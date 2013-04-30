@@ -12,7 +12,7 @@ open OUnit
 *)
 let test_fabs () =
   Ffi_raw.(Types.(
-    let callspec = allocate_bufferspec () in
+    let callspec = allocate_callspec () in
     let arg_1_offset = Ffi_raw.add_argument callspec double in
     let () = prep_callspec callspec double in
     
@@ -36,7 +36,7 @@ let test_fabs () =
 *)
 let test_pow () =
   Ffi_raw.(Types.(
-    let callspec = allocate_bufferspec () in
+    let callspec = allocate_callspec () in
     let arg_1_offset = Ffi_raw.add_argument callspec double in
     let arg_2_offset = Ffi_raw.add_argument callspec double in
     let () = prep_callspec callspec double in

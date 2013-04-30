@@ -100,6 +100,10 @@ external write : offset:int -> 'a ctype -> immediate_pointer -> 'a -> unit
 
 (* Allocate a new C call specification *)
 external allocate_bufferspec : unit -> bufferspec
+  = "ctypes_allocate_bufferspec"
+
+(* Allocate a new C call specification *)
+external allocate_callspec : unit -> bufferspec
   = "ctypes_allocate_callspec"
 
 (* Add an argument to the C call specification *)

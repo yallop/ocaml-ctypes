@@ -147,7 +147,7 @@ struct
       | Pointer reftype ->
         Writer ((fun {raw_ptr} -> raw_ptr), RawTypes.pointer)
       | FunctionPointer fn ->
-        let cs' = Raw.allocate_bufferspec () in
+        let cs' = Raw.allocate_callspec () in
         let cs = build_callspec fn cs' in
         Writer (create_function_pointer cs' cs, RawTypes.pointer)
 
@@ -176,7 +176,7 @@ struct
 
   and function_builder : 'a. 'a fn -> RawTypes.voidp -> 'a
     = fun fn ->
-      let c = Raw.allocate_bufferspec () in
+      let c = Raw.allocate_callspec () in
       let e = build_ccallspec fn c in
       invoke e [] c
 

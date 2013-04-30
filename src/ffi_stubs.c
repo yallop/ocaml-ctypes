@@ -278,15 +278,20 @@ static struct bufferspec {
   /* A null-terminated array of size `nelements' types */
   ffi_type **args;
 
+} bufferspec_prototype = {
+  0, 0, 0, BUILDING, NULL,
+};
+
+static struct callspec {
+  struct bufferspec bufferspec;
+
   /* return value offset */
   size_t roffset;
 
   /* The libffi call interface structure. */
-  /* TODO: perhaps use just a prefix of bufferspec for the struct
-     case, omitting roffset and cif. */
   ffi_cif cif;
-} bufferspec_prototype = {
-  0, 0, 0, BUILDING, NULL, -1
+} callspec_prototype = {
+  { 0, 0, 0, BUILDING, NULL }, -1,
 };
 
 void finalize_bufferspec(value v)
@@ -369,12 +374,21 @@ static void populate_callbuffer(struct bufferspec *bufferspec, callbuffer *buf, 
 }
 
 
-/* Allocate a new C call specification */
-/* allocate_callspec : unit -> bufferspec */
-value ctypes_allocate_callspec(value unit)
+/* Allocate a new C buffer specification */
+/* allocate_buffer : unit -> bufferspec */
+value ctypes_allocate_bufferspec(value unit)
 {
   return allocate_custom(&bufferspec_custom_ops,
                          sizeof(struct bufferspec),
+                         &bufferspec_prototype);
+}
+
+/* Allocate a new C call specification */
+/* allocate_callspec : unit -> callspec */
+value ctypes_allocate_callspec(value unit)
+{
+  return allocate_custom(&bufferspec_custom_ops,
+                         sizeof(struct callspec),
                          &bufferspec_prototype);
 }
 
@@ -410,16 +424,16 @@ value ctypes_add_argument(value bufferspec_, value argument_)
 
 /* Pass the return type and conclude the specification preparation */
 /* prep_callspec : bufferspec -> 'a ctype -> unit */
-value ctypes_prep_callspec(value bufferspec_, value rtype)
+value ctypes_prep_callspec(value callspec_, value rtype)
 {
-  CAMLparam2(bufferspec_, rtype);
+  CAMLparam2(callspec_, rtype);
 
-  struct bufferspec *bufferspec = Data_custom_val(bufferspec_);
+  struct callspec *callspec = Data_custom_val(callspec_);
   ffi_type *rffitype = (((struct type_info *)Data_custom_val(rtype)))->ffitype;
 
   /* Add the (aligned) space needed for the return value */
-  bufferspec->roffset = aligned_offset(bufferspec->bytes, rffitype->alignment);
-  bufferspec->bytes = bufferspec->roffset + rffitype->size;
+  callspec->roffset = aligned_offset(callspec->bufferspec.bytes, rffitype->alignment);
+  callspec->bufferspec.bytes = callspec->roffset + rffitype->size;
 
   /* Allocate an extra word after the return value space to work
      around a bug in libffi which causes it to write past the return
@@ -427,31 +441,32 @@ value ctypes_prep_callspec(value bufferspec_, value rtype)
 
         https://github.com/atgreen/libffi/issues/35
   */
-  bufferspec->bytes = aligned_offset(bufferspec->bytes, ffi_type_pointer.alignment);
-  bufferspec->bytes += ffi_type_pointer.size;
+  callspec->bufferspec.bytes = aligned_offset(callspec->bufferspec.bytes, ffi_type_pointer.alignment);
+  callspec->bufferspec.bytes += ffi_type_pointer.size;
 
-  ffi_status status = ffi_prep_cif(&bufferspec->cif,
+  ffi_status status = ffi_prep_cif(&callspec->cif,
                                    FFI_DEFAULT_ABI,
-                                   bufferspec->nelements,
+                                   callspec->bufferspec.nelements,
                                    rffitype,
-                                   bufferspec->args);
+                                   callspec->bufferspec.args);
 
   check_ffi_status(status);
 
-  bufferspec->state = CALLSPEC;
+  callspec->bufferspec.state = CALLSPEC;
   CAMLreturn(Val_unit);
 }
 
-/* Call the function specified by `bufferspec', passing arguments and return
+/* Call the function specified by `callspec', passing arguments and return
    values in `buffer' */
-/* call' : voidp -> bufferspec -> (buffer -> unit) -> (buffer -> 'a) -> 'a */
-value ctypes_call(value function, value bufferspec_, value argwriter, value rvreader)
+/* call' : voidp -> callspec -> (buffer -> unit) -> (buffer -> 'a) -> 'a */
+value ctypes_call(value function, value callspec_, value argwriter, value rvreader)
 {
-  CAMLparam4(function, bufferspec_, argwriter, rvreader);
+  CAMLparam4(function, callspec_, argwriter, rvreader);
 
   void (*cfunction)(void) = (void (*)(void))(void *)function;
-  struct bufferspec *bufferspec = Data_custom_val(bufferspec_);
-  int roffset = bufferspec->roffset;
+  struct callspec *callspec = Data_custom_val(callspec_);
+  struct bufferspec *bufferspec = (struct bufferspec *)callspec;
+  int roffset = callspec->roffset;
 
   assert(bufferspec->state == CALLSPEC);
 
@@ -465,7 +480,7 @@ value ctypes_call(value function, value bufferspec_, value argwriter, value rvre
 
   caml_callback(argwriter, (value)buffer);
 
-  ffi_call(&bufferspec->cif,
+  ffi_call(&callspec->cif,
            cfunction,
            return_slot,
            (void **)(buffer + aligned_offset(bufferspec->bytes, ffi_type_pointer.alignment)));
@@ -510,13 +525,13 @@ static void callback_handler(ffi_cif *cif,
 
 
 /* Construct a pointer to a boxed n-ary function */
-/* make_function_pointer : bufferspec -> boxedfn -> voidp */
-value ctypes_make_function_pointer(value bufferspec_, value boxedfn)
+/* make_function_pointer : callspec -> boxedfn -> voidp */
+value ctypes_make_function_pointer(value callspec_, value boxedfn)
 {
-  CAMLparam2(bufferspec_, boxedfn);
-  struct bufferspec *bufferspec = Data_custom_val(bufferspec_);
+  CAMLparam2(callspec_, boxedfn);
+  struct callspec *callspec = Data_custom_val(callspec_);
 
-  assert(bufferspec->state == CALLSPEC);
+  assert(callspec->bufferspec.state == CALLSPEC);
 
   void (*code_address)(void) = NULL;
 
@@ -535,7 +550,7 @@ value ctypes_make_function_pointer(value bufferspec_, value boxedfn)
 
     ffi_status status =  ffi_prep_closure_loc
       ((ffi_closure *)closure,
-       &bufferspec->cif,
+       &callspec->cif,
        callback_handler,
        &closure->fn,
        (void *)code_address);
@@ -550,7 +565,7 @@ value ctypes_make_function_pointer(value bufferspec_, value boxedfn)
 }
 
 
-/* _complete_struct_type : bufferspec -> _ctype */
+/* _complete_struct_type : callspec -> _ctype */
 value ctypes_complete_structspec(value bufferspec_)
 {
   CAMLparam1(bufferspec_);
