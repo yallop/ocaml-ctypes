@@ -38,7 +38,6 @@ value ctypes_resolve_dl_flag(value flag)
     case _RTLD_GLOBAL:   return RTLD_GLOBAL;
     case _RTLD_NODELETE: return RTLD_NODELETE;
     case _RTLD_NOLOAD:   return RTLD_NOLOAD;
-    case _RTLD_DEEPBIND: return RTLD_DEEPBIND;
     default: assert(0);
   }
 }
