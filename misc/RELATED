@@ -1,0 +1,41 @@
+Related projects
+
+== caml-foreign ==
+
+https://forge.ocamlcore.org/plugins/mediawiki/wiki/caml-foreign/index.php/Caml_Foreign_Home
+
+handles C++ a bit
+
+fun1, fun2, ..., funN interface
+
+fairly complicated interface (different modules for arguments and
+return types; awkward protocols for setting up calls)
+
+apparently not higher-order
+
+== dlopen in the Caml development kit ==
+
+http://pauillac.inria.fr/cdk/
+
+small, simple interface
+
+part @-> / part fun1, fun2, ..., funN interface
+
+apparently not higher-order
+
+doesn't seem to handle arrays
+
+handles structs in some sense
+
+
+== David Teller asking for an untyped version ==
+
+http://caml.inria.fr/pub/ml-archives/caml-list/2007/10/bd3002cee148ef28da5c1ab46bba487f.en.html
+
+== Jon Harrop asking for an untyped version ==
+
+http://caml.inria.fr/pub/ml-archives/caml-list/2007/12/45e71c0e2339604e47051e61c8208831.en.html
+
+== Stephen McCracken asking for NLFFI ==
+
+http://caml.inria.fr/pub/ml-archives/caml-list/2002/05/0f4ef597d43f4a8540a4eb6d69116a39.fr.html

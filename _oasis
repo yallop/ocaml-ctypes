@@ -1,0 +1,130 @@
+OASISFormat: 0.3
+Name:        ffi
+Version:     0.1
+Synopsis:    Manipulate external buffers as C-like structs
+Authors:     Jeremy Yallop
+License:     MIT
+Plugins:     META (0.3)
+BuildTools:  ocamlbuild
+
+Library ffi
+  Path:             src/
+  Findlibname:      ffi
+  Modules:          Ffi
+  InternalModules:  Ffi_raw,Dl
+  CSources:         ffi_stubs.c,dl_stubs.c
+  CCLib:            -lffi
+  CCOpt:            -fPIC -Wall -Wno-unused-variable -g
+#  ByteOpt:          -warn-error A
+
+Library fts
+  Path:             examples/fts
+  Findlibname:      fts
+  Modules:          Fts
+  BuildDepends:     ffi
+
+Executable test_ffi_raw
+  Path:             tests
+  MainIs:           test_raw.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     unix,ffi,oUnit
+  Custom:           true
+
+Executable test_ffi_pointers
+  Path:             tests
+  MainIs:           test_pointers.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     unix,ffi,oUnit
+  Custom:           true
+
+Executable test_ffi_higher_order
+  Path:             tests
+  MainIs:           test_higher_order.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     unix,ffi,oUnit
+  Custom:           true
+
+Executable test_ffi_structs
+  Path:             tests
+  MainIs:           test_structs.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     unix,ffi,oUnit
+  Custom:           true
+
+Executable test_ffi_cstdlib
+  Path:             tests
+  MainIs:           test_cstdlib.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     unix,ffi,oUnit
+  Custom:           true
+
+Executable test_ffi_sizeof
+  Path:             tests
+  MainIs:           test_sizeof.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     unix,ffi,oUnit
+  Custom:           true
+
+Executable test_ffi_arrays
+  Path:             tests
+  MainIs:           test_array.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     unix,ffi,oUnit
+  Custom:           true
+
+Executable struct_subtyping
+  Path:             examples/struct-subtyping
+  MainIs:           struct_subtyping.ml
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     unix,ffi,oUnit
+  Custom:           true
+
+Test test_ffi_raw
+  Run$:             flag(tests)
+  Command:          $test_ffi_raw
+  WorkingDirectory: tests
+
+Test test_ffi_pointers
+  Run$:             flag(tests)
+  Command:          $test_ffi_pointers
+  WorkingDirectory: tests
+
+Test test_ffi_higher_order
+  Run$:             flag(tests)
+  Command:          $test_ffi_higher_order
+  WorkingDirectory: tests
+
+Test test_ffi_structs
+  Run$:             flag(tests)
+  Command:          $test_ffi_structs
+  WorkingDirectory: tests
+
+Test test_ffi_cstdlib
+  Run$:             flag(tests)
+  Command:          $test_ffi_cstdlib
+  WorkingDirectory: tests
+
+Test test_ffi_sizeof
+  Run$:             flag(tests)
+  Command:          $test_ffi_sizeof
+  WorkingDirectory: tests
+
+Test test_ffi_arrays
+  Run$:             flag(tests)
+  Command:          $test_ffi_arrays
+  WorkingDirectory: tests

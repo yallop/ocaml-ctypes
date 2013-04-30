@@ -1,0 +1,77 @@
+# OASIS_START
+# DO NOT EDIT (digest: 663546fb0d01239f97128b0ab959e233)
+# Ignore VCS directories, you can use the same kind of rule outside 
+# OASIS_START/STOP if you want to exclude directories that contains 
+# useless stuff for the build process
+<**/.svn>: -traverse
+<**/.svn>: not_hygienic
+".bzr": -traverse
+".bzr": not_hygienic
+".hg": -traverse
+".hg": not_hygienic
+".git": -traverse
+".git": not_hygienic
+"_darcs": -traverse
+"_darcs": not_hygienic
+# Library ffi
+"src/ffi.cmxs": use_ffi
+<src/*.ml{,i}>: oasis_library_ffi_ccopt
+"src/ffi_stubs.c": oasis_library_ffi_ccopt
+"src/dl_stubs.c": oasis_library_ffi_ccopt
+<src/ffi.{cma,cmxa}>: oasis_library_ffi_cclib
+"src/libffi_stubs.lib": oasis_library_ffi_cclib
+"src/dllffi_stubs.dll": oasis_library_ffi_cclib
+"src/libffi_stubs.a": oasis_library_ffi_cclib
+"src/dllffi_stubs.so": oasis_library_ffi_cclib
+<src/ffi.{cma,cmxa}>: use_libffi_stubs
+# Library fts
+"examples/fts/fts.cmxs": use_fts
+<examples/fts/*.ml{,i}>: use_ffi
+# Executable test_ffi_raw
+<tests/test_raw.{native,byte}>: use_ffi
+<tests/test_raw.{native,byte}>: pkg_unix
+<tests/test_raw.{native,byte}>: pkg_oUnit
+<tests/test_raw.{native,byte}>: custom
+# Executable test_ffi_pointers
+<tests/test_pointers.{native,byte}>: use_ffi
+<tests/test_pointers.{native,byte}>: pkg_unix
+<tests/test_pointers.{native,byte}>: pkg_oUnit
+<tests/test_pointers.{native,byte}>: custom
+# Executable test_ffi_higher_order
+<tests/test_higher_order.{native,byte}>: use_ffi
+<tests/test_higher_order.{native,byte}>: pkg_unix
+<tests/test_higher_order.{native,byte}>: pkg_oUnit
+<tests/test_higher_order.{native,byte}>: custom
+# Executable test_ffi_structs
+<tests/test_structs.{native,byte}>: use_ffi
+<tests/test_structs.{native,byte}>: pkg_unix
+<tests/test_structs.{native,byte}>: pkg_oUnit
+<tests/test_structs.{native,byte}>: custom
+# Executable test_ffi_cstdlib
+<tests/test_cstdlib.{native,byte}>: use_ffi
+<tests/test_cstdlib.{native,byte}>: pkg_unix
+<tests/test_cstdlib.{native,byte}>: pkg_oUnit
+<tests/test_cstdlib.{native,byte}>: custom
+# Executable test_ffi_sizeof
+<tests/test_sizeof.{native,byte}>: use_ffi
+<tests/test_sizeof.{native,byte}>: pkg_unix
+<tests/test_sizeof.{native,byte}>: pkg_oUnit
+<tests/test_sizeof.{native,byte}>: custom
+# Executable test_ffi_arrays
+<tests/test_array.{native,byte}>: use_ffi
+<tests/test_array.{native,byte}>: pkg_unix
+<tests/test_array.{native,byte}>: pkg_oUnit
+<tests/*.ml{,i}>: use_ffi
+<tests/*.ml{,i}>: pkg_unix
+<tests/*.ml{,i}>: pkg_oUnit
+<tests/test_array.{native,byte}>: custom
+# Executable struct_subtyping
+<examples/struct-subtyping/struct_subtyping.{native,byte}>: use_ffi
+<examples/struct-subtyping/struct_subtyping.{native,byte}>: pkg_unix
+<examples/struct-subtyping/struct_subtyping.{native,byte}>: pkg_oUnit
+<examples/struct-subtyping/*.ml{,i}>: use_ffi
+<examples/struct-subtyping/*.ml{,i}>: pkg_unix
+<examples/struct-subtyping/*.ml{,i}>: pkg_oUnit
+<examples/struct-subtyping/struct_subtyping.{native,byte}>: custom
+# OASIS_STOP
+<tests/clib/*>: not_hygienic
