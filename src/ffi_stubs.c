@@ -42,17 +42,13 @@
     raw_write_ ## MUNGENAME,                                                   \
   };                                                                           \
                                                                                \
-  value ctypes_ ## MUNGENAME ## _type_info2(value _)                           \
-  {                                                                            \
-    return ((value)&_ ## MUNGENAME ## _type_info);                             \
-  }                                                                            \
   value ctypes_ ## MUNGENAME ## _type_info(value unit)                         \
   {                                                                            \
     CAMLparam1(unit);                                                          \
     CAMLlocal1(block);                                                         \
-    block = ctypes_allocate_type_info(unit); /* TODO: skip memcpy */           \
-    struct type_info *ti = Data_custom_val(block);                             \
-    memcpy(ti, &_ ## MUNGENAME ## _type_info, sizeof *ti);                     \
+    block = allocate_custom(&type_info_custom_ops,                             \
+                            sizeof(struct type_info),                          \
+                            &_ ## MUNGENAME ## _type_info);                    \
     CAMLreturn (block);                                                        \
   }                                                                            \
 
