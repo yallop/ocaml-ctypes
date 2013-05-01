@@ -85,6 +85,11 @@ int callback_returns_funptr(vintfun *(*callback)(int), int x)
 }
 
 
+int *pass_pointer_through(int *a, int *b, int i)
+{
+  return (i >= 0) ? a : b;
+}
+
 struct simple {
   int i;
   double f;
