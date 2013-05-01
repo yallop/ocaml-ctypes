@@ -77,6 +77,15 @@ Executable test_ffi_sizeof
   BuildDepends:     unix,ffi,oUnit
   Custom:           true
 
+Executable test_ffi_unions
+  Path:             tests
+  MainIs:           test_unions.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     unix,ffi,oUnit
+  Custom:           true
+
 Executable test_ffi_arrays
   Path:             tests
   MainIs:           test_array.ml
@@ -127,4 +136,9 @@ Test test_ffi_sizeof
 Test test_ffi_arrays
   Run$:             flag(tests)
   Command:          $test_ffi_arrays
+  WorkingDirectory: tests
+
+Test test_ffi_unions
+  Run$:             flag(tests)
+  Command:          $test_ffi_unions
   WorkingDirectory: tests

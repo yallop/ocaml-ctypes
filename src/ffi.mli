@@ -6,6 +6,7 @@ sig
   type +'a structure
   type 'a union
 
+  exception Unsupported of string
   exception IncompleteType
 
   val sizeof : 'a typ -> int

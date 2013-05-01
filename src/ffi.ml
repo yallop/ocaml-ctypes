@@ -3,6 +3,7 @@
 module C =
 struct
   exception IncompleteType
+  exception Unsupported of string
 
   module Raw = Ffi_raw
   module RawTypes = Ffi_raw.Types
@@ -61,6 +62,8 @@ struct
       | Primitive p               -> RawTypes.alignment p
       | Struct { ctype = None }   -> raise IncompleteType
       | Struct { ctype = Some p } -> RawTypes.alignment p
+      | Union { ucomplete=false } -> raise IncompleteType
+      | Union { ualignment }      -> ualignment
       | Array (t, i)              -> alignment t
       | Pointer _                 -> RawTypes.(alignment pointer)
       | FunctionPointer _         -> RawTypes.(alignment pointer)
@@ -146,6 +149,8 @@ struct
         raise IncompleteType
       | Struct ({ctype=Some p} as stype) ->
         Reader ((fun managed -> {managed; stype; raw_ptr' = Raw.managed_secret managed}), p)
+      | Union _ ->
+        raise (Unsupported "Passing or returning union by value")
       | Pointer reftype ->
         Reader ((fun raw_ptr -> {pbyte_offset=0; reftype; raw_ptr; pmanaged=None}), RawTypes.pointer)
       | FunctionPointer f ->
@@ -165,6 +170,8 @@ struct
         raise IncompleteType
       | Struct {ctype=Some p} ->
         Writer ((fun {managed} -> managed), p)
+      | Union _ ->
+        raise (Unsupported "Passing or returning union by value")
       | Pointer reftype ->
         Writer ((fun {raw_ptr} -> raw_ptr), RawTypes.pointer)
       | FunctionPointer fn ->
@@ -225,6 +232,7 @@ struct
           | Array (elemtype, alength) ->
             ({ astart = {ptr with reftype = elemtype};
                alength } : a)
+          | Union _ -> {union = ptr }
           | _ -> let Reader (from_prim, ctype) = reader reftype in
                  from_prim (Raw.read ~offset ctype raw_ptr)
 
