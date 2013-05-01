@@ -13,6 +13,13 @@ struct
     mutable ctype: 'a Raw.structure RawTypes.ctype option
   }
 
+  type 'a union_type = {
+    utag: string;
+    mutable ucomplete: bool;
+    mutable usize: int;
+    mutable ualignment: int;
+  }
+
   type 'a structure = { managed : Raw.managed_buffer;
                         raw_ptr' : Raw.immediate_pointer;
                         stype : 'a structure_type }
@@ -22,6 +29,7 @@ struct
     | Primitive : 'a RawTypes.ctype -> 'a typ
     | Pointer : 'a typ -> 'a ptr typ
     | Struct : 'a structure_type -> 'a structure typ
+    | Union : 'a union_type -> 'a union typ
     | Array : 'a typ * int -> 'a array typ
     | FunctionPointer : ('a -> 'b) fn -> ('a -> 'b) typ
   and _ fn =
@@ -33,6 +41,7 @@ struct
                  pbyte_offset : int }
   and 'a array = { astart: 'a ptr;
                    alength : int }
+  and 'a union = { union : 'a union ptr }
 
   let rec sizeof : 'a. 'a typ -> int
     = fun (type a) (t : a typ) -> match t with
@@ -40,9 +49,21 @@ struct
       | Primitive p               -> RawTypes.sizeof p
       | Struct { ctype = None }   -> raise IncompleteType
       | Struct { ctype = Some p } -> RawTypes.sizeof p
+      | Union { ucomplete=false } -> raise IncompleteType
+      | Union { usize }           -> usize
       | Array (t, i)              -> i * sizeof t
       | Pointer _                 -> RawTypes.(sizeof pointer)
       | FunctionPointer _         -> RawTypes.(sizeof pointer)
+
+  let rec alignment : 'a. 'a typ -> int
+    = fun (type a) (t : a typ) -> match t with
+        Void                      -> raise IncompleteType
+      | Primitive p               -> RawTypes.alignment p
+      | Struct { ctype = None }   -> raise IncompleteType
+      | Struct { ctype = Some p } -> RawTypes.alignment p
+      | Array (t, i)              -> alignment t
+      | Pointer _                 -> RawTypes.(alignment pointer)
+      | FunctionPointer _         -> RawTypes.(alignment pointer)
 
   (* TODO: we could dispense with these type and the accompanying
      interpretations.  It'd probably make things more efficient, for
@@ -337,6 +358,29 @@ struct
     let addr { managed; raw_ptr'=raw_ptr ; stype } =
       { reftype = Struct stype; pmanaged = Some managed;
         raw_ptr; pbyte_offset = 0 }
+  end
+
+  module Union =
+  struct
+    type 's t = 's union = { union: 's union ptr }
+    type ('a, 's) field  = 'a typ
+        
+    let tag utag = Union {utag; usize = 0; ualignment = 0; ucomplete = false}
+    let seal (Union u) = u.ucomplete <- true
+
+    let ( *:* ) (Union u) ftype =
+      begin
+        u.usize <- max u.usize (sizeof ftype);
+        u.ualignment <- max u.ualignment (alignment ftype);
+        ftype
+      end
+
+    let make t = { union = Ptr.allocate t }
+    let (@.) {union} reftype = {union with reftype}
+    let (|->) p reftype = {p with reftype}
+    let setf s field v = Ptr.((s @. field) := v)
+    let getf s field = Ptr.(!(s @. field))
+    let addr {union} = union
   end
 
   module Type =

@@ -4,6 +4,7 @@ module Types :
 sig
   type 'a ctype
   external sizeof : _ ctype -> int = "ctypes_sizeof"
+  external alignment : _ ctype -> int = "ctypes_alignment"
 
   type voidp
   val null : voidp
@@ -31,6 +32,8 @@ struct
   type voidp
 
   external sizeof : _ ctype -> int = "ctypes_sizeof"
+
+  external alignment : _ ctype -> int = "ctypes_alignment"
 
   external _int_type_info : unit -> int ctype = "ctypes_int_type_info"
   let int = _int_type_info ()

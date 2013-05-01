@@ -225,6 +225,12 @@ value ctypes_sizeof(value typespec)
   return Val_int(((struct type_info *)(Data_custom_val(typespec)))->ffitype->size);
 }
 
+/* alignment : _ctype -> int */
+value ctypes_alignment(value typespec)
+{
+  return Val_int(((struct type_info *)(Data_custom_val(typespec)))->ffitype->alignment);
+}
+
 static void check_ffi_status(ffi_status status)
 {
   switch (status)
