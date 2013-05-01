@@ -76,7 +76,7 @@ let test_sizeof_structs () = Type.(
       for i = 1 to 10 do
         let homogeneous : h structure typ = tag "h" in
         for j = 1 to i do
-          homogeneous *:* int;
+          ignore (homogeneous *:* int);
         done;
         seal homogeneous;
         assert_equal (i * sizeof int) (sizeof homogeneous)
