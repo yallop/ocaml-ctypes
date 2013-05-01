@@ -141,10 +141,9 @@ struct
         (Reader (id, RawTypes.void) : a reader)
       | Primitive p ->
         Reader (id, p)
-      | Array (reftype, n) ->
-        (* TODO: (NB: arrays have non-copying semantics.  We'll need a new
-           primitive ctype, I think.). *)
-        assert false
+      | Array (reftype, alength) ->
+        let Reader (f, t) = reader (Pointer reftype) in
+        Reader ((fun p -> {astart = f p; alength}), t)
       | Struct {ctype=None} ->
         raise IncompleteType
       | Struct ({ctype=Some p} as stype) ->
@@ -152,7 +151,8 @@ struct
       | Union _ ->
         raise (Unsupported "Passing or returning union by value")
       | Pointer reftype ->
-        Reader ((fun raw_ptr -> {pbyte_offset=0; reftype; raw_ptr; pmanaged=None}), RawTypes.pointer)
+        Reader ((fun raw_ptr ->
+          {pbyte_offset=0; reftype; raw_ptr; pmanaged=None}), RawTypes.pointer)
       | FunctionPointer f ->
         Reader (function_builder f, RawTypes.pointer)
 
@@ -162,10 +162,9 @@ struct
         (Writer (id, RawTypes.void) : a writer)
       | Primitive p ->
         Writer (id, p)
-      | Array (reftype, n) ->
-        (* TODO: (NB: arrays have non-copying semantics.  We'll need a new
-           primitive ctype, I think.). *)
-        assert false
+      | Array (reftype, alength) ->
+        let Writer (f, t) = writer (Pointer reftype) in
+        Writer ((fun {astart} -> f astart), t)
       | Struct {ctype=None} ->
         raise IncompleteType
       | Struct {ctype=Some p} ->
@@ -340,6 +339,7 @@ struct
           | Pointer p                -> add_argument RawTypes.pointer
           | Struct {ctype=None}      -> raise IncompleteType
           | Struct {ctype=Some ctyp} -> add_argument ctyp
+          | Union _                  -> assert false (* TODO *)
           | FunctionPointer _        -> add_argument RawTypes.pointer
         in
         { ftype; foffset }

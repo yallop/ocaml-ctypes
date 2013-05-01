@@ -90,7 +90,8 @@ open Types
 type bufferspec
 
 (* An immediate pointer to a block of memory, not managed by the
-   garbage collector, into which we can read/write C values *)
+   garbage collector, into which we can read/write C values.  Note:
+   the pointer *must* be word-aligned. *)
 type immediate_pointer = voidp
 
 (* Read a C value from a block of memory *)
