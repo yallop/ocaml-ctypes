@@ -79,8 +79,10 @@ let test_reading_and_writing_global_value () = Ptr.(
   assert_equal (!ptr) 100;
   ptr := 200;
   assert_equal (!ptr) 200;
-  ptr := 100;
+  assert_equal (!ptr') 200;
+  ptr' := 100;
   assert_equal (!ptr) 100;
+  assert_equal (!ptr') 100;
   )
 
 
@@ -114,6 +116,25 @@ let test_reading_returned_global () =
 (*
   [TODO]
 *)
+let test_passing_pointer_through () =
+  let open Type in
+  let open Ptr in
+  let pass_pointer_through = 
+    foreign "pass_pointer_through" Type.(ptr int @-> ptr int @-> int @-> returning (ptr int)) 
+      ~from:testlib in
+  let p1 = Ptr.make int 25 in
+  let p2 = Ptr.make int 32 in
+  let rv = pass_pointer_through p1 p2 10 in
+  assert_equal !rv !p1;
+  assert_equal 25 !rv;
+  let rv = pass_pointer_through p1 p2 (-10) in
+  assert_equal !rv !p2;
+  assert_equal 32 !rv
+
+
+(*
+  [TODO]
+*)
 let test_pointer_arithmetic () =
   (* TODO *)
   ()
@@ -132,6 +153,7 @@ let suite = "Pointer tests" >:::
 
    "global value" >:: test_reading_and_writing_global_value;
    "allocation" >:: test_allocation;
+   "passing pointers through functions" >:: test_passing_pointer_through;
    "returned globals" >:: test_reading_returned_global;
    "arithmetic" >:: test_pointer_arithmetic;
   ]
