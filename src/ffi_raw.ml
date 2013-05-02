@@ -148,6 +148,10 @@ external allocate : int -> managed_buffer
 external managed_secret : managed_buffer -> immediate_pointer
   = "ctypes_managed_secret"
 
+(* Obtain the address of the managed block. *)
+external pointer_plus : immediate_pointer -> int -> immediate_pointer
+  = "ctypes_pointer_plus"
+
 (* An internal error: for example, an `ffi_type' object passed to
    ffi_prep_cif was incorrect. *)
 exception Ffi_internal_error of string

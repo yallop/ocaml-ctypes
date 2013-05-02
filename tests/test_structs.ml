@@ -94,9 +94,51 @@ let test_returning_struct () =
   end in ()
 
 
+(*
+  Test reading and writing pointers to struct members.
+*)
+let test_pointers_to_struct_members () =
+  let module M = struct
+    open Type
+    open Struct
+    type s
+
+    let styp : s structure typ = tag "s"
+    let i = styp *:* int
+    let j = styp *:* int
+    let k = styp *:* ptr int
+    let () = seal styp
+
+    let s = make styp
+
+    let () = Ptr.(begin
+      let sp = addr s in
+      sp |-> i := 10;
+      sp |-> j := 20;
+      sp |-> k := sp |-> i;
+      assert_equal ~msg:"sp->i = 10" ~printer:string_of_int
+        10 (!(sp |-> i));
+      assert_equal ~msg:"sp->j = 20" ~printer:string_of_int
+        20 (!(sp |-> j));
+      assert_equal ~msg:"*sp->k = 10" ~printer:string_of_int
+        10 (!(!(sp |-> k)));
+      (sp |-> k) := (sp |-> j);
+      assert_equal ~msg:"*sp->k = 20" ~printer:string_of_int
+        20 (!(!(sp |-> k)));
+      sp |-> i := 15;
+      sp |-> j := 25;
+      assert_equal ~msg:"*sp->k = 25" ~printer:string_of_int
+        25 (!(!(sp |-> k)));
+      sp |-> k := sp |-> i;
+      assert_equal ~msg:"*sp->k = 15" ~printer:string_of_int
+        15 (!(!(sp |-> k)));
+    end)
+  end in ()
+
 let suite = "Struct tests" >:::
   ["passing struct" >:: test_passing_struct;
    "returning struct" >:: test_returning_struct;
+   "pointers to struct members" >:: test_pointers_to_struct_members;
   ]
 
 

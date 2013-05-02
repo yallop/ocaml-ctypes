@@ -172,7 +172,8 @@ struct
       | Union _ ->
         raise (Unsupported "Passing or returning union by value")
       | Pointer reftype ->
-        Writer ((fun {raw_ptr} -> raw_ptr), RawTypes.pointer)
+        Writer ((fun {raw_ptr; pbyte_offset} -> Raw.pointer_plus raw_ptr pbyte_offset),
+                RawTypes.pointer)
       | FunctionPointer fn ->
         let cs' = Raw.allocate_callspec () in
         let cs = build_callspec fn cs' in

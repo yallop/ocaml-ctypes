@@ -606,3 +606,10 @@ value ctypes_managed_secret(value managed_buffer)
 {
   return (value)(*(void **)Data_custom_val(managed_buffer));
 }
+
+/* pointer_plus : char* -> int -> char* */
+value ctypes_pointer_plus(value ptr, value i)
+{
+  /* TODO: we should perhaps check that the result is word-aligned */
+  return (value)(((char*)ptr) + Int_val(i));
+}
