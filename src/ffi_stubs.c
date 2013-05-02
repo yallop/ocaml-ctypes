@@ -9,6 +9,7 @@
 #include <ffi.h>
 
 #include <assert.h>
+#include <limits.h>
 #include <string.h>
 
 #include <stdint.h>
@@ -165,9 +166,12 @@ static void *Cast_to_voidp(value p) { return (void *)p; }
 
 make_primitive_interface(Val_int, Int_val, int8_t, int8_t, ffi_type_sint8)
 make_primitive_interface(Val_int, Int_val, int16_t, int16_t, ffi_type_sint16)
-make_primitive_interface(Val_int, Int_val, uint8_t, uint8_t, ffi_type_uint8)
-make_primitive_interface(Val_int, Int_val, unsigned char, char, ffi_type_schar)
-make_primitive_interface(Val_int, Int_val, unsigned char, uchar, ffi_type_uchar)
+make_primitive_interface(Val_int, Int_val, signed char, schar, ffi_type_schar)
+#if CHAR_MIN < 0
+make_primitive_interface(Val_int, Int_val, signed char, char, ffi_type_schar)
+#else
+make_primitive_interface(Val_int, Int_val, unsigned char, char, ffi_type_uchar)
+#endif
 make_primitive_interface(Val_int, Int_val, int, int, ffi_type_sint)
 make_primitive_interface(Val_int, Int_val, short, short, ffi_type_sshort)
 make_primitive_interface(caml_copy_int32, Int32_val, int32_t, int32_t, ffi_type_sint32)
@@ -176,22 +180,77 @@ make_primitive_interface(caml_copy_double, Double_val, double, double, ffi_type_
 make_primitive_interface(caml_copy_double, Double_val, float, float, ffi_type_float)
 make_primitive_interface(Cast_from_voidp, Cast_to_voidp, void *, voidp, ffi_type_pointer)
 make_primitive_interface(caml_copy_nativeint, Nativeint_val, int, nativeint, ffi_type_sint)
+
 /* TODO: this is probably not really safe.  Receiving strings from C
    is fine, but passing strings to C means passing a pointer to an
    object that the GC may move.  Perhaps we can copy the string into
    safer storage (e.g. a managed_buffer) before the call.
  */
 make_primitive_interface(caml_copy_string, String_val, char *, string, ffi_type_pointer)
-/* TODO: support
-ffi_type_ushort
-ffi_type_uint
-ffi_type_ulong
-ffi_type_slong
-ffi_type_longdouble
-ffi_type_uint16
-ffi_type_uint32
-ffi_type_uint64
-*/
+#define Uint8_val(V) (*((uint8_t *) Data_custom_val(V)))
+#define Uint16_val(V) (*((uint8_t *) Data_custom_val(V)))
+#define Uint32_val(V) (*((uint8_t *) Data_custom_val(V)))
+#define Uint64_val(V) (*((uint8_t *) Data_custom_val(V)))
+extern value caml_copy_uint8(uint8_t);
+extern value caml_copy_uint16(uint16_t);
+extern value caml_copy_uint32(uint32_t);
+extern value caml_copy_uint64(uint64_t);
+make_primitive_interface(caml_copy_uint8, Uint8_val, uint8_t, uint8_t, ffi_type_uint8)
+make_primitive_interface(caml_copy_uint16, Uint16_val, uint16_t, uint16_t, ffi_type_uint16)
+make_primitive_interface(caml_copy_uint32, Uint32_val, uint32_t, uint32_t, ffi_type_uint32)
+make_primitive_interface(caml_copy_uint64, Uint64_val, uint64_t, uint64_t, ffi_type_uint64)
+make_primitive_interface(caml_copy_uint8, Uint8_val, unsigned char, uchar, ffi_type_uchar)
+
+/* short is at least 16 bits. */
+#if USHRT_MAX == 65535U
+  make_primitive_interface(caml_copy_uint16, Uint16_val, unsigned short, ushort, ffi_type_uint16)
+#elif USHRT_MAX == 4294967295UL
+  make_primitive_interface(caml_copy_uint32, Uint32_val, unsigned short, ushort, ffi_type_uint32)
+#elif USHRT_MAX == 18446744073709551615ULL
+  make_primitive_interface(caml_copy_uint64, Uint64_val, unsigned short, ushort, ffi_type_uint64)
+#else
+# error "No suitable OCaml type available for representing unsigned short values"
+#endif
+
+/* int is at least 16 bits. */
+#if UINT_MAX == 65535U
+  make_primitive_interface(caml_copy_uint16, Uint16_val, unsigned int, uint, ffi_type_uint16)
+#elif UINT_MAX == 4294967295UL
+  make_primitive_interface(caml_copy_uint32, Uint32_val, unsigned int, uint, ffi_type_uint32)
+#elif UINT_MAX == 18446744073709551615ULL
+  make_primitive_interface(caml_copy_uint64, Uint64_val, unsigned int, uint, ffi_type_uint64)
+#else
+# error "No suitable OCaml type available for representing unsigned int values"
+#endif
+
+/* long is at least 32 bits. */
+#if LONG_MAX == 2147483647L
+  make_primitive_interface(caml_copy_int32, Int32_val, long, long, ffi_type_sint32)
+  make_primitive_interface(caml_copy_uint32, Uint32_val, unsigned long, ulong, ffi_type_uint32)
+#elif LONG_MAX == 9223372036854775807LL
+  make_primitive_interface(caml_copy_int64, Int64_val, long, long, ffi_type_sint64)
+  make_primitive_interface(caml_copy_uint64, Uint64_val, unsigned long, ulong, ffi_type_uint64)
+#else
+# error "No suitable OCaml type available for representing longs"
+#endif
+
+/* long long is at least 64 bits. */
+#if LLONG_MAX == 9223372036854775807LL
+  make_primitive_interface(caml_copy_int64, Int64_val, long long, llong, ffi_type_sint64)
+  make_primitive_interface(caml_copy_uint64, Uint64_val, unsigned long long, ullong, ffi_type_uint64)
+#else 
+# error "No suitable OCaml type available for representing longs"
+#endif
+
+#if SIZE_MAX == 65535U
+  make_primitive_interface(caml_copy_uint16, Uint16_val, size_t, size_t, ffi_type_uint16)
+#elif SIZE_MAX == 4294967295UL
+  make_primitive_interface(caml_copy_uint32, Uint32_val, size_t, size_t, ffi_type_uint32)
+#elif SIZE_MAX == 18446744073709551615ULL
+  make_primitive_interface(caml_copy_uint64, Uint64_val, size_t, size_t, ffi_type_uint64)
+#else
+# error "No suitable OCaml type available for representing size_t values"
+#endif
 
 static value raw_read_void(struct type_info *ti, void *buf) { return Val_unit; }
 static value raw_write_void(struct type_info *ti, void *buf, value cv) { return Val_unit; }

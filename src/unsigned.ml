@@ -214,4 +214,4 @@ module Uchar : S = Uint8
 module UShort : S = (val pick ~size:(ushort_size ()))
 module UInt : S = (val pick ~size:(uint_size ()))
 module ULong : S = (val pick ~size:(ulong_size ()))
-module ULongLong : S = (val pick ~size:(ulonglong_size ()))
+module ULLong : S = (val pick ~size:(ulonglong_size ()))

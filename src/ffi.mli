@@ -13,6 +13,8 @@ sig
 
   module Type :
   sig
+    open Unsigned
+
     type 'a t = 'a typ
     type 'a f
 
@@ -27,8 +29,16 @@ sig
     val int16_t : int t
     val int32_t : int32 t
     val int64_t : int64 t
-    val uchar : int t
-    val uint8_t : int t
+    val uchar : Uchar.t t
+    val uint8_t : Uint8.t t
+    val uint16_t : Uint16.t t
+    val uint32_t : Uint32.t t
+    val uint64_t : Uint64.t t
+    val size_t : Size_t.t t
+    val ushort : UShort.t t
+    val uint : UInt.t t
+    val ulong : ULong.t t
+    val ullong : ULLong.t t
 
     val string : string t
 

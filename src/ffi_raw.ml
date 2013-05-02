@@ -2,6 +2,8 @@
 
 module Types :
 sig
+  open Unsigned
+
   type 'a ctype
   external sizeof : _ ctype -> int = "ctypes_sizeof"
   external alignment : _ ctype -> int = "ctypes_alignment"
@@ -15,19 +17,29 @@ sig
   val char : char ctype
   val float : float ctype
   val double : float ctype
+  val short : int ctype
   val int : int ctype
   val nativeint : nativeint ctype
   val int8_t : int ctype
   val int16_t : int ctype
-  val short : int ctype
   val int32_t : int32 ctype
   val int64_t : int64 ctype
-  val uchar : int ctype
-  val uint8_t : int ctype
+  val uchar : Uchar.t ctype
+  val uint8_t : Uint8.t ctype
+  val uint16_t : Uint16.t ctype
+  val uint32_t : Uint32.t ctype
+  val uint64_t : Uint64.t ctype
+  val size_t : Size_t.t ctype
+  val ushort : UShort.t ctype
+  val uint : UInt.t ctype
+  val ulong : ULong.t ctype
+  val ullong : ULLong.t ctype
 
   val string : string ctype
 end =
 struct
+  open Unsigned
+
   type 'a ctype
   type voidp
 
@@ -51,34 +63,58 @@ struct
   let void = _void_type_info ()
 
   external _int8_t_type_info : unit -> int ctype = "ctypes_int8_t_type_info"
-  let int8_t = _int8_t_type_info()
+  let int8_t = _int8_t_type_info ()
 
   external _int16_t_type_info : unit -> int ctype = "ctypes_int16_t_type_info"
-  let int16_t = _int16_t_type_info()
-
-  external _uint8_t_type_info : unit -> int ctype = "ctypes_uint8_t_type_info"
-  let uint8_t = _uint8_t_type_info()
+  let int16_t = _int16_t_type_info ()
 
   external _char_type_info : unit -> char ctype = "ctypes_char_type_info"
-  let char = _char_type_info()
-
-  external _uchar_type_info : unit -> int ctype = "ctypes_uchar_type_info"
-  let uchar = _uchar_type_info()
+  let char = _char_type_info ()
 
   external _short_type_info : unit -> int ctype = "ctypes_short_type_info"
-  let short = _short_type_info()
+  let short = _short_type_info ()
 
   external _int32_t_type_info : unit -> int32 ctype = "ctypes_int32_t_type_info"
-  let int32_t = _int32_t_type_info()
+  let int32_t = _int32_t_type_info ()
 
   external _int64_t_type_info : unit -> int64 ctype = "ctypes_int64_t_type_info"
-  let int64_t = _int64_t_type_info()
+  let int64_t = _int64_t_type_info ()
 
   external _float_type_info : unit -> float ctype = "ctypes_float_type_info"
-  let float = _float_type_info()
+  let float = _float_type_info ()
 
   external _string_type_info : unit -> string ctype = "ctypes_string_type_info"
-  let string = _string_type_info()
+  let string = _string_type_info ()
+
+  external _uchar_type_info : unit -> Uchar.t ctype = "ctypes_uchar_type_info"
+  let uchar = _uchar_type_info ()
+
+  external _uint8_t_type_info : unit -> Uint8.t ctype = "ctypes_uint8_t_type_info"
+  let uint8_t = _uint8_t_type_info ()
+
+  external _uint16_t_type_info : unit -> Uint16.t ctype = "ctypes_uint16_t_type_info"
+  let uint16_t = _uint16_t_type_info ()
+
+  external _uint32_t_type_info : unit -> Uint32.t ctype = "ctypes_uint32_t_type_info"
+  let uint32_t = _uint32_t_type_info ()
+
+  external _uint64_t_type_info : unit -> Uint64.t ctype = "ctypes_uint64_t_type_info"
+  let uint64_t = _uint64_t_type_info ()
+
+  external _size_t_type_info : unit -> Size_t.t ctype = "ctypes_size_t_type_info"
+  let size_t = _size_t_type_info ()
+
+  external _ushort_type_info : unit -> UShort.t ctype = "ctypes_ushort_type_info"
+  let ushort = _ushort_type_info ()
+
+  external _uint_type_info : unit -> UInt.t ctype = "ctypes_uint_type_info"
+  let uint = _uint_type_info ()
+
+  external _ulong_type_info : unit -> ULong.t ctype = "ctypes_ulong_type_info"
+  let ulong = _ulong_type_info ()
+
+  external _ullong_type_info : unit -> ULLong.t ctype = "ctypes_ullong_type_info"
+  let ullong = _ullong_type_info ()
 
   external _null : unit -> voidp = "ctypes_null_value"
   let null = _null ()

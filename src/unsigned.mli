@@ -44,5 +44,6 @@ module Uint32 : S
 module Uint64 : S
 module Size_t : S
 module UShort : S
+module UInt : S
 module ULong : S
-module ULongLong : S
+module ULLong : S

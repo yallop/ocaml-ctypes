@@ -1,5 +1,6 @@
 open OUnit
 open Ffi.C
+open Unsigned
 
 
 (* 
@@ -67,12 +68,12 @@ let test_endian_detection () =
 
     let () = assert_equal
       ~msg:"the byte that we expected to change was changed"
-      arr.(updated_char_index) 1
+      arr.(updated_char_index) Uchar.one
 
     let () = for i = 1 to sizeof int64_t - 1 do
         if i <> updated_char_index then
           assert_equal ~msg:"only the top or the bottom byte was changed"
-            0 arr.(i)
+            Uchar.zero arr.(i)
       done
   end in ()
 

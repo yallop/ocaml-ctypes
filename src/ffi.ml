@@ -410,6 +410,14 @@ struct
     let int64_t = Primitive RawTypes.int64_t
     let uchar = Primitive RawTypes.uchar
     let uint8_t = Primitive RawTypes.uint8_t
+    let uint16_t = Primitive RawTypes.uint16_t
+    let uint32_t = Primitive RawTypes.uint32_t
+    let uint64_t = Primitive RawTypes.uint64_t
+    let size_t = Primitive RawTypes.size_t
+    let ushort = Primitive RawTypes.ushort
+    let uint = Primitive RawTypes.uint
+    let ulong = Primitive RawTypes.ulong
+    let ullong = Primitive RawTypes.ullong
 
     let string = Primitive RawTypes.string
 
