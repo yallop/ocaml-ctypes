@@ -4,7 +4,9 @@ sig
   type 'a ptr
   type 'a array
   type +'a structure
+  type 'a union
 
+  exception Unsupported of string
   exception IncompleteType
 
   val sizeof : 'a typ -> int
@@ -83,6 +85,23 @@ sig
     val (@.) : 's structure -> ('a, 's) field -> 'a ptr
     val (|->) : 's structure ptr -> ('a, 's) field -> 'a ptr
     val addr : 's structure -> 's structure ptr
+  end
+
+  module Union :
+  sig
+    type 's t = 's union
+    type ('a, -'s) field
+        
+    val tag : string -> 's union typ
+    val ( *:* ) : 's union typ -> 'a typ -> ('a, 's) field
+    val seal : 's union typ -> unit
+
+    val make : 's union typ -> 's union
+    val setf : 's union -> ('a, 's) field -> 'a -> unit
+    val getf : 's union -> ('a, 's) field -> 'a
+    val (@.) : 's union -> ('a, 's) field -> 'a ptr
+    val (|->) : 's union ptr -> ('a, 's) field -> 'a ptr
+    val addr : 's union -> 's union ptr
   end
 
   val foreign : ?from:Dl.library -> string -> ('a -> 'b) Type.f -> ('a -> 'b)

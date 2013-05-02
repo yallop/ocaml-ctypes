@@ -3,6 +3,7 @@
 module C =
 struct
   exception IncompleteType
+  exception Unsupported of string
 
   module Raw = Ffi_raw
   module RawTypes = Ffi_raw.Types
@@ -11,6 +12,13 @@ struct
     tag: string;
     bufspec: Raw.bufferspec;
     mutable ctype: 'a Raw.structure RawTypes.ctype option
+  }
+
+  type 'a union_type = {
+    utag: string;
+    mutable ucomplete: bool;
+    mutable usize: int;
+    mutable ualignment: int;
   }
 
   type 'a structure = { managed : Raw.managed_buffer;
@@ -22,6 +30,7 @@ struct
     | Primitive : 'a RawTypes.ctype -> 'a typ
     | Pointer : 'a typ -> 'a ptr typ
     | Struct : 'a structure_type -> 'a structure typ
+    | Union : 'a union_type -> 'a union typ
     | Array : 'a typ * int -> 'a array typ
     | FunctionPointer : ('a -> 'b) fn -> ('a -> 'b) typ
   and _ fn =
@@ -33,6 +42,7 @@ struct
                  pbyte_offset : int }
   and 'a array = { astart: 'a ptr;
                    alength : int }
+  and 'a union = { union : 'a union ptr }
 
   let rec sizeof : 'a. 'a typ -> int
     = fun (type a) (t : a typ) -> match t with
@@ -40,9 +50,23 @@ struct
       | Primitive p               -> RawTypes.sizeof p
       | Struct { ctype = None }   -> raise IncompleteType
       | Struct { ctype = Some p } -> RawTypes.sizeof p
+      | Union { ucomplete=false } -> raise IncompleteType
+      | Union { usize }           -> usize
       | Array (t, i)              -> i * sizeof t
       | Pointer _                 -> RawTypes.(sizeof pointer)
       | FunctionPointer _         -> RawTypes.(sizeof pointer)
+
+  let rec alignment : 'a. 'a typ -> int
+    = fun (type a) (t : a typ) -> match t with
+        Void                      -> raise IncompleteType
+      | Primitive p               -> RawTypes.alignment p
+      | Struct { ctype = None }   -> raise IncompleteType
+      | Struct { ctype = Some p } -> RawTypes.alignment p
+      | Union { ucomplete=false } -> raise IncompleteType
+      | Union { ualignment }      -> ualignment
+      | Array (t, i)              -> alignment t
+      | Pointer _                 -> RawTypes.(alignment pointer)
+      | FunctionPointer _         -> RawTypes.(alignment pointer)
 
   (* TODO: we could dispense with these type and the accompanying
      interpretations.  It'd probably make things more efficient, for
@@ -117,16 +141,18 @@ struct
         (Reader (id, RawTypes.void) : a reader)
       | Primitive p ->
         Reader (id, p)
-      | Array (reftype, n) ->
-        (* TODO: (NB: arrays have non-copying semantics.  We'll need a new
-           primitive ctype, I think.). *)
-        assert false
+      | Array (reftype, alength) ->
+        let Reader (f, t) = reader (Pointer reftype) in
+        Reader ((fun p -> {astart = f p; alength}), t)
       | Struct {ctype=None} ->
         raise IncompleteType
       | Struct ({ctype=Some p} as stype) ->
         Reader ((fun managed -> {managed; stype; raw_ptr' = Raw.managed_secret managed}), p)
+      | Union _ ->
+        raise (Unsupported "Passing or returning union by value")
       | Pointer reftype ->
-        Reader ((fun raw_ptr -> {pbyte_offset=0; reftype; raw_ptr; pmanaged=None}), RawTypes.pointer)
+        Reader ((fun raw_ptr ->
+          {pbyte_offset=0; reftype; raw_ptr; pmanaged=None}), RawTypes.pointer)
       | FunctionPointer f ->
         Reader (function_builder f, RawTypes.pointer)
 
@@ -136,18 +162,19 @@ struct
         (Writer (id, RawTypes.void) : a writer)
       | Primitive p ->
         Writer (id, p)
-      | Array (reftype, n) ->
-        (* TODO: (NB: arrays have non-copying semantics.  We'll need a new
-           primitive ctype, I think.). *)
-        assert false
+      | Array (reftype, alength) ->
+        let Writer (f, t) = writer (Pointer reftype) in
+        Writer ((fun {astart} -> f astart), t)
       | Struct {ctype=None} ->
         raise IncompleteType
       | Struct {ctype=Some p} ->
         Writer ((fun {managed} -> managed), p)
+      | Union _ ->
+        raise (Unsupported "Passing or returning union by value")
       | Pointer reftype ->
         Writer ((fun {raw_ptr} -> raw_ptr), RawTypes.pointer)
       | FunctionPointer fn ->
-        let cs' = Raw.allocate_bufferspec () in
+        let cs' = Raw.allocate_callspec () in
         let cs = build_callspec fn cs' in
         Writer (create_function_pointer cs' cs, RawTypes.pointer)
 
@@ -176,7 +203,7 @@ struct
 
   and function_builder : 'a. 'a fn -> RawTypes.voidp -> 'a
     = fun fn ->
-      let c = Raw.allocate_bufferspec () in
+      let c = Raw.allocate_callspec () in
       let e = build_ccallspec fn c in
       invoke e [] c
 
@@ -204,6 +231,7 @@ struct
           | Array (elemtype, alength) ->
             ({ astart = {ptr with reftype = elemtype};
                alength } : a)
+          | Union _ -> {union = ptr }
           | _ -> let Reader (from_prim, ctype) = reader reftype in
                  from_prim (Raw.read ~offset ctype raw_ptr)
 
@@ -311,6 +339,7 @@ struct
           | Pointer p                -> add_argument RawTypes.pointer
           | Struct {ctype=None}      -> raise IncompleteType
           | Struct {ctype=Some ctyp} -> add_argument ctyp
+          | Union _                  -> assert false (* TODO *)
           | FunctionPointer _        -> add_argument RawTypes.pointer
         in
         { ftype; foffset }
@@ -337,6 +366,29 @@ struct
     let addr { managed; raw_ptr'=raw_ptr ; stype } =
       { reftype = Struct stype; pmanaged = Some managed;
         raw_ptr; pbyte_offset = 0 }
+  end
+
+  module Union =
+  struct
+    type 's t = 's union = { union: 's union ptr }
+    type ('a, 's) field  = 'a typ
+        
+    let tag utag = Union {utag; usize = 0; ualignment = 0; ucomplete = false}
+    let seal (Union u) = u.ucomplete <- true
+
+    let ( *:* ) (Union u) ftype =
+      begin
+        u.usize <- max u.usize (sizeof ftype);
+        u.ualignment <- max u.ualignment (alignment ftype);
+        ftype
+      end
+
+    let make t = { union = Ptr.allocate t }
+    let (@.) {union} reftype = {union with reftype}
+    let (|->) p reftype = {p with reftype}
+    let setf s field v = Ptr.((s @. field) := v)
+    let getf s field = Ptr.(!(s @. field))
+    let addr {union} = union
   end
 
   module Type =

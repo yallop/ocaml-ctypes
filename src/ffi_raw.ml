@@ -4,6 +4,7 @@ module Types :
 sig
   type 'a ctype
   external sizeof : _ ctype -> int = "ctypes_sizeof"
+  external alignment : _ ctype -> int = "ctypes_alignment"
 
   type voidp
   val null : voidp
@@ -31,6 +32,8 @@ struct
   type voidp
 
   external sizeof : _ ctype -> int = "ctypes_sizeof"
+
+  external alignment : _ ctype -> int = "ctypes_alignment"
 
   external _int_type_info : unit -> int ctype = "ctypes_int_type_info"
   let int = _int_type_info ()
@@ -87,7 +90,8 @@ open Types
 type bufferspec
 
 (* An immediate pointer to a block of memory, not managed by the
-   garbage collector, into which we can read/write C values *)
+   garbage collector, into which we can read/write C values.  Note:
+   the pointer *must* be word-aligned. *)
 type immediate_pointer = voidp
 
 (* Read a C value from a block of memory *)
@@ -99,12 +103,8 @@ external write : offset:int -> 'a ctype -> immediate_pointer -> 'a -> unit
   = "ctypes_write"
 
 (* Allocate a new C call specification *)
-external allocate_bufferspec : unit -> bufferspec
+external allocate_callspec : unit -> bufferspec
   = "ctypes_allocate_callspec"
-
-(* Add an argument to the C call specification *)
-external add_argument : bufferspec -> _ ctype -> int
-  = "ctypes_add_argument"
 
 (* Pass the return type and conclude the specification preparation *)
 external prep_callspec : bufferspec -> _ ctype -> unit
@@ -116,6 +116,21 @@ external prep_callspec : bufferspec -> _ ctype -> unit
 external call : immediate_pointer -> bufferspec -> (immediate_pointer -> unit) -> (immediate_pointer -> 'a) -> 'a
   = "ctypes_call"
 
+type managed_buffer
+type _ structure = managed_buffer
+
+(* Allocate a new C typed buffer specification *)
+external allocate_bufferspec : unit -> bufferspec
+  = "ctypes_allocate_bufferspec"
+
+(* Produce a structure type representation from the buffer specification. *)
+external complete_struct_type : bufferspec -> _ structure ctype
+  = "ctypes_complete_structspec"
+
+(* Add an argument to the C buffer specification *)
+external add_argument : bufferspec -> _ ctype -> int
+  = "ctypes_add_argument"
+
 (* nary callbacks *)
 type boxedfn =
   | Done of (immediate_pointer -> unit)
@@ -125,15 +140,11 @@ type boxedfn =
 external make_function_pointer : bufferspec -> boxedfn -> immediate_pointer
   = "ctypes_make_function_pointer"
 
-type managed_buffer
-type _ structure = managed_buffer
-
-external complete_struct_type : bufferspec -> _ structure ctype
-  = "ctypes_complete_structspec"
-
+(* Allocate a region of stable memory managed by a custom block. *)
 external allocate : int -> managed_buffer
   = "ctypes_allocate"
 
+(* Obtain the address of the managed block. *)
 external managed_secret : managed_buffer -> immediate_pointer
   = "ctypes_managed_secret"
 

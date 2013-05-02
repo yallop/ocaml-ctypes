@@ -1,0 +1,18 @@
+# Generated files
+myocamlbuild.ml
+setup.ml
+setup.data
+setup.log
+src/META
+src/ffi.mllib
+src/libffi_stubs.clib
+examples/fts/META
+examples/fts/fts.mllib
+test_*.native
+struct_subtyping.native
+_build
+build
+tests/clib/*
+
+#
+*~

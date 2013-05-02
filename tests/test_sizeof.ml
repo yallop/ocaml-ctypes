@@ -42,6 +42,29 @@ let test_sizeof_primitives () = Type.(
 (*
   Test some properties of the sizes of structs.
 *)
+let test_sizeof_unions () = Type.(
+  let open Union in
+
+  let int_char = tag "int_char" in
+  let _ = int_char *:* int in
+  let _ = int_char *:* char in
+  let _ = seal int_char in
+  
+  assert_equal (sizeof int) (sizeof int_char);
+
+
+  let char17 = tag "char17" in
+  let _ = char17 *:* array 17 char in
+  let _ = seal char17 in
+  
+  assert_equal 17 (sizeof char17)
+)
+
+
+
+(*
+  Test some properties of the sizes of structs.
+*)
 let test_sizeof_structs () = Type.(
   let module M = struct
     open Struct
@@ -53,7 +76,7 @@ let test_sizeof_structs () = Type.(
       for i = 1 to 10 do
         let homogeneous : h structure typ = tag "h" in
         for j = 1 to i do
-          homogeneous *:* int;
+          ignore (homogeneous *:* int);
         done;
         seal homogeneous;
         assert_equal (i * sizeof int) (sizeof homogeneous)
@@ -107,6 +130,7 @@ let test_sizeof_pointers () = Type.(
 let suite = "Struct tests" >:::
   ["sizeof primitives" >:: test_sizeof_primitives;
    "sizeof structs"    >:: test_sizeof_structs;
+   "sizeof unions"     >:: test_sizeof_unions;
    "sizeof void"       >:: test_sizeof_void;
    "sizeof arrays"     >:: test_sizeof_arrays;
    "sizeof pointers"   >:: test_sizeof_pointers;
