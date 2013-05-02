@@ -11,8 +11,8 @@ Library ffi
   Path:             src/
   Findlibname:      ffi
   Modules:          Ffi
-  InternalModules:  Ffi_raw,Dl
-  CSources:         ffi_stubs.c,dl_stubs.c
+  InternalModules:  Unsigned,Ffi_raw,Dl
+  CSources:         unsigned_stubs.c,ffi_stubs.c,dl_stubs.c
   CCLib:            -lffi
   CCOpt:            -fPIC -Wall -Wno-unused-variable -g
 #  ByteOpt:          -warn-error A
