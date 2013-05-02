@@ -1,5 +1,6 @@
 open OUnit
 open Ffi.C
+open Unsigned
 
 
 (*
@@ -137,10 +138,50 @@ let test_div () =
     let () = test ~num:11 ~dem:2 ~quotient:5 ~remainder:1
   end in ()
 
+
+(*
+  Call the functions
+
+     void qsort(void *base, size_t nmemb, size_t size,
+                int(*compar)(const void *, const void *));
+*)
+let test_qsort () =
+  let open Type in
+  let comparator = ptr void @-> ptr void @-> returning int in
+  let qsort = foreign "qsort" (ptr void @-> size_t @-> size_t @-> funptr comparator @->
+                               returning void) in
+
+  let sortby (type a) (typ : a typ) (f : a -> a -> int) (l : a list) =
+    let open Array in
+    let open Size_t in
+    let open Infix in
+    let open Ptr in
+    let arr = of_list typ l in
+    let len = of_int (length arr) in
+    let size = of_int (sizeof typ) in
+    let cmp xp yp =
+      let x = !(from_voidp typ xp)
+      and y = !(from_voidp typ yp) in
+      f x y
+    in
+    let () = qsort (to_voidp (start arr)) len size cmp in
+    to_list arr
+    in
+    
+    assert_equal
+      [5; 4; 3; 2; 1]
+      (sortby int (fun x y -> - (compare x y)) [3; 4; 1; 2; 5]);
+
+    assert_equal
+      ['o'; 'q'; 'r'; 's'; 't']
+      (sortby char compare ['q'; 's'; 'o'; 'r'; 't'])
+
+
 let suite = "C standard library tests" >:::
   ["test isX functions" >:: test_isX_functions;
    "test string function" >:: test_string_functions;
    "test div function" >:: test_div;
+   "test qsort function" >:: test_qsort;
   ]
 
 

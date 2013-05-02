@@ -75,6 +75,7 @@ sig
     val unsafe_get : 'a t -> int -> 'a
     val unsafe_set : 'a t -> int -> 'a -> unit
     val of_list : 'a typ -> 'a list -> 'a t
+    val to_list : 'a t -> 'a list
     val length : 'a t -> int
     val start : 'a t -> 'a ptr
     val from_ptr : 'a ptr -> int -> 'a t

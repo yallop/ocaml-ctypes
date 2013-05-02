@@ -315,6 +315,18 @@ struct
         match initial with
           | None -> arr
           | Some v -> fill arr v; arr
+
+    let of_list typ list =
+      let arr = make typ (List.length list) in
+      List.iteri (set arr) list;
+      arr
+
+    let to_list a =
+      let l = ref [] in
+      for i = length a - 1 downto 0 do
+        l := get a i :: !l
+      done;
+      !l
   end
 
   module Struct =
