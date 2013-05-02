@@ -215,3 +215,14 @@ module UShort : S = (val pick ~size:(ushort_size ()))
 module UInt : S = (val pick ~size:(uint_size ()))
 module ULong : S = (val pick ~size:(ulong_size ()))
 module ULLong : S = (val pick ~size:(ulonglong_size ()))
+
+type uchar = Uchar.t
+type uint8 = Uint8.t
+type uint16 = Uint16.t
+type uint32 = Uint32.t
+type uint64 = Uint64.t
+type size_t = Size_t.t
+type ushort = UShort.t
+type uint = UInt.t
+type ulong = ULong.t
+type ullong = ULLong.t

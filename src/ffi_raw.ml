@@ -24,16 +24,16 @@ sig
   val int16_t : int ctype
   val int32_t : int32 ctype
   val int64_t : int64 ctype
-  val uchar : Uchar.t ctype
-  val uint8_t : Uint8.t ctype
-  val uint16_t : Uint16.t ctype
-  val uint32_t : Uint32.t ctype
-  val uint64_t : Uint64.t ctype
-  val size_t : Size_t.t ctype
-  val ushort : UShort.t ctype
-  val uint : UInt.t ctype
-  val ulong : ULong.t ctype
-  val ullong : ULLong.t ctype
+  val uchar : uchar ctype
+  val uint8_t : uint8 ctype
+  val uint16_t : uint16 ctype
+  val uint32_t : uint32 ctype
+  val uint64_t : uint64 ctype
+  val size_t : size_t ctype
+  val ushort : ushort ctype
+  val uint : uint ctype
+  val ulong : ulong ctype
+  val ullong : ullong ctype
 
   val string : string ctype
 end =
@@ -86,34 +86,34 @@ struct
   external _string_type_info : unit -> string ctype = "ctypes_string_type_info"
   let string = _string_type_info ()
 
-  external _uchar_type_info : unit -> Uchar.t ctype = "ctypes_uchar_type_info"
+  external _uchar_type_info : unit -> uchar ctype = "ctypes_uchar_type_info"
   let uchar = _uchar_type_info ()
 
-  external _uint8_t_type_info : unit -> Uint8.t ctype = "ctypes_uint8_t_type_info"
+  external _uint8_t_type_info : unit -> uint8 ctype = "ctypes_uint8_t_type_info"
   let uint8_t = _uint8_t_type_info ()
 
-  external _uint16_t_type_info : unit -> Uint16.t ctype = "ctypes_uint16_t_type_info"
+  external _uint16_t_type_info : unit -> uint16 ctype = "ctypes_uint16_t_type_info"
   let uint16_t = _uint16_t_type_info ()
 
-  external _uint32_t_type_info : unit -> Uint32.t ctype = "ctypes_uint32_t_type_info"
+  external _uint32_t_type_info : unit -> uint32 ctype = "ctypes_uint32_t_type_info"
   let uint32_t = _uint32_t_type_info ()
 
-  external _uint64_t_type_info : unit -> Uint64.t ctype = "ctypes_uint64_t_type_info"
+  external _uint64_t_type_info : unit -> uint64 ctype = "ctypes_uint64_t_type_info"
   let uint64_t = _uint64_t_type_info ()
 
-  external _size_t_type_info : unit -> Size_t.t ctype = "ctypes_size_t_type_info"
+  external _size_t_type_info : unit -> size_t ctype = "ctypes_size_t_type_info"
   let size_t = _size_t_type_info ()
 
-  external _ushort_type_info : unit -> UShort.t ctype = "ctypes_ushort_type_info"
+  external _ushort_type_info : unit -> ushort ctype = "ctypes_ushort_type_info"
   let ushort = _ushort_type_info ()
 
-  external _uint_type_info : unit -> UInt.t ctype = "ctypes_uint_type_info"
+  external _uint_type_info : unit -> uint ctype = "ctypes_uint_type_info"
   let uint = _uint_type_info ()
 
-  external _ulong_type_info : unit -> ULong.t ctype = "ctypes_ulong_type_info"
+  external _ulong_type_info : unit -> ulong ctype = "ctypes_ulong_type_info"
   let ulong = _ulong_type_info ()
 
-  external _ullong_type_info : unit -> ULLong.t ctype = "ctypes_ullong_type_info"
+  external _ullong_type_info : unit -> ullong ctype = "ctypes_ullong_type_info"
   let ullong = _ullong_type_info ()
 
   external _null : unit -> voidp = "ctypes_null_value"

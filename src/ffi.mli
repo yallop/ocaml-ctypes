@@ -29,16 +29,16 @@ sig
     val int16_t : int t
     val int32_t : int32 t
     val int64_t : int64 t
-    val uchar : Uchar.t t
-    val uint8_t : Uint8.t t
-    val uint16_t : Uint16.t t
-    val uint32_t : Uint32.t t
-    val uint64_t : Uint64.t t
-    val size_t : Size_t.t t
-    val ushort : UShort.t t
-    val uint : UInt.t t
-    val ulong : ULong.t t
-    val ullong : ULLong.t t
+    val uchar : uchar t
+    val uint8_t : uint8 t
+    val uint16_t : uint16 t
+    val uint32_t : uint32 t
+    val uint64_t : uint64 t
+    val size_t : size_t t
+    val ushort : ushort t
+    val uint : uint t
+    val ulong : ulong t
+    val ullong : ullong t
 
     val string : string t
 
@@ -74,6 +74,7 @@ sig
     val set : 'a t -> int -> 'a -> unit
     val unsafe_get : 'a t -> int -> 'a
     val unsafe_set : 'a t -> int -> 'a -> unit
+    val of_list : 'a typ -> 'a list -> 'a t
     val length : 'a t -> int
     val start : 'a t -> 'a ptr
     val from_ptr : 'a ptr -> int -> 'a t
