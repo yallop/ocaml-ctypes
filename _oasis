@@ -13,8 +13,8 @@ Library ffi
   Modules:          Ffi
   InternalModules:  Ffi_raw,Dl
   CSources:         ffi_stubs.c,dl_stubs.c
-  CCLib:            -lffi
-  CCOpt:            -fPIC -Wall -Wno-unused-variable -g
+  CCLib:            -lffix -L/usr/local/opt/libffi/lib
+  CCOpt:            -ansi -fPIC -Wall -Wno-unused-variable -g  -I/usr/local/opt/libffi/lib/libffi-3.0.13/include
 #  ByteOpt:          -warn-error A
 
 Library fts

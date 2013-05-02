@@ -25,7 +25,11 @@ clean: setup.ml
 	ocaml setup.ml -clean
 	rm -f tests/clib/test_functions.so tests/clib/test_functions.o
 
-ctestlib: tests/clib/test_functions.so
+ctestlib: _build/tests/clib/test_functions.so
 
-tests/clib/test_functions.so: tests/clib/test_functions.o
-	cd tests/clib && cc -g -shared -o test_functions.so test_functions.o
+_build/tests/clib/test_functions.o: tests/clib/test_functions.c
+	mkdir -p _build/tests/clib
+	$(CC) -c $(CFLAGS) -o $@ $<
+
+_build/tests/clib/test_functions.so: _build/tests/clib/test_functions.o
+	$(CC) -g -shared -o $@ $<

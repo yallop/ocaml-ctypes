@@ -52,14 +52,8 @@
     CAMLreturn (block);                                                        \
   }                                                                            \
 
-
-struct type_info {
-  const char *name;
-  ffi_type   *ffitype;
-  value     (*raw_read)(struct type_info *, void *);
-  value     (*raw_write)(struct type_info *, void *, value);
-};
-
+value ctypes_allocate_type_info(value);
+static struct type_info _struct_type_info_prototype;
 
 static value allocate_custom(struct custom_operations *ops, size_t size, void *prototype)
 {
@@ -74,86 +68,22 @@ static value allocate_custom(struct custom_operations *ops, size_t size, void *p
 }
 
 
-static void finalize_free(value v)
-{
-  free(*((void **)Data_custom_val(v)));
-}
-
-static struct custom_operations managed_buffer_custom_ops = {
-  "ocaml-ctypes:managed_buffer",
-  finalize_free,
-  
-  /* TODO: implement other custom ops */
-  custom_compare_default,
-  custom_hash_default,
-  custom_serialize_default,
-  custom_deserialize_default
+struct type_info {
+  const char *name;
+  ffi_type   *ffitype;
+  value     (*raw_read)(struct type_info *, void *);
+  value     (*raw_write)(struct type_info *, void *, value);
 };
-
-
-/* _allocate_structure : _ctype -> voidp */
-value ctypes_allocate(value size_)
-{
-  CAMLparam1(size_);
-  int size = Int_val(size_);
-  CAMLlocal1(block);
-  block = allocate_custom(&managed_buffer_custom_ops, sizeof(void*), NULL);
-  /* We don't want to let OCaml manage the block (i.e. allocate it
-     with allocate_custom rather than malloc) because the GC is likely
-     to move it about at inconvenient moments, rendering our pointers
-     invalid. */ 
-  void *p = malloc(size);
-  if (p == NULL) {
-    caml_raise_out_of_memory();
-  }
-
-  void **d = (void **)Data_custom_val(block);
-  *d = p;
-  CAMLreturn(block);
-}
-
-
-static value raw_read_struct(struct type_info * ti, void *buf)
-{
-  CAMLparam0();
-  CAMLlocal1(block);
-  block = ctypes_allocate(Val_int(ti->ffitype->size));
-  memcpy(*((void **)Data_custom_val(block)), buf, ti->ffitype->size);
-  CAMLreturn(block);
-}
-
-
-static value raw_write_struct(struct type_info * ti, void *buf, value cv)
-{
-  void **cv_ = Data_custom_val(cv);
-  memcpy(buf, *cv_, ti->ffitype->size);
-  return Val_unit;
-}
-
-static struct type_info _struct_type_info_prototype = {
-  "struct",
-  NULL,
-  raw_read_struct,
-  raw_write_struct,
-};
-
 
 static struct custom_operations type_info_custom_ops = {
-    "ocaml-ctypes:type_info",
+    .identifier= "ocaml-ctypes:type_info",
     /* TODO: implement custom ops */
-    custom_finalize_default,
-    custom_compare_default,
-    custom_hash_default,
-    custom_serialize_default,
-    custom_deserialize_default
+    .finalize=    custom_finalize_default,
+    .compare=     custom_compare_default,
+    .hash=        custom_hash_default,
+    .serialize=   custom_serialize_default,
+    .deserialize= custom_deserialize_default
 };
-
-value ctypes_allocate_type_info(value unit)
-{
-  return allocate_custom(&type_info_custom_ops,
-                         sizeof(struct type_info),
-                         &_struct_type_info_prototype);
-}
 
 struct struct_type_info {
   struct type_info type_info;
@@ -303,13 +233,14 @@ void finalize_bufferspec(value v)
 }
 
 static struct custom_operations bufferspec_custom_ops = {
-  "ocaml-ctypes:bufferspec",
-  finalize_bufferspec,
-  /* TODO: implement other custom ops */
-  custom_compare_default,
-  custom_hash_default,
-  custom_serialize_default,
-  custom_deserialize_default
+    .identifier= "ocaml-ctypes:bufferspec",
+    .finalize=    finalize_bufferspec,
+
+    /* TODO: implement other custom ops */
+    .compare=     custom_compare_default,
+    .hash=        custom_hash_default,
+    .serialize=   custom_serialize_default,
+    .deserialize= custom_deserialize_default
 };
 
 /* We store two things in the callbuffer: a "scratch" area for passing
@@ -526,6 +457,8 @@ static void callback_handler(ffi_cif *cif,
 }
 
 
+#include <stdio.h>
+
 /* Construct a pointer to a boxed n-ary function */
 /* make_function_pointer : callspec -> boxedfn -> voidp */
 value ctypes_make_function_pointer(value callspec_, value boxedfn)
@@ -539,7 +472,7 @@ value ctypes_make_function_pointer(value callspec_, value boxedfn)
 
   closure *closure = ffi_closure_alloc(sizeof *closure,
                                        (void *)&code_address);
-
+  fprintf(stderr, "alloc: %p\n", closure);
   if (closure == NULL) {
     caml_raise_out_of_memory();
   }
@@ -564,6 +497,43 @@ value ctypes_make_function_pointer(value callspec_, value boxedfn)
 
 
   CAMLreturn (Val_unit); /* This will just crash */
+}
+
+static void finalize_free(value v)
+{
+  free(*((void **)Data_custom_val(v)));
+}
+
+static struct custom_operations managed_buffer_custom_ops = {
+    .identifier= "ocaml-ctypes:managed_buffer",
+    .finalize=    finalize_free,
+
+    /* TODO: implement other custom ops */
+    .compare=     custom_compare_default,
+    .hash=        custom_hash_default,
+    .serialize=   custom_serialize_default,
+    .deserialize= custom_deserialize_default
+};
+
+/* _allocate_structure : _ctype -> voidp */
+value ctypes_allocate(value size_)
+{
+  CAMLparam1(size_);
+  int size = Int_val(size_);
+  CAMLlocal1(block);
+  block = allocate_custom(&managed_buffer_custom_ops, sizeof(void*), NULL);
+  /* We don't want to let OCaml manage the block (i.e. allocate it
+     with allocate_custom rather than malloc) because the GC is likely
+     to move it about at inconvenient moments, rendering our pointers
+     invalid. */ 
+  void *p = malloc(size);
+  if (p == NULL) {
+    caml_raise_out_of_memory();
+  }
+
+  void **d = (void **)Data_custom_val(block);
+  *d = p;
+  CAMLreturn(block);
 }
 
 
@@ -605,4 +575,36 @@ value ctypes_complete_structspec(value bufferspec_)
 value ctypes_managed_secret(value managed_buffer)
 {
   return (value)(*(void **)Data_custom_val(managed_buffer));
+}
+
+
+static value raw_read_struct(struct type_info * ti, void *buf)
+{
+  CAMLparam0();
+  CAMLlocal1(block);
+  block = ctypes_allocate(Val_int(ti->ffitype->size));
+  memcpy(*((void **)Data_custom_val(block)), buf, ti->ffitype->size);
+  CAMLreturn(block);
+}
+
+
+static value raw_write_struct(struct type_info * ti, void *buf, value cv)
+{
+  void **cv_ = Data_custom_val(cv);
+  memcpy(buf, *cv_, ti->ffitype->size);
+  return Val_unit;
+}
+
+static struct type_info _struct_type_info_prototype = {
+  "struct",
+  NULL,
+  raw_read_struct,
+  raw_write_struct,
+};
+
+value ctypes_allocate_type_info(value unit)
+{
+  return allocate_custom(&type_info_custom_ops,
+                         sizeof(struct type_info),
+                         &_struct_type_info_prototype);
 }
