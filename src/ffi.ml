@@ -115,10 +115,6 @@ struct
         fun f -> Raw.Fn (fun buffer -> 
           box (f (read buffer)))
 
-  let create_function_pointer : 'a. Raw.bufferspec -> 'a callbackspec -> 'a -> Raw.immediate_pointer
-    = fun e c f -> 
-      Raw.make_function_pointer e (box_function c f)
-
   let rec build_callspec : 'a. 'a fn -> Raw.bufferspec -> 'a callbackspec =
     fun (type a) fn callspec -> match (fn : a fn) with
       | Returns ty ->
@@ -177,7 +173,9 @@ struct
       | FunctionPointer fn ->
         let cs' = Raw.allocate_callspec () in
         let cs = build_callspec fn cs' in
-        Writer (create_function_pointer cs' cs, RawTypes.pointer)
+        let box = box_function cs in
+        Writer ((fun f -> Raw.make_function_pointer cs' (box f)),
+                RawTypes.pointer)
 
   (*
     callspec = allocate_callspec ()
