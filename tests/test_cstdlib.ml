@@ -140,7 +140,7 @@ let test_div () =
 
 
 (*
-  Call the functions
+  Call the function
 
      void qsort(void *base, size_t nmemb, size_t size,
                 int(*compar)(const void *, const void *));
@@ -177,11 +177,141 @@ let test_qsort () =
       (sortby char compare ['q'; 's'; 'o'; 'r'; 't'])
 
 
+(*
+  Call the function
+
+     void *bsearch(const void *key, const void *base,
+                   size_t nmemb, size_t size,
+                   int (*compar)(const void *, const void *));
+*)
+let test_bsearch () =
+  let module M = struct
+    open Type
+    let comparator = ptr void @-> ptr void @-> returning int
+    let bsearch = foreign "bsearch" (ptr void @-> ptr void @-> size_t @-> size_t @->
+                                     funptr comparator @->
+                                     returning (ptr void))
+    
+    let qsort = foreign "qsort" (ptr void @-> size_t @-> size_t @-> funptr comparator @->
+                                 returning void)
+    let strlen = foreign "strlen" (ptr char @-> returning size_t)
+
+    (*
+      struct mi {
+         int nr;
+         char *name;
+      } months[] = {
+         { 1, "jan" }, { 2, "feb" }, { 3, "mar" }, { 4, "apr" },
+         { 5, "may" }, { 6, "jun" }, { 7, "jul" }, { 8, "aug" },
+         { 9, "sep" }, {10, "oct" }, {11, "nov" }, {12, "dec" }
+      };
+    *)
+    open Struct
+    type mi
+    let mi = Struct.tag "mi"
+    let mr   = mi *:* int
+    let name = mi *:* ptr char
+    let () = seal (mi : mi structure typ)
+
+  let of_string : string -> char array =
+    fun s ->
+      let len = String.length s in
+      let arr = Array.make char (len + 1) in
+      for i = 0 to len - 1 do
+        arr.(i) <- s.[i];
+      done;
+      arr.(len) <- '\000';
+      arr
+      
+  let as_string : char ptr -> string =
+    fun p -> 
+      let len = Size_t.to_int (strlen p) in
+      let s = String.create len in
+      for i = 0 to len - 1 do
+        s.[i] <- Ptr.(!(p + i));
+      done;
+      s
+
+  let mkmi n s =
+    let m = make mi in
+    setf m mr n;
+    setf m name (Array.start (of_string s));
+    m
+ 
+  open Ptr
+
+  let cmpi m1 m2 =
+    let mi1 = from_voidp mi m1 in
+    let mi2 = from_voidp mi m2 in
+    Pervasives.compare
+      (as_string (!(mi1 |-> name)))
+      (as_string (!(mi2 |-> name)))
+      
+  let months = Array.of_list mi [
+    mkmi 1 "jan";
+    mkmi 2 "feb";
+    mkmi 3 "mar";
+    mkmi 4 "apr";
+    mkmi 5 "may";
+    mkmi 6 "jun";
+    mkmi 7 "jul";
+    mkmi 8 "aug";
+    mkmi 9 "sep";
+    mkmi 10 "oct";
+    mkmi 11 "nov";
+    mkmi 12 "dec";
+  ]
+
+  let () = qsort
+    (to_voidp (Array.start months))
+    (Size_t.of_int (Array.length months))
+    (Size_t.of_int (sizeof mi))
+    cmpi
+  
+  let search : mi structure -> mi structure array -> mi structure option
+    = fun key array ->
+      let len = Size_t.of_int (Array.length array) in
+      let size = Size_t.of_int (sizeof mi) in
+      let r : unit ptr =
+        bsearch (to_voidp (addr key)) (to_voidp (Array.start array)) len size cmpi in
+      if r = null then None
+      else Some (!(from_voidp mi r))
+
+  let find_month_by_name : string -> mi structure option =
+    fun s -> search (mkmi 0 s) months
+
+  let () = match find_month_by_name "dec" with
+      Some m -> assert_equal 12 (getf m mr)
+    | _ -> assert false
+
+  let () = match find_month_by_name "feb" with
+      Some m -> assert_equal 2 (getf m mr)
+    | _ -> assert false
+
+  let () = match find_month_by_name "jan" with
+      Some m -> assert_equal 1 (getf m mr)
+    | _ -> assert false
+
+  let () = match find_month_by_name "may" with
+      Some m -> assert_equal 5 (getf m mr)
+    | _ -> assert false
+
+  let () = 
+    assert_equal None (find_month_by_name "missing")
+
+  let () = 
+    assert_equal None (find_month_by_name "")
+
+  end in ()
+    
+    
+    
 let suite = "C standard library tests" >:::
   ["test isX functions" >:: test_isX_functions;
    "test string function" >:: test_string_functions;
    "test div function" >:: test_div;
    "test qsort function" >:: test_qsort;
+   "test bsearch function" >:: test_bsearch;
   ]
 
 
