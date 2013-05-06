@@ -34,7 +34,8 @@ struct
     | Array : 'a typ * int -> 'a array typ
     | FunctionPointer : ('a -> 'b) fn -> ('a -> 'b) typ
   and _ fn =
-    | Returns : 'a typ -> 'a fn
+    (* The flag indicates whether we should check errno *)
+    | Returns : bool * 'a typ -> 'a fn
     | Function : 'a typ * 'b fn -> ('a -> 'b) fn
   and 'a ptr = { reftype : 'a typ;
                  raw_ptr : Raw.immediate_pointer;
@@ -74,7 +75,7 @@ struct
      exposing opportunities for optimization), but might make things
      terribly higher-order. *)
   type _ ccallspec =
-      Call : ('b -> 'a) * 'b RawTypes.ctype -> 'a ccallspec
+      Call : bool * ('b -> 'a) * 'b RawTypes.ctype -> 'a ccallspec
     | WriteArg : (Raw.immediate_pointer -> 'a -> unit) * 'b ccallspec -> ('a -> 'b) ccallspec
 
   type _ callbackspec =
@@ -93,15 +94,20 @@ struct
     ...
     write arg_n buffer v_n)
   *)
-  let rec invoke : 'a.'a ccallspec -> (Raw.immediate_pointer -> unit) list -> Raw.bufferspec -> Raw.immediate_pointer -> 'a
-    = fun (type a) (fn : a ccallspec) -> match fn with
-      | Call (f, ftype) ->
+  let rec invoke : 'a.string option -> 'a ccallspec -> (Raw.immediate_pointer -> unit) list -> Raw.bufferspec -> Raw.immediate_pointer -> 'a
+    = fun name (type a) (fn : a ccallspec) -> match fn with
+      | Call (check_errno, f, ftype) ->
+        let call = match check_errno, name with
+          | true, Some name -> Raw.call_errno name 
+          | true, None      -> Raw.call_errno "" 
+          | false, _        -> Raw.call
+        in
         fun writers callspec addr ->
-          f (Raw.call addr callspec
+          f (call addr callspec
                (fun buf -> List.iter (fun w -> w buf) writers)
                (Raw.read ~offset:0 ftype))
       | WriteArg (write, ccallspec) ->
-        let next = invoke ccallspec in
+        let next = invoke name ccallspec in
         fun writers callspec addr v ->
           next ((fun buffer -> write buffer v) :: writers) callspec addr
 
@@ -117,7 +123,7 @@ struct
 
   let rec build_callspec : 'a. 'a fn -> Raw.bufferspec -> 'a callbackspec =
     fun (type a) fn callspec -> match (fn : a fn) with
-      | Returns ty ->
+      | Returns (_, ty) ->
         let Writer (to_prim, ctype) = writer ty in
         let _ = Raw.prep_callspec callspec ctype in
         Return (to_prim, ctype)
@@ -187,10 +193,10 @@ struct
   *)
   and build_ccallspec : 'a. 'a fn -> Raw.bufferspec -> 'a ccallspec
     = fun (type a) (fn : a fn) callspec -> match fn with
-      | Returns t ->
+      | Returns (check_errno, t) ->
         let Reader (from_prim, ctype) = reader t in
         let () = Raw.prep_callspec callspec ctype in
-        (Call (from_prim, ctype) : a ccallspec)
+        (Call (check_errno, from_prim, ctype) : a ccallspec)
       | Function (Void, f) ->
         let rest = build_ccallspec f callspec in
         WriteArg ((fun _ _ -> ()), rest)
@@ -200,11 +206,11 @@ struct
         let rest = build_ccallspec f callspec in
         WriteArg ((fun buf x -> Raw.write ~offset ctype buf (to_prim x)), rest)
 
-  and function_builder : 'a. 'a fn -> RawTypes.voidp -> 'a
-    = fun fn ->
+  and function_builder : 'a. ?name:string -> 'a fn -> RawTypes.voidp -> 'a
+    = fun ?name fn ->
       let c = Raw.allocate_callspec () in
       let e = build_ccallspec fn c in
-      invoke e [] c
+      invoke name e [] c
 
   module Ptr =
   struct
@@ -435,13 +441,14 @@ struct
     let ptr t = Pointer t
     let ( @->) f t = Function (f, t)
 
-    let returning v = Returns v
+    let returning v = Returns (false, v)
+    let syscall v = Returns (true, v)
     let funptr f = FunctionPointer f
   end
 
   let foreign ?from symbol typ =
     let addr = Dl.dlsym ?handle:from ~symbol in
-    function_builder typ addr
+    function_builder ~name:symbol typ addr
 
   let foreign_value ?from symbol reftype =
     let raw_ptr = Dl.dlsym ?handle:from ~symbol in

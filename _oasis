@@ -95,6 +95,15 @@ Executable test_ffi_arrays
   BuildDepends:     unix,ffi,oUnit
   Custom:           true
 
+Executable test_ffi_errno
+  Path:             tests
+  MainIs:           test_errno.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     unix,ffi,oUnit
+  Custom:           true
+
 Executable struct_subtyping
   Path:             examples/struct-subtyping
   MainIs:           struct_subtyping.ml
@@ -141,4 +150,9 @@ Test test_ffi_arrays
 Test test_ffi_unions
   Run$:             flag(tests)
   Command:          $test_ffi_unions
+  WorkingDirectory: tests
+
+Test test_ffi_errno
+  Run$:             flag(tests)
+  Command:          $test_ffi_errno
   WorkingDirectory: tests

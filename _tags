@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 003a67831cdbb75fd88ff9a2c6c63c78)
+# DO NOT EDIT (digest: 67e3451bbe6a298c5375c4758f8625dc)
 # Ignore VCS directories, you can use the same kind of rule outside 
 # OASIS_START/STOP if you want to exclude directories that contains 
 # useless stuff for the build process
@@ -67,10 +67,15 @@
 <tests/test_array.{native,byte}>: use_ffi
 <tests/test_array.{native,byte}>: pkg_unix
 <tests/test_array.{native,byte}>: pkg_oUnit
+<tests/test_array.{native,byte}>: custom
+# Executable test_ffi_errno
+<tests/test_errno.{native,byte}>: use_ffi
+<tests/test_errno.{native,byte}>: pkg_unix
+<tests/test_errno.{native,byte}>: pkg_oUnit
 <tests/*.ml{,i}>: use_ffi
 <tests/*.ml{,i}>: pkg_unix
 <tests/*.ml{,i}>: pkg_oUnit
-<tests/test_array.{native,byte}>: custom
+<tests/test_errno.{native,byte}>: custom
 # Executable struct_subtyping
 <examples/struct-subtyping/struct_subtyping.{native,byte}>: use_ffi
 <examples/struct-subtyping/struct_subtyping.{native,byte}>: pkg_unix

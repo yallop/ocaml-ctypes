@@ -4,10 +4,12 @@
 #include <caml/custom.h>
 #include <caml/callback.h>
 #include <caml/fail.h>
+#include <caml/unixsupport.h>
 /* #include <caml/threads.h> */
 
 #include <ffi.h>
 
+#include <errno.h>
 #include <assert.h>
 #include <limits.h>
 #include <string.h>
@@ -548,6 +550,23 @@ value ctypes_call(value function, value callspec_, value argwriter, value rvread
 
   CAMLreturn(caml_callback(rvreader, (value)return_slot));
 }
+
+value ctypes_call_errno(value fnname, value function, value callspec_, value argwriter, value rvreader)
+{
+  CAMLparam5(fnname, function, callspec_, argwriter, rvreader);
+  
+  errno = 0;
+  CAMLlocal1(rv);
+  rv = ctypes_call(function, callspec_, argwriter, rvreader);
+  if (errno != 0)
+  {
+    char *buffer = alloca(caml_string_length(fnname) + 1);
+    strcpy(buffer, String_val(fnname));
+    unix_error(errno, buffer, Nothing);
+  }
+  CAMLreturn(rv);
+}
+
 
 typedef struct closure closure;
 struct closure
