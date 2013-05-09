@@ -88,8 +88,7 @@ let test_returning_struct () =
     let () = assert_equal 12.5 Ptr.(!(t |-> f))
       ~printer:string_of_float
 
-    let () = prerr_endline "TODO: reinstate once we have pointer equality sorted out"
-    (* let () = assert_equal Ptr.(!(!t --> p)) t *)
+    let () = assert_equal Ptr.(!(t |-> p)) t
 
   end in ()
 
