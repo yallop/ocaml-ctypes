@@ -72,10 +72,15 @@
 <tests/test_array.{native,byte}>: use_ffi
 <tests/test_array.{native,byte}>: pkg_unix
 <tests/test_array.{native,byte}>: pkg_oUnit
+<tests/test_array.{native,byte}>: custom
+# Executable test_ffi_errno
+<tests/test_errno.{native,byte}>: use_ffi
+<tests/test_errno.{native,byte}>: pkg_unix
+<tests/test_errno.{native,byte}>: pkg_oUnit
 <tests/*.ml{,i}>: use_ffi
 <tests/*.ml{,i}>: pkg_unix
 <tests/*.ml{,i}>: pkg_oUnit
-<tests/test_array.{native,byte}>: custom
+<tests/test_errno.{native,byte}>: custom
 # Executable struct_subtyping
 <examples/struct-subtyping/struct_subtyping.{native,byte}>: use_ffi
 <examples/struct-subtyping/struct_subtyping.{native,byte}>: pkg_unix

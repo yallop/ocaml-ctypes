@@ -47,6 +47,7 @@ sig
     val ( @-> ) : 'a t -> 'b f -> ('a -> 'b) f
 
     val returning : 'a t -> 'a f
+    val syscall : 'a t -> 'a f
     val funptr : ('a -> 'b) f -> ('a -> 'b) t
   end
 

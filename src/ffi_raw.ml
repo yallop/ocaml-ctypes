@@ -152,6 +152,10 @@ external prep_callspec : bufferspec -> _ ctype -> unit
 external call : immediate_pointer -> bufferspec -> (immediate_pointer -> unit) -> (immediate_pointer -> 'a) -> 'a
   = "ctypes_call"
 
+(* As ctypes_call, but check errno and raise Unix_error if the call failed. *)
+external call_errno : string -> immediate_pointer -> bufferspec -> (immediate_pointer -> unit) -> (immediate_pointer -> 'a) -> 'a
+  = "ctypes_call_errno"
+
 type managed_buffer
 type _ structure = managed_buffer
 
