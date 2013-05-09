@@ -1,0 +1,99 @@
+open OUnit
+open Ffi.C
+
+let hash = Hashtbl.hash
+
+
+(*
+  Test hashing and equality for managed buffers.
+
+  Hashing and equality are based on the addresses of malloc-allocated
+  objects, so even structurally-equal values should have different
+  hashes and compare unequal.
+*)
+let test_managed_buffer_hashing_and_equality () =
+  let open Ptr in let open Type in
+  let i1 = make int 20 in
+  let i2 = make int 20 in
+  assert_equal (!i1) (!i2);
+  assert_equal (hash i1) (hash i1);
+  assert_bool
+    "equal-but-not-identical objects have distinct hashes"
+    (hash i1 <> hash i2);
+  assert_bool
+    "equal-but-not-identical objects do not compare equal"
+    (i1 <> i2)
+
+
+(*
+  Test type info hashing and equality.
+
+  Hashing and equality are based on the addresses of malloc-allocated
+  objects, so even structurally-equal values should have different
+  hashes and compare unequal.
+*)
+
+let test_type_info_hashing_and_equality () =
+  let module M = struct
+    open Struct
+    open Type
+      
+    type s
+    let s : s structure typ = tag "s"
+    let _ = begin
+      ignore (s *:* double);
+      ignore (s *:* ptr s);
+      ignore (seal s)
+    end
+      
+    type t
+    let t : t structure typ = tag "s"
+    let _ = begin
+      ignore (t *:* double);
+      ignore (t *:* ptr t);
+      ignore (seal t)
+    end
+      
+    let () = begin
+      (* Pointer equality is structural. *)
+      assert_equal ~msg:"Equal pointer types have equal hashes"
+        (hash (ptr double)) (hash (ptr double));
+
+      assert_equal ~msg:"Equal pointer types compare equal"
+        (ptr double) (ptr double);
+
+      (* Array equality is structural. *)
+      assert_equal ~msg:"Equal array types have equal hashes"
+        (hash (array 3 (array 4 int))) (hash (array 3 (array 4 int)));
+
+      assert_equal ~msg:"Equal array types compare equal"
+        (array 3 (array 4 int)) (array 3 (array 4 int));
+
+      assert_bool "Distinct array types do not compare equal"
+        (array 3 (array 4 int) <> array 3 (array 5 int));
+
+      (* Structure equality is address-based in ctypes *)
+      assert_equal (hash s) (hash s);
+
+      assert_bool
+        "equal-but-not-identical structure types have distinct hashes"
+        (hash s <> hash t);
+
+      assert_bool
+        "equal-but-not-identical structure types do not compare equal"
+        (Obj.repr s <> Obj.repr t);
+    end
+  end in ()
+
+
+let suite = "Custom ops tests" >:::
+  ["managed buffer hashing and equality" >::
+     test_managed_buffer_hashing_and_equality;
+
+   "type info hashing and equality" >::
+     test_type_info_hashing_and_equality;
+  ]
+
+
+let _ =
+  run_test_tt_main suite

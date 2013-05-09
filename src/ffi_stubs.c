@@ -4,6 +4,7 @@
 #include <caml/custom.h>
 #include <caml/callback.h>
 #include <caml/fail.h>
+#include <caml/hash.h>
 /* #include <caml/threads.h> */
 
 #include <ffi.h>
@@ -14,14 +15,14 @@
 
 #include <stdint.h>
 
-/* TODO: don't use caml_alloc_custom unless actually necessary.
-   caml_alloc may be sufficient in some cases */
 /* TODO: support callbacks that raise exceptions?  e.g. using caml_callback_exn etc.  */
-/* TODO: thread support (caml_acquire_runtime_system / caml_release_runtime_system) 
+/* TODO: thread support (caml_acquire_runtime_system / caml_release_runtime_system)
    (2) As a special case: If you enter/leave_blocking_section() then some
    other thread might (almost certainly will) do an allocation. So any ocaml
    values you need in enter/leave_blocking_section() need to be copied to C
    values beforehand and values you need after need to be protected. */
+/* TODO: perhaps we should just use memcmp in places of [bits of] the
+   tedious comparison functions */
 
 #define make_primitive_interface(VAL_X, X_VAL, CTYPE, MUNGENAME, FFITYPE)      \
   static value raw_read_ ## MUNGENAME(struct type_info * _, void *p)           \
@@ -80,13 +81,26 @@ static void finalize_free(value v)
   free(*((void **)Data_custom_val(v)));
 }
 
+static int compare_pointers(value l_, value r_)
+{
+  /* pointer comparison */
+  intptr_t l = (intptr_t)*(void **)Data_custom_val(l_);
+  intptr_t r = (intptr_t)*(void **)Data_custom_val(r_);
+  return (l > r) - (l < r);
+}
+
+static long hash_address(value l)
+{
+  /* address hashing */
+  return (long)*(void **)Data_custom_val(l);
+}
+
 static struct custom_operations managed_buffer_custom_ops = {
   "ocaml-ctypes:managed_buffer",
   finalize_free,
-  
-  /* TODO: implement other custom ops */
-  custom_compare_default,
-  custom_hash_default,
+  compare_pointers,
+  hash_address,
+  /* Managed buffers are not serializable. */
   custom_serialize_default,
   custom_deserialize_default
 };
@@ -102,7 +116,7 @@ value ctypes_allocate(value size_)
   /* We don't want to let OCaml manage the block (i.e. allocate it
      with allocate_custom rather than malloc) because the GC is likely
      to move it about at inconvenient moments, rendering our pointers
-     invalid. */ 
+     invalid. */
   void *p = malloc(size);
   if (p == NULL) {
     caml_raise_out_of_memory();
@@ -139,14 +153,32 @@ static struct type_info _struct_type_info_prototype = {
 };
 
 
+static int compare_type_infos(value l_, value r_)
+{
+  struct type_info *lti = Data_custom_val(l_);
+  struct type_info *rti = Data_custom_val(r_);
+
+  intptr_t l = (intptr_t)&lti->ffitype;
+  intptr_t r = (intptr_t)&rti->ffitype;
+  return (l > r) - (l < r);
+}
+
+
+static long hash_type_info(value v)
+{
+  struct type_info *l = Data_custom_val(v);
+  return (long)l->ffitype;
+}
+
+
 static struct custom_operations type_info_custom_ops = {
-    "ocaml-ctypes:type_info",
-    /* TODO: implement custom ops */
-    custom_finalize_default,
-    custom_compare_default,
-    custom_hash_default,
-    custom_serialize_default,
-    custom_deserialize_default
+  "ocaml-ctypes:type_info",
+  custom_finalize_default,
+  compare_type_infos,
+  hash_type_info,
+  /* type_info objects are not serializable */
+  custom_serialize_default,
+  custom_deserialize_default
 };
 
 value ctypes_allocate_type_info(value unit)
@@ -238,7 +270,7 @@ make_primitive_interface(caml_copy_uint8, Uint8_val, unsigned char, uchar, ffi_t
 #if LLONG_MAX == 9223372036854775807LL
   make_primitive_interface(caml_copy_int64, Int64_val, long long, llong, ffi_type_sint64)
   make_primitive_interface(caml_copy_uint64, Uint64_val, unsigned long long, ullong, ffi_type_uint64)
-#else 
+#else
 # error "No suitable OCaml type available for representing longs"
 #endif
 
@@ -264,12 +296,12 @@ static struct type_info _void_type_info = {
 
 value ctypes_void_type_info(value unit)
 {
-    CAMLparam1(unit);                                    
-    CAMLlocal1(block);                                   
-    block = ctypes_allocate_type_info(unit);             
-    struct type_info *ti = Data_custom_val(block);       
+    CAMLparam1(unit);
+    CAMLlocal1(block);
+    block = ctypes_allocate_type_info(unit);
+    struct type_info *ti = Data_custom_val(block);
     memcpy(ti, &_void_type_info, sizeof _void_type_info);
-    CAMLreturn (block);                                  
+    CAMLreturn (block);
 }
 
 /* null_value : unit -> voidp */
@@ -361,12 +393,34 @@ void finalize_bufferspec(value v)
   free(bufferspec->args);
 }
 
+
+static int compare_bufferspecs(value l_, value r_)
+{
+  struct bufferspec *lti = Data_custom_val(l_);
+  struct bufferspec *rti = Data_custom_val(r_);
+
+  intptr_t l = (intptr_t)&lti->args;
+  intptr_t r = (intptr_t)&rti->args;
+  return (l > r) - (l < r);
+}
+
+
+static long hash_bufferspec(value v)
+{
+  struct bufferspec *bufferspec = Data_custom_val(v);
+
+  return bufferspec->args != NULL
+    ? caml_hash_mix_int64(0, (uint64)bufferspec->args)
+    : 0;
+}
+
+
 static struct custom_operations bufferspec_custom_ops = {
   "ocaml-ctypes:bufferspec",
   finalize_bufferspec,
-  /* TODO: implement other custom ops */
-  custom_compare_default,
-  custom_hash_default,
+  compare_bufferspecs,
+  hash_bufferspec,
+  /* bufferspec objects are not serializable */
   custom_serialize_default,
   custom_deserialize_default
 };
@@ -463,7 +517,7 @@ value ctypes_add_argument(value bufferspec_, value argument_)
   struct bufferspec *bufferspec = Data_custom_val(bufferspec_);
   ffi_type *argtype = (((struct type_info *)Data_custom_val(argument_)))->ffitype;
 
-  assert(bufferspec->state == BUILDING);
+  assert(bufferspec->state == BUILDING); /* TODO: raise a proper error */
 
   int offset = aligned_offset(bufferspec->bytes, argtype->alignment);
   bufferspec->bytes = offset + argtype->size;
@@ -575,7 +629,7 @@ static void callback_handler(ffi_cif *cif,
   {
     void *cvalue = args[i];
     assert (Tag_val(boxedfn) == Fn);
-    /* unbox and call */ 
+    /* unbox and call */
     boxedfn = caml_callback(Field(boxedfn, 0), (value)cvalue);
   }
 
@@ -620,9 +674,6 @@ value ctypes_make_function_pointer(value callspec_, value boxedfn)
 
     CAMLreturn ((value)(void *)code_address);
   }
-
-
-  CAMLreturn (Val_unit); /* This will just crash */
 }
 
 
@@ -657,7 +708,7 @@ value ctypes_complete_structspec(value bufferspec_)
 
   bufferspec->state = STRUCTSPEC;
 
-  
+
   CAMLreturn(block);
 }
 

@@ -86,6 +86,15 @@ Executable test_ffi_unions
   BuildDepends:     unix,ffi,oUnit
   Custom:           true
 
+Executable test_ffi_custom_ops
+  Path:             tests
+  MainIs:           test_custom_ops.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     unix,ffi,oUnit
+  Custom:           true
+
 Executable test_ffi_arrays
   Path:             tests
   MainIs:           test_array.ml
@@ -141,4 +150,9 @@ Test test_ffi_arrays
 Test test_ffi_unions
   Run$:             flag(tests)
   Command:          $test_ffi_unions
+  WorkingDirectory: tests
+
+Test test_ffi_custom_ops
+  Run$:             flag(tests)
+  Command:          $test_ffi_custom_ops
   WorkingDirectory: tests

@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 003a67831cdbb75fd88ff9a2c6c63c78)
+# DO NOT EDIT (digest: ef4acaedbe83bf4a7c2785edddf8254b)
 # Ignore VCS directories, you can use the same kind of rule outside 
 # OASIS_START/STOP if you want to exclude directories that contains 
 # useless stuff for the build process
@@ -63,6 +63,11 @@
 <tests/test_unions.{native,byte}>: pkg_unix
 <tests/test_unions.{native,byte}>: pkg_oUnit
 <tests/test_unions.{native,byte}>: custom
+# Executable test_ffi_custom_ops
+<tests/test_custom_ops.{native,byte}>: use_ffi
+<tests/test_custom_ops.{native,byte}>: pkg_unix
+<tests/test_custom_ops.{native,byte}>: pkg_oUnit
+<tests/test_custom_ops.{native,byte}>: custom
 # Executable test_ffi_arrays
 <tests/test_array.{native,byte}>: use_ffi
 <tests/test_array.{native,byte}>: pkg_unix
