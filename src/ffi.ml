@@ -304,16 +304,16 @@ struct
     let to_voidp : 'a. 'a ptr -> unit ptr =
       fun p -> {p with reftype = Void}
 
-    let allocate : 'a. 'a typ -> 'a ptr
-      = fun (type a) (reftype : a typ) -> 
-        let pmanaged = Raw.allocate (sizeof reftype) in
+    let allocate : 'a. 'a typ -> count:int -> 'a ptr
+      = fun (type a) (reftype : a typ) ~count ->
+        let pmanaged = Raw.allocate (count * sizeof reftype) in
         { reftype ; pbyte_offset = 0;
           raw_ptr = Raw.managed_secret pmanaged;
           pmanaged = Some pmanaged }
 
     let make : 'a. 'a typ -> 'a -> 'a ptr
       = fun (type a) (reftype : a typ) (v : a) ->
-        let p = allocate reftype in begin
+        let p = allocate ~count:1 reftype in begin
           p := v;
           p
         end
@@ -404,7 +404,7 @@ struct
         { ftype; foffset }
 
     let make (type s) (Struct stype as s : s structure typ) =
-      { structure = Ptr.allocate s }
+      { structure = Ptr.allocate s ~count:1 }
                                                                            
     let (@.) (type s) (type a) 
         { structure }
@@ -438,7 +438,7 @@ struct
         ftype
       end
 
-    let make t = { union = Ptr.allocate t }
+    let make t = { union = Ptr.allocate t ~count:1 }
     let (@.) {union} reftype = {union with reftype}
     let (|->) p reftype = {p with reftype}
     let setf s field v = Ptr.((s @. field) := v)

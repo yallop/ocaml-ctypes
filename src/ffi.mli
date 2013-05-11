@@ -64,7 +64,7 @@ sig
     val from_voidp : 'a typ -> unit ptr -> 'a ptr
     val to_voidp : _ ptr -> unit ptr
     val make : 'a typ -> 'a -> 'a ptr
-    val allocate : 'a typ -> 'a ptr
+    val allocate : 'a typ -> count:int -> 'a ptr
   end
 
   module Array :
