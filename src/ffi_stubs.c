@@ -454,7 +454,7 @@ value ctypes_read(value offset_, value ctype, value buffer_)
 
 /* Write a C value to a block of memory */
 /* write : int -> ctype -> buffer -> 'a -> unit */
-value ctypes_write(value offset_, value ctype, value buffer_, value v)
+value ctypes_write(value offset_, value ctype, value v, value buffer_)
 {
   CAMLparam4(offset_, ctype, buffer_, v);
   struct type_info *type_info = Data_custom_val(ctype);
@@ -716,11 +716,12 @@ value ctypes_complete_structspec(value bufferspec_)
                           sizeof(struct struct_type_info),
                           &_struct_type_info_prototype);
   struct struct_type_info *t = Data_custom_val(block);
+  /* TODO: this is not safe: we're keeping a pointer into a block that may be moved */
   ffi_type *s = t->type_info.ffitype = &t->ffi_type;
 
   s->type = FFI_TYPE_STRUCT;
   s->elements = bufferspec->args;
-  s->size = 0;
+  s->size = s->alignment = 0;
 
   ffi_status status = ffi_prep_cif(&_dummy_cif, FFI_DEFAULT_ABI, 0, s, NULL);
 
@@ -742,4 +743,18 @@ value ctypes_pointer_plus(value ptr, value i)
 {
   /* TODO: we should perhaps check that the result is word-aligned */
   return (value)(((char*)ptr) + Int_val(i));
+}
+
+
+/* memcpy : dest:immediate_pointer -> dest_offset:int ->
+            src:immediate_pointer -> src_offset:int ->
+            size:int -> unit */
+value ctypes_memcpy(value dst, value dst_offset,
+                    value src, value src_offset, value size)
+{
+  CAMLparam5(dst, dst_offset, src, src_offset, size);
+  memcpy((char *)dst + Int_val(dst_offset),
+         (void *)src + Int_val(src_offset),
+         Int_val(size));
+  CAMLreturn(Val_unit);
 }

@@ -20,7 +20,7 @@ let test_fabs () =
     
     let fabs x =
       call dlfabs callspec
-        (fun buffer -> write arg_1_offset double buffer x)
+        (write ~offset:arg_1_offset double x)
         (read ~offset:0 double)
     in
 
@@ -46,8 +46,8 @@ let test_pow () =
     let pow x y =
       call dlpow callspec
         (fun buffer ->
-          write arg_1_offset double buffer x;
-          write arg_2_offset double buffer y)
+          write arg_1_offset double x buffer;
+          write arg_2_offset double y buffer)
         (read ~offset:0 double)
     in
 

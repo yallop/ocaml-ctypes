@@ -3,7 +3,7 @@ sig
   type 'a typ
   type 'a ptr
   type 'a array
-  type +'a structure
+  type 'a structure
   type 'a union
 
   exception Unsupported of string

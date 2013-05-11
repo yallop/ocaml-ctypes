@@ -113,13 +113,13 @@ Executable test_ffi_errno
   BuildDepends:     unix,ffi,oUnit
   Custom:           true
 
-Executable struct_subtyping
-  Path:             examples/struct-subtyping
-  MainIs:           struct_subtyping.ml
-  CompiledObject:   best
-  Install:          false
-  BuildDepends:     unix,ffi,oUnit
-  Custom:           true
+# Executable struct_subtyping
+#   Path:             examples/struct-subtyping
+#   MainIs:           struct_subtyping.ml
+#   CompiledObject:   best
+#   Install:          false
+#   BuildDepends:     unix,ffi,oUnit
+#   Custom:           true
 
 Test test_ffi_raw
   Run$:             flag(tests)

@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: ef4acaedbe83bf4a7c2785edddf8254b)
+# DO NOT EDIT (digest: c71b2a5e2ed240da2d5938d49df858a1)
 # Ignore VCS directories, you can use the same kind of rule outside 
 # OASIS_START/STOP if you want to exclude directories that contains 
 # useless stuff for the build process
@@ -81,13 +81,5 @@
 <tests/*.ml{,i}>: pkg_unix
 <tests/*.ml{,i}>: pkg_oUnit
 <tests/test_errno.{native,byte}>: custom
-# Executable struct_subtyping
-<examples/struct-subtyping/struct_subtyping.{native,byte}>: use_ffi
-<examples/struct-subtyping/struct_subtyping.{native,byte}>: pkg_unix
-<examples/struct-subtyping/struct_subtyping.{native,byte}>: pkg_oUnit
-<examples/struct-subtyping/*.ml{,i}>: use_ffi
-<examples/struct-subtyping/*.ml{,i}>: pkg_unix
-<examples/struct-subtyping/*.ml{,i}>: pkg_oUnit
-<examples/struct-subtyping/struct_subtyping.{native,byte}>: custom
 # OASIS_STOP
 <tests/clib/*>: not_hygienic

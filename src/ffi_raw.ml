@@ -1,5 +1,7 @@
 (* Low-level unsafe interface for calling functions using libffi. *)
 
+
+
 module Types :
 sig
   open Unsigned
@@ -135,7 +137,7 @@ external read : offset:int -> 'a ctype -> immediate_pointer -> 'a
   = "ctypes_read"
 
 (* Write a C value to a block of memory *)
-external write : offset:int -> 'a ctype -> immediate_pointer -> 'a -> unit
+external write : offset:int -> 'a ctype -> 'a -> immediate_pointer -> unit
   = "ctypes_write"
 
 (* Allocate a new C call specification *)
@@ -188,7 +190,7 @@ external allocate : int -> managed_buffer
 external managed_secret : managed_buffer -> immediate_pointer
   = "ctypes_managed_secret"
 
-(* Obtain the address of the managed block. *)
+(* Pointer arithmetic. *)
 external pointer_plus : immediate_pointer -> int -> immediate_pointer
   = "ctypes_pointer_plus"
 
@@ -199,3 +201,9 @@ let () = Callback.register_exception "FFI_internal_error"
   (Ffi_internal_error "")
 
 let () = at_exit Gc.major (* TODO: remove this after testing *)
+
+external memcpy :
+  dst:immediate_pointer -> dst_offset:int ->
+  src:immediate_pointer -> src_offset:int ->
+    size:int -> unit
+  = "ctypes_memcpy"
