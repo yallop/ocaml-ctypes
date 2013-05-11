@@ -346,8 +346,7 @@ struct
     let from_ptr astart alength = {astart; alength}
 
     let fill ({ alength } as arr) v =
-      (* TODO: a more efficient implementation, probably based on memcpy *)
-      for i = 0 to alength do unsafe_set arr i v done
+      for i = 0 to alength - 1 do unsafe_set arr i v done
 
     let make : 'a. 'a typ -> ?initial:'a -> int -> 'a t
       = fun (type a) reftype ?initial alength ->

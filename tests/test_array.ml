@@ -2,9 +2,6 @@ open OUnit
 open Ffi.C
 
 
-let testlib = Dl.(dlopen ~filename:"clib/test_functions.so" ~flags:[RTLD_NOW])
-
-
 (*
   Creating multidimensional arrays, and reading and writing elements.
 *)
@@ -88,8 +85,27 @@ let test_multidimensional_arrays () =
   done
 
 
+(*
+  Test that creating an array initializes all elements appropriately.
+*)
+let test_array_initialiation () =
+  let open Type in
+  let int_array = Array.make int ~initial:33 10 in
+  for i = 0 to Array.length int_array - 1 do
+    assert_equal 33 int_array.(i)
+  done;
+
+  let int_array_array = Array.make (array 10 int) ~initial:int_array 5 in
+  for i = 0 to Array.length int_array_array - 1 do
+    for j = 0 to Array.length int_array_array.(i) - 1 do
+      assert_equal 33 int_array_array.(i).(j)
+    done
+  done
+
+
 let suite = "Array tests" >:::
   ["multidimensional arrays" >:: test_multidimensional_arrays;
+   "array initialization" >:: test_array_initialiation;
   ]
 
 
