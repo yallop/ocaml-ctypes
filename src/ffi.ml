@@ -11,6 +11,21 @@ struct
 
   type 'a structure_type = {
     tag: string;
+
+    (* TODO: with some care to hand over ownership of the args array during
+       struct spec completion we could discard the bufferspec here.  That is,
+       we could merge it with the ctype field; it should become something like
+       
+       type 'a structspec =
+         Incomplete of Raw.bufferspec
+       | Complete of 'a structure ctype
+
+      type 'a structure_type = {
+        tag: string;
+        mutable passable: bool;
+        mutable spec: 'a structspec
+      }
+    *)
     bufspec: Raw.bufferspec;
 
     (* Whether the struct can be passed or returned by value.  For the
@@ -20,8 +35,9 @@ struct
 
     mutable ctype: 'a Raw.structure RawTypes.ctype option;
 
-  (* TODO: perhaps keep references to fields that might be collected,
-     at least until we seal the structure. *)
+    (* TODO: we should be keeping references to fields around if the struct is
+       passable, since prep_cif might inspect them.
+    *)
   }
 
   type 'a union_type = {
@@ -377,19 +393,21 @@ struct
     let ( *:* ) : 'a 's. 's structure typ -> 'a typ -> ('a, 's) field
       = fun (type b) (Struct ({bufspec} as s)) (ftype : b typ) -> 
         ensure_unsealed s;
-        let add_argument t = Raw.add_argument bufspec t in
+        let add_argument t = Raw.add_argument bufspec t 
+        and add_unpassable_argument t = Raw.add_unpassable_argument
+          bufspec ~size:(sizeof t) ~alignment:(alignment t) in
         let foffset = match ftype with
           | Void                     -> raise IncompleteType
-          | Array (reftype, n)       -> (s.passable <- false;
-                                         assert false (* TODO *))
+          | Array _ as a             -> (s.passable <- false;
+                                         add_unpassable_argument a)
           | Primitive p              -> add_argument p
           | Pointer p                -> add_argument RawTypes.pointer
           | Struct {ctype=None}      -> raise IncompleteType
           | Struct {ctype=Some ctyp;
                     passable}        -> (s.passable <- s.passable && passable;
                                          add_argument ctyp)
-          | Union _                  -> (s.passable <- false;
-                                         assert false (* TODO *))
+          | Union _  as u            -> (s.passable <- false;
+                                         add_unpassable_argument u)
           | FunctionPointer _        -> add_argument RawTypes.pointer
         in
         { ftype; foffset }

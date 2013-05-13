@@ -134,10 +134,69 @@ let test_pointers_to_struct_members () =
     end)
   end in ()
 
+
+(*
+  Test structs with union members.
+*)
+let test_structs_with_union_members () =
+  let module M = struct
+    open Type
+    type u and s
+
+    open Union
+    let utyp : u union typ = tag "u"
+    let uc = utyp *:* char
+    let ui = utyp *:* int
+    let uf = utyp *:* double
+    let () = seal utyp
+
+    let u = make utyp
+    let () = begin
+      setf u ui 14;
+      assert_equal ~msg:"u.ui = 14" ~printer:string_of_int
+        14 (getf u ui);
+
+      setf u uc 'x';
+      assert_equal ~msg:"u.uc = 'x'" ~printer:(String.make 1)
+        'x' (getf u uc);
+
+      setf u uf 5.55;
+      assert_equal ~msg:"u.uf = 5.5" ~printer:string_of_float
+        5.55 (getf u uf);
+    end
+
+    open Struct
+    let styp : s structure typ = tag "s"
+    let si = styp *:* int
+    let su = styp *:* utyp
+    let sc = styp *:* char
+    let () = seal styp
+
+    let s = make styp
+
+    let () = begin
+      setf s si 22;
+      setf s su u;
+      setf s sc 'z';
+
+      assert_equal ~msg:"s.si = 22" ~printer:string_of_int
+        22 (getf s si);
+      
+      assert_equal ~msg:"s.su.uc = 5.55" ~printer:string_of_float
+        5.55 (Union.getf (getf s su) uf);
+
+      assert_equal ~msg:"s.sc = 'z'" ~printer:(String.make 1)
+        'z' (getf s sc);
+    end
+  end in ()
+
+
+
 let suite = "Struct tests" >:::
   ["passing struct" >:: test_passing_struct;
    "returning struct" >:: test_returning_struct;
    "pointers to struct members" >:: test_pointers_to_struct_members;
+   "structs with union members" >:: test_structs_with_union_members;
   ]
 
 

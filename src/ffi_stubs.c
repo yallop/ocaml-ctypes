@@ -87,14 +87,21 @@ static struct bufferspec {
   /* The capacity of the args array, including the terminating null. */
   size_t capacity;
 
+  /* The maximum element alignment */
+  size_t max_align;
+
   /* The state of the bufferspec value. */
-  enum { BUILDING, STRUCTSPEC, CALLSPEC } state;
+  enum { BUILDING,
+         BUILDING_UNPASSABLE,
+         STRUCTSPEC,
+         STRUCTSPEC_UNPASSABLE,
+         CALLSPEC } state;
 
   /* A null-terminated array of size `nelements' types */
   ffi_type **args;
 
 } bufferspec_prototype = {
-  0, 0, 0, BUILDING, NULL,
+  0, 0, 0, 0, BUILDING, NULL,
 };
 
 static struct callspec {
@@ -106,7 +113,7 @@ static struct callspec {
   /* The libffi call interface structure. */
   ffi_cif cif;
 } callspec_prototype = {
-  { 0, 0, 0, BUILDING, NULL }, -1,
+  { 0, 0, 0, 0, BUILDING, NULL }, -1,
 };
 
 void finalize_bufferspec(value v)
@@ -205,6 +212,40 @@ value ctypes_allocate_callspec(value unit)
                          &bufferspec_prototype);
 }
 
+
+static int ctypes_add_unpassable_argument_(struct bufferspec *bufferspec, int size, int alignment)
+{
+  assert(bufferspec->state == BUILDING
+      || bufferspec->state == BUILDING_UNPASSABLE);
+
+  bufferspec->state = BUILDING_UNPASSABLE;
+  free(bufferspec->args);
+  bufferspec->args = NULL;
+
+  int offset = aligned_offset(bufferspec->bytes, alignment);
+  bufferspec->bytes = offset + size;
+
+  bufferspec->nelements += 1;
+  bufferspec->max_align = alignment > bufferspec->max_align
+    ? alignment
+    : bufferspec->max_align;
+  
+  return offset;
+}
+
+/* Add a struct element to the C call specification using only size and alignment information */
+/* add_unpassable_argument : bufferspec -> size:int -> alignment:int -> int */
+value ctypes_add_unpassable_argument(value bufferspec_, value size_, value alignment_)
+{
+  CAMLparam3(bufferspec_, size_, alignment_);
+  struct bufferspec *bufferspec = Data_custom_val(bufferspec_);
+  int size = Int_val(size_);
+  int alignment = Int_val(alignment_);
+
+  CAMLreturn(Val_int(ctypes_add_unpassable_argument_(bufferspec, size, alignment))); 
+}
+
+
 /* Add an argument to the C call specification */
 /* add_argument : bufferspec -> 'a ctype -> int */
 value ctypes_add_argument(value bufferspec_, value argument_)
@@ -215,25 +256,48 @@ value ctypes_add_argument(value bufferspec_, value argument_)
   struct bufferspec *bufferspec = Data_custom_val(bufferspec_);
   ffi_type *argtype = (((struct type_info *)Data_custom_val(argument_)))->ffitype;
 
-  assert(bufferspec->state == BUILDING); /* TODO: raise a proper error */
+  switch (bufferspec->state) {
 
-  int offset = aligned_offset(bufferspec->bytes, argtype->alignment);
-  bufferspec->bytes = offset + argtype->size;
+  case BUILDING: {
+    /* If there's a possibility that this spec represents an argument list or
+       a struct we might pass by value then we have to take care to maintain
+       the args, capacity and nelements members. */
+    int offset = aligned_offset(bufferspec->bytes, argtype->alignment);
+    bufferspec->bytes = offset + argtype->size;
 
-  if (bufferspec->nelements + 2 >= bufferspec->capacity) {
-    void *temp = realloc(bufferspec->args, (bufferspec->capacity + increment_size) * sizeof *bufferspec->args);
-    if (temp == NULL) {
-      caml_raise_out_of_memory();
+    if (bufferspec->nelements + 2 >= bufferspec->capacity) {
+      size_t new_size = (bufferspec->capacity + increment_size) * sizeof *bufferspec->args;
+      void *temp = realloc(bufferspec->args, new_size);
+      if (temp == NULL) {
+        caml_raise_out_of_memory();
+      }
+      bufferspec->args = temp;
+      bufferspec->capacity += increment_size;
     }
-    bufferspec->args = temp;
-    bufferspec->capacity += increment_size;
+    bufferspec->args[bufferspec->nelements] = argtype;
+    bufferspec->args[bufferspec->nelements + 1] = NULL;
+    bufferspec->nelements += 1;
+    bufferspec->max_align = argtype->alignment > bufferspec->max_align
+      ? argtype->alignment
+      : bufferspec->max_align;
+    CAMLreturn(Val_int(offset));
   }
-  bufferspec->args[bufferspec->nelements] = argtype;
-  bufferspec->args[bufferspec->nelements + 1] = NULL;
-  bufferspec->nelements += 1;
+  case BUILDING_UNPASSABLE: {
+    /* If this spec represents an unpassable struct then we can ignore the
+       args, capacity and nelements members. */
+    int offset = ctypes_add_unpassable_argument_
+               (bufferspec,
+                argtype->size,
+                argtype->alignment);
 
-  CAMLreturn(Val_int(offset));
+    CAMLreturn(Val_int(offset));
+  }
+  default: {
+    assert(0);
+  }
+  }
 }
+
 
 /* Pass the return type and conclude the specification preparation */
 /* prep_callspec : bufferspec -> 'a ctype -> unit */
@@ -401,21 +465,37 @@ value ctypes_complete_structspec(value bufferspec_)
 
   CAMLlocal1(block);
   block = ctypes_allocate_struct_type_info(bufferspec->args);
-
-  /* We'll use prep_ffi_cif to trigger computation of the size and alignment
-     of the struct type rather than repeating what's already in libffi.  It'd
-     be nice if the initialize_aggregate function were exposed so that we
-     could do without the dummy cif.
-  */
   struct type_info *t = Data_custom_val(block);
-  ffi_cif _dummy_cif;
-  ffi_status status = ffi_prep_cif(&_dummy_cif, FFI_DEFAULT_ABI, 0, t->ffitype, NULL);
 
-  check_ffi_status(status);
+  switch (bufferspec->state) {
+  case BUILDING: {
+    /* We'll use prep_ffi_cif to trigger computation of the size and alignment
+       of the struct type rather than repeating what's already in libffi.  It'd
+       be nice if the initialize_aggregate function were exposed so that we
+       could do without the dummy cif.
+    */
+    ffi_cif _dummy_cif;
+    ffi_status status = ffi_prep_cif(&_dummy_cif, FFI_DEFAULT_ABI, 0, t->ffitype, NULL);
 
-  bufferspec->state = STRUCTSPEC;
+    check_ffi_status(status);
 
-  CAMLreturn(block);
+    bufferspec->state = STRUCTSPEC;
+
+    CAMLreturn(block);
+  }
+  case BUILDING_UNPASSABLE: {
+    /* Compute padding, and populate the size and alignment fields.  The other
+       components, including the args array, are ignored altogether */
+    t->ffitype->size = aligned_offset(bufferspec->bytes, bufferspec->max_align);
+    t->ffitype->alignment = bufferspec->max_align;
+    CAMLreturn(block);
+
+    bufferspec->state = STRUCTSPEC_UNPASSABLE;
+  }
+  default: {
+    assert (0);
+  }
+  }
 }
 
 /* pointer_plus : char* -> int -> char* */

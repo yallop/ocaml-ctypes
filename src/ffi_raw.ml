@@ -177,6 +177,10 @@ external complete_struct_type : bufferspec -> _ structure ctype
 external add_argument : bufferspec -> _ ctype -> int
   = "ctypes_add_argument"
 
+(* add_unpassable_argument : bufferspec -> size:int -> alignment:int -> int *)
+external add_unpassable_argument : bufferspec -> size:int -> alignment:int -> int
+  = "ctypes_add_unpassable_argument"
+
 (* nary callbacks *)
 type boxedfn =
   | Done of (immediate_pointer -> unit)
