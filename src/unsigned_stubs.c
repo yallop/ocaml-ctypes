@@ -108,6 +108,7 @@
       return caml_copy_string(buf);                                          \
   }                                                                          \
                                                                              \
+  /* max : unit -> t */                                                      \
   value ctypes_uint ## BITS ## _max(value a)                                 \
   {                                                                          \
     return caml_copy_uint ## BITS ((TYPE(BITS))(-1));                        \
