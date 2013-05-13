@@ -137,7 +137,7 @@ external read : 'a ctype -> offset:int -> immediate_pointer -> 'a
   = "ctypes_read"
 
 (* Write a C value to a block of memory *)
-external write : offset:int -> 'a ctype -> 'a -> immediate_pointer -> unit
+external write :  'a ctype -> offset:int -> 'a -> immediate_pointer -> unit
   = "ctypes_write"
 
 (* Allocate a new C call specification *)

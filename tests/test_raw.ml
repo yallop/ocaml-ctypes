@@ -20,8 +20,8 @@ let test_fabs () =
     
     let fabs x =
       call dlfabs callspec
-        (write ~offset:arg_1_offset double x)
-        (read ~offset:0 double)
+        (write double ~offset:arg_1_offset x)
+        (read double ~offset:0)
     in
 
     assert_equal 2.0 (fabs (-2.0)) ~printer:string_of_float;
@@ -46,8 +46,8 @@ let test_pow () =
     let pow x y =
       call dlpow callspec
         (fun buffer ->
-          write arg_1_offset double x buffer;
-          write arg_2_offset double y buffer)
+          write double ~offset:arg_1_offset x buffer;
+          write double ~offset:arg_2_offset y buffer)
         (read ~offset:0 double)
     in
 

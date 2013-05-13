@@ -402,10 +402,10 @@ value ctypes_read(value ctype, value offset_, value buffer_)
 }
 
 /* Write a C value to a block of memory */
-/* write : int -> ctype -> buffer -> 'a -> unit */
-value ctypes_write(value offset_, value ctype, value v, value buffer_)
+/* write : ctype -> offset:int -> 'a -> buffer -> unit */
+value ctypes_write(value ctype, value offset_, value v, value buffer_)
 {
-  CAMLparam4(offset_, ctype, buffer_, v);
+  CAMLparam4(ctype, offset_, buffer_, v);
   struct type_info *type_info = Data_custom_val(ctype);
   callbuffer *buffer = (callbuffer *)buffer_;
   int offset = Int_val(offset_);

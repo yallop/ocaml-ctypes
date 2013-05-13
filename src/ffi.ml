@@ -95,8 +95,6 @@ struct
       Return : (offset:int -> 'a -> Raw.immediate_pointer -> unit) -> 'a callbackspec
     | ReadArg : (Raw.immediate_pointer -> 'a) * 'b callbackspec -> ('a -> 'b) callbackspec
 
-  type 'a builder = Builder of (offset:int -> Raw.immediate_pointer -> 'a)
-  type 'a writer = Writer of (offset:int -> 'a -> Raw.immediate_pointer -> unit)
   type arg_type = ArgType : 'b RawTypes.ctype -> arg_type
 
   (*
@@ -135,31 +133,29 @@ struct
   let rec build_callspec : 'a. 'a fn -> Raw.bufferspec -> 'a callbackspec =
     fun (type a) fn callspec -> match (fn : a fn) with
       | Returns (_, ty) ->
-        let Writer write = writer ty in
-        let (ArgType ctype) = arg_type ty in
+        let ArgType ctype = arg_type ty in
         let _ = Raw.prep_callspec callspec ctype in
-        Return write
+        Return (writer ty)
       | Function (Void, f) -> (* TODO: eliminate this special case *)
         let rest = build_callspec f callspec in
-        ReadArg ((fun _ -> ()), rest)
+        ReadArg (build Void ~offset:0, rest)
       | Function (p, f) ->
-        let Builder build = builder p in
         let ArgType ctype = arg_type p in
         let _ = Raw.add_argument callspec ctype in
         let rest = build_callspec f callspec in
-        ReadArg (build ~offset:0, rest)
+        ReadArg (build p ~offset:0, rest)
 
   (* Describes how to read a value, e.g. from a return buffer *)
-  and builder : 'a. 'a typ -> 'a builder =
+  and build : 'a. 'a typ -> offset:int -> Raw.immediate_pointer -> 'a =
     fun (type a) (t : a typ) -> match t with
       | Void ->
-        (Builder (Raw.read RawTypes.void) : a builder)
+        (Raw.read RawTypes.void : offset:int -> Raw.immediate_pointer -> a)
       | Primitive p ->
-        Builder (Raw.read p)
+        Raw.read p
       | Struct {ctype=None} ->
         raise IncompleteType
       | Struct ({ctype=Some p}) as reftype ->
-        Builder (fun ~offset buf -> 
+        (fun ~offset buf -> 
           let m = Raw.read p ~offset buf in
           { structure = 
               { pmanaged = Some m;
@@ -167,46 +163,48 @@ struct
                 raw_ptr = Raw.block_address m;
                 pbyte_offset = 0}})
       | Pointer reftype ->
-        Builder (fun ~offset buf -> 
+        (fun ~offset buf -> 
           {raw_ptr=Raw.read RawTypes.pointer ~offset buf;
            pbyte_offset = 0;
            reftype;
            pmanaged = None})
       | FunctionPointer f ->
         let build_fun = function_builder f in
-        Builder (fun ~offset buf -> build_fun (Raw.read RawTypes.pointer ~offset buf))
+        (fun ~offset buf -> build_fun (Raw.read RawTypes.pointer ~offset buf))
       (* The following cases should never happen; non-struct aggregate
          types are excluded during type construction. *)
       | Union _ -> assert false
       | Array _ -> assert false
 
-  and writer : 'a. 'a typ -> 'a writer =
+  and writer : 'a. 'a typ -> offset:int -> 'a -> Raw.immediate_pointer -> unit =
     fun (type a) (t : a typ) -> match t with
       | Void ->
-        (Writer (fun ~offset _ _ -> ()) : a writer)
-      | Primitive p -> Writer (fun ~offset -> Raw.write ~offset p)
+        ((fun ~offset _ _ -> ()) : offset:int -> a -> Raw.immediate_pointer -> unit)
+      | Primitive p ->
+        Raw.write p
       | Pointer reftype ->
-          Writer (fun ~offset {raw_ptr; pbyte_offset} -> Raw.write ~offset RawTypes.pointer
-            ((Raw.pointer_plus raw_ptr pbyte_offset)))
+        (fun ~offset {raw_ptr; pbyte_offset} -> Raw.write RawTypes.pointer ~offset
+          ((Raw.pointer_plus raw_ptr pbyte_offset)))
       | FunctionPointer fn ->
         let cs' = Raw.allocate_callspec () in
         let cs = build_callspec fn cs' in
         let box = box_function cs in
-        Writer (fun ~offset f -> Raw.write ~offset RawTypes.pointer (Raw.make_function_pointer cs' (box f)))
+        (fun ~offset f ->
+          Raw.write RawTypes.pointer ~offset (Raw.make_function_pointer cs' (box f)))
       | Struct {ctype=None} ->
         raise IncompleteType
       | Struct {ctype=Some _} as s ->
         let size = sizeof s in
-        Writer (fun ~offset {structure={raw_ptr=src; pbyte_offset=src_offset}} dst ->
+        (fun ~offset {structure={raw_ptr=src; pbyte_offset=src_offset}} dst ->
           Raw.memcpy ~size ~dst ~dst_offset:offset ~src ~src_offset)
       | Union {ucomplete=false} ->
         raise IncompleteType
       | Union {usize=size} ->
-        Writer (fun ~offset {union={raw_ptr=src; pbyte_offset=src_offset}} dst ->
+        (fun ~offset {union={raw_ptr=src; pbyte_offset=src_offset}} dst ->
           Raw.memcpy ~size ~dst ~dst_offset:offset ~src ~src_offset)
       | Array _ as a ->
         let size = sizeof a in
-        Writer (fun ~offset {astart={raw_ptr=src; pbyte_offset=src_offset}} dst ->
+        (fun ~offset {astart={raw_ptr=src; pbyte_offset=src_offset}} dst ->
           Raw.memcpy ~size ~dst ~dst_offset:offset ~src ~src_offset)
           
   and arg_type : 'a. 'a typ -> arg_type
@@ -233,20 +231,17 @@ struct
   and build_ccallspec : 'a. 'a fn -> Raw.bufferspec -> 'a ccallspec
     = fun (type a) (fn : a fn) callspec -> match fn with
       | Returns (check_errno, t) ->
-        let Builder (build) = builder t in
         let ArgType ctype = arg_type t in
         let () = Raw.prep_callspec callspec ctype in
-        (Call (check_errno, build ~offset:0) : a ccallspec)
+        (Call (check_errno, build t ~offset:0) : a ccallspec)
       | Function (Void, f) -> (* TODO: eliminate this special case *)
-        let Writer do_write = writer Void in
         let rest = build_ccallspec f callspec in
-        WriteArg (do_write ~offset:0, rest)
+        WriteArg (writer Void ~offset:0, rest)
       | Function (p, f) ->
-        let Writer do_write = writer p in
         let ArgType ctype = arg_type p in
         let offset = Raw.add_argument callspec ctype in
         let rest = build_ccallspec f callspec in
-        WriteArg (do_write ~offset, rest)
+        WriteArg (writer p ~offset, rest)
 
   and function_builder : 'a. ?name:string -> 'a fn -> RawTypes.voidp -> 'a
     = fun ?name fn ->
@@ -278,9 +273,7 @@ struct
           | Array (elemtype, alength) ->
             { astart = {ptr with reftype = elemtype}; alength }
           (* If it's a value type then we cons a new value. *)
-          | _ -> 
-            let Builder build = builder reftype in
-            build ~offset raw_ptr
+          | _ -> build reftype ~offset raw_ptr
 
     let diff : 'a. 'a t -> 'a t -> int =
       fun {pbyte_offset = o1; reftype} {pbyte_offset = o2} ->
@@ -297,8 +290,7 @@ struct
 
     let (:=) : 'a. 'a t -> 'a -> unit
       = fun (type a) ({reftype; raw_ptr; pbyte_offset=offset} : a t) ->
-        let Writer write = writer reftype in
-        fun v -> write ~offset v raw_ptr
+        fun v -> writer reftype ~offset v raw_ptr
               
     let from_voidp : 'a. 'a typ -> unit ptr -> 'a ptr =
       fun reftype p -> {p with reftype}
