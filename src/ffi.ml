@@ -3,6 +3,7 @@
 module C =
 struct
   exception IncompleteType
+  exception ModifyingSealedType
   exception Unsupported of string
 
   module Raw = Ffi_raw
@@ -76,19 +77,16 @@ struct
       | FunctionPointer _         -> RawTypes.(alignment pointer)
 
   let passable (type a) (t : a typ) = match t with
-        Void                      -> true
-      | Primitive p               -> true
-      | Struct { passable }       -> passable
-      | Union _                   -> false
-      | Array _                   -> false
-      | Pointer _                 -> true
-      | FunctionPointer _         -> true
+        Void                       -> true
+      | Primitive p                -> true
+      | Struct { ctype = None }    -> raise IncompleteType
+      | Struct { passable }        -> passable
+      | Union { ucomplete = false} -> raise IncompleteType
+      | Union _                    -> false
+      | Array _                    -> false
+      | Pointer _                  -> true
+      | FunctionPointer _          -> true
 
-  (* TODO: we could dispense with these type and the accompanying
-     interpretations.  It'd probably make things more efficient, for
-     various reasons (elimination of tags, elimination of recursion,
-     exposing opportunities for optimization), but might make things
-     terribly higher-order. *)
   type _ ccallspec =
       Call : bool * ('b -> 'a) * 'b RawTypes.ctype -> 'a ccallspec
     | WriteArg : ('a -> Raw.immediate_pointer -> unit) * 'b ccallspec -> ('a -> 'b) ccallspec
@@ -143,7 +141,7 @@ struct
         let (ArgType ctype) = arg_type ty in
         let _ = Raw.prep_callspec callspec ctype in
         Return write
-      | Function (Void, f) ->
+      | Function (Void, f) -> (* TODO: eliminate this special case *)
         let rest = build_callspec f callspec in
         ReadArg ((fun _ -> ()), rest)
       | Function (p, f) ->
@@ -154,6 +152,7 @@ struct
 
   (* Describes how to read an argument, e.g. from a return buffer *)
   and builder : 'a. 'a typ -> 'a builder =
+    (* TODO: rewrite builder similarly to writer *)
     fun (type a) (t : a typ) -> match t with
       | Void ->
         (Builder (id, RawTypes.void) : a builder)
@@ -181,7 +180,7 @@ struct
   and writer : 'a. 'a typ -> 'a writer =
     fun (type a) (t : a typ) -> match t with
       | Void ->
-        (Writer (fun ~offset -> Raw.write ~offset RawTypes.void) : a writer)
+        (Writer (fun ~offset _ _ -> ()) : a writer)
       | Primitive p -> Writer (fun ~offset -> Raw.write ~offset p)
       | Pointer reftype ->
           Writer (fun ~offset {raw_ptr; pbyte_offset} -> Raw.write ~offset RawTypes.pointer
@@ -195,22 +194,18 @@ struct
         raise IncompleteType
       | Struct {ctype=Some _} as s ->
         let size = sizeof s in
-          Writer (fun ~offset {structure={raw_ptr; pbyte_offset}} buf ->
-            Raw.memcpy ~size
-              ~dst:buf ~dst_offset:offset
-              ~src:raw_ptr ~src_offset:pbyte_offset)
-       | Union {usize=size} ->
-         Writer (fun ~offset {union={raw_ptr; pbyte_offset}} buf ->
-            Raw.memcpy ~size
-              ~dst:buf ~dst_offset:offset
-              ~src:raw_ptr ~src_offset:pbyte_offset)
-       | Array _ as a ->
-         let size = sizeof a in
-         Writer (fun ~offset {astart={raw_ptr; pbyte_offset}} buf ->
-            Raw.memcpy ~size
-              ~dst:buf ~dst_offset:offset
-              ~src:raw_ptr ~src_offset:pbyte_offset)
-
+        Writer (fun ~offset {structure={raw_ptr=src; pbyte_offset=src_offset}} dst ->
+          Raw.memcpy ~size ~dst ~dst_offset:offset ~src ~src_offset)
+      | Union {ucomplete=false} ->
+        raise IncompleteType
+      | Union {usize=size} ->
+        Writer (fun ~offset {union={raw_ptr=src; pbyte_offset=src_offset}} dst ->
+          Raw.memcpy ~size ~dst ~dst_offset:offset ~src ~src_offset)
+      | Array _ as a ->
+        let size = sizeof a in
+        Writer (fun ~offset {astart={raw_ptr=src; pbyte_offset=src_offset}} dst ->
+          Raw.memcpy ~size ~dst ~dst_offset:offset ~src ~src_offset)
+          
   and arg_type : 'a. 'a typ -> arg_type
     = fun (type a) (t : a typ) -> match t with
       | Void -> ArgType RawTypes.void
@@ -238,9 +233,10 @@ struct
         let Builder (from_prim, ctype) = builder t in
         let () = Raw.prep_callspec callspec ctype in
         (Call (check_errno, from_prim, ctype) : a ccallspec)
-      | Function (Void, f) ->
+      | Function (Void, f) -> (* TODO: eliminate this special case *)
+        let Writer do_write = writer Void in
         let rest = build_ccallspec f callspec in
-        WriteArg ((fun _ _ -> ()), rest)
+        WriteArg (do_write ~offset:0, rest)
       | Function (p, f) ->
         let Writer do_write = writer p in
         let ArgType ctype = arg_type p in
@@ -270,6 +266,8 @@ struct
       = fun (type a) ({raw_ptr; reftype; pbyte_offset=offset} as ptr : a t) ->
         match reftype with
           | Void -> raise IncompleteType
+          | Union {ucomplete=false} -> raise IncompleteType
+          | Struct {ctype=None} -> raise IncompleteType
           (* If it's a reference type then we take a reference *)
           | Union _ -> ({union = ptr } : a)
           | Struct _ -> { structure = ptr}
@@ -381,11 +379,17 @@ struct
         
     let tag tag = Struct {bufspec = Raw.allocate_bufferspec (); ctype = None; tag; passable=true}
       
+    let ensure_unsealed = function
+      | {ctype=None} -> ()
+      | _            -> raise ModifyingSealedType
+
     let seal (Struct s) =
+      ensure_unsealed s;
       s.ctype <- Some (Raw.complete_struct_type s.bufspec)
 
     let ( *:* ) : 'a 's. 's structure typ -> 'a typ -> ('a, 's) field
       = fun (type b) (Struct ({bufspec} as s)) (ftype : b typ) -> 
+        ensure_unsealed s;
         let add_argument t = Raw.add_argument bufspec t in
         let foffset = match ftype with
           | Void                     -> raise IncompleteType
@@ -409,13 +413,15 @@ struct
     let (@.) (type s) (type a) 
         { structure }
         { ftype=reftype; foffset=pbyte_offset } = 
-      { structure with pbyte_offset ; reftype }
+      { structure with
+        pbyte_offset = structure.pbyte_offset + pbyte_offset;
+        reftype }
 
     let (|->) : 'a 's. 's structure ptr -> ('a, 's) field -> 'a ptr =
       fun (type a) (type s)
-        { reftype=Struct s; raw_ptr; pbyte_offset=offset; pmanaged }
-        { ftype=reftype; foffset=pbyte_offset } ->
-          { reftype; raw_ptr; pbyte_offset; pmanaged }
+        { raw_ptr; pbyte_offset; pmanaged }
+        { ftype=reftype; foffset } ->
+          { reftype; raw_ptr; pbyte_offset=foffset + pbyte_offset; pmanaged }
 
     let setf s field v = Ptr.((s @. field) := v)
     let getf s field = Ptr.(!(s @. field))
@@ -429,10 +435,19 @@ struct
     type ('a, 's) field  = 'a typ
         
     let tag utag = Union {utag; usize = 0; ualignment = 0; ucomplete = false}
-    let seal (Union u) = u.ucomplete <- true
+
+    let ensure_unsealed = function
+      | {ucomplete=true} -> raise ModifyingSealedType
+      | _ -> ()
+
+    let seal (Union u) = begin
+      ensure_unsealed u;
+      u.ucomplete <- true
+    end
 
     let ( *:* ) (Union u) ftype =
       begin
+        ensure_unsealed u;
         u.usize <- max u.usize (sizeof ftype);
         u.ualignment <- max u.ualignment (alignment ftype);
         ftype
