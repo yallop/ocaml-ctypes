@@ -17,6 +17,8 @@ sig
 
   val void : unit ctype
   val char : char ctype
+  val schar : int ctype
+  val uchar : uchar ctype
   val float : float ctype
   val double : float ctype
   val short : int ctype
@@ -26,7 +28,6 @@ sig
   val int16_t : int ctype
   val int32_t : int32 ctype
   val int64_t : int64 ctype
-  val uchar : uchar ctype
   val uint8_t : uint8 ctype
   val uint16_t : uint16 ctype
   val uint32_t : uint32 ctype
@@ -72,6 +73,9 @@ struct
 
   external _char_type_info : unit -> char ctype = "ctypes_char_type_info"
   let char = _char_type_info ()
+
+  external _schar_type_info : unit -> int ctype = "ctypes_schar_type_info"
+  let schar = _schar_type_info ()
 
   external _short_type_info : unit -> int ctype = "ctypes_short_type_info"
   let short = _short_type_info ()
