@@ -60,9 +60,91 @@ let test_unions_are_not_passable () =
   end in ()
 
 
+(*
+  Test struct passability.  Structs are passable unless they contain
+  unpassable members (unions, arrays, or unpassable structs).
+*)
+let test_struct_passability () =
+  let module M = struct
+    open Struct
+    open Type
+    type s1 and s2 and s3 and s4 and s5 and u
+
+    let s1 : s1 structure typ = tag "s1"
+    let _ = s1 *:* int
+    let _ = s1 *:* double
+    let _ = s1 *:* ptr s1
+    let _ = s1 *:* funptr (int @-> returning int)
+    let () = seal s1
+
+    let s2 : s2 structure typ = tag "s2"
+    let _ = s2 *:* s1
+    let _ = s2 *:* double
+    let _ = s2 *:* ptr (array 10 int)
+    let () = seal s2
+
+    let s3 : s3 structure typ = tag "s3"
+    let _ = s3 *:* array 10 (ptr char)
+    let () = seal s3
+
+    let s4 : s4 structure typ = tag "s4"
+    let _ = s4 *:* s3
+    let () = seal s4
+
+    let u : u union typ = Union.tag "u"
+    let _ = Union.(u *:* int)
+    let () = Union.seal u
+
+    let s5 : s5 structure typ = tag "s5"
+    let _ = s5 *:* u
+    let () = seal s5
+
+    let _ = begin
+      (* Struct types can be argument types *)
+      ignore (s1 @-> returning void);
+      ignore (s2 @-> returning void);
+
+      (* Struct types can be return types *)
+      ignore (void @-> returning s1);
+      ignore (void @-> returning s2);
+
+      assert_raises
+        ~msg:"Structs with array members rejected as arguments"
+        (Unsupported "Unsupported argument type")
+        (fun () -> s3 @-> returning void);
+
+      assert_raises
+        ~msg:"Structs with array members rejected as return types"
+        (Unsupported "Unsupported return type")
+        (fun () -> void @-> returning s3);
+
+      assert_raises
+        ~msg:"Structs with unpassable struct members rejected as arguments"
+        (Unsupported "Unsupported argument type")
+        (fun () -> s4 @-> returning void);
+
+      assert_raises
+        ~msg:"Structs with unpassable struct members rejected as return types"
+        (Unsupported "Unsupported return type")
+        (fun () -> void @-> returning s4);
+
+      assert_raises
+        ~msg:"Structs with union members rejected as arguments"
+        (Unsupported "Unsupported argument type")
+        (fun () -> s5 @-> returning void);
+
+      assert_raises
+        ~msg:"Structs with union members rejected as return types"
+        (Unsupported "Unsupported return type")
+        (fun () -> void @-> returning s5);
+    end
+  end in ()
+
+
 let suite = "Passability tests" >:::
   ["primitives are passable" >:: test_primitives_are_passable;
    "unions are not passable" >:: test_unions_are_not_passable;
+   "struct passability" >:: test_struct_passability;
   ]
 
 
