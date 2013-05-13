@@ -56,10 +56,6 @@ struct
       Call : bool * (Raw.immediate_pointer -> 'a) -> 'a ccallspec
     | WriteArg : ('a -> Raw.immediate_pointer -> unit) * 'b ccallspec -> ('a -> 'b) ccallspec
 
-  type _ callbackspec =
-      Return : (offset:int -> 'a -> Raw.immediate_pointer -> unit) -> 'a callbackspec
-    | ReadArg : (Raw.immediate_pointer -> 'a) * 'b callbackspec -> ('a -> 'b) callbackspec
-
   type arg_type = ArgType : 'b RawTypes.ctype -> arg_type
 
   let rec sizeof : 'a. 'a typ -> int
@@ -134,29 +130,28 @@ struct
         fun writers callspec addr v ->
           next (write v :: writers) callspec addr
 
-  let rec box_function : 'a. 'a callbackspec -> 'a -> Raw.boxedfn
-    = fun (type a) (fn : a callbackspec) -> match fn with
-      | Return write ->
-        fun f -> Raw.Done (write ~offset:0 f)
-      | ReadArg (read, rest) ->
-        let box = box_function rest in
-        fun f -> Raw.Fn (fun buffer -> 
-          box (f (read buffer)))
+  let rec prep_callspec : 'a. Raw.bufferspec -> 'a typ -> unit
+    = fun callspec ty ->
+      let ArgType ctype = arg_type ty in
+      Raw.prep_callspec callspec ctype
 
-  let rec build_callspec : 'a. 'a fn -> Raw.bufferspec -> 'a callbackspec =
+  and add_argument : 'a. Raw.bufferspec -> 'a typ -> int
+    = fun callspec (type a) (ty : a typ) -> match ty with
+      | Void -> 0
+      | _    -> let ArgType ctype = arg_type ty in
+                Raw.add_argument callspec ctype
+
+  and build_callspec : 'a. 'a fn -> Raw.bufferspec -> 'a -> Raw.boxedfn =
     fun (type a) fn callspec -> match (fn : a fn) with
       | Returns (_, ty) ->
-        let ArgType ctype = arg_type ty in
-        let _ = Raw.prep_callspec callspec ctype in
-        Return (write ty)
-      | Function (Void, f) -> (* TODO: eliminate this special case *)
-        let rest = build_callspec f callspec in
-        ReadArg (build Void ~offset:0, rest)
+        let _ = prep_callspec callspec ty
+        and write_rv = write ty in
+        fun f -> Raw.Done (write_rv ~offset:0 f)
       | Function (p, f) ->
-        let ArgType ctype = arg_type p in
-        let _ = Raw.add_argument callspec ctype in
-        let rest = build_callspec f callspec in
-        ReadArg (build p ~offset:0, rest)
+        let _ = add_argument callspec p
+        and box = build_callspec f callspec
+        and read = build p ~offset:0 in
+        fun f -> Raw.Fn (fun buf -> box (f (read buf)))
 
   (* Describes how to read a value, e.g. from a return buffer *)
   and build : 'a. 'a typ -> offset:int -> Raw.immediate_pointer -> 'a =
@@ -196,14 +191,15 @@ struct
       | Primitive p ->
         Raw.write p
       | Pointer reftype ->
-        (fun ~offset {raw_ptr; pbyte_offset} -> Raw.write RawTypes.pointer ~offset
-          ((Raw.pointer_plus raw_ptr pbyte_offset)))
+        (fun ~offset {raw_ptr; pbyte_offset} -> 
+          Raw.write RawTypes.pointer ~offset
+            (Raw.pointer_plus raw_ptr pbyte_offset))
       | FunctionPointer fn ->
         let cs' = Raw.allocate_callspec () in
         let cs = build_callspec fn cs' in
-        let box = box_function cs in
         (fun ~offset f ->
-          Raw.write RawTypes.pointer ~offset (Raw.make_function_pointer cs' (box f)))
+          Raw.write RawTypes.pointer ~offset
+            (Raw.make_function_pointer cs' (cs f)))
       | Struct {ctype=None} ->
         raise IncompleteType
       | Struct {ctype=Some _} as s ->
@@ -231,16 +227,11 @@ struct
   and build_ccallspec : 'a. 'a fn -> Raw.bufferspec -> 'a ccallspec
     = fun (type a) (fn : a fn) callspec -> match fn with
       | Returns (check_errno, t) ->
-        let ArgType ctype = arg_type t in
-        let () = Raw.prep_callspec callspec ctype in
+        let () = prep_callspec callspec t in
         (Call (check_errno, build t ~offset:0) : a ccallspec)
-      | Function (Void, f) -> (* TODO: eliminate this special case *)
-        let rest = build_ccallspec f callspec in
-        WriteArg (write Void ~offset:0, rest)
       | Function (p, f) ->
-        let ArgType ctype = arg_type p in
-        let offset = Raw.add_argument callspec ctype in
-        let rest = build_ccallspec f callspec in
+        let offset = add_argument callspec p
+        and rest = build_ccallspec f callspec in
         WriteArg (write p ~offset, rest)
 
   and build_function : 'a. ?name:string -> 'a fn -> RawTypes.voidp -> 'a
