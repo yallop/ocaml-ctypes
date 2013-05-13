@@ -7,6 +7,8 @@
 #include <caml/hash.h>
 #include <caml/unixsupport.h>
 
+#include "managed_buffer_stubs.h"
+
 /* #include <caml/threads.h> */
 
 #include <ffi.h>
@@ -79,7 +81,6 @@ static value allocate_custom(struct custom_operations *ops, size_t size, void *p
 }
 
 
-extern value ctypes_allocate(value);
 static value raw_read_struct(struct type_info * ti, void *buf)
 {
   CAMLparam0();
