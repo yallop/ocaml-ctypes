@@ -52,6 +52,16 @@ struct
   and 'a union = { union : 'a union ptr }
   and 'a structure = { structure : 'a structure ptr }
 
+  type _ ccallspec =
+      Call : bool * (Raw.immediate_pointer -> 'a) -> 'a ccallspec
+    | WriteArg : ('a -> Raw.immediate_pointer -> unit) * 'b ccallspec -> ('a -> 'b) ccallspec
+
+  type _ callbackspec =
+      Return : (offset:int -> 'a -> Raw.immediate_pointer -> unit) -> 'a callbackspec
+    | ReadArg : (Raw.immediate_pointer -> 'a) * 'b callbackspec -> ('a -> 'b) callbackspec
+
+  type arg_type = ArgType : 'b RawTypes.ctype -> arg_type
+
   let rec sizeof : 'a. 'a typ -> int
     = fun (type a) (t : a typ) -> match t with
         Void                      -> raise IncompleteType
@@ -87,15 +97,18 @@ struct
       | Pointer _                  -> true
       | FunctionPointer _          -> true
 
-  type _ ccallspec =
-      Call : bool * (Raw.immediate_pointer -> 'a) -> 'a ccallspec
-    | WriteArg : ('a -> Raw.immediate_pointer -> unit) * 'b ccallspec -> ('a -> 'b) ccallspec
-
-  type _ callbackspec =
-      Return : (offset:int -> 'a -> Raw.immediate_pointer -> unit) -> 'a callbackspec
-    | ReadArg : (Raw.immediate_pointer -> 'a) * 'b callbackspec -> ('a -> 'b) callbackspec
-
-  type arg_type = ArgType : 'b RawTypes.ctype -> arg_type
+  let arg_type : 'a. 'a typ -> arg_type
+    = fun (type a) (t : a typ) -> match t with
+      | Void -> ArgType RawTypes.void
+      | Primitive p -> ArgType p
+      | Struct {ctype=None} -> raise IncompleteType
+      | Struct {ctype=Some p} as s -> ArgType p
+      | Pointer reftype -> ArgType RawTypes.pointer
+      | FunctionPointer fn -> ArgType RawTypes.pointer
+      (* The following cases should never happen; non-struct aggregate
+         types are excluded during type construction. *)
+      | Union _ -> assert false
+      | Array _ -> assert false
 
   (*
     call addr callspec return (fun buffer ->
@@ -135,7 +148,7 @@ struct
       | Returns (_, ty) ->
         let ArgType ctype = arg_type ty in
         let _ = Raw.prep_callspec callspec ctype in
-        Return (writer ty)
+        Return (write ty)
       | Function (Void, f) -> (* TODO: eliminate this special case *)
         let rest = build_callspec f callspec in
         ReadArg (build Void ~offset:0, rest)
@@ -169,14 +182,14 @@ struct
            reftype;
            pmanaged = None})
       | FunctionPointer f ->
-        let build_fun = function_builder f in
+        let build_fun = build_function f in
         (fun ~offset buf -> build_fun (Raw.read RawTypes.pointer ~offset buf))
       (* The following cases should never happen; non-struct aggregate
          types are excluded during type construction. *)
       | Union _ -> assert false
       | Array _ -> assert false
 
-  and writer : 'a. 'a typ -> offset:int -> 'a -> Raw.immediate_pointer -> unit =
+  and write : 'a. 'a typ -> offset:int -> 'a -> Raw.immediate_pointer -> unit =
     fun (type a) (t : a typ) -> match t with
       | Void ->
         ((fun ~offset _ _ -> ()) : offset:int -> a -> Raw.immediate_pointer -> unit)
@@ -207,19 +220,6 @@ struct
         (fun ~offset {astart={raw_ptr=src; pbyte_offset=src_offset}} dst ->
           Raw.memcpy ~size ~dst ~dst_offset:offset ~src ~src_offset)
           
-  and arg_type : 'a. 'a typ -> arg_type
-    = fun (type a) (t : a typ) -> match t with
-      | Void -> ArgType RawTypes.void
-      | Primitive p -> ArgType p
-      | Struct {ctype=None} -> raise IncompleteType
-      | Struct {ctype=Some p} as s -> ArgType p
-      | Pointer reftype -> ArgType RawTypes.pointer
-      | FunctionPointer fn -> ArgType RawTypes.pointer
-      (* The following cases should never happen; non-struct aggregate
-         types are excluded during type construction. *)
-      | Union _ -> assert false
-      | Array _ -> assert false
-
   (*
     callspec = allocate_callspec ()
     arg_1 = add_argument callspec argtype
@@ -236,14 +236,14 @@ struct
         (Call (check_errno, build t ~offset:0) : a ccallspec)
       | Function (Void, f) -> (* TODO: eliminate this special case *)
         let rest = build_ccallspec f callspec in
-        WriteArg (writer Void ~offset:0, rest)
+        WriteArg (write Void ~offset:0, rest)
       | Function (p, f) ->
         let ArgType ctype = arg_type p in
         let offset = Raw.add_argument callspec ctype in
         let rest = build_ccallspec f callspec in
-        WriteArg (writer p ~offset, rest)
+        WriteArg (write p ~offset, rest)
 
-  and function_builder : 'a. ?name:string -> 'a fn -> RawTypes.voidp -> 'a
+  and build_function : 'a. ?name:string -> 'a fn -> RawTypes.voidp -> 'a
     = fun ?name fn ->
       let c = Raw.allocate_callspec () in
       let e = build_ccallspec fn c in
@@ -290,7 +290,7 @@ struct
 
     let (:=) : 'a. 'a t -> 'a -> unit
       = fun (type a) ({reftype; raw_ptr; pbyte_offset=offset} : a t) ->
-        fun v -> writer reftype ~offset v raw_ptr
+        fun v -> write reftype ~offset v raw_ptr
               
     let from_voidp : 'a. 'a typ -> unit ptr -> 'a ptr =
       fun reftype p -> {p with reftype}
@@ -505,7 +505,7 @@ struct
 
   let foreign ?from symbol typ =
     let addr = Dl.dlsym ?handle:from ~symbol in
-    function_builder ~name:symbol typ addr
+    build_function ~name:symbol typ addr
 
   let foreign_value ?from symbol reftype =
     let raw_ptr = Dl.dlsym ?handle:from ~symbol in
