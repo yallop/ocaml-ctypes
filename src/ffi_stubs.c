@@ -79,58 +79,7 @@ static value allocate_custom(struct custom_operations *ops, size_t size, void *p
 }
 
 
-static void finalize_free(value v)
-{
-  free(*((void **)Data_custom_val(v)));
-}
-
-static int compare_pointers(value l_, value r_)
-{
-  /* pointer comparison */
-  intptr_t l = (intptr_t)*(void **)Data_custom_val(l_);
-  intptr_t r = (intptr_t)*(void **)Data_custom_val(r_);
-  return (l > r) - (l < r);
-}
-
-static long hash_address(value l)
-{
-  /* address hashing */
-  return (long)*(void **)Data_custom_val(l);
-}
-
-static struct custom_operations managed_buffer_custom_ops = {
-  "ocaml-ctypes:managed_buffer",
-  finalize_free,
-  compare_pointers,
-  hash_address,
-  /* Managed buffers are not serializable. */
-  custom_serialize_default,
-  custom_deserialize_default
-};
-
-
-/* _allocate_structure : _ctype -> voidp */
-value ctypes_allocate(value size_)
-{
-  CAMLparam1(size_);
-  int size = Int_val(size_);
-  CAMLlocal1(block);
-  block = allocate_custom(&managed_buffer_custom_ops, sizeof(void*), NULL);
-  /* We don't want to let OCaml manage the block (i.e. allocate it
-     with allocate_custom rather than malloc) because the GC is likely
-     to move it about at inconvenient moments, rendering our pointers
-     invalid. */
-  void *p = malloc(size);
-  if (p == NULL) {
-    caml_raise_out_of_memory();
-  }
-
-  void **d = (void **)Data_custom_val(block);
-  *d = p;
-  CAMLreturn(block);
-}
-
-
+extern value ctypes_allocate(value);
 static value raw_read_struct(struct type_info * ti, void *buf)
 {
   CAMLparam0();
@@ -731,11 +680,6 @@ value ctypes_complete_structspec(value bufferspec_)
 
 
   CAMLreturn(block);
-}
-
-value ctypes_managed_secret(value managed_buffer)
-{
-  return (value)(*(void **)Data_custom_val(managed_buffer));
 }
 
 /* pointer_plus : char* -> int -> char* */

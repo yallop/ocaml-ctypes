@@ -164,7 +164,7 @@ struct
           { structure = 
               { pmanaged = Some m;
                 reftype;
-                raw_ptr = Raw.managed_secret m;
+                raw_ptr = Raw.block_address m;
                 pbyte_offset = 0}})
       | Pointer reftype ->
         Builder (fun ~offset buf -> 
@@ -310,7 +310,7 @@ struct
       = fun (type a) (reftype : a typ) ~count ->
         let pmanaged = Raw.allocate (count * sizeof reftype) in
         { reftype ; pbyte_offset = 0;
-          raw_ptr = Raw.managed_secret pmanaged;
+          raw_ptr = Raw.block_address pmanaged;
           pmanaged = Some pmanaged }
 
     let make : 'a. 'a typ -> 'a -> 'a ptr
@@ -356,7 +356,7 @@ struct
         let p = Raw.allocate (alength * (sizeof reftype)) in
         let arr = { alength;
                     astart = { reftype; pbyte_offset = 0;
-                               raw_ptr = Raw.managed_secret p;
+                               raw_ptr = Raw.block_address p;
                                pmanaged = Some p } } in
         match initial with
           | None -> arr

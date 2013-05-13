@@ -187,8 +187,8 @@ external allocate : int -> managed_buffer
   = "ctypes_allocate"
 
 (* Obtain the address of the managed block. *)
-external managed_secret : managed_buffer -> immediate_pointer
-  = "ctypes_managed_secret"
+external block_address : managed_buffer -> immediate_pointer
+  = "ctypes_block_address"
 
 (* Pointer arithmetic. *)
 external pointer_plus : immediate_pointer -> int -> immediate_pointer
