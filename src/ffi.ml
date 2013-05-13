@@ -386,6 +386,8 @@ struct
       | {ctype=None} -> ()
       | _            -> raise ModifyingSealedType
 
+    let offsetof {foffset} = foffset
+
     let seal (Struct s) =
       ensure_unsealed s;
       s.ctype <- Some (Raw.complete_struct_type s.bufspec)

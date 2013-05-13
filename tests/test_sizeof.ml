@@ -127,7 +127,7 @@ let test_sizeof_pointers () = Type.(
 )
 
 
-let suite = "Struct tests" >:::
+let suite = "sizeof tests" >:::
   ["sizeof primitives" >:: test_sizeof_primitives;
    "sizeof structs"    >:: test_sizeof_structs;
    "sizeof unions"     >:: test_sizeof_unions;

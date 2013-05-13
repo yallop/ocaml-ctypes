@@ -65,7 +65,10 @@ static void check_ffi_status(ffi_status status)
    offset that satisfies `alignment'. */
 static size_t aligned_offset(size_t offset, size_t alignment)
 {
-  return offset + (offset % alignment);
+  size_t overhang = offset % alignment;
+  return overhang == 0
+    ? offset
+    : offset - overhang + alignment;
 }
 
 /* A description of a typed buffer.  The bufferspec type serves a dual

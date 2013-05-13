@@ -122,6 +122,15 @@ Executable test_ffi_passable
   BuildDepends:     unix,ffi,oUnit
   Custom:           true
 
+Executable test_ffi_alignment
+  Path:             tests
+  MainIs:           test_alignment.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     unix,ffi,oUnit
+  Custom:           true
+
 # Executable struct_subtyping
 #   Path:             examples/struct-subtyping
 #   MainIs:           struct_subtyping.ml
@@ -183,4 +192,9 @@ Test test_ffi_errno
 Test test_passable
   Run$:             flag(tests)
   Command:          $test_ffi_passable
+  WorkingDirectory: tests
+
+Test test_alignment
+  Run$:             flag(tests)
+  Command:          $test_ffi_alignment
   WorkingDirectory: tests

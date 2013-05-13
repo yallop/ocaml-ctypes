@@ -10,6 +10,7 @@ sig
   exception IncompleteType
 
   val sizeof : 'a typ -> int
+  val alignment : 'a typ -> int
 
   module Type :
   sig
@@ -98,6 +99,7 @@ sig
     val getf : 's structure -> ('a, 's) field -> 'a
     val (@.) : 's structure -> ('a, 's) field -> 'a ptr
     val (|->) : 's structure ptr -> ('a, 's) field -> 'a ptr
+    val offsetof : (_, _) field -> int
     val addr : 's structure -> 's structure ptr
   end
 
