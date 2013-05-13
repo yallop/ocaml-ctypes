@@ -1,0 +1,13 @@
+Change the representation of structs; a struct value is now simple a
+(fat) pointer.
+
+Entirely rule out passing arrays and unions by value.  Structs with
+union or array fields can no longer be passed by value.
+
+Support pointer writes for arrays and unions, and simplify the 
+
+Clear up the semantics of reading/writing/passing/returning various
+types.  We now have a clear distinction between reference types (which
+correspond to C's aggregate types) and value types (i.e. primitives).
+Reading a value type from an address makes a copy, while reading a
+reference type creates a (suitably-typed) alias.  

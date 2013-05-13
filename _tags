@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: cc1c2e11b265da3d47f8c061faf74dd8)
+# DO NOT EDIT (digest: 3f2ff76e87d9098173a7dfba9606b889)
 # Ignore VCS directories, you can use the same kind of rule outside 
 # OASIS_START/STOP if you want to exclude directories that contains 
 # useless stuff for the build process
@@ -79,9 +79,14 @@
 <tests/test_errno.{native,byte}>: use_ffi
 <tests/test_errno.{native,byte}>: pkg_unix
 <tests/test_errno.{native,byte}>: pkg_oUnit
+<tests/test_errno.{native,byte}>: custom
+# Executable test_ffi_passable
+<tests/test_passable.{native,byte}>: use_ffi
+<tests/test_passable.{native,byte}>: pkg_unix
+<tests/test_passable.{native,byte}>: pkg_oUnit
 <tests/*.ml{,i}>: use_ffi
 <tests/*.ml{,i}>: pkg_unix
 <tests/*.ml{,i}>: pkg_oUnit
-<tests/test_errno.{native,byte}>: custom
+<tests/test_passable.{native,byte}>: custom
 # OASIS_STOP
 <tests/clib/*>: not_hygienic

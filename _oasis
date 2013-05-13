@@ -113,6 +113,15 @@ Executable test_ffi_errno
   BuildDepends:     unix,ffi,oUnit
   Custom:           true
 
+Executable test_ffi_passable
+  Path:             tests
+  MainIs:           test_passable.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     unix,ffi,oUnit
+  Custom:           true
+
 # Executable struct_subtyping
 #   Path:             examples/struct-subtyping
 #   MainIs:           struct_subtyping.ml
@@ -169,4 +178,9 @@ Test test_ffi_custom_ops
 Test test_ffi_errno
   Run$:             flag(tests)
   Command:          $test_ffi_errno
+  WorkingDirectory: tests
+
+Test test_passable
+  Run$:             flag(tests)
+  Command:          $test_ffi_passable
   WorkingDirectory: tests
