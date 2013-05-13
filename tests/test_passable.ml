@@ -61,6 +61,66 @@ let test_unions_are_not_passable () =
 
 
 (*
+  Test that arrays are not passable
+*)
+let test_arrays_are_not_passable () =
+  let open Type in
+
+  assert_raises ~msg:"Array type rejected as argument"
+    (Unsupported "Unsupported argument type")
+    (fun () -> array 1 int @-> returning void);
+      
+  assert_raises ~msg:"Array type rejected as return type"
+    (Unsupported "Unsupported return type")
+    (fun () -> void @-> returning (array 1 int))
+
+
+(*
+  Test that pointers are passable
+*)
+let test_pointers_are_passable () =
+  let open Type in
+
+  (* Pointers to primitives are passable *)
+  let _ = ptr void @-> returning (ptr void)
+  and _ = ptr int @-> returning (ptr int)
+  and _ = ptr (ptr int) @-> returning (ptr (ptr int))
+  in
+
+  (* Pointers to unpassable types are passable *)
+  let module M = struct
+    type s1 and u
+
+    open Struct
+    let s1 : s1 structure typ = tag "s1"
+    let _ = s1 *:* int
+    let _ = s1 *:* ptr s1
+    let () = seal s1
+
+    open Union
+    let u : u union typ = tag "u"
+    let _ = u *:* int
+    let () = seal u
+  end in
+  let open M in
+
+  let _ = ptr s1 @-> returning (ptr s1)
+  and _ = ptr u @-> returning (ptr u) in
+  ()
+
+
+(*
+  Test that function pointers are passable
+*)
+let test_function_pointers_are_passable () =
+  let open Type in
+
+  (* Pointers to primitives are passable *)
+  ignore (funptr (int @-> returning int)
+          @-> returning (funptr (int @-> returning int)))
+
+
+(*
   Test struct passability.  Structs are passable unless they contain
   unpassable members (unions, arrays, or unpassable structs).
 *)
@@ -144,6 +204,9 @@ let test_struct_passability () =
 let suite = "Passability tests" >:::
   ["primitives are passable" >:: test_primitives_are_passable;
    "unions are not passable" >:: test_unions_are_not_passable;
+   "arrays are not passable" >:: test_arrays_are_not_passable;
+   "pointers are passable" >:: test_pointers_are_passable;
+   "function pointers are passable" >:: test_function_pointers_are_passable;
    "struct passability" >:: test_struct_passability;
   ]
 
