@@ -88,18 +88,16 @@ struct
       | FunctionPointer _          -> true
 
   type _ ccallspec =
-      Call : bool * ('b -> 'a) * 'b RawTypes.ctype -> 'a ccallspec
+      Call : bool * (Raw.immediate_pointer -> 'a) -> 'a ccallspec
     | WriteArg : ('a -> Raw.immediate_pointer -> unit) * 'b ccallspec -> ('a -> 'b) ccallspec
 
   type _ callbackspec =
       Return : (offset:int -> 'a -> Raw.immediate_pointer -> unit) -> 'a callbackspec
     | ReadArg : (Raw.immediate_pointer -> 'a) * 'b callbackspec -> ('a -> 'b) callbackspec
 
-  type _ builder = Builder : ('b -> 'a) * 'b RawTypes.ctype -> 'a builder
+  type 'a builder = Builder of (offset:int -> Raw.immediate_pointer -> 'a)
   type 'a writer = Writer of (offset:int -> 'a -> Raw.immediate_pointer -> unit)
   type arg_type = ArgType : 'b RawTypes.ctype -> arg_type
-
-  let id x = x
 
   (*
     call addr callspec return (fun buffer ->
@@ -110,16 +108,16 @@ struct
   *)
   let rec invoke : 'a.string option -> 'a ccallspec -> (Raw.immediate_pointer -> unit) list -> Raw.bufferspec -> Raw.immediate_pointer -> 'a
     = fun name (type a) (fn : a ccallspec) -> match fn with
-      | Call (check_errno, f, ftype) ->
+      | Call (check_errno, read_return_value) ->
         let call = match check_errno, name with
           | true, Some name -> Raw.call_errno name 
           | true, None      -> Raw.call_errno "" 
           | false, _        -> Raw.call
         in
         fun writers callspec addr ->
-          f (call addr callspec
-               (fun buf -> List.iter (fun w -> w buf) writers)
-               (Raw.read ~offset:0 ftype))
+          call addr callspec
+            (fun buf -> List.iter (fun w -> w buf) writers)
+            read_return_value
       | WriteArg (write, ccallspec) ->
         let next = invoke name ccallspec in
         fun writers callspec addr v ->
@@ -145,33 +143,38 @@ struct
         let rest = build_callspec f callspec in
         ReadArg ((fun _ -> ()), rest)
       | Function (p, f) ->
-        let Builder (from_prim, ctype) = builder p in
+        let Builder build = builder p in
+        let ArgType ctype = arg_type p in
         let _ = Raw.add_argument callspec ctype in
         let rest = build_callspec f callspec in
-        ReadArg ((fun buf -> from_prim (Raw.read ~offset:0 ctype buf)), rest)
+        ReadArg (build ~offset:0, rest)
 
-  (* Describes how to read an argument, e.g. from a return buffer *)
+  (* Describes how to read a value, e.g. from a return buffer *)
   and builder : 'a. 'a typ -> 'a builder =
-    (* TODO: rewrite builder similarly to writer *)
     fun (type a) (t : a typ) -> match t with
       | Void ->
-        (Builder (id, RawTypes.void) : a builder)
+        (Builder (Raw.read RawTypes.void) : a builder)
       | Primitive p ->
-        Builder (id, p)
+        Builder (Raw.read p)
       | Struct {ctype=None} ->
         raise IncompleteType
       | Struct ({ctype=Some p}) as reftype ->
-        Builder ((fun m -> { structure = 
-                               {pmanaged = Some m;
-                                reftype;
-                                raw_ptr = Raw.managed_secret m;
-                                pbyte_offset = 0}}),
-                 p)
+        Builder (fun ~offset buf -> 
+          let m = Raw.read p ~offset buf in
+          { structure = 
+              { pmanaged = Some m;
+                reftype;
+                raw_ptr = Raw.managed_secret m;
+                pbyte_offset = 0}})
       | Pointer reftype ->
-        Builder ((fun raw_ptr ->
-          {pbyte_offset=0; reftype; raw_ptr; pmanaged=None}), RawTypes.pointer)
+        Builder (fun ~offset buf -> 
+          {raw_ptr=Raw.read RawTypes.pointer ~offset buf;
+           pbyte_offset = 0;
+           reftype;
+           pmanaged = None})
       | FunctionPointer f ->
-        Builder (function_builder f, RawTypes.pointer)
+        let build_fun = function_builder f in
+        Builder (fun ~offset buf -> build_fun (Raw.read RawTypes.pointer ~offset buf))
       (* The following cases should never happen; non-struct aggregate
          types are excluded during type construction. *)
       | Union _ -> assert false
@@ -230,9 +233,10 @@ struct
   and build_ccallspec : 'a. 'a fn -> Raw.bufferspec -> 'a ccallspec
     = fun (type a) (fn : a fn) callspec -> match fn with
       | Returns (check_errno, t) ->
-        let Builder (from_prim, ctype) = builder t in
+        let Builder (build) = builder t in
+        let ArgType ctype = arg_type t in
         let () = Raw.prep_callspec callspec ctype in
-        (Call (check_errno, from_prim, ctype) : a ccallspec)
+        (Call (check_errno, build ~offset:0) : a ccallspec)
       | Function (Void, f) -> (* TODO: eliminate this special case *)
         let Writer do_write = writer Void in
         let rest = build_ccallspec f callspec in
@@ -275,8 +279,8 @@ struct
             { astart = {ptr with reftype = elemtype}; alength }
           (* If it's a value type then we cons a new value. *)
           | _ -> 
-            let Builder (from_prim, ctype) = builder reftype in
-            from_prim (Raw.read ~offset ctype raw_ptr)
+            let Builder build = builder reftype in
+            build ~offset raw_ptr
 
     let diff : 'a. 'a t -> 'a t -> int =
       fun {pbyte_offset = o1; reftype} {pbyte_offset = o2} ->

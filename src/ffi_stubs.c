@@ -442,9 +442,9 @@ typedef struct callbuffer callbuffer;
 
 /* Read a C value from a block of memory */
 /* read : int -> ctype -> buffer -> 'a */
-value ctypes_read(value offset_, value ctype, value buffer_)
+value ctypes_read(value ctype, value offset_, value buffer_)
 {
-  CAMLparam3(offset_, ctype, buffer_);
+  CAMLparam3(ctype, offset_, buffer_);
   struct type_info *type_info = Data_custom_val(ctype);
   callbuffer *buffer = (callbuffer *)buffer_;
   int offset = Int_val(offset_);

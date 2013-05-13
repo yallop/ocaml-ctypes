@@ -133,7 +133,7 @@ type bufferspec
 type immediate_pointer = voidp
 
 (* Read a C value from a block of memory *)
-external read : offset:int -> 'a ctype -> immediate_pointer -> 'a
+external read : 'a ctype -> offset:int -> immediate_pointer -> 'a
   = "ctypes_read"
 
 (* Write a C value to a block of memory *)
