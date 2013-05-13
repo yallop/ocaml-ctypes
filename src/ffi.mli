@@ -20,6 +20,7 @@ sig
 
     val void  : unit t
     val char : char t
+    val schar : int t
     val float : float t
     val double : float t
     val int   : int t

@@ -473,6 +473,7 @@ struct
 
     let void = Void
     let char = Primitive RawTypes.char
+    let schar = Primitive RawTypes.schar
     let float = Primitive RawTypes.float
     let double = Primitive RawTypes.double
     let int = Primitive RawTypes.int
