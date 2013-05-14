@@ -107,6 +107,7 @@ static struct bufferspec {
   0, 0, 0, 0, BUILDING, NULL,
 };
 
+
 static struct callspec {
   struct bufferspec bufferspec;
 
@@ -119,7 +120,8 @@ static struct callspec {
   { 0, 0, 0, 0, BUILDING, NULL }, -1,
 };
 
-void finalize_bufferspec(value v)
+
+static void finalize_bufferspec(value v)
 {
   struct bufferspec *bufferspec = Data_custom_val(v);
   free(bufferspec->args);
@@ -467,7 +469,8 @@ value ctypes_complete_structspec(value bufferspec_)
   struct bufferspec *bufferspec = Data_custom_val(bufferspec_);
 
   CAMLlocal1(block);
-  block = ctypes_allocate_struct_type_info(bufferspec->args);
+  /* Allocate a struct_type_info, transferring ownership of `args' */
+  block = ctypes_allocate_struct_type_info(&bufferspec->args);
   struct type_info *t = Data_custom_val(block);
 
   switch (bufferspec->state) {
@@ -491,9 +494,10 @@ value ctypes_complete_structspec(value bufferspec_)
        components, including the args array, are ignored altogether */
     t->ffitype->size = aligned_offset(bufferspec->bytes, bufferspec->max_align);
     t->ffitype->alignment = bufferspec->max_align;
-    CAMLreturn(block);
 
     bufferspec->state = STRUCTSPEC_UNPASSABLE;
+
+    CAMLreturn(block);
   }
   default: {
     assert (0);

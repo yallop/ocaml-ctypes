@@ -4,8 +4,9 @@
 
 #include <caml/mlvalues.h>
 #include <caml/memory.h>
-#include <caml/alloc.h>
 #include <caml/custom.h>
+#include <caml/alloc.h>
+#include <caml/fail.h>
 
 #include <ffi.h>
 
@@ -35,12 +36,9 @@
                                                                                \
   value ctypes_ ## MUNGENAME ## _type_info(value unit)                         \
   {                                                                            \
-    CAMLparam1(unit);                                                          \
-    CAMLlocal1(block);                                                         \
-    block = allocate_custom(&type_info_custom_ops,                             \
+    return allocate_custom(&type_info_custom_ops,                              \
                             sizeof(struct type_info),                          \
                             &_ ## MUNGENAME ## _type_info);                    \
-    CAMLreturn (block);                                                        \
   }                                                                            \
 
 
@@ -75,13 +73,6 @@ static value raw_write_struct(struct type_info * ti, void *buf, value cv)
   return Val_unit;
 }
 
-static struct type_info _struct_type_info_prototype = {
-  "struct",
-  NULL,
-  raw_read_struct,
-  raw_write_struct,
-};
-
 
 static int compare_type_infos(value l_, value r_)
 {
@@ -111,35 +102,61 @@ static struct custom_operations type_info_custom_ops = {
   custom_deserialize_default
 };
 
-/* allocate_type_info : unit -> _ ctype */
-value ctypes_allocate_type_info(value unit)
-{
-  return allocate_custom(&type_info_custom_ops,
-                         sizeof(struct type_info),
-                         &_struct_type_info_prototype);
-}
 
-
-struct struct_type_info {
+static struct struct_type_info {
   struct type_info type_info;
-  ffi_type         ffi_type;
+  ffi_type       **args; /* TODO: struct hack */
+} _struct_type_info_prototype = {
+  { "struct",
+    NULL,
+    raw_read_struct,
+    raw_write_struct },
+  NULL,
 };
 
 
-/* allocate_struct_type_info : ffitype** -> _ ctype */
-value ctypes_allocate_struct_type_info(ffi_type **args)
+static void finalize_struct_type_info(value v)
 {
-  CAMLlocal1(block);
-  block = allocate_custom(&type_info_custom_ops,
-                          sizeof(struct struct_type_info),
-                          &_struct_type_info_prototype);
+  struct struct_type_info *sti = Data_custom_val(v);
+  free(sti->args);
+  free(sti->type_info.ffitype);
+}
+
+
+
+static struct custom_operations struct_type_info_custom_ops = {
+  /* the same as type_info, except for the finalizer */
+  "ocaml-ctypes:struct_type_info",
+  finalize_struct_type_info,
+  compare_type_infos,
+  hash_type_info,
+  /* type_info objects are not serializable */
+  custom_serialize_default,
+  custom_deserialize_default
+};
+
+
+/* allocate_struct_type_info : ffitype*** -> _ ctype */
+value ctypes_allocate_struct_type_info(ffi_type ***args)
+{
+  value block = allocate_custom(&struct_type_info_custom_ops,
+                                sizeof(struct struct_type_info),
+                                &_struct_type_info_prototype);
+
   struct struct_type_info *t = Data_custom_val(block);
-  /* TODO: this is not safe: we're keeping a pointer into a block that may be moved */
-  ffi_type *s = t->type_info.ffitype = &t->ffi_type;
+
+  ffi_type *s = t->type_info.ffitype = malloc(sizeof *s);
+  if (s == NULL) {
+    caml_raise_out_of_memory();
+  }
 
   s->type = FFI_TYPE_STRUCT;
-  s->elements = args;
   s->size = s->alignment = 0;
+  /* Assume ownership of the *alloced buffer 'args' */
+  /* TODO: we could free the args/elements array at this point if the
+     struct isn't passable */
+  s->elements = t->args = *args;
+  *args = NULL;
 
   return block;
 }
@@ -242,14 +259,12 @@ static struct type_info _void_type_info = {
   raw_write_void,
 };
 
+
 value ctypes_void_type_info(value unit)
 {
-    CAMLparam1(unit);
-    CAMLlocal1(block);
-    block = ctypes_allocate_type_info(unit);
-    struct type_info *ti = Data_custom_val(block);
-    memcpy(ti, &_void_type_info, sizeof _void_type_info);
-    CAMLreturn (block);
+    return allocate_custom(&type_info_custom_ops,
+                           sizeof(struct type_info),
+                           &_void_type_info);
 }
 
 

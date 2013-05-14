@@ -9,35 +9,22 @@ struct
   module Raw = Ffi_raw
   module RawTypes = Ffi_raw.Types
 
+  type 'a structspec =
+      Incomplete of Raw.bufferspec
+    | Complete of 'a Raw.structure RawTypes.ctype
+
   type 'a structure_type = {
     tag: string;
-
-    (* TODO: with some care to hand over ownership of the args array during
-       struct spec completion we could discard the bufferspec here.  That is,
-       we could merge it with the ctype field; it should become something like
-       
-       type 'a structspec =
-         Incomplete of Raw.bufferspec
-       | Complete of 'a structure ctype
-
-      type 'a structure_type = {
-        tag: string;
-        mutable passable: bool;
-        mutable spec: 'a structspec
-      }
-    *)
-    bufspec: Raw.bufferspec;
-
     (* Whether the struct can be passed or returned by value.  For the
        moment, at least, we don't support passing structs that contain
        unions or arrays as members *)
     mutable passable: bool;
 
-    mutable ctype: 'a Raw.structure RawTypes.ctype option;
+    (* TODO: hand over ownership of the bufferspec during struct sealing *)
+    mutable spec: 'a structspec;
 
     (* TODO: we should be keeping references to fields around if the struct is
-       passable, since prep_cif might inspect them.
-    *)
+       passable, since prep_cif might inspect them. *)
   }
 
   type 'a union_type = {
@@ -48,23 +35,22 @@ struct
   }
 
   type _ typ =
-      Void : unit typ
-    | Primitive : 'a RawTypes.ctype -> 'a typ
-    | Pointer : 'a typ -> 'a ptr typ
-    | Struct : 'a structure_type -> 'a structure typ
-    | Union : 'a union_type -> 'a union typ
-    | Array : 'a typ * int -> 'a array typ
-    | FunctionPointer : ('a -> 'b) fn -> ('a -> 'b) typ
+      Void            :                      unit typ
+    | Primitive       : 'a RawTypes.ctype -> 'a typ
+    | Pointer         : 'a typ            -> 'a ptr typ
+    | Struct          : 'a structure_type -> 'a structure typ
+    | Union           : 'a union_type     -> 'a union typ
+    | Array           : 'a typ * int      -> 'a array typ
+    | FunctionPointer : ('a -> 'b) fn     -> ('a -> 'b) typ
   and _ fn =
     (* The flag indicates whether we should check errno *)
-    | Returns : bool * 'a typ -> 'a fn
-    | Function : 'a typ * 'b fn -> ('a -> 'b) fn
-  and 'a ptr = { reftype : 'a typ;
-                 raw_ptr : Raw.immediate_pointer;
-                 pmanaged : Raw.managed_buffer option;
+    | Returns  : bool * 'a typ   -> 'a fn
+    | Function : 'a typ * 'b fn  -> ('a -> 'b) fn
+  and 'a ptr = { reftype      : 'a typ;
+                 raw_ptr      : Raw.immediate_pointer;
+                 pmanaged     : Raw.managed_buffer option;
                  pbyte_offset : int }
-  and 'a array = { astart: 'a ptr;
-                   alength : int }
+  and 'a array = { astart : 'a ptr; alength : int }
   and 'a union = { union : 'a union ptr }
   and 'a structure = { structure : 'a structure ptr }
 
@@ -76,51 +62,50 @@ struct
 
   let rec sizeof : 'a. 'a typ -> int
     = fun (type a) (t : a typ) -> match t with
-        Void                      -> raise IncompleteType
-      | Primitive p               -> RawTypes.sizeof p
-      | Struct { ctype = None }   -> raise IncompleteType
-      | Struct { ctype = Some p } -> RawTypes.sizeof p
-      | Union { ucomplete=false } -> raise IncompleteType
-      | Union { usize }           -> usize
-      | Array (t, i)              -> i * sizeof t
-      | Pointer _                 -> RawTypes.(sizeof pointer)
-      | FunctionPointer _         -> RawTypes.(sizeof pointer)
+        Void                           -> raise IncompleteType
+      | Primitive p                    -> RawTypes.sizeof p
+      | Struct { spec = Incomplete _ } -> raise IncompleteType
+      | Struct { spec = Complete p }   -> RawTypes.sizeof p
+      | Union { ucomplete = false }    -> raise IncompleteType
+      | Union { usize }                -> usize
+      | Array (t, i)                   -> i * sizeof t
+      | Pointer _                      -> RawTypes.(sizeof pointer)
+      | FunctionPointer _              -> RawTypes.(sizeof pointer)
 
   let rec alignment : 'a. 'a typ -> int
     = fun (type a) (t : a typ) -> match t with
-        Void                      -> raise IncompleteType
-      | Primitive p               -> RawTypes.alignment p
-      | Struct { ctype = None }   -> raise IncompleteType
-      | Struct { ctype = Some p } -> RawTypes.alignment p
-      | Union { ucomplete=false } -> raise IncompleteType
-      | Union { ualignment }      -> ualignment
-      | Array (t, i)              -> alignment t
-      | Pointer _                 -> RawTypes.(alignment pointer)
-      | FunctionPointer _         -> RawTypes.(alignment pointer)
+        Void                           -> raise IncompleteType
+      | Primitive p                    -> RawTypes.alignment p
+      | Struct { spec = Incomplete _ } -> raise IncompleteType
+      | Struct { spec = Complete p }   -> RawTypes.alignment p
+      | Union { ucomplete = false }    -> raise IncompleteType
+      | Union { ualignment }           -> ualignment
+      | Array (t, i)                   -> alignment t
+      | Pointer _                      -> RawTypes.(alignment pointer)
+      | FunctionPointer _              -> RawTypes.(alignment pointer)
 
   let passable (type a) (t : a typ) = match t with
-        Void                       -> true
-      | Primitive p                -> true
-      | Struct { ctype = None }    -> raise IncompleteType
-      | Struct { passable }        -> passable
-      | Union { ucomplete = false} -> raise IncompleteType
-      | Union _                    -> false
-      | Array _                    -> false
-      | Pointer _                  -> true
-      | FunctionPointer _          -> true
+        Void                           -> true
+      | Primitive p                    -> true
+      | Struct { spec = Incomplete _ } -> raise IncompleteType
+      | Struct { passable }            -> passable
+      | Union { ucomplete = false}     -> raise IncompleteType
+      | Union _                        -> false
+      | Array _                        -> false
+      | Pointer _                      -> true
+      | FunctionPointer _              -> true
 
-  let arg_type : 'a. 'a typ -> arg_type
-    = fun (type a) (t : a typ) -> match t with
-      | Void -> ArgType RawTypes.void
-      | Primitive p -> ArgType p
-      | Struct {ctype=None} -> raise IncompleteType
-      | Struct {ctype=Some p} as s -> ArgType p
-      | Pointer reftype -> ArgType RawTypes.pointer
-      | FunctionPointer fn -> ArgType RawTypes.pointer
+  let arg_type (type a) (t : a typ) = match t with
+      | Void                         -> ArgType RawTypes.void
+      | Primitive p                  -> ArgType p
+      | Struct {spec = Incomplete _} -> raise IncompleteType
+      | Struct {spec = Complete p}   -> ArgType p
+      | Pointer reftype              -> ArgType RawTypes.pointer
+      | FunctionPointer fn           -> ArgType RawTypes.pointer
       (* The following cases should never happen; non-struct aggregate
          types are excluded during type construction. *)
-      | Union _ -> assert false
-      | Array _ -> assert false
+      | Union _                      -> assert false
+      | Array _                      -> assert false
 
   (*
     call addr callspec return (fun buffer ->
@@ -160,13 +145,13 @@ struct
   and build_callspec : 'a. 'a fn -> Raw.bufferspec -> 'a -> Raw.boxedfn =
     fun (type a) fn callspec -> match (fn : a fn) with
       | Returns (_, ty) ->
-        let _ = prep_callspec callspec ty
-        and write_rv = write ty in
+        let _ = prep_callspec callspec ty in
+        let write_rv = write ty in
         fun f -> Raw.Done (write_rv ~offset:0 f)
       | Function (p, f) ->
-        let _ = add_argument callspec p
-        and box = build_callspec f callspec
-        and read = build p ~offset:0 in
+        let _ = add_argument callspec p in
+        let box = build_callspec f callspec in
+        let read = build p ~offset:0 in
         fun f -> Raw.Fn (fun buf -> box (f (read buf)))
 
   (* Describes how to read a value, e.g. from a return buffer *)
@@ -176,9 +161,9 @@ struct
         (Raw.read RawTypes.void : offset:int -> Raw.immediate_pointer -> a)
       | Primitive p ->
         Raw.read p
-      | Struct {ctype=None} ->
+      | Struct {spec=Incomplete _} ->
         raise IncompleteType
-      | Struct ({ctype=Some p}) as reftype ->
+      | Struct ({spec=Complete p}) as reftype ->
         (fun ~offset buf -> 
           let m = Raw.read p ~offset buf in
           { structure = 
@@ -216,9 +201,9 @@ struct
         (fun ~offset f ->
           Raw.write RawTypes.pointer ~offset
             (Raw.make_function_pointer cs' (cs f)))
-      | Struct {ctype=None} ->
+      | Struct {spec=Incomplete _} ->
         raise IncompleteType
-      | Struct {ctype=Some _} as s ->
+      | Struct {spec=Complete _} as s ->
         let size = sizeof s in
         (fun ~offset {structure={raw_ptr=src; pbyte_offset=src_offset}} dst ->
           Raw.memcpy ~size ~dst ~dst_offset:offset ~src ~src_offset)
@@ -246,8 +231,8 @@ struct
         let () = prep_callspec callspec t in
         (Call (check_errno, build t ~offset:0) : a ccallspec)
       | Function (p, f) ->
-        let offset = add_argument callspec p
-        and rest = build_ccallspec f callspec in
+        let offset = add_argument callspec p in
+        let rest = build_ccallspec f callspec in
         WriteArg (write p ~offset, rest)
 
   and build_function : 'a. ?name:string -> 'a fn -> RawTypes.voidp -> 'a
@@ -273,10 +258,10 @@ struct
         match reftype with
           | Void -> raise IncompleteType
           | Union {ucomplete=false} -> raise IncompleteType
-          | Struct {ctype=None} -> raise IncompleteType
+          | Struct {spec=Incomplete _} -> raise IncompleteType
           (* If it's a reference type then we take a reference *)
           | Union _ -> ({union = ptr } : a)
-          | Struct _ -> { structure = ptr}
+          | Struct _ -> { structure = ptr }
           | Array (elemtype, alength) ->
             { astart = {ptr with reftype = elemtype}; alength }
           (* If it's a value type then we cons a new value. *)
@@ -380,41 +365,41 @@ struct
     type ('a, 's) field  = { ftype: 'a typ;
                              foffset: int }
         
-    let tag tag = Struct {bufspec = Raw.allocate_bufferspec (); ctype = None; tag; passable=true}
+    let tag tag = Struct {spec = Incomplete (Raw.allocate_bufferspec ()); tag; passable=true}
       
-    let ensure_unsealed = function
-      | {ctype=None} -> ()
-      | _            -> raise ModifyingSealedType
+    let bufferspec {spec} = match spec with
+      | Incomplete s -> s
+      | Complete _   -> raise ModifyingSealedType
 
     let offsetof {foffset} = foffset
 
     let seal (Struct s) =
-      ensure_unsealed s;
-      s.ctype <- Some (Raw.complete_struct_type s.bufspec)
+      let bufspec = bufferspec s in
+      s.spec <- Complete (Raw.complete_struct_type bufspec)
 
     let ( *:* ) : 'a 's. 's structure typ -> 'a typ -> ('a, 's) field
-      = fun (type b) (Struct ({bufspec} as s)) (ftype : b typ) -> 
-        ensure_unsealed s;
-        let add_argument t = Raw.add_argument bufspec t 
+      = fun (type b) (Struct s) (ftype : b typ) -> 
+        let bufspec = bufferspec s in
+        let add_argument t = Raw.add_argument bufspec t
         and add_unpassable_argument t = Raw.add_unpassable_argument
           bufspec ~size:(sizeof t) ~alignment:(alignment t) in
         let foffset = match ftype with
-          | Void                     -> raise IncompleteType
-          | Array _ as a             -> (s.passable <- false;
-                                         add_unpassable_argument a)
-          | Primitive p              -> add_argument p
-          | Pointer p                -> add_argument RawTypes.pointer
-          | Struct {ctype=None}      -> raise IncompleteType
-          | Struct {ctype=Some ctyp;
-                    passable}        -> (s.passable <- s.passable && passable;
-                                         add_argument ctyp)
-          | Union _  as u            -> (s.passable <- false;
-                                         add_unpassable_argument u)
-          | FunctionPointer _        -> add_argument RawTypes.pointer
+          | Void                       -> raise IncompleteType
+          | Array _ as a               -> (s.passable <- false;
+                                           add_unpassable_argument a)
+          | Primitive p                -> add_argument p
+          | Pointer p                  -> add_argument RawTypes.pointer
+          | Struct {spec=Incomplete _} -> raise IncompleteType
+          | Struct {spec=Complete t;
+                    passable}          -> (s.passable <- s.passable && passable;
+                                           add_argument t)
+          | Union _  as u              -> (s.passable <- false;
+                                           add_unpassable_argument u)
+          | FunctionPointer _          -> add_argument RawTypes.pointer
         in
         { ftype; foffset }
 
-    let make (type s) (Struct stype as s : s structure typ) =
+    let make (type s) (Struct _ as s : s structure typ) =
       { structure = Ptr.allocate s ~count:1 }
                                                                            
     let (@.) (type s) (type a) 
@@ -443,9 +428,8 @@ struct
         
     let tag utag = Union {utag; usize = 0; ualignment = 0; ucomplete = false}
 
-    let ensure_unsealed = function
-      | {ucomplete=true} -> raise ModifyingSealedType
-      | _ -> ()
+    let ensure_unsealed {ucomplete} =
+      if ucomplete then raise ModifyingSealedType
 
     let seal (Union u) = begin
       ensure_unsealed u;

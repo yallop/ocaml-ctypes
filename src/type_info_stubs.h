@@ -15,8 +15,8 @@ struct type_info {
 /* allocate_type_info : unit -> _ ctype */
 extern value ctypes_allocate_type_info(value unit);
 
-/* allocate_struct_type_info : ffitype** -> _ ctype */
-value ctypes_allocate_struct_type_info(ffi_type **args);
+/* allocate_struct_type_info : ffitype*** -> _ ctype */
+value ctypes_allocate_struct_type_info(ffi_type ***args);
 
 /* X_type_info : unit -> _ ctype */
 extern value ctypes_int8_t_type_info(value unit);
