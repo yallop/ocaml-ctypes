@@ -29,7 +29,6 @@ let test_primitives_are_passable () =
   and _ = uint @-> returning uint
   and _ = ulong @-> returning ulong
   and _ = ullong @-> returning ullong
-  and _ = string @-> returning string
   in ()
 
 

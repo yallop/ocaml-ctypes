@@ -37,8 +37,6 @@ sig
   val uint : uint ctype
   val ulong : ulong ctype
   val ullong : ullong ctype
-
-  val string : string ctype
 end =
 struct
   open Unsigned
@@ -88,9 +86,6 @@ struct
 
   external _float_type_info : unit -> float ctype = "ctypes_float_type_info"
   let float = _float_type_info ()
-
-  external _string_type_info : unit -> string ctype = "ctypes_string_type_info"
-  let string = _string_type_info ()
 
   external _uchar_type_info : unit -> uchar ctype = "ctypes_uchar_type_info"
   let uchar = _uchar_type_info ()

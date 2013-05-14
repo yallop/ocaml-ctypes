@@ -42,8 +42,6 @@ sig
     val ulong : ulong t
     val ullong : ullong t
 
-    val string : string t
-
     val array : int -> 'a t -> 'a array t
     val ptr : 'a t -> 'a ptr t
     val ( @-> ) : 'a t -> 'b f -> ('a -> 'b) f
@@ -52,6 +50,11 @@ sig
     val syscall : 'a t -> 'a f
     val funptr : ('a -> 'b) f -> ('a -> 'b) t
   end
+
+  val string_of_char_ptr : char ptr -> string
+  val string_of_char_array : char array -> string
+  val char_array_of_string : string -> char array
+  val char_ptr_of_string : string -> char ptr
 
   module Ptr :
   sig

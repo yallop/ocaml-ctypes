@@ -50,4 +50,9 @@ extern value ctypes_uint_size (value _);
 extern value ctypes_ulong_size (value _);
 extern value ctypes_ulonglong_size (value _);
 
+#define Uint8_val(V) (*((uint8_t *) Data_custom_val(V)))
+#define Uint16_val(V) (*((uint16_t *) Data_custom_val(V)))
+#define Uint32_val(V) (*((uint32_t *) Data_custom_val(V)))
+#define Uint64_val(V) (*((uint64_t *) Data_custom_val(V)))
+
 #endif /* CTYPES_UNMSIGNED_STUBS_H */

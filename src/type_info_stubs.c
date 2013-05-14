@@ -181,17 +181,6 @@ make_primitive_interface(caml_copy_double, Double_val, double, double, ffi_type_
 make_primitive_interface(caml_copy_double, Double_val, float, float, ffi_type_float)
 make_primitive_interface(Cast_from_voidp, Cast_to_voidp, void *, voidp, ffi_type_pointer)
 make_primitive_interface(caml_copy_nativeint, Nativeint_val, int, nativeint, ffi_type_sint)
-
-/* TODO: this is probably not really safe.  Receiving strings from C
-   is fine, but passing strings to C means passing a pointer to an
-   object that the GC may move.  Perhaps we can copy the string into
-   safer storage (e.g. a managed_buffer) before the call.
- */
-make_primitive_interface(caml_copy_string, String_val, char *, string, ffi_type_pointer)
-#define Uint8_val(V) (*((uint8_t *) Data_custom_val(V)))
-#define Uint16_val(V) (*((uint8_t *) Data_custom_val(V)))
-#define Uint32_val(V) (*((uint8_t *) Data_custom_val(V)))
-#define Uint64_val(V) (*((uint8_t *) Data_custom_val(V)))
 make_primitive_interface(caml_copy_uint8, Uint8_val, uint8_t, uint8_t, ffi_type_uint8)
 make_primitive_interface(caml_copy_uint16, Uint16_val, uint16_t, uint16_t, ffi_type_uint16)
 make_primitive_interface(caml_copy_uint32, Uint32_val, uint32_t, uint32_t, ffi_type_uint32)

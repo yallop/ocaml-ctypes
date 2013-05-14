@@ -479,8 +479,6 @@ struct
     let ulong = Primitive RawTypes.ulong
     let ullong = Primitive RawTypes.ullong
 
-    let string = Primitive RawTypes.string
-
     let array i t = Array (t, i)
     let ptr t = Pointer t
     let ( @->) f t = 
@@ -505,4 +503,34 @@ struct
   let foreign_value ?from symbol reftype =
     let raw_ptr = Dl.dlsym ?handle:from ~symbol in
     { Ptr.reftype ; raw_ptr; pbyte_offset = 0 ; pmanaged=None }
+
+  let string_of_ptr_and_length : char ptr -> int -> string
+    = fun charp length -> 
+      let s = String.create length in
+      for i = 0 to length - 1 do
+        s.[i] <- Ptr.(! (charp  + i))
+      done;
+      s
+
+  let strlen = foreign "strlen" Type.(ptr char @-> returning size_t)
+
+  let string_of_char_ptr : char ptr -> string
+    = fun charp -> 
+      string_of_ptr_and_length charp (Unsigned.Size_t.to_int (strlen charp))
+
+  let string_of_char_array : char array -> string
+    = fun { astart; alength } -> string_of_ptr_and_length astart alength
+
+  let char_array_of_string : string -> char array =
+    fun s ->
+      let len = String.length s in
+      let arr = Array.make Type.char (len + 1) in
+      for i = 0 to len - 1 do
+        arr.(i) <- s.[i]
+      done;
+      arr.(len) <- '\000';
+      arr
+
+  let char_ptr_of_string : string -> char ptr
+    = fun s -> Array.start (char_array_of_string s)
 end
