@@ -20,7 +20,6 @@ struct
        unions or arrays as members *)
     mutable passable: bool;
 
-    (* TODO: hand over ownership of the bufferspec during struct sealing *)
     mutable spec: 'a structspec;
 
     (* TODO: we should be keeping references to fields around if the struct is

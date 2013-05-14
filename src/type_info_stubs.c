@@ -105,7 +105,7 @@ static struct custom_operations type_info_custom_ops = {
 
 static struct struct_type_info {
   struct type_info type_info;
-  ffi_type       **args; /* TODO: struct hack */
+  ffi_type       **args;
 } _struct_type_info_prototype = {
   { "struct",
     NULL,
