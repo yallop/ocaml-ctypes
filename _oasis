@@ -6,6 +6,7 @@ Authors:     Jeremy Yallop
 License:     MIT
 Plugins:     META (0.3)
 BuildTools:  ocamlbuild
+PostConfCommand: ocaml discover.ml -ocamlc $ocamlc -ext-obj $ext_obj -exec-name $default_executable_name
 
 Library ffi
   Path:             src/
