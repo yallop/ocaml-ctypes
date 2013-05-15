@@ -334,13 +334,9 @@ struct
       for i = 0 to alength - 1 do unsafe_set arr i v done
 
     let make : 'a. 'a typ -> ?initial:'a -> int -> 'a t
-      = fun (type a) reftype ?initial alength ->
-        (* TODO: simplify, using Ptr.allocate *)
-        let p = Raw.allocate (alength * (sizeof reftype)) in
-        let arr = { alength;
-                    astart = { reftype; pbyte_offset = 0;
-                               raw_ptr = Raw.block_address p;
-                               pmanaged = Some p } } in
+      = fun (type a) reftype ?initial count ->
+        let arr = { astart = Ptr.allocate ~count reftype;
+                    alength = count } in
         match initial with
           | None -> arr
           | Some v -> fill arr v; arr
