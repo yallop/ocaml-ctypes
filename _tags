@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 17b6ceeae58cefc7e7f9f0392f55e010)
+# DO NOT EDIT (digest: ebd88c812b236da9b3f9ceb6a939ca9a)
 # Ignore VCS directories, you can use the same kind of rule outside 
 # OASIS_START/STOP if you want to exclude directories that contains 
 # useless stuff for the build process
@@ -21,11 +21,6 @@
 "src/type_info_stubs.c": oasis_library_ffi_ccopt
 "src/ffi_stubs.c": oasis_library_ffi_ccopt
 "src/dl_stubs.c": oasis_library_ffi_ccopt
-<src/ffi.{cma,cmxa}>: oasis_library_ffi_cclib
-"src/libffi_stubs.lib": oasis_library_ffi_cclib
-"src/dllffi_stubs.dll": oasis_library_ffi_cclib
-"src/libffi_stubs.a": oasis_library_ffi_cclib
-"src/dllffi_stubs.so": oasis_library_ffi_cclib
 <src/ffi.{cma,cmxa}>: use_libffi_stubs
 # Library fts
 "examples/fts/fts.cmxs": use_fts
