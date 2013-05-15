@@ -95,3 +95,4 @@
 <tests/test_alignment.{native,byte}>: custom
 # OASIS_STOP
 <tests/clib/*>: not_hygienic
+<src/*.c>: use_C_libffi
