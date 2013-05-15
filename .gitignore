@@ -12,6 +12,7 @@ struct_subtyping.native
 _build
 build
 tests/clib/*
-
+src/ffi_config.h
+src/ffi_config.ml
 #
 *~
