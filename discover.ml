@@ -366,7 +366,7 @@ let () =
     test_code (opt, lib) libffi_code
   in
 
-  test_feature "libffi" "HAVE_LIBFFI" test_libffi;
+  test_feature "libffi" "" test_libffi;
 
   if !not_available <> [] then begin
     if not have_pkg_config then
