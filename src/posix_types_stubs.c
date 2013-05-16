@@ -64,7 +64,6 @@ static enum arithmetic _underlying_type(size_t typeinfo)
 EXPOSE_TYPEINFO(blkcnt_t)
 EXPOSE_TYPEINFO(blksize_t)
 EXPOSE_TYPEINFO(clock_t)
-EXPOSE_TYPEINFO(clockid_t)
 EXPOSE_TYPEINFO(dev_t)
 EXPOSE_TYPEINFO(fsblkcnt_t)
 EXPOSE_TYPEINFO(fsfilcnt_t)
@@ -78,9 +77,6 @@ EXPOSE_TYPEINFO(pid_t)
 EXPOSE_TYPEINFO(ssize_t)
 EXPOSE_TYPEINFO(suseconds_t)
 EXPOSE_TYPEINFO(time_t)
-/* The Open Group says timer_t should be an arithmetic type, but it's
-   a pointer on Linux. */
-/* EXPOSE_TYPEINFO(timer_t) */
 EXPOSE_TYPEINFO(uid_t)
 EXPOSE_TYPEINFO(useconds_t)
 
@@ -95,4 +91,3 @@ EXPOSE_TYPESIZE(pthread_mutexattr_t)
 EXPOSE_TYPESIZE(pthread_once_t)
 EXPOSE_TYPESIZE(pthread_rwlock_t)
 EXPOSE_TYPESIZE(pthread_rwlockattr_t)
-EXPOSE_TYPESIZE(timer_t)

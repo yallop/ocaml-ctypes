@@ -4,7 +4,6 @@ open Ffi.C
 type blkcnt_t
 type blksize_t
 type clock_t
-type clockid_t
 type dev_t
 type fsblkcnt_t
 type fsfilcnt_t
@@ -25,7 +24,6 @@ type useconds_t
 val blkcnt_t    : blkcnt_t typ
 val blksize_t   : blksize_t typ
 val clock_t     : clock_t typ
-val clockid_t   : clockid_t typ
 val dev_t       : dev_t typ
 val fsblkcnt_t  : fsblkcnt_t typ
 val fsfilcnt_t  : fsfilcnt_t typ
@@ -55,7 +53,6 @@ type pthread_mutexattr_t
 type pthread_once_t
 type pthread_rwlock_t
 type pthread_rwlockattr_t
-type timer_t
 
 val key_t                : key_t typ
 val pthread_t            : pthread_t typ
@@ -68,4 +65,3 @@ val pthread_mutexattr_t  : pthread_mutexattr_t typ
 val pthread_once_t       : pthread_once_t typ
 val pthread_rwlock_t     : pthread_rwlock_t typ
 val pthread_rwlockattr_t : pthread_rwlockattr_t typ
-val timer_t              : timer_t typ
