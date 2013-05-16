@@ -17,10 +17,10 @@ let test_inspecting_float () =
     open Union
     open Type
     type u
-    let utyp : u union typ = tag "u"
-    let f = utyp *:* double
-    let i = utyp *:* int64_t
-    let () = seal utyp
+    let utyp : u union typ = union "u"
+    let f = utyp +:+ double
+    let i = utyp +:+ int64_t
+    let () = sealu utyp
 
     let pi = 3.14
     let e = 2.718
@@ -52,10 +52,10 @@ let test_endian_detection () =
     open Union
     open Type
     type e
-    let etyp : e union typ = tag "e"
-    let i = etyp *:* int64_t
-    let c = etyp *:* array (sizeof int64_t) uchar
-    let () = seal etyp
+    let etyp : e union typ = union "e"
+    let i = etyp +:+ int64_t
+    let c = etyp +:+ array (sizeof int64_t) uchar
+    let () = sealu etyp
 
     let updated_char_index =
       if Sys.big_endian then  sizeof int64_t - 1 else 0

@@ -64,22 +64,22 @@ let test_sizeof_primitives () = Type.(
 
 
 (*
-  Test some properties of the sizes of structs.
+  Test some properties of the sizes of unions.
 *)
 let test_sizeof_unions () = Type.(
   let open Union in
 
-  let int_char = tag "int_char" in
-  let _ = int_char *:* int in
-  let _ = int_char *:* char in
-  let _ = seal int_char in
+  let int_char = union "int_char" in
+  let _ = int_char +:+ int in
+  let _ = int_char +:+ char in
+  let _ = sealu int_char in
   
   assert_equal (sizeof int) (sizeof int_char);
 
 
-  let char17 = tag "char17" in
-  let _ = char17 *:* array 17 char in
-  let _ = seal char17 in
+  let char17 = union "char17" in
+  let _ = char17 +:+ array 17 char in
+  let _ = sealu char17 in
   
   assert_equal 17 (sizeof char17)
 )
@@ -98,11 +98,11 @@ let test_sizeof_structs () = Type.(
     type h
     let () =
       for i = 1 to 10 do
-        let homogeneous : h structure typ = tag "h" in
+        let homogeneous : h structure typ = structure "h" in
         for j = 1 to i do
           ignore (homogeneous *:* int);
         done;
-        seal homogeneous;
+        seals homogeneous;
         assert_equal (i * sizeof int) (sizeof homogeneous)
       done
 
@@ -142,10 +142,10 @@ let test_sizeof_pointers () = Type.(
   let module M = struct
     open Struct
     type t
-    let t : t structure typ = tag "t"
+    let t : t structure typ = structure "t"
     let c = t *:* int
     let f = t *:* double
-    let () = seal t
+    let () = seals t
   end in
   assert_equal pointer_size (sizeof (ptr M.t))
 )

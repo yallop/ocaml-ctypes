@@ -96,9 +96,9 @@ sig
     type 's t = 's structure
     type ('a, -'s) field
         
-    val tag : string -> 's structure typ
+    val structure : string -> 's structure typ
     val ( *:* ) : 's structure typ -> 'a typ -> ('a, 's) field
-    val seal : 's structure typ -> unit
+    val seals : 's structure typ -> unit
 
     val make : 's structure typ -> 's structure
     val setf : 's structure -> ('a, 's) field -> 'a -> unit
@@ -114,9 +114,9 @@ sig
     type 's t = 's union
     type ('a, -'s) field
         
-    val tag : string -> 's union typ
-    val ( *:* ) : 's union typ -> 'a typ -> ('a, 's) field
-    val seal : 's union typ -> unit
+    val union : string -> 's union typ
+    val ( +:+ ) : 's union typ -> 'a typ -> ('a, 's) field
+    val sealu : 's union typ -> unit
 
     val make : 's union typ -> 's union
     val setf : 's union -> ('a, 's) field -> 'a -> unit

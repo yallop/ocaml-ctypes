@@ -50,7 +50,7 @@ let test_incomplete_alignment () = Type.(
 
   let module M = struct
     open Struct
-    let t = tag "t"
+    let t = structure "t"
     let i = t *:* int
       
     let () =
@@ -60,8 +60,8 @@ let test_incomplete_alignment () = Type.(
 
   let module M = struct
     open Union
-    let u = tag "u"
-    let i = u *:* int
+    let u = union "u"
+    let i = u +:+ int
       
     let () =
       assert_raises IncompleteType
@@ -91,23 +91,24 @@ let test_incomplete_alignment () = Type.(
 let test_struct_tail_padding () = 
   let module M = struct
     open Type
+    open Union
     open Struct
     type a and b and u
 
-    let struct_a = tag "A"
+    let struct_a = structure "A"
     let a = struct_a *:* char
     let b = struct_a *:* int
     let c = struct_a *:* char
-    let () = seal (struct_a : a structure typ)
+    let () = seals (struct_a : a structure typ)
 
-    let u = Union.tag "U"
-    let x = Union.(u *:* char)
-    let () = Union.seal (u : u union typ)
+    let u = union "U"
+    let x = u +:+ char
+    let () = sealu (u : u union typ)
 
-    let struct_b = tag "B"
+    let struct_b = structure "B"
     let d = struct_b *:* struct_a
     let e = struct_b *:* u
-    let () = seal (struct_b : b structure typ)
+    let () = seals (struct_b : b structure typ)
 
     let char_ptr p = Ptr.(from_voidp char (to_voidp p))
 

@@ -117,8 +117,8 @@ struct
     = fun name (type a) (fn : a ccallspec) -> match fn with
       | Call (check_errno, read_return_value) ->
         let call = match check_errno, name with
-          | true, Some name -> Raw.call_errno name 
-          | true, None      -> Raw.call_errno "" 
+          | true, Some name -> Raw.call_errno name
+          | true, None      -> Raw.call_errno ""
           | false, _        -> Raw.call
         in
         fun writers callspec addr ->
@@ -163,15 +163,15 @@ struct
       | Struct {spec=Incomplete _} ->
         raise IncompleteType
       | Struct ({spec=Complete p}) as reftype ->
-        (fun ~offset buf -> 
+        (fun ~offset buf ->
           let m = Raw.read p ~offset buf in
-          { structure = 
+          { structure =
               { pmanaged = Some m;
                 reftype;
                 raw_ptr = Raw.block_address m;
                 pbyte_offset = 0}})
       | Pointer reftype ->
-        (fun ~offset buf -> 
+        (fun ~offset buf ->
           {raw_ptr=Raw.read RawTypes.pointer ~offset buf;
            pbyte_offset = 0;
            reftype;
@@ -191,7 +191,7 @@ struct
       | Primitive p ->
         Raw.write p
       | Pointer reftype ->
-        (fun ~offset {raw_ptr; pbyte_offset} -> 
+        (fun ~offset {raw_ptr; pbyte_offset} ->
           Raw.write RawTypes.pointer ~offset
             (Raw.pointer_plus raw_ptr pbyte_offset))
       | FunctionPointer fn ->
@@ -215,7 +215,7 @@ struct
         let size = sizeof a in
         (fun ~offset {astart={raw_ptr=src; pbyte_offset=src_offset}} dst ->
           Raw.memcpy ~size ~dst ~dst_offset:offset ~src ~src_offset)
-          
+
   (*
     callspec = allocate_callspec ()
     arg_1 = add_argument callspec argtype
@@ -270,7 +270,7 @@ struct
       fun {pbyte_offset = o1; reftype} {pbyte_offset = o2} ->
         (* We assume the pointers are properly aligned, or at least that
            the difference is a multiple of sizeof reftype. *)
-        (o2 - o1) / sizeof reftype 
+        (o2 - o1) / sizeof reftype
 
     let (+) : 'a. 'a t -> int -> 'a t =
       fun ({pbyte_offset; reftype} as p) x ->
@@ -282,10 +282,10 @@ struct
     let (:=) : 'a. 'a t -> 'a -> unit
       = fun (type a) ({reftype; raw_ptr; pbyte_offset=offset} : a t) ->
         fun v -> write reftype ~offset v raw_ptr
-              
+
     let from_voidp : 'a. 'a typ -> unit ptr -> 'a ptr =
       fun reftype p -> {p with reftype}
-        
+
     let to_voidp : 'a. 'a ptr -> unit ptr =
       fun p -> {p with reftype = Void}
 
@@ -359,21 +359,21 @@ struct
     type 's t = 's structure = { structure : 's structure ptr }
     type ('a, 's) field  = { ftype: 'a typ;
                              foffset: int }
-        
-    let tag tag = Struct {spec = Incomplete (Raw.allocate_bufferspec ()); tag; passable=true}
-      
+
+    let structure tag =
+      Struct {spec = Incomplete (Raw.allocate_bufferspec ()); tag; passable=true}
+
     let bufferspec {spec} = match spec with
       | Incomplete s -> s
       | Complete _   -> raise ModifyingSealedType
 
     let offsetof {foffset} = foffset
 
-    let seal (Struct s) =
+    let seals (Struct s) =
       let bufspec = bufferspec s in
       s.spec <- Complete (Raw.complete_struct_type bufspec)
 
-    let ( *:* ) : 'a 's. 's structure typ -> 'a typ -> ('a, 's) field
-      = fun (type b) (Struct s) (ftype : b typ) -> 
+    let ( *:* ) (type b) (Struct s) (ftype : b typ) =
         let bufspec = bufferspec s in
         let add_argument t = Raw.add_argument bufspec t
         and add_unpassable_argument t = Raw.add_unpassable_argument
@@ -396,10 +396,10 @@ struct
 
     let make (type s) (Struct _ as s : s structure typ) =
       { structure = Ptr.allocate s ~count:1 }
-                                                                           
-    let (@.) (type s) (type a) 
+
+    let (@.) (type s) (type a)
         { structure }
-        { ftype=reftype; foffset=pbyte_offset } = 
+        { ftype=reftype; foffset=pbyte_offset } =
       { structure with
         pbyte_offset = structure.pbyte_offset + pbyte_offset;
         reftype }
@@ -420,18 +420,18 @@ struct
   struct
     type 's t = 's union = { union: 's union ptr }
     type ('a, 's) field  = 'a typ
-        
-    let tag utag = Union {utag; usize = 0; ualignment = 0; ucomplete = false}
+
+    let union utag = Union {utag; usize = 0; ualignment = 0; ucomplete = false}
 
     let ensure_unsealed {ucomplete} =
       if ucomplete then raise ModifyingSealedType
 
-    let seal (Union u) = begin
+    let sealu (Union u) = begin
       ensure_unsealed u;
       u.ucomplete <- true
     end
 
-    let ( *:* ) (Union u) ftype =
+    let ( +:+ ) (Union u) ftype =
       begin
         ensure_unsealed u;
         u.usize <- max u.usize (sizeof ftype);
@@ -479,13 +479,13 @@ struct
 
     let array i t = Array (t, i)
     let ptr t = Pointer t
-    let ( @->) f t = 
+    let ( @->) f t =
       if not (passable f) then
         raise (Unsupported "Unsupported argument type")
       else
         Function (f, t)
 
-    let returning v = 
+    let returning v =
       if not (passable v) then
         raise (Unsupported "Unsupported return type")
       else
@@ -503,7 +503,7 @@ struct
     { Ptr.reftype ; raw_ptr; pbyte_offset = 0 ; pmanaged=None }
 
   let string_of_ptr_and_length : char ptr -> int -> string
-    = fun charp length -> 
+    = fun charp length ->
       let s = String.create length in
       for i = 0 to length - 1 do
         s.[i] <- Ptr.(! (charp  + i))
@@ -513,7 +513,7 @@ struct
   let strlen = foreign "strlen" Type.(ptr char @-> returning size_t)
 
   let string_of_char_ptr : char ptr -> string
-    = fun charp -> 
+    = fun charp ->
       string_of_ptr_and_length charp (Unsigned.Size_t.to_int (strlen charp))
 
   let string_of_char_array : char array -> string
