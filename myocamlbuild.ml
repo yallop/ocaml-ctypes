@@ -1,5 +1,5 @@
 (* OASIS_START *)
-(* DO NOT EDIT (digest: 9f986df023aa688d9d3bf6cfe735f8f2) *)
+(* DO NOT EDIT (digest: 3f28a72ce003bb3c474b040ad5ddf316) *)
 module OASISGettext = struct
 (* # 21 "/Users/avsm/.opam/4.01.0dev+trunk/build/oasis-mirage.0.3.0a/src/oasis/OASISGettext.ml" *)
 
@@ -549,14 +549,15 @@ let package_default =
        [
           ("tests", ["src"]);
           ("examples/ncurses", ["src"]);
-          ("examples/fts", ["src"])
+          ("examples/fts", ["src"]);
+          ("examples/date", ["src"])
        ];
      }
   ;;
 
 let dispatch_default = MyOCamlbuildBase.dispatch_default package_default;;
 
-# 560 "myocamlbuild.ml"
+# 561 "myocamlbuild.ml"
 (* OASIS_STOP *)
 
 open Ocamlbuild_plugin

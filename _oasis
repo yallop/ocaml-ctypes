@@ -11,9 +11,9 @@ PostConfCommand: ocaml discover.ml -ocamlc $ocamlc -ext-obj $ext_obj -exec-name 
 Library ffi
   Path:             src/
   Findlibname:      ffi
-  Modules:          Ffi
+  Modules:          Ffi,PosixTypes
   InternalModules:  Unsigned,Signed,Ffi_raw,Dl
-  CSources:         unsigned_stubs.h,unsigned_stubs.c,managed_buffer_stubs.h,managed_buffer_stubs.c,type_info_stubs.h,type_info_stubs.c,ffi_stubs.c,dl_stubs.c
+  CSources:         unsigned_stubs.h,unsigned_stubs.c,managed_buffer_stubs.h,managed_buffer_stubs.c,type_info_stubs.h,type_info_stubs.c,ffi_stubs.c,dl_stubs.c,posix_types_stubs.c
   CCOpt:            -fPIC -Wall -Wno-unused-variable -g
 #  ByteOpt:          -warn-error A
 
@@ -141,6 +141,14 @@ Executable test_ffi_alignment
   Path:             tests
   MainIs:           test_alignment.ml
   Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     unix,ffi,oUnit
+  Custom:           true
+
+Executable date_example
+  Path:             examples/date
+  MainIs:           date.ml
   CompiledObject:   best
   Install:          false
   BuildDepends:     unix,ffi,oUnit

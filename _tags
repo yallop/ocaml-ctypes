@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 59a6fb595e249555537378e31acaad91)
+# DO NOT EDIT (digest: 5a0ae965a24dc549dfecad2216697c07)
 # Ignore VCS directories, you can use the same kind of rule outside 
 # OASIS_START/STOP if you want to exclude directories that contains 
 # useless stuff for the build process
@@ -21,6 +21,7 @@
 "src/type_info_stubs.c": oasis_library_ffi_ccopt
 "src/ffi_stubs.c": oasis_library_ffi_ccopt
 "src/dl_stubs.c": oasis_library_ffi_ccopt
+"src/posix_types_stubs.c": oasis_library_ffi_ccopt
 <src/ffi.{cma,cmxa}>: use_libffi_stubs
 # Library fts
 "examples/fts/fts.cmxs": use_fts
@@ -99,6 +100,14 @@
 <tests/*.ml{,i}>: pkg_unix
 <tests/*.ml{,i}>: pkg_oUnit
 <tests/test_alignment.{native,byte}>: custom
+# Executable date_example
+<examples/date/date.{native,byte}>: use_ffi
+<examples/date/date.{native,byte}>: pkg_unix
+<examples/date/date.{native,byte}>: pkg_oUnit
+<examples/date/*.ml{,i}>: use_ffi
+<examples/date/*.ml{,i}>: pkg_unix
+<examples/date/*.ml{,i}>: pkg_oUnit
+<examples/date/date.{native,byte}>: custom
 # OASIS_STOP
 <tests/clib/*>: not_hygienic
 <src/*>: use_C_libffi
