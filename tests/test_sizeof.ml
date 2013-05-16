@@ -6,35 +6,59 @@ open Ffi.C
   Test some relationships between the sizes of primitive types.
 *)
 let test_sizeof_primitives () = Type.(
-  assert_equal ~msg:"sizeof char == 1"
+  assert_equal ~msg:"sizeof (char) == 1"
     (sizeof char) 1;
 
-  assert_bool "sizeof char <= sizeof int"
+  assert_equal ~msg:"sizeof (unsigned char) == 1"
+    (sizeof uchar) 1;
+
+  assert_equal ~msg:"sizeof (signed char) == 1"
+    (sizeof schar) 1;
+
+  assert_bool "sizeof (char) <= sizeof (int)"
     (sizeof char <= sizeof int);
 
-  assert_bool "sizeof float <= sizeof double"
+  assert_bool "sizeof (float) <= sizeof (double)"
     (sizeof char <= sizeof int);
 
-  assert_bool "sizeof short <= sizeof int"
+  assert_bool "sizeof (short) <= sizeof (int)"
     (sizeof char <= sizeof int);
 
-  assert_bool "sizeof int <= sizeof long"
-    (sizeof char <= sizeof int);
+  assert_bool "sizeof (int) <= sizeof (long)"
+    (sizeof int <= sizeof long);
 
-  assert_equal ~msg:"2 * sizeof int32_t == sizeof int64_t"
+  assert_bool "sizeof (long) <= sizeof (long long)"
+    (sizeof long <= sizeof llong);
+
+  assert_equal ~msg:"2 * sizeof (int32_t) == sizeof (int64_t)"
     (2 * sizeof int32_t) (sizeof int64_t);
 
-  assert_equal ~msg:"2 * sizeof int16_t == sizeof int32_t"
+  assert_equal ~msg:"2 * sizeof (int16_t) == sizeof (int32_t)"
     (2 * sizeof int16_t) (sizeof int32_t);
 
-  assert_equal ~msg:"2 * sizeof int8_t == sizeof int16_t"
+  assert_equal ~msg:"2 * sizeof (int8_t) == sizeof (int16_t)"
     (2 * sizeof int8_t) (sizeof int16_t);
 
-  assert_bool "sizeof int16_t <= sizeof int"
+  assert_bool "sizeof (int16_t) <= sizeof (int)"
     (sizeof int16_t <= sizeof int);
 
-  assert_bool "sizeof int32_t <= sizeof long"
-    (sizeof int16_t <= sizeof int);
+  assert_bool "sizeof (int32_t) <= sizeof (long)"
+    (sizeof int32_t <= sizeof long);
+
+  assert_bool "sizeof (int64_t) <= sizeof (long long)"
+    (sizeof int64_t <= sizeof llong);
+
+  assert_equal ~msg:"sizeof (short) == sizeof (unsigned short)"
+    (sizeof short) (sizeof ushort);
+
+  assert_equal ~msg:"sizeof (int) == sizeof (unsigned int)"
+    (sizeof int <= sizeof uint);
+
+  assert_equal ~msg:"sizeof (long) == sizeof (unsigned long)"
+    (sizeof long <= sizeof ulong);
+
+  assert_bool "sizeof (long long) == sizeof (unsigned long long)"
+    (sizeof llong <= sizeof ullong);
 )
 
 
