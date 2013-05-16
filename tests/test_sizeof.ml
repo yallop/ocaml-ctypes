@@ -52,13 +52,13 @@ let test_sizeof_primitives () = Type.(
     (sizeof short) (sizeof ushort);
 
   assert_equal ~msg:"sizeof (int) == sizeof (unsigned int)"
-    (sizeof int <= sizeof uint);
+    (sizeof int) (sizeof uint);
 
   assert_equal ~msg:"sizeof (long) == sizeof (unsigned long)"
-    (sizeof long <= sizeof ulong);
+    (sizeof long) (sizeof ulong);
 
-  assert_bool "sizeof (long long) == sizeof (unsigned long long)"
-    (sizeof llong <= sizeof ullong);
+  assert_equal ~msg:"sizeof (long long) == sizeof (unsigned long long)"
+    (sizeof llong) (sizeof ullong);
 )
 
 
