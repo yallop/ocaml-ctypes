@@ -53,6 +53,7 @@ type pthread_mutexattr_t
 type pthread_once_t
 type pthread_rwlock_t
 type pthread_rwlockattr_t
+type sigset_t
 
 val key_t                : key_t typ
 val pthread_t            : pthread_t typ
@@ -65,3 +66,4 @@ val pthread_mutexattr_t  : pthread_mutexattr_t typ
 val pthread_once_t       : pthread_once_t typ
 val pthread_rwlock_t     : pthread_rwlock_t typ
 val pthread_rwlockattr_t : pthread_rwlockattr_t typ
+val sigset_t             : sigset_t typ

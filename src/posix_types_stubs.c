@@ -4,6 +4,7 @@
 
 #include <sys/types.h>
 #include <unistd.h>
+#include <signal.h>
 
 enum arithmetic {
   Int8,
@@ -91,3 +92,4 @@ EXPOSE_TYPESIZE(pthread_mutexattr_t)
 EXPOSE_TYPESIZE(pthread_once_t)
 EXPOSE_TYPESIZE(pthread_rwlock_t)
 EXPOSE_TYPESIZE(pthread_rwlockattr_t)
+EXPOSE_TYPESIZE(sigset_t)
