@@ -16,7 +16,9 @@ enum dl_flags_caml {
   _RTLD_GLOBAL,
   _RTLD_NODELETE,
   _RTLD_NOLOAD,
+#ifdef _RTLD_DEEPBIND
   _RTLD_DEEPBIND,
+#endif /* _RTLD_DEEPBIND */
 };
 
 static value Val_some(value v)
@@ -38,7 +40,9 @@ value ctypes_resolve_dl_flag(value flag)
     case _RTLD_GLOBAL:   return RTLD_GLOBAL;
     case _RTLD_NODELETE: return RTLD_NODELETE;
     case _RTLD_NOLOAD:   return RTLD_NOLOAD;
+#ifdef _RTLD_DEEPBIND
     case _RTLD_DEEPBIND: return RTLD_DEEPBIND;
+#endif /* _RTLD_DEEPBIND */
     default: assert(0);
   }
 }
