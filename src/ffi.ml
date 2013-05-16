@@ -457,10 +457,12 @@ struct
     let schar = Primitive RawTypes.schar
     let float = Primitive RawTypes.float
     let double = Primitive RawTypes.double
+    let short = Primitive RawTypes.short
     let int = Primitive RawTypes.int
+    let long = Primitive RawTypes.long
+    let llong = Primitive RawTypes.llong
     let nativeint = Primitive RawTypes.nativeint
     let int8_t = Primitive RawTypes.int8_t
-    let short = Primitive RawTypes.short
     let int16_t = Primitive RawTypes.int16_t
     let int32_t = Primitive RawTypes.int32_t
     let int64_t = Primitive RawTypes.int64_t

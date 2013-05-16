@@ -14,6 +14,7 @@ sig
 
   module Type :
   sig
+    open Signed
     open Unsigned
 
     type 'a t = 'a typ
@@ -24,10 +25,12 @@ sig
     val schar : int t
     val float : float t
     val double : float t
+    val short : int t
     val int   : int t
+    val long  : long t
+    val llong  : llong t
     val nativeint : nativeint t
     val int8_t : int t
-    val short : int t
     val int16_t : int t
     val int32_t : int32 t
     val int64_t : int64 t

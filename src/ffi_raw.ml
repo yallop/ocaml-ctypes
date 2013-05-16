@@ -4,6 +4,7 @@
 
 module Types :
 sig
+  open Signed
   open Unsigned
 
   type 'a ctype
@@ -23,6 +24,8 @@ sig
   val double : float ctype
   val short : int ctype
   val int : int ctype
+  val long : long ctype
+  val llong : llong ctype
   val nativeint : nativeint ctype
   val int8_t : int ctype
   val int16_t : int ctype
@@ -40,6 +43,7 @@ sig
 end =
 struct
   open Unsigned
+  open Signed
 
   type 'a ctype
   type voidp
@@ -50,6 +54,12 @@ struct
 
   external _int_type_info : unit -> int ctype = "ctypes_int_type_info"
   let int = _int_type_info ()
+
+  external _long_type_info : unit -> long ctype = "ctypes_long_type_info"
+  let long = _long_type_info ()
+
+  external _llong_type_info : unit -> llong ctype = "ctypes_llong_type_info"
+  let llong = _llong_type_info ()
 
   external _nativeint_type_info : unit -> nativeint ctype = "ctypes_nativeint_type_info"
   let nativeint = _nativeint_type_info ()
