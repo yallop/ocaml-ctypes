@@ -29,6 +29,21 @@ Library sigset
   Modules:          Sigset
   BuildDepends:     ffi
 
+Library ncurses
+  Path:             examples/ncurses
+  Findlibname:      ncurses
+  Modules:          Ncurses
+  BuildDepends:     ffi
+  CCLib:            -lncurses
+
+Executable ncurses_cmd
+   Path:            examples/ncurses
+   MainIs:          ncurses_cmd.ml
+   CompiledObject:  best
+   Install:         false
+   BuildDepends:    unix,ncurses
+   Custom:          true
+
 Executable test_ffi_raw
   Path:             tests
   MainIs:           test_raw.ml
