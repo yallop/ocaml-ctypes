@@ -7,6 +7,8 @@ src/ffi.mllib
 src/libffi_stubs.clib
 examples/fts/META
 examples/fts/fts.mllib
+examples/sigset/META
+examples/sigset/sigset.mllib
 test_*.native
 struct_subtyping.native
 _build

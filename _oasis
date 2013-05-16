@@ -23,6 +23,12 @@ Library fts
   Modules:          Fts
   BuildDepends:     ffi
 
+Library sigset
+  Path:             examples/sigset
+  Findlibname:      sigset
+  Modules:          Sigset
+  BuildDepends:     ffi
+
 Executable test_ffi_raw
   Path:             tests
   MainIs:           test_raw.ml
