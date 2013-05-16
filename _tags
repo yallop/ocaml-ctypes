@@ -26,6 +26,17 @@
 # Library fts
 "examples/fts/fts.cmxs": use_fts
 <examples/fts/*.ml{,i}>: use_ffi
+# Library ncurses
+"examples/ncurses/ncurses.cmxs": use_ncurses
+<examples/ncurses/ncurses.{cma,cmxa}>: oasis_library_ncurses_cclib
+# Executable ncurses_cmd
+<examples/ncurses/ncurses_cmd.{native,byte}>: use_ncurses
+<examples/ncurses/ncurses_cmd.{native,byte}>: use_ffi
+<examples/ncurses/ncurses_cmd.{native,byte}>: pkg_unix
+<examples/ncurses/*.ml{,i}>: use_ncurses
+<examples/ncurses/*.ml{,i}>: use_ffi
+<examples/ncurses/*.ml{,i}>: pkg_unix
+<examples/ncurses/ncurses_cmd.{native,byte}>: custom
 # Executable test_ffi_raw
 <tests/test_raw.{native,byte}>: use_ffi
 <tests/test_raw.{native,byte}>: pkg_unix
@@ -100,3 +111,4 @@
 # OASIS_STOP
 <tests/clib/*>: not_hygienic
 <src/*>: use_C_libffi
+true: annot
