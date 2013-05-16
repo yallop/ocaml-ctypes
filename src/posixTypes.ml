@@ -63,7 +63,6 @@ external typeof_mode_t : unit -> arithmetic = "ctypes_typeof_mode_t"
 external typeof_nlink_t : unit -> arithmetic = "ctypes_typeof_nlink_t"
 external typeof_off_t : unit -> arithmetic = "ctypes_typeof_off_t"
 external typeof_pid_t : unit -> arithmetic = "ctypes_typeof_pid_t"
-external typeof_pthread_t : unit -> arithmetic = "ctypes_typeof_pthread_t"
 external typeof_ssize_t : unit -> arithmetic = "ctypes_typeof_ssize_t"
 external typeof_suseconds_t : unit -> arithmetic = "ctypes_typeof_suseconds_t"
 external typeof_time_t : unit -> arithmetic = "ctypes_typeof_time_t"
@@ -84,7 +83,6 @@ module Mode = (val mkArithmetic (typeof_mode_t ()) : Abstract)
 module Nlink = (val mkArithmetic (typeof_nlink_t ()) : Abstract)
 module Off = (val mkArithmetic (typeof_off_t ()) : Abstract)
 module Pid = (val mkArithmetic (typeof_pid_t ()) : Abstract)
-module Pthread = (val mkArithmetic (typeof_pthread_t ()) : Abstract)
 module Size = 
 struct
   type t = Unsigned.size_t
@@ -110,7 +108,6 @@ type mode_t = Mode.t
 type nlink_t = Nlink.t
 type off_t = Off.t
 type pid_t = Pid.t
-type pthread_t = Pthread.t
 type size_t = Size.t
 type ssize_t = Ssize.t
 type suseconds_t = Suseconds.t
@@ -132,7 +129,6 @@ let mode_t = Mode.t
 let nlink_t = Nlink.t
 let off_t = Off.t
 let pid_t = Pid.t
-let pthread_t = Pthread.t
 let size_t = Size.t
 let ssize_t = Ssize.t
 let suseconds_t = Suseconds.t
@@ -143,6 +139,7 @@ let useconds_t = Useconds.t
 (* Non-arithmetic types *)
 
 external sizeof_key_t : unit -> int = "ctypes_sizeof_key_t"
+external sizeof_pthread_t : unit -> int = "ctypes_sizeof_pthread_t"
 external sizeof_pthread_attr_t : unit -> int = "ctypes_sizeof_pthread_attr_t"
 external sizeof_pthread_cond_t : unit -> int = "ctypes_sizeof_pthread_cond_t"
 external sizeof_pthread_condattr_t : unit -> int = "ctypes_sizeof_pthread_condattr_t"
@@ -155,6 +152,7 @@ external sizeof_pthread_rwlockattr_t : unit -> int = "ctypes_sizeof_pthread_rwlo
 external sizeof_timer_t : unit -> int = "ctypes_sizeof_timer_t"
 
 module Key = (val mkAbstractSized ~size:(sizeof_key_t ()) : Abstract)
+module Pthread = (val mkAbstractSized ~size:(sizeof_pthread_t ()) : Abstract)
 module Pthread_Attr = (val mkAbstractSized ~size:(sizeof_pthread_attr_t ()) : Abstract)
 module Pthread_Cond = (val mkAbstractSized ~size:(sizeof_pthread_cond_t ()) : Abstract)
 module Pthread_Condattr = (val mkAbstractSized ~size:(sizeof_pthread_condattr_t ()) : Abstract)
@@ -167,6 +165,7 @@ module Pthread_Rwlockattr = (val mkAbstractSized ~size:(sizeof_pthread_rwlockatt
 module Timer = (val mkAbstractSized ~size:(sizeof_timer_t ()) : Abstract)
 
 type key_t = Key.t
+type pthread_t = Pthread.t
 type pthread_attr_t = Pthread_Attr.t
 type pthread_cond_t = Pthread_Cond.t
 type pthread_condattr_t = Pthread_Condattr.t
@@ -179,6 +178,7 @@ type pthread_rwlockattr_t = Pthread_Rwlockattr.t
 type timer_t = Timer.t
 
 let key_t = Key.t
+let pthread_t = Pthread.t
 let pthread_attr_t = Pthread_Attr.t
 let pthread_cond_t = Pthread_Cond.t
 let pthread_condattr_t = Pthread_Condattr.t

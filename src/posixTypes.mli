@@ -15,7 +15,6 @@ type mode_t
 type nlink_t
 type off_t
 type pid_t
-type pthread_t
 type size_t = Unsigned.size_t
 type ssize_t
 type suseconds_t
@@ -37,7 +36,6 @@ val mode_t      : mode_t typ
 val nlink_t     : nlink_t typ
 val off_t       : off_t typ
 val pid_t       : pid_t typ
-val pthread_t   : pthread_t typ
 val size_t      : size_t typ
 val ssize_t     : ssize_t typ
 val suseconds_t : suseconds_t typ
@@ -47,6 +45,7 @@ val useconds_t  : useconds_t typ
 
 (* non-arithmetic types from <sys/types.h> *)
 type key_t
+type pthread_t
 type pthread_attr_t
 type pthread_cond_t
 type pthread_condattr_t
@@ -59,6 +58,7 @@ type pthread_rwlockattr_t
 type timer_t
 
 val key_t                : key_t typ
+val pthread_t            : pthread_t typ
 val pthread_attr_t       : pthread_attr_t typ
 val pthread_cond_t       : pthread_cond_t typ
 val pthread_condattr_t   : pthread_condattr_t typ
