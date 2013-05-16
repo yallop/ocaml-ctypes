@@ -75,7 +75,7 @@ struct
   let nlink_t = int (* :-( *)
 
   type ftsent
-  let ftsent : ftsent structure typ = tag "ftsent"
+  let ftsent : ftsent structure typ = structure "ftsent"
   let fts_cycle   = ftsent *:* ptr ftsent
   let fts_parent  = ftsent *:* ptr ftsent
   let fts_link    = ftsent *:* ptr ftsent
@@ -96,7 +96,7 @@ struct
   let fts_instr   = ftsent *:* short (* ushort *)
   let fts_statp   = ftsent *:* ptr void (* really a struct stat * *)
   let fts_name    = ftsent *:* ptr char
-  let () = seal ftsent
+  let () = seals ftsent
 
   open Ptr
 

@@ -23,11 +23,11 @@ let test_passing_struct () =
     open Struct
     open Type
     type simple
-    let simple : simple structure typ = tag "simple"
+    let simple : simple structure typ = structure "simple"
     let c = simple *:* int
     let f = simple *:* double
     let p = simple *:* ptr simple
-    let () = seal simple
+    let () = seals simple
       
     let accept_struct = foreign "accept_struct" (simple @-> returning int)
       ~from:testlib
@@ -67,11 +67,11 @@ let test_returning_struct () =
     open Type
     type simple
 
-    let simple : simple structure typ = tag "simple"
+    let simple : simple structure typ = structure "simple"
     let c = simple *:* int
     let f = simple *:* double
     let p = simple *:* ptr simple
-    let () = seal simple
+    let () = seals simple
 
     let return_struct = foreign "return_struct" (void @-> returning simple)
       ~from:testlib
@@ -102,11 +102,11 @@ let test_pointers_to_struct_members () =
     open Struct
     type s
 
-    let styp : s structure typ = tag "s"
+    let styp : s structure typ = structure "s"
     let i = styp *:* int
     let j = styp *:* int
     let k = styp *:* ptr int
-    let () = seal styp
+    let () = seals styp
 
     let s = make styp
 
@@ -144,11 +144,11 @@ let test_structs_with_union_members () =
     type u and s
 
     open Union
-    let utyp : u union typ = tag "u"
-    let uc = utyp *:* char
-    let ui = utyp *:* int
-    let uf = utyp *:* double
-    let () = seal utyp
+    let utyp : u union typ = union "u"
+    let uc = utyp +:+ char
+    let ui = utyp +:+ int
+    let uf = utyp +:+ double
+    let () = sealu utyp
 
     let u = make utyp
     let () = begin
@@ -166,11 +166,11 @@ let test_structs_with_union_members () =
     end
 
     open Struct
-    let styp : s structure typ = tag "s"
+    let styp : s structure typ = structure "s"
     let si = styp *:* int
     let su = styp *:* utyp
     let sc = styp *:* char
-    let () = seal styp
+    let () = seals styp
 
     let s = make styp
 

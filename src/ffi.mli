@@ -14,6 +14,7 @@ sig
 
   module Type :
   sig
+    open Signed
     open Unsigned
 
     type 'a t = 'a typ
@@ -24,10 +25,12 @@ sig
     val schar : int t
     val float : float t
     val double : float t
+    val short : int t
     val int   : int t
+    val long  : long t
+    val llong  : llong t
     val nativeint : nativeint t
     val int8_t : int t
-    val short : int t
     val int16_t : int t
     val int32_t : int32 t
     val int64_t : int64 t
@@ -93,9 +96,9 @@ sig
     type 's t = 's structure
     type ('a, -'s) field
         
-    val tag : string -> 's structure typ
+    val structure : string -> 's structure typ
     val ( *:* ) : 's structure typ -> 'a typ -> ('a, 's) field
-    val seal : 's structure typ -> unit
+    val seals : 's structure typ -> unit
 
     val make : 's structure typ -> 's structure
     val setf : 's structure -> ('a, 's) field -> 'a -> unit
@@ -111,9 +114,9 @@ sig
     type 's t = 's union
     type ('a, -'s) field
         
-    val tag : string -> 's union typ
-    val ( *:* ) : 's union typ -> 'a typ -> ('a, 's) field
-    val seal : 's union typ -> unit
+    val union : string -> 's union typ
+    val ( +:+ ) : 's union typ -> 'a typ -> ('a, 's) field
+    val sealu : 's union typ -> unit
 
     val make : 's union typ -> 's union
     val setf : 's union -> ('a, 's) field -> 'a -> unit

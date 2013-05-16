@@ -12,7 +12,7 @@ Library ffi
   Path:             src/
   Findlibname:      ffi
   Modules:          Ffi
-  InternalModules:  Unsigned,Ffi_raw,Dl
+  InternalModules:  Unsigned,Signed,Ffi_raw,Dl
   CSources:         unsigned_stubs.h,unsigned_stubs.c,managed_buffer_stubs.h,managed_buffer_stubs.c,type_info_stubs.h,type_info_stubs.c,ffi_stubs.c,dl_stubs.c
   CCOpt:            -fPIC -Wall -Wno-unused-variable -g
 #  ByteOpt:          -warn-error A

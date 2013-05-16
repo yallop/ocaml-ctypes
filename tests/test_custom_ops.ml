@@ -39,19 +39,19 @@ let test_type_info_hashing_and_equality () =
     open Type
       
     type s
-    let s : s structure typ = tag "s"
+    let s : s structure typ = structure "s"
     let _ = begin
       ignore (s *:* double);
       ignore (s *:* ptr s);
-      ignore (seal s)
+      ignore (seals s)
     end
       
     type t
-    let t : t structure typ = tag "s"
+    let t : t structure typ = structure "s"
     let _ = begin
       ignore (t *:* double);
       ignore (t *:* ptr t);
-      ignore (seal t)
+      ignore (seals t)
     end
       
     let () = begin

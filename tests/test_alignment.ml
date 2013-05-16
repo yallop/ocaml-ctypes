@@ -3,6 +3,74 @@ open Ffi.C
 
 
 (*
+  Test some relationships between the alignment requirements of primitive types.
+*)
+let test_primitive_alignment () = Type.(
+  assert_equal ~msg:"alignmentof(char) == 1"
+    (alignment char) 1;
+
+  assert_equal ~msg:"alignmentof(signed char) == 1"
+    (alignment schar) 1;
+
+  assert_equal ~msg:"alignmentof(unsigned char) == 1"
+    (alignment uchar) 1;
+
+  assert_equal ~msg:"alignmentof(short) == alignmentof(unsigned short)"
+    (alignment short) (alignment ushort);
+
+  assert_equal ~msg:"alignmentof(int) == alignmentof(unsigned int)"
+    (alignment int) (alignment uint);
+
+  assert_equal ~msg:"alignmentof(long) == alignmentof(unsigned long)"
+    (alignment long) (alignment ulong);
+
+  assert_equal ~msg:"alignmentof(long long) == alignmentof(unsigned long long)"
+    (alignment llong) (alignment ullong);
+
+  assert_equal ~msg:"alignmentof(int8_t) == alignmentof(uint8_t)"
+    (alignment int8_t) (alignment uint8_t);
+
+  assert_equal ~msg:"alignmentof(int16_t) == alignmentof(uint16_t)"
+    (alignment int16_t) (alignment uint16_t);
+
+  assert_equal ~msg:"alignmentof(int32_t) == alignmentof(uint32_t)"
+    (alignment int32_t) (alignment uint32_t);
+
+  assert_equal ~msg:"alignmentof(int64_t) == alignmentof(uint64_t)"
+    (alignment int64_t) (alignment uint64_t);
+)
+
+
+(*
+  Test that requesting the alignment of an incomplete type raises an exception.
+*)
+let test_incomplete_alignment () = Type.(
+  assert_raises IncompleteType
+    (fun () -> alignment void);
+
+  let module M = struct
+    open Struct
+    let t = structure "t"
+    let i = t *:* int
+      
+    let () =
+      assert_raises IncompleteType
+        (fun () -> alignment t)
+  end in
+
+  let module M = struct
+    open Union
+    let u = union "u"
+    let i = u +:+ int
+      
+    let () =
+      assert_raises IncompleteType
+        (fun () -> alignment u)
+  end in
+  ())
+
+
+(*
   Test that structs are properly tail-padded.  For example, suppose a 32-bit
   architecture with 8-bit bytes and word-aligned ints and the following
   definitions:
@@ -23,23 +91,24 @@ open Ffi.C
 let test_struct_tail_padding () = 
   let module M = struct
     open Type
+    open Union
     open Struct
     type a and b and u
 
-    let struct_a = tag "A"
+    let struct_a = structure "A"
     let a = struct_a *:* char
     let b = struct_a *:* int
     let c = struct_a *:* char
-    let () = seal (struct_a : a structure typ)
+    let () = seals (struct_a : a structure typ)
 
-    let u = Union.tag "U"
-    let x = Union.(u *:* char)
-    let () = Union.seal (u : u union typ)
+    let u = union "U"
+    let x = u +:+ char
+    let () = sealu (u : u union typ)
 
-    let struct_b = tag "B"
+    let struct_b = structure "B"
     let d = struct_b *:* struct_a
     let e = struct_b *:* u
-    let () = seal (struct_b : b structure typ)
+    let () = seals (struct_b : b structure typ)
 
     let char_ptr p = Ptr.(from_voidp char (to_voidp p))
 
@@ -94,6 +163,8 @@ let test_struct_tail_padding () =
 
 let suite = "Alignment tests" >:::
   ["struct tail padding" >:: test_struct_tail_padding;
+   "primitive alignment" >:: test_primitive_alignment;
+   "alignment of incomplete types" >:: test_incomplete_alignment;
   ]
 
 

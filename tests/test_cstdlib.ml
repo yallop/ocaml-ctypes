@@ -122,10 +122,10 @@ let test_div () =
     open Struct
     open Type
     type div_t
-    let div_t : div_t structure typ = tag "div_t"
+    let div_t : div_t structure typ = structure "div_t"
     let quot = div_t *:* int
     let rem = div_t *:* int
-    let () = seal div_t
+    let () = seals div_t
       
     let div = foreign "div" (int @-> int @-> returning div_t)
 
@@ -210,10 +210,10 @@ let test_bsearch () =
     *)
     open Struct
     type mi
-    let mi = Struct.tag "mi"
+    let mi = structure "mi"
     let mr   = mi *:* int
     let name = mi *:* ptr char
-    let () = seal (mi : mi structure typ)
+    let () = seals (mi : mi structure typ)
 
   let of_string : string -> char array =
     fun s ->
