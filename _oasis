@@ -131,6 +131,14 @@ Executable test_ffi_alignment
   BuildDepends:     unix,ffi,oUnit
   Custom:           true
 
+Executable date_example
+  Path:             examples/date
+  MainIs:           date.ml
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     unix,ffi,oUnit
+  Custom:           true
+
 # Executable struct_subtyping
 #   Path:             examples/struct-subtyping
 #   MainIs:           struct_subtyping.ml
