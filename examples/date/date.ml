@@ -16,14 +16,14 @@ let tm_yday  = tm *:* int (* day in the year *)
 let tm_isdst = tm *:* int (* daylight saving time *)
 let () = seals (tm : tm structure typ)
 
-let time = foreign "time" (ptr Time.t @-> syscall Time.t)
+let time = foreign "time" (ptr time_t @-> syscall time_t)
   
 let asctime = foreign "asctime" (ptr tm @-> returning (ptr char))
 
-let localtime = foreign "localtime" (ptr Time.t @-> returning (ptr tm))
+let localtime = foreign "localtime" (ptr time_t @-> returning (ptr tm))
 
 let () = begin
-  let timep = Ptr.allocate ~count:1 Time.t in
+  let timep = Ptr.allocate ~count:1 time_t in
   let time = time timep in
   assert (time = Ptr.(!timep));
   let tm = localtime timep in
