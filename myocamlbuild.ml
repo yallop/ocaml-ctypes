@@ -1,5 +1,5 @@
 (* OASIS_START *)
-(* DO NOT EDIT (digest: 3b37a6b76dbab8476566aa7e9c4bb4e9) *)
+(* DO NOT EDIT (digest: 9f986df023aa688d9d3bf6cfe735f8f2) *)
 module OASISGettext = struct
 (* # 21 "/Users/avsm/.opam/4.01.0dev+trunk/build/oasis-mirage.0.3.0a/src/oasis/OASISGettext.ml" *)
 
@@ -508,7 +508,11 @@ open Ocamlbuild_plugin;;
 let package_default =
   {
      MyOCamlbuildBase.lib_ocaml =
-       [("ffi", ["src"]); ("fts", ["examples/fts"])];
+       [
+          ("ffi", ["src"]);
+          ("fts", ["examples/fts"]);
+          ("ncurses", ["examples/ncurses"])
+       ];
      lib_c =
        [
           ("ffi",
@@ -535,15 +539,24 @@ let package_default =
                       A "-ccopt";
                       A "-g"
                    ])
-            ])
+            ]);
+          (["oasis_library_ncurses_cclib"; "link"],
+            [(OASISExpr.EBool true, S [A "-cclib"; A "-lncurses"])]);
+          (["oasis_library_ncurses_cclib"; "ocamlmklib"; "c"],
+            [(OASISExpr.EBool true, S [A "-lncurses"])])
        ];
-     includes = [("tests", ["src"]); ("examples/fts", ["src"])];
+     includes =
+       [
+          ("tests", ["src"]);
+          ("examples/ncurses", ["src"]);
+          ("examples/fts", ["src"])
+       ];
      }
   ;;
 
 let dispatch_default = MyOCamlbuildBase.dispatch_default package_default;;
 
-# 547 "myocamlbuild.ml"
+# 560 "myocamlbuild.ml"
 (* OASIS_STOP *)
 
 open Ocamlbuild_plugin

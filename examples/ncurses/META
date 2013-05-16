@@ -1,0 +1,12 @@
+# OASIS_START
+# DO NOT EDIT (digest: 8726ae4fcbfe5e8ed8cd4f4cd6ddb98e)
+version = "0.1"
+description = "Manipulate external buffers as C-like structs"
+requires = "ffi"
+archive(byte) = "ncurses.cma"
+archive(byte, plugin) = "ncurses.cma"
+archive(native) = "ncurses.cmxa"
+archive(native, plugin) = "ncurses.cmxs"
+exists_if = "ncurses.cma"
+# OASIS_STOP
+
