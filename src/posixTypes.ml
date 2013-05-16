@@ -19,6 +19,11 @@ let mkAbstractSized : size:int -> (module Abstract)
        open Ffi.C
        open Type
        open Unsigned
+       (* TODO: using a char array is no good; it has the wrong alignment
+          requirements.  That doesn't matter most of the time, since objects
+          are allocated with maximal alignment, but may cause problems when we
+          use a value of abstract type as a struct member.
+       *)
        type t = uchar array
        let t = array size uchar
      end : Abstract)
