@@ -59,7 +59,6 @@ let test_multidimensional_arrays () =
 
   (* four *)
   let four = Array.make (array 3 (array 2 (array 5 int32_t))) 10 in
-  let float = Pervasives.float in
 
   for i = 0 to 9 do
     for j = 0 to 2 do
