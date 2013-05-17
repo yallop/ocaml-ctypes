@@ -1,0 +1,11 @@
+* Functions passed to C are currently registered as global roots and never
+  unregistered.
+
+* Pointers are currently passed to C as immediate values, which means they
+  must be word-aligned.  This is mostly fine, but means that we can't bind
+  string-processing functions (for example), since
+
+     strchr("ab", 'b')
+
+  returns an address offset by one from the input.  We should support a second
+  type of safe, slow heap-allocated pointer for such cases.
