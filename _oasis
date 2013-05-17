@@ -227,3 +227,11 @@ Test test_alignment
   Run$:             flag(tests)
   Command:          $test_ctypes_alignment
   WorkingDirectory: tests
+
+Document ctypes
+  Title:                Ctypes docs
+  Type:                 ocamlbuild (0.3)
+  BuildTools+:          ocamldoc
+  Install:		true
+  XOCamlbuildPath:      .
+  XOCamlbuildLibraries: ctypes
