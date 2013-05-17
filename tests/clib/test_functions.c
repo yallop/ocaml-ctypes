@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 typedef int intfun(int, int);
 
@@ -101,7 +102,6 @@ int accept_struct(struct simple simple)
   return simple.i + (int)simple.f + (simple.self == NULL ? 1 : 0);
 }
 
-
 struct simple return_struct(void)
 {
   struct simple *t = malloc(sizeof *t);
@@ -117,3 +117,19 @@ struct simple return_struct(void)
 
   return s;
 }
+
+union padded {
+  int64_t i;
+  char    a[sizeof(int64_t) + 1];
+};
+
+int64_t sum_union_components(union padded *padded, size_t len)
+{
+  size_t i;
+  int64_t acc = 0;
+  for (i = 0; i < len; i++) {
+    acc += padded[i].i;
+  }
+  return acc;
+}
+

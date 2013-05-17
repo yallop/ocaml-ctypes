@@ -3,6 +3,9 @@ open Ffi.C
 open Unsigned
 
 
+let testlib = Dl.(dlopen ~filename:"clib/test_functions.so" ~flags:[RTLD_NOW])
+
+
 (* 
    Check that using a union to inspect the representation of a float (double)
    value gives the same result as Int64.of_bits.
@@ -79,9 +82,52 @@ let test_endian_detection () =
 
 
 
+(* Check that unions are tail-padded sufficiently to satisfy the alignment
+   requirements of all their members.
+*)
+let test_union_padding () =
+  let module M = struct
+    open Union
+    open Type
+    type padded
+    let padded : padded union typ = union "padded"
+    let i = padded +:+ int64_t
+    let a = padded +:+ array (sizeof int64_t + 1) char
+    let () = sealu padded
+
+    let sum_union_components = foreign "sum_union_components"
+      (ptr padded @-> size_t @-> returning int64_t)
+      ~from:testlib
+
+    let mkPadded : int64 -> padded union =
+      fun x ->
+        let u = make padded in
+        setf u i x;
+        u
+
+    let arr = Array.of_list padded [
+      mkPadded 1L;
+      mkPadded 2L;
+      mkPadded 3L;
+      mkPadded 4L;
+      mkPadded 5L;
+    ]
+      
+    let sum = sum_union_components
+      (Array.start arr)
+      (Unsigned.Size_t.of_int (Array.length arr))
+
+    let () = assert_equal
+      ~msg:"padded union members accessed correctly"
+      15L sum
+      ~printer:Int64.to_string
+  end in ()
+
+
 let suite = "Union tests" >:::
   ["inspecting float representation" >:: test_inspecting_float;
    "detecting endianness" >:: test_endian_detection;
+   "union padding" >:: test_union_padding;
   ]
 
 
