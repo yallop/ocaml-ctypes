@@ -58,12 +58,6 @@ static enum arithmetic _underlying_type(size_t typeinfo)
     return Val_int(underlying);                              \
   }
 
-#define EXPOSE_TYPESIZE(TYPENAME)              \
-  value ctypes_sizeof_ ## TYPENAME(value unit) \
-  {                                            \
-    return Val_int(sizeof(TYPENAME));          \
-  }
-
 EXPOSE_TYPEINFO(blkcnt_t)
 EXPOSE_TYPEINFO(blksize_t)
 EXPOSE_TYPEINFO(clock_t)
@@ -83,6 +77,12 @@ EXPOSE_TYPEINFO(time_t)
 EXPOSE_TYPEINFO(uid_t)
 EXPOSE_TYPEINFO(useconds_t)
 
+#define EXPOSE_TYPESIZE(TYPENAME)              \
+  value ctypes_sizeof_ ## TYPENAME(value unit) \
+  {                                            \
+    return Val_int(sizeof(TYPENAME));          \
+  }
+
 EXPOSE_TYPESIZE(key_t)
 EXPOSE_TYPESIZE(pthread_t)
 EXPOSE_TYPESIZE(pthread_attr_t)
@@ -95,3 +95,23 @@ EXPOSE_TYPESIZE(pthread_once_t)
 EXPOSE_TYPESIZE(pthread_rwlock_t)
 EXPOSE_TYPESIZE(pthread_rwlockattr_t)
 EXPOSE_TYPESIZE(sigset_t)
+
+#define EXPOSE_ALIGNMENT(TYPENAME)                  \
+  value ctypes_alignmentof_ ## TYPENAME(value unit) \
+  {                                                 \
+    struct s { char c; TYPENAME t; };               \
+    return Val_int(offsetof(struct s, t));          \
+  }
+
+EXPOSE_ALIGNMENT(key_t)
+EXPOSE_ALIGNMENT(pthread_t)
+EXPOSE_ALIGNMENT(pthread_attr_t)
+EXPOSE_ALIGNMENT(pthread_cond_t)
+EXPOSE_ALIGNMENT(pthread_condattr_t)
+EXPOSE_ALIGNMENT(pthread_key_t)
+EXPOSE_ALIGNMENT(pthread_mutex_t)
+EXPOSE_ALIGNMENT(pthread_mutexattr_t)
+EXPOSE_ALIGNMENT(pthread_once_t)
+EXPOSE_ALIGNMENT(pthread_rwlock_t)
+EXPOSE_ALIGNMENT(pthread_rwlockattr_t)
+EXPOSE_ALIGNMENT(sigset_t)
