@@ -444,8 +444,14 @@ struct
     let ensure_unsealed {ucomplete} =
       if ucomplete then raise ModifyingSealedType
 
+    let compute_padding {usize; ualignment} =
+      let overhang = usize mod ualignment in
+      if overhang = 0 then usize
+      else usize - overhang + ualignment
+
     let sealu (Union u) = begin
       ensure_unsealed u;
+      u.usize <- compute_padding u;
       u.ucomplete <- true
     end
 
