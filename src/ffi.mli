@@ -5,6 +5,7 @@ sig
   type 'a array
   type 'a structure
   type 'a union
+  type 'a abstract
 
   exception Unsupported of string
   exception IncompleteType
@@ -45,6 +46,7 @@ sig
     val ulong : ulong t
     val ullong : ullong t
 
+    val abstract : size:int -> alignment:int -> 'a abstract t
     val array : int -> 'a t -> 'a array t
     val ptr : 'a t -> 'a ptr t
     val ( @-> ) : 'a t -> 'b f -> ('a -> 'b) f

@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 5a0ae965a24dc549dfecad2216697c07)
+# DO NOT EDIT (digest: 9e2ded1292afca892c6211abf3822019)
 # Ignore VCS directories, you can use the same kind of rule outside 
 # OASIS_START/STOP if you want to exclude directories that contains 
 # useless stuff for the build process
@@ -26,6 +26,20 @@
 # Library fts
 "examples/fts/fts.cmxs": use_fts
 <examples/fts/*.ml{,i}>: use_ffi
+# Library sigset
+"examples/sigset/sigset.cmxs": use_sigset
+<examples/sigset/*.ml{,i}>: use_ffi
+# Library ncurses
+"examples/ncurses/ncurses.cmxs": use_ncurses
+<examples/ncurses/ncurses.{cma,cmxa}>: oasis_library_ncurses_cclib
+# Executable ncurses_cmd
+<examples/ncurses/ncurses_cmd.{native,byte}>: use_ncurses
+<examples/ncurses/ncurses_cmd.{native,byte}>: use_ffi
+<examples/ncurses/ncurses_cmd.{native,byte}>: pkg_unix
+<examples/ncurses/*.ml{,i}>: use_ncurses
+<examples/ncurses/*.ml{,i}>: use_ffi
+<examples/ncurses/*.ml{,i}>: pkg_unix
+<examples/ncurses/ncurses_cmd.{native,byte}>: custom
 # Executable test_ffi_raw
 <tests/test_raw.{native,byte}>: use_ffi
 <tests/test_raw.{native,byte}>: pkg_unix
@@ -100,3 +114,4 @@
 # OASIS_STOP
 <tests/clib/*>: not_hygienic
 <src/*>: use_C_libffi
+true: annot

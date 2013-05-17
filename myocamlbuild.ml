@@ -1,5 +1,5 @@
 (* OASIS_START *)
-(* DO NOT EDIT (digest: 69423074047e5f6c44cb513cff5819e9) *)
+(* DO NOT EDIT (digest: aab70013d4d0dda1dec1bb3795f00584) *)
 module OASISGettext = struct
 (* # 21 "/home/jeremy/.opam/4.01.0dev+trunk/build/oasis.0.3.0/src/oasis/OASISGettext.ml" *)
 
@@ -478,7 +478,12 @@ open Ocamlbuild_plugin;;
 let package_default =
   {
      MyOCamlbuildBase.lib_ocaml =
-       [("ffi", ["src"]); ("fts", ["examples/fts"])];
+       [
+          ("ffi", ["src"]);
+          ("fts", ["examples/fts"]);
+          ("sigset", ["examples/sigset"]);
+          ("ncurses", ["examples/ncurses"])
+       ];
      lib_c =
        [
           ("ffi",
@@ -505,11 +510,17 @@ let package_default =
                       A "-ccopt";
                       A "-g"
                    ])
-            ])
+            ]);
+          (["oasis_library_ncurses_cclib"; "link"],
+            [(OASISExpr.EBool true, S [A "-cclib"; A "-lncurses"])]);
+          (["oasis_library_ncurses_cclib"; "ocamlmklib"; "c"],
+            [(OASISExpr.EBool true, S [A "-lncurses"])])
        ];
      includes =
        [
           ("tests", ["src"]);
+          ("examples/sigset", ["src"]);
+          ("examples/ncurses", ["src"]);
           ("examples/fts", ["src"]);
           ("examples/date", ["src"])
        ];
@@ -518,7 +529,7 @@ let package_default =
 
 let dispatch_default = MyOCamlbuildBase.dispatch_default package_default;;
 
-# 522 "myocamlbuild.ml"
+# 533 "myocamlbuild.ml"
 (* OASIS_STOP *)
 
 open Ocamlbuild_plugin

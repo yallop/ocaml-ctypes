@@ -33,6 +33,11 @@ struct
     mutable ualignment: int;
   }
 
+  type abstract_type = {
+    asize : int;
+    aalignment : int;
+  }
+
   type _ typ =
       Void            :                      unit typ
     | Primitive       : 'a RawTypes.ctype -> 'a typ
@@ -40,6 +45,7 @@ struct
     | Struct          : 'a structure_type -> 'a structure typ
     | Union           : 'a union_type     -> 'a union typ
     | Array           : 'a typ * int      -> 'a array typ
+    | Abstract        : abstract_type     -> 'a abstract typ
     | FunctionPointer : ('a -> 'b) fn     -> ('a -> 'b) typ
   and _ fn =
     (* The flag indicates whether we should check errno *)
@@ -52,6 +58,7 @@ struct
   and 'a array = { astart : 'a ptr; alength : int }
   and 'a union = { union : 'a union ptr }
   and 'a structure = { structure : 'a structure ptr }
+  and 'a abstract = { abstract : 'a abstract ptr }
 
   type _ ccallspec =
       Call : bool * (Raw.immediate_pointer -> 'a) -> 'a ccallspec
@@ -68,6 +75,7 @@ struct
       | Union { ucomplete = false }    -> raise IncompleteType
       | Union { usize }                -> usize
       | Array (t, i)                   -> i * sizeof t
+      | Abstract { asize }             -> asize
       | Pointer _                      -> RawTypes.(sizeof pointer)
       | FunctionPointer _              -> RawTypes.(sizeof pointer)
 
@@ -80,6 +88,7 @@ struct
       | Union { ucomplete = false }    -> raise IncompleteType
       | Union { ualignment }           -> ualignment
       | Array (t, i)                   -> alignment t
+      | Abstract { aalignment }        -> aalignment
       | Pointer _                      -> RawTypes.(alignment pointer)
       | FunctionPointer _              -> RawTypes.(alignment pointer)
 
@@ -92,6 +101,7 @@ struct
       | Union _                        -> false
       | Array _                        -> false
       | Pointer _                      -> true
+      | Abstract _                     -> false
       | FunctionPointer _              -> true
 
   let arg_type (type a) (t : a typ) = match t with
@@ -105,6 +115,7 @@ struct
          types are excluded during type construction. *)
       | Union _                      -> assert false
       | Array _                      -> assert false
+      | Abstract _                   -> assert false
 
   (*
     call addr callspec return (fun buffer ->
@@ -183,6 +194,7 @@ struct
          types are excluded during type construction. *)
       | Union _ -> assert false
       | Array _ -> assert false
+      | Abstract _ -> assert false
 
   and write : 'a. 'a typ -> offset:int -> 'a -> Raw.immediate_pointer -> unit =
     fun (type a) (t : a typ) -> match t with
@@ -210,6 +222,9 @@ struct
         raise IncompleteType
       | Union {usize=size} ->
         (fun ~offset {union={raw_ptr=src; pbyte_offset=src_offset}} dst ->
+          Raw.memcpy ~size ~dst ~dst_offset:offset ~src ~src_offset)
+      | Abstract {asize=size} ->
+        (fun ~offset {abstract={raw_ptr=src; pbyte_offset=src_offset}} dst ->
           Raw.memcpy ~size ~dst ~dst_offset:offset ~src ~src_offset)
       | Array _ as a ->
         let size = sizeof a in
@@ -263,6 +278,7 @@ struct
           | Struct _ -> { structure = ptr }
           | Array (elemtype, alength) ->
             { astart = {ptr with reftype = elemtype}; alength }
+          | Abstract _ -> { abstract = ptr }
           (* If it's a value type then we cons a new value. *)
           | _ -> build reftype ~offset raw_ptr
 
@@ -390,6 +406,8 @@ struct
                                            add_argument t)
           | Union _  as u              -> (s.passable <- false;
                                            add_unpassable_argument u)
+          | Abstract _  as a           -> (s.passable <- false;
+                                           add_unpassable_argument a)
           | FunctionPointer _          -> add_argument RawTypes.pointer
         in
         { ftype; foffset }
@@ -484,6 +502,8 @@ struct
         raise (Unsupported "Unsupported argument type")
       else
         Function (f, t)
+    let abstract ~size ~alignment = 
+      Abstract { asize = size; aalignment = alignment }
 
     let returning v =
       if not (passable v) then

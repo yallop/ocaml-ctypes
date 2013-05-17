@@ -4,6 +4,9 @@
 
 #include <sys/types.h>
 #include <unistd.h>
+#include <signal.h>
+
+#include <stdint.h>
 
 enum arithmetic {
   Int8,
@@ -18,31 +21,31 @@ enum arithmetic {
   Double,
 };
 
-#define FLOATING_FLAG_BIT 16
-#define SIGNED_FLAG_BIT   15
+#define FLOATING_FLAG_BIT 15
+#define UNSIGNED_FLAG_BIT 14
 #define FLOATING ((size_t)1u << FLOATING_FLAG_BIT)
-#define SIGNED   ((size_t)1u << SIGNED_FLAG_BIT)
-#define IS_FLOATING(TYPENAME) \
+#define UNSIGNED ((size_t)1u << UNSIGNED_FLAG_BIT)
+#define CHECK_FLOATING(TYPENAME) \
   ((unsigned)(((TYPENAME) 0.5) != 0) << FLOATING_FLAG_BIT)
-#define IS_SIGNED(TYPENAME) \
-  ((unsigned)(((TYPENAME) -1) == -1) << SIGNED_FLAG_BIT)
-#define CLASSIFY(TYPENAME) (IS_FLOATING(TYPENAME) | IS_SIGNED(TYPENAME))
+#define CHECK_UNSIGNED(TYPENAME) \
+  ((unsigned)(((TYPENAME) -1) > 0) << UNSIGNED_FLAG_BIT)
+#define CLASSIFY(TYPENAME) (CHECK_FLOATING(TYPENAME) | CHECK_UNSIGNED(TYPENAME))
 #define ARITHMETIC_TYPEINFO(TYPENAME) (CLASSIFY(TYPENAME) | sizeof(TYPENAME))
 
 static enum arithmetic _underlying_type(size_t typeinfo)
 {
   switch (typeinfo)
   {
-  case FLOATING | sizeof(float):   return Float;
-  case FLOATING | sizeof(double):  return Double;
-  case SIGNED   | sizeof(int8_t):  return Int8;
-  case SIGNED   | sizeof(int16_t): return Int16;
-  case SIGNED   | sizeof(int32_t): return Int32;
-  case SIGNED   | sizeof(int64_t): return Int64;
-  case            sizeof(int8_t):  return Uint8;
-  case            sizeof(int16_t): return Uint16;
-  case            sizeof(int32_t): return Uint32;
-  case            sizeof(int64_t): return Uint64;
+  case FLOATING | sizeof(float):    return Float;
+  case FLOATING | sizeof(double):   return Double;
+  case UNSIGNED | sizeof(uint8_t):  return Uint8;
+  case UNSIGNED | sizeof(uint16_t): return Uint16;
+  case UNSIGNED | sizeof(uint32_t): return Uint32;
+  case UNSIGNED | sizeof(uint64_t): return Uint64;
+  case            sizeof(int8_t):   return Int8;
+  case            sizeof(int16_t):  return Int16;
+  case            sizeof(int32_t):  return Int32;
+  case            sizeof(int64_t):  return Int64;
   default: assert(0);
   }
 }
@@ -53,12 +56,6 @@ static enum arithmetic _underlying_type(size_t typeinfo)
     size_t typeinfo = ARITHMETIC_TYPEINFO(TYPENAME);         \
     enum arithmetic underlying = _underlying_type(typeinfo); \
     return Val_int(underlying);                              \
-  }
-
-#define EXPOSE_TYPESIZE(TYPENAME)              \
-  value ctypes_sizeof_ ## TYPENAME(value unit) \
-  {                                            \
-    return Val_int(sizeof(TYPENAME));          \
   }
 
 EXPOSE_TYPEINFO(blkcnt_t)
@@ -80,6 +77,12 @@ EXPOSE_TYPEINFO(time_t)
 EXPOSE_TYPEINFO(uid_t)
 EXPOSE_TYPEINFO(useconds_t)
 
+#define EXPOSE_TYPESIZE(TYPENAME)              \
+  value ctypes_sizeof_ ## TYPENAME(value unit) \
+  {                                            \
+    return Val_int(sizeof(TYPENAME));          \
+  }
+
 EXPOSE_TYPESIZE(key_t)
 EXPOSE_TYPESIZE(pthread_t)
 EXPOSE_TYPESIZE(pthread_attr_t)
@@ -91,3 +94,24 @@ EXPOSE_TYPESIZE(pthread_mutexattr_t)
 EXPOSE_TYPESIZE(pthread_once_t)
 EXPOSE_TYPESIZE(pthread_rwlock_t)
 EXPOSE_TYPESIZE(pthread_rwlockattr_t)
+EXPOSE_TYPESIZE(sigset_t)
+
+#define EXPOSE_ALIGNMENT(TYPENAME)                  \
+  value ctypes_alignmentof_ ## TYPENAME(value unit) \
+  {                                                 \
+    struct s { char c; TYPENAME t; };               \
+    return Val_int(offsetof(struct s, t));          \
+  }
+
+EXPOSE_ALIGNMENT(key_t)
+EXPOSE_ALIGNMENT(pthread_t)
+EXPOSE_ALIGNMENT(pthread_attr_t)
+EXPOSE_ALIGNMENT(pthread_cond_t)
+EXPOSE_ALIGNMENT(pthread_condattr_t)
+EXPOSE_ALIGNMENT(pthread_key_t)
+EXPOSE_ALIGNMENT(pthread_mutex_t)
+EXPOSE_ALIGNMENT(pthread_mutexattr_t)
+EXPOSE_ALIGNMENT(pthread_once_t)
+EXPOSE_ALIGNMENT(pthread_rwlock_t)
+EXPOSE_ALIGNMENT(pthread_rwlockattr_t)
+EXPOSE_ALIGNMENT(sigset_t)

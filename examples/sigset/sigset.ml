@@ -1,0 +1,60 @@
+open PosixTypes
+open Ffi.C
+open Type
+
+type t = sigset_t ptr
+
+let t = ptr sigset_t
+
+(* This function initializes the signal set set to exclude all of the defined
+   signals. It always returns 0.  *)
+let sigemptyset = foreign "sigemptyset" (ptr sigset_t @-> returning int)
+
+let empty () =
+  let setp = Ptr.allocate ~count:1 sigset_t in begin
+    ignore (sigemptyset setp);
+    setp
+  end
+
+(* This function initializes the signal set set to include all of the defined
+   signals. Again, the return value is 0. *)
+let sigfullset = foreign "sigfullset" (ptr sigset_t @-> returning int)
+
+let full () =
+  let setp = Ptr.allocate ~count:1 sigset_t in begin
+    ignore (sigfullset setp);
+    setp
+  end
+
+(* This function adds the signal signum to the signal set set. All sigaddset
+   does is modify set; it does not block or unblock any signals.
+
+   The return value is 0 on success and -1 on failure. The following errno
+   error condition is defined for this function:
+
+   EINVAL The signum argument doesn't specify a valid signal. 
+*)
+let sigaddset = foreign "sigaddset" (ptr sigset_t @-> int @-> syscall int)
+
+let add set signal = ignore (sigaddset set signal)
+
+(* This function removes the signal signum from the signal set set. All
+   sigdelset does is modify set; it does not block or unblock any signals.
+
+   The return value and error conditions are the same as for
+   sigaddset.  *)
+let sigdelset = foreign "sigdelset" (ptr sigset_t @-> int @-> syscall int)
+
+let del set signal = ignore (sigdelset set signal)
+
+(* The sigismember function tests whether the signal signum is a member of the
+   signal set set. It returns 1 if the signal is in the set, 0 if not, and -1 if
+   there is an error.
+
+   The following errno error condition is defined for this function:
+
+   EINVAL The signum argument doesn't specify a valid signal. 
+*)
+let sigismember = foreign "sigismember" (ptr sigset_t @-> int @-> syscall int)
+
+let mem set signal = sigismember set signal <> 0
