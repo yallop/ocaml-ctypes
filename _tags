@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 9e2ded1292afca892c6211abf3822019)
+# DO NOT EDIT (digest: f15b295ae2d23b037196c8df686f2f3c)
 # Ignore VCS directories, you can use the same kind of rule outside 
 # OASIS_START/STOP if you want to exclude directories that contains 
 # useless stuff for the build process
@@ -13,101 +13,101 @@
 ".git": not_hygienic
 "_darcs": -traverse
 "_darcs": not_hygienic
-# Library ffi
-"src/ffi.cmxs": use_ffi
-<src/*.ml{,i}>: oasis_library_ffi_ccopt
-"src/unsigned_stubs.c": oasis_library_ffi_ccopt
-"src/managed_buffer_stubs.c": oasis_library_ffi_ccopt
-"src/type_info_stubs.c": oasis_library_ffi_ccopt
-"src/ffi_stubs.c": oasis_library_ffi_ccopt
-"src/dl_stubs.c": oasis_library_ffi_ccopt
-"src/posix_types_stubs.c": oasis_library_ffi_ccopt
-<src/ffi.{cma,cmxa}>: use_libffi_stubs
+# Library ctypes
+"src/ctypes.cmxs": use_ctypes
+<src/*.ml{,i}>: oasis_library_ctypes_ccopt
+"src/unsigned_stubs.c": oasis_library_ctypes_ccopt
+"src/managed_buffer_stubs.c": oasis_library_ctypes_ccopt
+"src/type_info_stubs.c": oasis_library_ctypes_ccopt
+"src/ffi_stubs.c": oasis_library_ctypes_ccopt
+"src/dl_stubs.c": oasis_library_ctypes_ccopt
+"src/posix_types_stubs.c": oasis_library_ctypes_ccopt
+<src/ctypes.{cma,cmxa}>: use_libctypes_stubs
 # Library fts
 "examples/fts/fts.cmxs": use_fts
-<examples/fts/*.ml{,i}>: use_ffi
+<examples/fts/*.ml{,i}>: use_ctypes
 # Library sigset
 "examples/sigset/sigset.cmxs": use_sigset
-<examples/sigset/*.ml{,i}>: use_ffi
+<examples/sigset/*.ml{,i}>: use_ctypes
 # Library ncurses
 "examples/ncurses/ncurses.cmxs": use_ncurses
 <examples/ncurses/ncurses.{cma,cmxa}>: oasis_library_ncurses_cclib
 # Executable ncurses_cmd
 <examples/ncurses/ncurses_cmd.{native,byte}>: use_ncurses
-<examples/ncurses/ncurses_cmd.{native,byte}>: use_ffi
+<examples/ncurses/ncurses_cmd.{native,byte}>: use_ctypes
 <examples/ncurses/ncurses_cmd.{native,byte}>: pkg_unix
 <examples/ncurses/*.ml{,i}>: use_ncurses
-<examples/ncurses/*.ml{,i}>: use_ffi
+<examples/ncurses/*.ml{,i}>: use_ctypes
 <examples/ncurses/*.ml{,i}>: pkg_unix
 <examples/ncurses/ncurses_cmd.{native,byte}>: custom
-# Executable test_ffi_raw
-<tests/test_raw.{native,byte}>: use_ffi
+# Executable test_ctypes_raw
+<tests/test_raw.{native,byte}>: use_ctypes
 <tests/test_raw.{native,byte}>: pkg_unix
 <tests/test_raw.{native,byte}>: pkg_oUnit
 <tests/test_raw.{native,byte}>: custom
-# Executable test_ffi_pointers
-<tests/test_pointers.{native,byte}>: use_ffi
+# Executable test_ctypes_pointers
+<tests/test_pointers.{native,byte}>: use_ctypes
 <tests/test_pointers.{native,byte}>: pkg_unix
 <tests/test_pointers.{native,byte}>: pkg_oUnit
 <tests/test_pointers.{native,byte}>: custom
-# Executable test_ffi_higher_order
-<tests/test_higher_order.{native,byte}>: use_ffi
+# Executable test_ctypes_higher_order
+<tests/test_higher_order.{native,byte}>: use_ctypes
 <tests/test_higher_order.{native,byte}>: pkg_unix
 <tests/test_higher_order.{native,byte}>: pkg_oUnit
 <tests/test_higher_order.{native,byte}>: custom
-# Executable test_ffi_structs
-<tests/test_structs.{native,byte}>: use_ffi
+# Executable test_ctypes_structs
+<tests/test_structs.{native,byte}>: use_ctypes
 <tests/test_structs.{native,byte}>: pkg_unix
 <tests/test_structs.{native,byte}>: pkg_oUnit
 <tests/test_structs.{native,byte}>: custom
-# Executable test_ffi_cstdlib
-<tests/test_cstdlib.{native,byte}>: use_ffi
+# Executable test_ctypes_cstdlib
+<tests/test_cstdlib.{native,byte}>: use_ctypes
 <tests/test_cstdlib.{native,byte}>: pkg_unix
 <tests/test_cstdlib.{native,byte}>: pkg_oUnit
 <tests/test_cstdlib.{native,byte}>: custom
-# Executable test_ffi_sizeof
-<tests/test_sizeof.{native,byte}>: use_ffi
+# Executable test_ctypes_sizeof
+<tests/test_sizeof.{native,byte}>: use_ctypes
 <tests/test_sizeof.{native,byte}>: pkg_unix
 <tests/test_sizeof.{native,byte}>: pkg_oUnit
 <tests/test_sizeof.{native,byte}>: custom
-# Executable test_ffi_unions
-<tests/test_unions.{native,byte}>: use_ffi
+# Executable test_ctypes_unions
+<tests/test_unions.{native,byte}>: use_ctypes
 <tests/test_unions.{native,byte}>: pkg_unix
 <tests/test_unions.{native,byte}>: pkg_oUnit
 <tests/test_unions.{native,byte}>: custom
-# Executable test_ffi_custom_ops
-<tests/test_custom_ops.{native,byte}>: use_ffi
+# Executable test_ctypes_custom_ops
+<tests/test_custom_ops.{native,byte}>: use_ctypes
 <tests/test_custom_ops.{native,byte}>: pkg_unix
 <tests/test_custom_ops.{native,byte}>: pkg_oUnit
 <tests/test_custom_ops.{native,byte}>: custom
-# Executable test_ffi_arrays
-<tests/test_array.{native,byte}>: use_ffi
+# Executable test_ctypes_arrays
+<tests/test_array.{native,byte}>: use_ctypes
 <tests/test_array.{native,byte}>: pkg_unix
 <tests/test_array.{native,byte}>: pkg_oUnit
 <tests/test_array.{native,byte}>: custom
-# Executable test_ffi_errno
-<tests/test_errno.{native,byte}>: use_ffi
+# Executable test_ctypes_errno
+<tests/test_errno.{native,byte}>: use_ctypes
 <tests/test_errno.{native,byte}>: pkg_unix
 <tests/test_errno.{native,byte}>: pkg_oUnit
 <tests/test_errno.{native,byte}>: custom
-# Executable test_ffi_passable
-<tests/test_passable.{native,byte}>: use_ffi
+# Executable test_ctypes_passable
+<tests/test_passable.{native,byte}>: use_ctypes
 <tests/test_passable.{native,byte}>: pkg_unix
 <tests/test_passable.{native,byte}>: pkg_oUnit
 <tests/test_passable.{native,byte}>: custom
-# Executable test_ffi_alignment
-<tests/test_alignment.{native,byte}>: use_ffi
+# Executable test_ctypes_alignment
+<tests/test_alignment.{native,byte}>: use_ctypes
 <tests/test_alignment.{native,byte}>: pkg_unix
 <tests/test_alignment.{native,byte}>: pkg_oUnit
-<tests/*.ml{,i}>: use_ffi
+<tests/*.ml{,i}>: use_ctypes
 <tests/*.ml{,i}>: pkg_unix
 <tests/*.ml{,i}>: pkg_oUnit
 <tests/test_alignment.{native,byte}>: custom
 # Executable date_example
-<examples/date/date.{native,byte}>: use_ffi
+<examples/date/date.{native,byte}>: use_ctypes
 <examples/date/date.{native,byte}>: pkg_unix
 <examples/date/date.{native,byte}>: pkg_oUnit
-<examples/date/*.ml{,i}>: use_ffi
+<examples/date/*.ml{,i}>: use_ctypes
 <examples/date/*.ml{,i}>: pkg_unix
 <examples/date/*.ml{,i}>: pkg_oUnit
 <examples/date/date.{native,byte}>: custom

@@ -1,5 +1,5 @@
 OASISFormat: 0.3
-Name:        ffi
+Name:        ctypes
 Version:     0.1
 Synopsis:    Manipulate external buffers as C-like structs
 Authors:     Jeremy Yallop
@@ -8,9 +8,9 @@ Plugins:     META (0.3)
 BuildTools:  ocamlbuild
 PostConfCommand: ocaml discover.ml -ocamlc $ocamlc -ext-obj $ext_obj -exec-name $default_executable_name
 
-Library ffi
+Library ctypes
   Path:             src/
-  Findlibname:      ffi
+  Findlibname:      ctypes
   Modules:          Ffi,PosixTypes
   InternalModules:  Unsigned,Signed,Ffi_raw,Dl
   CSources:         unsigned_stubs.h,unsigned_stubs.c,managed_buffer_stubs.h,managed_buffer_stubs.c,type_info_stubs.h,type_info_stubs.c,ffi_stubs.c,dl_stubs.c,posix_types_stubs.c
@@ -21,19 +21,19 @@ Library fts
   Path:             examples/fts
   Findlibname:      fts
   Modules:          Fts
-  BuildDepends:     ffi
+  BuildDepends:     ctypes
 
 Library sigset
   Path:             examples/sigset
   Findlibname:      sigset
   Modules:          Sigset
-  BuildDepends:     ffi
+  BuildDepends:     ctypes
 
 Library ncurses
   Path:             examples/ncurses
   Findlibname:      ncurses
   Modules:          Ncurses
-  BuildDepends:     ffi
+  BuildDepends:     ctypes
   CCLib:            -lncurses
 
 Executable ncurses_cmd
@@ -44,112 +44,112 @@ Executable ncurses_cmd
    BuildDepends:    unix,ncurses
    Custom:          true
 
-Executable test_ffi_raw
+Executable test_ctypes_raw
   Path:             tests
   MainIs:           test_raw.ml
   Build$:           flag(tests)
   CompiledObject:   best
   Install:          false
-  BuildDepends:     unix,ffi,oUnit
+  BuildDepends:     unix,ctypes,oUnit
   Custom:           true
 
-Executable test_ffi_pointers
+Executable test_ctypes_pointers
   Path:             tests
   MainIs:           test_pointers.ml
   Build$:           flag(tests)
   CompiledObject:   best
   Install:          false
-  BuildDepends:     unix,ffi,oUnit
+  BuildDepends:     unix,ctypes,oUnit
   Custom:           true
 
-Executable test_ffi_higher_order
+Executable test_ctypes_higher_order
   Path:             tests
   MainIs:           test_higher_order.ml
   Build$:           flag(tests)
   CompiledObject:   best
   Install:          false
-  BuildDepends:     unix,ffi,oUnit
+  BuildDepends:     unix,ctypes,oUnit
   Custom:           true
 
-Executable test_ffi_structs
+Executable test_ctypes_structs
   Path:             tests
   MainIs:           test_structs.ml
   Build$:           flag(tests)
   CompiledObject:   best
   Install:          false
-  BuildDepends:     unix,ffi,oUnit
+  BuildDepends:     unix,ctypes,oUnit
   Custom:           true
 
-Executable test_ffi_cstdlib
+Executable test_ctypes_cstdlib
   Path:             tests
   MainIs:           test_cstdlib.ml
   Build$:           flag(tests)
   CompiledObject:   best
   Install:          false
-  BuildDepends:     unix,ffi,oUnit
+  BuildDepends:     unix,ctypes,oUnit
   Custom:           true
 
-Executable test_ffi_sizeof
+Executable test_ctypes_sizeof
   Path:             tests
   MainIs:           test_sizeof.ml
   Build$:           flag(tests)
   CompiledObject:   best
   Install:          false
-  BuildDepends:     unix,ffi,oUnit
+  BuildDepends:     unix,ctypes,oUnit
   Custom:           true
 
-Executable test_ffi_unions
+Executable test_ctypes_unions
   Path:             tests
   MainIs:           test_unions.ml
   Build$:           flag(tests)
   CompiledObject:   best
   Install:          false
-  BuildDepends:     unix,ffi,oUnit
+  BuildDepends:     unix,ctypes,oUnit
   Custom:           true
 
-Executable test_ffi_custom_ops
+Executable test_ctypes_custom_ops
   Path:             tests
   MainIs:           test_custom_ops.ml
   Build$:           flag(tests)
   CompiledObject:   best
   Install:          false
-  BuildDepends:     unix,ffi,oUnit
+  BuildDepends:     unix,ctypes,oUnit
   Custom:           true
 
-Executable test_ffi_arrays
+Executable test_ctypes_arrays
   Path:             tests
   MainIs:           test_array.ml
   Build$:           flag(tests)
   CompiledObject:   best
   Install:          false
-  BuildDepends:     unix,ffi,oUnit
+  BuildDepends:     unix,ctypes,oUnit
   Custom:           true
 
-Executable test_ffi_errno
+Executable test_ctypes_errno
   Path:             tests
   MainIs:           test_errno.ml
   Build$:           flag(tests)
   CompiledObject:   best
   Install:          false
-  BuildDepends:     unix,ffi,oUnit
+  BuildDepends:     unix,ctypes,oUnit
   Custom:           true
 
-Executable test_ffi_passable
+Executable test_ctypes_passable
   Path:             tests
   MainIs:           test_passable.ml
   Build$:           flag(tests)
   CompiledObject:   best
   Install:          false
-  BuildDepends:     unix,ffi,oUnit
+  BuildDepends:     unix,ctypes,oUnit
   Custom:           true
 
-Executable test_ffi_alignment
+Executable test_ctypes_alignment
   Path:             tests
   MainIs:           test_alignment.ml
   Build$:           flag(tests)
   CompiledObject:   best
   Install:          false
-  BuildDepends:     unix,ffi,oUnit
+  BuildDepends:     unix,ctypes,oUnit
   Custom:           true
 
 Executable date_example
@@ -157,7 +157,7 @@ Executable date_example
   MainIs:           date.ml
   CompiledObject:   best
   Install:          false
-  BuildDepends:     unix,ffi,oUnit
+  BuildDepends:     unix,ctypes,oUnit
   Custom:           true
 
 # Executable struct_subtyping
@@ -165,65 +165,65 @@ Executable date_example
 #   MainIs:           struct_subtyping.ml
 #   CompiledObject:   best
 #   Install:          false
-#   BuildDepends:     unix,ffi,oUnit
+#   BuildDepends:     unix,ctypes,oUnit
 #   Custom:           true
 
-Test test_ffi_raw
+Test test_ctypes_raw
   Run$:             flag(tests)
-  Command:          $test_ffi_raw
+  Command:          $test_ctypes_raw
   WorkingDirectory: tests
 
-Test test_ffi_pointers
+Test test_ctypes_pointers
   Run$:             flag(tests)
-  Command:          $test_ffi_pointers
+  Command:          $test_ctypes_pointers
   WorkingDirectory: tests
 
-Test test_ffi_higher_order
+Test test_ctypes_higher_order
   Run$:             flag(tests)
-  Command:          $test_ffi_higher_order
+  Command:          $test_ctypes_higher_order
   WorkingDirectory: tests
 
-Test test_ffi_structs
+Test test_ctypes_structs
   Run$:             flag(tests)
-  Command:          $test_ffi_structs
+  Command:          $test_ctypes_structs
   WorkingDirectory: tests
 
-Test test_ffi_cstdlib
+Test test_ctypes_cstdlib
   Run$:             flag(tests)
-  Command:          $test_ffi_cstdlib
+  Command:          $test_ctypes_cstdlib
   WorkingDirectory: tests
 
-Test test_ffi_sizeof
+Test test_ctypes_sizeof
   Run$:             flag(tests)
-  Command:          $test_ffi_sizeof
+  Command:          $test_ctypes_sizeof
   WorkingDirectory: tests
 
-Test test_ffi_arrays
+Test test_ctypes_arrays
   Run$:             flag(tests)
-  Command:          $test_ffi_arrays
+  Command:          $test_ctypes_arrays
   WorkingDirectory: tests
 
-Test test_ffi_unions
+Test test_ctypes_unions
   Run$:             flag(tests)
-  Command:          $test_ffi_unions
+  Command:          $test_ctypes_unions
   WorkingDirectory: tests
 
-Test test_ffi_custom_ops
+Test test_ctypes_custom_ops
   Run$:             flag(tests)
-  Command:          $test_ffi_custom_ops
+  Command:          $test_ctypes_custom_ops
   WorkingDirectory: tests
 
-Test test_ffi_errno
+Test test_ctypes_errno
   Run$:             flag(tests)
-  Command:          $test_ffi_errno
+  Command:          $test_ctypes_errno
   WorkingDirectory: tests
 
 Test test_passable
   Run$:             flag(tests)
-  Command:          $test_ffi_passable
+  Command:          $test_ctypes_passable
   WorkingDirectory: tests
 
 Test test_alignment
   Run$:             flag(tests)
-  Command:          $test_ffi_alignment
+  Command:          $test_ctypes_alignment
   WorkingDirectory: tests
