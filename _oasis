@@ -11,8 +11,8 @@ PostConfCommand: ocaml discover.ml -ocamlc $ocamlc -ext-obj $ext_obj -exec-name 
 Library ffi
   Path:             src/
   Findlibname:      ffi
-  Modules:          Ffi,PosixTypes
-  InternalModules:  Unsigned,Signed,Ffi_raw,Dl
+  Modules:          Ffi,PosixTypes,Ffi_raw
+  InternalModules:  Unsigned,Signed,Dl
   CSources:         unsigned_stubs.h,unsigned_stubs.c,managed_buffer_stubs.h,managed_buffer_stubs.c,type_info_stubs.h,type_info_stubs.c,ffi_stubs.c,dl_stubs.c,posix_types_stubs.c
   CCOpt:            -fPIC -Wall -Wno-unused-variable -g
 #  ByteOpt:          -warn-error A
