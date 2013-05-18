@@ -81,8 +81,8 @@ struct
   let fts_link    = ftsent *:* ptr ftsent
   let fts_number  = ftsent *:* int
   let fts_pointer = ftsent *:* ptr void
-  let fts_accpath = ftsent *:* ptr char
-  let fts_path    = ftsent *:* ptr char
+  let fts_accpath = ftsent *:* string
+  let fts_path    = ftsent *:* string
   let fts_errno   = ftsent *:* int
   let fts_symfd   = ftsent *:* int
   let fts_pathlen = ftsent *:* short (* ushort *)
@@ -95,7 +95,7 @@ struct
   let fts_flags   = ftsent *:* short (* ushort *)
   let fts_instr   = ftsent *:* short (* ushort *)
   let fts_statp   = ftsent *:* ptr void (* really a struct stat * *)
-  let fts_name    = ftsent *:* ptr char
+  let fts_name    = ftsent *:* string
   let () = seals ftsent
 
   open Ptr
@@ -106,13 +106,13 @@ struct
     = fun t -> fts_info_of_int (!(t |-> fts_info))
 
   let accpath : t -> string
-    = fun t -> string_of_char_ptr !(t |-> fts_accpath)
+    = fun t -> !(t |-> fts_accpath)
 
   let path : t -> string
-    = fun t -> string_of_char_ptr !(t |-> fts_path)
+    = fun t -> !(t |-> fts_path)
 
   let name : t -> string
-    = fun t -> string_of_char_ptr !(t |-> fts_name)
+    = fun t -> !(t |-> fts_name)
 
   let level : t -> int
     = fun t -> !(t |-> fts_level)

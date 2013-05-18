@@ -82,12 +82,10 @@ let test_string_functions () =
   let open Type in
 
   (* char *strchr(const char *str, int c);  *)
-  let strchr_ = foreign "strchr" (ptr char @-> int @-> returning (ptr char)) in
-  let strchr s c = string_of_char_ptr (strchr_ (char_ptr_of_string s) c) in
+  let strchr = foreign "strchr" (string @-> int @-> returning string) in
 
   (* int strcmp(const char *str1, const char *str2);  *)
-  let strcmp_ = foreign "strcmp" (ptr char @-> ptr char @-> returning int) in
-  let strcmp s1 s2 = strcmp_ (char_ptr_of_string s1) (char_ptr_of_string s2) in
+  let strcmp = foreign "strcmp" (string @-> string @-> returning int) in
   
   assert_equal "defg" (strchr "abcdefg" (Char.code 'd'))
     ~printer:(fun x -> x);

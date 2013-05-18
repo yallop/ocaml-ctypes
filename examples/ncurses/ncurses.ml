@@ -25,17 +25,11 @@ let addch =
 let mvwaddch =
   foreign "mvwaddch" (window @-> int @-> int @-> char @-> (returning void))
 
-let _addstr =
-  foreign "addstr" (ptr char @-> (returning void))
+let addstr =
+  foreign "addstr" (string @-> (returning void))
 
-let addstr s =
-  _addstr (char_ptr_of_string s) 
-
-let _mvwaddstr =
-  foreign "mvwaddstr" (window @-> int @-> int @-> ptr char @-> (returning void))
-
-let mvwaddstr w y x s =
-  _mvwaddstr w y x (char_ptr_of_string s)
+let mvwaddstr =
+  foreign "mvwaddstr" (window @-> int @-> int @-> string @-> (returning void))
 
 let box =
   foreign "box" (window @-> int @-> int @-> (returning void))

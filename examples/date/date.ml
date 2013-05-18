@@ -18,7 +18,7 @@ let () = seals (tm : tm structure typ)
 
 let time = foreign "time" (ptr time_t @-> syscall time_t)
   
-let asctime = foreign "asctime" (ptr tm @-> returning (ptr char))
+let asctime = foreign "asctime" (ptr tm @-> returning string)
 
 let localtime = foreign "localtime" (ptr time_t @-> returning (ptr tm))
 
@@ -27,5 +27,5 @@ let () = begin
   let time = time timep in
   assert (time = Ptr.(!timep));
   let tm = localtime timep in
-  print_endline (string_of_char_ptr (asctime tm))
+  print_endline (asctime tm)
 end

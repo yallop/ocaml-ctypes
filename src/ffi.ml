@@ -46,6 +46,7 @@ struct
     | Union           : 'a union_type     -> 'a union typ
     | Array           : 'a typ * int      -> 'a array typ
     | Abstract        : abstract_type     -> 'a abstract typ
+    | View            : ('a, 'b) view     -> 'a typ
     | FunctionPointer : ('a -> 'b) fn     -> ('a -> 'b) typ
   and _ fn =
     (* The flag indicates whether we should check errno *)
@@ -59,6 +60,7 @@ struct
   and 'a union = { union : 'a union ptr }
   and 'a structure = { structure : 'a structure ptr }
   and 'a abstract = { abstract : 'a abstract ptr }
+  and ('a, 'b) view = { read : 'b -> 'a; write : 'a -> 'b; ty: 'b typ }
 
   type _ ccallspec =
       Call : bool * (Raw.immediate_pointer -> 'a) -> 'a ccallspec
@@ -78,6 +80,7 @@ struct
       | Abstract { asize }             -> asize
       | Pointer _                      -> RawTypes.(sizeof pointer)
       | FunctionPointer _              -> RawTypes.(sizeof pointer)
+      | View { ty }                    -> sizeof ty
 
   let rec alignment : 'a. 'a typ -> int
     = fun (type a) (t : a typ) -> match t with
@@ -91,8 +94,10 @@ struct
       | Abstract { aalignment }        -> aalignment
       | Pointer _                      -> RawTypes.(alignment pointer)
       | FunctionPointer _              -> RawTypes.(alignment pointer)
+      | View { ty }                    -> alignment ty
 
-  let passable (type a) (t : a typ) = match t with
+  let rec passable : 'a. 'a typ -> bool
+    = fun (type a) (t : a typ) -> match t with
         Void                           -> true
       | Primitive p                    -> true
       | Struct { spec = Incomplete _ } -> raise IncompleteType
@@ -103,14 +108,17 @@ struct
       | Pointer _                      -> true
       | Abstract _                     -> false
       | FunctionPointer _              -> true
+      | View { ty }                    -> passable ty
 
-  let arg_type (type a) (t : a typ) = match t with
+  let rec arg_type : 'a. 'a typ -> arg_type
+    = fun (type a) (t : a typ) -> match t with
       | Void                         -> ArgType RawTypes.void
       | Primitive p                  -> ArgType p
       | Struct {spec = Incomplete _} -> raise IncompleteType
       | Struct {spec = Complete p}   -> ArgType p
       | Pointer reftype              -> ArgType RawTypes.pointer
       | FunctionPointer fn           -> ArgType RawTypes.pointer
+      | View { ty }                  -> arg_type ty
       (* The following cases should never happen; non-struct aggregate
          types are excluded during type construction. *)
       | Union _                      -> assert false
@@ -190,6 +198,9 @@ struct
       | FunctionPointer f ->
         let build_fun = build_function f in
         (fun ~offset buf -> build_fun (Raw.read RawTypes.pointer ~offset buf))
+      | View { read; ty } ->
+        let buildty = build ty in
+        (fun ~offset buf -> read (buildty ~offset buf))
       (* The following cases should never happen; non-struct aggregate
          types are excluded during type construction. *)
       | Union _ -> assert false
@@ -230,6 +241,9 @@ struct
         let size = sizeof a in
         (fun ~offset {astart={raw_ptr=src; pbyte_offset=src_offset}} dst ->
           Raw.memcpy ~size ~dst ~dst_offset:offset ~src ~src_offset)
+      | View { write=w; ty } ->
+        let writety = write ty in
+        (fun ~offset v -> writety ~offset (w v))
 
   (*
     callspec = allocate_callspec ()
@@ -267,12 +281,13 @@ struct
                            pbyte_offset = 0;
                            pmanaged=None}
 
-    let (!) : 'a. 'a t -> 'a
+    let rec (!) : 'a. 'a t -> 'a
       = fun (type a) ({raw_ptr; reftype; pbyte_offset=offset} as ptr : a t) ->
         match reftype with
           | Void -> raise IncompleteType
           | Union {ucomplete=false} -> raise IncompleteType
           | Struct {spec=Incomplete _} -> raise IncompleteType
+          | View { read; ty = reftype } -> read (! { ptr with reftype })
           (* If it's a reference type then we take a reference *)
           | Union _ -> ({union = ptr } : a)
           | Struct _ -> { structure = ptr }
@@ -394,7 +409,8 @@ struct
         let add_argument t = Raw.add_argument bufspec t
         and add_unpassable_argument t = Raw.add_unpassable_argument
           bufspec ~size:(sizeof t) ~alignment:(alignment t) in
-        let foffset = match ftype with
+        let rec offset : 'a. 'a typ -> int
+          = fun (type a) (ty : a typ) -> match ty with
           | Void                       -> raise IncompleteType
           | Array _ as a               -> (s.passable <- false;
                                            add_unpassable_argument a)
@@ -409,8 +425,9 @@ struct
           | Abstract _  as a           -> (s.passable <- false;
                                            add_unpassable_argument a)
           | FunctionPointer _          -> add_argument RawTypes.pointer
+          | View { ty }                -> offset ty
         in
-        { ftype; foffset }
+        { ftype; foffset = offset ftype }
 
     let make (type s) (Struct _ as s : s structure typ) =
       { structure = Ptr.allocate s ~count:1 }
@@ -471,6 +488,14 @@ struct
     let addr {union} = union
   end
 
+  let foreign ?from symbol typ =
+    let addr = Dl.dlsym ?handle:from ~symbol in
+    build_function ~name:symbol typ addr
+
+  let foreign_value ?from symbol reftype =
+    let raw_ptr = Dl.dlsym ?handle:from ~symbol in
+    { Ptr.reftype ; raw_ptr; pbyte_offset = 0 ; pmanaged=None }
+
   module Type =
   struct
     type 'a t = 'a typ
@@ -510,6 +535,7 @@ struct
         Function (f, t)
     let abstract ~size ~alignment = 
       Abstract { asize = size; aalignment = alignment }
+    let view ~read ~write ty = View { read; write; ty }
 
     let returning v =
       if not (passable v) then
@@ -518,43 +544,27 @@ struct
         Returns (false, v)
     let syscall v = Returns (true, v)
     let funptr f = FunctionPointer f
+
+    let strlen = foreign "strlen" (ptr char @-> returning size_t)
+
+    let string_of_char_ptr charp =
+        let length = Unsigned.Size_t.to_int (strlen charp) in
+        let s = String.create length in
+        for i = 0 to length - 1 do
+          s.[i] <- Ptr.(! (charp  + i))
+        done;
+        s
+
+    let char_ptr_of_string s =
+        let len = String.length s in
+        let p = Ptr.allocate ~count:(len + 1) char in
+        for i = 0 to len - 1 do
+          Ptr.(p + i := s.[i])
+        done;
+        Ptr.(p + len := '\000');
+        p
+
+    let string = view ~read:string_of_char_ptr ~write:char_ptr_of_string
+      (ptr char)
   end
-
-  let foreign ?from symbol typ =
-    let addr = Dl.dlsym ?handle:from ~symbol in
-    build_function ~name:symbol typ addr
-
-  let foreign_value ?from symbol reftype =
-    let raw_ptr = Dl.dlsym ?handle:from ~symbol in
-    { Ptr.reftype ; raw_ptr; pbyte_offset = 0 ; pmanaged=None }
-
-  let string_of_ptr_and_length : char ptr -> int -> string
-    = fun charp length ->
-      let s = String.create length in
-      for i = 0 to length - 1 do
-        s.[i] <- Ptr.(! (charp  + i))
-      done;
-      s
-
-  let strlen = foreign "strlen" Type.(ptr char @-> returning size_t)
-
-  let string_of_char_ptr : char ptr -> string
-    = fun charp ->
-      string_of_ptr_and_length charp (Unsigned.Size_t.to_int (strlen charp))
-
-  let string_of_char_array : char array -> string
-    = fun { astart; alength } -> string_of_ptr_and_length astart alength
-
-  let char_array_of_string : string -> char array =
-    fun s ->
-      let len = String.length s in
-      let arr = Array.make Type.char (len + 1) in
-      for i = 0 to len - 1 do
-        arr.(i) <- s.[i]
-      done;
-      arr.(len) <- '\000';
-      arr
-
-  let char_ptr_of_string : string -> char ptr
-    = fun s -> Array.start (char_array_of_string s)
 end
