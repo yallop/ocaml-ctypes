@@ -152,6 +152,15 @@ Executable test_ctypes_alignment
   BuildDepends:     unix,ctypes,oUnit
   Custom:           true
 
+Executable test_ctypes_views
+  Path:             tests
+  MainIs:           test_views.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     unix,ctypes,oUnit
+  Custom:           true
+
 Executable date_example
   Path:             examples/date
   MainIs:           date.ml
@@ -226,6 +235,11 @@ Test test_passable
 Test test_alignment
   Run$:             flag(tests)
   Command:          $test_ctypes_alignment
+  WorkingDirectory: tests
+
+Test test_views
+  Run$:             flag(tests)
+  Command:          $test_ctypes_views
   WorkingDirectory: tests
 
 Document ctypes

@@ -133,3 +133,14 @@ int64_t sum_union_components(union padded *padded, size_t len)
   return acc;
 }
 
+void concat_strings(const char **sv, int sc, char *buffer)
+{
+  int i = 0;
+  for (; i < sc; i++) {
+    const char *s = sv[i];
+    while (*s) {
+      *buffer++ = *s++;
+    }
+  }
+  *buffer = '\0';
+}

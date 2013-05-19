@@ -3,8 +3,8 @@ setup.ml
 setup.data
 setup.log
 src/META
-src/ffi.mllib
-src/libffi_stubs.clib
+src/ctypes.mllib
+src/libctypes_stubs.clib
 examples/fts/META
 examples/fts/fts.mllib
 examples/sigset/META
