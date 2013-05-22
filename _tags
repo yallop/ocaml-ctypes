@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: b320be6bdb20134e2f0fa06881e92b8b)
+# DO NOT EDIT (digest: fffa25836558c18225f24c1999539181)
 # Ignore VCS directories, you can use the same kind of rule outside 
 # OASIS_START/STOP if you want to exclude directories that contains 
 # useless stuff for the build process
@@ -104,10 +104,15 @@
 <tests/test_views.{native,byte}>: use_ctypes
 <tests/test_views.{native,byte}>: pkg_unix
 <tests/test_views.{native,byte}>: pkg_oUnit
+<tests/test_views.{native,byte}>: custom
+# Executable test_ctypes_global_values
+<tests/test_foreign_values.{native,byte}>: use_ctypes
+<tests/test_foreign_values.{native,byte}>: pkg_unix
+<tests/test_foreign_values.{native,byte}>: pkg_oUnit
 <tests/*.ml{,i}>: use_ctypes
 <tests/*.ml{,i}>: pkg_unix
 <tests/*.ml{,i}>: pkg_oUnit
-<tests/test_views.{native,byte}>: custom
+<tests/test_foreign_values.{native,byte}>: custom
 # Executable date_example
 <examples/date/date.{native,byte}>: use_ctypes
 <examples/date/date.{native,byte}>: pkg_unix

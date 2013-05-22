@@ -144,3 +144,5 @@ void concat_strings(const char **sv, int sc, char *buffer)
   }
   *buffer = '\0';
 }
+
+const char *global_string = "global string";
