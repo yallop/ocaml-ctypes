@@ -33,18 +33,22 @@ static value Val_some(value v)
 /* ctypes_resolve_dl_flag : flag -> int */
 value ctypes_resolve_dl_flag(value flag)
 {
+  int rv;
+
   switch (Int_val(flag))
   {
-    case _RTLD_LAZY:     return RTLD_LAZY;
-    case _RTLD_NOW:      return RTLD_NOW;
-    case _RTLD_GLOBAL:   return RTLD_GLOBAL;
-    case _RTLD_NODELETE: return RTLD_NODELETE;
-    case _RTLD_NOLOAD:   return RTLD_NOLOAD;
+    case _RTLD_LAZY:     rv = RTLD_LAZY;     break;
+    case _RTLD_NOW:      rv = RTLD_NOW;      break;
+    case _RTLD_GLOBAL:   rv = RTLD_GLOBAL;   break;
+    case _RTLD_NODELETE: rv = RTLD_NODELETE; break;
+    case _RTLD_NOLOAD:   rv = RTLD_NOLOAD;   break;
 #ifdef RTLD_DEEPBIND
-    case _RTLD_DEEPBIND: return RTLD_DEEPBIND;
+    case _RTLD_DEEPBIND: rv = RTLD_DEEPBIND; break;
 #endif /* _RTLD_DEEPBIND */
     default: assert(0);
   }
+
+  return Val_int(rv);
 }
 
 /* ctypes_dlopen : filename:string -> flags:int -> library option */
