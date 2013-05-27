@@ -2,6 +2,8 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <assert.h>
+
 
 typedef int intfun(int, int);
 
@@ -65,8 +67,6 @@ int write_through_callback_pointer_pointer(int (*f)(int **, int *))
 
   fprintf(stderr, "calling f(%p, %p)\n", &p, &y);
           
-  
-  int rv = f(&p, &y);
   fprintf(stderr, "[after] x = %d, y = %d, p = %p, *p = %d\n",
           x, y, p, *p);
   return f(&p, &y) + *p + x + y;
@@ -143,4 +143,36 @@ void concat_strings(const char **sv, int sc, char *buffer)
     }
   }
   *buffer = '\0';
+}
+
+
+union number {
+  int i;
+  double d;
+};
+
+struct tagged {
+  char tag;
+  union number num;
+};
+
+double accepts_pointer_to_array_of_structs(struct tagged(*arr)[5])
+{
+  double sum = 0.0;
+  int i = 0;
+  struct tagged *s = &(*arr[0]);
+  for (; i < 5; i++) {
+    switch (s[i].tag) {
+    case 'i': {
+      sum += s[i].num.i;
+      break;
+    }
+    case 'd': {
+      sum += s[i].num.d;
+      break;
+    }
+    default: assert(0);
+    }
+  }
+  return sum;
 }

@@ -2,6 +2,9 @@ open OUnit
 open Ffi.C
 
 
+let testlib = Dl.(dlopen ~filename:"clib/test_functions.so" ~flags:[RTLD_NOW])
+
+
 (*
   Creating multidimensional arrays, and reading and writing elements.
 *)
@@ -125,10 +128,79 @@ let test_pointer_to_array_arithmetic () =
   assert_equal 1 a.(0).(0)
 
 
+(*
+  Test passing pointer to array of structs.
+*)
+let test_passing_pointer_to_array_of_structs () =
+  let open Type in
+  let open Ptr in
+
+  (* union u {
+        int i;
+        double d;
+     }
+  *)
+  let open Union in
+  let u = union "u" in
+  let i = u +:+ int in
+  let d = u +:+ double in
+  let () = sealu u in
+
+  (* struct s {
+        char tag;
+        union u data;
+     }
+  *)
+  let open Struct in
+  let s = structure "s" in
+  let tag = s *:* char in
+  let data = s *:* u in
+  let () = seals s in
+
+  let box_int x =
+    let v = make s in
+    setf v tag 'i';
+    let pd = v @. data in
+    Union.(pd |-> i) := x;
+    v
+  in
+
+  let box_double x =
+    let v = make s in
+    setf v tag 'd';
+    let pd = v @. data in
+    Union.(pd |-> d) := x;
+    v
+  in
+
+  let accepts_pointer_to_array_of_structs =
+    foreign "accepts_pointer_to_array_of_structs"
+      (ptr (array 5 s) @-> returning double)
+      ~from:testlib in
+
+  let sum = 
+    accepts_pointer_to_array_of_structs
+      (Ptr.from_voidp
+         (array 5 s)
+         (Ptr.to_voidp
+            (Array.start
+               (Array.of_list s
+                  [box_int 10;
+                   box_double 3.5;
+                   box_int 12;
+                   box_double (-14.1);
+                   box_double (103.25)]))))
+  in
+  assert_equal
+    (103.25 +. (-14.1) +. 12.0 +. 3.5 +. 10.0)
+    sum
+
+
 let suite = "Array tests" >:::
   ["multidimensional arrays" >:: test_multidimensional_arrays;
    "array initialization" >:: test_array_initialiation;
    "pointer to array arithmetic" >:: test_pointer_to_array_arithmetic;
+   "passing pointer to array of structs" >:: test_passing_pointer_to_array_of_structs;
   ]
 
 
