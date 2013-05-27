@@ -1,4 +1,4 @@
-CFLAGS=-fPIC -g
+CFLAGS=-fPIC -g -Wall
 
 all: build
 
