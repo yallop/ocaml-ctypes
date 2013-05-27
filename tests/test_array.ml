@@ -102,9 +102,33 @@ let test_array_initialiation () =
   done
 
 
+(*
+  Test that creating an array initializes all elements appropriately.
+*)
+let test_pointer_to_array_arithmetic () =
+  let open Type in
+  let open Ptr in
+
+  (* int ( * )[3] *)
+  let p = allocate (array 3 int) ~count:4 in
+  p := Array.of_list int [1; 2; 3];
+  (p + 1) := Array.of_list int [4; 5; 6];
+  (p + 2) := Array.of_list int [7; 8; 9];
+  (p + 3) := Array.of_list int [10; 11; 12];
+  let q = p in
+  assert_equal 8 (!(q + 2)).(1);
+  assert_equal 12 (!(q + 3)).(2);
+  assert_equal 1 (!(q + 0)).(0);
+  let a = Array.from_ptr p 4 in
+  assert_equal 8 a.(2).(1);
+  assert_equal 12 a.(3).(2);
+  assert_equal 1 a.(0).(0)
+
+
 let suite = "Array tests" >:::
   ["multidimensional arrays" >:: test_multidimensional_arrays;
    "array initialization" >:: test_array_initialiation;
+   "pointer to array arithmetic" >:: test_pointer_to_array_arithmetic;
   ]
 
 
