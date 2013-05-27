@@ -161,6 +161,15 @@ Executable test_ctypes_views
   BuildDepends:     unix,ctypes,oUnit
   Custom:           true
 
+Executable test_ctypes_global_values
+  Path:             tests
+  MainIs:           test_foreign_values.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     unix,ctypes,oUnit
+  Custom:           true
+
 Executable date_example
   Path:             examples/date
   MainIs:           date.ml
@@ -240,6 +249,11 @@ Test test_alignment
 Test test_views
   Run$:             flag(tests)
   Command:          $test_ctypes_views
+  WorkingDirectory: tests
+
+Test test_foreign_values
+  Run$:             flag(tests)
+  Command:          $test_ctypes_global_values
   WorkingDirectory: tests
 
 Document ctypes

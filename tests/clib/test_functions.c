@@ -145,7 +145,6 @@ void concat_strings(const char **sv, int sc, char *buffer)
   *buffer = '\0';
 }
 
-
 union number {
   int i;
   double d;
@@ -176,3 +175,5 @@ double accepts_pointer_to_array_of_structs(struct tagged(*arr)[5])
   }
   return sum;
 }
+
+const char *global_string = "global string";
