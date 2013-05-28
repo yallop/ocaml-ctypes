@@ -112,14 +112,28 @@ let test_function_pointers_are_passable () =
 
 
 (*
+  Test that values of abstract types are not passable
+*)
+let test_abstract_values_are_not_passable () = begin
+  assert_raises ~msg:"Abstract type rejected as argument"
+    (Unsupported "Unsupported argument type")
+    (fun () -> (abstract ~size:1 ~alignment:1) @-> returning void);
+
+  assert_raises ~msg:"Abstract type rejected as return type"
+    (Unsupported "Unsupported return type")
+    (fun () -> void @-> returning (abstract ~size:1 ~alignment:1));
+end
+
+
+(*
   Test struct passability.  Structs are passable unless they contain
-  unpassable members (unions, arrays, or unpassable structs).
+  unpassable members (unions, arrays, abstract types, or unpassable structs).
 *)
 let test_struct_passability () =
   let module M = struct
     open Union
     open Struct
-    type s1 and s2 and s3 and s4 and s5 and u
+    type s1 and s2 and s3 and s4 and s5 and s6 and u
 
     let s1 : s1 structure typ = structure "s1"
     let _ = s1 *:* int
@@ -149,6 +163,10 @@ let test_struct_passability () =
     let s5 : s5 structure typ = structure "s5"
     let _ = s5 *:* u
     let () = seals s5
+
+    let s6 : s6 structure typ = structure "s6"
+    let _ = s6 *:* abstract ~size:1 ~alignment:1
+    let () = seals s6
 
     let _ = begin
       (* Struct types can be argument types *)
@@ -188,6 +206,16 @@ let test_struct_passability () =
         ~msg:"Structs with union members rejected as return types"
         (Unsupported "Unsupported return type")
         (fun () -> void @-> returning s5);
+
+      assert_raises
+        ~msg:"Structs with abstract members rejected as arguments"
+        (Unsupported "Unsupported argument type")
+        (fun () -> s6 @-> returning void);
+
+      assert_raises
+        ~msg:"Structs with abstract members rejected as return types"
+        (Unsupported "Unsupported return type")
+        (fun () -> void @-> returning s6);
     end
   end in ()
 
@@ -220,6 +248,7 @@ let suite = "Passability tests" >:::
    "arrays are not passable" >:: test_arrays_are_not_passable;
    "pointers are passable" >:: test_pointers_are_passable;
    "function pointers are passable" >:: test_function_pointers_are_passable;
+   "abstract values are not passable" >:: test_abstract_values_are_not_passable;
    "struct passability" >:: test_struct_passability;
    "incomplete types are not passable" >:: test_incomplete_passability;
   ]
