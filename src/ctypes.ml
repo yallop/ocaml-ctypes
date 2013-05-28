@@ -496,9 +496,6 @@ let foreign_value ?from symbol reftype =
 
 module Type =
 struct
-  type 'a t = 'a typ
-  type 'a f = 'a fn
-
   let void = Void
   let char = Primitive RawTypes.char
   let schar = Primitive RawTypes.schar

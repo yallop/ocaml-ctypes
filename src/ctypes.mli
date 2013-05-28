@@ -1,4 +1,5 @@
 type 'a typ
+type 'a fn
 type 'a ptr
 type 'a array
 type 'a structure
@@ -16,45 +17,42 @@ sig
   open Signed
   open Unsigned
 
-  type 'a t = 'a typ
-  type 'a f
+  val void  : unit typ
+  val char : char typ
+  val schar : int typ
+  val float : float typ
+  val double : float typ
+  val short : int typ
+  val int   : int typ
+  val long  : long typ
+  val llong  : llong typ
+  val nativeint : nativeint typ
+  val int8_t : int typ
+  val int16_t : int typ
+  val int32_t : int32 typ
+  val int64_t : int64 typ
+  val uchar : uchar typ
+  val uint8_t : uint8 typ
+  val uint16_t : uint16 typ
+  val uint32_t : uint32 typ
+  val uint64_t : uint64 typ
+  val size_t : size_t typ
+  val ushort : ushort typ
+  val uint : uint typ
+  val ulong : ulong typ
+  val ullong : ullong typ
 
-  val void  : unit t
-  val char : char t
-  val schar : int t
-  val float : float t
-  val double : float t
-  val short : int t
-  val int   : int t
-  val long  : long t
-  val llong  : llong t
-  val nativeint : nativeint t
-  val int8_t : int t
-  val int16_t : int t
-  val int32_t : int32 t
-  val int64_t : int64 t
-  val uchar : uchar t
-  val uint8_t : uint8 t
-  val uint16_t : uint16 t
-  val uint32_t : uint32 t
-  val uint64_t : uint64 t
-  val size_t : size_t t
-  val ushort : ushort t
-  val uint : uint t
-  val ulong : ulong t
-  val ullong : ullong t
+  val string : string typ
 
-  val string : string t
+  val view : read:('a -> 'b) -> write:('b -> 'a) -> 'a typ -> 'b typ
+  val abstract : size:int -> alignment:int -> 'a abstract typ
+  val array : int -> 'a typ -> 'a array typ
+  val ptr : 'a typ -> 'a ptr typ
+  val ( @-> ) : 'a typ -> 'b fn -> ('a -> 'b) fn
 
-  val view : read:('a -> 'b) -> write:('b -> 'a) -> 'a t -> 'b t
-  val abstract : size:int -> alignment:int -> 'a abstract t
-  val array : int -> 'a t -> 'a array t
-  val ptr : 'a t -> 'a ptr t
-  val ( @-> ) : 'a t -> 'b f -> ('a -> 'b) f
-
-  val returning : 'a t -> 'a f
-  val syscall : 'a t -> 'a f
-  val funptr : ('a -> 'b) f -> ('a -> 'b) t
+  val returning : 'a typ -> 'a fn
+  val syscall : 'a typ -> 'a fn
+  val funptr : ('a -> 'b) fn -> ('a -> 'b) typ
 end
 
 module Ptr :
@@ -124,5 +122,5 @@ sig
   val addr : 's union -> 's union ptr
 end
 
-val foreign : ?from:Dl.library -> string -> ('a -> 'b) Type.f -> ('a -> 'b)
-val foreign_value : ?from:Dl.library -> string -> 'a Type.t -> 'a ptr
+val foreign : ?from:Dl.library -> string -> ('a -> 'b) fn -> ('a -> 'b)
+val foreign_value : ?from:Dl.library -> string -> 'a typ -> 'a ptr
