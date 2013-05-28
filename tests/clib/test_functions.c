@@ -301,3 +301,14 @@ int accept_pointers_to_pointers(int *p, int **pp, int ***ppp, int ****pppp)
 {
   return *p + **pp + ***ppp + ****pppp;
 }
+
+intfun **returning_pointer_to_function_pointer(void)
+{
+  static intfun *f = times;
+  return &f;
+}
+
+int accepting_pointer_to_function_pointer(intfun **pfp)
+{
+  return (*pfp)(20, 4);
+}

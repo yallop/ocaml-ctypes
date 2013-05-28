@@ -107,17 +107,30 @@ let test_pointer_assignment_with_primitives () =
 
 
 (*
-  [TODO]
+  Test passing a pointer-to-a-function-pointer as an argument.
 *)
 let test_passing_pointer_to_function_pointer () =
-  () (* TODO *)
+  let arg_type = funptr (int @-> int @-> returning int) in
+  let accepting_pointer_to_function_pointer =
+    foreign "accepting_pointer_to_function_pointer" ~from:testlib
+      (ptr arg_type @-> returning int)
+  in
+  assert_equal ~printer:string_of_int
+    5 (accepting_pointer_to_function_pointer 
+         (Ptr.make arg_type ( / )))
+
 
 
 (*
-  [TODO]
+  Test returning a pointer to a function pointer
 *)
 let test_callback_returning_pointer_to_function_pointer () =
-  () (* TODO *)
+  let returning_pointer_to_function_pointer =
+    foreign "returning_pointer_to_function_pointer" ~from:testlib
+      (void @-> returning (ptr (funptr (int @-> int @-> returning int))))
+  in
+  assert_equal
+    10 Ptr.(!(returning_pointer_to_function_pointer ()) 2 5)
 
 
 (*
