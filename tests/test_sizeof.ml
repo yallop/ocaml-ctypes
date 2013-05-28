@@ -108,6 +108,18 @@ let test_sizeof_structs () =
   
 
 (*
+  Test that taking the size of an incomplete type is treated as an error.
+*)
+let test_sizeof_incomplete () = begin
+  assert_raises IncompleteType
+    (fun () -> sizeof (Struct.structure "incomplete"));
+
+  assert_raises IncompleteType
+    (fun () -> sizeof (Union.union "incomplete"));
+end
+  
+
+(*
   Test that taking the size of void is treated as an error.
 *)
 let test_sizeof_void () =
@@ -152,6 +164,7 @@ let suite = "sizeof tests" >:::
   ["sizeof primitives" >:: test_sizeof_primitives;
    "sizeof structs"    >:: test_sizeof_structs;
    "sizeof unions"     >:: test_sizeof_unions;
+   "sizeof incomplete" >:: test_sizeof_incomplete;
    "sizeof void"       >:: test_sizeof_void;
    "sizeof arrays"     >:: test_sizeof_arrays;
    "sizeof pointers"   >:: test_sizeof_pointers;
