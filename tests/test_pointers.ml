@@ -83,6 +83,46 @@ let test_dereferencing_pointers_to_incomplete_types () =
       (fun () -> !(from_voidp (Union.union "incomplete") null));
   end
 
+
+(*
+  Writing through a pointer to an abstract type
+*)
+let test_writing_through_pointer_to_abstract_type () =
+  let open Ptr in
+  let arra = Array.make int 2 in
+  let arrb = Array.make int 2 in
+  let absptr a =
+    from_voidp (abstract
+                  ~size:(2 * sizeof int)
+                  ~alignment:(alignment (array 2 int)))
+      (to_voidp (Array.start a)) in
+  let () = begin
+    arra.(0) <- 10;
+    arra.(1) <- 20;
+    arrb.(0) <- 30;
+    arrb.(1) <- 40;
+  end in
+  let dest = absptr arra in
+  let src = absptr arrb in
+  begin
+    assert_equal 10 arra.(0);
+    assert_equal 20 arra.(1);
+    assert_equal 30 arrb.(0);
+    assert_equal 40 arrb.(1);
+
+    dest := !src;
+
+    assert_equal 30 arra.(0);
+    assert_equal 40 arra.(1);
+    assert_equal 30 arrb.(0);
+    assert_equal 40 arrb.(1);
+
+    assert_bool "pointers distinct" (dest <> src);
+
+    assert_bool "arrays distinct" (arra <> arrb);
+  end
+
+
 (*
   [TODO]
 *)
@@ -166,6 +206,7 @@ let suite = "Pointer tests" >:::
    "passing_pointer_to_void" >:: test_passing_pointer_to_void;
 
    "incomplete types" >:: test_dereferencing_pointers_to_incomplete_types;
+   "abstract types" >:: test_writing_through_pointer_to_abstract_type;
    "global value" >:: test_reading_and_writing_global_value;
    "allocation" >:: test_allocation;
    "passing pointers through functions" >:: test_passing_pointer_through;
