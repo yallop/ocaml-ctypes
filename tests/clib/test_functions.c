@@ -296,3 +296,8 @@ int accept_pointers(float *float_p,
           + *ulong_p
           + *ullong_p);
 }
+
+int accept_pointers_to_pointers(int *p, int **pp, int ***ppp, int ****pppp)
+{
+  return *p + **pp + ***ppp + ****pppp;
+}

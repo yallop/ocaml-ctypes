@@ -62,10 +62,27 @@ let test_passing_pointers () =
 
 
 (*
-  [TODO]
+  Test passing pointers to pointers.
 *)
 let test_passing_pointers_to_pointers () =
-  () (* TODO *)
+  let accept_pointers_to_pointers =
+    foreign "accept_pointers_to_pointers" ~from:testlib
+      (ptr int @->
+       ptr (ptr int) @->
+       ptr (ptr (ptr int)) @->
+       ptr (ptr (ptr (ptr int))) @->
+       returning int) in
+
+  let open Ptr in
+  let p = make int 1
+  and pp = make (ptr int) (make int 2)
+  and ppp = make (ptr (ptr int)) (make (ptr int) (make int 3))
+  and pppp = make (ptr (ptr (ptr int)))
+    (make (ptr (ptr int)) (make (ptr int) (make int 4))) in
+
+  assert_equal ~msg:"Passing pointers to pointers"
+    Pervasives.(1 + 2 + 3 + 4)
+    (accept_pointers_to_pointers p pp ppp pppp)
 
 
 (*
