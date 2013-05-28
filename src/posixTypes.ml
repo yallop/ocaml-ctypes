@@ -1,11 +1,11 @@
 module type Abstract =
 sig
   type t
-  val t : t Ffi.C.typ
+  val t : t Ffi.typ
 end
 
-let mkAbstract : 'a. 'a Ffi.C.typ -> (module Abstract)
-  = fun (type a) (ty : a Ffi.C.typ) ->
+let mkAbstract : 'a. 'a Ffi.typ -> (module Abstract)
+  = fun (type a) (ty : a Ffi.typ) ->
     (module
      struct
        type t = a
@@ -16,8 +16,8 @@ let mkAbstractSized : size:int -> alignment:int -> (module Abstract)
   = fun ~size ~alignment ->
     (module
      struct
-       open Ffi.C.Type
-       type t = unit Ffi.C.abstract
+       open Ffi.Type
+       type t = unit Ffi.abstract
        let t = abstract ~size ~alignment
      end : Abstract)
 
@@ -34,7 +34,7 @@ type arithmetic =
   | Double
 
 let mkArithmetic = 
-  let open Ffi.C.Type in function
+  let open Ffi.Type in function
     Int8   -> mkAbstract int8_t
   | Int16  -> mkAbstract int16_t
   | Int32  -> mkAbstract int32_t
@@ -82,7 +82,7 @@ module Pid = (val mkArithmetic (typeof_pid_t ()) : Abstract)
 module Size = 
 struct
   type t = Unsigned.size_t
-  let t = Ffi.C.Type.size_t
+  let t = Ffi.Type.size_t
 end
 module Ssize = (val mkArithmetic (typeof_ssize_t ()) : Abstract)
 module Suseconds = (val mkArithmetic (typeof_suseconds_t ()) : Abstract)

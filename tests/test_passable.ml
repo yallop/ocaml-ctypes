@@ -1,5 +1,5 @@
 open OUnit
-open Ffi.C
+open Ffi
 
 
 (*

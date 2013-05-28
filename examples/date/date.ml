@@ -1,4 +1,4 @@
-open Ffi.C
+open Ffi
 open Type
 open PosixTypes
 open Struct

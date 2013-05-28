@@ -1,5 +1,5 @@
 open OUnit
-open Ffi.C
+open Ffi
 
 
 let testlib = Dl.(dlopen ~filename:"clib/test_functions.so" ~flags:[RTLD_NOW])

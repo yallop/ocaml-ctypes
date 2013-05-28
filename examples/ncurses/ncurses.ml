@@ -1,4 +1,4 @@
-open Ffi.C
+open Ffi
 open Type
 
 type window = unit ptr
