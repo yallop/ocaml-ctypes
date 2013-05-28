@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <assert.h>
+#include <string.h>
 
 
 typedef int intfun(int, int);
@@ -177,3 +178,71 @@ double accepts_pointer_to_array_of_structs(struct tagged(*arr)[5])
 }
 
 const char *global_string = "global string";
+
+
+/* OO-style example */
+struct animal_methods;
+struct animal {
+  struct animal_methods *vtable;
+};
+struct animal_methods {
+  char *(*say)(struct animal *);
+  char *(*identify)(struct animal *);
+};
+
+int check_name(struct animal *a, char *name)
+{
+  return strcmp(a->vtable->identify(a), name) == 0;
+}
+
+enum colour { white, red, black, pale };
+
+struct chorse_methods;
+
+struct chorse {
+  struct chorse_methods *vtable;
+  enum colour colour;
+};
+
+struct chorse_methods {
+  struct animal_methods base;
+  char *(*colour)(struct chorse *);
+};
+
+char *chorse_colour(struct chorse *chorse)
+{
+  switch (chorse->colour) {
+  case white : return "white";
+  case red   : return "red";
+  case black : return "black";
+  case pale  : return "pale";
+  }
+}
+
+char *chorse_say(struct animal *c)
+{
+  return "neigh";
+}
+
+char *chorse_identify(struct animal *a)
+{
+  static char buffer[30]; /* static allocation is adequate for the test */
+  sprintf(buffer, "%s horse", chorse_colour((struct chorse *)a));
+  return buffer;
+}
+
+static struct chorse_methods chorse_vtable = {
+  {
+    chorse_say,
+    chorse_identify,
+  },
+  chorse_colour,
+};
+
+struct chorse *new_chorse(int colour)
+{
+  struct chorse *h = malloc(sizeof *h);
+  h->vtable = &chorse_vtable;
+  h->colour = (enum colour)colour;
+  return h;
+}
