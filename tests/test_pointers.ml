@@ -134,20 +134,6 @@ let test_callback_returning_pointer_to_function_pointer () =
 
 
 (*
-  [TODO]
-*)
-let test_returning_pointer_to_void () =
-  () (* TODO *)
-
-
-(*
-  [TODO]
-*)
-let test_passing_pointer_to_void () =
-  () (* TODO *)
-
-
-(*
   Dereferencing pointers to incomplete types
 *)
 let test_dereferencing_pointers_to_incomplete_types () =
@@ -202,8 +188,9 @@ let test_writing_through_pointer_to_abstract_type () =
   end
 
 
-(*
-  [TODO]
+(* 
+   Test for reading and writing global values using the "foreign_value"
+   function.
 *)
 let test_reading_and_writing_global_value () = Ptr.(
   let ptr = foreign_value "global" int
@@ -217,11 +204,11 @@ let test_reading_and_writing_global_value () = Ptr.(
   ptr' := 100;
   assert_equal (!ptr) 100;
   assert_equal (!ptr') 100;
-  )
+)
 
 
 (*
-  [TODO]
+  Test bindings for malloc and free.
 *)
 let test_allocation () =
   let malloc = foreign "malloc" (int @-> returning (ptr void)) in
@@ -238,7 +225,7 @@ let test_allocation () =
 
 
 (*
-  [TODO]
+  Test a function that returns the address of a global variable.
 *)
 let test_reading_returned_global () =
   let return_global_address = 
@@ -248,7 +235,7 @@ let test_reading_returned_global () =
 
 
 (*
-  [TODO]
+  Test a function that returns a pointer passed as argument.
 *)
 let test_passing_pointer_through () =
   let open Ptr in
@@ -275,15 +262,12 @@ let test_pointer_arithmetic () =
 
 let suite = "Pointer tests" >:::
   ["passing pointers" >:: test_passing_pointers;
-   "passing_pointers_to_pointers" >:: test_passing_pointers_to_pointers;
-   "callback_receiving_pointers" >:: test_callback_receiving_pointers;
-   "callback_returning_pointers" >:: test_callback_returning_pointers;
-   "pointer_assignment_with_primitives" >:: test_pointer_assignment_with_primitives;
-   "passing_pointer_to_function_pointer" >:: test_passing_pointer_to_function_pointer;
-   "callback_returning_pointer_to_function_pointer" >:: test_callback_returning_pointer_to_function_pointer;
-   "returning_pointer_to_void" >:: test_returning_pointer_to_void;
-   "passing_pointer_to_void" >:: test_passing_pointer_to_void;
-
+   "passing pointers to pointers" >:: test_passing_pointers_to_pointers;
+   "callback receiving pointers" >:: test_callback_receiving_pointers;
+   "callback returning pointers" >:: test_callback_returning_pointers;
+   "pointer assignment with primitives" >:: test_pointer_assignment_with_primitives;
+   "passing pointer to function pointer" >:: test_passing_pointer_to_function_pointer;
+   "callback returning pointer to function pointer" >:: test_callback_returning_pointer_to_function_pointer;
    "incomplete types" >:: test_dereferencing_pointers_to_incomplete_types;
    "abstract types" >:: test_writing_through_pointer_to_abstract_type;
    "global value" >:: test_reading_and_writing_global_value;
