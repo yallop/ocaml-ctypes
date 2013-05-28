@@ -36,8 +36,13 @@ intfun *returning_funptr(int v)
   {
   case 0: return add;
   case 1: return times;
-  default: return NULL; /* TODO: can we handle null function pointers? */
+  default: return NULL;
   }
+}
+
+int accepting_possibly_null_funptr(intfun *f, int x, int y)
+{
+  return f != NULL ? f(x, y) : -1;
 }
 
 int global = 100;

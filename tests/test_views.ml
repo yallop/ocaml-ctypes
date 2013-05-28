@@ -52,9 +52,69 @@ let test_passing_chars_as_ints () =
     'X' (toupper 'X')
 
 
+
+(*
+  Use views to create a nullable function pointer.
+*)
+let test_nullable_function_pointer_view () =
+  let open Ptr in
+  let read_nullable : unit ptr -> (int -> int -> int) option =
+    fun p ->
+    if p = null then None
+    else (* rather circuitous *)
+      (* void **pp = malloc(sizeof *pp); *pp = p; *)
+      let pp = Ptr.make (ptr void) p in
+      (* (int ( **fp)(int, int)) = (int ( ** )(int, int)) p *)
+      let fpp =
+        from_voidp (funptr (int @-> int @-> returning int)) (to_voidp pp) in
+      Some !fpp
+  and write_nullable  : (int -> int -> int) option -> unit ptr = function
+    | None -> null
+    | Some f ->
+      (* (int ( **fp)(int, int)) = malloc(sizeof *fp); *fp = p *)
+      let fp : (int -> int -> int) ptr = Ptr.make (funptr (int @-> int @-> returning int)) f in
+      (* *((void ** )fp) *)
+      !(from_voidp (ptr void) (to_voidp fp))
+  in
+  let nullable_intptr = view ~read:read_nullable ~write:write_nullable (ptr void) in
+  let returning_funptr =
+    foreign "returning_funptr" ~from:testlib
+      (int @-> returning nullable_intptr)
+  and accepting_possibly_null_funptr =
+    foreign "accepting_possibly_null_funptr" ~from:testlib
+      (nullable_intptr @-> int @-> int @-> returning int)
+  in
+  begin
+    let fromSome = function None -> assert false | Some x -> x in
+
+    let add = fromSome (returning_funptr 0)
+    and times = fromSome (returning_funptr 1) in
+
+    assert_equal ~msg:"reading non-null function pointer return value"
+      9 (add 5 4);
+
+    assert_equal ~msg:"reading non-null function pointer return value"
+      20 (times 5 4);
+
+    assert_equal ~msg:"reading null function pointer return value"
+      None (returning_funptr 2);
+
+    assert_equal ~msg:"passing null function pointer"
+      (-1) (accepting_possibly_null_funptr None 2 3);
+
+    assert_equal ~msg:"passing non-null function pointer"
+      5 (accepting_possibly_null_funptr (Some Pervasives.(+)) 2 3);
+
+    assert_equal ~msg:"passing non-null function pointer obtained from C"
+      6 (accepting_possibly_null_funptr (returning_funptr 1) 2 3);
+
+  end
+
+
 let suite = "View tests" >:::
   ["passing array of strings" >:: test_passing_string_array;
    "custom views" >:: test_passing_chars_as_ints;
+   "nullable function pointers" >:: test_nullable_function_pointer_view;
   ]
 
 
