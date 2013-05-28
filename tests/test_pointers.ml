@@ -72,9 +72,9 @@ let test_passing_pointer_to_void () =
   [TODO]
 *)
 let test_reading_and_writing_global_value () = Ptr.(
-  let ptr = foreign_value "global" Type.int
+  let ptr = foreign_value "global" int
     ~from:testlib in
-  let ptr' = foreign_value "global" Type.int
+  let ptr' = foreign_value "global" int
     ~from:testlib in
   assert_equal (!ptr) 100;
   ptr := 200;
@@ -90,11 +90,11 @@ let test_reading_and_writing_global_value () = Ptr.(
   [TODO]
 *)
 let test_allocation () =
-  let malloc = foreign "malloc" Type.(int @-> returning (ptr void)) in
-  let free = foreign "free" Type.(ptr void @-> returning void) in
+  let malloc = foreign "malloc" (int @-> returning (ptr void)) in
+  let free = foreign "free" (ptr void @-> returning void) in
   
-  let pointer = malloc Type.(sizeof int) in Ptr.(
-    let int_pointer = from_voidp Type.int pointer in
+  let pointer = malloc (sizeof int) in Ptr.(
+    let int_pointer = from_voidp int pointer in
     int_pointer := 17;
     assert_equal !int_pointer 17;
     int_pointer := -3;
@@ -108,7 +108,7 @@ let test_allocation () =
 *)
 let test_reading_returned_global () =
   let return_global_address = 
-    foreign "return_global_address" Type.(void @-> returning (ptr int)) 
+    foreign "return_global_address" (void @-> returning (ptr int)) 
       ~from:testlib in
   Ptr.(assert_equal (!(return_global_address ())) 100)
 
@@ -117,10 +117,9 @@ let test_reading_returned_global () =
   [TODO]
 *)
 let test_passing_pointer_through () =
-  let open Type in
   let open Ptr in
   let pass_pointer_through = 
-    foreign "pass_pointer_through" Type.(ptr int @-> ptr int @-> int @-> returning (ptr int)) 
+    foreign "pass_pointer_through" (ptr int @-> ptr int @-> int @-> returning (ptr int)) 
       ~from:testlib in
   let p1 = Ptr.make int 25 in
   let p2 = Ptr.make int 32 in

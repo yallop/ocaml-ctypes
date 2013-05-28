@@ -6,8 +6,7 @@ open Ctypes
   Call fdopendir() with a bogus file descriptor and check that an exception is raised. 
 *)
 let test_errno_exception_raised () =
-  let fdopendir = foreign "fdopendir" Type.(int @-> syscall (ptr void)) in
-  (* assert_raises (Unix.Unix_error (0, "", "")) *)
+  let fdopendir = foreign "fdopendir" (int @-> syscall (ptr void)) in
   assert_raises (Unix.Unix_error(Unix.EBADF, "fdopendir", ""))
     (fun () -> fdopendir (-300))
     

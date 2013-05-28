@@ -17,10 +17,10 @@ let testlib = Dl.(dlopen ~filename:"clib/test_functions.so" ~flags:[RTLD_NOW])
    as the first argument.
 *)
 let test_higher_order_basic () =
-  let intfun = Type.(int @-> int @-> returning int) in
+  let intfun = (int @-> int @-> returning int) in
 
   let higher_order_1 = foreign ~from:testlib "higher_order_1"
-    Type.(funptr intfun @-> int @-> int @-> returning int)
+    (funptr intfun @-> int @-> int @-> returning int)
   in
 
   (* higher_order_1 f x y returns true iff f x y == x + y *)
@@ -43,10 +43,10 @@ let test_higher_order_basic () =
   as the first and second arguments.
 *)
 let test_higher_higher_order () =
-  let intfun = Type.(int @-> int @-> returning int) in
-  let acceptor = Type.(funptr intfun @-> int @-> int @-> returning int) in
+  let intfun = (int @-> int @-> returning int) in
+  let acceptor = (funptr intfun @-> int @-> int @-> returning int) in
   let higher_order_3 = foreign ~from:testlib "higher_order_3"
-    Type.(funptr acceptor @-> funptr intfun @-> int @-> int @-> returning int)
+    (funptr acceptor @-> funptr intfun @-> int @-> int @-> returning int)
   in
 
   let acceptor op x y = op x (op x y) in
@@ -65,9 +65,9 @@ let test_higher_higher_order () =
   call the returned function from OCaml.
 *)
 let test_returning_pointer_to_function () =
-  let intfun = Type.(int @-> int @-> returning int) in
+  let intfun = (int @-> int @-> returning int) in
   let returning_funptr = foreign ~from:testlib "returning_funptr"
-    Type.(int @-> returning (funptr intfun))
+    (int @-> returning (funptr intfun))
   in
 
   let add = returning_funptr 0 in
@@ -89,9 +89,9 @@ let test_returning_pointer_to_function () =
   returning a pointer-to-function.)
 *)
 let test_callback_returns_pointer_to_function () =
-  let intfun = Type.(int @-> returning int) in
+  let intfun = (int @-> returning int) in
   let callback_returns_funptr = foreign ~from:testlib "callback_returns_funptr"
-    Type.(funptr (int @-> returning (funptr intfun)) @-> int @-> returning int)
+    (funptr (int @-> returning (funptr intfun)) @-> int @-> returning int)
   in
 
   let callback = function

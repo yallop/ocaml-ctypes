@@ -13,12 +13,12 @@ let mkAbstract : 'a. 'a Ctypes.typ -> (module Abstract)
      end : Abstract)
 
 let mkAbstractSized : size:int -> alignment:int -> (module Abstract)
-  = fun ~size ~alignment ->
+  = fun ~size ~alignment:a ->
     (module
      struct
-       open Ctypes.Type
+       open Ctypes
        type t = unit Ctypes.abstract
-       let t = abstract ~size ~alignment
+       let t = abstract ~size ~alignment:a
      end : Abstract)
 
 type arithmetic =
@@ -34,7 +34,7 @@ type arithmetic =
   | Double
 
 let mkArithmetic = 
-  let open Ctypes.Type in function
+  let open Ctypes in function
     Int8   -> mkAbstract int8_t
   | Int16  -> mkAbstract int16_t
   | Int32  -> mkAbstract int32_t
@@ -82,7 +82,7 @@ module Pid = (val mkArithmetic (typeof_pid_t ()) : Abstract)
 module Size = 
 struct
   type t = Unsigned.size_t
-  let t = Ctypes.Type.size_t
+  let t = Ctypes.size_t
 end
 module Ssize = (val mkArithmetic (typeof_ssize_t ()) : Abstract)
 module Suseconds = (val mkArithmetic (typeof_suseconds_t ()) : Abstract)

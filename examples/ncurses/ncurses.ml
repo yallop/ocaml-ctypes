@@ -1,5 +1,4 @@
 open Ctypes
-open Type
 
 type window = unit ptr
 let window : window typ = ptr void

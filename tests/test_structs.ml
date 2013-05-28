@@ -21,7 +21,6 @@ let testlib = Dl.(dlopen ~filename:"clib/test_functions.so" ~flags:[RTLD_NOW])
 let test_passing_struct () =
   let module M = struct
     open Struct
-    open Type
     type simple
     let simple : simple structure typ = structure "simple"
     let c = simple *:* int
@@ -64,7 +63,6 @@ let test_passing_struct () =
 let test_returning_struct () =
   let module M = struct
     open Struct
-    open Type
     type simple
 
     let simple : simple structure typ = structure "simple"
@@ -98,7 +96,6 @@ let test_returning_struct () =
 *)
 let test_pointers_to_struct_members () =
   let module M = struct
-    open Type
     open Struct
     type s
 
@@ -140,7 +137,6 @@ let test_pointers_to_struct_members () =
 *)
 let test_structs_with_union_members () =
   let module M = struct
-    open Type
     type u and s
 
     open Union
@@ -197,7 +193,6 @@ let test_structs_with_union_members () =
 *)
 let test_structs_with_array_members () =
   let module M = struct
-    open Type
     type u and s
 
     open Struct

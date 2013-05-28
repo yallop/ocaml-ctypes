@@ -12,7 +12,6 @@ let testlib = Dl.(dlopen ~filename:"clib/test_functions.so" ~flags:[RTLD_NOW])
 let test_oo_hierarchy () =
   let module M = struct
     open Struct
-    open Type
 
     let cast base p = Ptr.from_voidp base (Ptr.to_voidp p)
 

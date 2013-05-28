@@ -494,71 +494,68 @@ let foreign_value ?from symbol reftype =
   let raw_ptr = Dl.dlsym ?handle:from ~symbol in
   { Ptr.reftype ; raw_ptr; pbyte_offset = 0 ; pmanaged=None }
 
-module Type =
-struct
-  let void = Void
-  let char = Primitive RawTypes.char
-  let schar = Primitive RawTypes.schar
-  let float = Primitive RawTypes.float
-  let double = Primitive RawTypes.double
-  let short = Primitive RawTypes.short
-  let int = Primitive RawTypes.int
-  let long = Primitive RawTypes.long
-  let llong = Primitive RawTypes.llong
-  let nativeint = Primitive RawTypes.nativeint
-  let int8_t = Primitive RawTypes.int8_t
-  let int16_t = Primitive RawTypes.int16_t
-  let int32_t = Primitive RawTypes.int32_t
-  let int64_t = Primitive RawTypes.int64_t
-  let uchar = Primitive RawTypes.uchar
-  let uint8_t = Primitive RawTypes.uint8_t
-  let uint16_t = Primitive RawTypes.uint16_t
-  let uint32_t = Primitive RawTypes.uint32_t
-  let uint64_t = Primitive RawTypes.uint64_t
-  let size_t = Primitive RawTypes.size_t
-  let ushort = Primitive RawTypes.ushort
-  let uint = Primitive RawTypes.uint
-  let ulong = Primitive RawTypes.ulong
-  let ullong = Primitive RawTypes.ullong
+let void = Void
+let char = Primitive RawTypes.char
+let schar = Primitive RawTypes.schar
+let float = Primitive RawTypes.float
+let double = Primitive RawTypes.double
+let short = Primitive RawTypes.short
+let int = Primitive RawTypes.int
+let long = Primitive RawTypes.long
+let llong = Primitive RawTypes.llong
+let nativeint = Primitive RawTypes.nativeint
+let int8_t = Primitive RawTypes.int8_t
+let int16_t = Primitive RawTypes.int16_t
+let int32_t = Primitive RawTypes.int32_t
+let int64_t = Primitive RawTypes.int64_t
+let uchar = Primitive RawTypes.uchar
+let uint8_t = Primitive RawTypes.uint8_t
+let uint16_t = Primitive RawTypes.uint16_t
+let uint32_t = Primitive RawTypes.uint32_t
+let uint64_t = Primitive RawTypes.uint64_t
+let size_t = Primitive RawTypes.size_t
+let ushort = Primitive RawTypes.ushort
+let uint = Primitive RawTypes.uint
+let ulong = Primitive RawTypes.ulong
+let ullong = Primitive RawTypes.ullong
 
-  let array i t = Array (t, i)
-  let ptr t = Pointer t
-  let ( @->) f t =
-    if not (passable f) then
-      raise (Unsupported "Unsupported argument type")
-    else
-      Function (f, t)
-  let abstract ~size ~alignment = 
-    Abstract { asize = size; aalignment = alignment }
-  let view ~read ~write ty = View { read; write; ty }
+let array i t = Array (t, i)
+let ptr t = Pointer t
+let ( @->) f t =
+  if not (passable f) then
+    raise (Unsupported "Unsupported argument type")
+  else
+    Function (f, t)
+let abstract ~size ~alignment = 
+  Abstract { asize = size; aalignment = alignment }
+let view ~read ~write ty = View { read; write; ty }
 
-  let returning v =
-    if not (passable v) then
-      raise (Unsupported "Unsupported return type")
-    else
-      Returns (false, v)
-  let syscall v = Returns (true, v)
-  let funptr f = FunctionPointer f
+let returning v =
+  if not (passable v) then
+    raise (Unsupported "Unsupported return type")
+  else
+    Returns (false, v)
+let syscall v = Returns (true, v)
+let funptr f = FunctionPointer f
 
-  let strlen = foreign "strlen" (ptr char @-> returning size_t)
+let strlen = foreign "strlen" (ptr char @-> returning size_t)
 
-  let string_of_char_ptr charp =
-      let length = Unsigned.Size_t.to_int (strlen charp) in
-      let s = String.create length in
-      for i = 0 to length - 1 do
-        s.[i] <- Ptr.(! (charp  + i))
-      done;
-      s
+let string_of_char_ptr charp =
+    let length = Unsigned.Size_t.to_int (strlen charp) in
+    let s = String.create length in
+    for i = 0 to length - 1 do
+      s.[i] <- Ptr.(! (charp  + i))
+    done;
+    s
 
-  let char_ptr_of_string s =
-      let len = String.length s in
-      let p = Ptr.allocate ~count:(len + 1) char in
-      for i = 0 to len - 1 do
-        Ptr.(p + i := s.[i])
-      done;
-      Ptr.(p + len := '\000');
-      p
+let char_ptr_of_string s =
+    let len = String.length s in
+    let p = Ptr.allocate ~count:(len + 1) char in
+    for i = 0 to len - 1 do
+      Ptr.(p + i := s.[i])
+    done;
+    Ptr.(p + len := '\000');
+    p
 
-  let string = view ~read:string_of_char_ptr ~write:char_ptr_of_string
-    (ptr char)
-end
+let string = view ~read:string_of_char_ptr ~write:char_ptr_of_string
+  (ptr char)

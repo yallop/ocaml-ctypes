@@ -6,7 +6,6 @@ open Ctypes
   Test that primitives are passable.
 *)
 let test_primitives_are_passable () =
-  let open Type in
   let _ = void @-> returning void 
   and _ = char @-> returning char
   and _ = schar @-> returning schar
@@ -38,7 +37,6 @@ let test_primitives_are_passable () =
 let test_unions_are_not_passable () =
   let module M = struct
     open Union
-    open Type
     type u
 
     let u : u union typ = union "u"
@@ -63,8 +61,6 @@ let test_unions_are_not_passable () =
   Test that arrays are not passable
 *)
 let test_arrays_are_not_passable () =
-  let open Type in
-
   assert_raises ~msg:"Array type rejected as argument"
     (Unsupported "Unsupported argument type")
     (fun () -> array 1 int @-> returning void);
@@ -78,8 +74,6 @@ let test_arrays_are_not_passable () =
   Test that pointers are passable
 *)
 let test_pointers_are_passable () =
-  let open Type in
-
   (* Pointers to primitives are passable *)
   let _ = ptr void @-> returning (ptr void)
   and _ = ptr int @-> returning (ptr int)
@@ -112,8 +106,6 @@ let test_pointers_are_passable () =
   Test that function pointers are passable
 *)
 let test_function_pointers_are_passable () =
-  let open Type in
-
   (* Pointers to primitives are passable *)
   ignore (funptr (int @-> returning int)
           @-> returning (funptr (int @-> returning int)))
@@ -127,7 +119,6 @@ let test_struct_passability () =
   let module M = struct
     open Union
     open Struct
-    open Type
     type s1 and s2 and s3 and s4 and s5 and u
 
     let s1 : s1 structure typ = structure "s1"

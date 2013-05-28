@@ -9,52 +9,6 @@ type 'a abstract
 exception Unsupported of string
 exception IncompleteType
 
-val sizeof : 'a typ -> int
-val alignment : 'a typ -> int
-
-module Type :
-sig
-  open Signed
-  open Unsigned
-
-  val void  : unit typ
-  val char : char typ
-  val schar : int typ
-  val float : float typ
-  val double : float typ
-  val short : int typ
-  val int   : int typ
-  val long  : long typ
-  val llong  : llong typ
-  val nativeint : nativeint typ
-  val int8_t : int typ
-  val int16_t : int typ
-  val int32_t : int32 typ
-  val int64_t : int64 typ
-  val uchar : uchar typ
-  val uint8_t : uint8 typ
-  val uint16_t : uint16 typ
-  val uint32_t : uint32 typ
-  val uint64_t : uint64 typ
-  val size_t : size_t typ
-  val ushort : ushort typ
-  val uint : uint typ
-  val ulong : ulong typ
-  val ullong : ullong typ
-
-  val string : string typ
-
-  val view : read:('a -> 'b) -> write:('b -> 'a) -> 'a typ -> 'b typ
-  val abstract : size:int -> alignment:int -> 'a abstract typ
-  val array : int -> 'a typ -> 'a array typ
-  val ptr : 'a typ -> 'a ptr typ
-  val ( @-> ) : 'a typ -> 'b fn -> ('a -> 'b) fn
-
-  val returning : 'a typ -> 'a fn
-  val syscall : 'a typ -> 'a fn
-  val funptr : ('a -> 'b) fn -> ('a -> 'b) typ
-end
-
 module Ptr :
 sig
   type 'a t = 'a ptr
@@ -121,6 +75,49 @@ sig
   val (|->) : 's union ptr -> ('a, 's) field -> 'a ptr
   val addr : 's union -> 's union ptr
 end
+
+val sizeof : 'a typ -> int
+val alignment : 'a typ -> int
+
+open Signed
+open Unsigned
+
+val void  : unit typ
+val char : char typ
+val schar : int typ
+val float : float typ
+val double : float typ
+val short : int typ
+val int   : int typ
+val long  : long typ
+val llong  : llong typ
+val nativeint : nativeint typ
+val int8_t : int typ
+val int16_t : int typ
+val int32_t : int32 typ
+val int64_t : int64 typ
+val uchar : uchar typ
+val uint8_t : uint8 typ
+val uint16_t : uint16 typ
+val uint32_t : uint32 typ
+val uint64_t : uint64 typ
+val size_t : size_t typ
+val ushort : ushort typ
+val uint : uint typ
+val ulong : ulong typ
+val ullong : ullong typ
+
+val string : string typ
+
+val view : read:('a -> 'b) -> write:('b -> 'a) -> 'a typ -> 'b typ
+val abstract : size:int -> alignment:int -> 'a abstract typ
+val array : int -> 'a typ -> 'a array typ
+val ptr : 'a typ -> 'a ptr typ
+val ( @-> ) : 'a typ -> 'b fn -> ('a -> 'b) fn
+
+val returning : 'a typ -> 'a fn
+val syscall : 'a typ -> 'a fn
+val funptr : ('a -> 'b) fn -> ('a -> 'b) typ
 
 val foreign : ?from:Dl.library -> string -> ('a -> 'b) fn -> ('a -> 'b)
 val foreign_value : ?from:Dl.library -> string -> 'a typ -> 'a ptr

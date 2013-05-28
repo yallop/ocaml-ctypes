@@ -1,5 +1,4 @@
 open Ctypes
-open Type
 
 (* The fts functions are provided for traversing file hierarchies.  A simple
    overview is that the fts_open() function returns a "handle" on a file

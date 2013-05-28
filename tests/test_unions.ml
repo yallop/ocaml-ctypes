@@ -18,7 +18,6 @@ let testlib = Dl.(dlopen ~filename:"clib/test_functions.so" ~flags:[RTLD_NOW])
 let test_inspecting_float () =
   let module M = struct
     open Union
-    open Type
     type u
     let utyp : u union typ = union "u"
     let f = utyp +:+ double
@@ -53,7 +52,6 @@ let test_inspecting_float () =
 let test_endian_detection () =
   let module M = struct
     open Union
-    open Type
     type e
     let etyp : e union typ = union "e"
     let i = etyp +:+ int64_t
@@ -88,7 +86,6 @@ let test_endian_detection () =
 let test_union_padding () =
   let module M = struct
     open Union
-    open Type
     type padded
     let padded : padded union typ = union "padded"
     let i = padded +:+ int64_t

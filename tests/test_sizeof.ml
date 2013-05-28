@@ -5,7 +5,7 @@ open Ctypes
 (*
   Test some relationships between the sizes of primitive types.
 *)
-let test_sizeof_primitives () = Type.(
+let test_sizeof_primitives () = begin
   assert_equal ~msg:"sizeof (char) == 1"
     (sizeof char) 1;
 
@@ -59,14 +59,14 @@ let test_sizeof_primitives () = Type.(
 
   assert_equal ~msg:"sizeof (long long) == sizeof (unsigned long long)"
     (sizeof llong) (sizeof ullong);
-)
+end
 
 
 
 (*
   Test some properties of the sizes of unions.
 *)
-let test_sizeof_unions () = Type.(
+let test_sizeof_unions () =
   let open Union in
 
   let int_char = union "int_char" in
@@ -82,14 +82,12 @@ let test_sizeof_unions () = Type.(
   let _ = sealu char17 in
   
   assert_equal 17 (sizeof char17)
-)
-
 
 
 (*
   Test some properties of the sizes of structs.
 *)
-let test_sizeof_structs () = Type.(
+let test_sizeof_structs () =
   let module M = struct
     open Struct
 
@@ -106,34 +104,33 @@ let test_sizeof_structs () = Type.(
         assert_equal (i * sizeof int) (sizeof homogeneous)
       done
 
-  end in ())
+  end in ()
   
 
 (*
   Test that taking the size of void is treated as an error.
 *)
-let test_sizeof_void () = Type.(
+let test_sizeof_void () =
   assert_raises IncompleteType
     (fun () -> sizeof void)
-)
  
 
 (*
   Test the behaviour of sizeof on array types.
 *)
-let test_sizeof_arrays () = Type.(
+let test_sizeof_arrays () = begin
   assert_equal ~msg:"The size of an array is the sum of the size of its members"
     (12 * (sizeof int8_t)) (sizeof (array 12 int8_t));
 
   assert_equal ~msg:"Arrays of arrays are correctly sized"
-    (5 * 7 * (sizeof nativeint)) (sizeof (array 7 (array 5 nativeint)));
-)
+    (5 * 7 * (sizeof nativeint)) (sizeof (array 7 (array 5 nativeint)))
+end
  
 
 (*
   Test that all pointers have equal size.
 *)
-let test_sizeof_pointers () = Type.(
+let test_sizeof_pointers () = begin
   let pointer_size = sizeof (ptr void) in
   assert_equal pointer_size (sizeof (ptr void));
   assert_equal pointer_size (sizeof (ptr int));
@@ -148,7 +145,7 @@ let test_sizeof_pointers () = Type.(
     let () = seals t
   end in
   assert_equal pointer_size (sizeof (ptr M.t))
-)
+end
 
 
 let suite = "sizeof tests" >:::

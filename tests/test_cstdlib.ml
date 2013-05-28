@@ -19,7 +19,7 @@ open Unsigned
      int isisxdigit(int)
 *)
 let test_isX_functions () =
-  let t = Type.(int @-> returning int) in
+  let t = (int @-> returning int) in
   let isalnum = foreign "isalnum" t
   and isalpha = foreign "isalpha" t
   and iscntrl = foreign "iscntrl" t
@@ -79,8 +79,6 @@ let test_isX_functions () =
     int strcmp(const char *str1, const char *str2); 
 *)
 let test_string_functions () =
-  let open Type in
-
   (* char *strchr(const char *str, int c);  *)
   let strchr = foreign "strchr" (string @-> int @-> returning string) in
 
@@ -118,7 +116,6 @@ let test_string_functions () =
 let test_div () =
   let module M = struct
     open Struct
-    open Type
     type div_t
     let div_t : div_t structure typ = structure "div_t"
     let quot = div_t *:* int
@@ -146,7 +143,6 @@ let test_div () =
                 int(*compar)(const void *, const void *));
 *)
 let test_qsort () =
-  let open Type in
   let comparator = ptr void @-> ptr void @-> returning int in
   let qsort = foreign "qsort" (ptr void @-> size_t @-> size_t @-> funptr comparator @->
                                returning void) in
@@ -186,7 +182,6 @@ let test_qsort () =
 *)
 let test_bsearch () =
   let module M = struct
-    open Type
     let comparator = ptr void @-> ptr void @-> returning int
     let bsearch = foreign "bsearch" (ptr void @-> ptr void @-> size_t @-> size_t @->
                                      funptr comparator @->

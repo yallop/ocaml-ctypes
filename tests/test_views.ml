@@ -14,7 +14,6 @@ let testlib = Dl.(dlopen ~filename:"clib/test_functions.so" ~flags:[RTLD_NOW])
   parameter.  Examine the output buffer using a cast to a string view.
 *)
 let test_passing_string_array () =
-  let open Type in
   let concat = foreign "concat_strings" ~from:testlib
     (ptr string @-> int @-> ptr char @-> returning void) in
 
@@ -40,7 +39,6 @@ let test_passing_string_array () =
   using a custom view that treats chars as ints.
 *)
 let test_passing_chars_as_ints () =
-  let open Type in
   let charish = view ~read:Char.chr ~write:Char.code int in
   let toupper = foreign "toupper" (charish @-> returning charish) in
 

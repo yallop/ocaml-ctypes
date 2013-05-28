@@ -5,7 +5,7 @@ open Ctypes
 (*
   Test some relationships between the alignment requirements of primitive types.
 *)
-let test_primitive_alignment () = Type.(
+let test_primitive_alignment () = begin
   assert_equal ~msg:"alignmentof(char) == 1"
     (alignment char) 1;
 
@@ -38,13 +38,13 @@ let test_primitive_alignment () = Type.(
 
   assert_equal ~msg:"alignmentof(int64_t) == alignmentof(uint64_t)"
     (alignment int64_t) (alignment uint64_t);
-)
+end
 
 
 (*
   Test that requesting the alignment of an incomplete type raises an exception.
 *)
-let test_incomplete_alignment () = Type.(
+let test_incomplete_alignment () =
   assert_raises IncompleteType
     (fun () -> alignment void);
 
@@ -67,7 +67,7 @@ let test_incomplete_alignment () = Type.(
       assert_raises IncompleteType
         (fun () -> alignment u)
   end in
-  ())
+  ()
 
 
 (*
@@ -90,7 +90,6 @@ let test_incomplete_alignment () = Type.(
 *)
 let test_struct_tail_padding () = 
   let module M = struct
-    open Type
     open Union
     open Struct
     type a and b and u

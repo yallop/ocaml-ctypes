@@ -1,5 +1,4 @@
 open Ctypes
-open Type
 open PosixTypes
 open Struct
 

@@ -1,6 +1,5 @@
 open PosixTypes
 open Ctypes
-open Type
 
 type t = sigset_t ptr
 

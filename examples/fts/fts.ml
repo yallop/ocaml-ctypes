@@ -1,5 +1,4 @@
 open Ctypes
-open Type
 
 type fts_info =
     FTS_D
