@@ -187,7 +187,6 @@ let test_structs_with_union_members () =
   end in ()
 
 
-
 (*
   Test structs with array members.
 *)
@@ -251,12 +250,26 @@ let test_structs_with_array_members () =
   end in ()
 
 
+(*
+  Test that attempting to update a sealed struct is treated as an error.
+*)
+let test_updating_sealed_struct () =
+  let open Struct in
+  let styp = structure "sealed" in
+  let i = styp *:* int in
+  let () = seals styp in
+
+  assert_raises (ModifyingSealedType "sealed")
+    (fun () -> styp *:* char)
+
+
 let suite = "Struct tests" >:::
   ["passing struct" >:: test_passing_struct;
    "returning struct" >:: test_returning_struct;
    "pointers to struct members" >:: test_pointers_to_struct_members;
    "structs with union members" >:: test_structs_with_union_members;
    "structs with array members" >:: test_structs_with_array_members;
+   "updating sealed struct" >:: test_updating_sealed_struct;
   ]
 
 
