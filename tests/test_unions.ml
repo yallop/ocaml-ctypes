@@ -151,11 +151,25 @@ let test_union_address () =
   end in ()
 
 
+(*
+  Test that attempting to update a sealed union is treated as an error.
+*)
+let test_updating_sealed_union () =
+  let open Union in
+  let utyp = union "sealed" in
+  let i = utyp +:+ int in
+  let () = sealu utyp in
+
+  assert_raises (ModifyingSealedType "sealed")
+    (fun () -> utyp +:+ char)
+
+
 let suite = "Union tests" >:::
   ["inspecting float representation" >:: test_inspecting_float;
    "detecting endianness" >:: test_endian_detection;
    "union padding" >:: test_union_padding;
    "union address" >:: test_union_address;
+   "updating sealed union" >:: test_updating_sealed_union;
   ]
 
 
