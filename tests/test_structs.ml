@@ -92,6 +92,24 @@ let test_returning_struct () =
 
 
 (*
+  Check that attempts to use incomplete types for struct members are rejected.
+*)
+let test_incomplete_struct_members () =
+  let open Struct in
+  let s = structure "s" in begin
+
+    assert_raises IncompleteType
+      (fun () -> s *:* void);
+
+    assert_raises IncompleteType
+      (fun () -> s *:* structure "incomplete");
+
+    assert_raises IncompleteType
+      (fun () -> s *:* Union.union "incomplete");
+  end
+
+
+(*
   Test reading and writing pointers to struct members.
 *)
 let test_pointers_to_struct_members () =
@@ -266,6 +284,7 @@ let test_updating_sealed_struct () =
 let suite = "Struct tests" >:::
   ["passing struct" >:: test_passing_struct;
    "returning struct" >:: test_returning_struct;
+   "incomplete struct members rejected" >:: test_incomplete_struct_members;
    "pointers to struct members" >:: test_pointers_to_struct_members;
    "structs with union members" >:: test_structs_with_union_members;
    "structs with array members" >:: test_structs_with_array_members;
