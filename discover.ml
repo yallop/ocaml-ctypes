@@ -159,13 +159,13 @@ let test_code args stub_code =
     cleanup ();
     raise exn
 
-let config = open_out "src/ffi_config.h"
-let config_ml = open_out "src/ffi_config.ml"
+let config = open_out "src/ctypes_config.h"
+let config_ml = open_out "src/ctypes_config.ml"
 
 let () =
   fprintf config "\
-#ifndef __FFI_CONFIG_H
-#define __FFI_CONFIG_H
+#ifndef __CTYPES_CONFIG_H
+#define __CTYPES_CONFIG_H
 "
 
 let not_available = ref []

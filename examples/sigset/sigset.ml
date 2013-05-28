@@ -1,5 +1,5 @@
 open PosixTypes
-open Ffi
+open Ctypes
 open Type
 
 type t = sigset_t ptr

@@ -4,8 +4,8 @@ exception IncompleteType
 exception ModifyingSealedType
 exception Unsupported of string
 
-module Raw = Ffi_raw
-module RawTypes = Ffi_raw.Types
+module Raw = Ctypes_raw
+module RawTypes = Ctypes_raw.Types
 
 type 'a structspec =
     Incomplete of Raw.bufferspec

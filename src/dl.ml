@@ -18,7 +18,7 @@ external _dlopen : ?filename:string -> flags:int -> library option
   = "ctypes_dlopen"
     
 (* void *dlsym(void *handle, const char *symbol); *)
-external _dlsym : ?handle:library -> symbol:string -> Ffi_raw.Types.voidp option
+external _dlsym : ?handle:library -> symbol:string -> Ctypes_raw.Types.voidp option
   = "ctypes_dlsym"
 
 (* int dlclose(void *handle); *)

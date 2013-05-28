@@ -11,9 +11,9 @@ open OUnit
         double fabs(double)
 *)
 let test_fabs () =
-  Ffi_raw.(Types.(
+  Ctypes_raw.(Types.(
     let callspec = allocate_callspec () in
-    let arg_1_offset = Ffi_raw.add_argument callspec double in
+    let arg_1_offset = add_argument callspec double in
     let () = prep_callspec callspec double in
     
     let dlfabs = Dl.dlsym "fabs" in
@@ -35,10 +35,10 @@ let test_fabs () =
         double pow(double, double)
 *)
 let test_pow () =
-  Ffi_raw.(Types.(
+  Ctypes_raw.(Types.(
     let callspec = allocate_callspec () in
-    let arg_1_offset = Ffi_raw.add_argument callspec double in
-    let arg_2_offset = Ffi_raw.add_argument callspec double in
+    let arg_1_offset = add_argument callspec double in
+    let arg_2_offset = add_argument callspec double in
     let () = prep_callspec callspec double in
     
     let dlpow = Dl.dlsym "pow" in

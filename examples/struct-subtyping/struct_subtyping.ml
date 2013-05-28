@@ -1,4 +1,4 @@
-open Ffi.C
+open Ctypes
 open Struct
 open OUnit
 

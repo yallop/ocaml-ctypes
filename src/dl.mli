@@ -12,4 +12,4 @@ type flag =
 
 val dlopen : ?filename:string -> flags:flag list -> library
 val dlclose : handle:library -> unit
-val dlsym : ?handle:library -> symbol:string -> Ffi_raw.immediate_pointer
+val dlsym : ?handle:library -> symbol:string -> Ctypes_raw.immediate_pointer

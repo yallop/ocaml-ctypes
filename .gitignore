@@ -12,8 +12,8 @@ examples/sigset/sigset.mllib
 _build
 build
 tests/clib/*
-src/ffi_config.h
-src/ffi_config.ml
+src/ctypes_config.h
+src/ctypes_config.ml
 *.native
 .*.swp
 #

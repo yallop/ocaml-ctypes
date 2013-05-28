@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: e69e375002fb73b8f8bbb0f524825c85)
+# DO NOT EDIT (digest: 43ec813d012f84f96542bbc7201cab1e)
 # Ignore VCS directories, you can use the same kind of rule outside 
 # OASIS_START/STOP if you want to exclude directories that contains 
 # useless stuff for the build process
@@ -19,7 +19,7 @@
 "src/unsigned_stubs.c": oasis_library_ctypes_ccopt
 "src/managed_buffer_stubs.c": oasis_library_ctypes_ccopt
 "src/type_info_stubs.c": oasis_library_ctypes_ccopt
-"src/ffi_stubs.c": oasis_library_ctypes_ccopt
+"src/ctypes_stubs.c": oasis_library_ctypes_ccopt
 "src/dl_stubs.c": oasis_library_ctypes_ccopt
 "src/posix_types_stubs.c": oasis_library_ctypes_ccopt
 <src/ctypes.{cma,cmxa}>: use_libctypes_stubs

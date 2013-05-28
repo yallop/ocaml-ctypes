@@ -1,4 +1,4 @@
-open Ffi
+open Ctypes
 
 (* arithmetic types from <sys/types.h> *)
 type blkcnt_t

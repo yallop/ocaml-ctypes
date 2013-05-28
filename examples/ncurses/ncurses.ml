@@ -1,4 +1,4 @@
-open Ffi
+open Ctypes
 open Type
 
 type window = unit ptr

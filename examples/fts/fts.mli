@@ -1,4 +1,4 @@
-open Ffi
+open Ctypes
 open Type
 
 (* The fts functions are provided for traversing file hierarchies.  A simple
