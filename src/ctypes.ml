@@ -112,16 +112,16 @@ let rec arg_type : 'a. 'a typ -> arg_type
   = fun (type a) (t : a typ) -> match t with
     | Void                         -> ArgType RawTypes.void
     | Primitive p                  -> ArgType p
-    | Struct {spec = Incomplete _} -> raise IncompleteType
     | Struct {spec = Complete p}   -> ArgType p
     | Pointer reftype              -> ArgType RawTypes.pointer
     | FunctionPointer fn           -> ArgType RawTypes.pointer
     | View { ty }                  -> arg_type ty
-    (* The following cases should never happen; non-struct aggregate
-       types are excluded during type construction. *)
+    (* The following cases should never happen; aggregate types other than
+       complete struct types are excluded during type construction. *)
     | Union _                      -> assert false
     | Array _                      -> assert false
     | Abstract _                   -> assert false
+    | Struct {spec = Incomplete _} -> assert false
 
 (*
   call addr callspec return (fun buffer ->

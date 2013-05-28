@@ -192,6 +192,28 @@ let test_struct_passability () =
   end in ()
 
 
+(*
+  Test passability of incomplete types.  Trying to use an incomplete type
+  in a function specification should give rise to an error.
+*)
+let test_incomplete_passability () =
+  let s = Struct.structure "incomplete"
+  and u = Union.union "incomplete"
+  in begin
+    assert_raises IncompleteType
+      (fun () -> s @-> returning void);
+    
+    assert_raises IncompleteType
+      (fun () -> void @-> returning s);
+    
+    assert_raises IncompleteType
+      (fun () -> u @-> returning void);
+    
+    assert_raises IncompleteType
+      (fun () -> void @-> returning u);
+  end
+
+
 let suite = "Passability tests" >:::
   ["primitives are passable" >:: test_primitives_are_passable;
    "unions are not passable" >:: test_unions_are_not_passable;
@@ -199,6 +221,7 @@ let suite = "Passability tests" >:::
    "pointers are passable" >:: test_pointers_are_passable;
    "function pointers are passable" >:: test_function_pointers_are_passable;
    "struct passability" >:: test_struct_passability;
+   "incomplete types are not passable" >:: test_incomplete_passability;
   ]
 
 
