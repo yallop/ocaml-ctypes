@@ -160,6 +160,21 @@ let test_sizeof_pointers () = begin
 end
 
 
+(*
+  Test that the size of a view type is the same as the underlying type.
+*)
+let test_sizeof_views () = begin
+  let const c x = c in
+  let vint = view ~read:(const [1]) ~write:(const 0) int
+  and vchar = view ~read:(const ["1"]) ~write:(const 'a') char
+  and vvoid = view ~read:(const (fun () -> ())) ~write:(const ()) void
+  in
+  assert_equal (sizeof int) (sizeof vint);
+  assert_equal (sizeof char) (sizeof vchar);
+  assert_raises IncompleteType (fun () -> sizeof vvoid);
+end
+
+
 let suite = "sizeof tests" >:::
   ["sizeof primitives" >:: test_sizeof_primitives;
    "sizeof structs"    >:: test_sizeof_structs;
@@ -168,6 +183,7 @@ let suite = "sizeof tests" >:::
    "sizeof void"       >:: test_sizeof_void;
    "sizeof arrays"     >:: test_sizeof_arrays;
    "sizeof pointers"   >:: test_sizeof_pointers;
+   "sizeof views"      >:: test_sizeof_views;
   ]
 
 
