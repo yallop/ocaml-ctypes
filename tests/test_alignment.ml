@@ -42,6 +42,16 @@ end
 
 
 (*
+  Test the alignment of abstract types
+*)
+let test_abstract_alignment () =
+  for i = 1 to 10 do
+    assert_equal
+      i (alignment (abstract ~size:(11 - i) ~alignment:i))
+  done
+
+
+(*
   Test that requesting the alignment of an incomplete type raises an exception.
 *)
 let test_incomplete_alignment () =
@@ -68,6 +78,48 @@ let test_incomplete_alignment () =
         (fun () -> alignment u)
   end in
   ()
+
+
+(* 
+   Test that the alignment of a struct is equal to the maximum
+   alignment of its members.
+*)
+let test_struct_alignment () = 
+  let module M = struct
+    open Struct
+    type a and b and u
+
+    let maximum = List.fold_left max 0
+
+    let struct_a = structure "A"
+    let _ = struct_a *:* char
+    let _ = struct_a *:* int
+    let _ = struct_a *:* double
+    let () = seals struct_a
+
+    let () = assert_equal
+      (maximum [alignment char;
+                alignment int;
+                alignment double])
+      (alignment struct_a)
+
+    let abs = abstract ~size:33 ~alignment:33
+    let charish = view ~read:(fun _ -> ()) ~write:(fun () -> 'c') char
+
+    let struct_b = structure "A"
+    let _ = struct_b *:* charish
+    let _ = struct_b *:* funptr (int @-> returning int)
+    let _ = struct_b *:* abs
+    let _ = struct_b *:* double
+    let () = seals struct_b
+
+    let () = assert_equal
+      (maximum [alignment charish;
+                alignment (funptr (int @-> returning int));
+                alignment abs;
+                alignment double])
+      (alignment struct_b)
+  end in ()
 
 
 (*
@@ -163,6 +215,8 @@ let test_struct_tail_padding () =
 let suite = "Alignment tests" >:::
   ["struct tail padding" >:: test_struct_tail_padding;
    "primitive alignment" >:: test_primitive_alignment;
+   "struct alignment" >:: test_struct_alignment;
+   "alignment of abstract types" >:: test_abstract_alignment;
    "alignment of incomplete types" >:: test_incomplete_alignment;
   ]
 
