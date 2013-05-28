@@ -252,3 +252,47 @@ struct chorse *new_chorse(int colour)
   h->colour = (enum colour)colour;
   return h;
 }
+/* (End of OO-style example) */
+
+int accept_pointers(float *float_p,
+                    double *double_p,
+                    short *short_p,
+                    int *int_p,
+                    long *long_p,
+                    long long *llong_p,
+                    int *nativeint_p,
+                    int8_t *int8_t_p,
+                    int16_t *int16_t_p,
+                    int32_t *int32_t_p,
+                    int64_t *int64_t_p,
+                    uint8_t *uint8_t_p,
+                    uint16_t *uint16_t_p,
+                    uint32_t *uint32_t_p,
+                    uint64_t *uint64_t_p,
+                    size_t *size_t_p,
+                    unsigned short *ushort_p,
+                    unsigned *uint_p,
+                    unsigned long *ulong_p,
+                    unsigned long long *ullong_p)
+{
+  return (*float_p
+          + *double_p
+          + *short_p
+          + *int_p
+          + *long_p
+          + *llong_p
+          + *nativeint_p
+          + *int8_t_p
+          + *int16_t_p
+          + *int32_t_p
+          + *int64_t_p
+          + *uint8_t_p
+          + *uint16_t_p
+          + *uint32_t_p
+          + *uint64_t_p
+          + *size_t_p
+          + *ushort_p
+          + *uint_p
+          + *ulong_p
+          + *ullong_p);
+}

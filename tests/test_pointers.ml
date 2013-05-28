@@ -6,10 +6,59 @@ let testlib = Dl.(dlopen ~filename:"clib/test_functions.so" ~flags:[RTLD_NOW])
 
 
 (*
-  [TODO]
+  Test passing various types of pointers to a function.
 *)
 let test_passing_pointers () =
-  () (* TODO *)
+  let accept_pointers = foreign "accept_pointers" ~from:testlib
+    (ptr float @->
+     ptr double @->
+     ptr short @->
+     ptr int @->
+     ptr long @->
+     ptr llong @->
+     ptr nativeint @->
+     ptr int8_t @->
+     ptr int16_t @->
+     ptr int32_t @->
+     ptr int64_t @->
+     ptr uint8_t @->
+     ptr uint16_t @->
+     ptr uint32_t @->
+     ptr uint64_t @->
+     ptr size_t @->
+     ptr ushort @->
+     ptr uint @->
+     ptr ulong @->
+     ptr ullong @->
+     returning int) in
+  assert_equal ~msg:"Passing pointers to various numeric types"
+    ~printer:string_of_int
+    (1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 +
+     11 + 12 + 13 + 14 + 15 + 16 + 17 + 18 + 19 + 20)
+    (let open Signed in
+     let open Unsigned in
+     let open Ptr in
+     accept_pointers
+       (make float 1.0)
+       (make double 2.0)
+       (make short 3)
+       (make int 4)
+       (make long (Long.of_int 5))
+       (make llong (LLong.of_int 6))
+       (make nativeint 7n)
+       (make int8_t 8)
+       (make int16_t 9)
+       (make int32_t 10l)
+       (make int64_t 11L)
+       (make uint8_t (Uint8.of_int 12))
+       (make uint16_t (Uint16.of_int 13))
+       (make uint32_t (Uint32.of_int 14))
+       (make uint64_t (Uint64.of_int 15))
+       (make size_t (Size_t.of_int 16))
+       (make ushort (UShort.of_int 17))
+       (make uint (UInt.of_int 18))
+       (make ulong (ULong.of_int 19))
+       (make ullong (ULLong.of_int 20)))
 
 
 (*

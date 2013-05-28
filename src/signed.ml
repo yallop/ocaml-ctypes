@@ -54,7 +54,7 @@ end
 
 (* C guarantees that sizeof(t) == sizeof(unsigned t) *)
 external long_size : unit -> int = "ctypes_ulong_size"
-external llong_size : unit -> int = "ctypes_ullong_size"
+external llong_size : unit -> int = "ctypes_ulonglong_size"
 
 let pick : size:int -> (module S) =
   fun ~size -> match size with
