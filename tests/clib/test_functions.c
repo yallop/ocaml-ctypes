@@ -216,6 +216,7 @@ char *chorse_colour(struct chorse *chorse)
   case red   : return "red";
   case black : return "black";
   case pale  : return "pale";
+  default: assert(0);
   }
 }
 
