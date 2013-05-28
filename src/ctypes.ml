@@ -1,7 +1,7 @@
 (* TODO: better array support, perhaps based on bigarrays integration *)
 
 exception IncompleteType
-exception ModifyingSealedType
+exception ModifyingSealedType of string
 exception Unsupported of string
 
 module Raw = Ctypes_raw
@@ -392,9 +392,9 @@ struct
   let structure tag =
     Struct {spec = Incomplete (Raw.allocate_bufferspec ()); tag; passable=true}
 
-  let bufferspec {spec} = match spec with
+  let bufferspec {tag; spec} = match spec with
     | Incomplete s -> s
-    | Complete _   -> raise ModifyingSealedType
+    | Complete _   -> raise (ModifyingSealedType tag)
 
   let offsetof {foffset} = foffset
 
@@ -456,8 +456,8 @@ struct
 
   let union utag = Union {utag; usize = 0; ualignment = 0; ucomplete = false}
 
-  let ensure_unsealed {ucomplete} =
-    if ucomplete then raise ModifyingSealedType
+  let ensure_unsealed {ucomplete; utag} =
+    if ucomplete then raise (ModifyingSealedType utag)
 
   let compute_padding {usize; ualignment} =
     let overhang = usize mod ualignment in

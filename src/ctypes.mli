@@ -7,6 +7,7 @@ type 'a union
 type 'a abstract
 
 exception Unsupported of string
+exception ModifyingSealedType of string
 exception IncompleteType
 
 module Ptr :
