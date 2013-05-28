@@ -19,7 +19,9 @@ open Unsigned
      int isisxdigit(int)
 *)
 let test_isX_functions () =
-  let t = (int @-> returning int) in
+  let cchar = view ~read:Char.chr ~write:Char.code int in
+  let bool = view ~read:((<>)0) ~write:(fun b -> if b then 1 else 0) int in
+  let t = (cchar @-> returning bool) in
   let isalnum = foreign "isalnum" t
   and isalpha = foreign "isalpha" t
   and iscntrl = foreign "iscntrl" t
@@ -31,44 +33,39 @@ let test_isX_functions () =
   and isspace = foreign "isspace" t
   and isupper = foreign "isupper" t
   and isxdigit = foreign "isxdigit" t
-  in
-  let assert_satisfied f c =
-    assert_equal true ((f (Char.code c)) <> 0)
-  and assert_not_satisified f c =
-    assert_equal 0 (f (Char.code c))
   in begin
-    assert_satisfied isalnum 'a';
-    assert_not_satisified isalnum ' ';
+    assert_bool "" (isalnum 'a');
+    assert_bool "" (not (isalnum ' '));
     
-    assert_satisfied isalpha 'x';
-    assert_not_satisified isalpha ';';
+    assert_bool "" (isalpha 'x');
+    assert_bool "" (not (isalpha ';'));
 
-    assert_satisfied iscntrl '\r';
-    assert_not_satisified iscntrl 'a';
+    assert_bool "" (iscntrl '\r');
+    assert_bool "" (not (iscntrl 'a'));
 
-    assert_satisfied isdigit '2';
-    assert_not_satisified isdigit 'a';
+    assert_bool "" (isdigit '2');
+    assert_bool "" (not (isdigit 'a'));
 
-    assert_satisfied isgraph '?';
-    assert_not_satisified isgraph ' ';
+    assert_bool "" (isgraph '?');
+    assert_bool "" (not (isgraph ' '));
 
-    assert_satisfied islower 's';
-    assert_not_satisified islower 'S';
+    assert_bool "" (islower 's');
+    assert_bool "" (not (islower 'S'));
 
-    assert_satisfied isprint ' ';
-    assert_not_satisified isprint '\b';
+    assert_bool "" (isprint ' ');
+    assert_bool "" (not (isprint '\b'));
 
-    assert_satisfied ispunct '.';
-    assert_not_satisified ispunct 'a';
+    assert_bool "" (ispunct '.');
+    assert_bool "" (not (ispunct 'a'));
 
-    assert_satisfied isspace '\t';
-    assert_not_satisified isspace '~';
+    assert_bool "" (isspace '\t');
+    assert_bool "" (not (isspace '~'));
 
-    assert_satisfied isupper 'X';
-    assert_not_satisified isupper 'x';
+    assert_bool "" (isupper 'X');
+    assert_bool "" (not (isupper 'x'));
 
-    assert_satisfied isxdigit 'f';
-    assert_not_satisified isxdigit 'g';
+    assert_bool "" (isxdigit 'f');
+    assert_bool "" (not (isxdigit 'g'));
   end
 
 
