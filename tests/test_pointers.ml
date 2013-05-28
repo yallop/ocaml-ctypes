@@ -208,19 +208,37 @@ let test_reading_and_writing_global_value () = Ptr.(
 
 
 (*
-  Test bindings for malloc and free.
+  Test bindings for malloc, realloc and free.
 *)
 let test_allocation () =
-  let malloc = foreign "malloc" (int @-> returning (ptr void)) in
+  let open Unsigned in
+  let malloc = foreign "malloc" (size_t @-> returning (ptr void)) in
+  let realloc = foreign "realloc" (ptr void @-> size_t @-> returning (ptr void)) in
   let free = foreign "free" (ptr void @-> returning void) in
   
-  let pointer = malloc (sizeof int) in Ptr.(
+  let pointer = malloc (Size_t.of_int (sizeof int)) in Ptr.(
     let int_pointer = from_voidp int pointer in
     int_pointer := 17;
     assert_equal !int_pointer 17;
     int_pointer := -3;
     assert_equal !int_pointer (-3);
-    free pointer
+
+    let pointer' = realloc pointer (Size_t.of_int (20 * sizeof int)) in
+    assert_bool "realloc succeeded" (pointer' <> null);
+    let int_pointer = from_voidp int pointer' in
+
+    assert_equal ~msg:"realloc copied the existing data over"
+      !int_pointer (-3);
+
+    for i = 0 to 19 do
+      (int_pointer + i) := i
+    done;
+
+    for i = 0 to 19 do
+      assert_equal i !(int_pointer + i)
+    done;
+
+    free pointer'
   )
 
 
