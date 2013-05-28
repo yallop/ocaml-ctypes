@@ -121,10 +121,41 @@ let test_union_padding () =
   end in ()
 
 
+(* Check that the address of a union is equal to the addresses of each
+   of its members.
+*)
+let test_union_address () =
+  let module M = struct
+    open Union
+    open Ptr
+    type u
+    let u : u union typ = union "u"
+    let i = u +:+ int64_t
+    let c = u +:+ char
+    let s = u +:+ ptr (Struct.structure "incomplete")
+    let () = sealu u
+
+    let up = addr (Union.make u)
+
+    let () = begin
+
+      assert_equal
+        (to_voidp up) (to_voidp (up |-> i));
+
+      assert_equal
+        (to_voidp up) (to_voidp (up |-> c));
+
+      assert_equal
+        (to_voidp up) (to_voidp (up |-> s));
+    end
+  end in ()
+
+
 let suite = "Union tests" >:::
   ["inspecting float representation" >:: test_inspecting_float;
    "detecting endianness" >:: test_endian_detection;
    "union padding" >:: test_union_padding;
+   "union address" >:: test_union_address;
   ]
 
 
