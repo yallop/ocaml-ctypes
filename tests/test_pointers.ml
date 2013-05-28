@@ -69,6 +69,21 @@ let test_passing_pointer_to_void () =
 
 
 (*
+  Dereferencing pointers to incomplete types
+*)
+let test_dereferencing_pointers_to_incomplete_types () =
+  let open Ptr in begin
+    assert_raises IncompleteType
+      (fun () -> !null);
+
+    assert_raises IncompleteType
+      (fun () -> !(from_voidp (Struct.structure "incomplete") null));
+
+    assert_raises IncompleteType
+      (fun () -> !(from_voidp (Union.union "incomplete") null));
+  end
+
+(*
   [TODO]
 *)
 let test_reading_and_writing_global_value () = Ptr.(
@@ -150,6 +165,7 @@ let suite = "Pointer tests" >:::
    "returning_pointer_to_void" >:: test_returning_pointer_to_void;
    "passing_pointer_to_void" >:: test_passing_pointer_to_void;
 
+   "incomplete types" >:: test_dereferencing_pointers_to_incomplete_types;
    "global value" >:: test_reading_and_writing_global_value;
    "allocation" >:: test_allocation;
    "passing pointers through functions" >:: test_passing_pointer_through;
