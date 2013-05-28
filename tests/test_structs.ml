@@ -274,11 +274,44 @@ let test_structs_with_array_members () =
 let test_updating_sealed_struct () =
   let open Struct in
   let styp = structure "sealed" in
-  let i = styp *:* int in
+  let _ = styp *:* int in
   let () = seals styp in
 
   assert_raises (ModifyingSealedType "sealed")
     (fun () -> styp *:* char)
+
+
+(* 
+   Check that references to fields aren't garbage collected while they're
+   still needed.
+*)
+let test_field_references_not_invalidated () =
+  let module M = struct
+    open Struct
+    type s1 and s2
+
+    (*
+      struct s1 {
+        struct s2 {
+          int i;
+        } s2;
+      };
+    *)
+    let s1 : s1 structure typ = structure "s1"
+    let () = (fun () ->
+      let s2 : s2 structure typ = structure "s2" in
+      let _ = s2 *:* int in
+      let () = seals s2 in
+      let _ = s1 *:* s2 in
+      ()
+    ) ()
+    let () = begin
+      Gc.major ();
+      seals s1;
+      assert_equal ~printer:string_of_int
+        (sizeof int) (sizeof s1)
+    end
+  end in ()
 
 
 let suite = "Struct tests" >:::
@@ -289,6 +322,7 @@ let suite = "Struct tests" >:::
    "structs with union members" >:: test_structs_with_union_members;
    "structs with array members" >:: test_structs_with_array_members;
    "updating sealed struct" >:: test_updating_sealed_struct;
+   "field references not invalidated" >:: test_field_references_not_invalidated;
   ]
 
 
