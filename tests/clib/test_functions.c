@@ -312,3 +312,20 @@ int accepting_pointer_to_function_pointer(intfun **pfp)
 {
   return (*pfp)(20, 4);
 }
+
+typedef int pintfun1(int *, int *);
+int passing_pointers_to_callback(pintfun1 *f)
+{
+  int x = 3, y = 4;
+  return f(&x, &y);
+}
+
+
+typedef int *pintfun2(int, int);
+int accepting_pointer_from_callback(pintfun2 *f)
+{
+  int *p = f(7, 8);
+  int q = *p;
+  *p = 12;
+  return q;
+}

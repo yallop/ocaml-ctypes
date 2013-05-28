@@ -86,17 +86,36 @@ let test_passing_pointers_to_pointers () =
 
 
 (*
-  [TODO]
+  Passing a callback that accepts pointers as arguments.
 *)
 let test_callback_receiving_pointers () =
-  () (* TODO *)
+  let pintfun1 = ptr int @-> ptr int @-> returning int in
+  let passing_pointers_to_callback =
+    foreign ~from:testlib "passing_pointers_to_callback"
+      (funptr pintfun1 @-> returning int)
+  in
+  let deref = Ptr.(!) in
+  assert_equal 7
+    (passing_pointers_to_callback (fun lp rp -> deref lp + deref rp))
 
 
 (*
-  [TODO]
+  Passing a callback that returns a pointer.
 *)
 let test_callback_returning_pointers () =
-  () (* TODO *)
+  let pintfun2 = int @-> int @-> returning (ptr int) in
+  let p = Ptr.make int 17 in
+  let accepting_pointer_from_callback =
+    foreign ~from:testlib "accepting_pointer_from_callback"
+      (funptr pintfun2 @-> returning int)
+  in begin
+    assert_equal 17 Ptr.(!p);
+
+    assert_equal 56
+      (accepting_pointer_from_callback Ptr.(fun x y -> p := (x * y); p));
+
+    assert_equal 12 Ptr.(!p)
+  end
 
 
 (*
