@@ -82,6 +82,14 @@ let test_string_functions () =
   (* int strcmp(const char *str1, const char *str2);  *)
   let strcmp = foreign "strcmp" (string @-> string @-> returning int) in
   
+  (* int memcmp(const void *ptr1, const void *ptr2, size_t num) *)
+  let memcmp = foreign "memcmp"
+    (ptr void @-> ptr void @-> size_t @-> returning int) in
+
+  (* void  *memset(void *ptr, int value, size_t num) *)
+  let memset = foreign "memset"
+    (ptr void @-> int @-> size_t @-> returning (ptr void)) in
+
   assert_equal "defg" (strchr "abcdefg" (Char.code 'd'))
     ~printer:(fun x -> x);
 
@@ -92,9 +100,21 @@ let test_string_functions () =
     (strcmp "def" "abc" > 0);
 
   assert_bool "strcmp('abc', 'abc') == 0"
-    (strcmp "abc" "abc" = 0)
+    (strcmp "abc" "abc" = 0);
 
-  (* TODO: test other string functions once we support size_t *)
+  let open Ptr in
+  let p1 = make int 10 and p2 = make int 20 in
+  assert_bool "memcmp(&10, &20) < 0"
+    (memcmp (to_voidp p1) (to_voidp p2) (Size_t.of_int (sizeof int)) < 0);
+
+  let p = allocate uchar 12 in 
+  let i = 44 in
+  let u = UChar.of_int i in begin
+    memset (to_voidp p) i (Size_t.of_int 12);
+    for i = 0 to 11 do
+      assert_equal u !(p + i)
+    done
+  end
 
 
 (*
