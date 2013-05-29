@@ -50,10 +50,10 @@ let test_passing_pointers () =
        (make int16_t 9)
        (make int32_t 10l)
        (make int64_t 11L)
-       (make uint8_t (Uint8.of_int 12))
-       (make uint16_t (Uint16.of_int 13))
-       (make uint32_t (Uint32.of_int 14))
-       (make uint64_t (Uint64.of_int 15))
+       (make uint8_t (UInt8.of_int 12))
+       (make uint16_t (UInt16.of_int 13))
+       (make uint32_t (UInt32.of_int 14))
+       (make uint64_t (UInt64.of_int 15))
        (make size_t (Size_t.of_int 16))
        (make ushort (UShort.of_int 17))
        (make uint (UInt.of_int 18))
@@ -125,7 +125,7 @@ let test_pointer_assignment_with_primitives () =
   let open Signed in
   let open Unsigned in
   let p_char = Ptr.make char '1'
-  and p_uchar = Ptr.make uchar (Uchar.of_int 2)
+  and p_uchar = Ptr.make uchar (UChar.of_int 2)
   and p_schar = Ptr.make schar 3
   and p_float = Ptr.make float 4.0
   and p_double = Ptr.make double 5.0
@@ -138,10 +138,10 @@ let test_pointer_assignment_with_primitives () =
   and p_int16_t = Ptr.make int16_t 12
   and p_int32_t = Ptr.make int32_t 13l
   and p_int64_t = Ptr.make int64_t 14L
-  and p_uint8_t = Ptr.make uint8_t (Uint8.of_int 15)
-  and p_uint16_t = Ptr.make uint16_t (Uint16.of_int 16)
-  and p_uint32_t = Ptr.make uint32_t (Uint32.of_int 17)
-  and p_uint64_t = Ptr.make uint64_t (Uint64.of_int 18)
+  and p_uint8_t = Ptr.make uint8_t (UInt8.of_int 15)
+  and p_uint16_t = Ptr.make uint16_t (UInt16.of_int 16)
+  and p_uint32_t = Ptr.make uint32_t (UInt32.of_int 17)
+  and p_uint64_t = Ptr.make uint64_t (UInt64.of_int 18)
   and p_size_t = Ptr.make size_t (Size_t.of_int 19)
   and p_ushort = Ptr.make ushort (UShort.of_int 20)
   and p_uint = Ptr.make uint (UInt.of_int 21)
@@ -150,7 +150,7 @@ let test_pointer_assignment_with_primitives () =
   in begin
     let open Ptr in
     assert_equal '1' (!p_char);
-    assert_equal (Uchar.of_int 2) (!p_uchar);
+    assert_equal (UChar.of_int 2) (!p_uchar);
     assert_equal 3 (!p_schar);
     assert_equal 4.0 (!p_float);
     assert_equal 5.0 (!p_double);
@@ -163,10 +163,10 @@ let test_pointer_assignment_with_primitives () =
     assert_equal 12 (!p_int16_t);
     assert_equal 13l (!p_int32_t);
     assert_equal 14L (!p_int64_t);
-    assert_equal (Uint8.of_int 15) (!p_uint8_t);
-    assert_equal (Uint16.of_int 16) (!p_uint16_t);
-    assert_equal (Uint32.of_int 17) (!p_uint32_t);
-    assert_equal (Uint64.of_int 18) (!p_uint64_t);
+    assert_equal (UInt8.of_int 15) (!p_uint8_t);
+    assert_equal (UInt16.of_int 16) (!p_uint16_t);
+    assert_equal (UInt32.of_int 17) (!p_uint32_t);
+    assert_equal (UInt64.of_int 18) (!p_uint64_t);
     assert_equal (Size_t.of_int 19) (!p_size_t);
     assert_equal (UShort.of_int 20) (!p_ushort);
     assert_equal (UInt.of_int 21) (!p_uint);
@@ -174,7 +174,7 @@ let test_pointer_assignment_with_primitives () =
     assert_equal (ULLong.of_int 23) (!p_ullong);
 
     p_char := '2';
-    p_uchar := (Uchar.of_int 102);
+    p_uchar := (UChar.of_int 102);
     p_schar := 103;
     p_float := 104.0;
     p_double := 105.0;
@@ -187,10 +187,10 @@ let test_pointer_assignment_with_primitives () =
     p_int16_t := 112;
     p_int32_t := 113l;
     p_int64_t := 114L;
-    p_uint8_t := (Uint8.of_int 115);
-    p_uint16_t := (Uint16.of_int 116);
-    p_uint32_t := (Uint32.of_int 117);
-    p_uint64_t := (Uint64.of_int 118);
+    p_uint8_t := (UInt8.of_int 115);
+    p_uint16_t := (UInt16.of_int 116);
+    p_uint32_t := (UInt32.of_int 117);
+    p_uint64_t := (UInt64.of_int 118);
     p_size_t := (Size_t.of_int 119);
     p_ushort := (UShort.of_int 120);
     p_uint := (UInt.of_int 121);
@@ -198,7 +198,7 @@ let test_pointer_assignment_with_primitives () =
     p_ullong := (ULLong.of_int 123);
 
     assert_equal '2' (!p_char);
-    assert_equal (Uchar.of_int 102) (!p_uchar);
+    assert_equal (UChar.of_int 102) (!p_uchar);
     assert_equal 103 (!p_schar);
     assert_equal 104.0 (!p_float);
     assert_equal 105.0 (!p_double);
@@ -211,10 +211,10 @@ let test_pointer_assignment_with_primitives () =
     assert_equal 112 (!p_int16_t);
     assert_equal 113l (!p_int32_t);
     assert_equal 114L (!p_int64_t);
-    assert_equal (Uint8.of_int 115) (!p_uint8_t);
-    assert_equal (Uint16.of_int 116) (!p_uint16_t);
-    assert_equal (Uint32.of_int 117) (!p_uint32_t);
-    assert_equal (Uint64.of_int 118) (!p_uint64_t);
+    assert_equal (UInt8.of_int 115) (!p_uint8_t);
+    assert_equal (UInt16.of_int 116) (!p_uint16_t);
+    assert_equal (UInt32.of_int 117) (!p_uint32_t);
+    assert_equal (UInt64.of_int 118) (!p_uint64_t);
     assert_equal (Size_t.of_int 119) (!p_size_t);
     assert_equal (UShort.of_int 120) (!p_ushort);
     assert_equal (UInt.of_int 121) (!p_uint);

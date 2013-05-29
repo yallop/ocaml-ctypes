@@ -69,12 +69,12 @@ let test_endian_detection () =
 
     let () = assert_equal
       ~msg:"the byte that we expected to change was changed"
-      arr.(updated_char_index) Uchar.one
+      arr.(updated_char_index) UChar.one
 
     let () = for i = 1 to sizeof int64_t - 1 do
         if i <> updated_char_index then
           assert_equal ~msg:"only the top or the bottom byte was changed"
-            Uchar.zero arr.(i)
+            UChar.zero arr.(i)
       done
   end in ()
 

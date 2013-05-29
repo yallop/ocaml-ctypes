@@ -83,7 +83,7 @@ struct
 end
 
 
-module Uint8 : S = 
+module UInt8 : S = 
 struct
   module B =
   struct
@@ -111,7 +111,7 @@ struct
 end
 
 
-module Uint16 : S =
+module UInt16 : S =
 struct
   module B =
   struct
@@ -139,7 +139,7 @@ struct
 end
 
 
-module Uint32 : S = 
+module UInt32 : S = 
 struct
   module B =
   struct
@@ -167,7 +167,7 @@ struct
 end
 
 
-module Uint64 : S = 
+module UInt64 : S = 
 struct
   module B =
   struct
@@ -197,10 +197,10 @@ end
 
 let pick : size:int -> (module S) =
   fun ~size -> match size with
-    | 1 -> (module Uint8)
-    | 2 -> (module Uint16)
-    | 4 -> (module Uint32)
-    | 8 -> (module Uint64)
+    | 1 -> (module UInt8)
+    | 2 -> (module UInt16)
+    | 4 -> (module UInt32)
+    | 8 -> (module UInt64)
     | _ -> assert false
       
 external size_t_size : unit -> int = "ctypes_size_t_size"
@@ -210,17 +210,17 @@ external ulong_size : unit -> int = "ctypes_ulong_size"
 external ulonglong_size : unit -> int = "ctypes_ulonglong_size"
 
 module Size_t : S = (val pick ~size:(size_t_size ()))
-module Uchar : S = Uint8
+module UChar : S = UInt8
 module UShort : S = (val pick ~size:(ushort_size ()))
 module UInt : S = (val pick ~size:(uint_size ()))
 module ULong : S = (val pick ~size:(ulong_size ()))
 module ULLong : S = (val pick ~size:(ulonglong_size ()))
 
-type uchar = Uchar.t
-type uint8 = Uint8.t
-type uint16 = Uint16.t
-type uint32 = Uint32.t
-type uint64 = Uint64.t
+type uchar = UChar.t
+type uint8 = UInt8.t
+type uint16 = UInt16.t
+type uint32 = UInt32.t
+type uint64 = UInt64.t
 type size_t = Size_t.t
 type ushort = UShort.t
 type uint = UInt.t

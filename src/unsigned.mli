@@ -37,22 +37,22 @@ module type S = sig
   end
 end
 
-module Uchar : S
-module Uint8 : S
-module Uint16 : S
-module Uint32 : S
-module Uint64 : S
+module UChar : S
+module UInt8 : S
+module UInt16 : S
+module UInt32 : S
+module UInt64 : S
 module Size_t : S
 module UShort : S
 module UInt : S
 module ULong : S
 module ULLong : S
 
-type uchar = Uchar.t
-type uint8 = Uint8.t
-type uint16 = Uint16.t
-type uint32 = Uint32.t
-type uint64 = Uint64.t
+type uchar = UChar.t
+type uint8 = UInt8.t
+type uint16 = UInt16.t
+type uint32 = UInt32.t
+type uint64 = UInt64.t
 type size_t = Size_t.t
 type ushort = UShort.t
 type uint = UInt.t
