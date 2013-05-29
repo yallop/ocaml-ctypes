@@ -42,16 +42,11 @@
   }                                                                            \
 
 
-/* TODO: inline or factor out */
 static value allocate_custom(struct custom_operations *ops, size_t size, void *prototype)
 {
   /* http://caml.inria.fr/pub/docs/manual-ocaml-4.00/manual033.html#htoc286 */
   value block = caml_alloc_custom(ops, size, 0, 1);
-  void *data = Data_custom_val(block);
-  if (prototype != NULL)
-  {
-    memcpy(data, prototype, size);
-  }
+  memcpy(Data_custom_val(block), prototype, size);
   return block;
 }
 
@@ -251,9 +246,9 @@ static struct type_info _void_type_info = {
 
 value ctypes_void_type_info(value unit)
 {
-    return allocate_custom(&type_info_custom_ops,
-                           sizeof(struct type_info),
-                           &_void_type_info);
+  return allocate_custom(&type_info_custom_ops,
+                         sizeof(struct type_info),
+                         &_void_type_info);
 }
 
 

@@ -363,7 +363,7 @@ value ctypes_call(value function, value callspec_, value argwriter, value rvread
   char *return_slot = callbuffer + roffset;
 
   populate_arg_array(bufferspec, (struct callbuffer *)callbuffer,
-                     callbuffer + arg_array_offset);
+                     (void **)(callbuffer + arg_array_offset));
 
   caml_callback(argwriter, (value)callbuffer);
 
