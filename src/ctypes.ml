@@ -11,6 +11,8 @@ type 'a structspec =
     Incomplete of Raw.bufferspec
   | Complete of 'a Raw.structure RawTypes.ctype
 
+type box = Box : 'a -> box
+
 type 'a structure_type = {
   tag: string;
   (* Whether the struct can be passed or returned by value.  For the
@@ -20,8 +22,9 @@ type 'a structure_type = {
 
   mutable spec: 'a structspec;
 
-  (* TODO: we should be keeping references to fields around if the struct is
-     passable, since prep_cif might inspect them. *)
+  (* We keep the field type values around, since functions such as
+     complete_struct_type may need to access the underlying C values. *)
+  mutable fields : box list;
 }
 
 type 'a union_type = {
@@ -390,11 +393,17 @@ struct
                            foffset: int }
 
   let structure tag =
-    Struct {spec = Incomplete (Raw.allocate_bufferspec ()); tag; passable=true}
+    Struct {spec = Incomplete (Raw.allocate_bufferspec ()); tag;
+            passable=true; fields=[]}
 
   let bufferspec {tag; spec} = match spec with
     | Incomplete s -> s
     | Complete _   -> raise (ModifyingSealedType tag)
+
+  let add_field field s =
+    (* TODO: we only really need to save field references if the struct is
+       passable (and may therefore be inspected by prep_cif). *)
+    s.fields <- Box field :: s.fields
 
   let offsetof {foffset} = foffset
 
@@ -404,25 +413,27 @@ struct
 
   let ( *:* ) (type b) (Struct s) (ftype : b typ) =
       let bufspec = bufferspec s in
-      let add_argument t = Raw.add_argument bufspec t
-      and add_unpassable_argument t = Raw.add_unpassable_argument
+      let add_member t = 
+        add_field t s;
+        Raw.add_argument bufspec t
+      and add_unpassable_member t = Raw.add_unpassable_argument
         bufspec ~size:(sizeof t) ~alignment:(alignment t) in
       let rec offset : 'a. 'a typ -> int
         = fun (type a) (ty : a typ) -> match ty with
         | Void                       -> raise IncompleteType
         | Array _ as a               -> (s.passable <- false;
-                                         add_unpassable_argument a)
-        | Primitive p                -> add_argument p
-        | Pointer p                  -> add_argument RawTypes.pointer
+                                         add_unpassable_member a)
+        | Primitive p                -> add_member p
+        | Pointer p                  -> add_member RawTypes.pointer
         | Struct {spec=Incomplete _} -> raise IncompleteType
         | Struct {spec=Complete t;
                   passable}          -> (s.passable <- s.passable && passable;
-                                         add_argument t)
+                                         add_member t)
         | Union _  as u              -> (s.passable <- false;
-                                         add_unpassable_argument u)
+                                         add_unpassable_member u)
         | Abstract _  as a           -> (s.passable <- false;
-                                         add_unpassable_argument a)
-        | FunctionPointer _          -> add_argument RawTypes.pointer
+                                         add_unpassable_member a)
+        | FunctionPointer _          -> add_member RawTypes.pointer
         | View { ty }                -> offset ty
       in
       { ftype; foffset = offset ftype }
