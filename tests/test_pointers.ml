@@ -388,11 +388,46 @@ let test_passing_pointer_through () =
 
 
 (*
-  [TODO]
+  Tests for various aspects of pointer arithmetic.
 *)
 let test_pointer_arithmetic () =
-  (* TODO *)
-  ()
+  let open Ptr in
+  let arr = Array.of_list int [1;2;3;4;5;6;7;8] in
+
+  (* Traverse the array using an int pointer *)
+  let p = Array.start arr in
+  for i = 0 to 7 do
+    assert_equal !(p + i) (succ i)
+  done;
+
+  let open Struct in
+  let twoints = structure "s" in
+  let i1 = twoints *:* int in
+  let i2 = twoints *:* int in
+  let () = seals twoints in
+  
+  (* Traverse the array using a 'struct twoints' pointer *)
+  let ps = from_voidp twoints (to_voidp p) in
+
+  for i = 0 to 3 do
+    assert_equal !((ps + i) |-> i1) Pervasives.(2 * i + 1);
+    assert_equal !((ps + i) |-> i2) Pervasives.(2 * i + 2);
+  done;
+  
+  (* Traverse the array using a char pointer *)
+  let pc = from_voidp char (to_voidp p) in
+  
+  for i = 0 to 7 do
+    let p' = pc + i * sizeof int in
+    assert_equal !(from_voidp int (to_voidp p')) (succ i)
+  done;
+
+  (* Reverse traversal *)
+  let pend = p + 7 in
+  for i = 0 to 7 do
+    assert_equal !(pend - i) Pervasives.(8 - i)
+  done
+    
 
 
 let suite = "Pointer tests" >:::
