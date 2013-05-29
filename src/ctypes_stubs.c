@@ -171,29 +171,33 @@ static struct custom_operations bufferspec_custom_ops = {
  */
 typedef struct callbuffer callbuffer;
 
-/* [TODO]: document. */
+/* Compute the size of the buffer needed to hold the pointer array
+   used by ffi_call, the arguments and the return value */
 static size_t compute_arg_buffer_size(struct bufferspec *bufferspec, size_t *arg_array_offset)
 {
   assert(bufferspec->state == CALLSPEC);
 
   size_t bytes = bufferspec->bytes;
 
-  size_t callbuffer_size = bytes;
   *arg_array_offset = aligned_offset(bytes, ffi_type_pointer.alignment);
   bytes = *arg_array_offset + bufferspec->nelements * sizeof(void *);
 
   return bytes;
 }
 
-/* [TODO]: document. */
-static void populate_callbuffer(struct bufferspec *bufferspec, callbuffer *buf, size_t bytes, size_t arg_array_offset)
+/* Set the pointers in `arg_array' to the addresses of the argument
+   slots in `callbuffer' as indicated by the elements of the ffitype
+   array in the bufferspec.
+ */ 
+static void populate_arg_array(struct bufferspec *bufferspec,
+                               callbuffer *callbuffer,
+                               void **arg_array)
 {
-  void **arg_array = (void **)((char *)buf + arg_array_offset);
   size_t i = 0, offset = 0;
   for (; i < bufferspec->nelements; i++)
   {
     offset = aligned_offset(offset, bufferspec->args[i]->alignment);
-    arg_array[i] = (char *)buf + offset;
+    arg_array[i] = (char *)callbuffer + offset;
     offset += bufferspec->args[i]->size;
   }
 }
@@ -355,17 +359,18 @@ value ctypes_call(value function, value callspec_, value argwriter, value rvread
   size_t arg_array_offset;
   size_t bytes = compute_arg_buffer_size(bufferspec, &arg_array_offset);
 
-  char *buffer = alloca(bytes);
-  char *return_slot = buffer + roffset;
+  char *callbuffer = alloca(bytes);
+  char *return_slot = callbuffer + roffset;
 
-  populate_callbuffer(bufferspec, (struct callbuffer *)buffer, bytes, arg_array_offset);
+  populate_arg_array(bufferspec, (struct callbuffer *)callbuffer,
+                     callbuffer + arg_array_offset);
 
-  caml_callback(argwriter, (value)buffer);
+  caml_callback(argwriter, (value)callbuffer);
 
   ffi_call(&callspec->cif,
            cfunction,
            return_slot,
-           (void **)(buffer + aligned_offset(bufferspec->bytes, ffi_type_pointer.alignment)));
+           (void **)(callbuffer + arg_array_offset));
 
   CAMLreturn(caml_callback(rvreader, (value)return_slot));
 }
