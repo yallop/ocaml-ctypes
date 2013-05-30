@@ -59,7 +59,6 @@ let test_passing_chars_as_ints () =
     'X' (toupper 'X')
 
 
-
 (*
   Use views to create a nullable function pointer.
 *)
@@ -96,7 +95,29 @@ let test_nullable_function_pointer_view () =
 
     assert_equal ~msg:"passing non-null function pointer obtained from C"
       6 (accepting_possibly_null_funptr (returning_funptr 1) 2 3);
+  end
 
+
+(*
+  Use the nullable pointer view to view nulls as Nones.
+*)
+let test_nullable_pointer_view () =
+  let open Ptr in
+  let p = Ptr.make int 10 in
+  let pp = make (ptr int) p in
+  let npp = from_voidp (ptr_opt int) (to_voidp pp) in
+  begin
+    assert_equal 10 ! !pp;
+
+    begin match !npp with
+      | Some x -> assert_equal 10 !x
+      | None -> assert false
+    end;
+    
+    pp := from_voidp int null;
+
+    assert_equal null (to_voidp !pp);
+    assert_equal None !npp;
   end
 
 
@@ -104,6 +125,7 @@ let suite = "View tests" >:::
   ["passing array of strings" >:: test_passing_string_array;
    "custom views" >:: test_passing_chars_as_ints;
    "nullable function pointers" >:: test_nullable_function_pointer_view;
+   "nullable pointers" >:: test_nullable_pointer_view;
   ]
 
 
