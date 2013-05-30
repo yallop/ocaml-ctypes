@@ -188,7 +188,7 @@ external add_unpassable_argument : bufferspec -> size:int -> alignment:int -> in
 
 (* nary callbacks *)
 type boxedfn =
-  | Done of (immediate_pointer -> unit)
+  | Done of (immediate_pointer -> unit) * bufferspec
   | Fn of (immediate_pointer -> boxedfn)
 
 (* Construct a pointer to a boxed n-ary function *)
