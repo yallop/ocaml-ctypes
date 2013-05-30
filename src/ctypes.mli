@@ -121,6 +121,7 @@ val view : read:('a -> 'b) -> write:('b -> 'a) -> 'a typ -> 'b typ
 val abstract : size:int -> alignment:int -> 'a abstract typ
 val array : int -> 'a typ -> 'a array typ
 val ptr : 'a typ -> 'a ptr typ
+val ptr_opt : 'a typ -> 'a ptr option typ
 val ( @-> ) : 'a typ -> 'b fn -> ('a -> 'b) fn
 
 val returning : 'a typ -> 'a fn

@@ -578,18 +578,21 @@ let char_ptr_of_string s =
 let string = view ~read:string_of_char_ptr ~write:char_ptr_of_string
   (ptr char)
 
-let funptr_opt =
-  let open Ptr in
-  let castp typ p = Ptr.(from_voidp typ (to_voidp p)) in
-  let read_nullable fn p =
-    if p = null then None
-    else Some !(castp (funptr fn) (Ptr.make (ptr void) p))
-  and write_nullable fn = function
-    | None -> null
-    | Some f -> !(castp (ptr void) (Ptr.make (funptr fn) f))
-  in
-  fun fn ->
-    view
-      ~read:(read_nullable fn)
-      ~write:(write_nullable fn)
-      (ptr void)
+let castp typ p = Ptr.(from_voidp typ (to_voidp p))
+
+let read_nullable t p = Ptr.(
+  if p = null then None
+  else Some !(castp t (Ptr.make (ptr void) p)))
+
+let write_nullable t = Ptr.(function
+  | None -> null
+  | Some f -> !(castp (ptr void) (Ptr.make t f)))
+
+let nullable_view t =
+  let read = read_nullable t
+  and write = write_nullable t in
+  view ~read ~write (ptr void)
+
+let funptr_opt fn = nullable_view (funptr fn)
+
+let ptr_opt t = nullable_view (ptr t)
