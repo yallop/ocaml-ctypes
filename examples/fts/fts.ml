@@ -71,18 +71,6 @@ let fts_set_option_value = function
 
 let castp typ p = Ptr.(from_voidp typ (to_voidp p))
 
-(* TODO: this doesn't belong here. *)
-let nullable_funptr t =
-  let open Ptr in
-  let read_nullable p =
-    if p = null then None
-    else Some !(castp (funptr t) (Ptr.make (ptr void) p))
-  and write_nullable  = function
-    | None -> null
-    | Some f -> !(castp (ptr void) (Ptr.make (funptr t) f))
-  in
-  view ~read:read_nullable ~write:write_nullable (ptr void)
-
 module FTSENT =
 struct
   open PosixTypes
@@ -213,7 +201,7 @@ open FTS
 *)
 let compar_type = ptr FTSENT.t @-> ptr FTSENT.t @-> returning int
 let _fts_open = foreign "fts_open"
-  (ptr string @-> int @-> nullable_funptr compar_type @-> returning (ptr fts))
+  (ptr string @-> int @-> funptr_opt compar_type @-> returning (ptr fts))
 
 (* FTSENT *fts_read(FTS *ftsp); *)
 let _fts_read = foreign "fts_read" (ptr fts @-> syscall (ptr ftsent))

@@ -65,18 +65,7 @@ let test_passing_chars_as_ints () =
 *)
 let test_nullable_function_pointer_view () =
   let open Ptr in
-  let funptype = funptr (int @-> int @-> returning int) in
-  let castp typ p = from_voidp typ (to_voidp p) in
-  let read_nullable : unit ptr -> (int -> int -> int) option =
-    fun p ->
-    if p = null then None
-    else (* rather circuitous *)
-      Some !(castp funptype (Ptr.make (ptr void) p))
-  and write_nullable  : (int -> int -> int) option -> unit ptr = function
-    | None -> null
-    | Some f -> !(castp (ptr void) (Ptr.make funptype f))
-  in
-  let nullable_intptr = view ~read:read_nullable ~write:write_nullable (ptr void) in
+  let nullable_intptr = funptr_opt (int @-> int @-> returning int) in
   let returning_funptr =
     foreign "returning_funptr" ~from:testlib
       (int @-> returning nullable_intptr)

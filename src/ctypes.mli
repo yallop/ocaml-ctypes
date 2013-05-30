@@ -126,6 +126,7 @@ val ( @-> ) : 'a typ -> 'b fn -> ('a -> 'b) fn
 val returning : 'a typ -> 'a fn
 val syscall : 'a typ -> 'a fn
 val funptr : ('a -> 'b) fn -> ('a -> 'b) typ
+val funptr_opt : ('a -> 'b) fn -> ('a -> 'b) option typ
 
 val foreign : ?from:Dl.library -> string -> ('a -> 'b) fn -> ('a -> 'b)
 val foreign_value : ?from:Dl.library -> string -> 'a typ -> 'a ptr
