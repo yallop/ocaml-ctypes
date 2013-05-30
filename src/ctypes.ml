@@ -166,7 +166,7 @@ and build_callspec : 'a. 'a fn -> Raw.bufferspec -> 'a -> Raw.boxedfn =
     | Returns (_, ty) ->
       let _ = prep_callspec callspec ty in
       let write_rv = write ty in
-      fun f -> Raw.Done (write_rv ~offset:0 f)
+      fun f -> Raw.Done (write_rv ~offset:0 f, callspec)
     | Function (p, f) ->
       let _ = add_argument callspec p in
       let box = build_callspec f callspec in

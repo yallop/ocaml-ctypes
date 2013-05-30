@@ -114,10 +114,15 @@ static struct callspec {
   /* return value offset */
   size_t roffset;
 
-  /* The libffi call interface structure. */
-  ffi_cif cif;
+  /* The libffi call interface structure.  It would be nice if this member
+     could be a value rather than a pointer (to save a layer of indirection)
+     but the ffi_closure structure keeps the address of the structure, and the
+     GC can move callspec values around.
+  */
+  ffi_cif *cif;
+
 } callspec_prototype = {
-  { 0, 0, 0, 0, BUILDING, NULL }, -1,
+  { 0, 0, 0, 0, BUILDING, NULL }, -1, NULL
 };
 
 
@@ -125,6 +130,10 @@ static void finalize_bufferspec(value v)
 {
   struct bufferspec *bufferspec = Data_custom_val(v);
   free(bufferspec->args);
+  if (bufferspec->state == CALLSPEC) {
+    struct callspec *callspec = (struct callspec *)bufferspec;
+    free(callspec->cif);
+  }
 }
 
 
@@ -218,7 +227,7 @@ value ctypes_allocate_callspec(value unit)
 {
   return allocate_custom(&bufferspec_custom_ops,
                          sizeof(struct callspec),
-                         &bufferspec_prototype);
+                         &callspec_prototype);
 }
 
 
@@ -317,6 +326,12 @@ value ctypes_prep_callspec(value callspec_, value rtype)
   struct callspec *callspec = Data_custom_val(callspec_);
   ffi_type *rffitype = (((struct type_info *)Data_custom_val(rtype)))->ffitype;
 
+  /* Allocate the cif structure */
+  callspec->cif = malloc(sizeof *callspec->cif);
+  if (callspec->cif == NULL) {
+    caml_raise_out_of_memory();
+  }
+
   /* Add the (aligned) space needed for the return value */
   callspec->roffset = aligned_offset(callspec->bufferspec.bytes, rffitype->alignment);
   callspec->bufferspec.bytes = callspec->roffset + rffitype->size;
@@ -330,7 +345,7 @@ value ctypes_prep_callspec(value callspec_, value rtype)
   callspec->bufferspec.bytes = aligned_offset(callspec->bufferspec.bytes, ffi_type_pointer.alignment);
   callspec->bufferspec.bytes += ffi_type_pointer.size;
 
-  ffi_status status = ffi_prep_cif(&callspec->cif,
+  ffi_status status = ffi_prep_cif(callspec->cif,
                                    FFI_DEFAULT_ABI,
                                    callspec->bufferspec.nelements,
                                    rffitype,
@@ -367,7 +382,7 @@ value ctypes_call(value function, value callspec_, value argwriter, value rvread
 
   caml_callback(argwriter, (value)callbuffer);
 
-  ffi_call(&callspec->cif,
+  ffi_call(callspec->cif,
            cfunction,
            return_slot,
            (void **)(callbuffer + arg_array_offset));
@@ -406,6 +421,8 @@ static void callback_handler(ffi_cif *cif,
                              void **args,
                              void *user_data_)
 {
+  CAMLparam0 ();
+
   int arity = cif->nargs;
 
   value *user_data = user_data_;
@@ -425,6 +442,8 @@ static void callback_handler(ffi_cif *cif,
   /* now store the return value */
   assert (Tag_val(boxedfn) == Done);
   caml_callback(Field(boxedfn, 0), (value)ret);
+
+  CAMLreturn0;
 }
 
 
@@ -454,7 +473,7 @@ value ctypes_make_function_pointer(value callspec_, value boxedfn)
 
     ffi_status status =  ffi_prep_closure_loc
       ((ffi_closure *)closure,
-       &callspec->cif,
+       callspec->cif,
        callback_handler,
        &closure->fn,
        (void *)code_address);
