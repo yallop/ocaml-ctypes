@@ -213,8 +213,6 @@ exception Ffi_internal_error of string
 let () = Callback.register_exception "FFI_internal_error"
   (Ffi_internal_error "")
 
-let () = at_exit Gc.major (* TODO: remove this after testing *)
-
 external memcpy :
   dst:immediate_pointer -> dst_offset:int ->
   src:immediate_pointer -> src_offset:int ->
