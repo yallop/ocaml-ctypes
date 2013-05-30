@@ -532,8 +532,9 @@ value ctypes_complete_structspec(value bufferspec_)
 /* pointer_plus : char* -> int -> char* */
 value ctypes_pointer_plus(value ptr, value i)
 {
-  /* TODO: we should perhaps check that the result is word-aligned */
-  return (value)(((char*)ptr) + Int_val(i));
+  char *p = (((char*)ptr) + Int_val(i));
+  assert(((intptr_t)p & 0x1) == 0); /* check alignment */
+  return (value)p;
 }
 
 
