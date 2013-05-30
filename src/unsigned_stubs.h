@@ -6,7 +6,7 @@
 #include <stdint.h>
 
 #define UINT_DECLS(BITS)                                                  \
-  extern value caml_copy_uint ## BITS(uint ## BITS ## _t u);             \
+  extern value ctypes_copy_uint ## BITS(uint ## BITS ## _t u);            \
   /* uintX_add : t -> t -> t */                                           \
   extern value ctypes_uint ## BITS ## _ ## add(value a, value b);         \
   /* uintX_sub : t -> t -> t */                                           \

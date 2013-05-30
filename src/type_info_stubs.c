@@ -176,30 +176,30 @@ make_primitive_interface(caml_copy_double, Double_val, double, double, ffi_type_
 make_primitive_interface(caml_copy_double, Double_val, float, float, ffi_type_float)
 make_primitive_interface(Cast_from_voidp, Cast_to_voidp, void *, voidp, ffi_type_pointer)
 make_primitive_interface(caml_copy_nativeint, Nativeint_val, int, nativeint, ffi_type_sint)
-make_primitive_interface(caml_copy_uint8, Uint8_val, uint8_t, uint8_t, ffi_type_uint8)
-make_primitive_interface(caml_copy_uint16, Uint16_val, uint16_t, uint16_t, ffi_type_uint16)
-make_primitive_interface(caml_copy_uint32, Uint32_val, uint32_t, uint32_t, ffi_type_uint32)
-make_primitive_interface(caml_copy_uint64, Uint64_val, uint64_t, uint64_t, ffi_type_uint64)
-make_primitive_interface(caml_copy_uint8, Uint8_val, unsigned char, uchar, ffi_type_uchar)
+make_primitive_interface(ctypes_copy_uint8, Uint8_val, uint8_t, uint8_t, ffi_type_uint8)
+make_primitive_interface(ctypes_copy_uint16, Uint16_val, uint16_t, uint16_t, ffi_type_uint16)
+make_primitive_interface(ctypes_copy_uint32, Uint32_val, uint32_t, uint32_t, ffi_type_uint32)
+make_primitive_interface(ctypes_copy_uint64, Uint64_val, uint64_t, uint64_t, ffi_type_uint64)
+make_primitive_interface(ctypes_copy_uint8, Uint8_val, unsigned char, uchar, ffi_type_uchar)
 
 /* short is at least 16 bits. */
 #if USHRT_MAX == 65535U
-  make_primitive_interface(caml_copy_uint16, Uint16_val, unsigned short, ushort, ffi_type_uint16)
+  make_primitive_interface(ctypes_copy_uint16, Uint16_val, unsigned short, ushort, ffi_type_uint16)
 #elif USHRT_MAX == 4294967295UL
-  make_primitive_interface(caml_copy_uint32, Uint32_val, unsigned short, ushort, ffi_type_uint32)
+  make_primitive_interface(ctypes_copy_uint32, Uint32_val, unsigned short, ushort, ffi_type_uint32)
 #elif USHRT_MAX == 18446744073709551615ULL
-  make_primitive_interface(caml_copy_uint64, Uint64_val, unsigned short, ushort, ffi_type_uint64)
+  make_primitive_interface(ctypes_copy_uint64, Uint64_val, unsigned short, ushort, ffi_type_uint64)
 #else
 # error "No suitable OCaml type available for representing unsigned short values"
 #endif
 
 /* int is at least 16 bits. */
 #if UINT_MAX == 65535U
-  make_primitive_interface(caml_copy_uint16, Uint16_val, unsigned int, uint, ffi_type_uint16)
+  make_primitive_interface(ctypes_copy_uint16, Uint16_val, unsigned int, uint, ffi_type_uint16)
 #elif UINT_MAX == 4294967295UL
-  make_primitive_interface(caml_copy_uint32, Uint32_val, unsigned int, uint, ffi_type_uint32)
+  make_primitive_interface(ctypes_copy_uint32, Uint32_val, unsigned int, uint, ffi_type_uint32)
 #elif UINT_MAX == 18446744073709551615ULL
-  make_primitive_interface(caml_copy_uint64, Uint64_val, unsigned int, uint, ffi_type_uint64)
+  make_primitive_interface(ctypes_copy_uint64, Uint64_val, unsigned int, uint, ffi_type_uint64)
 #else
 # error "No suitable OCaml type available for representing unsigned int values"
 #endif
@@ -207,10 +207,10 @@ make_primitive_interface(caml_copy_uint8, Uint8_val, unsigned char, uchar, ffi_t
 /* long is at least 32 bits. */
 #if LONG_MAX == 2147483647L
   make_primitive_interface(caml_copy_int32, Int32_val, long, long, ffi_type_sint32)
-  make_primitive_interface(caml_copy_uint32, Uint32_val, unsigned long, ulong, ffi_type_uint32)
+  make_primitive_interface(ctypes_copy_uint32, Uint32_val, unsigned long, ulong, ffi_type_uint32)
 #elif LONG_MAX == 9223372036854775807LL
   make_primitive_interface(caml_copy_int64, Int64_val, long, long, ffi_type_sint64)
-  make_primitive_interface(caml_copy_uint64, Uint64_val, unsigned long, ulong, ffi_type_uint64)
+  make_primitive_interface(ctypes_copy_uint64, Uint64_val, unsigned long, ulong, ffi_type_uint64)
 #else
 # error "No suitable OCaml type available for representing longs"
 #endif
@@ -218,17 +218,17 @@ make_primitive_interface(caml_copy_uint8, Uint8_val, unsigned char, uchar, ffi_t
 /* long long is at least 64 bits. */
 #if LLONG_MAX == 9223372036854775807LL
   make_primitive_interface(caml_copy_int64, Int64_val, long long, llong, ffi_type_sint64)
-  make_primitive_interface(caml_copy_uint64, Uint64_val, unsigned long long, ullong, ffi_type_uint64)
+  make_primitive_interface(ctypes_copy_uint64, Uint64_val, unsigned long long, ullong, ffi_type_uint64)
 #else
 # error "No suitable OCaml type available for representing longs"
 #endif
 
 #if SIZE_MAX == 65535U
-  make_primitive_interface(caml_copy_uint16, Uint16_val, size_t, size_t, ffi_type_uint16)
+  make_primitive_interface(ctypes_copy_uint16, Uint16_val, size_t, size_t, ffi_type_uint16)
 #elif SIZE_MAX == 4294967295UL
-  make_primitive_interface(caml_copy_uint32, Uint32_val, size_t, size_t, ffi_type_uint32)
+  make_primitive_interface(ctypes_copy_uint32, Uint32_val, size_t, size_t, ffi_type_uint32)
 #elif SIZE_MAX == 18446744073709551615ULL
-  make_primitive_interface(caml_copy_uint64, Uint64_val, size_t, size_t, ffi_type_uint64)
+  make_primitive_interface(ctypes_copy_uint64, Uint64_val, size_t, size_t, ffi_type_uint64)
 #else
 # error "No suitable OCaml type available for representing size_t values"
 #endif
