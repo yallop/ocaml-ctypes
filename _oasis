@@ -44,6 +44,14 @@ Executable ncurses_cmd
    BuildDepends:    unix,ncurses
    Custom:          true
 
+Executable fts_cmd
+   Path:            examples/fts
+   MainIs:          fts_cmd.ml
+   CompiledObject:  best
+   Install:         false
+   BuildDepends:    unix,fts
+   Custom:          true
+
 Executable test_ctypes_raw
   Path:             tests
   MainIs:           test_raw.ml

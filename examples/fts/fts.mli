@@ -62,11 +62,6 @@ type fts_info =
      symbolic link itself. *)
   | FTS_SLNONE
 
-module FTS :
-sig
-  type t
-end
-
 module FTSENT :
 sig
   type t
@@ -129,6 +124,23 @@ sig
 
   (* A pointer to stat(2) information for the file. *)
   (* val statp : t -> stat *)
+end
+
+module FTS :
+sig
+  type t
+
+  val cur : t -> FTSENT.t
+
+  val child : t -> FTSENT.t
+
+  val array : t -> FTSENT.t list
+
+  val dev : t -> PosixTypes.dev_t
+
+  val path : t -> string
+
+  val rfd : t -> int
 end
 
 type fts_open_option =
@@ -199,8 +211,8 @@ type fts_open_option =
    else.  *)
 val fts_open :
   path_argv:string list ->
-  options:fts_open_option list ->
   ?compar:(FTSENT.t ptr -> FTSENT.t ptr -> int) ->
+  options:fts_open_option list ->
   FTS.t
 
 (* The fts_children() function returns a pointer to an FTSENT structure
@@ -241,20 +253,13 @@ val fts_children :
    directories that do not cause cycles or symbolic links to symbolic links may
    cause files to be visited more than once, or directories more than twice.)
 
-   If all the members of the hierarchy have been returned, fts_read() returns
-   NULL and sets the external variable errno to 0.  If an error unrelated to a
-   file in the hierarchy occurs, fts_read() returns NULL and sets errno
-   appropriately.  If an error related to a returned file occurs, a pointer to
-   an FTSENT structure is returned, and errno may or may not have been set (see
-   fts_info).
-
    The FTSENT structures returned by fts_read() may be overwritten after a
    call to fts_close() on the same file hierarchy stream, or, after a call to
    fts_read() on the same file hierarchy stream unless they represent a file of
    type directory, in which case they will not be overwritten until after a
    call to fts_read() after the FTSENT structure has been returned by the
    function fts_read() in postorder.  *)
-val fts_read : FTS.t -> FTSENT.t
+val fts_read : FTS.t -> FTSENT.t option
 
 type fts_set_option = 
   (* Re-visit the file; any file type may be revisited.  The next call to

@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 43ec813d012f84f96542bbc7201cab1e)
+# DO NOT EDIT (digest: ca984b4203b0f38bd0ab0b0b200df5ff)
 # Ignore VCS directories, you can use the same kind of rule outside 
 # OASIS_START/STOP if you want to exclude directories that contains 
 # useless stuff for the build process
@@ -25,7 +25,6 @@
 <src/ctypes.{cma,cmxa}>: use_libctypes_stubs
 # Library fts
 "examples/fts/fts.cmxs": use_fts
-<examples/fts/*.ml{,i}>: use_ctypes
 # Library sigset
 "examples/sigset/sigset.cmxs": use_sigset
 <examples/sigset/*.ml{,i}>: use_ctypes
@@ -40,6 +39,14 @@
 <examples/ncurses/*.ml{,i}>: use_ctypes
 <examples/ncurses/*.ml{,i}>: pkg_unix
 <examples/ncurses/ncurses_cmd.{native,byte}>: custom
+# Executable fts_cmd
+<examples/fts/fts_cmd.{native,byte}>: use_fts
+<examples/fts/fts_cmd.{native,byte}>: use_ctypes
+<examples/fts/fts_cmd.{native,byte}>: pkg_unix
+<examples/fts/*.ml{,i}>: use_fts
+<examples/fts/*.ml{,i}>: use_ctypes
+<examples/fts/*.ml{,i}>: pkg_unix
+<examples/fts/fts_cmd.{native,byte}>: custom
 # Executable test_ctypes_raw
 <tests/test_raw.{native,byte}>: use_ctypes
 <tests/test_raw.{native,byte}>: pkg_unix

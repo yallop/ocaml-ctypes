@@ -62,16 +62,25 @@ let fts_set_option_value = function
   | FTS_FOLLOW -> 2
   | FTS_SKIP   -> 4
 
+let castp typ p = Ptr.(from_voidp typ (to_voidp p))
+
+(* TODO: this doesn't belong here. *)
+let nullable_funptr t =
+  let open Ptr in
+  let read_nullable p =
+    if p = null then None
+    else Some !(castp (funptr t) (Ptr.make (ptr void) p))
+  and write_nullable  = function
+    | None -> null
+    | Some f -> !(castp (ptr void) (Ptr.make (funptr t) f))
+  in
+  view ~read:read_nullable ~write:write_nullable (ptr void)
+
 module FTSENT =
 struct
+  open PosixTypes
+  open Unsigned
   open Struct
-
-  (* typedef unsigned long int __ino_t; *)
-  let ino_t = int (* :-( *)
-  (* typedef unsigned long int __dev_t; *)
-  let dev_t = int (* :-( *)
-  (* typedef unsigned long int __nlink_t; *)
-  let nlink_t = int (* :-( *)
 
   type ftsent
   let ftsent : ftsent structure typ = structure "ftsent"
@@ -84,25 +93,26 @@ struct
   let fts_path    = ftsent *:* string
   let fts_errno   = ftsent *:* int
   let fts_symfd   = ftsent *:* int
-  let fts_pathlen = ftsent *:* short (* ushort *)
-  let fts_namelen = ftsent *:* short (* ushort *)
+  let fts_pathlen = ftsent *:* ushort
+  let fts_namelen = ftsent *:* ushort
   let fts_ino     = ftsent *:* ino_t
   let fts_dev     = ftsent *:* dev_t
   let fts_nlink   = ftsent *:* nlink_t
   let fts_level   = ftsent *:* short
-  let fts_info    = ftsent *:* short (* ushort *)
-  let fts_flags   = ftsent *:* short (* ushort *)
-  let fts_instr   = ftsent *:* short (* ushort *)
+  let fts_info    = ftsent *:* ushort
+  let fts_flags   = ftsent *:* ushort
+  let fts_instr   = ftsent *:* ushort
   let fts_statp   = ftsent *:* ptr void (* really a struct stat * *)
-  let fts_name    = ftsent *:* string
+  let fts_name    = ftsent *:* char
   let () = seals ftsent
 
   open Ptr
 
   type t = ftsent structure ptr
+  let t = ptr ftsent
 
   let info : t -> fts_info
-    = fun t -> fts_info_of_int (!(t |-> fts_info))
+    = fun t -> fts_info_of_int (UShort.to_int (!(t |-> fts_info)))
 
   let accpath : t -> string
     = fun t -> !(t |-> fts_accpath)
@@ -111,7 +121,8 @@ struct
     = fun t -> !(t |-> fts_path)
 
   let name : t -> string
-    = fun t -> !(t |-> fts_name)
+    = fun t -> 
+      !(from_voidp string (to_voidp (Ptr.make (ptr char) (t |-> fts_name))))
 
   let level : t -> int
     = fun t -> !(t |-> fts_level)
@@ -143,22 +154,62 @@ end
 
 module FTS =
 struct
-  type t = unit ptr
+  open Struct
+  open PosixTypes
+  open FTSENT
+
+  type fts
+  let fts : fts structure typ = structure "fts"
+  let fts_cur     = fts *:* ptr ftsent
+  let fts_child   = fts *:* ptr ftsent
+  let fts_array   = fts *:* ptr (ptr ftsent)
+  let fts_dev     = fts *:* dev_t
+  let fts_path    = fts *:* string
+  let fts_rfd     = fts *:* int
+  let fts_pathlen = fts *:* int
+  let fts_nitems  = fts *:* int
+  let fts_compar  = fts *:* funptr
+    (ptr FTSENT.t @-> ptr FTSENT.t @-> returning int)
+  (* fts_options would work well as a view *)
+  let fts_options = fts *:* int
+  let () = seals fts
+
+  open Ptr
+
+  type t = fts structure ptr
+
+  let cur : t -> FTSENT.t
+    = fun t -> !(t |-> fts_cur)
+
+  let child : t -> FTSENT.t
+    = fun t -> !(t |-> fts_child)
+
+  let array : t -> FTSENT.t list
+    = fun t ->
+      Array.(to_list (from_ptr !(t |-> fts_array) !(t |-> fts_nitems)))
+
+  let dev : t -> dev_t
+    = fun t -> !(t |-> fts_dev)
+
+  let path : t -> string
+    = fun t -> !(t |-> fts_path)
+
+  let rfd : t -> int
+    = fun t -> !(t |-> fts_rfd)
 end
 
 open FTSENT
-let fts = void
+open FTS
 
-(*
-  FTS *fts_open(char * const *path_argv, int options,
-                int (*compar)(const FTSENT **, const FTSENT **));
+(* FTS *fts_open(char * const *path_argv, int options,
+                 int ( *compar)(const FTSENT **, const FTSENT ** ));
 *)
-let compar_type = ptr (ptr ftsent) @-> ptr (ptr ftsent) @-> returning int
-let _fts_open = foreign "fts_open" (ptr (ptr char) @-> int @-> funptr compar_type
-                                    @-> returning (ptr fts))
+let compar_type = ptr FTSENT.t @-> ptr FTSENT.t @-> returning int
+let _fts_open = foreign "fts_open"
+  (ptr string @-> int @-> nullable_funptr compar_type @-> returning (ptr fts))
 
 (* FTSENT *fts_read(FTS *ftsp); *)
-let fts_read = foreign "fts_read" (ptr fts @-> returning (ptr ftsent))
+let _fts_read = foreign "fts_read" (ptr fts @-> syscall (ptr ftsent))
 
 (* FTSENT *fts_children(FTS *ftsp, int options); *)
 let _fts_children = foreign "fts_children" (ptr fts @-> int @-> returning (ptr ftsent))
@@ -170,6 +221,11 @@ let _fts_set = foreign "fts_set" (ptr fts @-> ptr (ftsent) @-> int @-> returning
 let _fts_close = foreign "fts_close" (ptr fts @-> returning int) 
 
 let crush_options f : 'a list -> int = List.fold_left (fun i o -> i lor (f o)) 0
+
+let fts_read fts =
+  let p = _fts_read fts in
+  if Ptr.(to_voidp p = null) then None
+  else Some p
 
 let fts_close ftsp =
   match _fts_close ftsp with 
@@ -184,4 +240,14 @@ let fts_set ~ftsp ~f ~options =
 let fts_children ~ftsp ~name_only =
   _fts_children ftsp (fts_children_option_of_bool name_only)
 
-let fts_open ~path_argv ~options ?compar = assert false (* TODO *)
+let null_terminated_array_of_ptr_list typ list =
+  let nitems = List.length list in
+  let arr = Array.make typ (1 + nitems) in
+  List.iteri (Array.set arr) list;
+  Ptr.((castp (ptr void) (Array.start arr + nitems)) := null);
+  arr
+
+let fts_open ~path_argv ?compar ~options = 
+  let paths = null_terminated_array_of_ptr_list string path_argv in
+  let options = crush_options fts_open_option_value options in
+  _fts_open (Array.start paths) options compar
