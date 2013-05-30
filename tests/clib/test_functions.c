@@ -182,8 +182,12 @@ double accepts_pointer_to_array_of_structs(struct tagged(*arr)[5])
   return sum;
 }
 
-const char *global_string = "global string";
+#define GLOBAL_STRING "global string"
 
+struct global_struct {
+  size_t len;
+  const char str[sizeof GLOBAL_STRING];
+} global_struct = { sizeof GLOBAL_STRING - 1, GLOBAL_STRING };
 
 /* OO-style example */
 struct animal_methods;

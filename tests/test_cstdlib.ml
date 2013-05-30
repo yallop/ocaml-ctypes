@@ -90,7 +90,7 @@ let test_string_functions () =
   let memset = foreign "memset"
     (ptr void @-> int @-> size_t @-> returning (ptr void)) in
 
-  assert_equal "defg" (strchr "abcdefg" (Char.code 'd'))
+  assert_equal "efg" (strchr "abcdefg" (Char.code 'e'))
     ~printer:(fun x -> x);
 
   assert_bool "strcmp('abc', 'def') < 0"
