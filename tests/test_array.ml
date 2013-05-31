@@ -117,14 +117,14 @@ let test_pointer_to_array_arithmetic () =
 
   (* int ( * )[3] *)
   let p = allocate (array 3 int) ~count:4 in
-  p := Array.of_list int [1; 2; 3];
-  (p + 1) := Array.of_list int [4; 5; 6];
-  (p + 2) := Array.of_list int [7; 8; 9];
-  (p + 3) := Array.of_list int [10; 11; 12];
+  p <-@ Array.of_list int [1; 2; 3];
+  (p +@ 1) <-@ Array.of_list int [4; 5; 6];
+  (p +@ 2) <-@ Array.of_list int [7; 8; 9];
+  (p +@ 3) <-@ Array.of_list int [10; 11; 12];
   let q = p in
-  assert_equal 8 (!(q + 2)).(1);
-  assert_equal 12 (!(q + 3)).(2);
-  assert_equal 1 (!(q + 0)).(0);
+  assert_equal 8 (!@(q +@ 2)).(1);
+  assert_equal 12 (!@(q +@ 3)).(2);
+  assert_equal 1 (!@(q +@ 0)).(0);
   let a = Array.from_ptr p 4 in
   assert_equal 8 a.(2).(1);
   assert_equal 12 a.(3).(2);
@@ -163,7 +163,7 @@ let test_passing_pointer_to_array_of_structs () =
     let v = make s in
     setf v tag 'i';
     let pd = v @. data in
-    Union.(pd |-> i) := x;
+    Union.(pd |-> i) <-@ x;
     v
   in
 
@@ -171,7 +171,7 @@ let test_passing_pointer_to_array_of_structs () =
     let v = make s in
     setf v tag 'd';
     let pd = v @. data in
-    Union.(pd |-> d) := x;
+    Union.(pd |-> d) <-@ x;
     v
   in
 

@@ -12,7 +12,7 @@ let usage = "fts_cmd path [ path .. ]"
 let sort_by_name lp rp =
   let open Ctypes.Ptr in
   let open FTSENT in
-  compare (name !lp) (name !rp)
+  compare (name !@lp) (name !@rp)
 
 let ents ?compar path_argv =
   let fts : FTS.t = fts_open ~path_argv ?compar ~options:[] in

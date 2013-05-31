@@ -22,10 +22,10 @@ sig
   type 'a t = 'a ptr
 
   val null : unit ptr
-  val (!) : 'a t -> 'a
-  val (:=) : 'a t -> 'a -> unit
-  val (+) : 'a t -> int -> 'a t
-  val (-) : 'a t -> int -> 'a t
+  val (!@) : 'a t -> 'a
+  val (<-@) : 'a t -> 'a -> unit
+  val (+@) : 'a t -> int -> 'a t
+  val (-@) : 'a t -> int -> 'a t
   val diff : 'a t -> 'a t -> int
   val from_voidp : 'a typ -> unit ptr -> 'a ptr
   val to_voidp : _ ptr -> unit ptr

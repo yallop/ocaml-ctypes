@@ -31,7 +31,7 @@ let localtime = foreign "localtime" (ptr time_t @-> returning (ptr tm))
 let () = begin
   let timep = Ptr.allocate ~count:1 time_t in
   let time = time timep in
-  assert (time = Ptr.(!timep));
+  assert (time = Ptr.(!@timep));
   let tm = localtime timep in
   print_endline (asctime tm)
 end

@@ -35,7 +35,7 @@ let test_passing_string_array () =
   let s = Ptr.from_voidp string (Ptr.to_voidp buf_addr) in
 
   assert_equal ~msg:"Check output"
-    "the quick brown fox etc. etc. " Ptr.(!s)
+    "the quick brown fox etc. etc. " Ptr.(!@s)
 
 
 (*
@@ -107,17 +107,17 @@ let test_nullable_pointer_view () =
   let pp = make (ptr int) p in
   let npp = from_voidp (ptr_opt int) (to_voidp pp) in
   begin
-    assert_equal 10 ! !pp;
+    assert_equal 10 !@ !@pp;
 
-    begin match !npp with
-      | Some x -> assert_equal 10 !x
+    begin match !@npp with
+      | Some x -> assert_equal 10 !@x
       | None -> assert false
     end;
     
-    pp := from_voidp int null;
+    pp <-@ from_voidp int null;
 
-    assert_equal null (to_voidp !pp);
-    assert_equal None !npp;
+    assert_equal null (to_voidp !@pp);
+    assert_equal None !@npp;
   end
 
 

@@ -296,13 +296,13 @@ struct
                           pbyte_offset = 0;
                           pmanaged = None }
 
-  let rec (!) : 'a. 'a t -> 'a
+  let rec (!@) : 'a. 'a t -> 'a
     = fun (type a) ({ raw_ptr; reftype; pbyte_offset = offset } as ptr : a t) ->
       match reftype with
         | Void -> raise IncompleteType
         | Union { ucomplete = false } -> raise IncompleteType
         | Struct { spec = Incomplete _ } -> raise IncompleteType
-        | View { read; ty = reftype } -> read (! { ptr with reftype })
+        | View { read; ty = reftype } -> read (!@ { ptr with reftype })
         (* If it's a reference type then we take a reference *)
         | Union _ -> ({ union = ptr } : a)
         | Struct _ -> { structure = ptr }
@@ -318,14 +318,14 @@ struct
          the difference is a multiple of sizeof reftype. *)
       (o2 - o1) / sizeof reftype
 
-  let (+) : 'a. 'a t -> int -> 'a t
+  let (+@) : 'a. 'a t -> int -> 'a t
     = fun ({ pbyte_offset; reftype } as p) x ->
       { p with pbyte_offset = pbyte_offset + (x * sizeof reftype) }
 
-  let (-) : 'a. 'a t -> int -> 'a t
-    = fun p x -> p + (-x)
+  let (-@) : 'a. 'a t -> int -> 'a t
+    = fun p x -> p +@ (-x)
 
-  let (:=) : 'a. 'a t -> 'a -> unit
+  let (<-@) : 'a. 'a t -> 'a -> unit
     = fun (type a) ({ reftype; raw_ptr; pbyte_offset = offset } : a t) ->
       fun v -> write reftype ~offset v raw_ptr
 
@@ -345,7 +345,7 @@ struct
   let make : 'a. 'a typ -> 'a -> 'a ptr
     = fun (type a) (reftype : a typ) (v : a) ->
       let p = allocate ~count:1 reftype in begin
-        p := v;
+        p <-@ v;
         p
       end
 end
@@ -359,10 +359,10 @@ struct
       invalid_arg "index out of bounds"
 
   let unsafe_get { astart } n =
-    Ptr.(!(astart + n))
+    Ptr.(!@(astart +@ n))
 
   let unsafe_set { astart } n v =
-    Ptr.((astart + n) := v)
+    Ptr.((astart +@ n) <-@ v)
 
   let get arr n =
     check_bound arr n;
@@ -465,8 +465,8 @@ struct
         { reftype; raw_ptr; pbyte_offset = foffset + pbyte_offset; pmanaged }
 
   open Ptr
-  let setf s field v = (s @. field) := v
-  let getf s field = !(s @. field)
+  let setf s field v = (s @. field) <-@ v
+  let getf s field = !@(s @. field)
 
   let addr { structure } = structure
 end
@@ -503,8 +503,8 @@ struct
   let make t = { union = Ptr.allocate t ~count:1 }
   let (@.) { union } reftype = { union with reftype }
   let (|->) p reftype = { p with reftype }
-  let setf s field v = Ptr.((s @. field) := v)
-  let getf s field = Ptr.(!(s @. field))
+  let setf s field v = Ptr.((s @. field) <-@ v)
+  let getf s field = Ptr.(!@(s @. field))
   let addr { union } = union
 end
 
@@ -566,18 +566,19 @@ let string_of_char_ptr charp =
     let length = Unsigned.Size_t.to_int (strlen charp) in
     let s = String.create length in
     for i = 0 to length - 1 do
-      s.[i] <- Ptr.(! (charp  + i))
+      s.[i] <- Ptr.(!@ (charp +@ i))
     done;
     s
 
 let char_ptr_of_string s =
-    let len = String.length s in
-    let p = Ptr.allocate ~count:(len + 1) char in
-    for i = 0 to len - 1 do
-      Ptr.(p + i := s.[i])
-    done;
-    Ptr.(p + len := '\000');
-    p
+  let open Ptr in
+  let len = String.length s in
+  let p = allocate ~count:(len + 1) char in
+  for i = 0 to len - 1 do
+    (p +@ i <-@ s.[i])
+  done;
+  (p +@ len <-@ '\000');
+  p
 
 let string = view ~read:string_of_char_ptr ~write:char_ptr_of_string
   (ptr char)
@@ -586,11 +587,11 @@ let castp typ p = Ptr.(from_voidp typ (to_voidp p))
 
 let read_nullable t p = Ptr.(
   if p = null then None
-  else Some !(castp t (Ptr.make (ptr void) p)))
+  else Some !@(castp t (make (ptr void) p)))
 
 let write_nullable t = Ptr.(function
   | None -> null
-  | Some f -> !(castp (ptr void) (Ptr.make t f)))
+  | Some f -> !@(castp (ptr void) (make t f)))
 
 let nullable_view t =
   let read = read_nullable t

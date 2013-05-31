@@ -101,7 +101,7 @@ let test_callback_receiving_pointers () =
     foreign ~from:testlib "passing_pointers_to_callback"
       (funptr pintfun1 @-> returning int)
   in
-  let deref = Ptr.(!) in
+  let deref = Ptr.(!@) in
   assert_equal 7
     (passing_pointers_to_callback (fun lp rp -> deref lp + deref rp))
 
@@ -116,12 +116,12 @@ let test_callback_returning_pointers () =
     foreign ~from:testlib "accepting_pointer_from_callback"
       (funptr pintfun2 @-> returning int)
   in begin
-    assert_equal 17 Ptr.(!p);
+    assert_equal 17 Ptr.(!@p);
 
     assert_equal 56
-      (accepting_pointer_from_callback Ptr.(fun x y -> p := (x * y); p));
+      (accepting_pointer_from_callback Ptr.(fun x y -> p <-@ (x * y); p));
 
-    assert_equal 12 Ptr.(!p)
+    assert_equal 12 Ptr.(!@p)
   end
 
 
@@ -156,77 +156,77 @@ let test_pointer_assignment_with_primitives () =
   and p_ullong = Ptr.make ullong (ULLong.of_int 23)
   in begin
     let open Ptr in
-    assert_equal '1' (!p_char);
-    assert_equal (UChar.of_int 2) (!p_uchar);
-    assert_equal 3 (!p_schar);
-    assert_equal 4.0 (!p_float);
-    assert_equal 5.0 (!p_double);
-    assert_equal 6 (!p_short);
-    assert_equal 7 (!p_int);
-    assert_equal (Long.of_int 8) (!p_long);
-    assert_equal (LLong.of_int 9) (!p_llong);
-    assert_equal 10n (!p_nativeint);
-    assert_equal 11 (!p_int8_t);
-    assert_equal 12 (!p_int16_t);
-    assert_equal 13l (!p_int32_t);
-    assert_equal 14L (!p_int64_t);
-    assert_equal (UInt8.of_int 15) (!p_uint8_t);
-    assert_equal (UInt16.of_int 16) (!p_uint16_t);
-    assert_equal (UInt32.of_int 17) (!p_uint32_t);
-    assert_equal (UInt64.of_int 18) (!p_uint64_t);
-    assert_equal (Size_t.of_int 19) (!p_size_t);
-    assert_equal (UShort.of_int 20) (!p_ushort);
-    assert_equal (UInt.of_int 21) (!p_uint);
-    assert_equal (ULong.of_int 22) (!p_ulong);
-    assert_equal (ULLong.of_int 23) (!p_ullong);
+    assert_equal '1' (!@p_char);
+    assert_equal (UChar.of_int 2) (!@p_uchar);
+    assert_equal 3 (!@p_schar);
+    assert_equal 4.0 (!@p_float);
+    assert_equal 5.0 (!@p_double);
+    assert_equal 6 (!@p_short);
+    assert_equal 7 (!@p_int);
+    assert_equal (Long.of_int 8) (!@p_long);
+    assert_equal (LLong.of_int 9) (!@p_llong);
+    assert_equal 10n (!@p_nativeint);
+    assert_equal 11 (!@p_int8_t);
+    assert_equal 12 (!@p_int16_t);
+    assert_equal 13l (!@p_int32_t);
+    assert_equal 14L (!@p_int64_t);
+    assert_equal (UInt8.of_int 15) (!@p_uint8_t);
+    assert_equal (UInt16.of_int 16) (!@p_uint16_t);
+    assert_equal (UInt32.of_int 17) (!@p_uint32_t);
+    assert_equal (UInt64.of_int 18) (!@p_uint64_t);
+    assert_equal (Size_t.of_int 19) (!@p_size_t);
+    assert_equal (UShort.of_int 20) (!@p_ushort);
+    assert_equal (UInt.of_int 21) (!@p_uint);
+    assert_equal (ULong.of_int 22) (!@p_ulong);
+    assert_equal (ULLong.of_int 23) (!@p_ullong);
 
-    p_char := '2';
-    p_uchar := (UChar.of_int 102);
-    p_schar := 103;
-    p_float := 104.0;
-    p_double := 105.0;
-    p_short := 106;
-    p_int := 107;
-    p_long := (Long.of_int 108);
-    p_llong := (LLong.of_int 109);
-    p_nativeint := 110n;
-    p_int8_t := 111;
-    p_int16_t := 112;
-    p_int32_t := 113l;
-    p_int64_t := 114L;
-    p_uint8_t := (UInt8.of_int 115);
-    p_uint16_t := (UInt16.of_int 116);
-    p_uint32_t := (UInt32.of_int 117);
-    p_uint64_t := (UInt64.of_int 118);
-    p_size_t := (Size_t.of_int 119);
-    p_ushort := (UShort.of_int 120);
-    p_uint := (UInt.of_int 121);
-    p_ulong := (ULong.of_int 122);
-    p_ullong := (ULLong.of_int 123);
+    p_char <-@ '2';
+    p_uchar <-@ (UChar.of_int 102);
+    p_schar <-@ 103;
+    p_float <-@ 104.0;
+    p_double <-@ 105.0;
+    p_short <-@ 106;
+    p_int <-@ 107;
+    p_long <-@ (Long.of_int 108);
+    p_llong <-@ (LLong.of_int 109);
+    p_nativeint <-@ 110n;
+    p_int8_t <-@ 111;
+    p_int16_t <-@ 112;
+    p_int32_t <-@ 113l;
+    p_int64_t <-@ 114L;
+    p_uint8_t <-@ (UInt8.of_int 115);
+    p_uint16_t <-@ (UInt16.of_int 116);
+    p_uint32_t <-@ (UInt32.of_int 117);
+    p_uint64_t <-@ (UInt64.of_int 118);
+    p_size_t <-@ (Size_t.of_int 119);
+    p_ushort <-@ (UShort.of_int 120);
+    p_uint <-@ (UInt.of_int 121);
+    p_ulong <-@ (ULong.of_int 122);
+    p_ullong <-@ (ULLong.of_int 123);
 
-    assert_equal '2' (!p_char);
-    assert_equal (UChar.of_int 102) (!p_uchar);
-    assert_equal 103 (!p_schar);
-    assert_equal 104.0 (!p_float);
-    assert_equal 105.0 (!p_double);
-    assert_equal 106 (!p_short);
-    assert_equal 107 (!p_int);
-    assert_equal (Long.of_int 108) (!p_long);
-    assert_equal (LLong.of_int 109) (!p_llong);
-    assert_equal 110n (!p_nativeint);
-    assert_equal 111 (!p_int8_t);
-    assert_equal 112 (!p_int16_t);
-    assert_equal 113l (!p_int32_t);
-    assert_equal 114L (!p_int64_t);
-    assert_equal (UInt8.of_int 115) (!p_uint8_t);
-    assert_equal (UInt16.of_int 116) (!p_uint16_t);
-    assert_equal (UInt32.of_int 117) (!p_uint32_t);
-    assert_equal (UInt64.of_int 118) (!p_uint64_t);
-    assert_equal (Size_t.of_int 119) (!p_size_t);
-    assert_equal (UShort.of_int 120) (!p_ushort);
-    assert_equal (UInt.of_int 121) (!p_uint);
-    assert_equal (ULong.of_int 122) (!p_ulong);
-    assert_equal (ULLong.of_int 123) (!p_ullong);
+    assert_equal '2' (!@p_char);
+    assert_equal (UChar.of_int 102) (!@p_uchar);
+    assert_equal 103 (!@p_schar);
+    assert_equal 104.0 (!@p_float);
+    assert_equal 105.0 (!@p_double);
+    assert_equal 106 (!@p_short);
+    assert_equal 107 (!@p_int);
+    assert_equal (Long.of_int 108) (!@p_long);
+    assert_equal (LLong.of_int 109) (!@p_llong);
+    assert_equal 110n (!@p_nativeint);
+    assert_equal 111 (!@p_int8_t);
+    assert_equal 112 (!@p_int16_t);
+    assert_equal 113l (!@p_int32_t);
+    assert_equal 114L (!@p_int64_t);
+    assert_equal (UInt8.of_int 115) (!@p_uint8_t);
+    assert_equal (UInt16.of_int 116) (!@p_uint16_t);
+    assert_equal (UInt32.of_int 117) (!@p_uint32_t);
+    assert_equal (UInt64.of_int 118) (!@p_uint64_t);
+    assert_equal (Size_t.of_int 119) (!@p_size_t);
+    assert_equal (UShort.of_int 120) (!@p_ushort);
+    assert_equal (UInt.of_int 121) (!@p_uint);
+    assert_equal (ULong.of_int 122) (!@p_ulong);
+    assert_equal (ULLong.of_int 123) (!@p_ullong);
   end
 
 
@@ -254,7 +254,7 @@ let test_callback_returning_pointer_to_function_pointer () =
       (void @-> returning (ptr (funptr (int @-> int @-> returning int))))
   in
   assert_equal
-    10 Ptr.(!(returning_pointer_to_function_pointer ()) 2 5)
+    10 Ptr.(!@(returning_pointer_to_function_pointer ()) 2 5)
 
 
 (*
@@ -263,13 +263,13 @@ let test_callback_returning_pointer_to_function_pointer () =
 let test_dereferencing_pointers_to_incomplete_types () =
   let open Ptr in begin
     assert_raises IncompleteType
-      (fun () -> !null);
+      (fun () -> !@null);
 
     assert_raises IncompleteType
-      (fun () -> !(from_voidp (Struct.structure "incomplete") null));
+      (fun () -> !@(from_voidp (Struct.structure "incomplete") null));
 
     assert_raises IncompleteType
-      (fun () -> !(from_voidp (Union.union "incomplete") null));
+      (fun () -> !@(from_voidp (Union.union "incomplete") null));
   end
 
 
@@ -299,7 +299,7 @@ let test_writing_through_pointer_to_abstract_type () =
     assert_equal 30 arrb.(0);
     assert_equal 40 arrb.(1);
 
-    dest := !src;
+    dest <-@ !@src;
 
     assert_equal 30 arra.(0);
     assert_equal 40 arra.(1);
@@ -319,13 +319,13 @@ let test_writing_through_pointer_to_abstract_type () =
 let test_reading_and_writing_global_value () = Ptr.(
   let ptr = foreign_value "global" int ~from:testlib in
   let ptr' = foreign_value "global" int ~from:testlib in
-  assert_equal (!ptr) 100;
-  ptr := 200;
-  assert_equal (!ptr) 200;
-  assert_equal (!ptr') 200;
-  ptr' := 100;
-  assert_equal (!ptr) 100;
-  assert_equal (!ptr') 100;
+  assert_equal (!@ptr) 100;
+  ptr <-@ 200;
+  assert_equal (!@ptr) 200;
+  assert_equal (!@ptr') 200;
+  ptr' <-@ 100;
+  assert_equal (!@ptr) 100;
+  assert_equal (!@ptr') 100;
 )
 
 
@@ -340,24 +340,24 @@ let test_allocation () =
   
   let pointer = malloc (Size_t.of_int (sizeof int)) in Ptr.(
     let int_pointer = from_voidp int pointer in
-    int_pointer := 17;
-    assert_equal !int_pointer 17;
-    int_pointer := -3;
-    assert_equal !int_pointer (-3);
+    int_pointer <-@ 17;
+    assert_equal !@int_pointer 17;
+    int_pointer <-@ -3;
+    assert_equal !@int_pointer (-3);
 
     let pointer' = realloc pointer (Size_t.of_int (20 * sizeof int)) in
     assert_bool "realloc succeeded" (pointer' <> null);
     let int_pointer = from_voidp int pointer' in
 
     assert_equal ~msg:"realloc copied the existing data over"
-      !int_pointer (-3);
+      !@int_pointer (-3);
 
     for i = 0 to 19 do
-      (int_pointer + i) := i
+      (int_pointer +@ i) <-@ i
     done;
 
     for i = 0 to 19 do
-      assert_equal i !(int_pointer + i)
+      assert_equal i !@(int_pointer +@ i)
     done;
 
     free pointer'
@@ -371,7 +371,7 @@ let test_reading_returned_global () =
   let return_global_address = 
     foreign "return_global_address" ~from:testlib
       (void @-> returning (ptr int)) in
-  Ptr.(assert_equal (!(return_global_address ())) 100)
+  Ptr.(assert_equal (!@(return_global_address ())) 100)
 
 
 (*
@@ -385,11 +385,11 @@ let test_passing_pointer_through () =
   let p1 = Ptr.make int 25 in
   let p2 = Ptr.make int 32 in
   let rv = pass_pointer_through p1 p2 10 in
-  assert_equal !rv !p1;
-  assert_equal 25 !rv;
+  assert_equal !@rv !@p1;
+  assert_equal 25 !@rv;
   let rv = pass_pointer_through p1 p2 (-10) in
-  assert_equal !rv !p2;
-  assert_equal 32 !rv
+  assert_equal !@rv !@p2;
+  assert_equal 32 !@rv
 
 
 (*
@@ -402,7 +402,7 @@ let test_pointer_arithmetic () =
   (* Traverse the array using an int pointer *)
   let p = Array.start arr in
   for i = 0 to 7 do
-    assert_equal !(p + i) (succ i)
+    assert_equal !@(p +@ i) (succ i)
   done;
 
   let open Struct in
@@ -415,22 +415,22 @@ let test_pointer_arithmetic () =
   let ps = from_voidp twoints (to_voidp p) in
 
   for i = 0 to 3 do
-    assert_equal !((ps + i) |-> i1) Pervasives.(2 * i + 1);
-    assert_equal !((ps + i) |-> i2) Pervasives.(2 * i + 2);
+    assert_equal !@((ps +@ i) |-> i1) (2 * i + 1);
+    assert_equal !@((ps +@ i) |-> i2) (2 * i + 2);
   done;
   
   (* Traverse the array using a char pointer *)
   let pc = from_voidp char (to_voidp p) in
   
   for i = 0 to 7 do
-    let p' = pc + i * sizeof int in
-    assert_equal !(from_voidp int (to_voidp p')) (succ i)
+    let p' = pc +@ i * sizeof int in
+    assert_equal !@(from_voidp int (to_voidp p')) (succ i)
   done;
 
   (* Reverse traversal *)
-  let pend = p + 7 in
+  let pend = p +@ 7 in
   for i = 0 to 7 do
-    assert_equal !(pend - i) Pervasives.(8 - i)
+    assert_equal !@(pend -@ i) (8 - i)
   done
     
 

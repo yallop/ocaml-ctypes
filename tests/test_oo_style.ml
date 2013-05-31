@@ -46,10 +46,10 @@ let test_oo_hierarchy () =
     let () = seals animal_methods
 
     let call_say cinstance =
-      Ptr.(!((getf (!cinstance) animal_vtable) |-> say)) cinstance
+      Ptr.(!@((getf (!@cinstance) animal_vtable) |-> say)) cinstance
 
     let call_identify cinstance =
-        Ptr.(!((getf (!cinstance) animal_vtable) |-> identify)) cinstance
+        Ptr.(!@((getf (!@cinstance) animal_vtable) |-> identify)) cinstance
 
     (* constructor *)
     class animalc ~cinstance = object
@@ -74,7 +74,7 @@ let test_oo_hierarchy () =
     let () = seals camel_methods
 
     let call_humps cinstance =
-      Ptr.(!((getf (!cinstance) camel_vtable) |-> humps)) cinstance
+      Ptr.(!@((getf (!@cinstance) camel_vtable) |-> humps)) cinstance
 
     (* constructor *)
     class camelc ~cinstance = object
@@ -86,7 +86,7 @@ let test_oo_hierarchy () =
     let () = begin
       let open Ptr in
       let vt = camel_vtable_singleton in
-      let base_vt = !(cast animal_methods (addr vt)) in
+      let base_vt = !@(cast animal_methods (addr vt)) in
       (* say *)
       setf base_vt say (fun animal -> "humph");
 
@@ -96,7 +96,7 @@ let test_oo_hierarchy () =
         Printf.sprintf "%d-hump camel" n);
 
       (* humps *)
-      setf vt humps (fun camel -> !(camel |-> nhumps))
+      setf vt humps (fun camel -> !@(camel |-> nhumps))
     end
 
     let new_camel ~humps =

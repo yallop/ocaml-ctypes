@@ -119,7 +119,7 @@ let test_string_functions () =
   let u = UChar.of_int i in begin
     memset (to_voidp p) i (Size_t.of_int 12);
     for i = 0 to 11 do
-      assert_equal u !(p + i)
+      assert_equal u !@(p +@ i)
     done
   end
 
@@ -181,8 +181,8 @@ let test_qsort () =
     let len = of_int (length arr) in
     let size = of_int (sizeof typ) in
     let cmp xp yp =
-      let x = !(from_voidp typ xp)
-      and y = !(from_voidp typ yp) in
+      let x = !@(from_voidp typ xp)
+      and y = !@(from_voidp typ yp) in
       f x y
     in
     let () = qsort (to_voidp (start arr)) len size cmp in
@@ -249,7 +249,7 @@ let test_bsearch () =
       let len = Size_t.to_int (strlen p) in
       let s = String.create len in
       for i = 0 to len - 1 do
-        s.[i] <- Ptr.(!(p + i));
+        s.[i] <- Ptr.(!@(p +@ i));
       done;
       s
 
@@ -265,8 +265,8 @@ let test_bsearch () =
     let mi1 = from_voidp mi m1 in
     let mi2 = from_voidp mi m2 in
     Pervasives.compare
-      (as_string (!(mi1 |-> name)))
-      (as_string (!(mi2 |-> name)))
+      (as_string (!@(mi1 |-> name)))
+      (as_string (!@(mi2 |-> name)))
       
   let months = Array.of_list mi [
     mkmi 1 "jan";
@@ -299,7 +299,7 @@ let test_bsearch () =
           (to_voidp (Array.start array))
           len size cmpi in
       if r = null then None
-      else Some (!(from_voidp mi r))
+      else Some (!@(from_voidp mi r))
 
   let find_month_by_name : string -> mi structure option =
     fun s -> search (mkmi 0 s) months

@@ -107,44 +107,44 @@ struct
   let t = ptr ftsent
 
   let info : t -> fts_info
-    = fun t -> fts_info_of_int (UShort.to_int (!(t |-> fts_info)))
+    = fun t -> fts_info_of_int (UShort.to_int (!@(t |-> fts_info)))
 
   let accpath : t -> string
-    = fun t -> !(t |-> fts_accpath)
+    = fun t -> !@(t |-> fts_accpath)
 
   let path : t -> string
-    = fun t -> !(t |-> fts_path)
+    = fun t -> !@(t |-> fts_path)
 
   let name : t -> string
     = fun t -> 
-      !(from_voidp string (to_voidp (Ptr.make (ptr char) (t |-> fts_name))))
+      !@(from_voidp string (to_voidp (Ptr.make (ptr char) (t |-> fts_name))))
 
   let level : t -> int
-    = fun t -> !(t |-> fts_level)
+    = fun t -> !@(t |-> fts_level)
 
   let errno : t -> int
-    = fun t -> !(t |-> fts_errno)
+    = fun t -> !@(t |-> fts_errno)
 
   let number : t -> int
-    = fun t -> !(t |-> fts_number)
+    = fun t -> !@(t |-> fts_number)
 
   let set_number : t -> int -> unit
-    = fun t x -> t |-> fts_number := x
+    = fun t x -> t |-> fts_number <-@ x
 
   let pointer : t -> unit ptr
-    = fun t -> !(t |-> fts_pointer)
+    = fun t -> !@(t |-> fts_pointer)
 
   let set_pointer : t -> unit ptr -> unit
-    = fun t x -> t |-> fts_pointer := x
+    = fun t x -> t |-> fts_pointer <-@ x
 
   let parent : t -> t
-    = fun t -> !(t |-> fts_parent)
+    = fun t -> !@(t |-> fts_parent)
 
   let link : t -> t
-    = fun t -> !(t |-> fts_link)
+    = fun t -> !@(t |-> fts_link)
 
   let cycle : t -> t
-    = fun t -> !(t |-> fts_cycle)
+    = fun t -> !@(t |-> fts_cycle)
 end
 
 module FTS =
@@ -174,23 +174,23 @@ struct
   type t = fts structure ptr
 
   let cur : t -> FTSENT.t
-    = fun t -> !(t |-> fts_cur)
+    = fun t -> !@(t |-> fts_cur)
 
   let child : t -> FTSENT.t
-    = fun t -> !(t |-> fts_child)
+    = fun t -> !@(t |-> fts_child)
 
   let array : t -> FTSENT.t list
     = fun t ->
-      Array.(to_list (from_ptr !(t |-> fts_array) !(t |-> fts_nitems)))
+      Array.(to_list (from_ptr !@(t |-> fts_array) !@(t |-> fts_nitems)))
 
   let dev : t -> dev_t
-    = fun t -> !(t |-> fts_dev)
+    = fun t -> !@(t |-> fts_dev)
 
   let path : t -> string
-    = fun t -> !(t |-> fts_path)
+    = fun t -> !@(t |-> fts_path)
 
   let rfd : t -> int
-    = fun t -> !(t |-> fts_rfd)
+    = fun t -> !@(t |-> fts_rfd)
 end
 
 open FTSENT
@@ -239,7 +239,7 @@ let null_terminated_array_of_ptr_list typ list =
   let nitems = List.length list in
   let arr = Array.make typ (1 + nitems) in
   List.iteri (Array.set arr) list;
-  Ptr.((castp (ptr void) (Array.start arr + nitems)) := null);
+  Ptr.((castp (ptr void) (Array.start arr +@ nitems)) <-@ null);
   arr
 
 let fts_open ~path_argv ?compar ~options = 

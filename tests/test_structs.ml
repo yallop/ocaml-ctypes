@@ -88,12 +88,12 @@ let test_returning_struct () =
 
     let t = getf s p
 
-    let () = assert_equal 10 Ptr.(!(t |-> c))
+    let () = assert_equal 10 Ptr.(!@(t |-> c))
       ~printer:string_of_int
-    let () = assert_equal 12.5 Ptr.(!(t |-> f))
+    let () = assert_equal 12.5 Ptr.(!@(t |-> f))
       ~printer:string_of_float
 
-    let () = assert_equal Ptr.(!(t |-> p)) t
+    let () = assert_equal Ptr.(!@(t |-> p)) t
 
   end in ()
 
@@ -134,25 +134,25 @@ let test_pointers_to_struct_members () =
 
     let () = Ptr.(begin
       let sp = addr s in
-      sp |-> i := 10;
-      sp |-> j := 20;
-      sp |-> k := sp |-> i;
+      sp |-> i <-@ 10;
+      sp |-> j <-@ 20;
+      (sp |-> k) <-@ (sp |-> i);
       assert_equal ~msg:"sp->i = 10" ~printer:string_of_int
-        10 (!(sp |-> i));
+        10 (!@(sp |-> i));
       assert_equal ~msg:"sp->j = 20" ~printer:string_of_int
-        20 (!(sp |-> j));
+        20 (!@(sp |-> j));
       assert_equal ~msg:"*sp->k = 10" ~printer:string_of_int
-        10 (!(!(sp |-> k)));
-      (sp |-> k) := (sp |-> j);
+        10 (!@(!@(sp |-> k)));
+      (sp |-> k) <-@ (sp |-> j);
       assert_equal ~msg:"*sp->k = 20" ~printer:string_of_int
-        20 (!(!(sp |-> k)));
-      sp |-> i := 15;
-      sp |-> j := 25;
+        20 (!@(!@(sp |-> k)));
+      sp |-> i <-@ 15;
+      sp |-> j <-@ 25;
       assert_equal ~msg:"*sp->k = 25" ~printer:string_of_int
-        25 (!(!(sp |-> k)));
-      sp |-> k := sp |-> i;
+        25 (!@(!@(sp |-> k)));
+      (sp |-> k) <-@ (sp |-> i);
       assert_equal ~msg:"*sp->k = 15" ~printer:string_of_int
-        15 (!(!(sp |-> k)));
+        15 (!@(!@(sp |-> k)));
     end)
   end in ()
 
