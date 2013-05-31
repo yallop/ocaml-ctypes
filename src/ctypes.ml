@@ -98,7 +98,7 @@ let rec alignment : 'a. 'a typ -> int
     | Struct { spec = Complete p }   -> RawTypes.alignment p
     | Union { ucomplete = false }    -> raise IncompleteType
     | Union { ualignment }           -> ualignment
-    | Array (t, i)                   -> alignment t
+    | Array (t, _)                   -> alignment t
     | Abstract { aalignment }        -> aalignment
     | Pointer _                      -> RawTypes.(alignment pointer)
     | FunctionPointer _              -> RawTypes.(alignment pointer)
@@ -107,7 +107,7 @@ let rec alignment : 'a. 'a typ -> int
 let rec passable : 'a. 'a typ -> bool
   = fun (type a) (t : a typ) -> match t with
       Void                           -> true
-    | Primitive p                    -> true
+    | Primitive _                    -> true
     | Struct { spec = Incomplete _ } -> raise IncompleteType
     | Struct { passable }            -> passable
     | Union { ucomplete = false }    -> raise IncompleteType
@@ -123,8 +123,8 @@ let rec arg_type : 'a. 'a typ -> arg_type
     | Void                           -> ArgType RawTypes.void
     | Primitive p                    -> ArgType p
     | Struct { spec = Complete p }   -> ArgType p
-    | Pointer reftype                -> ArgType RawTypes.pointer
-    | FunctionPointer fn             -> ArgType RawTypes.pointer
+    | Pointer _                      -> ArgType RawTypes.pointer
+    | FunctionPointer _              -> ArgType RawTypes.pointer
     | View { ty }                    -> arg_type ty
     (* The following cases should never happen; aggregate types other than
        complete struct types are excluded during type construction. *)
@@ -228,7 +228,7 @@ and write : 'a. 'a typ -> offset:int -> 'a -> Raw.immediate_pointer -> unit
       ((fun ~offset _ _ -> ()) : offset:int -> a -> _ -> _)
     | Primitive p ->
       Raw.write p
-    | Pointer reftype ->
+    | Pointer _ ->
       (fun ~offset { raw_ptr; pbyte_offset } ->
         Raw.write RawTypes.pointer ~offset
           (Raw.pointer_plus raw_ptr pbyte_offset))
@@ -380,7 +380,7 @@ struct
     for i = 0 to alength - 1 do unsafe_set arr i v done
 
   let make : 'a. 'a typ -> ?initial:'a -> int -> 'a t
-    = fun (type a) reftype ?initial count ->
+    = fun reftype ?initial count ->
       let arr = { astart = Ptr.allocate ~count reftype;
                   alength = count } in
       match initial with
@@ -435,7 +435,7 @@ struct
         | Array _ as a                   -> (s.passable <- false;
                                              add_unpassable_member a)
         | Primitive p                    -> add_member p
-        | Pointer p                      -> add_member RawTypes.pointer
+        | Pointer _                      -> add_member RawTypes.pointer
         | Struct { spec = Incomplete _ } -> raise IncompleteType
         | Struct { spec = Complete t; passable } 
                                          -> (s.passable <- s.passable && passable;
@@ -451,18 +451,14 @@ struct
 
   let make s = { structure = Ptr.allocate s ~count:1 }
 
-  let (@.) (type s) (type a)
-      { structure }
-      { ftype = reftype; foffset } =
+  let (@.) { structure } { ftype = reftype; foffset } =
     { structure with
       reftype;
       pbyte_offset = structure.pbyte_offset + foffset }
 
   let (|->) : 'a 's. 's structure ptr -> ('a, 's) field -> 'a ptr
-    = fun (type a) (type s)
-      { raw_ptr; pbyte_offset; pmanaged }
-      { ftype = reftype; foffset } ->
-        { reftype; raw_ptr; pbyte_offset = foffset + pbyte_offset; pmanaged }
+    = fun { raw_ptr; pbyte_offset; pmanaged } { ftype = reftype; foffset } ->
+      { reftype; raw_ptr; pbyte_offset = foffset + pbyte_offset; pmanaged }
 
   open Ptr
   let setf s field v = (s @. field) <-@ v
