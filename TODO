@@ -1,6 +1,0 @@
-  arrays and unions as struct members
-  boxed pointers; take more care about word alignment 
-  more tests for arrays
-  tests for pointer arithmetic
-  refactoring
-  documentation (ocamldoc)
