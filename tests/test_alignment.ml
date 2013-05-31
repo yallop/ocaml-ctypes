@@ -220,11 +220,20 @@ let test_struct_tail_padding () =
 
 
 let suite = "Alignment tests" >:::
-  ["struct tail padding" >:: test_struct_tail_padding;
-   "primitive alignment" >:: test_primitive_alignment;
-   "struct alignment" >:: test_struct_alignment;
-   "alignment of abstract types" >:: test_abstract_alignment;
-   "alignment of incomplete types" >:: test_incomplete_alignment;
+  ["struct tail padding"
+    >:: test_struct_tail_padding;
+
+   "primitive alignment"
+   >:: test_primitive_alignment;
+
+   "struct alignment"
+   >:: test_struct_alignment;
+
+   "alignment of abstract types"
+   >:: test_abstract_alignment;
+
+   "alignment of incomplete types"
+   >:: test_incomplete_alignment;
   ]
 
 

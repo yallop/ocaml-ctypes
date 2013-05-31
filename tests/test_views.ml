@@ -122,10 +122,17 @@ let test_nullable_pointer_view () =
 
 
 let suite = "View tests" >:::
-  ["passing array of strings" >:: test_passing_string_array;
-   "custom views" >:: test_passing_chars_as_ints;
-   "nullable function pointers" >:: test_nullable_function_pointer_view;
-   "nullable pointers" >:: test_nullable_pointer_view;
+  ["passing array of strings"
+   >:: test_passing_string_array;
+
+   "custom views"
+   >:: test_passing_chars_as_ints;
+
+   "nullable function pointers"
+   >:: test_nullable_function_pointer_view;
+
+   "nullable pointers"
+   >:: test_nullable_pointer_view;
   ]
 
 

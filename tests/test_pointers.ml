@@ -317,10 +317,8 @@ let test_writing_through_pointer_to_abstract_type () =
    function.
 *)
 let test_reading_and_writing_global_value () = Ptr.(
-  let ptr = foreign_value "global" int
-    ~from:testlib in
-  let ptr' = foreign_value "global" int
-    ~from:testlib in
+  let ptr = foreign_value "global" int ~from:testlib in
+  let ptr' = foreign_value "global" int ~from:testlib in
   assert_equal (!ptr) 100;
   ptr := 200;
   assert_equal (!ptr) 200;
@@ -371,8 +369,8 @@ let test_allocation () =
 *)
 let test_reading_returned_global () =
   let return_global_address = 
-    foreign "return_global_address" (void @-> returning (ptr int)) 
-      ~from:testlib in
+    foreign "return_global_address" ~from:testlib
+      (void @-> returning (ptr int)) in
   Ptr.(assert_equal (!(return_global_address ())) 100)
 
 
@@ -381,9 +379,9 @@ let test_reading_returned_global () =
 *)
 let test_passing_pointer_through () =
   let open Ptr in
-  let pass_pointer_through = 
-    foreign "pass_pointer_through" (ptr int @-> ptr int @-> int @-> returning (ptr int)) 
-      ~from:testlib in
+  let pass_pointer_through = foreign "pass_pointer_through" ~from:testlib
+    (ptr int @-> ptr int @-> int @-> returning (ptr int)) 
+  in
   let p1 = Ptr.make int 25 in
   let p2 = Ptr.make int 32 in
   let rv = pass_pointer_through p1 p2 10 in
@@ -438,20 +436,47 @@ let test_pointer_arithmetic () =
 
 
 let suite = "Pointer tests" >:::
-  ["passing pointers" >:: test_passing_pointers;
-   "passing pointers to pointers" >:: test_passing_pointers_to_pointers;
-   "callback receiving pointers" >:: test_callback_receiving_pointers;
-   "callback returning pointers" >:: test_callback_returning_pointers;
-   "pointer assignment with primitives" >:: test_pointer_assignment_with_primitives;
-   "passing pointer to function pointer" >:: test_passing_pointer_to_function_pointer;
-   "callback returning pointer to function pointer" >:: test_callback_returning_pointer_to_function_pointer;
-   "incomplete types" >:: test_dereferencing_pointers_to_incomplete_types;
-   "abstract types" >:: test_writing_through_pointer_to_abstract_type;
-   "global value" >:: test_reading_and_writing_global_value;
-   "allocation" >:: test_allocation;
-   "passing pointers through functions" >:: test_passing_pointer_through;
-   "returned globals" >:: test_reading_returned_global;
-   "arithmetic" >:: test_pointer_arithmetic;
+  ["passing pointers"
+    >:: test_passing_pointers;
+
+   "passing pointers to pointers"
+    >:: test_passing_pointers_to_pointers;
+
+   "callback receiving pointers"
+    >:: test_callback_receiving_pointers;
+
+   "callback returning pointers"
+    >:: test_callback_returning_pointers;
+
+   "pointer assignment with primitives"
+    >:: test_pointer_assignment_with_primitives;
+
+   "passing pointer to function pointer"
+    >:: test_passing_pointer_to_function_pointer;
+
+   "callback returning pointer to function pointer"
+    >:: test_callback_returning_pointer_to_function_pointer;
+
+   "incomplete types"
+    >:: test_dereferencing_pointers_to_incomplete_types;
+
+   "abstract types"
+    >:: test_writing_through_pointer_to_abstract_type;
+
+   "global value"
+    >:: test_reading_and_writing_global_value;
+
+   "allocation"
+    >:: test_allocation;
+
+   "passing pointers through functions"
+    >:: test_passing_pointer_through;
+
+   "returned globals"
+    >:: test_reading_returned_global;
+
+   "arithmetic"
+    >:: test_pointer_arithmetic;
   ]
 
 

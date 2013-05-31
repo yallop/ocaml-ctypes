@@ -64,8 +64,12 @@ let test_pow () =
 
 
 let suite = "Raw interface tests" >:::
-  ["test_abs" >:: test_fabs;
-   "test_pow" >:: test_pow]
+  ["test_abs"
+    >:: test_fabs;
+
+   "test_pow"
+   >:: test_pow
+  ]
 
 
 let _ =

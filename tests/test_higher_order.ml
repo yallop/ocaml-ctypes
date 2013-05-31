@@ -40,7 +40,9 @@ let test_higher_order_basic () =
 (*
   Call a C function of type 
 
-       int (int ( * )(int ( * )(int, int), int, int), int ( * )(int, int), int, int)
+       int (int ( * )(int ( * )(int, int), int, int),
+            int ( * )(int, int),
+            int, int)
 
   passing OCaml functions of type
 
@@ -111,10 +113,17 @@ let test_callback_returns_pointer_to_function () =
 
 
 let suite = "Higher-order tests" >:::
-  ["test_higher_order_basic" >:: test_higher_order_basic;
-   "test_higher_higher_order" >:: test_higher_higher_order;
-   "test_returning_pointer_to_function" >:: test_returning_pointer_to_function;
-   "test_callback_returns_pointer_to_function" >:: test_callback_returns_pointer_to_function;
+  ["test_higher_order_basic"
+    >:: test_higher_order_basic;
+
+   "test_higher_higher_order"
+   >:: test_higher_higher_order;
+
+   "test_returning_pointer_to_function"
+   >:: test_returning_pointer_to_function;
+
+   "test_callback_returns_pointer_to_function"
+   >:: test_callback_returns_pointer_to_function;
   ]
 
 

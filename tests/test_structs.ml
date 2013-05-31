@@ -322,14 +322,29 @@ let test_field_references_not_invalidated () =
 
 
 let suite = "Struct tests" >:::
-  ["passing struct" >:: test_passing_struct;
-   "returning struct" >:: test_returning_struct;
-   "incomplete struct members rejected" >:: test_incomplete_struct_members;
-   "pointers to struct members" >:: test_pointers_to_struct_members;
-   "structs with union members" >:: test_structs_with_union_members;
-   "structs with array members" >:: test_structs_with_array_members;
-   "updating sealed struct" >:: test_updating_sealed_struct;
-   "field references not invalidated" >:: test_field_references_not_invalidated;
+  ["passing struct"
+    >:: test_passing_struct;
+   
+   "returning struct"
+   >:: test_returning_struct;
+
+   "incomplete struct members rejected"
+   >:: test_incomplete_struct_members;
+
+   "pointers to struct members"
+   >:: test_pointers_to_struct_members;
+
+   "structs with union members"
+   >:: test_structs_with_union_members;
+
+   "structs with array members"
+   >:: test_structs_with_array_members;
+
+   "updating sealed struct"
+   >:: test_updating_sealed_struct;
+
+   "field references not invalidated"
+   >:: test_field_references_not_invalidated;
   ]
 
 

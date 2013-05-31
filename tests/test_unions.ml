@@ -172,11 +172,20 @@ let test_updating_sealed_union () =
 
 
 let suite = "Union tests" >:::
-  ["inspecting float representation" >:: test_inspecting_float;
-   "detecting endianness" >:: test_endian_detection;
-   "union padding" >:: test_union_padding;
-   "union address" >:: test_union_address;
-   "updating sealed union" >:: test_updating_sealed_union;
+  ["inspecting float representation"
+   >:: test_inspecting_float;
+
+   "detecting endianness"
+   >:: test_endian_detection;
+
+   "union padding"
+   >:: test_union_padding;
+
+   "union address"
+   >:: test_union_address;
+
+   "updating sealed union"
+   >:: test_updating_sealed_union;
   ]
 
 

@@ -168,8 +168,9 @@ let test_div () =
 *)
 let test_qsort () =
   let comparator = ptr void @-> ptr void @-> returning int in
-  let qsort = foreign "qsort" (ptr void @-> size_t @-> size_t @-> funptr comparator @->
-                               returning void) in
+  let qsort = foreign "qsort"
+    (ptr void @-> size_t @-> size_t @-> funptr comparator @->
+     returning void) in
 
   let sortby (type a) (typ : a typ) (f : a -> a -> int) (l : a list) =
     let open Array in
@@ -207,12 +208,13 @@ let test_qsort () =
 let test_bsearch () =
   let module M = struct
     let comparator = ptr void @-> ptr void @-> returning int
-    let bsearch = foreign "bsearch" (ptr void @-> ptr void @-> size_t @-> size_t @->
-                                     funptr comparator @->
-                                     returning (ptr void))
+    let bsearch = foreign "bsearch"
+      (ptr void @-> ptr void @-> size_t @-> size_t @-> funptr comparator @->
+       returning (ptr void))
     
-    let qsort = foreign "qsort" (ptr void @-> size_t @-> size_t @-> funptr comparator @->
-                                 returning void)
+    let qsort = foreign "qsort"
+      (ptr void @-> size_t @-> size_t @-> funptr comparator @->
+       returning void)
     let strlen = foreign "strlen" (ptr char @-> returning size_t)
 
     (*
@@ -292,7 +294,10 @@ let test_bsearch () =
       let len = Size_t.of_int (Array.length array) in
       let size = Size_t.of_int (sizeof mi) in
       let r : unit ptr =
-        bsearch (to_voidp (addr key)) (to_voidp (Array.start array)) len size cmpi in
+        bsearch
+          (to_voidp (addr key))
+          (to_voidp (Array.start array))
+          len size cmpi in
       if r = null then None
       else Some (!(from_voidp mi r))
 
@@ -326,11 +331,20 @@ let test_bsearch () =
     
     
 let suite = "C standard library tests" >:::
-  ["test isX functions" >:: test_isX_functions;
-   "test string function" >:: test_string_functions;
-   "test div function" >:: test_div;
-   "test qsort function" >:: test_qsort;
-   "test bsearch function" >:: test_bsearch;
+  ["test isX functions"
+    >:: test_isX_functions;
+
+   "test string function"
+   >:: test_string_functions;
+
+   "test div function"
+   >:: test_div;
+   
+   "test qsort function"
+   >:: test_qsort;
+   
+   "test bsearch function"
+   >:: test_bsearch;
   ]
 
 

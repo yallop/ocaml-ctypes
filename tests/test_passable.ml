@@ -250,14 +250,29 @@ let test_incomplete_passability () =
 
 
 let suite = "Passability tests" >:::
-  ["primitives are passable" >:: test_primitives_are_passable;
-   "unions are not passable" >:: test_unions_are_not_passable;
-   "arrays are not passable" >:: test_arrays_are_not_passable;
-   "pointers are passable" >:: test_pointers_are_passable;
-   "function pointers are passable" >:: test_function_pointers_are_passable;
-   "abstract values are not passable" >:: test_abstract_values_are_not_passable;
-   "struct passability" >:: test_struct_passability;
-   "incomplete types are not passable" >:: test_incomplete_passability;
+  ["primitives are passable"
+    >:: test_primitives_are_passable;
+
+   "unions are not passable"
+    >:: test_unions_are_not_passable;
+
+   "arrays are not passable"
+    >:: test_arrays_are_not_passable;
+
+   "pointers are passable"
+    >:: test_pointers_are_passable;
+
+   "function pointers are passable"
+    >:: test_function_pointers_are_passable;
+
+   "abstract values are not passable"
+    >:: test_abstract_values_are_not_passable;
+
+   "struct passability"
+    >:: test_struct_passability;
+
+   "incomplete types are not passable"
+    >:: test_incomplete_passability;
   ]
 
 

@@ -193,15 +193,32 @@ end
 
 
 let suite = "sizeof tests" >:::
-  ["sizeof primitives" >:: test_sizeof_primitives;
-   "sizeof structs"    >:: test_sizeof_structs;
-   "sizeof unions"     >:: test_sizeof_unions;
-   "sizeof abstract"   >:: test_sizeof_abstract;
-   "sizeof incomplete" >:: test_sizeof_incomplete;
-   "sizeof void"       >:: test_sizeof_void;
-   "sizeof arrays"     >:: test_sizeof_arrays;
-   "sizeof pointers"   >:: test_sizeof_pointers;
-   "sizeof views"      >:: test_sizeof_views;
+  ["sizeof primitives"
+   >:: test_sizeof_primitives;
+   
+   "sizeof structs"
+   >:: test_sizeof_structs;
+   
+   "sizeof unions"
+   >:: test_sizeof_unions;
+
+   "sizeof abstract"
+   >:: test_sizeof_abstract;
+
+   "sizeof incomplete"
+   >:: test_sizeof_incomplete;
+
+   "sizeof void"
+   >:: test_sizeof_void;
+
+   "sizeof arrays"
+   >:: test_sizeof_arrays;
+
+   "sizeof pointers"
+   >:: test_sizeof_pointers;
+
+   "sizeof views"
+   >:: test_sizeof_views;
   ]
 
 

@@ -147,7 +147,8 @@ let test_oo_hierarchy () =
 
 
 let suite = "OO-style tests" >:::
-  ["OO style" >:: test_oo_hierarchy;
+  ["OO style"
+    >:: test_oo_hierarchy;
   ]
 
 

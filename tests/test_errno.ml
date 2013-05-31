@@ -10,7 +10,8 @@ open Ctypes
 
 
 (*
-  Call fdopendir() with a bogus file descriptor and check that an exception is raised. 
+   Call fdopendir() with a bogus file descriptor and check that an exception
+   is raised.
 *)
 let test_errno_exception_raised () =
   let fdopendir = foreign "fdopendir" (int @-> syscall (ptr void)) in
@@ -37,9 +38,14 @@ let test_errno_no_exception_raised () =
     
 
 let suite = "errno tests" >:::
-  ["Exception from fdopendir" >:: test_errno_exception_raised;
-   "Exception from chdir" >:: test_int_return_errno_exception_raised;
-   "No exception from chdir" >:: test_errno_no_exception_raised;
+  ["Exception from fdopendir"
+    >:: test_errno_exception_raised;
+
+   "Exception from chdir"
+   >:: test_int_return_errno_exception_raised;
+
+   "No exception from chdir"
+   >:: test_errno_no_exception_raised;
   ]
 
 

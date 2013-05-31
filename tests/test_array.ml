@@ -199,10 +199,17 @@ let test_passing_pointer_to_array_of_structs () =
 
 
 let suite = "Array tests" >:::
-  ["multidimensional arrays" >:: test_multidimensional_arrays;
-   "array initialization" >:: test_array_initialiation;
-   "pointer to array arithmetic" >:: test_pointer_to_array_arithmetic;
-   "passing pointer to array of structs" >:: test_passing_pointer_to_array_of_structs;
+  ["multidimensional arrays"
+    >:: test_multidimensional_arrays;
+
+   "array initialization"
+   >:: test_array_initialiation;
+
+   "pointer to array arithmetic"
+   >:: test_pointer_to_array_arithmetic;
+
+   "passing pointer to array of structs"
+   >:: test_passing_pointer_to_array_of_structs;
   ]
 
 

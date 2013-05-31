@@ -15,7 +15,7 @@ let testlib = Dl.(dlopen ~filename:"clib/test_functions.so" ~flags:[RTLD_NOW])
 (*
   Retrieve a struct exposed as a global value. 
 *)
-let test_retrieving_string () =
+let test_retrieving_struct () =
   let open Struct in
   let open Ptr in
   let s = structure "global_struct" in
@@ -35,7 +35,8 @@ let test_retrieving_string () =
 
 
 let suite = "Foreign value tests" >:::
-  ["retrieving string" >:: test_retrieving_string;
+  ["retrieving global struct"
+    >:: test_retrieving_struct;
   ]
 
 
