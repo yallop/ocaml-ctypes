@@ -134,11 +134,13 @@ let rec arg_type : 'a. 'a typ -> arg_type
     | Struct { spec = Incomplete _ } -> assert false
 
 (*
-  call addr callspec return (fun buffer ->
-  write arg_1 buffer v_1
-  write arg_2 buffer v_2
-  ...
-  write arg_n buffer v_n)
+  call addr callspec
+   (fun buffer ->
+        write arg_1 buffer v_1
+        write arg_2 buffer v_2
+        ...
+        write arg_n buffer v_n)
+   read_return_value
 *)
 let rec invoke : 'a. string option ->
                      'a ccallspec ->
@@ -260,11 +262,11 @@ and write : 'a. 'a typ -> offset:int -> 'a -> Raw.immediate_pointer -> unit
 
 (*
   callspec = allocate_callspec ()
-  arg_1 = add_argument callspec argtype
-  arg_2 = add_argument callspec argtype
+  add_argument callspec arg1
+  add_argument callspec arg2
   ...
-  arg_n = add_argument callspec argtype
-  return = prep_callspec callspec rettype
+  add_argument callspec argn
+  prep_callspec callspec rettype
 *)
 and build_ccallspec : 'a. 'a fn -> Raw.bufferspec -> 'a ccallspec
   = fun (type a) (fn : a fn) callspec -> match fn with
