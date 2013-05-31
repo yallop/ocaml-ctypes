@@ -107,44 +107,44 @@ struct
   let t = ptr ftsent
 
   let info : t -> fts_info
-    = fun t -> fts_info_of_int (UShort.to_int (!@(t |-> fts_info)))
+    = fun t -> fts_info_of_int (UShort.to_int (getf !@t fts_info))
 
   let accpath : t -> string
-    = fun t -> !@(t |-> fts_accpath)
+    = fun t -> getf !@t fts_accpath
 
   let path : t -> string
-    = fun t -> !@(t |-> fts_path)
+    = fun t -> getf !@t fts_path
 
   let name : t -> string
     = fun t -> 
       !@(from_voidp string (to_voidp (Ptr.make (ptr char) (t |-> fts_name))))
 
   let level : t -> int
-    = fun t -> !@(t |-> fts_level)
+    = fun t -> getf !@t fts_level
 
   let errno : t -> int
-    = fun t -> !@(t |-> fts_errno)
+    = fun t -> getf !@t fts_errno
 
   let number : t -> int
-    = fun t -> !@(t |-> fts_number)
+    = fun t -> getf !@t fts_number
 
   let set_number : t -> int -> unit
-    = fun t x -> t |-> fts_number <-@ x
+    = fun t -> setf !@t fts_number
 
   let pointer : t -> unit ptr
-    = fun t -> !@(t |-> fts_pointer)
+    = fun t -> getf !@t fts_pointer
 
   let set_pointer : t -> unit ptr -> unit
-    = fun t x -> t |-> fts_pointer <-@ x
+    = fun t -> setf !@t fts_pointer
 
   let parent : t -> t
-    = fun t -> !@(t |-> fts_parent)
+    = fun t -> getf !@t fts_parent
 
   let link : t -> t
-    = fun t -> !@(t |-> fts_link)
+    = fun t -> getf !@t fts_link
 
   let cycle : t -> t
-    = fun t -> !@(t |-> fts_cycle)
+    = fun t -> getf !@t fts_cycle
 end
 
 module FTS =
@@ -174,23 +174,23 @@ struct
   type t = fts structure ptr
 
   let cur : t -> FTSENT.t
-    = fun t -> !@(t |-> fts_cur)
+    = fun t -> getf !@t fts_cur
 
   let child : t -> FTSENT.t
-    = fun t -> !@(t |-> fts_child)
+    = fun t -> getf !@t fts_child
 
   let array : t -> FTSENT.t list
     = fun t ->
-      Array.(to_list (from_ptr !@(t |-> fts_array) !@(t |-> fts_nitems)))
+      Array.(to_list (from_ptr (getf !@t fts_array) (getf !@t fts_nitems)))
 
   let dev : t -> dev_t
-    = fun t -> !@(t |-> fts_dev)
+    = fun t -> getf !@t fts_dev
 
   let path : t -> string
-    = fun t -> !@(t |-> fts_path)
+    = fun t -> getf !@t fts_path
 
   let rfd : t -> int
-    = fun t -> !@(t |-> fts_rfd)
+    = fun t -> getf !@t fts_rfd
 end
 
 open FTSENT
