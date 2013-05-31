@@ -210,10 +210,10 @@ let _fts_read = foreign "fts_read" (ptr fts @-> syscall (ptr ftsent))
 let _fts_children = foreign "fts_children" (ptr fts @-> int @-> returning (ptr ftsent))
 
 (* int fts_set(FTS *ftsp, FTSENT *f, int options); *)
-let _fts_set = foreign "fts_set" (ptr fts @-> ptr (ftsent) @-> int @-> returning int)
+let _fts_set = foreign "fts_set" (ptr fts @-> ptr (ftsent) @-> int @-> syscall int)
 
 (* int fts_close(FTS *ftsp); *)
-let _fts_close = foreign "fts_close" (ptr fts @-> returning int) 
+let _fts_close = foreign "fts_close" (ptr fts @-> syscall int) 
 
 let crush_options f : 'a list -> int = List.fold_left (fun i o -> i lor (f o)) 0
 
@@ -223,14 +223,10 @@ let fts_read fts =
   else Some p
 
 let fts_close ftsp =
-  match _fts_close ftsp with 
-    | 0 -> ()
-    | _ -> failwith "fts_close error"
+  ignore (_fts_close ftsp)
       
 let fts_set ~ftsp ~f ~options =
-  match _fts_set ftsp f (crush_options fts_set_option_value options) with
-    | 0 -> ()
-    | _ -> failwith "fts_set error"
+  ignore (_fts_set ftsp f (crush_options fts_set_option_value options))
 
 let fts_children ~ftsp ~name_only =
   _fts_children ftsp (fts_children_option_of_bool name_only)
