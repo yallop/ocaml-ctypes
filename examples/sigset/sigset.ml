@@ -40,7 +40,7 @@ let full () =
 
    EINVAL The signum argument doesn't specify a valid signal. 
 *)
-let sigaddset = foreign "sigaddset" (ptr sigset_t @-> int @-> syscall int)
+let sigaddset = foreign "sigaddset" (ptr sigset_t @-> int @-> returning_checking_errno int)
 
 let add set signal = ignore (sigaddset set signal)
 
@@ -49,7 +49,7 @@ let add set signal = ignore (sigaddset set signal)
 
    The return value and error conditions are the same as for
    sigaddset.  *)
-let sigdelset = foreign "sigdelset" (ptr sigset_t @-> int @-> syscall int)
+let sigdelset = foreign "sigdelset" (ptr sigset_t @-> int @-> returning_checking_errno int)
 
 let del set signal = ignore (sigdelset set signal)
 
@@ -61,6 +61,6 @@ let del set signal = ignore (sigdelset set signal)
 
    EINVAL The signum argument doesn't specify a valid signal. 
 *)
-let sigismember = foreign "sigismember" (ptr sigset_t @-> int @-> syscall int)
+let sigismember = foreign "sigismember" (ptr sigset_t @-> int @-> returning_checking_errno int)
 
 let mem set signal = sigismember set signal <> 0

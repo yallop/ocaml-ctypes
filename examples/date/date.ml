@@ -22,7 +22,7 @@ let tm_yday  = tm *:* int (* day in the year *)
 let tm_isdst = tm *:* int (* daylight saving time *)
 let () = seals (tm : tm structure typ)
 
-let time = foreign "time" (ptr time_t @-> syscall time_t)
+let time = foreign "time" (ptr time_t @-> returning_checking_errno time_t)
   
 let asctime = foreign "asctime" (ptr tm @-> returning string)
 

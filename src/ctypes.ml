@@ -560,7 +560,7 @@ let returning v =
     raise (Unsupported "Unsupported return type")
   else
     Returns (false, v)
-let syscall v = Returns (true, v)
+let returning_checking_errno v = Returns (true, v)
 let funptr f = FunctionPointer f
 
 let strlen = foreign "strlen" (ptr char @-> returning size_t)

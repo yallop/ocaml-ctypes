@@ -14,7 +14,7 @@ open Ctypes
    is raised.
 *)
 let test_errno_exception_raised () =
-  let fdopendir = foreign "fdopendir" (int @-> syscall (ptr void)) in
+  let fdopendir = foreign "fdopendir" (int @-> returning_checking_errno (ptr void)) in
   assert_raises (Unix.Unix_error(Unix.EBADF, "fdopendir", ""))
     (fun () -> fdopendir (-300))
     
@@ -23,7 +23,7 @@ let test_errno_exception_raised () =
   Call chdir() with a valid directory path and check that zero is returned. 
 *)
 let test_int_return_errno_exception_raised () =
-  let chdir = foreign "chdir" (string @-> syscall int) in
+  let chdir = foreign "chdir" (string @-> returning_checking_errno int) in
   assert_raises (Unix.Unix_error(Unix.ENOENT, "chdir", ""))
     (fun () -> chdir "/unlikely_to_exist")
     
@@ -32,7 +32,7 @@ let test_int_return_errno_exception_raised () =
   Call chdir() with a valid directory path and check that zero is returned. 
 *)
 let test_errno_no_exception_raised () =
-  let chdir = foreign "chdir" (string @-> syscall int) in
+  let chdir = foreign "chdir" (string @-> returning_checking_errno int) in
   assert_equal 0 (chdir (Sys.getcwd ()))
 
     

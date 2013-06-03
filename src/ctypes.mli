@@ -127,7 +127,7 @@ val ptr_opt : 'a typ -> 'a ptr option typ
 val ( @-> ) : 'a typ -> 'b fn -> ('a -> 'b) fn
 
 val returning : 'a typ -> 'a fn
-val syscall : 'a typ -> 'a fn
+val returning_checking_errno : 'a typ -> 'a fn
 val funptr : ('a -> 'b) fn -> ('a -> 'b) typ
 val funptr_opt : ('a -> 'b) fn -> ('a -> 'b) option typ
 
