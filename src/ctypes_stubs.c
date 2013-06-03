@@ -23,8 +23,6 @@
 #include "managed_buffer_stubs.h"
 #include "type_info_stubs.h"
 
-/* #include <caml/threads.h> */
-
 /* TODO: support callbacks that raise exceptions?  e.g. using caml_callback_exn etc.  */
 /* TODO: thread support (caml_acquire_runtime_system / caml_release_runtime_system)
    (2) As a special case: If you enter/leave_blocking_section() then some
@@ -540,7 +538,7 @@ value ctypes_complete_structspec(value bufferspec_)
 value ctypes_pointer_plus(value ptr, value i)
 {
   char *p = (((char*)ptr) + Int_val(i));
-  assert(((intptr_t)p & 0x1) == 0); /* check alignment */
+  CTYPES_ENSURE_WORD_ALIGNED(p);
   return (value)p;
 }
 

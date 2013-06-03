@@ -212,14 +212,18 @@ external block_address : managed_buffer -> immediate_pointer
 external pointer_plus : immediate_pointer -> int -> immediate_pointer
   = "ctypes_pointer_plus"
 
+external memcpy :
+  dst:immediate_pointer -> dst_offset:int ->
+  src:immediate_pointer -> src_offset:int ->
+    size:int -> unit
+  = "ctypes_memcpy"
+
 (* An internal error: for example, an `ffi_type' object passed to
    ffi_prep_cif was incorrect. *)
 exception Ffi_internal_error of string
 let () = Callback.register_exception "FFI_internal_error"
   (Ffi_internal_error "")
 
-external memcpy :
-  dst:immediate_pointer -> dst_offset:int ->
-  src:immediate_pointer -> src_offset:int ->
-    size:int -> unit
-  = "ctypes_memcpy"
+exception Misaligned_pointer
+let () = Callback.register_exception "Misaligned_pointer"
+  Misaligned_pointer
