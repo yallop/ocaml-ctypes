@@ -448,10 +448,15 @@ let test_pointer_comparison () =
     !@buf
   in
 
+  let (<) l r = compare l r < 0
+  and (>) l r = compare l r > 0
+  and (=) l r = compare l r = 0 in
+
   (* equal but not identical pointers compare equal *)
   let p = make int 10 in
   let p' = from_voidp int (to_voidp p) in
-  assert_equal p p';
+  assert_bool "equal but not identical poitners compare equal"
+    (p = p');
 
   (* Canonicalization preserves ordering *)
   assert_bool "p < p+n"
@@ -515,7 +520,8 @@ let test_pointer_comparison () =
     (canonicalize p2 < canonicalize p3);
 
   (* Canonicalization preserves equality *)
-  assert_equal (to_voidp p) (canonicalize p)
+  assert_bool "canonicalization preserves equality"
+    (to_voidp p = canonicalize p)
 
 
 let suite = "Pointer tests" >:::

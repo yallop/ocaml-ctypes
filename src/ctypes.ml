@@ -348,6 +348,9 @@ struct
         p <-@ v;
         p
       end
+
+  let compare {raw_ptr=lp; pbyte_offset=loff} {raw_ptr=rp; pbyte_offset=roff}
+      = compare (Raw.pointer_plus lp loff) (Raw.pointer_plus rp roff)
 end
 
 module Array =
