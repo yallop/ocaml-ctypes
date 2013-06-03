@@ -165,7 +165,11 @@ value ctypes_allocate_struct_type_info(ffi_type ***args)
 
 
 static value Cast_from_voidp(void *p) { return (value)p; }
-static void *Cast_to_voidp(value p) { return (void *)p; }
+static void *Cast_to_voidp(value v) {
+  void *p = (void *)v;
+  CTYPES_ENSURE_WORD_ALIGNED(p);
+  return p;
+}
 
 make_primitive_interface(Val_int, Int_val, int8_t, int8_t, ffi_type_sint8)
 make_primitive_interface(Val_int, Int_val, int16_t, int16_t, ffi_type_sint16)

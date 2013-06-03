@@ -10,6 +10,7 @@
 
 #include <caml/mlvalues.h>
 #include <caml/fail.h>
+#include <caml/callback.h>
 
 #include <ffi.h>
 
