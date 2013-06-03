@@ -1,7 +1,7 @@
 OASISFormat: 0.3
 Name:        ctypes
 Version:     0.1
-Synopsis:    Manipulate external buffers as C-like structs
+Synopsis:    Combinators for binding to C libraries without writing any C.
 Authors:     Jeremy Yallop
 License:     MIT
 Plugins:     META (0.3)
@@ -13,21 +13,29 @@ Library ctypes
   Findlibname:      ctypes
   Modules:          Ctypes,PosixTypes
   InternalModules:  Unsigned,Signed,Ctypes_raw,Dl
-  CSources:         unsigned_stubs.h,unsigned_stubs.c,managed_buffer_stubs.h,managed_buffer_stubs.c,type_info_stubs.h,type_info_stubs.c,ctypes_stubs.c,dl_stubs.c,posix_types_stubs.c
+  CSources:         unsigned_stubs.h,unsigned_stubs.c,
+                    managed_buffer_stubs.h,managed_buffer_stubs.c,
+                    type_info_stubs.h,type_info_stubs.c,
+                    ctypes_stubs.c,
+                    dl_stubs.c,
+                    posix_types_stubs.c
   CCOpt:            -fPIC -Wall -Wno-unused-variable -g
-#  ByteOpt:          -warn-error A
+  BuildDepends:     unix
+  Install:          true
 
 Library fts
   Path:             examples/fts
   Findlibname:      fts
   Modules:          Fts
   BuildDepends:     ctypes
+  Install:          false
 
 Library sigset
   Path:             examples/sigset
   Findlibname:      sigset
   Modules:          Sigset
   BuildDepends:     ctypes
+  Install:          false
 
 Library ncurses
   Path:             examples/ncurses
@@ -35,6 +43,7 @@ Library ncurses
   Modules:          Ncurses
   BuildDepends:     ctypes
   CCLib:            -lncurses
+  Install:          false
 
 Executable ncurses_cmd
    Path:            examples/ncurses
@@ -43,6 +52,7 @@ Executable ncurses_cmd
    Install:         false
    BuildDepends:    unix,ncurses
    Custom:          true
+   Install:         false
 
 Executable fts_cmd
    Path:            examples/fts
@@ -282,6 +292,6 @@ Document ctypes
   Title:                Ctypes docs
   Type:                 ocamlbuild (0.3)
   BuildTools+:          ocamldoc
-  Install:		true
+  Install:              true
   XOCamlbuildPath:      .
   XOCamlbuildLibraries: ctypes

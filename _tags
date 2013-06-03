@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: ca984b4203b0f38bd0ab0b0b200df5ff)
+# DO NOT EDIT (digest: 88bad23826e7e6b982e49f396153021c)
 # Ignore VCS directories, you can use the same kind of rule outside 
 # OASIS_START/STOP if you want to exclude directories that contains 
 # useless stuff for the build process
@@ -23,11 +23,19 @@
 "src/dl_stubs.c": oasis_library_ctypes_ccopt
 "src/posix_types_stubs.c": oasis_library_ctypes_ccopt
 <src/ctypes.{cma,cmxa}>: use_libctypes_stubs
+<src/*.ml{,i}>: pkg_unix
+"src/unsigned_stubs.c": pkg_unix
+"src/managed_buffer_stubs.c": pkg_unix
+"src/type_info_stubs.c": pkg_unix
+"src/ctypes_stubs.c": pkg_unix
+"src/dl_stubs.c": pkg_unix
+"src/posix_types_stubs.c": pkg_unix
 # Library fts
 "examples/fts/fts.cmxs": use_fts
 # Library sigset
 "examples/sigset/sigset.cmxs": use_sigset
 <examples/sigset/*.ml{,i}>: use_ctypes
+<examples/sigset/*.ml{,i}>: pkg_unix
 # Library ncurses
 "examples/ncurses/ncurses.cmxs": use_ncurses
 <examples/ncurses/ncurses.{cma,cmxa}>: oasis_library_ncurses_cclib

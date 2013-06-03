@@ -1,7 +1,7 @@
 # OASIS_START
-# DO NOT EDIT (digest: d501f9709c8744b4580eeefd2b3092c1)
+# DO NOT EDIT (digest: 264d355b46519ec755d9aa1ee8f0b6fa)
 version = "0.1"
-description = "Manipulate external buffers as C-like structs"
+description = "Combinators for binding to C libraries without writing any C."
 requires = "ctypes"
 archive(byte) = "ncurses.cma"
 archive(byte, plugin) = "ncurses.cma"
