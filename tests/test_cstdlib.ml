@@ -43,7 +43,7 @@ let test_isX_functions () =
   in begin
     assert_bool "" (isalnum 'a');
     assert_bool "" (not (isalnum ' '));
-    
+
     assert_bool "" (isalpha 'x');
     assert_bool "" (not (isalpha ';'));
 
@@ -79,8 +79,8 @@ let test_isX_functions () =
 (*
   Call the functions
 
-    char *strchr(const char *str, int c); 
-    int strcmp(const char *str1, const char *str2); 
+    char *strchr(const char *str, int c);
+    int strcmp(const char *str1, const char *str2);
 *)
 let test_string_functions () =
   (* char *strchr(const char *str, int c);  *)
@@ -88,7 +88,7 @@ let test_string_functions () =
 
   (* int strcmp(const char *str1, const char *str2);  *)
   let strcmp = foreign "strcmp" (string @-> string @-> returning int) in
-  
+
   (* int memcmp(const void *ptr1, const void *ptr2, size_t num) *)
   let memcmp = foreign "memcmp"
     (ptr void @-> ptr void @-> size_t @-> returning int) in
@@ -100,6 +100,10 @@ let test_string_functions () =
   assert_equal "efg" (strchr "abcdefg" (Char.code 'e'))
     ~printer:(fun x -> x);
 
+  (* non-word-aligned pointers trigger exceptions (for now) *)
+  assert_raises Ctypes_raw.Misaligned_pointer
+    (fun () -> strchr "abcdefg" (Char.code 'd'));
+
   assert_bool "strcmp('abc', 'def') < 0"
     (strcmp "abc" "def" < 0);
 
@@ -109,15 +113,16 @@ let test_string_functions () =
   assert_bool "strcmp('abc', 'abc') == 0"
     (strcmp "abc" "abc" = 0);
 
+
   let open Ptr in
   let p1 = make int 10 and p2 = make int 20 in
   assert_bool "memcmp(&10, &20) < 0"
     (memcmp (to_voidp p1) (to_voidp p2) (Size_t.of_int (sizeof int)) < 0);
 
-  let p = allocate uchar 12 in 
+  let p = allocate uchar 12 in
   let i = 44 in
   let u = UChar.of_int i in begin
-    memset (to_voidp p) i (Size_t.of_int 12);
+    ignore (memset (to_voidp p) i (Size_t.of_int 12));
     for i = 0 to 11 do
       assert_equal u !@(p +@ i)
     done
@@ -145,7 +150,7 @@ let test_div () =
     let quot = div_t *:* int
     let rem = div_t *:* int
     let () = seals div_t
-      
+
     let div = foreign "div" (int @-> int @-> returning div_t)
 
     let test ~num ~dem ~quotient ~remainder =
@@ -153,9 +158,9 @@ let test_div () =
       let () = assert_equal quotient (getf v quot) in
       let () = assert_equal remainder (getf v rem) in
       ()
-      
+
     let () = test ~num:10 ~dem:2 ~quotient:5 ~remainder:0
-      
+
     let () = test ~num:11 ~dem:2 ~quotient:5 ~remainder:1
   end in ()
 
@@ -188,7 +193,7 @@ let test_qsort () =
     let () = qsort (to_voidp (start arr)) len size cmp in
     to_list arr
     in
-    
+
     assert_equal
       [5; 4; 3; 2; 1]
       (sortby int (fun x y -> - (compare x y)) [3; 4; 1; 2; 5]);
@@ -211,7 +216,7 @@ let test_bsearch () =
     let bsearch = foreign "bsearch"
       (ptr void @-> ptr void @-> size_t @-> size_t @-> funptr comparator @->
        returning (ptr void))
-    
+
     let qsort = foreign "qsort"
       (ptr void @-> size_t @-> size_t @-> funptr comparator @->
        returning void)
@@ -243,9 +248,9 @@ let test_bsearch () =
       done;
       arr.(len) <- '\000';
       arr
-      
+
   let as_string : char ptr -> string =
-    fun p -> 
+    fun p ->
       let len = Size_t.to_int (strlen p) in
       let s = String.create len in
       for i = 0 to len - 1 do
@@ -258,7 +263,7 @@ let test_bsearch () =
     setf m mr n;
     setf m name (Array.start (of_string s));
     m
- 
+
   open Ptr
 
   let cmpi m1 m2 =
@@ -267,7 +272,7 @@ let test_bsearch () =
     Pervasives.compare
       (as_string (!@(mi1 |-> name)))
       (as_string (!@(mi2 |-> name)))
-      
+
   let months = Array.of_list mi [
     mkmi 1 "jan";
     mkmi 2 "feb";
@@ -288,7 +293,7 @@ let test_bsearch () =
     (Size_t.of_int (Array.length months))
     (Size_t.of_int (sizeof mi))
     cmpi
-  
+
   let search : mi structure -> mi structure array -> mi structure option
     = fun key array ->
       let len = Size_t.of_int (Array.length array) in
@@ -320,16 +325,16 @@ let test_bsearch () =
       Some m -> assert_equal 5 (getf m mr)
     | _ -> assert false
 
-  let () = 
+  let () =
     assert_equal None (find_month_by_name "missing")
 
-  let () = 
+  let () =
     assert_equal None (find_month_by_name "")
 
   end in ()
-    
-    
-    
+
+
+
 let suite = "C standard library tests" >:::
   ["test isX functions"
     >:: test_isX_functions;
@@ -339,10 +344,10 @@ let suite = "C standard library tests" >:::
 
    "test div function"
    >:: test_div;
-   
+
    "test qsort function"
    >:: test_qsort;
-   
+
    "test bsearch function"
    >:: test_bsearch;
   ]
