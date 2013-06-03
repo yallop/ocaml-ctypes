@@ -75,7 +75,9 @@ value ctypes_dlsym(value handle_option, value symbol)
 {
   CAMLparam2(handle_option, symbol);
 
-  void *handle = handle_option == Val_none ? RTLD_DEFAULT : (void *)Some_val(handle_option);
+  void *handle = handle_option == Val_none
+    ? RTLD_DEFAULT
+    : (void *)Some_val(handle_option);
 
   char *s = String_val(symbol);
   void *result = dlsym(handle, s);

@@ -165,11 +165,13 @@ external prep_callspec : bufferspec -> _ ctype -> unit
 (* Call the function specified by `bufferspec' at the given address.
    The callback functions write the arguments to the buffer and read
    the return value. *)
-external call : immediate_pointer -> bufferspec -> (immediate_pointer -> unit) -> (immediate_pointer -> 'a) -> 'a
+external call : immediate_pointer -> bufferspec ->
+  (immediate_pointer -> unit) -> (immediate_pointer -> 'a) -> 'a
   = "ctypes_call"
 
 (* As ctypes_call, but check errno and raise Unix_error if the call failed. *)
-external call_errno : string -> immediate_pointer -> bufferspec -> (immediate_pointer -> unit) -> (immediate_pointer -> 'a) -> 'a
+external call_errno : string -> immediate_pointer -> bufferspec ->
+  (immediate_pointer -> unit) -> (immediate_pointer -> 'a) -> 'a
   = "ctypes_call_errno"
 
 type managed_buffer

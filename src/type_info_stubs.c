@@ -49,7 +49,8 @@
   }                                                                            \
 
 
-static value allocate_custom(struct custom_operations *ops, size_t size, void *prototype)
+static value allocate_custom(struct custom_operations *ops, size_t size,
+                             void *prototype)
 {
   /* http://caml.inria.fr/pub/docs/manual-ocaml-4.00/manual033.html#htoc286 */
   value block = caml_alloc_custom(ops, size, 0, 1);
@@ -266,19 +267,21 @@ value ctypes_void_type_info(value unit)
 /* sizeof : _ ctype -> int */
 value ctypes_sizeof(value typespec)
 {
-  return Val_int(((struct type_info *)(Data_custom_val(typespec)))->ffitype->size);
+  struct type_info *ti = (struct type_info *)Data_custom_val(typespec);
+  return Val_int(ti->ffitype->size);
 }
 
 
 /* alignment : _ ctype -> int */
 value ctypes_alignment(value typespec)
 {
-  return Val_int(((struct type_info *)(Data_custom_val(typespec)))->ffitype->alignment);
+  struct type_info *ti = (struct type_info *)Data_custom_val(typespec);
+  return Val_int(ti->ffitype->alignment);
 }
 
 
 /* Read a C value from a block of memory */
-/* read : ctype -> offset:int -> buffer -> 'a */
+/* read : 'a ctype -> offset:int -> immediate_pointer -> 'a */
 value ctypes_read(value ctype, value offset_, value buffer_)
 {
   CAMLparam3(ctype, offset_, buffer_);
@@ -290,7 +293,7 @@ value ctypes_read(value ctype, value offset_, value buffer_)
 
 
 /* Write a C value to a block of memory */
-/* write : ctype -> offset:int -> 'a -> buffer -> unit */
+/* write : 'a ctype -> offset:int -> 'a -> immediate_pointer -> unit */
 value ctypes_write(value ctype, value offset_, value v, value buffer_)
 {
   CAMLparam4(ctype, offset_, buffer_, v);

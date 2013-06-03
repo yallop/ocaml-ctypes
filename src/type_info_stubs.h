@@ -21,9 +21,6 @@ struct type_info {
   value     (*raw_write)(struct type_info *, void *, value);
 };
 
-/* allocate_type_info : unit -> _ ctype */
-extern value ctypes_allocate_type_info(value unit);
-
 /* allocate_struct_type_info : ffitype*** -> _ ctype */
 value ctypes_allocate_struct_type_info(ffi_type ***args);
 
@@ -62,11 +59,11 @@ extern value ctypes_sizeof(value ctype);
 extern value ctypes_alignment(value ctype);
 
 /* Read a C value from a block of memory */
-/* read : ctype -> offset:int -> buffer -> 'a */
+/* read : 'a ctype -> offset:int -> immediate_pointer -> 'a */
 extern value ctypes_read(value ctype, value offset, value buffer);
 
 /* Write a C value to a block of memory */
-/* write : ctype -> offset:int -> 'a -> buffer -> unit */
+/* write : 'a ctype -> offset:int -> 'a -> immediate_pointer -> unit */
 extern value ctypes_write(value ctype, value offset, value v, value buffer);
 
 /* Raise Misaligned_pointer unless the argument is word-aligned */

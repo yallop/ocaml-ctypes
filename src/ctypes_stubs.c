@@ -23,22 +23,17 @@
 #include "managed_buffer_stubs.h"
 #include "type_info_stubs.h"
 
-/* TODO: support callbacks that raise exceptions?  e.g. using caml_callback_exn etc.  */
-/* TODO: thread support (caml_acquire_runtime_system / caml_release_runtime_system)
-   (2) As a special case: If you enter/leave_blocking_section() then some
-   other thread might (almost certainly will) do an allocation. So any ocaml
-   values you need in enter/leave_blocking_section() need to be copied to C
-   values beforehand and values you need after need to be protected. */
+/* TODO: support callbacks that raise exceptions?  e.g. using
+   caml_callback_exn etc.  */
 
-static value allocate_custom(struct custom_operations *ops, size_t size, void *prototype)
+/* TODO: thread support */
+
+static value allocate_custom(struct custom_operations *ops, size_t size,
+                             void *prototype)
 {
   /* http://caml.inria.fr/pub/docs/manual-ocaml-4.00/manual033.html#htoc286 */
   value block = caml_alloc_custom(ops, size, 0, 1);
-  void *data = Data_custom_val(block);
-  if (prototype != NULL)
-  {
-    memcpy(data, prototype, size);
-  }
+  memcpy(Data_custom_val(block), prototype, size);
   return block;
 }
 
@@ -51,8 +46,7 @@ value ctypes_null_value(value unit)
 
 static void check_ffi_status(ffi_status status)
 {
-  switch (status)
-  {
+  switch (status) {
   case FFI_OK:
     break;
   case FFI_BAD_TYPEDEF:
@@ -66,6 +60,7 @@ static void check_ffi_status(ffi_status status)
   }
 }
 
+
 /* Given an offset into a fully-aligned buffer, compute the next
    offset that satisfies `alignment'. */
 static size_t aligned_offset(size_t offset, size_t alignment)
@@ -76,38 +71,36 @@ static size_t aligned_offset(size_t offset, size_t alignment)
     : offset - overhang + alignment;
 }
 
+
 /* A description of a typed buffer.  The bufferspec type serves a dual
-   purpose: it describes the buffer used to hold the arguments that we
-   pass to C functions via ffi_call, and it describes the layout of
-   structs.
-*/
+   purpose: it describes the buffer used to hold the arguments that we pass to
+   C functions via ffi_call, and it describes the layout of structs.  */
 static struct bufferspec {
-  /* The ffi_cif structure holds the information that we're
-     maintaining here, but it isn't part of the public interface. */
-
-  /* The space needed to store properly-aligned arguments and return
-     value. */
+  /* The ffi_cif structure holds the information that we're maintaining here,
+     but it isn't part of the public interface. */
+     
+  /* The space needed to store properly-aligned arguments and return value. */
   size_t bytes;
-
+     
   /* The number of elements. */
   size_t nelements;
-
+  
   /* The capacity of the args array, including the terminating null. */
   size_t capacity;
-
+  
   /* The maximum element alignment */
   size_t max_align;
-
+  
   /* The state of the bufferspec value. */
   enum { BUILDING,
          BUILDING_UNPASSABLE,
          STRUCTSPEC,
          STRUCTSPEC_UNPASSABLE,
          CALLSPEC } state;
-
+  
   /* A null-terminated array of size `nelements' types */
   ffi_type **args;
-
+  
 } bufferspec_prototype = {
   0, 0, 0, 0, BUILDING, NULL,
 };
@@ -115,17 +108,17 @@ static struct bufferspec {
 
 static struct callspec {
   struct bufferspec bufferspec;
-
+  
   /* return value offset */
   size_t roffset;
-
-  /* The libffi call interface structure.  It would be nice if this member
-     could be a value rather than a pointer (to save a layer of indirection)
-     but the ffi_closure structure keeps the address of the structure, and the
-     GC can move callspec values around.
+  
+  /* The libffi call interface structure.  It would be nice for this member to
+     be a value rather than a pointer (to save a layer of indirection) but the
+     ffi_closure structure keeps the address of the structure, and the GC can
+     move callspec values around.
   */
   ffi_cif *cif;
-
+  
 } callspec_prototype = {
   { 0, 0, 0, 0, BUILDING, NULL }, -1, NULL
 };
@@ -146,7 +139,7 @@ static int compare_bufferspecs(value l_, value r_)
 {
   struct bufferspec *lti = Data_custom_val(l_);
   struct bufferspec *rti = Data_custom_val(r_);
-
+  
   intptr_t l = (intptr_t)&lti->args;
   intptr_t r = (intptr_t)&rti->args;
   return (l > r) - (l < r);
@@ -156,7 +149,7 @@ static int compare_bufferspecs(value l_, value r_)
 static long hash_bufferspec(value v)
 {
   struct bufferspec *bufferspec = Data_custom_val(v);
-
+  
   return bufferspec->args != NULL
     ? caml_hash_mix_int64(0, (uint64)bufferspec->args)
     : 0;
@@ -185,31 +178,29 @@ static struct custom_operations bufferspec_custom_ops = {
  */
 typedef struct callbuffer callbuffer;
 
-/* Compute the size of the buffer needed to hold the pointer array
-   used by ffi_call, the arguments and the return value */
-static size_t compute_arg_buffer_size(struct bufferspec *bufferspec, size_t *arg_array_offset)
+/* Compute the size of the buffer needed to hold the pointer array used by
+   ffi_call, the arguments and the return value */
+static size_t compute_arg_buffer_size(struct bufferspec *bufferspec,
+                                      size_t *arg_array_offset)
 {
   assert(bufferspec->state == CALLSPEC);
-
+     
   size_t bytes = bufferspec->bytes;
-
+     
   *arg_array_offset = aligned_offset(bytes, ffi_type_pointer.alignment);
   bytes = *arg_array_offset + bufferspec->nelements * sizeof(void *);
-
+     
   return bytes;
 }
 
-/* Set the pointers in `arg_array' to the addresses of the argument
-   slots in `callbuffer' as indicated by the elements of the ffitype
-   array in the bufferspec.
- */ 
+/* Set the pointers in `arg_array' to the addresses of the argument slots in
+   `callbuffer' as indicated by the elements of the ffitype array in the
+   bufferspec.  */ 
 static void populate_arg_array(struct bufferspec *bufferspec,
-                               callbuffer *callbuffer,
-                               void **arg_array)
+                               callbuffer *callbuffer, void **arg_array)
 {
   size_t i = 0, offset = 0;
-  for (; i < bufferspec->nelements; i++)
-  {
+  for (; i < bufferspec->nelements; i++) {
     offset = aligned_offset(offset, bufferspec->args[i]->alignment);
     arg_array[i] = (char *)callbuffer + offset;
     offset += bufferspec->args[i]->size;
@@ -227,7 +218,7 @@ value ctypes_allocate_bufferspec(value unit)
 }
 
 /* Allocate a new C call specification */
-/* allocate_callspec : unit -> callspec */
+/* allocate_callspec : unit -> bufferspec */
 value ctypes_allocate_callspec(value unit)
 {
   return allocate_custom(&bufferspec_custom_ops,
@@ -236,7 +227,8 @@ value ctypes_allocate_callspec(value unit)
 }
 
 
-static int ctypes_add_unpassable_argument_(struct bufferspec *bufferspec, int size, int alignment)
+static int ctypes_add_unpassable_argument_(struct bufferspec *bufferspec,
+                                           int size, int alignment)
 {
   assert(bufferspec->state == BUILDING
       || bufferspec->state == BUILDING_UNPASSABLE);
@@ -256,16 +248,19 @@ static int ctypes_add_unpassable_argument_(struct bufferspec *bufferspec, int si
   return offset;
 }
 
-/* Add a struct element to the C call specification using only size and alignment information */
+/* Add a struct element to the C call specification using only size and
+   alignment information */
 /* add_unpassable_argument : bufferspec -> size:int -> alignment:int -> int */
-value ctypes_add_unpassable_argument(value bufferspec_, value size_, value alignment_)
+value ctypes_add_unpassable_argument(value bufferspec_, value size_,
+                                     value alignment_)
 {
   CAMLparam3(bufferspec_, size_, alignment_);
   struct bufferspec *bufferspec = Data_custom_val(bufferspec_);
   int size = Int_val(size_);
   int alignment = Int_val(alignment_);
 
-  CAMLreturn(Val_int(ctypes_add_unpassable_argument_(bufferspec, size, alignment))); 
+  int rv = ctypes_add_unpassable_argument_(bufferspec, size, alignment);
+  CAMLreturn(Val_int(rv)); 
 }
 
 
@@ -277,10 +272,10 @@ value ctypes_add_argument(value bufferspec_, value argument_)
 
   CAMLparam2(bufferspec_, argument_);
   struct bufferspec *bufferspec = Data_custom_val(bufferspec_);
-  ffi_type *argtype = (((struct type_info *)Data_custom_val(argument_)))->ffitype;
+  struct type_info *ti = (struct type_info *)Data_custom_val(argument_);
+  ffi_type *argtype = ti->ffitype;
 
   switch (bufferspec->state) {
-
   case BUILDING: {
     /* If there's a possibility that this spec represents an argument list or
        a struct we might pass by value then we have to take care to maintain
@@ -289,7 +284,8 @@ value ctypes_add_argument(value bufferspec_, value argument_)
     bufferspec->bytes = offset + argtype->size;
 
     if (bufferspec->nelements + 2 >= bufferspec->capacity) {
-      size_t new_size = (bufferspec->capacity + increment_size) * sizeof *bufferspec->args;
+      size_t new_size = ((bufferspec->capacity + increment_size)
+                         * sizeof *bufferspec->args);
       void *temp = realloc(bufferspec->args, new_size);
       if (temp == NULL) {
         caml_raise_out_of_memory();
@@ -308,11 +304,9 @@ value ctypes_add_argument(value bufferspec_, value argument_)
   case BUILDING_UNPASSABLE: {
     /* If this spec represents an unpassable struct then we can ignore the
        args, capacity and nelements members. */
-    int offset = ctypes_add_unpassable_argument_
-               (bufferspec,
-                argtype->size,
-                argtype->alignment);
-
+    int offset = ctypes_add_unpassable_argument_(bufferspec,
+                                                 argtype->size,
+                                                 argtype->alignment);
     CAMLreturn(Val_int(offset));
   }
   default: {
@@ -338,16 +332,18 @@ value ctypes_prep_callspec(value callspec_, value rtype)
   }
 
   /* Add the (aligned) space needed for the return value */
-  callspec->roffset = aligned_offset(callspec->bufferspec.bytes, rffitype->alignment);
+  callspec->roffset = aligned_offset(callspec->bufferspec.bytes,
+                                     rffitype->alignment);
   callspec->bufferspec.bytes = callspec->roffset + rffitype->size;
 
   /* Allocate an extra word after the return value space to work
      around a bug in libffi which causes it to write past the return
      value space.
 
-        https://github.com/atgreen/libffi/issues/35
+     https://github.com/atgreen/libffi/issues/35
   */
-  callspec->bufferspec.bytes = aligned_offset(callspec->bufferspec.bytes, ffi_type_pointer.alignment);
+  callspec->bufferspec.bytes = aligned_offset(callspec->bufferspec.bytes,
+                                              ffi_type_pointer.alignment);
   callspec->bufferspec.bytes += ffi_type_pointer.size;
 
   ffi_status status = ffi_prep_cif(callspec->cif,
@@ -364,8 +360,10 @@ value ctypes_prep_callspec(value callspec_, value rtype)
 
 /* Call the function specified by `callspec', passing arguments and return
    values in `buffer' */
-/* call' : voidp -> callspec -> (buffer -> unit) -> (buffer -> 'a) -> 'a */
-value ctypes_call(value function, value callspec_, value argwriter, value rvreader)
+/* call : immediate_pointer -> bufferspec -> (immediate_pointer -> unit) ->
+          (immediate_pointer -> 'a) -> 'a */
+value ctypes_call(value function, value callspec_, value argwriter,
+                  value rvreader)
 {
   CAMLparam4(function, callspec_, argwriter, rvreader);
 
@@ -395,7 +393,12 @@ value ctypes_call(value function, value callspec_, value argwriter, value rvread
   CAMLreturn(caml_callback(rvreader, (value)return_slot));
 }
 
-value ctypes_call_errno(value fnname, value function, value callspec_, value argwriter, value rvreader)
+
+/* call_errno : string -> immediate_pointer -> bufferspec -> 
+               (immediate_pointer -> unit) ->
+               (immediate_pointer -> 'a) -> 'a */
+value ctypes_call_errno(value fnname, value function, value callspec_,
+                        value argwriter, value rvreader)
 {
   CAMLparam5(fnname, function, callspec_, argwriter, rvreader);
   
@@ -453,7 +456,7 @@ static void callback_handler(ffi_cif *cif,
 
 
 /* Construct a pointer to a boxed n-ary function */
-/* make_function_pointer : callspec -> boxedfn -> voidp */
+/* make_function_pointer : bufferspec -> boxedfn -> immediate_pointer */
 value ctypes_make_function_pointer(value callspec_, value boxedfn)
 {
   CAMLparam2(callspec_, boxedfn);
@@ -463,16 +466,14 @@ value ctypes_make_function_pointer(value callspec_, value boxedfn)
 
   void (*code_address)(void) = NULL;
 
-  closure *closure = ffi_closure_alloc(sizeof *closure,
-                                       (void *)&code_address);
+  closure *closure = ffi_closure_alloc(sizeof *closure, (void *)&code_address);
 
   if (closure == NULL) {
     caml_raise_out_of_memory();
-  }
-  else {
+  } else {
     closure->fn = boxedfn;
    /* TODO: what should be the lifetime of OCaml functions passed to C
-      (ffi_closure objects) When can we call ffi_closure_free and
+      (ffi_closure objects)?  When can we call ffi_closure_free and
       caml_unregister_generational_global_root? */
     caml_register_generational_global_root(&(closure->fn));
 
@@ -490,7 +491,7 @@ value ctypes_make_function_pointer(value callspec_, value boxedfn)
 }
 
 
-/* _complete_struct_type : callspec -> _ctype */
+/* _complete_struct_type : bufferspec -> _ structure ctype */
 value ctypes_complete_structspec(value bufferspec_)
 {
   CAMLparam1(bufferspec_);
@@ -505,12 +506,13 @@ value ctypes_complete_structspec(value bufferspec_)
   switch (bufferspec->state) {
   case BUILDING: {
     /* We'll use prep_ffi_cif to trigger computation of the size and alignment
-       of the struct type rather than repeating what's already in libffi.  It'd
-       be nice if the initialize_aggregate function were exposed so that we
-       could do without the dummy cif.
+       of the struct type rather than repeating what's already in libffi.
+       It'd be nice if the initialize_aggregate function were exposed so that
+       we could do without the dummy cif.
     */
     ffi_cif _dummy_cif;
-    ffi_status status = ffi_prep_cif(&_dummy_cif, FFI_DEFAULT_ABI, 0, t->ffitype, NULL);
+    ffi_status status = ffi_prep_cif(&_dummy_cif, FFI_DEFAULT_ABI, 0,
+                                     t->ffitype, NULL);
 
     check_ffi_status(status);
 
@@ -534,7 +536,7 @@ value ctypes_complete_structspec(value bufferspec_)
   }
 }
 
-/* pointer_plus : char* -> int -> char* */
+/* pointer_plus : immediate_pointer -> int -> immediate_pointer */
 value ctypes_pointer_plus(value ptr, value i)
 {
   char *p = (((char*)ptr) + Int_val(i));
