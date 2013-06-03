@@ -434,6 +434,89 @@ let test_pointer_arithmetic () =
   done
     
 
+(*
+  Test pointer comparisons.
+*)
+let test_pointer_comparison () =
+  let open Ptr in
+
+  let canonicalize p =
+    (* Ensure that the 'pbyte_offset' component of the pointer is zero by
+       writing the pointer to memory and then reading it back. *)
+    let buf = Ptr.allocate ~count:1 (ptr void) in
+    buf <-@ (to_voidp p);
+    !@buf
+  in
+
+  (* equal but not identical pointers compare equal *)
+  let p = make int 10 in
+  let p' = from_voidp int (to_voidp p) in
+  assert_equal p p';
+
+  (* Canonicalization preserves ordering *)
+  assert_bool "p < p+n"
+    (p < (p +@ 10));
+    
+  assert_bool "canonicalize(p) < canonicalize(p+n)"
+    (canonicalize p < canonicalize (p +@ 10));
+
+  assert_bool "p > p-1"
+    (p > (p -@ 1));
+    
+  assert_bool "canonicalize(p) > canonicalize(p-1)"
+    (canonicalize p > canonicalize (p -@ 1));
+
+  let open Struct in
+  let s3 = structure "s3" in
+  let i = s3 *:* int in
+  let j = s3 *:* int in
+  let k = s3 *:* int in
+  let () = seals s3 in
+
+  let sp = addr (make s3) in
+  let p1 = to_voidp (sp |-> i)
+  and p2 = to_voidp (sp |-> j)
+  and p3 = to_voidp (sp |-> k) in
+
+  assert_bool "sp |-> i < sp |-> j"
+    (p1 < p2);
+
+  assert_bool "sp |-> i < canonicalize (sp |-> j)"
+    (p1 < canonicalize p2);
+
+  assert_bool "canonicalize (sp |-> i) < sp |-> j"
+    (canonicalize p1 < p2);
+
+  assert_bool "canonicalize (sp |-> i) < canonicalize (sp |-> j)"
+    (canonicalize p1 < canonicalize p2);
+
+  assert_bool "sp |-> i < sp |-> k"
+    (p1 < p3);
+
+  assert_bool "sp |-> i < canonicalize (sp |-> k)"
+    (p1 < canonicalize p3);
+
+  assert_bool "canonicalize (sp |-> i) < sp |-> k"
+    (canonicalize p1 < p3);
+
+  assert_bool "canonicalize (sp |-> i) < canonicalize (sp |-> k)"
+    (canonicalize p1 < canonicalize p3);
+
+  assert_bool "sp |-> j < sp |-> k"
+    (p2 < p3);
+
+  assert_bool "sp |-> j < canonicalize (sp |-> k)"
+    (p2 < canonicalize p3);
+
+  assert_bool "canonicalize (sp |-> j) < sp |-> k"
+    (canonicalize p2 < p3);
+
+  assert_bool "canonicalize (sp |-> j) < canonicalize (sp |-> k)"
+    (canonicalize p2 < canonicalize p3);
+
+  (* Canonicalization preserves equality *)
+  assert_equal (to_voidp p) (canonicalize p)
+
 
 let suite = "Pointer tests" >:::
   ["passing pointers"
@@ -477,6 +560,9 @@ let suite = "Pointer tests" >:::
 
    "arithmetic"
     >:: test_pointer_arithmetic;
+
+   "comparisons"
+    >:: test_pointer_comparison;
   ]
 
 
