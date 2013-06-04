@@ -32,7 +32,7 @@ let test_passing_struct () =
     let c = simple *:* int
     let f = simple *:* double
     let p = simple *:* ptr simple
-    let () = seals simple
+    let () = seal simple
       
     let accept_struct = foreign "accept_struct" (simple @-> returning int)
       ~from:testlib
@@ -74,7 +74,7 @@ let test_returning_struct () =
     let c = simple *:* int
     let f = simple *:* double
     let p = simple *:* ptr simple
-    let () = seals simple
+    let () = seal simple
 
     let return_struct = foreign "return_struct" (void @-> returning simple)
       ~from:testlib
@@ -124,7 +124,7 @@ let test_pointers_to_struct_members () =
     let i = styp *:* int
     let j = styp *:* int
     let k = styp *:* ptr int
-    let () = seals styp
+    let () = seal styp
 
     let s = make styp
 
@@ -164,7 +164,7 @@ let test_structs_with_union_members () =
     let uc = utyp +:+ char
     let ui = utyp +:+ int
     let uf = utyp +:+ double
-    let () = sealu utyp
+    let () = seal utyp
 
     let u = make utyp
     let () = begin
@@ -185,7 +185,7 @@ let test_structs_with_union_members () =
     let si = styp *:* int
     let su = styp *:* utyp
     let sc = styp *:* char
-    let () = seals styp
+    let () = seal styp
 
     let s = make styp
 
@@ -217,7 +217,7 @@ let test_structs_with_array_members () =
     let i = styp *:* int
     let a = styp *:* array 3 double
     let c = styp *:* char
-    let () = seals styp
+    let () = seal styp
 
     let s = make styp
 
@@ -274,7 +274,7 @@ let test_structs_with_array_members () =
 let test_updating_sealed_struct () =
   let styp = structure "sealed" in
   let _ = styp *:* int in
-  let () = seals styp in
+  let () = seal styp in
 
   assert_raises (ModifyingSealedType "sealed")
     (fun () -> styp *:* char)
@@ -299,13 +299,13 @@ let test_field_references_not_invalidated () =
     let () = (fun () ->
       let s2 : s2 structure typ = structure "s2" in
       let _ = s2 *:* int in
-      let () = seals s2 in
+      let () = seal s2 in
       let _ = s1 *:* s2 in
       ()
     ) ()
     let () = begin
       Gc.major ();
-      seals s1;
+      seal s1;
       assert_equal ~printer:string_of_int
         (sizeof int) (sizeof s1)
     end

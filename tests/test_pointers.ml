@@ -399,7 +399,7 @@ let test_pointer_arithmetic () =
   let twoints = structure "s" in
   let i1 = twoints *:* int in
   let i2 = twoints *:* int in
-  let () = seals twoints in
+  let () = seal twoints in
   
   (* Traverse the array using a 'struct twoints' pointer *)
   let ps = from_voidp twoints (to_voidp p) in
@@ -463,7 +463,7 @@ let test_pointer_comparison () =
   let i = s3 *:* int in
   let j = s3 *:* int in
   let k = s3 *:* int in
-  let () = seals s3 in
+  let () = seal s3 in
 
   let sp = addr (make s3) in
   let p1 = to_voidp (sp |-> i)

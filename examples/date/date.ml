@@ -19,7 +19,7 @@ let tm_year  = tm *:* int (* year *)
 let tm_wday  = tm *:* int (* day of the week *)
 let tm_yday  = tm *:* int (* day in the year *)
 let tm_isdst = tm *:* int (* daylight saving time *)
-let () = seals (tm : tm structure typ)
+let () = seal (tm : tm structure typ)
 
 let time = foreign "time" (ptr time_t @-> returning_checking_errno time_t)
   

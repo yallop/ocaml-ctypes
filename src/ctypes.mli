@@ -102,11 +102,9 @@ val funptr_opt : ('a -> 'b) fn -> ('a -> 'b) option typ
 
 val structure : string -> 's structure typ
 val ( *:* ) : 's structure typ -> 'a typ -> ('a, 's structure) field
-val seals : 's structure typ -> unit
-
 val union : string -> 's union typ
 val ( +:+ ) : 's union typ -> 'a typ -> ('a, 's union) field
-val sealu : 's union typ -> unit
+val seal : (_, _) structured typ -> unit
 
 val foreign : ?from:Dl.library -> string -> ('a -> 'b) fn -> ('a -> 'b)
 val foreign_value : ?from:Dl.library -> string -> 'a typ -> 'a ptr

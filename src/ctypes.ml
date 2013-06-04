@@ -439,10 +439,6 @@ let ( *:* ) (type b) (Struct s) (ftype : b typ) =
     in
     { ftype; foffset = offset ftype }
 
-let seals (Struct s) =
-  let bufspec = bufferspec s in
-  s.spec <- Complete (Raw.complete_struct_type bufspec)
-
 let addr { structured } = structured
 
 let offsetof { foffset } = foffset
@@ -457,11 +453,15 @@ let compute_union_padding { usize; ualignment } =
   if overhang = 0 then usize
   else usize - overhang + ualignment
 
-let sealu (Union u) = begin
-  ensure_unsealed u;
-  u.usize <- compute_union_padding u;
-  u.ucomplete <- true
-end
+let seal (type a) (type s) : (a, s) structured typ -> unit = function
+  | Struct s ->
+    let bufspec = bufferspec s in
+    s.spec <- Complete (Raw.complete_struct_type bufspec)
+  | Union u -> begin
+    ensure_unsealed u;
+    u.usize <- compute_union_padding u;
+    u.ucomplete <- true
+  end
 
 let ( +:+ ) (Union u) ftype =
   begin
