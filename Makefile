@@ -25,7 +25,7 @@ clean: setup.ml
 	ocaml setup.ml -clean
 	rm -f tests/clib/test_functions.so tests/clib/test_functions.o
 
-doc: setup.ml
+doc: setup.ml setup.data
 	ocaml setup.ml -doc
 
 ctestlib: tests/clib/test_functions.so

@@ -11,8 +11,8 @@ PostConfCommand: ocaml discover.ml -ocamlc $ocamlc -ext-obj $ext_obj -exec-name 
 Library ctypes
   Path:             src/
   Findlibname:      ctypes
-  Modules:          Ctypes,PosixTypes
-  InternalModules:  Unsigned,Signed,Ctypes_raw,Dl
+  Modules:          Unsigned,Signed,Dl,Ctypes,PosixTypes
+  InternalModules:  Ctypes_raw
   CSources:         unsigned_stubs.h,unsigned_stubs.c,
                     managed_buffer_stubs.h,managed_buffer_stubs.c,
                     type_info_stubs.h,type_info_stubs.c,

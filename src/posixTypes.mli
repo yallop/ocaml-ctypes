@@ -7,7 +7,11 @@
 
 open Ctypes
 
+(** Some POSIX types. *)
+
 (* arithmetic types from <sys/types.h> *)
+(** {2 POSIX arithmetic types} *)
+
 type blkcnt_t
 type blksize_t
 type clock_t
@@ -27,6 +31,8 @@ type suseconds_t
 type time_t
 type uid_t
 type useconds_t
+
+(** {3 Values representing POSIX arithmetic types} *)
 
 val blkcnt_t    : blkcnt_t typ
 val blksize_t   : blksize_t typ
@@ -49,6 +55,8 @@ val uid_t       : uid_t typ
 val useconds_t  : useconds_t typ
 
 (* non-arithmetic types from <sys/types.h> *)
+(** {2 POSIX non-arithmetic types} *)
+
 type key_t
 type pthread_t
 type pthread_attr_t
@@ -61,6 +69,8 @@ type pthread_once_t
 type pthread_rwlock_t
 type pthread_rwlockattr_t
 type sigset_t
+
+(** {3 Values representing POSIX non-arithmetic types} *)
 
 val key_t                : key_t typ
 val pthread_t            : pthread_t typ
