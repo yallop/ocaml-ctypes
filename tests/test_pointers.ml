@@ -511,6 +511,52 @@ let test_pointer_comparison () =
     (to_voidp p = canonicalize p)
 
 
+(*
+  Test pointer differences.
+*)
+let test_pointer_differences () =
+  let canonicalize p =
+    (* Ensure that the 'pbyte_offset' component of the pointer is zero by
+       writing the pointer to memory and then reading it back. *)
+    let buf = allocate_n ~count:1 (ptr void) in
+    buf <-@ (to_voidp p);
+    !@buf
+  in
+
+  let s = structure "s" in
+  let i = s *:* int in
+  let j = s *:* array 17 char in
+  let k = s *:* double in
+  let l = s *:* char in
+  let () = seal s in
+
+  let v = make s in
+  let p = addr v in
+
+  let to_charp p = from_voidp char (to_voidp p) in
+  let cp = to_charp p in
+
+  assert_equal (offsetof i) (ptr_diff cp (to_charp (p |-> i)));
+  assert_equal (offsetof j) (ptr_diff cp (to_charp (p |-> j)));
+  assert_equal (offsetof k) (ptr_diff cp (to_charp (p |-> k)));
+  assert_equal (offsetof l) (ptr_diff cp (to_charp (p |-> l)));
+
+  assert_equal (-offsetof i) (ptr_diff (to_charp (p |-> i)) cp);
+  assert_equal (-offsetof j) (ptr_diff (to_charp (p |-> j)) cp);
+  assert_equal (-offsetof k) (ptr_diff (to_charp (p |-> k)) cp);
+  assert_equal (-offsetof l) (ptr_diff (to_charp (p |-> l)) cp);
+
+  assert_equal (offsetof i) (ptr_diff cp (to_charp (canonicalize (p |-> i))));
+  assert_equal (offsetof j) (ptr_diff cp (to_charp (canonicalize (p |-> j))));
+  assert_equal (offsetof k) (ptr_diff cp (to_charp (canonicalize (p |-> k))));
+  assert_equal (offsetof l) (ptr_diff cp (to_charp (canonicalize (p |-> l))));
+
+  assert_equal (-offsetof i) (ptr_diff (to_charp (canonicalize (p |-> i))) cp);
+  assert_equal (-offsetof j) (ptr_diff (to_charp (canonicalize (p |-> j))) cp);
+  assert_equal (-offsetof k) (ptr_diff (to_charp (canonicalize (p |-> k))) cp);
+  assert_equal (-offsetof l) (ptr_diff (to_charp (canonicalize (p |-> l))) cp)
+
+
 let suite = "Pointer tests" >:::
   ["passing pointers"
     >:: test_passing_pointers;
@@ -556,6 +602,9 @@ let suite = "Pointer tests" >:::
 
    "comparisons"
     >:: test_pointer_comparison;
+
+   "differences"
+    >:: test_pointer_differences;
   ]
 
 

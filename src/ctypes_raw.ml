@@ -214,6 +214,11 @@ external block_address : managed_buffer -> immediate_pointer
 external pointer_plus : immediate_pointer -> int -> immediate_pointer
   = "ctypes_pointer_plus"
 
+(* Pointer difference. *)
+external pointer_diff : immediate_pointer -> int -> immediate_pointer -> int
+  -> int
+  = "ctypes_pointer_diff"
+
 external memcpy :
   dst:immediate_pointer -> dst_offset:int ->
   src:immediate_pointer -> src_offset:int ->

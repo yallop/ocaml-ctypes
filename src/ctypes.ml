@@ -308,11 +308,11 @@ let rec (!@) : 'a. 'a ptr -> 'a
       (* If it's a value type then we cons a new value. *)
       | _ -> build reftype ~offset raw_ptr
 
-let ptr_diff : 'a. 'a ptr -> 'a ptr -> int
-  = fun { pbyte_offset = o1; reftype } { pbyte_offset = o2 } ->
+let ptr_diff { raw_ptr = lp; pbyte_offset = loff; reftype }
+    { raw_ptr = rp; pbyte_offset = roff } =
     (* We assume the pointers are properly aligned, or at least that
        the difference is a multiple of sizeof reftype. *)
-    (o2 - o1) / sizeof reftype
+  Raw.pointer_diff lp loff rp roff / sizeof reftype
 
 let (+@) : 'a. 'a ptr -> int -> 'a ptr
   = fun ({ pbyte_offset; reftype } as p) x ->
@@ -345,7 +345,7 @@ let allocate : 'a. 'a typ -> 'a -> 'a ptr
       p
     end
 
-let ptr_compare {raw_ptr=lp; pbyte_offset=loff} {raw_ptr=rp; pbyte_offset=roff}
+let ptr_compare {raw_ptr = lp; pbyte_offset = loff} {raw_ptr = rp; pbyte_offset = roff}
     = compare (Raw.pointer_plus lp loff) (Raw.pointer_plus rp roff)
 
 module Array =

@@ -545,6 +545,15 @@ value ctypes_pointer_plus(value ptr, value i)
 }
 
 
+/* pointer_diff : immediate_pointer -> int -> immediate_pointer -> int -> int */
+value ctypes_pointer_diff(value lp, value loff, value rp, value roff)
+{
+  char *l = (char*)lp + Int_val(loff);
+  char *r = (char*)rp + Int_val(roff);
+  return Val_int(r - l);
+}
+
+
 /* memcpy : dest:immediate_pointer -> dest_offset:int ->
             src:immediate_pointer -> src_offset:int ->
             size:int -> unit */
