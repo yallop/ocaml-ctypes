@@ -5,35 +5,43 @@
  * See the file LICENSE for details.
  *)
 
+open Signed
+open Unsigned
+
 type 'a typ
 type 'a fn
 type 'a ptr
 type 'a array
-type 'a structure
-type 'a union
+type ('a, 'kind) structured
+type 'a structure = ('a, [`Struct]) structured
+type 'a union = ('a, [`Union]) structured
 type 'a abstract
+type ('a, 't) field
 
 exception Unsupported of string
 exception ModifyingSealedType of string
 exception IncompleteType
 
-module Ptr :
-sig
-  type 'a t = 'a ptr
+val make : ((_, _) structured as 's) typ -> 's
+val setf : ((_, _) structured as 's) -> ('a, 's) field -> 'a -> unit
+val getf : ((_, _) structured as 's) -> ('a, 's) field -> 'a
+val (@.) : ((_, _) structured as 's) -> ('a, 's) field -> 'a ptr
+val (|->) : ((_, _) structured as 's) ptr -> ('a, 's) field -> 'a ptr
+val offsetof : (_, (_, [`Struct]) structured) field -> int
+val addr : ((_, _) structured as 's) -> 's ptr
 
-  val null : unit ptr
-  val (!@) : 'a t -> 'a
-  val (<-@) : 'a t -> 'a -> unit
-  val (+@) : 'a t -> int -> 'a t
-  val (-@) : 'a t -> int -> 'a t
-  val diff : 'a t -> 'a t -> int
-  val from_voidp : 'a typ -> unit ptr -> 'a ptr
-  val to_voidp : _ ptr -> unit ptr
-  val make : 'a typ -> 'a -> 'a ptr
-  val allocate : 'a typ -> count:int -> 'a ptr
+val null : unit ptr
+val (!@) : 'a ptr -> 'a
+val (<-@) : 'a ptr -> 'a -> unit
+val (+@) : 'a ptr -> int -> 'a ptr
+val (-@) : 'a ptr -> int -> 'a ptr
+val ptr_diff : 'a ptr -> 'a ptr -> int
+val from_voidp : 'a typ -> unit ptr -> 'a ptr
+val to_voidp : _ ptr -> unit ptr
+val allocate : 'a typ -> 'a -> 'a ptr
+val allocate_n : 'a typ -> count:int -> 'a ptr
 
-  val compare : 'a t -> 'a t -> int
-end
+val ptr_compare : 'a ptr -> 'a ptr -> int
 
 module Array :
 sig
@@ -51,46 +59,8 @@ sig
   val make : 'a typ -> ?initial:'a -> int -> 'a t
 end
 
-module Struct :
-sig
-  type 's t = 's structure
-  type ('a, -'s) field
-
-  val structure : string -> 's structure typ
-  val ( *:* ) : 's structure typ -> 'a typ -> ('a, 's) field
-  val seals : 's structure typ -> unit
-
-  val make : 's structure typ -> 's structure
-  val setf : 's structure -> ('a, 's) field -> 'a -> unit
-  val getf : 's structure -> ('a, 's) field -> 'a
-  val (@.) : 's structure -> ('a, 's) field -> 'a ptr
-  val (|->) : 's structure ptr -> ('a, 's) field -> 'a ptr
-  val offsetof : (_, _) field -> int
-  val addr : 's structure -> 's structure ptr
-end
-
-module Union :
-sig
-  type 's t = 's union
-  type ('a, -'s) field
-
-  val union : string -> 's union typ
-  val ( +:+ ) : 's union typ -> 'a typ -> ('a, 's) field
-  val sealu : 's union typ -> unit
-
-  val make : 's union typ -> 's union
-  val setf : 's union -> ('a, 's) field -> 'a -> unit
-  val getf : 's union -> ('a, 's) field -> 'a
-  val (@.) : 's union -> ('a, 's) field -> 'a ptr
-  val (|->) : 's union ptr -> ('a, 's) field -> 'a ptr
-  val addr : 's union -> 's union ptr
-end
-
 val sizeof : 'a typ -> int
 val alignment : 'a typ -> int
-
-open Signed
-open Unsigned
 
 val void  : unit typ
 val char : char typ
@@ -125,11 +95,18 @@ val array : int -> 'a typ -> 'a array typ
 val ptr : 'a typ -> 'a ptr typ
 val ptr_opt : 'a typ -> 'a ptr option typ
 val ( @-> ) : 'a typ -> 'b fn -> ('a -> 'b) fn
-
 val returning : 'a typ -> 'a fn
 val returning_checking_errno : 'a typ -> 'a fn
 val funptr : ('a -> 'b) fn -> ('a -> 'b) typ
 val funptr_opt : ('a -> 'b) fn -> ('a -> 'b) option typ
+
+val structure : string -> 's structure typ
+val ( *:* ) : 's structure typ -> 'a typ -> ('a, 's structure) field
+val seals : 's structure typ -> unit
+
+val union : string -> 's union typ
+val ( +:+ ) : 's union typ -> 'a typ -> ('a, 's union) field
+val sealu : 's union typ -> unit
 
 val foreign : ?from:Dl.library -> string -> ('a -> 'b) fn -> ('a -> 'b)
 val foreign_value : ?from:Dl.library -> string -> 'a typ -> 'a ptr

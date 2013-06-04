@@ -74,8 +74,6 @@ end
   Test some properties of the sizes of unions.
 *)
 let test_sizeof_unions () =
-  let open Union in
-
   let int_char = union "int_char" in
   let _ = int_char +:+ int in
   let _ = int_char +:+ char in
@@ -96,8 +94,6 @@ let test_sizeof_unions () =
 *)
 let test_sizeof_structs () =
   let module M = struct
-    open Struct
-
     (* We don't expect homogeneous structs consisting of words to have
        any padding. *)
     type h
@@ -129,10 +125,10 @@ let test_sizeof_abstract () =
 *)
 let test_sizeof_incomplete () = begin
   assert_raises IncompleteType
-    (fun () -> sizeof (Struct.structure "incomplete"));
+    (fun () -> sizeof (structure "incomplete"));
 
   assert_raises IncompleteType
-    (fun () -> sizeof (Union.union "incomplete"));
+    (fun () -> sizeof (union "incomplete"));
 end
   
 
@@ -166,7 +162,6 @@ let test_sizeof_pointers () = begin
   assert_equal pointer_size (sizeof (funptr (int @-> returning int)));
   assert_equal pointer_size (sizeof (ptr (ptr void)));
   let module M = struct
-    open Struct
     type t
     let t : t structure typ = structure "t"
     let c = t *:* int

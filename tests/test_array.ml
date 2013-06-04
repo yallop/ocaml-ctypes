@@ -113,10 +113,8 @@ let test_array_initialiation () =
   Test that creating an array initializes all elements appropriately.
 *)
 let test_pointer_to_array_arithmetic () =
-  let open Ptr in
-
   (* int ( * )[3] *)
-  let p = allocate (array 3 int) ~count:4 in
+  let p = allocate_n (array 3 int) ~count:4 in
   p <-@ Array.of_list int [1; 2; 3];
   (p +@ 1) <-@ Array.of_list int [4; 5; 6];
   (p +@ 2) <-@ Array.of_list int [7; 8; 9];
@@ -135,14 +133,11 @@ let test_pointer_to_array_arithmetic () =
   Test passing pointer to array of structs.
 *)
 let test_passing_pointer_to_array_of_structs () =
-  let open Ptr in
-
   (* union u {
         int i;
         double d;
      }
   *)
-  let open Union in
   let u = union "u" in
   let i = u +:+ int in
   let d = u +:+ double in
@@ -153,7 +148,6 @@ let test_passing_pointer_to_array_of_structs () =
         union u data;
      }
   *)
-  let open Struct in
   let s = structure "s" in
   let tag = s *:* char in
   let data = s *:* u in
@@ -163,7 +157,7 @@ let test_passing_pointer_to_array_of_structs () =
     let v = make s in
     setf v tag 'i';
     let pd = v @. data in
-    Union.(pd |-> i) <-@ x;
+    (pd |-> i) <-@ x;
     v
   in
 
@@ -171,7 +165,7 @@ let test_passing_pointer_to_array_of_structs () =
     let v = make s in
     setf v tag 'd';
     let pd = v @. data in
-    Union.(pd |-> d) <-@ x;
+    (pd |-> d) <-@ x;
     v
   in
 
@@ -182,9 +176,9 @@ let test_passing_pointer_to_array_of_structs () =
 
   let sum = 
     accepts_pointer_to_array_of_structs
-      (Ptr.from_voidp
+      (from_voidp
          (array 5 s)
-         (Ptr.to_voidp
+         (to_voidp
             (Array.start
                (Array.of_list s
                   [box_int 10;

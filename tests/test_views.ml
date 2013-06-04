@@ -31,11 +31,11 @@ let test_passing_string_array () =
   let buf = Array.make char outlen in
 
   let () = Array.(concat (start arr) (length arr) (start buf)) in
-  let buf_addr = Ptr.make (ptr char) (Array.start buf) in
-  let s = Ptr.from_voidp string (Ptr.to_voidp buf_addr) in
+  let buf_addr = allocate (ptr char) (Array.start buf) in
+  let s = from_voidp string (to_voidp buf_addr) in
 
   assert_equal ~msg:"Check output"
-    "the quick brown fox etc. etc. " Ptr.(!@s)
+    "the quick brown fox etc. etc. " !@s
 
 
 (*
@@ -63,7 +63,6 @@ let test_passing_chars_as_ints () =
   Use views to create a nullable function pointer.
 *)
 let test_nullable_function_pointer_view () =
-  let open Ptr in
   let nullable_intptr = funptr_opt (int @-> int @-> returning int) in
   let returning_funptr =
     foreign "returning_funptr" ~from:testlib
@@ -102,9 +101,8 @@ let test_nullable_function_pointer_view () =
   Use the nullable pointer view to view nulls as Nones.
 *)
 let test_nullable_pointer_view () =
-  let open Ptr in
-  let p = Ptr.make int 10 in
-  let pp = make (ptr int) p in
+  let p = allocate int 10 in
+  let pp = allocate (ptr int) p in
   let npp = from_voidp (ptr_opt int) (to_voidp pp) in
   begin
     assert_equal 10 !@ !@pp;

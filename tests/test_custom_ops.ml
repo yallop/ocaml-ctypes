@@ -19,10 +19,9 @@ let hash = Hashtbl.hash
   hashes and compare unequal.
 *)
 let test_managed_buffer_hashing_and_equality () =
-  let open Ptr in
-  let i1 = make int 20 in
-  let i2 = make int 20 in
-  assert_equal (!@i1) (!@i2);
+  let i1 = allocate int 20 in
+  let i2 = allocate int 20 in
+  assert_equal !@i1 !@i2;
   assert_equal (hash i1) (hash i1);
   assert_bool
     "equal-but-not-identical objects have distinct hashes"
@@ -42,8 +41,6 @@ let test_managed_buffer_hashing_and_equality () =
 
 let test_type_info_hashing_and_equality () =
   let module M = struct
-    open Struct
-      
     type s
     let s : s structure typ = structure "s"
     let _ = begin

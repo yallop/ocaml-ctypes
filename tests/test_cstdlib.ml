@@ -113,13 +113,11 @@ let test_string_functions () =
   assert_bool "strcmp('abc', 'abc') == 0"
     (strcmp "abc" "abc" = 0);
 
-
-  let open Ptr in
-  let p1 = make int 10 and p2 = make int 20 in
+  let p1 = allocate int 10 and p2 = allocate int 20 in
   assert_bool "memcmp(&10, &20) < 0"
     (memcmp (to_voidp p1) (to_voidp p2) (Size_t.of_int (sizeof int)) < 0);
 
-  let p = allocate uchar 12 in
+  let p = allocate_n uchar 12 in
   let i = 44 in
   let u = UChar.of_int i in begin
     ignore (memset (to_voidp p) i (Size_t.of_int 12));
@@ -144,7 +142,6 @@ let test_string_functions () =
 *)
 let test_div () =
   let module M = struct
-    open Struct
     type div_t
     let div_t : div_t structure typ = structure "div_t"
     let quot = div_t *:* int
@@ -181,7 +178,6 @@ let test_qsort () =
     let open Array in
     let open Size_t in
     let open Infix in
-    let open Ptr in
     let arr = of_list typ l in
     let len = of_int (length arr) in
     let size = of_int (sizeof typ) in
@@ -232,7 +228,6 @@ let test_bsearch () =
          { 9, "sep" }, {10, "oct" }, {11, "nov" }, {12, "dec" }
       };
     *)
-    open Struct
     type mi
     let mi = structure "mi"
     let mr   = mi *:* int
@@ -254,7 +249,7 @@ let test_bsearch () =
       let len = Size_t.to_int (strlen p) in
       let s = String.create len in
       for i = 0 to len - 1 do
-        s.[i] <- Ptr.(!@(p +@ i));
+        s.[i] <- !@(p +@ i);
       done;
       s
 
@@ -263,8 +258,6 @@ let test_bsearch () =
     setf m mr n;
     setf m name (Array.start (of_string s));
     m
-
-  open Ptr
 
   let cmpi m1 m2 =
     let mi1 = from_voidp mi m1 in

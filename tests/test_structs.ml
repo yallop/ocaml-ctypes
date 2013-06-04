@@ -27,7 +27,6 @@ let testlib = Dl.(dlopen ~filename:"clib/test_functions.so" ~flags:[RTLD_NOW])
 *)
 let test_passing_struct () =
   let module M = struct
-    open Struct
     type simple
     let simple : simple structure typ = structure "simple"
     let c = simple *:* int
@@ -40,11 +39,11 @@ let test_passing_struct () =
       
     let s = make simple
 
-    let () = Ptr.(begin
+    let () = begin
       setf s c 10;
       setf s f 14.5;
       setf s p (from_voidp simple null)
-    end)
+    end
       
     let v = accept_struct s
 
@@ -69,7 +68,6 @@ let test_passing_struct () =
 *)
 let test_returning_struct () =
   let module M = struct
-    open Struct
     type simple
 
     let simple : simple structure typ = structure "simple"
@@ -88,12 +86,12 @@ let test_returning_struct () =
 
     let t = getf s p
 
-    let () = assert_equal 10 Ptr.(!@(t |-> c))
+    let () = assert_equal 10 !@(t |-> c)
       ~printer:string_of_int
-    let () = assert_equal 12.5 Ptr.(!@(t |-> f))
+    let () = assert_equal 12.5 !@(t |-> f)
       ~printer:string_of_float
 
-    let () = assert_equal Ptr.(!@(t |-> p)) t
+    let () = assert_equal !@(t |-> p) t
 
   end in ()
 
@@ -102,7 +100,6 @@ let test_returning_struct () =
   Check that attempts to use incomplete types for struct members are rejected.
 *)
 let test_incomplete_struct_members () =
-  let open Struct in
   let s = structure "s" in begin
 
     assert_raises IncompleteType
@@ -112,7 +109,7 @@ let test_incomplete_struct_members () =
       (fun () -> s *:* structure "incomplete");
 
     assert_raises IncompleteType
-      (fun () -> s *:* Union.union "incomplete");
+      (fun () -> s *:* union "incomplete");
   end
 
 
@@ -121,7 +118,6 @@ let test_incomplete_struct_members () =
 *)
 let test_pointers_to_struct_members () =
   let module M = struct
-    open Struct
     type s
 
     let styp : s structure typ = structure "s"
@@ -132,7 +128,7 @@ let test_pointers_to_struct_members () =
 
     let s = make styp
 
-    let () = Ptr.(begin
+    let () = begin
       let sp = addr s in
       sp |-> i <-@ 10;
       sp |-> j <-@ 20;
@@ -153,7 +149,7 @@ let test_pointers_to_struct_members () =
       (sp |-> k) <-@ (sp |-> i);
       assert_equal ~msg:"*sp->k = 15" ~printer:string_of_int
         15 (!@(!@(sp |-> k)));
-    end)
+    end
   end in ()
 
 
@@ -164,7 +160,6 @@ let test_structs_with_union_members () =
   let module M = struct
     type u and s
 
-    open Union
     let utyp : u union typ = union "u"
     let uc = utyp +:+ char
     let ui = utyp +:+ int
@@ -186,7 +181,6 @@ let test_structs_with_union_members () =
         5.55 (getf u uf);
     end
 
-    open Struct
     let styp : s structure typ = structure "s"
     let si = styp *:* int
     let su = styp *:* utyp
@@ -204,7 +198,7 @@ let test_structs_with_union_members () =
         22 (getf s si);
       
       assert_equal ~msg:"s.su.uc = 5.55" ~printer:string_of_float
-        5.55 (Union.getf (getf s su) uf);
+        5.55 (getf (getf s su) uf);
 
       assert_equal ~msg:"s.sc = 'z'" ~printer:(String.make 1)
         'z' (getf s sc);
@@ -219,7 +213,6 @@ let test_structs_with_array_members () =
   let module M = struct
     type u and s
 
-    open Struct
     let styp : s structure typ = structure "s"
     let i = styp *:* int
     let a = styp *:* array 3 double
@@ -279,7 +272,6 @@ let test_structs_with_array_members () =
   Test that attempting to update a sealed struct is treated as an error.
 *)
 let test_updating_sealed_struct () =
-  let open Struct in
   let styp = structure "sealed" in
   let _ = styp *:* int in
   let () = seals styp in
@@ -294,7 +286,6 @@ let test_updating_sealed_struct () =
 *)
 let test_field_references_not_invalidated () =
   let module M = struct
-    open Struct
     type s1 and s2
 
     (*

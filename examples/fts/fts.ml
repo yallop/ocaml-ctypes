@@ -69,13 +69,12 @@ let fts_set_option_value = function
   | FTS_FOLLOW -> 2
   | FTS_SKIP   -> 4
 
-let castp typ p = Ptr.(from_voidp typ (to_voidp p))
+let castp typ p = from_voidp typ (to_voidp p)
 
 module FTSENT =
 struct
   open PosixTypes
   open Unsigned
-  open Struct
 
   type ftsent
   let ftsent : ftsent structure typ = structure "ftsent"
@@ -101,8 +100,6 @@ struct
   let fts_name    = ftsent *:* char
   let () = seals ftsent
 
-  open Ptr
-
   type t = ftsent structure ptr
   let t = ptr ftsent
 
@@ -117,7 +114,7 @@ struct
 
   let name : t -> string
     = fun t -> 
-      !@(from_voidp string (to_voidp (Ptr.make (ptr char) (t |-> fts_name))))
+      !@(from_voidp string (to_voidp (allocate (ptr char) (t |-> fts_name))))
 
   let level : t -> int
     = fun t -> getf !@t fts_level
@@ -149,7 +146,6 @@ end
 
 module FTS =
 struct
-  open Struct
   open PosixTypes
   open FTSENT
 
@@ -168,8 +164,6 @@ struct
   (* fts_options would work well as a view *)
   let fts_options = fts *:* int
   let () = seals fts
-
-  open Ptr
 
   type t = fts structure ptr
 
@@ -219,7 +213,7 @@ let crush_options f : 'a list -> int = List.fold_left (fun i o -> i lor (f o)) 0
 
 let fts_read fts =
   let p = _fts_read fts in
-  if Ptr.(to_voidp p = null) then None
+  if to_voidp p = null then None
   else Some p
 
 let fts_close ftsp =
@@ -235,7 +229,7 @@ let null_terminated_array_of_ptr_list typ list =
   let nitems = List.length list in
   let arr = Array.make typ (1 + nitems) in
   List.iteri (Array.set arr) list;
-  Ptr.((castp (ptr void) (Array.start arr +@ nitems)) <-@ null);
+  (castp (ptr void) (Array.start arr +@ nitems)) <-@ null;
   arr
 
 let fts_open ~path_argv ?compar ~options = 

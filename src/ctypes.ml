@@ -65,10 +65,13 @@ and 'a ptr = { reftype      : 'a typ;
                pmanaged     : Raw.managed_buffer option;
                pbyte_offset : int }
 and 'a array = { astart : 'a ptr; alength : int }
-and 'a union = { union : 'a union ptr }
-and 'a structure = { structure : 'a structure ptr }
+and ('a, 'kind) structured = { structured : ('a, 'kind) structured ptr }
+and 'a union = ('a, [`Union]) structured
+and 'a structure = ('a, [`Struct]) structured
 and 'a abstract = { abstract : 'a abstract ptr }
 and ('a, 'b) view = { read : 'b -> 'a; write : 'a -> 'b; ty: 'b typ }
+
+type ('a, 's) field = { ftype: 'a typ; foffset: int }
 
 type _ ccallspec =
     Call : bool * (Raw.immediate_pointer -> 'a) -> 'a ccallspec
@@ -199,7 +202,7 @@ and build : 'a. 'a typ -> offset:int -> Raw.immediate_pointer -> 'a
     | Struct { spec = Complete p } as reftype ->
       (fun ~offset buf ->
         let m = Raw.read p ~offset buf in
-        { structure =
+        { structured =
             { pmanaged = Some m;
               reftype;
               raw_ptr = Raw.block_address m;
@@ -242,12 +245,12 @@ and write : 'a. 'a typ -> offset:int -> 'a -> Raw.immediate_pointer -> unit
       raise IncompleteType
     | Struct { spec = Complete _ } as s ->
       let size = sizeof s in
-      (fun ~offset { structure = { raw_ptr; pbyte_offset = src_offset } } dst ->
+      (fun ~offset { structured = { raw_ptr; pbyte_offset = src_offset } } dst ->
         Raw.memcpy ~size ~dst ~dst_offset:offset ~src:raw_ptr ~src_offset)
     | Union { ucomplete=false } ->
       raise IncompleteType
     | Union { usize = size } ->
-      (fun ~offset { union = { raw_ptr = src; pbyte_offset = src_offset } } dst ->
+      (fun ~offset { structured = { raw_ptr = src; pbyte_offset = src_offset } } dst ->
         Raw.memcpy ~size ~dst ~dst_offset:offset ~src ~src_offset)
     | Abstract { asize = size } ->
       (fun ~offset { abstract = { raw_ptr = src; pbyte_offset = src_offset } } dst ->
@@ -284,74 +287,66 @@ and build_function : 'a. ?name:string -> 'a fn -> RawTypes.voidp -> 'a
     let e = build_ccallspec fn c in
     invoke name e [] c
 
-module Ptr =
-struct
-  type 'a t = 'a ptr = { reftype : 'a typ;
-                         raw_ptr : Raw.immediate_pointer;
-                         pmanaged : Raw.managed_buffer option;
-                         pbyte_offset : int }
+let null : unit ptr = { raw_ptr = RawTypes.null;
+                        reftype = Void;
+                        pbyte_offset = 0;
+                        pmanaged = None }
 
-  let null : unit ptr = { raw_ptr = RawTypes.null;
-                          reftype = Void;
-                          pbyte_offset = 0;
-                          pmanaged = None }
+let rec (!@) : 'a. 'a ptr -> 'a
+  = fun (type a) ({ raw_ptr; reftype; pbyte_offset = offset } as ptr : a ptr) ->
+    match reftype with
+      | Void -> raise IncompleteType
+      | Union { ucomplete = false } -> raise IncompleteType
+      | Struct { spec = Incomplete _ } -> raise IncompleteType
+      | View { read; ty = reftype } -> read (!@ { ptr with reftype })
+      (* If it's a reference type then we take a reference *)
+      | Union _ -> ({ structured = ptr } : a)
+      | Struct _ -> { structured = ptr }
+      | Array (elemtype, alength) ->
+        { astart = { ptr with reftype = elemtype }; alength }
+      | Abstract _ -> { abstract = ptr }
+      (* If it's a value type then we cons a new value. *)
+      | _ -> build reftype ~offset raw_ptr
 
-  let rec (!@) : 'a. 'a t -> 'a
-    = fun (type a) ({ raw_ptr; reftype; pbyte_offset = offset } as ptr : a t) ->
-      match reftype with
-        | Void -> raise IncompleteType
-        | Union { ucomplete = false } -> raise IncompleteType
-        | Struct { spec = Incomplete _ } -> raise IncompleteType
-        | View { read; ty = reftype } -> read (!@ { ptr with reftype })
-        (* If it's a reference type then we take a reference *)
-        | Union _ -> ({ union = ptr } : a)
-        | Struct _ -> { structure = ptr }
-        | Array (elemtype, alength) ->
-          { astart = { ptr with reftype = elemtype }; alength }
-        | Abstract _ -> { abstract = ptr }
-        (* If it's a value type then we cons a new value. *)
-        | _ -> build reftype ~offset raw_ptr
+let ptr_diff : 'a. 'a ptr -> 'a ptr -> int
+  = fun { pbyte_offset = o1; reftype } { pbyte_offset = o2 } ->
+    (* We assume the pointers are properly aligned, or at least that
+       the difference is a multiple of sizeof reftype. *)
+    (o2 - o1) / sizeof reftype
 
-  let diff : 'a. 'a t -> 'a t -> int
-    = fun { pbyte_offset = o1; reftype } { pbyte_offset = o2 } ->
-      (* We assume the pointers are properly aligned, or at least that
-         the difference is a multiple of sizeof reftype. *)
-      (o2 - o1) / sizeof reftype
+let (+@) : 'a. 'a ptr -> int -> 'a ptr
+  = fun ({ pbyte_offset; reftype } as p) x ->
+    { p with pbyte_offset = pbyte_offset + (x * sizeof reftype) }
 
-  let (+@) : 'a. 'a t -> int -> 'a t
-    = fun ({ pbyte_offset; reftype } as p) x ->
-      { p with pbyte_offset = pbyte_offset + (x * sizeof reftype) }
+let (-@) : 'a. 'a ptr -> int -> 'a ptr
+  = fun p x -> p +@ (-x)
 
-  let (-@) : 'a. 'a t -> int -> 'a t
-    = fun p x -> p +@ (-x)
+let (<-@) : 'a. 'a ptr -> 'a -> unit
+  = fun (type a) ({ reftype; raw_ptr; pbyte_offset = offset } : a ptr) ->
+    fun v -> write reftype ~offset v raw_ptr
 
-  let (<-@) : 'a. 'a t -> 'a -> unit
-    = fun (type a) ({ reftype; raw_ptr; pbyte_offset = offset } : a t) ->
-      fun v -> write reftype ~offset v raw_ptr
+let from_voidp : 'a. 'a typ -> unit ptr -> 'a ptr
+  = fun reftype p -> { p with reftype }
 
-  let from_voidp : 'a. 'a typ -> unit ptr -> 'a ptr
-    = fun reftype p -> { p with reftype }
+let to_voidp : 'a. 'a ptr -> unit ptr
+  = fun p -> { p with reftype = Void }
 
-  let to_voidp : 'a. 'a ptr -> unit ptr
-    = fun p -> { p with reftype = Void }
+let allocate_n : 'a. 'a typ -> count:int -> 'a ptr
+  = fun (type a) (reftype : a typ) ~count ->
+    let pmanaged = Raw.allocate (count * sizeof reftype) in
+    { reftype; pbyte_offset = 0;
+      raw_ptr = Raw.block_address pmanaged;
+      pmanaged = Some pmanaged }
 
-  let allocate : 'a. 'a typ -> count:int -> 'a ptr
-    = fun (type a) (reftype : a typ) ~count ->
-      let pmanaged = Raw.allocate (count * sizeof reftype) in
-      { reftype; pbyte_offset = 0;
-        raw_ptr = Raw.block_address pmanaged;
-        pmanaged = Some pmanaged }
+let allocate : 'a. 'a typ -> 'a -> 'a ptr
+  = fun (type a) (reftype : a typ) (v : a) ->
+    let p = allocate_n ~count:1 reftype in begin
+      p <-@ v;
+      p
+    end
 
-  let make : 'a. 'a typ -> 'a -> 'a ptr
-    = fun (type a) (reftype : a typ) (v : a) ->
-      let p = allocate ~count:1 reftype in begin
-        p <-@ v;
-        p
-      end
-
-  let compare {raw_ptr=lp; pbyte_offset=loff} {raw_ptr=rp; pbyte_offset=roff}
-      = compare (Raw.pointer_plus lp loff) (Raw.pointer_plus rp roff)
-end
+let ptr_compare {raw_ptr=lp; pbyte_offset=loff} {raw_ptr=rp; pbyte_offset=roff}
+    = compare (Raw.pointer_plus lp loff) (Raw.pointer_plus rp roff)
 
 module Array =
 struct
@@ -361,11 +356,8 @@ struct
     if i >= alength then
       invalid_arg "index out of bounds"
 
-  let unsafe_get { astart } n =
-    Ptr.(!@(astart +@ n))
-
-  let unsafe_set { astart } n v =
-    Ptr.((astart +@ n) <-@ v)
+  let unsafe_get { astart } n = !@(astart +@ n)
+  let unsafe_set { astart } n v = (astart +@ n) <-@ v
 
   let get arr n =
     check_bound arr n;
@@ -384,7 +376,7 @@ struct
 
   let make : 'a. 'a typ -> ?initial:'a -> int -> 'a t
     = fun reftype ?initial count ->
-      let arr = { astart = Ptr.allocate ~count reftype;
+      let arr = { astart = allocate_n ~count reftype;
                   alength = count } in
       match initial with
         | None -> arr
@@ -403,109 +395,81 @@ struct
     !l
 end
 
-module Struct =
-struct
-  type 's t = 's structure = { structure : 's structure ptr }
-  type ('a, 's) field  = { ftype: 'a typ;
-                           foffset: int }
+let make s = { structured = allocate_n s ~count:1 }
+let (|->) p { ftype = reftype; foffset } =
+  { p with reftype; pbyte_offset = p.pbyte_offset + foffset }
+let (@.) { structured = p } f = p |-> f
+let setf s field v = (s @. field) <-@ v
+let getf s field = !@(s @. field)
 
-  let structure tag =
-    Struct { spec = Incomplete (Raw.allocate_bufferspec ()); tag;
-             passable = true; fields = [] }
+let structure tag =
+  Struct { spec = Incomplete (Raw.allocate_bufferspec ()); tag;
+           passable = true; fields = [] }
+    
+let bufferspec { tag; spec } = match spec with
+  | Incomplete s -> s
+  | Complete _   -> raise (ModifyingSealedType tag)
+    
+let add_field field s = s.fields <- Box field :: s.fields
 
-  let bufferspec { tag; spec } = match spec with
-    | Incomplete s -> s
-    | Complete _   -> raise (ModifyingSealedType tag)
-
-  let add_field field s = s.fields <- Box field :: s.fields
-
-  let offsetof { foffset } = foffset
-
-  let seals (Struct s) =
+let ( *:* ) (type b) (Struct s) (ftype : b typ) =
     let bufspec = bufferspec s in
-    s.spec <- Complete (Raw.complete_struct_type bufspec)
+    let add_member t = 
+      add_field t s;
+      Raw.add_argument bufspec t
+    and add_unpassable_member t = Raw.add_unpassable_argument
+      bufspec ~size:(sizeof t) ~alignment:(alignment t) in
+    let rec offset : 'a. 'a typ -> int
+      = fun (type a) (ty : a typ) -> match ty with
+      | Void                           -> raise IncompleteType
+      | Array _ as a                   -> (s.passable <- false;
+                                           add_unpassable_member a)
+      | Primitive p                    -> add_member p
+      | Pointer _                      -> add_member RawTypes.pointer
+      | Struct { spec = Incomplete _ } -> raise IncompleteType
+      | Struct { spec = Complete t; passable } 
+                                       -> (s.passable <- s.passable && passable;
+                                           add_member t)
+      | Union _  as u                  -> (s.passable <- false;
+                                           add_unpassable_member u)
+      | Abstract _  as a               -> (s.passable <- false;
+                                           add_unpassable_member a)
+      | FunctionPointer _              -> add_member RawTypes.pointer
+      | View { ty }                    -> offset ty
+    in
+    { ftype; foffset = offset ftype }
 
-  let ( *:* ) (type b) (Struct s) (ftype : b typ) =
-      let bufspec = bufferspec s in
-      let add_member t = 
-        add_field t s;
-        Raw.add_argument bufspec t
-      and add_unpassable_member t = Raw.add_unpassable_argument
-        bufspec ~size:(sizeof t) ~alignment:(alignment t) in
-      let rec offset : 'a. 'a typ -> int
-        = fun (type a) (ty : a typ) -> match ty with
-        | Void                           -> raise IncompleteType
-        | Array _ as a                   -> (s.passable <- false;
-                                             add_unpassable_member a)
-        | Primitive p                    -> add_member p
-        | Pointer _                      -> add_member RawTypes.pointer
-        | Struct { spec = Incomplete _ } -> raise IncompleteType
-        | Struct { spec = Complete t; passable } 
-                                         -> (s.passable <- s.passable && passable;
-                                             add_member t)
-        | Union _  as u                  -> (s.passable <- false;
-                                             add_unpassable_member u)
-        | Abstract _  as a               -> (s.passable <- false;
-                                             add_unpassable_member a)
-        | FunctionPointer _              -> add_member RawTypes.pointer
-        | View { ty }                    -> offset ty
-      in
-      { ftype; foffset = offset ftype }
+let seals (Struct s) =
+  let bufspec = bufferspec s in
+  s.spec <- Complete (Raw.complete_struct_type bufspec)
 
-  let make s = { structure = Ptr.allocate s ~count:1 }
+let addr { structured } = structured
 
-  let (@.) { structure } { ftype = reftype; foffset } =
-    { structure with
-      reftype;
-      pbyte_offset = structure.pbyte_offset + foffset }
+let offsetof { foffset } = foffset
 
-  let (|->) : 'a 's. 's structure ptr -> ('a, 's) field -> 'a ptr
-    = fun { raw_ptr; pbyte_offset; pmanaged } { ftype = reftype; foffset } ->
-      { reftype; raw_ptr; pbyte_offset = foffset + pbyte_offset; pmanaged }
+let union utag = Union { utag; usize = 0; ualignment = 0; ucomplete = false }
 
-  open Ptr
-  let setf s field v = (s @. field) <-@ v
-  let getf s field = !@(s @. field)
+let ensure_unsealed { ucomplete; utag } =
+  if ucomplete then raise (ModifyingSealedType utag)
 
-  let addr { structure } = structure
+let compute_union_padding { usize; ualignment } =
+  let overhang = usize mod ualignment in
+  if overhang = 0 then usize
+  else usize - overhang + ualignment
+
+let sealu (Union u) = begin
+  ensure_unsealed u;
+  u.usize <- compute_union_padding u;
+  u.ucomplete <- true
 end
 
-module Union =
-struct
-  type 's t = 's union = { union: 's union ptr }
-  type ('a, 's) field  = 'a typ
-
-  let union utag = Union { utag; usize = 0; ualignment = 0; ucomplete = false }
-
-  let ensure_unsealed { ucomplete; utag } =
-    if ucomplete then raise (ModifyingSealedType utag)
-
-  let compute_padding { usize; ualignment } =
-    let overhang = usize mod ualignment in
-    if overhang = 0 then usize
-    else usize - overhang + ualignment
-
-  let sealu (Union u) = begin
+let ( +:+ ) (Union u) ftype =
+  begin
     ensure_unsealed u;
-    u.usize <- compute_padding u;
-    u.ucomplete <- true
+    u.usize <- max u.usize (sizeof ftype);
+    u.ualignment <- max u.ualignment (alignment ftype);
+    { ftype; foffset = 0 }
   end
-
-  let ( +:+ ) (Union u) ftype =
-    begin
-      ensure_unsealed u;
-      u.usize <- max u.usize (sizeof ftype);
-      u.ualignment <- max u.ualignment (alignment ftype);
-      ftype
-    end
-
-  let make t = { union = Ptr.allocate t ~count:1 }
-  let (@.) { union } reftype = { union with reftype }
-  let (|->) p reftype = { p with reftype }
-  let setf s field v = Ptr.((s @. field) <-@ v)
-  let getf s field = Ptr.(!@(s @. field))
-  let addr { union } = union
-end
 
 let foreign ?from symbol typ =
   let addr = Dl.dlsym ?handle:from ~symbol in
@@ -513,7 +477,7 @@ let foreign ?from symbol typ =
 
 let foreign_value ?from symbol reftype =
   let raw_ptr = Dl.dlsym ?handle:from ~symbol in
-  { Ptr.reftype; raw_ptr; pbyte_offset = 0; pmanaged = None }
+  { reftype; raw_ptr; pbyte_offset = 0; pmanaged = None }
 
 let void = Void
 let char = Primitive RawTypes.char
@@ -565,14 +529,13 @@ let string_of_char_ptr charp =
     let length = Unsigned.Size_t.to_int (strlen charp) in
     let s = String.create length in
     for i = 0 to length - 1 do
-      s.[i] <- Ptr.(!@ (charp +@ i))
+      s.[i] <- !@ (charp +@ i)
     done;
     s
 
 let char_ptr_of_string s =
-  let open Ptr in
   let len = String.length s in
-  let p = allocate ~count:(len + 1) char in
+  let p = allocate_n ~count:(len + 1) char in
   for i = 0 to len - 1 do
     (p +@ i <-@ s.[i])
   done;
@@ -582,15 +545,15 @@ let char_ptr_of_string s =
 let string = view ~read:string_of_char_ptr ~write:char_ptr_of_string
   (ptr char)
 
-let castp typ p = Ptr.(from_voidp typ (to_voidp p))
+let castp typ p = from_voidp typ (to_voidp p)
 
-let read_nullable t p = Ptr.(
+let read_nullable t p =
   if p = null then None
-  else Some !@(castp t (make (ptr void) p)))
+  else Some !@(castp t (allocate (ptr void) p))
 
-let write_nullable t = Ptr.(function
+let write_nullable t = function
   | None -> null
-  | Some f -> !@(castp (ptr void) (make t f)))
+  | Some f -> !@(castp (ptr void) (allocate t f))
 
 let nullable_view t =
   let read = read_nullable t

@@ -44,28 +44,27 @@ let test_passing_pointers () =
      11 + 12 + 13 + 14 + 15 + 16 + 17 + 18 + 19 + 20)
     (let open Signed in
      let open Unsigned in
-     let open Ptr in
      accept_pointers
-       (make float 1.0)
-       (make double 2.0)
-       (make short 3)
-       (make int 4)
-       (make long (Long.of_int 5))
-       (make llong (LLong.of_int 6))
-       (make nativeint 7n)
-       (make int8_t 8)
-       (make int16_t 9)
-       (make int32_t 10l)
-       (make int64_t 11L)
-       (make uint8_t (UInt8.of_int 12))
-       (make uint16_t (UInt16.of_int 13))
-       (make uint32_t (UInt32.of_int 14))
-       (make uint64_t (UInt64.of_int 15))
-       (make size_t (Size_t.of_int 16))
-       (make ushort (UShort.of_int 17))
-       (make uint (UInt.of_int 18))
-       (make ulong (ULong.of_int 19))
-       (make ullong (ULLong.of_int 20)))
+       (allocate float 1.0)
+       (allocate double 2.0)
+       (allocate short 3)
+       (allocate int 4)
+       (allocate long (Long.of_int 5))
+       (allocate llong (LLong.of_int 6))
+       (allocate nativeint 7n)
+       (allocate int8_t 8)
+       (allocate int16_t 9)
+       (allocate int32_t 10l)
+       (allocate int64_t 11L)
+       (allocate uint8_t (UInt8.of_int 12))
+       (allocate uint16_t (UInt16.of_int 13))
+       (allocate uint32_t (UInt32.of_int 14))
+       (allocate uint64_t (UInt64.of_int 15))
+       (allocate size_t (Size_t.of_int 16))
+       (allocate ushort (UShort.of_int 17))
+       (allocate uint (UInt.of_int 18))
+       (allocate ulong (ULong.of_int 19))
+       (allocate ullong (ULLong.of_int 20)))
 
 
 (*
@@ -80,12 +79,11 @@ let test_passing_pointers_to_pointers () =
        ptr (ptr (ptr (ptr int))) @->
        returning int) in
 
-  let open Ptr in
-  let p = make int 1
-  and pp = make (ptr int) (make int 2)
-  and ppp = make (ptr (ptr int)) (make (ptr int) (make int 3))
-  and pppp = make (ptr (ptr (ptr int)))
-    (make (ptr (ptr int)) (make (ptr int) (make int 4))) in
+  let p = allocate int 1
+  and pp = allocate (ptr int) (allocate int 2)
+  and ppp = allocate (ptr (ptr int)) (allocate (ptr int) (allocate int 3))
+  and pppp = allocate (ptr (ptr (ptr int)))
+    (allocate (ptr (ptr int)) (allocate (ptr int) (allocate int 4))) in
 
   assert_equal ~msg:"Passing pointers to pointers"
     Pervasives.(1 + 2 + 3 + 4)
@@ -101,9 +99,8 @@ let test_callback_receiving_pointers () =
     foreign ~from:testlib "passing_pointers_to_callback"
       (funptr pintfun1 @-> returning int)
   in
-  let deref = Ptr.(!@) in
   assert_equal 7
-    (passing_pointers_to_callback (fun lp rp -> deref lp + deref rp))
+    (passing_pointers_to_callback (fun lp rp -> !@lp + !@rp))
 
 
 (*
@@ -111,17 +108,17 @@ let test_callback_receiving_pointers () =
 *)
 let test_callback_returning_pointers () =
   let pintfun2 = int @-> int @-> returning (ptr int) in
-  let p = Ptr.make int 17 in
+  let p = allocate int 17 in
   let accepting_pointer_from_callback =
     foreign ~from:testlib "accepting_pointer_from_callback"
       (funptr pintfun2 @-> returning int)
   in begin
-    assert_equal 17 Ptr.(!@p);
+    assert_equal 17 !@p;
 
     assert_equal 56
-      (accepting_pointer_from_callback Ptr.(fun x y -> p <-@ (x * y); p));
+      (accepting_pointer_from_callback (fun x y -> p <-@ (x * y); p));
 
-    assert_equal 12 Ptr.(!@p)
+    assert_equal 12 !@p
   end
 
 
@@ -131,31 +128,30 @@ let test_callback_returning_pointers () =
 let test_pointer_assignment_with_primitives () =
   let open Signed in
   let open Unsigned in
-  let p_char = Ptr.make char '1'
-  and p_uchar = Ptr.make uchar (UChar.of_int 2)
-  and p_schar = Ptr.make schar 3
-  and p_float = Ptr.make float 4.0
-  and p_double = Ptr.make double 5.0
-  and p_short = Ptr.make short 6
-  and p_int = Ptr.make int 7
-  and p_long = Ptr.make long (Long.of_int 8)
-  and p_llong = Ptr.make llong (LLong.of_int 9)
-  and p_nativeint = Ptr.make nativeint 10n
-  and p_int8_t = Ptr.make int8_t 11
-  and p_int16_t = Ptr.make int16_t 12
-  and p_int32_t = Ptr.make int32_t 13l
-  and p_int64_t = Ptr.make int64_t 14L
-  and p_uint8_t = Ptr.make uint8_t (UInt8.of_int 15)
-  and p_uint16_t = Ptr.make uint16_t (UInt16.of_int 16)
-  and p_uint32_t = Ptr.make uint32_t (UInt32.of_int 17)
-  and p_uint64_t = Ptr.make uint64_t (UInt64.of_int 18)
-  and p_size_t = Ptr.make size_t (Size_t.of_int 19)
-  and p_ushort = Ptr.make ushort (UShort.of_int 20)
-  and p_uint = Ptr.make uint (UInt.of_int 21)
-  and p_ulong = Ptr.make ulong (ULong.of_int 22)
-  and p_ullong = Ptr.make ullong (ULLong.of_int 23)
+  let p_char = allocate char '1'
+  and p_uchar = allocate uchar (UChar.of_int 2)
+  and p_schar = allocate schar 3
+  and p_float = allocate float 4.0
+  and p_double = allocate double 5.0
+  and p_short = allocate short 6
+  and p_int = allocate int 7
+  and p_long = allocate long (Long.of_int 8)
+  and p_llong = allocate llong (LLong.of_int 9)
+  and p_nativeint = allocate nativeint 10n
+  and p_int8_t = allocate int8_t 11
+  and p_int16_t = allocate int16_t 12
+  and p_int32_t = allocate int32_t 13l
+  and p_int64_t = allocate int64_t 14L
+  and p_uint8_t = allocate uint8_t (UInt8.of_int 15)
+  and p_uint16_t = allocate uint16_t (UInt16.of_int 16)
+  and p_uint32_t = allocate uint32_t (UInt32.of_int 17)
+  and p_uint64_t = allocate uint64_t (UInt64.of_int 18)
+  and p_size_t = allocate size_t (Size_t.of_int 19)
+  and p_ushort = allocate ushort (UShort.of_int 20)
+  and p_uint = allocate uint (UInt.of_int 21)
+  and p_ulong = allocate ulong (ULong.of_int 22)
+  and p_ullong = allocate ullong (ULLong.of_int 23)
   in begin
-    let open Ptr in
     assert_equal '1' (!@p_char);
     assert_equal (UChar.of_int 2) (!@p_uchar);
     assert_equal 3 (!@p_schar);
@@ -241,7 +237,7 @@ let test_passing_pointer_to_function_pointer () =
   in
   assert_equal ~printer:string_of_int
     5 (accepting_pointer_to_function_pointer 
-         (Ptr.make arg_type ( / )))
+         (allocate arg_type ( / )))
 
 
 
@@ -254,22 +250,22 @@ let test_callback_returning_pointer_to_function_pointer () =
       (void @-> returning (ptr (funptr (int @-> int @-> returning int))))
   in
   assert_equal
-    10 Ptr.(!@(returning_pointer_to_function_pointer ()) 2 5)
+    10 (!@(returning_pointer_to_function_pointer ()) 2 5)
 
 
 (*
   Dereferencing pointers to incomplete types
 *)
 let test_dereferencing_pointers_to_incomplete_types () =
-  let open Ptr in begin
+  begin
     assert_raises IncompleteType
       (fun () -> !@null);
 
     assert_raises IncompleteType
-      (fun () -> !@(from_voidp (Struct.structure "incomplete") null));
+      (fun () -> !@(from_voidp (structure "incomplete") null));
 
     assert_raises IncompleteType
-      (fun () -> !@(from_voidp (Union.union "incomplete") null));
+      (fun () -> !@(from_voidp (union "incomplete") null));
   end
 
 
@@ -277,7 +273,6 @@ let test_dereferencing_pointers_to_incomplete_types () =
   Writing through a pointer to an abstract type
 *)
 let test_writing_through_pointer_to_abstract_type () =
-  let open Ptr in
   let arra = Array.make int 2 in
   let arrb = Array.make int 2 in
   let absptr a =
@@ -316,7 +311,7 @@ let test_writing_through_pointer_to_abstract_type () =
    Test for reading and writing global values using the "foreign_value"
    function.
 *)
-let test_reading_and_writing_global_value () = Ptr.(
+let test_reading_and_writing_global_value () =
   let ptr = foreign_value "global" int ~from:testlib in
   let ptr' = foreign_value "global" int ~from:testlib in
   assert_equal (!@ptr) 100;
@@ -325,8 +320,7 @@ let test_reading_and_writing_global_value () = Ptr.(
   assert_equal (!@ptr') 200;
   ptr' <-@ 100;
   assert_equal (!@ptr) 100;
-  assert_equal (!@ptr') 100;
-)
+  assert_equal (!@ptr') 100
 
 
 (*
@@ -338,7 +332,7 @@ let test_allocation () =
   let realloc = foreign "realloc" (ptr void @-> size_t @-> returning (ptr void)) in
   let free = foreign "free" (ptr void @-> returning void) in
   
-  let pointer = malloc (Size_t.of_int (sizeof int)) in Ptr.(
+  let pointer = malloc (Size_t.of_int (sizeof int)) in
     let int_pointer = from_voidp int pointer in
     int_pointer <-@ 17;
     assert_equal !@int_pointer 17;
@@ -361,7 +355,6 @@ let test_allocation () =
     done;
 
     free pointer'
-  )
 
 
 (*
@@ -371,19 +364,18 @@ let test_reading_returned_global () =
   let return_global_address = 
     foreign "return_global_address" ~from:testlib
       (void @-> returning (ptr int)) in
-  Ptr.(assert_equal (!@(return_global_address ())) 100)
+  assert_equal (!@(return_global_address ())) 100
 
 
 (*
   Test a function that returns a pointer passed as argument.
 *)
 let test_passing_pointer_through () =
-  let open Ptr in
   let pass_pointer_through = foreign "pass_pointer_through" ~from:testlib
     (ptr int @-> ptr int @-> int @-> returning (ptr int)) 
   in
-  let p1 = Ptr.make int 25 in
-  let p2 = Ptr.make int 32 in
+  let p1 = allocate int 25 in
+  let p2 = allocate int 32 in
   let rv = pass_pointer_through p1 p2 10 in
   assert_equal !@rv !@p1;
   assert_equal 25 !@rv;
@@ -396,7 +388,6 @@ let test_passing_pointer_through () =
   Tests for various aspects of pointer arithmetic.
 *)
 let test_pointer_arithmetic () =
-  let open Ptr in
   let arr = Array.of_list int [1;2;3;4;5;6;7;8] in
 
   (* Traverse the array using an int pointer *)
@@ -405,7 +396,6 @@ let test_pointer_arithmetic () =
     assert_equal !@(p +@ i) (succ i)
   done;
 
-  let open Struct in
   let twoints = structure "s" in
   let i1 = twoints *:* int in
   let i2 = twoints *:* int in
@@ -438,22 +428,20 @@ let test_pointer_arithmetic () =
   Test pointer comparisons.
 *)
 let test_pointer_comparison () =
-  let open Ptr in
-
   let canonicalize p =
     (* Ensure that the 'pbyte_offset' component of the pointer is zero by
        writing the pointer to memory and then reading it back. *)
-    let buf = Ptr.allocate ~count:1 (ptr void) in
+    let buf = allocate_n ~count:1 (ptr void) in
     buf <-@ (to_voidp p);
     !@buf
   in
 
-  let (<) l r = compare l r < 0
-  and (>) l r = compare l r > 0
-  and (=) l r = compare l r = 0 in
+  let (<) l r = ptr_compare l r < 0
+  and (>) l r = ptr_compare l r > 0
+  and (=) l r = ptr_compare l r = 0 in
 
   (* equal but not identical pointers compare equal *)
-  let p = make int 10 in
+  let p = allocate int 10 in
   let p' = from_voidp int (to_voidp p) in
   assert_bool "equal but not identical poitners compare equal"
     (p = p');
@@ -471,7 +459,6 @@ let test_pointer_comparison () =
   assert_bool "canonicalize(p) > canonicalize(p-1)"
     (canonicalize p > canonicalize (p -@ 1));
 
-  let open Struct in
   let s3 = structure "s3" in
   let i = s3 *:* int in
   let j = s3 *:* int in
