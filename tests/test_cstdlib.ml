@@ -115,7 +115,7 @@ let test_string_functions () =
 
 
   let open Ptr in
-  let p1 = make int 10 and p2 = make int 20 in
+  let p1 = fresh int 10 and p2 = fresh int 20 in
   assert_bool "memcmp(&10, &20) < 0"
     (memcmp (to_voidp p1) (to_voidp p2) (Size_t.of_int (sizeof int)) < 0);
 
@@ -144,7 +144,6 @@ let test_string_functions () =
 *)
 let test_div () =
   let module M = struct
-    open Struct
     type div_t
     let div_t : div_t structure typ = structure "div_t"
     let quot = div_t *:* int
@@ -232,7 +231,6 @@ let test_bsearch () =
          { 9, "sep" }, {10, "oct" }, {11, "nov" }, {12, "dec" }
       };
     *)
-    open Struct
     type mi
     let mi = structure "mi"
     let mr   = mi *:* int

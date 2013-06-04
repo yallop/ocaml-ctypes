@@ -24,7 +24,6 @@ let testlib = Dl.(dlopen ~filename:"clib/test_functions.so" ~flags:[RTLD_NOW])
 *)
 let test_inspecting_float () =
   let module M = struct
-    open Union
     type u
     let utyp : u union typ = union "u"
     let f = utyp +:+ double
@@ -58,7 +57,6 @@ let test_inspecting_float () =
 *)
 let test_endian_detection () =
   let module M = struct
-    open Union
     type e
     let etyp : e union typ = union "e"
     let i = etyp +:+ int64_t
@@ -92,7 +90,6 @@ let test_endian_detection () =
 *)
 let test_union_padding () =
   let module M = struct
-    open Union
     type padded
     let padded : padded union typ = union "padded"
     let i = padded +:+ int64_t
@@ -133,16 +130,15 @@ let test_union_padding () =
 *)
 let test_union_address () =
   let module M = struct
-    open Union
     open Ptr
     type u
     let u : u union typ = union "u"
     let i = u +:+ int64_t
     let c = u +:+ char
-    let s = u +:+ ptr (Struct.structure "incomplete")
+    let s = u +:+ ptr (structure "incomplete")
     let () = sealu u
 
-    let up = addr (Union.make u)
+    let up = addr (make u)
 
     let () = begin
 
@@ -162,7 +158,6 @@ let test_union_address () =
   Test that attempting to update a sealed union is treated as an error.
 *)
 let test_updating_sealed_union () =
-  let open Union in
   let utyp = union "sealed" in
   let i = utyp +:+ int in
   let () = sealu utyp in

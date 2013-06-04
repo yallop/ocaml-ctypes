@@ -66,7 +66,6 @@ let test_incomplete_alignment () =
     (fun () -> alignment void);
 
   let module M = struct
-    open Struct
     let t = structure "t"
     let i = t *:* int
       
@@ -76,7 +75,6 @@ let test_incomplete_alignment () =
   end in
 
   let module M = struct
-    open Union
     let u = union "u"
     let i = u +:+ int
       
@@ -93,7 +91,6 @@ let test_incomplete_alignment () =
 *)
 let test_struct_alignment () = 
   let module M = struct
-    open Struct
     type a and b and u
 
     let maximum = List.fold_left max 0
@@ -149,8 +146,6 @@ let test_struct_alignment () =
 *)
 let test_struct_tail_padding () = 
   let module M = struct
-    open Union
-    open Struct
     type a and b and u
 
     let struct_a = structure "A"

@@ -43,7 +43,6 @@ let test_primitives_are_passable () =
 *)
 let test_unions_are_not_passable () =
   let module M = struct
-    open Union
     type u
 
     let u : u union typ = union "u"
@@ -91,13 +90,11 @@ let test_pointers_are_passable () =
   let module M = struct
     type s1 and u
 
-    open Struct
     let s1 : s1 structure typ = structure "s1"
     let _ = s1 *:* int
     let _ = s1 *:* ptr s1
     let () = seals s1
 
-    open Union
     let u : u union typ = union "u"
     let _ = u +:+ int
     let () = sealu u
@@ -138,8 +135,6 @@ end
 *)
 let test_struct_passability () =
   let module M = struct
-    open Union
-    open Struct
     type s1 and s2 and s3 and s4 and s5 and s6 and u
 
     let s1 : s1 structure typ = structure "s1"
@@ -232,8 +227,8 @@ let test_struct_passability () =
   in a function specification should give rise to an error.
 *)
 let test_incomplete_passability () =
-  let s = Struct.structure "incomplete"
-  and u = Union.union "incomplete"
+  let s = structure "incomplete"
+  and u = union "incomplete"
   in begin
     assert_raises IncompleteType
       (fun () -> s @-> returning void);

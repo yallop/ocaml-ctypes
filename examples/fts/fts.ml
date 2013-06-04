@@ -75,7 +75,6 @@ module FTSENT =
 struct
   open PosixTypes
   open Unsigned
-  open Struct
 
   type ftsent
   let ftsent : ftsent structure typ = structure "ftsent"
@@ -117,7 +116,7 @@ struct
 
   let name : t -> string
     = fun t -> 
-      !@(from_voidp string (to_voidp (Ptr.make (ptr char) (t |-> fts_name))))
+      !@(from_voidp string (to_voidp (Ptr.fresh (ptr char) (t |-> fts_name))))
 
   let level : t -> int
     = fun t -> getf !@t fts_level
@@ -149,7 +148,6 @@ end
 
 module FTS =
 struct
-  open Struct
   open PosixTypes
   open FTSENT
 

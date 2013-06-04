@@ -142,7 +142,6 @@ let test_passing_pointer_to_array_of_structs () =
         double d;
      }
   *)
-  let open Union in
   let u = union "u" in
   let i = u +:+ int in
   let d = u +:+ double in
@@ -153,7 +152,6 @@ let test_passing_pointer_to_array_of_structs () =
         union u data;
      }
   *)
-  let open Struct in
   let s = structure "s" in
   let tag = s *:* char in
   let data = s *:* u in
@@ -163,7 +161,7 @@ let test_passing_pointer_to_array_of_structs () =
     let v = make s in
     setf v tag 'i';
     let pd = v @. data in
-    Union.(pd |-> i) <-@ x;
+    (pd |-> i) <-@ x;
     v
   in
 
@@ -171,7 +169,7 @@ let test_passing_pointer_to_array_of_structs () =
     let v = make s in
     setf v tag 'd';
     let pd = v @. data in
-    Union.(pd |-> d) <-@ x;
+    (pd |-> d) <-@ x;
     v
   in
 

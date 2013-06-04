@@ -46,26 +46,26 @@ let test_passing_pointers () =
      let open Unsigned in
      let open Ptr in
      accept_pointers
-       (make float 1.0)
-       (make double 2.0)
-       (make short 3)
-       (make int 4)
-       (make long (Long.of_int 5))
-       (make llong (LLong.of_int 6))
-       (make nativeint 7n)
-       (make int8_t 8)
-       (make int16_t 9)
-       (make int32_t 10l)
-       (make int64_t 11L)
-       (make uint8_t (UInt8.of_int 12))
-       (make uint16_t (UInt16.of_int 13))
-       (make uint32_t (UInt32.of_int 14))
-       (make uint64_t (UInt64.of_int 15))
-       (make size_t (Size_t.of_int 16))
-       (make ushort (UShort.of_int 17))
-       (make uint (UInt.of_int 18))
-       (make ulong (ULong.of_int 19))
-       (make ullong (ULLong.of_int 20)))
+       (fresh float 1.0)
+       (fresh double 2.0)
+       (fresh short 3)
+       (fresh int 4)
+       (fresh long (Long.of_int 5))
+       (fresh llong (LLong.of_int 6))
+       (fresh nativeint 7n)
+       (fresh int8_t 8)
+       (fresh int16_t 9)
+       (fresh int32_t 10l)
+       (fresh int64_t 11L)
+       (fresh uint8_t (UInt8.of_int 12))
+       (fresh uint16_t (UInt16.of_int 13))
+       (fresh uint32_t (UInt32.of_int 14))
+       (fresh uint64_t (UInt64.of_int 15))
+       (fresh size_t (Size_t.of_int 16))
+       (fresh ushort (UShort.of_int 17))
+       (fresh uint (UInt.of_int 18))
+       (fresh ulong (ULong.of_int 19))
+       (fresh ullong (ULLong.of_int 20)))
 
 
 (*
@@ -81,11 +81,11 @@ let test_passing_pointers_to_pointers () =
        returning int) in
 
   let open Ptr in
-  let p = make int 1
-  and pp = make (ptr int) (make int 2)
-  and ppp = make (ptr (ptr int)) (make (ptr int) (make int 3))
-  and pppp = make (ptr (ptr (ptr int)))
-    (make (ptr (ptr int)) (make (ptr int) (make int 4))) in
+  let p = fresh int 1
+  and pp = fresh (ptr int) (fresh int 2)
+  and ppp = fresh (ptr (ptr int)) (fresh (ptr int) (fresh int 3))
+  and pppp = fresh (ptr (ptr (ptr int)))
+    (fresh (ptr (ptr int)) (fresh (ptr int) (fresh int 4))) in
 
   assert_equal ~msg:"Passing pointers to pointers"
     Pervasives.(1 + 2 + 3 + 4)
@@ -111,7 +111,7 @@ let test_callback_receiving_pointers () =
 *)
 let test_callback_returning_pointers () =
   let pintfun2 = int @-> int @-> returning (ptr int) in
-  let p = Ptr.make int 17 in
+  let p = Ptr.fresh int 17 in
   let accepting_pointer_from_callback =
     foreign ~from:testlib "accepting_pointer_from_callback"
       (funptr pintfun2 @-> returning int)
@@ -131,29 +131,29 @@ let test_callback_returning_pointers () =
 let test_pointer_assignment_with_primitives () =
   let open Signed in
   let open Unsigned in
-  let p_char = Ptr.make char '1'
-  and p_uchar = Ptr.make uchar (UChar.of_int 2)
-  and p_schar = Ptr.make schar 3
-  and p_float = Ptr.make float 4.0
-  and p_double = Ptr.make double 5.0
-  and p_short = Ptr.make short 6
-  and p_int = Ptr.make int 7
-  and p_long = Ptr.make long (Long.of_int 8)
-  and p_llong = Ptr.make llong (LLong.of_int 9)
-  and p_nativeint = Ptr.make nativeint 10n
-  and p_int8_t = Ptr.make int8_t 11
-  and p_int16_t = Ptr.make int16_t 12
-  and p_int32_t = Ptr.make int32_t 13l
-  and p_int64_t = Ptr.make int64_t 14L
-  and p_uint8_t = Ptr.make uint8_t (UInt8.of_int 15)
-  and p_uint16_t = Ptr.make uint16_t (UInt16.of_int 16)
-  and p_uint32_t = Ptr.make uint32_t (UInt32.of_int 17)
-  and p_uint64_t = Ptr.make uint64_t (UInt64.of_int 18)
-  and p_size_t = Ptr.make size_t (Size_t.of_int 19)
-  and p_ushort = Ptr.make ushort (UShort.of_int 20)
-  and p_uint = Ptr.make uint (UInt.of_int 21)
-  and p_ulong = Ptr.make ulong (ULong.of_int 22)
-  and p_ullong = Ptr.make ullong (ULLong.of_int 23)
+  let p_char = Ptr.fresh char '1'
+  and p_uchar = Ptr.fresh uchar (UChar.of_int 2)
+  and p_schar = Ptr.fresh schar 3
+  and p_float = Ptr.fresh float 4.0
+  and p_double = Ptr.fresh double 5.0
+  and p_short = Ptr.fresh short 6
+  and p_int = Ptr.fresh int 7
+  and p_long = Ptr.fresh long (Long.of_int 8)
+  and p_llong = Ptr.fresh llong (LLong.of_int 9)
+  and p_nativeint = Ptr.fresh nativeint 10n
+  and p_int8_t = Ptr.fresh int8_t 11
+  and p_int16_t = Ptr.fresh int16_t 12
+  and p_int32_t = Ptr.fresh int32_t 13l
+  and p_int64_t = Ptr.fresh int64_t 14L
+  and p_uint8_t = Ptr.fresh uint8_t (UInt8.of_int 15)
+  and p_uint16_t = Ptr.fresh uint16_t (UInt16.of_int 16)
+  and p_uint32_t = Ptr.fresh uint32_t (UInt32.of_int 17)
+  and p_uint64_t = Ptr.fresh uint64_t (UInt64.of_int 18)
+  and p_size_t = Ptr.fresh size_t (Size_t.of_int 19)
+  and p_ushort = Ptr.fresh ushort (UShort.of_int 20)
+  and p_uint = Ptr.fresh uint (UInt.of_int 21)
+  and p_ulong = Ptr.fresh ulong (ULong.of_int 22)
+  and p_ullong = Ptr.fresh ullong (ULLong.of_int 23)
   in begin
     let open Ptr in
     assert_equal '1' (!@p_char);
@@ -241,7 +241,7 @@ let test_passing_pointer_to_function_pointer () =
   in
   assert_equal ~printer:string_of_int
     5 (accepting_pointer_to_function_pointer 
-         (Ptr.make arg_type ( / )))
+         (Ptr.fresh arg_type ( / )))
 
 
 
@@ -266,10 +266,10 @@ let test_dereferencing_pointers_to_incomplete_types () =
       (fun () -> !@null);
 
     assert_raises IncompleteType
-      (fun () -> !@(from_voidp (Struct.structure "incomplete") null));
+      (fun () -> !@(from_voidp (structure "incomplete") null));
 
     assert_raises IncompleteType
-      (fun () -> !@(from_voidp (Union.union "incomplete") null));
+      (fun () -> !@(from_voidp (union "incomplete") null));
   end
 
 
@@ -382,8 +382,8 @@ let test_passing_pointer_through () =
   let pass_pointer_through = foreign "pass_pointer_through" ~from:testlib
     (ptr int @-> ptr int @-> int @-> returning (ptr int)) 
   in
-  let p1 = Ptr.make int 25 in
-  let p2 = Ptr.make int 32 in
+  let p1 = Ptr.fresh int 25 in
+  let p2 = Ptr.fresh int 32 in
   let rv = pass_pointer_through p1 p2 10 in
   assert_equal !@rv !@p1;
   assert_equal 25 !@rv;
@@ -405,7 +405,6 @@ let test_pointer_arithmetic () =
     assert_equal !@(p +@ i) (succ i)
   done;
 
-  let open Struct in
   let twoints = structure "s" in
   let i1 = twoints *:* int in
   let i2 = twoints *:* int in
@@ -453,7 +452,7 @@ let test_pointer_comparison () =
   and (=) l r = compare l r = 0 in
 
   (* equal but not identical pointers compare equal *)
-  let p = make int 10 in
+  let p = fresh int 10 in
   let p' = from_voidp int (to_voidp p) in
   assert_bool "equal but not identical poitners compare equal"
     (p = p');
@@ -471,7 +470,6 @@ let test_pointer_comparison () =
   assert_bool "canonicalize(p) > canonicalize(p-1)"
     (canonicalize p > canonicalize (p -@ 1));
 
-  let open Struct in
   let s3 = structure "s3" in
   let i = s3 *:* int in
   let j = s3 *:* int in

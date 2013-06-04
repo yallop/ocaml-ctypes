@@ -7,7 +7,6 @@
 
 open Ctypes
 open PosixTypes
-open Struct
 
 type tm
 let tm = structure "tm"

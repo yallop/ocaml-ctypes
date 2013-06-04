@@ -31,7 +31,7 @@ let test_passing_string_array () =
   let buf = Array.make char outlen in
 
   let () = Array.(concat (start arr) (length arr) (start buf)) in
-  let buf_addr = Ptr.make (ptr char) (Array.start buf) in
+  let buf_addr = Ptr.fresh (ptr char) (Array.start buf) in
   let s = Ptr.from_voidp string (Ptr.to_voidp buf_addr) in
 
   assert_equal ~msg:"Check output"
@@ -103,8 +103,8 @@ let test_nullable_function_pointer_view () =
 *)
 let test_nullable_pointer_view () =
   let open Ptr in
-  let p = Ptr.make int 10 in
-  let pp = make (ptr int) p in
+  let p = fresh int 10 in
+  let pp = fresh (ptr int) p in
   let npp = from_voidp (ptr_opt int) (to_voidp pp) in
   begin
     assert_equal 10 !@ !@pp;
