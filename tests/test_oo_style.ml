@@ -18,7 +18,7 @@ let testlib = Dl.(dlopen ~filename:"clib/test_functions.so" ~flags:[RTLD_NOW])
 *)
 let test_oo_hierarchy () =
   let module M = struct
-    let cast base p = Ptr.from_voidp base (Ptr.to_voidp p)
+    let cast base p = from_voidp base (to_voidp p)
 
     (* We'll build part of the hierarchy in C and part in OCaml.
 
@@ -44,10 +44,10 @@ let test_oo_hierarchy () =
     let () = seals animal_methods
 
     let call_say cinstance =
-      Ptr.(!@((getf (!@cinstance) animal_vtable) |-> say)) cinstance
+      !@((getf (!@cinstance) animal_vtable) |-> say) cinstance
 
     let call_identify cinstance =
-        Ptr.(!@((getf (!@cinstance) animal_vtable) |-> identify)) cinstance
+      !@((getf (!@cinstance) animal_vtable) |-> identify) cinstance
 
     (* constructor *)
     class animalc ~cinstance = object
@@ -72,7 +72,7 @@ let test_oo_hierarchy () =
     let () = seals camel_methods
 
     let call_humps cinstance =
-      Ptr.(!@((getf (!@cinstance) camel_vtable) |-> humps)) cinstance
+      !@((getf (!@cinstance) camel_vtable) |-> humps) cinstance
 
     (* constructor *)
     class camelc ~cinstance = object
@@ -82,7 +82,6 @@ let test_oo_hierarchy () =
       
     let camel_vtable_singleton = make camel_methods
     let () = begin
-      let open Ptr in
       let vt = camel_vtable_singleton in
       let base_vt = !@(cast animal_methods (addr vt)) in
       (* say *)

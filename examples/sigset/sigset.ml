@@ -17,7 +17,7 @@ let t = ptr sigset_t
 let sigemptyset = foreign "sigemptyset" (ptr sigset_t @-> returning int)
 
 let empty () =
-  let setp = Ptr.allocate ~count:1 sigset_t in begin
+  let setp = allocate_n ~count:1 sigset_t in begin
     ignore (sigemptyset setp);
     setp
   end
@@ -27,7 +27,7 @@ let empty () =
 let sigfullset = foreign "sigfullset" (ptr sigset_t @-> returning int)
 
 let full () =
-  let setp = Ptr.allocate ~count:1 sigset_t in begin
+  let setp = allocate_n ~count:1 sigset_t in begin
     ignore (sigfullset setp);
     setp
   end

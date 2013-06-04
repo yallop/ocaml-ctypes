@@ -5,6 +5,9 @@
  * See the file LICENSE for details.
  *)
 
+open Signed
+open Unsigned
+
 type 'a typ
 type 'a fn
 type 'a ptr
@@ -27,23 +30,18 @@ val (|->) : ((_, _) structured as 's) ptr -> ('a, 's) field -> 'a ptr
 val offsetof : (_, (_, [`Struct]) structured) field -> int
 val addr : ((_, _) structured as 's) -> 's ptr
 
-module Ptr :
-sig
-  type 'a t = 'a ptr
+val null : unit ptr
+val (!@) : 'a ptr -> 'a
+val (<-@) : 'a ptr -> 'a -> unit
+val (+@) : 'a ptr -> int -> 'a ptr
+val (-@) : 'a ptr -> int -> 'a ptr
+val ptr_diff : 'a ptr -> 'a ptr -> int
+val from_voidp : 'a typ -> unit ptr -> 'a ptr
+val to_voidp : _ ptr -> unit ptr
+val allocate : 'a typ -> 'a -> 'a ptr
+val allocate_n : 'a typ -> count:int -> 'a ptr
 
-  val null : unit ptr
-  val (!@) : 'a t -> 'a
-  val (<-@) : 'a t -> 'a -> unit
-  val (+@) : 'a t -> int -> 'a t
-  val (-@) : 'a t -> int -> 'a t
-  val ptr_diff : 'a t -> 'a t -> int
-  val from_voidp : 'a typ -> unit ptr -> 'a ptr
-  val to_voidp : _ ptr -> unit ptr
-  val fresh : 'a typ -> 'a -> 'a ptr
-  val allocate : 'a typ -> count:int -> 'a ptr
-
-  val compare : 'a t -> 'a t -> int
-end
+val ptr_compare : 'a ptr -> 'a ptr -> int
 
 module Array :
 sig
@@ -63,9 +61,6 @@ end
 
 val sizeof : 'a typ -> int
 val alignment : 'a typ -> int
-
-open Signed
-open Unsigned
 
 val void  : unit typ
 val char : char typ

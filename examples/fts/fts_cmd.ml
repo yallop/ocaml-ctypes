@@ -10,7 +10,7 @@ open Fts
 let usage = "fts_cmd path [ path .. ]"
 
 let sort_by_name lp rp =
-  let open Ctypes.Ptr in
+  let open Ctypes in
   let open FTSENT in
   String.compare (name !@lp) (name !@rp)
 

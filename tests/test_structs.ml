@@ -39,11 +39,11 @@ let test_passing_struct () =
       
     let s = make simple
 
-    let () = Ptr.(begin
+    let () = begin
       setf s c 10;
       setf s f 14.5;
       setf s p (from_voidp simple null)
-    end)
+    end
       
     let v = accept_struct s
 
@@ -86,12 +86,12 @@ let test_returning_struct () =
 
     let t = getf s p
 
-    let () = assert_equal 10 Ptr.(!@(t |-> c))
+    let () = assert_equal 10 !@(t |-> c)
       ~printer:string_of_int
-    let () = assert_equal 12.5 Ptr.(!@(t |-> f))
+    let () = assert_equal 12.5 !@(t |-> f)
       ~printer:string_of_float
 
-    let () = assert_equal Ptr.(!@(t |-> p)) t
+    let () = assert_equal !@(t |-> p) t
 
   end in ()
 
@@ -128,7 +128,7 @@ let test_pointers_to_struct_members () =
 
     let s = make styp
 
-    let () = Ptr.(begin
+    let () = begin
       let sp = addr s in
       sp |-> i <-@ 10;
       sp |-> j <-@ 20;
@@ -149,7 +149,7 @@ let test_pointers_to_struct_members () =
       (sp |-> k) <-@ (sp |-> i);
       assert_equal ~msg:"*sp->k = 15" ~printer:string_of_int
         15 (!@(!@(sp |-> k)));
-    end)
+    end
   end in ()
 
 

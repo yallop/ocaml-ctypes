@@ -130,7 +130,6 @@ let test_union_padding () =
 *)
 let test_union_address () =
   let module M = struct
-    open Ptr
     type u
     let u : u union typ = union "u"
     let i = u +:+ int64_t
