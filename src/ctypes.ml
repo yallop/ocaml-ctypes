@@ -70,6 +70,8 @@ and 'a structure = { structure : 'a structure ptr }
 and 'a abstract = { abstract : 'a abstract ptr }
 and ('a, 'b) view = { read : 'b -> 'a; write : 'a -> 'b; ty: 'b typ }
 
+type ('a, 's) field = { ftype: 'a typ; foffset: int }
+
 type _ ccallspec =
     Call : bool * (Raw.immediate_pointer -> 'a) -> 'a ccallspec
   | WriteArg : ('a -> Raw.immediate_pointer -> unit) * 'b ccallspec -> ('a -> 'b) ccallspec
@@ -406,8 +408,6 @@ end
 module Struct =
 struct
   type 's t = 's structure = { structure : 's structure ptr }
-  type ('a, 's) field  = { ftype: 'a typ;
-                           foffset: int }
 
   let structure tag =
     Struct { spec = Incomplete (Raw.allocate_bufferspec ()); tag;
@@ -473,7 +473,6 @@ end
 module Union =
 struct
   type 's t = 's union = { union: 's union ptr }
-  type ('a, 's) field  = 'a typ
 
   let union utag = Union { utag; usize = 0; ualignment = 0; ucomplete = false }
 
@@ -496,12 +495,12 @@ struct
       ensure_unsealed u;
       u.usize <- max u.usize (sizeof ftype);
       u.ualignment <- max u.ualignment (alignment ftype);
-      ftype
+      { ftype; foffset = 0 }
     end
 
   let make t = { union = Ptr.allocate t ~count:1 }
-  let (@.) { union } reftype = { union with reftype }
-  let (|->) p reftype = { p with reftype }
+  let (@.) { union } { ftype } = { union with reftype = ftype }
+  let (|->) p { ftype } = { p with reftype = ftype }
   let setf s field v = Ptr.((s @. field) <-@ v)
   let getf s field = Ptr.(!@(s @. field))
   let addr { union } = union

@@ -12,6 +12,7 @@ type 'a array
 type 'a structure
 type 'a union
 type 'a abstract
+type ('a, 't) field
 
 exception Unsupported of string
 exception ModifyingSealedType of string
@@ -54,7 +55,6 @@ end
 module Struct :
 sig
   type 's t = 's structure
-  type ('a, -'s) field
 
   val structure : string -> 's structure typ
   val ( *:* ) : 's structure typ -> 'a typ -> ('a, 's) field
@@ -72,7 +72,6 @@ end
 module Union :
 sig
   type 's t = 's union
-  type ('a, -'s) field
 
   val union : string -> 's union typ
   val ( +:+ ) : 's union typ -> 'a typ -> ('a, 's) field
