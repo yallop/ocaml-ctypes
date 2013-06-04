@@ -141,7 +141,7 @@ let test_passing_pointer_to_array_of_structs () =
   let u = union "u" in
   let i = u +:+ int in
   let d = u +:+ double in
-  let () = sealu u in
+  let () = seal u in
 
   (* struct s {
         char tag;
@@ -151,7 +151,7 @@ let test_passing_pointer_to_array_of_structs () =
   let s = structure "s" in
   let tag = s *:* char in
   let data = s *:* u in
-  let () = seals s in
+  let () = seal s in
 
   let box_int x =
     let v = make s in

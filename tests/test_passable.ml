@@ -49,7 +49,7 @@ let test_unions_are_not_passable () =
     let c = u +:+ int
     let f = u +:+ double
     let p = u +:+ ptr u
-    let () = sealu u
+    let () = seal u
 
     let _ = begin
       assert_raises ~msg:"Union type rejected as argument"
@@ -93,11 +93,11 @@ let test_pointers_are_passable () =
     let s1 : s1 structure typ = structure "s1"
     let _ = s1 *:* int
     let _ = s1 *:* ptr s1
-    let () = seals s1
+    let () = seal s1
 
     let u : u union typ = union "u"
     let _ = u +:+ int
-    let () = sealu u
+    let () = seal u
   end in
   let open M in
 
@@ -142,33 +142,33 @@ let test_struct_passability () =
     let _ = s1 *:* double
     let _ = s1 *:* ptr s1
     let _ = s1 *:* funptr (int @-> returning int)
-    let () = seals s1
+    let () = seal s1
 
     let s2 : s2 structure typ = structure "s2"
     let _ = s2 *:* s1
     let _ = s2 *:* double
     let _ = s2 *:* ptr (array 10 int)
-    let () = seals s2
+    let () = seal s2
 
     let s3 : s3 structure typ = structure "s3"
     let _ = s3 *:* array 10 (ptr char)
-    let () = seals s3
+    let () = seal s3
 
     let s4 : s4 structure typ = structure "s4"
     let _ = s4 *:* s3
-    let () = seals s4
+    let () = seal s4
 
     let u : u union typ = union "u"
     let _ = u +:+ int
-    let () = sealu u
+    let () = seal u
 
     let s5 : s5 structure typ = structure "s5"
     let _ = s5 *:* u
-    let () = seals s5
+    let () = seal s5
 
     let s6 : s6 structure typ = structure "s6"
     let _ = s6 *:* abstract ~size:1 ~alignment:1
-    let () = seals s6
+    let () = seal s6
 
     let _ = begin
       (* Struct types can be argument types *)

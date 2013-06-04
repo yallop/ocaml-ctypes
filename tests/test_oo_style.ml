@@ -36,12 +36,12 @@ let test_oo_hierarchy () =
 
     (* class layout (vtable pointer, no instance variables) *)
     let animal_vtable = animal *:* ptr animal_methods
-    let () = seals animal
+    let () = seal animal
       
     (* method table layout (two virtual methods) *)
     let say = animal_methods *:* funptr (ptr animal @-> returning string)
     let identify = animal_methods *:* funptr (ptr animal @-> returning string)
-    let () = seals animal_methods
+    let () = seal animal_methods
 
     let call_say cinstance =
       !@((getf (!@cinstance) animal_vtable) |-> say) cinstance
@@ -64,12 +64,12 @@ let test_oo_hierarchy () =
     (* class layout (vtable pointer, one instance variable) *)
     let camel_vtable = camel *:* ptr camel_methods
     let nhumps = camel *:* int
-    let () = seals camel
+    let () = seal camel
 
     (* method table layout (one additional virtual method) *) 
     let _ = camel_methods *:* animal_methods
     let humps = camel_methods *:* funptr (ptr camel @-> returning int)
-    let () = seals camel_methods
+    let () = seal camel_methods
 
     let call_humps cinstance =
       !@((getf (!@cinstance) camel_vtable) |-> humps) cinstance

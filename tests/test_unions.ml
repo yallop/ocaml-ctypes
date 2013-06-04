@@ -28,7 +28,7 @@ let test_inspecting_float () =
     let utyp : u union typ = union "u"
     let f = utyp +:+ double
     let i = utyp +:+ int64_t
-    let () = sealu utyp
+    let () = seal utyp
 
     let pi = 3.14
     let e = 2.718
@@ -61,7 +61,7 @@ let test_endian_detection () =
     let etyp : e union typ = union "e"
     let i = etyp +:+ int64_t
     let c = etyp +:+ array (sizeof int64_t) uchar
-    let () = sealu etyp
+    let () = seal etyp
 
     let updated_char_index =
       if Sys.big_endian then  sizeof int64_t - 1 else 0
@@ -94,7 +94,7 @@ let test_union_padding () =
     let padded : padded union typ = union "padded"
     let i = padded +:+ int64_t
     let a = padded +:+ array (sizeof int64_t + 1) char
-    let () = sealu padded
+    let () = seal padded
 
     let sum_union_components = foreign "sum_union_components"
       (ptr padded @-> size_t @-> returning int64_t)
@@ -135,7 +135,7 @@ let test_union_address () =
     let i = u +:+ int64_t
     let c = u +:+ char
     let s = u +:+ ptr (structure "incomplete")
-    let () = sealu u
+    let () = seal u
 
     let up = addr (make u)
 
@@ -159,7 +159,7 @@ let test_union_address () =
 let test_updating_sealed_union () =
   let utyp = union "sealed" in
   let i = utyp +:+ int in
-  let () = sealu utyp in
+  let () = seal utyp in
 
   assert_raises (ModifyingSealedType "sealed")
     (fun () -> utyp +:+ char)

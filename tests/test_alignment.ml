@@ -99,7 +99,7 @@ let test_struct_alignment () =
     let _ = struct_a *:* char
     let _ = struct_a *:* int
     let _ = struct_a *:* double
-    let () = seals struct_a
+    let () = seal struct_a
 
     let () = assert_equal
       (maximum [alignment char;
@@ -115,7 +115,7 @@ let test_struct_alignment () =
     let _ = struct_b *:* funptr (int @-> returning int)
     let _ = struct_b *:* abs
     let _ = struct_b *:* double
-    let () = seals struct_b
+    let () = seal struct_b
 
     let () = assert_equal
       (maximum [alignment charish;
@@ -152,16 +152,16 @@ let test_struct_tail_padding () =
     let a = struct_a *:* char
     let b = struct_a *:* int
     let c = struct_a *:* char
-    let () = seals (struct_a : a structure typ)
+    let () = seal (struct_a : a structure typ)
 
     let u = union "U"
     let x = u +:+ char
-    let () = sealu (u : u union typ)
+    let () = seal (u : u union typ)
 
     let struct_b = structure "B"
     let d = struct_b *:* struct_a
     let e = struct_b *:* u
-    let () = seals (struct_b : b structure typ)
+    let () = seal (struct_b : b structure typ)
 
     let char_ptr p = from_voidp char (to_voidp p)
 

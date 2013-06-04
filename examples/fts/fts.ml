@@ -98,7 +98,7 @@ struct
   let fts_instr   = ftsent *:* ushort
   let fts_statp   = ftsent *:* ptr void (* really a struct stat * *)
   let fts_name    = ftsent *:* char
-  let () = seals ftsent
+  let () = seal ftsent
 
   type t = ftsent structure ptr
   let t = ptr ftsent
@@ -163,7 +163,7 @@ struct
     (ptr FTSENT.t @-> ptr FTSENT.t @-> returning int)
   (* fts_options would work well as a view *)
   let fts_options = fts *:* int
-  let () = seals fts
+  let () = seal fts
 
   type t = fts structure ptr
 

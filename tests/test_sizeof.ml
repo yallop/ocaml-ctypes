@@ -77,14 +77,14 @@ let test_sizeof_unions () =
   let int_char = union "int_char" in
   let _ = int_char +:+ int in
   let _ = int_char +:+ char in
-  let _ = sealu int_char in
+  let _ = seal int_char in
   
   assert_equal (sizeof int) (sizeof int_char);
 
 
   let char17 = union "char17" in
   let _ = char17 +:+ array 17 char in
-  let _ = sealu char17 in
+  let _ = seal char17 in
   
   assert_equal 17 (sizeof char17)
 
@@ -103,7 +103,7 @@ let test_sizeof_structs () =
         for j = 1 to i do
           ignore (homogeneous *:* int);
         done;
-        seals homogeneous;
+        seal homogeneous;
         assert_equal (i * sizeof int) (sizeof homogeneous)
       done
 
@@ -166,7 +166,7 @@ let test_sizeof_pointers () = begin
     let t : t structure typ = structure "t"
     let c = t *:* int
     let f = t *:* double
-    let () = seals t
+    let () = seal t
   end in
   assert_equal pointer_size (sizeof (ptr M.t))
 end

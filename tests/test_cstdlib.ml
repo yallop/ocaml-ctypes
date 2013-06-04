@@ -146,7 +146,7 @@ let test_div () =
     let div_t : div_t structure typ = structure "div_t"
     let quot = div_t *:* int
     let rem = div_t *:* int
-    let () = seals div_t
+    let () = seal div_t
 
     let div = foreign "div" (int @-> int @-> returning div_t)
 
@@ -232,7 +232,7 @@ let test_bsearch () =
     let mi = structure "mi"
     let mr   = mi *:* int
     let name = mi *:* ptr char
-    let () = seals (mi : mi structure typ)
+    let () = seal (mi : mi structure typ)
 
   let of_string : string -> char array =
     fun s ->

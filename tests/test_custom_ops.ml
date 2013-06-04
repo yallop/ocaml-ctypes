@@ -46,7 +46,7 @@ let test_type_info_hashing_and_equality () =
     let _ = begin
       ignore (s *:* double);
       ignore (s *:* ptr s);
-      ignore (seals s)
+      ignore (seal s)
     end
       
     type t
@@ -54,7 +54,7 @@ let test_type_info_hashing_and_equality () =
     let _ = begin
       ignore (t *:* double);
       ignore (t *:* ptr t);
-      ignore (seals t)
+      ignore (seal t)
     end
       
     let () = begin
