@@ -13,6 +13,8 @@ module type S = sig
   val minus_one : t
   val min_int : t
   val shift_right_logical : t -> int -> t
+  val of_int64 : int64 -> t
+  val to_int64 : t -> int64
 end
 
 module type Basics = sig
@@ -51,12 +53,16 @@ module Int32 =
 struct
   include Int32
   module Infix = MakeInfix(Int32)
+  let of_int64 = Int64.to_int32
+  let to_int64 = Int64.of_int32
 end
 
 module Int64 = 
 struct
   include Int64
   module Infix = MakeInfix(Int64)
+  let of_int64 x = x
+  let to_int64 x = x
 end
 
 (* C guarantees that sizeof(t) == sizeof(unsigned t) *)

@@ -23,9 +23,14 @@ module type S = sig
   (** The smallest representable integer. *)
 
   val shift_right_logical : t -> int -> t
-(** {!shift_right_logical} [x] [y] shifts [x] to the right by [y] bits.  See
-    {!Int32.shift_right_logical}. *)
+  (** {!shift_right_logical} [x] [y] shifts [x] to the right by [y] bits.  See
+      {!Int32.shift_right_logical}. *)
 
+  val of_int64 : int64 -> t
+  (** Convert the given int64 value to a signed integer. *)
+
+  val to_int64 : t -> int64
+  (** Convert the given signed integer to an int64 value. *)
 end
 (** Signed integer operations *)
 
