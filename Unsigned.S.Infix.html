@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link rel="Up" href="Unsigned.S.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Index of module types" rel=Appendix href="index_module_types.html">
+<link title="Unsigned" rel="Chapter" href="Unsigned.html">
+<link title="Signed" rel="Chapter" href="Signed.html">
+<link title="Dl" rel="Chapter" href="Dl.html">
+<link title="Ctypes" rel="Chapter" href="Ctypes.html">
+<link title="PosixTypes" rel="Chapter" href="PosixTypes.html"><title>Unsigned.S.Infix</title>
+</head>
+<body>
+<div class="navbar">&nbsp;<a class="up" href="Unsigned.S.html" title="Unsigned.S">Up</a>
+&nbsp;</div>
+<h1>Module <a href="type_Unsigned.S.Infix.html">Unsigned.S.Infix</a></h1>
+<pre><span class="keyword">module</span> Infix: <code class="code">sig</code> <a href="Unsigned.S.Infix.html">..</a> <code class="code">end</code></pre><div class="info">
+Infix names for the unsigned integer operations.<br>
+</div>
+<hr width="100%">
+<pre><span id="VAL(+)"><span class="keyword">val</span> (+)</span> : <code class="type"><a href="Unsigned.S.html#TYPEt">Unsigned.S.t</a> -> <a href="Unsigned.S.html#TYPEt">Unsigned.S.t</a> -> <a href="Unsigned.S.html#TYPEt">Unsigned.S.t</a></code></pre><div class="info">
+Addition.  See <a href="Unsigned.S.html#VALadd"><code class="code">Unsigned.S.add</code></a>.<br>
+</div>
+<pre><span id="VAL(-)"><span class="keyword">val</span> (-)</span> : <code class="type"><a href="Unsigned.S.html#TYPEt">Unsigned.S.t</a> -> <a href="Unsigned.S.html#TYPEt">Unsigned.S.t</a> -> <a href="Unsigned.S.html#TYPEt">Unsigned.S.t</a></code></pre><div class="info">
+Subtraction.  See <a href="Unsigned.S.html#VALsub"><code class="code">Unsigned.S.sub</code></a>.<br>
+</div>
+<pre><span id="VAL( * )"><span class="keyword">val</span> ( * )</span> : <code class="type"><a href="Unsigned.S.html#TYPEt">Unsigned.S.t</a> -> <a href="Unsigned.S.html#TYPEt">Unsigned.S.t</a> -> <a href="Unsigned.S.html#TYPEt">Unsigned.S.t</a></code></pre><div class="info">
+Multiplication.  See <a href="Unsigned.S.html#VALmul"><code class="code">Unsigned.S.mul</code></a>.<br>
+</div>
+<pre><span id="VAL(/)"><span class="keyword">val</span> (/)</span> : <code class="type"><a href="Unsigned.S.html#TYPEt">Unsigned.S.t</a> -> <a href="Unsigned.S.html#TYPEt">Unsigned.S.t</a> -> <a href="Unsigned.S.html#TYPEt">Unsigned.S.t</a></code></pre><div class="info">
+Division.  See <a href="Unsigned.S.html#VALdiv"><code class="code">Unsigned.S.div</code></a>.<br>
+</div>
+<pre><span id="VAL(mod)"><span class="keyword">val</span> (mod)</span> : <code class="type"><a href="Unsigned.S.html#TYPEt">Unsigned.S.t</a> -> <a href="Unsigned.S.html#TYPEt">Unsigned.S.t</a> -> <a href="Unsigned.S.html#TYPEt">Unsigned.S.t</a></code></pre><div class="info">
+Integer remainder.  See <a href="Unsigned.S.html#VALrem"><code class="code">Unsigned.S.rem</code></a>.<br>
+</div>
+<pre><span id="VAL(land)"><span class="keyword">val</span> (land)</span> : <code class="type"><a href="Unsigned.S.html#TYPEt">Unsigned.S.t</a> -> <a href="Unsigned.S.html#TYPEt">Unsigned.S.t</a> -> <a href="Unsigned.S.html#TYPEt">Unsigned.S.t</a></code></pre><div class="info">
+Bitwise logical and.  See <a href="Unsigned.S.html#VALlogand"><code class="code">Unsigned.S.logand</code></a>.<br>
+</div>
+<pre><span id="VAL(lor)"><span class="keyword">val</span> (lor)</span> : <code class="type"><a href="Unsigned.S.html#TYPEt">Unsigned.S.t</a> -> <a href="Unsigned.S.html#TYPEt">Unsigned.S.t</a> -> <a href="Unsigned.S.html#TYPEt">Unsigned.S.t</a></code></pre><div class="info">
+Bitwise logical or.  See <a href="Unsigned.S.html#VALlogor"><code class="code">Unsigned.S.logor</code></a>.<br>
+</div>
+<pre><span id="VAL(lxor)"><span class="keyword">val</span> (lxor)</span> : <code class="type"><a href="Unsigned.S.html#TYPEt">Unsigned.S.t</a> -> <a href="Unsigned.S.html#TYPEt">Unsigned.S.t</a> -> <a href="Unsigned.S.html#TYPEt">Unsigned.S.t</a></code></pre><div class="info">
+Bitwise logical exclusive or.  See <a href="Unsigned.S.html#VALlogxor"><code class="code">Unsigned.S.logxor</code></a>.<br>
+</div>
+<pre><span id="VAL(lsl)"><span class="keyword">val</span> (lsl)</span> : <code class="type"><a href="Unsigned.S.html#TYPEt">Unsigned.S.t</a> -> int -> <a href="Unsigned.S.html#TYPEt">Unsigned.S.t</a></code></pre><div class="info">
+<code class="code">x lsl y</code> shifts <code class="code">x</code> to the left by <code class="code">y</code> bits.  See <a href="Unsigned.S.html#VALshift_left"><code class="code">Unsigned.S.shift_left</code></a>.<br>
+</div>
+<pre><span id="VAL(lsr)"><span class="keyword">val</span> (lsr)</span> : <code class="type"><a href="Unsigned.S.html#TYPEt">Unsigned.S.t</a> -> int -> <a href="Unsigned.S.html#TYPEt">Unsigned.S.t</a></code></pre><div class="info">
+<code class="code">x lsr y</code> shifts <code class="code">x</code> to the right by <code class="code">y</code> bits.  See <a href="Unsigned.S.html#VALshift_right"><code class="code">Unsigned.S.shift_right</code></a>.<br>
+</div>
+</body></html>

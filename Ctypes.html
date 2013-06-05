@@ -1,0 +1,512 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link rel="previous" href="Dl.html">
+<link rel="next" href="PosixTypes.html">
+<link rel="Up" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Index of module types" rel=Appendix href="index_module_types.html">
+<link title="Unsigned" rel="Chapter" href="Unsigned.html">
+<link title="Signed" rel="Chapter" href="Signed.html">
+<link title="Dl" rel="Chapter" href="Dl.html">
+<link title="Ctypes" rel="Chapter" href="Ctypes.html">
+<link title="PosixTypes" rel="Chapter" href="PosixTypes.html"><link title="Values representing C types" rel="Section" href="#types">
+<link title="Binding C functions and values" rel="Section" href="#values">
+<link title="Exceptions" rel="Section" href="#2_Exceptions">
+<link title="The void type" rel="Subsection" href="#3_Thevoidtype">
+<link title="Scalar types" rel="Subsection" href="#3_Scalartypes">
+<link title="Array types" rel="Subsection" href="#3_Arraytypes">
+<link title="Function types" rel="Subsection" href="#3_Functiontypes">
+<link title="Struct and union types" rel="Subsection" href="#3_Structanduniontypes">
+<link title="View types" rel="Subsection" href="#3_Viewtypes">
+<link title="Abstract types" rel="Subsection" href="#3_Abstracttypes">
+<link title="Operations on types" rel="Subsection" href="#3_Operationsontypes">
+<link title="Pointer values" rel="Subsection" href="#3_Pointervalues">
+<link title="Array values" rel="Subsection" href="#3_Arrayvalues">
+<link title="Struct and union values" rel="Subsection" href="#3_Structandunionvalues">
+<title>Ctypes</title>
+</head>
+<body>
+<div class="navbar"><a class="pre" href="Dl.html" title="Dl">Previous</a>
+&nbsp;<a class="up" href="index.html" title="Index">Up</a>
+&nbsp;<a class="post" href="PosixTypes.html" title="PosixTypes">Next</a>
+</div>
+<h1>Module <a href="type_Ctypes.html">Ctypes</a></h1>
+<pre><span class="keyword">module</span> Ctypes: <code class="code">sig</code> <a href="Ctypes.html">..</a> <code class="code">end</code></pre><div class="info">
+The core ctypes module. 
+<p>
+
+    The main points of interest are the set of functions for describing C
+    types (see <a href="Ctypes.html#types"><i>Values representing C types</i></a>) and the set of functions for accessing C values (see
+    <a href="Ctypes.html#values"><i>Binding C functions and values</i></a>).  The <a href="Ctypes.html#VALforeign"><code class="code">Ctypes.foreign</code></a> function for binding to native functions is
+    the main entry point for the library.<br>
+</div>
+<hr width="100%">
+<br>
+<h2 id="types">Values representing C types</h2><br>
+<pre><span id="TYPEtyp"><span class="keyword">type</span> <code class="type">'a</code> typ</span> </pre>
+<div class="info">
+The type of values representing C types.  There are two types associated
+    with each <code class="code">typ</code> value: the C type used to store and pass values, and the
+    corresponding OCaml type.  The type parameter indicates the OCaml type, so a
+    value of type <code class="code">t typ</code> is used to read and write OCaml values of type <code class="code">t</code>.
+    There are various uses of <code class="code">typ</code> values, including
+<p>
+<ul>
+<li>constructing function types for binding native functions using
+    <a href="Ctypes.html#VALforeign"><code class="code">Ctypes.foreign</code></a></li>
+</ul>
+<ul>
+<li>constructing pointers for reading and writing locations in C-managed
+    storage using <a href="Ctypes.html#VALptr"><code class="code">Ctypes.ptr</code></a></li>
+</ul>
+<ul>
+<li>describing the fields of structured types built with <a href="Ctypes.html#VALstructure"><code class="code">Ctypes.structure</code></a> and
+    <a href="Ctypes.html#VALunion"><code class="code">Ctypes.union</code></a>.</li>
+</ul>
+<br>
+</div>
+
+<br>
+<h3 id="3_Thevoidtype">The void type</h3><br>
+<pre><span id="VALvoid"><span class="keyword">val</span> void</span> : <code class="type">unit <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info">
+Value representing the C void type.  Void values appear in OCaml as the
+    unit type, so using void in an argument or result type specification
+    produces a function which accepts or returns unit.
+<p>
+
+    Dereferencing a pointer to void is an error, as in C, and will raise
+    <code class="code">IncompleteType</code>.<br>
+</div>
+<br>
+<h3 id="3_Scalartypes">Scalar types</h3>
+<p>
+
+    The scalar types consist of the <a href="Ctypes.html#arithmetic_types"><i>Arithmetic types</i></a> and the <a href="Ctypes.html#pointer_types"><i>Pointer types</i></a>.<br>
+<br>
+<h4 id="arithmetic_types">Arithmetic types</h4> 
+<p>
+
+    The arithmetic types consist of the signed and unsigned integer types
+    (including character types) and the floating types.  There are values
+    representing both exact-width integer types (of 8, 16, 32 and 64 bits) and
+    types whose size depend on the platform (signed and unsigned short, int, long,
+    long long).<br>
+<pre><span id="VALchar"><span class="keyword">val</span> char</span> : <code class="type">char <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info">
+Value representing the C type <code class="code">char</code>.<br>
+</div>
+<br>
+<h5 id="5_Signedintegertypes">Signed integer types</h5><br>
+<pre><span id="VALschar"><span class="keyword">val</span> schar</span> : <code class="type">int <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info">
+Value representing the C type <code class="code">signed char</code>.<br>
+</div>
+<pre><span id="VALshort"><span class="keyword">val</span> short</span> : <code class="type">int <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info">
+Value representing the C type (<code class="code">signed</code>) <code class="code">short</code>.<br>
+</div>
+<pre><span id="VALint"><span class="keyword">val</span> int</span> : <code class="type">int <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info">
+Value representing the C type (<code class="code">signed</code>) <code class="code">int</code>.<br>
+</div>
+<pre><span id="VALlong"><span class="keyword">val</span> long</span> : <code class="type"><a href="Signed.html#TYPElong">Signed.long</a> <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info">
+Value representing the C type (<code class="code">signed</code>) <code class="code">long</code>.<br>
+</div>
+<pre><span id="VALllong"><span class="keyword">val</span> llong</span> : <code class="type"><a href="Signed.html#TYPEllong">Signed.llong</a> <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info">
+Value representing the C type (<code class="code">signed</code>) <code class="code">long long</code>.<br>
+</div>
+<pre><span id="VALnativeint"><span class="keyword">val</span> nativeint</span> : <code class="type">nativeint <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info">
+Value representing the C type (<code class="code">signed</code>) <code class="code">int</code>.<br>
+</div>
+<pre><span id="VALint8_t"><span class="keyword">val</span> int8_t</span> : <code class="type">int <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info">
+Value representing an 8-bit signed integer C type.<br>
+</div>
+<pre><span id="VALint16_t"><span class="keyword">val</span> int16_t</span> : <code class="type">int <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info">
+Value representing a 16-bit signed integer C type.<br>
+</div>
+<pre><span id="VALint32_t"><span class="keyword">val</span> int32_t</span> : <code class="type">int32 <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info">
+Value representing a 32-bit signed integer C type.<br>
+</div>
+<pre><span id="VALint64_t"><span class="keyword">val</span> int64_t</span> : <code class="type">int64 <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info">
+Value representing a 64-bit signed integer C type.<br>
+</div>
+<br>
+<h5 id="5_Unsignedintegertypes">Unsigned integer types</h5><br>
+<pre><span id="VALuchar"><span class="keyword">val</span> uchar</span> : <code class="type"><a href="Unsigned.html#TYPEuchar">Unsigned.uchar</a> <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info">
+Value representing the C type <code class="code">unsigned char</code>.<br>
+</div>
+<pre><span id="VALuint8_t"><span class="keyword">val</span> uint8_t</span> : <code class="type"><a href="Unsigned.html#TYPEuint8">Unsigned.uint8</a> <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info">
+Value representing an 8-bit unsigned integer C type.<br>
+</div>
+<pre><span id="VALuint16_t"><span class="keyword">val</span> uint16_t</span> : <code class="type"><a href="Unsigned.html#TYPEuint16">Unsigned.uint16</a> <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info">
+Value representing a 16-bit unsigned integer C type.<br>
+</div>
+<pre><span id="VALuint32_t"><span class="keyword">val</span> uint32_t</span> : <code class="type"><a href="Unsigned.html#TYPEuint32">Unsigned.uint32</a> <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info">
+Value representing a 32-bit unsigned integer C type.<br>
+</div>
+<pre><span id="VALuint64_t"><span class="keyword">val</span> uint64_t</span> : <code class="type"><a href="Unsigned.html#TYPEuint64">Unsigned.uint64</a> <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info">
+Value representing a 64-bit unsigned integer C type.<br>
+</div>
+<pre><span id="VALsize_t"><span class="keyword">val</span> size_t</span> : <code class="type"><a href="Unsigned.html#TYPEsize_t">Unsigned.size_t</a> <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info">
+Value representing the C type <code class="code">size_t</code>, an alias for one of the unsigned
+    integer types.  The actual size and alignment requirements for <code class="code">size_t</code>
+    vary between platforms.<br>
+</div>
+<pre><span id="VALushort"><span class="keyword">val</span> ushort</span> : <code class="type"><a href="Unsigned.html#TYPEushort">Unsigned.ushort</a> <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info">
+Value representing the C type <code class="code">unsigned short</code>.<br>
+</div>
+<pre><span id="VALuint"><span class="keyword">val</span> uint</span> : <code class="type"><a href="Unsigned.html#TYPEuint">Unsigned.uint</a> <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info">
+Value representing the C type <code class="code">unsigned int</code>.<br>
+</div>
+<pre><span id="VALulong"><span class="keyword">val</span> ulong</span> : <code class="type"><a href="Unsigned.html#TYPEulong">Unsigned.ulong</a> <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info">
+Value representing the C type <code class="code">unsigned long</code>.<br>
+</div>
+<pre><span id="VALullong"><span class="keyword">val</span> ullong</span> : <code class="type"><a href="Unsigned.html#TYPEullong">Unsigned.ullong</a> <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info">
+Value representing the C type <code class="code">unsigned long long</code>.<br>
+</div>
+<br>
+<h5 id="5_Floatingtypes">Floating types</h5><br>
+<pre><span id="VALfloat"><span class="keyword">val</span> float</span> : <code class="type">float <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info">
+Value representing the C single-precision <code class="code">float</code> type.<br>
+</div>
+<pre><span id="VALdouble"><span class="keyword">val</span> double</span> : <code class="type">float <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info">
+Value representing the C type <code class="code">double</code>.<br>
+</div>
+<br>
+<h4 id="pointer_types">Pointer types</h4><br>
+<pre><span id="TYPEptr"><span class="keyword">type</span> <code class="type">'a</code> ptr</span> </pre>
+<div class="info">
+The type of pointer values.  A value of type <code class="code">t ptr</code> can be used to read
+    and write values of type <code class="code">t</code> at particular addresses.<br>
+</div>
+
+<pre><span id="VALptr"><span class="keyword">val</span> ptr</span> : <code class="type">'a <a href="Ctypes.html#TYPEtyp">typ</a> -> 'a <a href="Ctypes.html#TYPEptr">ptr</a> <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info">
+Construct a pointer type from an existing type (called the <i>reference
+    type</i>).<br>
+</div>
+<pre><span id="VALptr_opt"><span class="keyword">val</span> ptr_opt</span> : <code class="type">'a <a href="Ctypes.html#TYPEtyp">typ</a> -> 'a <a href="Ctypes.html#TYPEptr">ptr</a> option <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info">
+Construct a pointer type from an existing type (called the <i>reference
+    type</i>).  This behaves like <a href="Ctypes.html#VALptr"><code class="code">Ctypes.ptr</code></a>, except that null pointers appear in OCaml
+    as <code class="code">None</code>.<br>
+</div>
+<pre><span id="VALstring"><span class="keyword">val</span> string</span> : <code class="type">string <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info">
+A high-level representation of the string type.
+<p>
+
+    On the C side this behaves like <code class="code">char *</code>; on the OCaml side values read and written using <a href="Ctypes.html#VALstring"><code class="code">Ctypes.string</code></a> are simply native OCaml strings.
+<p>
+
+    To avoid problems with the garbage collector, values passed using <a href="Ctypes.html#VALstring"><code class="code">Ctypes.string</code></a> are copied into immovable C-managed storage before being passed to C.<br>
+</div>
+<br>
+<h3 id="3_Arraytypes">Array types</h3><br>
+<pre><span id="TYPEarray"><span class="keyword">type</span> <code class="type">'a</code> array</span> </pre>
+<div class="info">
+The type of C array values.  A value of type <code class="code">t array</code> can be used to read
+    and write array objects in C-managed storage.<br>
+</div>
+
+<pre><span id="VALarray"><span class="keyword">val</span> array</span> : <code class="type">int -> 'a <a href="Ctypes.html#TYPEtyp">typ</a> -> 'a <a href="Ctypes.html#TYPEarray">array</a> <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info">
+Construct a sized array type from a length and an existing type (called
+    the <i>element type</i>).<br>
+</div>
+<br>
+<h3 id="3_Functiontypes">Function types</h3><br>
+<pre><span id="TYPEfn"><span class="keyword">type</span> <code class="type">'a</code> fn</span> </pre>
+<div class="info">
+The type of values representing C function types.  A value of type <code class="code">t fn</code>
+    can be used to bind to C functions and to describe type of OCaml functions
+    passed to C.<br>
+</div>
+
+<pre><span id="VAL(@->)"><span class="keyword">val</span> (@-&gt;)</span> : <code class="type">'a <a href="Ctypes.html#TYPEtyp">typ</a> -> 'b <a href="Ctypes.html#TYPEfn">fn</a> -> ('a -> 'b) <a href="Ctypes.html#TYPEfn">fn</a></code></pre><div class="info">
+Construct a function type from a type and an existing function type.  This
+    corresponds to prepending a parameter to a C function parameter list.  For
+    example,
+<p>
+
+    <code class="code">int @-&gt; ptr void @-&gt; returning float</code>
+<p>
+
+    describes a function type that accepts two arguments -- an integer and a
+    pointer to void -- and returns a float.<br>
+</div>
+<pre><span id="VALreturning"><span class="keyword">val</span> returning</span> : <code class="type">'a <a href="Ctypes.html#TYPEtyp">typ</a> -> 'a <a href="Ctypes.html#TYPEfn">fn</a></code></pre><div class="info">
+Give the return type of a C function.  Note that <code class="code">returning</code> is intended
+    to be used together with <a href="Ctypes.html#VAL(@->)"><code class="code">Ctypes.(@-&gt;)</code></a>; see the documentation for <a href="Ctypes.html#VAL(@->)"><code class="code">Ctypes.(@-&gt;)</code></a> for an
+    example.<br>
+</div>
+<pre><span id="VALreturning_checking_errno"><span class="keyword">val</span> returning_checking_errno</span> : <code class="type">'a <a href="Ctypes.html#TYPEtyp">typ</a> -> 'a <a href="Ctypes.html#TYPEfn">fn</a></code></pre><div class="info">
+Give the return type of a C function.  This behaves like <a href="Ctypes.html#VALreturning"><code class="code">Ctypes.returning</code></a>,
+    except that calls to functions bound using <code class="code">returning_checking_errno</code> check
+    whether errno has been updated and raise <code class="code">Unix.Unix_error</code> if so.<br>
+</div>
+<pre><span id="VALfunptr"><span class="keyword">val</span> funptr</span> : <code class="type">('a -> 'b) <a href="Ctypes.html#TYPEfn">fn</a> -> ('a -> 'b) <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info">
+Construct a function pointer type from a function type.
+<p>
+
+    The ctypes library, like C itself, distinguishes functions and function
+    pointers.  Functions are not first class: it is not possible to use them
+    as arguments or return values of calls, or store them in addressable
+    memory.  Function pointers are first class, and so have none of these
+    restrictions.<br>
+</div>
+<pre><span id="VALfunptr_opt"><span class="keyword">val</span> funptr_opt</span> : <code class="type">('a -> 'b) <a href="Ctypes.html#TYPEfn">fn</a> -> ('a -> 'b) option <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info">
+Construct a function pointer type from a function type.
+<p>
+
+    This behaves like <a href="Ctypes.html#VALfunptr"><code class="code">Ctypes.funptr</code></a>, except that null pointers appear in OCaml as
+    <code class="code">None</code>.<br>
+</div>
+<br>
+<h3 id="3_Structanduniontypes">Struct and union types</h3><br>
+<pre><span id="TYPEstructured"><span class="keyword">type</span> <code class="type">('a, 'kind)</code> structured</span> </pre>
+<div class="info">
+The base type of values representing C struct and union types.  The
+    <code class="code">'kind</code> parameter is a polymorphic variant type indicating whether the type
+    represents a struct (<code class="code">`Struct</code>) or a union (<code class="code">`Union</code>).<br>
+</div>
+
+<pre><span id="TYPEstructure"><span class="keyword">type</span> <code class="type">'a</code> structure</span> = <code class="type">('a, [ `Struct ]) <a href="Ctypes.html#TYPEstructured">structured</a></code> </pre>
+<div class="info">
+The type of values representing C struct types.<br>
+</div>
+
+<pre><span id="TYPEunion"><span class="keyword">type</span> <code class="type">'a</code> union</span> = <code class="type">('a, [ `Union ]) <a href="Ctypes.html#TYPEstructured">structured</a></code> </pre>
+<div class="info">
+The type of values representing C union types.<br>
+</div>
+
+<pre><span id="TYPEfield"><span class="keyword">type</span> <code class="type">('a, 't)</code> field</span> </pre>
+<div class="info">
+The type of values representing C struct or union members (called "fields"
+    here).  A value of type <code class="code">(a, s) field</code> represents a field of type <code class="code">a</code> in a
+    struct or union of type <code class="code">s</code>.<br>
+</div>
+
+<pre><span id="VALstructure"><span class="keyword">val</span> structure</span> : <code class="type">string -> 's <a href="Ctypes.html#TYPEstructure">structure</a> <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info">
+Construct a new structure type.  The type value returned is incomplete and
+    can be updated using <a href="Ctypes.html#VAL( *:* )"><code class="code">Ctypes.( *:* )</code></a> until it is passed to <a href="Ctypes.html#VALseal"><code class="code">Ctypes.seal</code></a>, at which point
+    the set of fields is fixed.
+<p>
+
+    The type (<code class="code">'_s structure typ</code>) of the expression returned by the call
+    <code class="code">structure tag</code> includes a weak type variable, which can be explicitly
+    instantiated to ensure that the OCaml values representing different C
+    structure types have incompatible types.  Typical usage is as follows:
+<p>
+
+    <code class="code">type tagname</code>
+<p>
+
+    <code class="code">let tagname : tagname structure typ = structure "tagname"</code><br>
+</div>
+<pre><span id="VAL( *:* )"><span class="keyword">val</span> ( *:* )</span> : <code class="type">'s <a href="Ctypes.html#TYPEstructure">structure</a> <a href="Ctypes.html#TYPEtyp">typ</a> -><br>       'a <a href="Ctypes.html#TYPEtyp">typ</a> -> ('a, 's <a href="Ctypes.html#TYPEstructure">structure</a>) <a href="Ctypes.html#TYPEfield">field</a></code></pre><div class="info">
+<code class="code">s *:* t</code> adds a field of type <code class="code">t</code> to the structure type <code class="code">s</code> and returns
+    a field value that can be used to read and write the field in structure
+    instances (e.g. using <code class="code">getf</code> and <code class="code">setf</code>).
+<p>
+
+    Attempting to add a field to a structure type that has been sealed with
+    <code class="code">seal</code> is an error, and will raise <code class="code">ModifyingSealedType</code>.<br>
+</div>
+<pre><span id="VALunion"><span class="keyword">val</span> union</span> : <code class="type">string -> 's <a href="Ctypes.html#TYPEunion">union</a> <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info">
+Construct a new union type.  This behaves analogously to <a href="Ctypes.html#VALstructure"><code class="code">Ctypes.structure</code></a>;
+    fields are added with <a href="Ctypes.html#VAL(+:+)"><code class="code">Ctypes.(+:+)</code></a>.<br>
+</div>
+<pre><span id="VAL(+:+)"><span class="keyword">val</span> (+:+)</span> : <code class="type">'s <a href="Ctypes.html#TYPEunion">union</a> <a href="Ctypes.html#TYPEtyp">typ</a> -><br>       'a <a href="Ctypes.html#TYPEtyp">typ</a> -> ('a, 's <a href="Ctypes.html#TYPEunion">union</a>) <a href="Ctypes.html#TYPEfield">field</a></code></pre><div class="info">
+<code class="code">u +:+ t</code> adds a field of type <code class="code">t</code> to the union type <code class="code">u</code> and returns a
+    field value that can be used to read and write the field in union
+    instances (e.g. using <code class="code">getf</code> and <code class="code">setf</code>).
+<p>
+
+    Attempting to add a field to a union type that has been sealed with <code class="code">seal</code>
+    is an error, and will raise <code class="code">ModifyingSealedType</code>.<br>
+</div>
+<pre><span id="VALseal"><span class="keyword">val</span> seal</span> : <code class="type">('a, 'b) <a href="Ctypes.html#TYPEstructured">structured</a> <a href="Ctypes.html#TYPEtyp">typ</a> -> unit</code></pre><div class="info">
+<code class="code">seal t</code> completes the struct or union type <code class="code">t</code> so that no further fields
+    can be added.  Struct and union types must be sealed before they can be used
+    in a way that involves their size or alignment; see the documentation for
+    <a href="Ctypes.html#EXCEPTIONIncompleteType"><code class="code">Ctypes.IncompleteType</code></a> for further details.<br>
+</div>
+<br>
+<h3 id="3_Viewtypes">View types</h3><br>
+<pre><span id="VALview"><span class="keyword">val</span> view</span> : <code class="type">read:('a -> 'b) -> write:('b -> 'a) -> 'a <a href="Ctypes.html#TYPEtyp">typ</a> -> 'b <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info">
+<code class="code">view ~read:r ~write:w t</code> creates a C type representation <code class="code">t'</code> which
+    behaves like <code class="code">t</code> except that values read using <code class="code">t'</code> are subsequently
+    transformed using the function <code class="code">r</code> and values written using <code class="code">t'</code> are first
+    transformed using the function <code class="code">w</code>.
+<p>
+
+    For example, given suitable definitions of <code class="code">string_of_char_ptr</code> and
+    <code class="code">char_ptr_of_string</code>, the type representation
+<p>
+
+    <code class="code">view ~read:string_of_char_ptr ~write:char_ptr_of_string (ptr char)</code> 
+<p>
+
+    can be used to pass OCaml strings directly to and from bound C functions,
+    or to read and write string members in structs and arrays.  (In fact, the
+    <a href="Ctypes.html#VALstring"><code class="code">Ctypes.string</code></a> type representation is defined in exactly this way.)<br>
+</div>
+<br>
+<h3 id="3_Abstracttypes">Abstract types</h3><br>
+<pre><span id="TYPEabstract"><span class="keyword">type</span> <code class="type">'a</code> abstract</span> </pre>
+<div class="info">
+The type of abstract values.  The purpose of the <code class="code">abstract</code> type is to
+    represent values whose type varies from platform to platform.
+<p>
+
+    For example, the type <code class="code">Posix.pthread_t</code> is a pointer on some platforms,
+    an integer on other platforms, and a struct on a third set of platforms.
+    One way to deal with this kind of situation is to have
+    possibly-platform-specific code which interrogates the C type in some way
+    to help determine an appropriate representation.  Another way is to use
+    <code class="code">abstract</code>, leaving the representation opaque.
+<p>
+
+    (Note, however, that although <code class="code">pthread_t</code> is a convenient example, since
+    the type used to implement it varies significantly across platforms, it's
+    not actually a good match for <code class="code">abstract</code>, since values of type <code class="code">pthread_t</code>
+    are passed and returned by value.)<br>
+</div>
+
+<pre><span id="VALabstract"><span class="keyword">val</span> abstract</span> : <code class="type">size:int -> alignment:int -> 'a <a href="Ctypes.html#TYPEabstract">abstract</a> <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info">
+Create an abstract type specification from the size and alignment
+    requirements for the type.<br>
+</div>
+<br>
+<h3 id="3_Operationsontypes">Operations on types</h3><br>
+<pre><span id="VALsizeof"><span class="keyword">val</span> sizeof</span> : <code class="type">'a <a href="Ctypes.html#TYPEtyp">typ</a> -> int</code></pre><div class="info">
+<code class="code">sizeof t</code> computes the size in bytes of the type <code class="code">t</code>.  The exception
+    <code class="code">IncompleteType</code> is raised if <code class="code">t</code> is incomplete.<br>
+</div>
+<pre><span id="VALalignment"><span class="keyword">val</span> alignment</span> : <code class="type">'a <a href="Ctypes.html#TYPEtyp">typ</a> -> int</code></pre><div class="info">
+<code class="code">alignment t</code> computes the alignment requirements of the type <code class="code">t</code>.  The
+    exception <code class="code">IncompleteType</code> is raised if <code class="code">t</code> is incomplete.<br>
+</div>
+<br>
+<h2 id="values">Binding C functions and values</h2><br>
+<pre><span id="VALforeign"><span class="keyword">val</span> foreign</span> : <code class="type">?from:<a href="Dl.html#TYPElibrary">Dl.library</a> -> string -> ('a -> 'b) <a href="Ctypes.html#TYPEfn">fn</a> -> 'a -> 'b</code></pre><div class="info">
+<code class="code">foreign name typ</code> exposes the C function of type <code class="code">typ</code> named by <code class="code">name</code> as
+    an OCaml value.  The argument <code class="code">?from</code>, if supplied, is a library handle
+    returned by <a href="Dl.html#VALdlopen"><code class="code">Dl.dlopen</code></a>.<br>
+</div>
+<pre><span id="VALforeign_value"><span class="keyword">val</span> foreign_value</span> : <code class="type">?from:<a href="Dl.html#TYPElibrary">Dl.library</a> -> string -> 'a <a href="Ctypes.html#TYPEtyp">typ</a> -> 'a <a href="Ctypes.html#TYPEptr">ptr</a></code></pre><div class="info">
+<code class="code">foreign_value name typ</code> exposes the C value of type <code class="code">typ</code> named by <code class="code">name</code>
+    as an OCaml value.  The argument <code class="code">?from</code>, if supplied, is a library handle
+    returned by <a href="Dl.html#VALdlopen"><code class="code">Dl.dlopen</code></a>.<br>
+</div>
+<br>
+<h3 id="3_Pointervalues">Pointer values</h3><br>
+<pre><span id="VALnull"><span class="keyword">val</span> null</span> : <code class="type">unit <a href="Ctypes.html#TYPEptr">ptr</a></code></pre><div class="info">
+A null pointer.<br>
+</div>
+<pre><span id="VAL(!@)"><span class="keyword">val</span> (!@)</span> : <code class="type">'a <a href="Ctypes.html#TYPEptr">ptr</a> -> 'a</code></pre><div class="info">
+<code class="code">!@ p</code> dereferences the pointer <code class="code">p</code>.  If the reference type is a scalar
+    type then dereferencing constructs a new value.  If the reference type is
+    an aggregate type then dereferencing returns a value that references the
+    memory pointed to by <code class="code">p</code>.<br>
+</div>
+<pre><span id="VAL(<-@)"><span class="keyword">val</span> (&lt;-@)</span> : <code class="type">'a <a href="Ctypes.html#TYPEptr">ptr</a> -> 'a -> unit</code></pre><div class="info">
+<code class="code">p &lt;-@ v</code> writes the value <code class="code">v</code> to the address <code class="code">p</code>.<br>
+</div>
+<pre><span id="VAL(+@)"><span class="keyword">val</span> (+@)</span> : <code class="type">'a <a href="Ctypes.html#TYPEptr">ptr</a> -> int -> 'a <a href="Ctypes.html#TYPEptr">ptr</a></code></pre><div class="info">
+If <code class="code">p</code> is a pointer to an array element then <code class="code">p +@ n</code> computes the
+    address of the <code class="code">n</code>th next element.<br>
+</div>
+<pre><span id="VAL(-@)"><span class="keyword">val</span> (-@)</span> : <code class="type">'a <a href="Ctypes.html#TYPEptr">ptr</a> -> int -> 'a <a href="Ctypes.html#TYPEptr">ptr</a></code></pre><div class="info">
+If <code class="code">p</code> is a pointer to an array element then <code class="code">p -@ n</code> computes the address
+    of the nth previous element.<br>
+</div>
+<pre><span id="VALptr_diff"><span class="keyword">val</span> ptr_diff</span> : <code class="type">'a <a href="Ctypes.html#TYPEptr">ptr</a> -> 'a <a href="Ctypes.html#TYPEptr">ptr</a> -> int</code></pre><div class="info">
+<code class="code">ptr_diff p q</code> computes <code class="code">q - p</code>.  As in C, both <code class="code">p</code> and <code class="code">q</code> must point
+    into the same array, and the result value is the difference of the
+    subscripts of the two array elements.<br>
+</div>
+<pre><span id="VALfrom_voidp"><span class="keyword">val</span> from_voidp</span> : <code class="type">'a <a href="Ctypes.html#TYPEtyp">typ</a> -> unit <a href="Ctypes.html#TYPEptr">ptr</a> -> 'a <a href="Ctypes.html#TYPEptr">ptr</a></code></pre><div class="info">
+Conversion from <code class="code">void *</code>.<br>
+</div>
+<pre><span id="VALto_voidp"><span class="keyword">val</span> to_voidp</span> : <code class="type">'a <a href="Ctypes.html#TYPEptr">ptr</a> -> unit <a href="Ctypes.html#TYPEptr">ptr</a></code></pre><div class="info">
+Conversion to <code class="code">void *</code>.<br>
+</div>
+<pre><span id="VALallocate"><span class="keyword">val</span> allocate</span> : <code class="type">'a <a href="Ctypes.html#TYPEtyp">typ</a> -> 'a -> 'a <a href="Ctypes.html#TYPEptr">ptr</a></code></pre><div class="info">
+<code class="code">allocate t v</code> allocates a fresh value of type <code class="code">t</code>, initialises it with <code class="code">v</code>
+      and returns its address.<br>
+</div>
+<pre><span id="VALallocate_n"><span class="keyword">val</span> allocate_n</span> : <code class="type">'a <a href="Ctypes.html#TYPEtyp">typ</a> -> count:int -> 'a <a href="Ctypes.html#TYPEptr">ptr</a></code></pre><div class="info">
+<code class="code">allocate_n t ~count:n</code> allocates a fresh array with element type <code class="code">t</code>
+    and length <code class="code">n</code>, and returns its address.<br>
+</div>
+<pre><span id="VALptr_compare"><span class="keyword">val</span> ptr_compare</span> : <code class="type">'a <a href="Ctypes.html#TYPEptr">ptr</a> -> 'a <a href="Ctypes.html#TYPEptr">ptr</a> -> int</code></pre><div class="info">
+If <code class="code">p</code> and <code class="code">q</code> are pointers to elements <code class="code">i</code> and <code class="code">j</code> of the same array then
+    <code class="code">ptr_compare p q</code> compares the indexes of the elements.  The result is
+    negative if <code class="code">i</code> is less than <code class="code">j</code>, positive if <code class="code">i</code> is greater than <code class="code">j</code>, and
+    zero if <code class="code">i</code> and <code class="code">j</code> are equal.<br>
+</div>
+<br>
+<h3 id="3_Arrayvalues">Array values</h3><br>
+<pre><span class="keyword">module</span> <a href="Ctypes.Array.html">Array</a>: <code class="code">sig</code> <a href="Ctypes.Array.html">..</a> <code class="code">end</code></pre><div class="info">
+Operations on C arrays.
+</div>
+<br>
+<h3 id="3_Structandunionvalues">Struct and union values</h3><br>
+<pre><span id="VALmake"><span class="keyword">val</span> make</span> : <code class="type">('a, 'b) <a href="Ctypes.html#TYPEstructured">structured</a> <a href="Ctypes.html#TYPEtyp">typ</a> -> ('a, 'b) <a href="Ctypes.html#TYPEstructured">structured</a></code></pre><div class="info">
+Allocate a fresh, uninitialised structure or union value.<br>
+</div>
+<pre><span id="VALsetf"><span class="keyword">val</span> setf</span> : <code class="type">('b, 'c) <a href="Ctypes.html#TYPEstructured">structured</a> -><br>       ('a, ('b, 'c) <a href="Ctypes.html#TYPEstructured">structured</a>) <a href="Ctypes.html#TYPEfield">field</a> -> 'a -> unit</code></pre><div class="info">
+<code class="code">setf s f v</code> overwrites the value of the field <code class="code">f</code> in the structure or
+    union <code class="code">s</code> with <code class="code">v</code>.<br>
+</div>
+<pre><span id="VALgetf"><span class="keyword">val</span> getf</span> : <code class="type">('b, 'c) <a href="Ctypes.html#TYPEstructured">structured</a> -><br>       ('a, ('b, 'c) <a href="Ctypes.html#TYPEstructured">structured</a>) <a href="Ctypes.html#TYPEfield">field</a> -> 'a</code></pre><div class="info">
+<code class="code">getf s f</code> retrieves the value of the field <code class="code">f</code> in the structure or union <code class="code">s</code>.  The
+      semantics for non-scalar types are non-copying, as for <a href="Ctypes.html#VAL(!@)"><code class="code">Ctypes.(!@)</code></a>.<br>
+</div>
+<pre><span id="VAL(@.)"><span class="keyword">val</span> (@.)</span> : <code class="type">('b, 'c) <a href="Ctypes.html#TYPEstructured">structured</a> -><br>       ('a, ('b, 'c) <a href="Ctypes.html#TYPEstructured">structured</a>) <a href="Ctypes.html#TYPEfield">field</a> -> 'a <a href="Ctypes.html#TYPEptr">ptr</a></code></pre><div class="info">
+<code class="code">s @. f</code> computes the address of the field <code class="code">f</code> in the structure or union
+    value <code class="code">s</code>.<br>
+</div>
+<pre><span id="VAL(|->)"><span class="keyword">val</span> (|-&gt;)</span> : <code class="type">('b, 'c) <a href="Ctypes.html#TYPEstructured">structured</a> <a href="Ctypes.html#TYPEptr">ptr</a> -><br>       ('a, ('b, 'c) <a href="Ctypes.html#TYPEstructured">structured</a>) <a href="Ctypes.html#TYPEfield">field</a> -> 'a <a href="Ctypes.html#TYPEptr">ptr</a></code></pre><div class="info">
+<code class="code">p |-&gt; f</code> computes the address of the field <code class="code">f</code> in the structure or union
+    value pointed to by <code class="code">p</code>.<br>
+</div>
+<pre><span id="VALoffsetof"><span class="keyword">val</span> offsetof</span> : <code class="type">('a, ('b, [ `Struct ]) <a href="Ctypes.html#TYPEstructured">structured</a>) <a href="Ctypes.html#TYPEfield">field</a> -> int</code></pre><div class="info">
+<code class="code">offsetof f</code> returns the offset, in bytes, of the field <code class="code">f</code> from the
+    beginning of the associated struct type.<br>
+</div>
+<pre><span id="VALaddr"><span class="keyword">val</span> addr</span> : <code class="type">('a, 'b) <a href="Ctypes.html#TYPEstructured">structured</a> -> ('a, 'b) <a href="Ctypes.html#TYPEstructured">structured</a> <a href="Ctypes.html#TYPEptr">ptr</a></code></pre><div class="info">
+<code class="code">addr s</code> returns the address of the structure or union <code class="code">s</code>.<br>
+</div>
+<br>
+<h2 id="2_Exceptions">Exceptions</h2><br>
+<pre><span id="EXCEPTIONUnsupported"><span class="keyword">exception</span> Unsupported</span> <span class="keyword">of</span> <code class="type">string</code></pre>
+<div class="info">
+An attempt was made to use a feature not currently supported by ctypes.
+    In practice this refers to attempts to use an union, array or abstract
+    type as an argument or return type of a function.<br>
+</div>
+<pre><span id="EXCEPTIONModifyingSealedType"><span class="keyword">exception</span> ModifyingSealedType</span> <span class="keyword">of</span> <code class="type">string</code></pre>
+<div class="info">
+An attempt was made to modify a sealed struct or union type
+    description.<br>
+</div>
+<pre><span id="EXCEPTIONIncompleteType"><span class="keyword">exception</span> IncompleteType</span></pre>
+<div class="info">
+An attempt was made to compute the size or alignment of an incomplete
+    type.
+<p>
+
+    The incomplete types are struct and union types that have not been sealed,
+    and the void type.
+<p>
+
+    It is not permitted to compute the size or alignment requirements of an
+    incomplete type, to use it as a struct or union member, to read or write a
+    value of the type through a pointer or to use it as the referenced type in
+    pointer arithmetic.  Additionally, incomplete struct and union types
+    cannot be used as argument or return types.<br>
+</div>
+</body></html>
