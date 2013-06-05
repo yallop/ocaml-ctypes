@@ -301,9 +301,9 @@ type 'a abstract
 (** The type of abstract values.  The purpose of the [abstract] type is to
     represent values whose type varies from platform to platform.
 
-    For example, the type {!Posix.pthread_t} is a pointer on some platforms,
-    an integer on other platforms, and a struct on a third set of platforms.
-    One way to deal with this kind of situation is to have
+    For example, the type [pthread_t] is a pointer on some platforms, an
+    integer on other platforms, and a struct on a third set of platforms.  One
+    way to deal with this kind of situation is to have
     possibly-platform-specific code which interrogates the C type in some way
     to help determine an appropriate representation.  Another way is to use
     [abstract], leaving the representation opaque.

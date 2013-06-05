@@ -304,4 +304,4 @@ Document ctypes
   BuildTools+:          ocamldoc
   Install:              true
   XOCamlbuildPath:      .
-  XOCamlbuildLibraries: ctypes
+  XOCamlbuildLibraries: ctypes,ctypes.foreign
