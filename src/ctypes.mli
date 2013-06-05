@@ -35,7 +35,7 @@ type 'a typ
     {!union}.
 *)
 
-(** {3 Scalar types} *)
+(** {3 The void type} *)
 
 val void  : unit typ
 (** Value representing the C void type.  Void values appear in OCaml as the
@@ -46,7 +46,12 @@ val void  : unit typ
     [IncompleteType].
 *)
 
-(** {4 Arithmetic types} 
+(** {3 Scalar types}
+
+    The scalar types consist of the {!arithmetic_types} and the {!pointer_types}.
+*)
+
+(** {4:arithmetic_types Arithmetic types} 
 
     The arithmetic types consist of the signed and unsigned integer types
     (including character types) and the floating types.  There are values
@@ -133,7 +138,7 @@ val float : float typ
 val double : float typ
 (** Value representing the C type [double]. *)
 
-(** {4 Pointer types} *)
+(** {4:pointer_types Pointer types} *)
 
 type 'a ptr
 (** The type of pointer values.  A value of type [t ptr] can be used to read
