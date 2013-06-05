@@ -38,5 +38,5 @@ The documentation and source distribution contain more complex examples, involvi
 
 ## Links
 
-[Tutorial](https://github.com/ocamllabs/ocaml-ctypes/wiki/ctypes-tutorial)
-[API documentation](http://ocamllabs.github.io/ocaml-ctypes)
+* [Tutorial](https://github.com/ocamllabs/ocaml-ctypes/wiki/ctypes-tutorial)
+* [API documentation](http://ocamllabs.github.io/ocaml-ctypes)
