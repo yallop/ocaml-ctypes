@@ -11,7 +11,9 @@
 <link title="Unsigned" rel="Chapter" href="Unsigned.html">
 <link title="Signed" rel="Chapter" href="Signed.html">
 <link title="Ctypes" rel="Chapter" href="Ctypes.html">
-<link title="PosixTypes" rel="Chapter" href="PosixTypes.html"><title>Index of values</title>
+<link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
+<link title="Dl" rel="Chapter" href="Dl.html">
+<link title="Foreign" rel="Chapter" href="Foreign.html"><title>Index of values</title>
 </head>
 <body>
 <div class="navbar">&nbsp;<a class="up" href="index.html" title="Index">Up</a>
@@ -194,6 +196,21 @@ The comparison function for unsigned integers, with the same
 Division.
 </div>
 </td></tr>
+<tr><td><a href="Dl.html#VALdlclose">dlclose</a> [<a href="Dl.html">Dl</a>]</td>
+<td><div class="info">
+Close a dynamic library.
+</div>
+</td></tr>
+<tr><td><a href="Dl.html#VALdlopen">dlopen</a> [<a href="Dl.html">Dl</a>]</td>
+<td><div class="info">
+Open a dynamic library.
+</div>
+</td></tr>
+<tr><td><a href="Dl.html#VALdlsym">dlsym</a> [<a href="Dl.html">Dl</a>]</td>
+<td><div class="info">
+Look up a symbol in a dynamic library.
+</div>
+</td></tr>
 <tr><td><a href="Ctypes.html#VALdouble">double</a> [<a href="Ctypes.html">Ctypes</a>]</td>
 <td><div class="info">
 Value representing the C type <code class="code">double</code>.
@@ -203,6 +220,18 @@ Value representing the C type <code class="code">double</code>.
 <tr><td><a href="Ctypes.html#VALfloat">float</a> [<a href="Ctypes.html">Ctypes</a>]</td>
 <td><div class="info">
 Value representing the C single-precision <code class="code">float</code> type.
+</div>
+</td></tr>
+<tr><td><a href="Foreign.html#VALforeign">foreign</a> [<a href="Foreign.html">Foreign</a>]</td>
+<td><div class="info">
+<code class="code">foreign name typ</code> exposes the C function of type <code class="code">typ</code> named by <code class="code">name</code> as
+    an OCaml value.
+</div>
+</td></tr>
+<tr><td><a href="Foreign.html#VALforeign_value">foreign_value</a> [<a href="Foreign.html">Foreign</a>]</td>
+<td><div class="info">
+<code class="code">foreign_value name typ</code> exposes the C value of type <code class="code">typ</code> named by <code class="code">name</code>
+    as an OCaml value.
 </div>
 </td></tr>
 <tr><td><a href="Ctypes.Array.html#VALfrom_ptr">from_ptr</a> [<a href="Ctypes.Array.html">Ctypes.Array</a>]</td>

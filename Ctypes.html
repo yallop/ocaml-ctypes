@@ -15,7 +15,9 @@
 <link title="Unsigned" rel="Chapter" href="Unsigned.html">
 <link title="Signed" rel="Chapter" href="Signed.html">
 <link title="Ctypes" rel="Chapter" href="Ctypes.html">
-<link title="PosixTypes" rel="Chapter" href="PosixTypes.html"><link title="Values representing C types" rel="Section" href="#types">
+<link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
+<link title="Dl" rel="Chapter" href="Dl.html">
+<link title="Foreign" rel="Chapter" href="Foreign.html"><link title="Values representing C types" rel="Section" href="#types">
 <link title="Values representing C types" rel="Section" href="#types">
 <link title="Exceptions" rel="Section" href="#2_Exceptions">
 <link title="The void type" rel="Subsection" href="#3_Thevoidtype">
@@ -43,7 +45,7 @@ The core ctypes module.
 
     The main points of interest are the set of functions for describing C
     types (see <a href="Ctypes.html#types"><i>Values representing C types</i></a>) and the set of functions for accessing C values (see
-    <code class="code">values</code>).  The <code class="code">Foreign.foreign</code> function uses C type descriptions
+    <code class="code">values</code>).  The <a href="Foreign.html#VALforeign"><code class="code">Foreign.foreign</code></a> function uses C type descriptions
     to bind external C values.<br>
 </div>
 <hr width="100%">
@@ -59,7 +61,7 @@ The type of values representing C types.  There are two types associated
 <p>
 <ul>
 <li>constructing function types for binding native functions using
-    <code class="code">Foreign.foreign</code></li>
+    <a href="Foreign.html#VALforeign"><code class="code">Foreign.foreign</code></a></li>
 </ul>
 <ul>
 <li>constructing pointers for reading and writing locations in C-managed
@@ -362,9 +364,9 @@ The type of abstract values.  The purpose of the <code class="code">abstract</co
     represent values whose type varies from platform to platform.
 <p>
 
-    For example, the type <code class="code">Posix.pthread_t</code> is a pointer on some platforms,
-    an integer on other platforms, and a struct on a third set of platforms.
-    One way to deal with this kind of situation is to have
+    For example, the type <code class="code">pthread_t</code> is a pointer on some platforms, an
+    integer on other platforms, and a struct on a third set of platforms.  One
+    way to deal with this kind of situation is to have
     possibly-platform-specific code which interrogates the C type in some way
     to help determine an appropriate representation.  Another way is to use
     <code class="code">abstract</code>, leaving the representation opaque.
