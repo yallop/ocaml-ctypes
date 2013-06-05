@@ -96,7 +96,7 @@ let test_union_padding () =
     let a = padded +:+ array (sizeof int64_t + 1) char
     let () = seal padded
 
-    let sum_union_components = foreign "sum_union_components"
+    let sum_union_components = Foreign.foreign "sum_union_components"
       (ptr padded @-> size_t @-> returning int64_t)
       ~from:testlib
 

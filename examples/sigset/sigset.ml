@@ -7,6 +7,7 @@
 
 open PosixTypes
 open Ctypes
+open Foreign
 
 type t = sigset_t ptr
 
@@ -24,11 +25,11 @@ let empty () =
 
 (* This function initializes the signal set set to include all of the defined
    signals. Again, the return value is 0. *)
-let sigfullset = foreign "sigfullset" (ptr sigset_t @-> returning int)
+let sigfillset = foreign "sigfillset" (ptr sigset_t @-> returning int)
 
 let full () =
   let setp = allocate_n ~count:1 sigset_t in begin
-    ignore (sigfullset setp);
+    ignore (sigfillset setp);
     setp
   end
 

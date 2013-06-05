@@ -7,6 +7,7 @@
 
 open Ctypes
 open OUnit
+open Foreign
 
 
 let testlib = Dl.(dlopen ~filename:"clib/test_functions.so" ~flags:[RTLD_NOW])

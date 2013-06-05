@@ -55,7 +55,8 @@ type _ typ =
   | Array           : 'a typ * int      -> 'a array typ
   | Abstract        : abstract_type     -> 'a abstract typ
   | View            : ('a, 'b) view     -> 'a typ
-  | FunctionPointer : ('a -> 'b) fn     -> ('a -> 'b) typ
+  | FunctionPointer : string option * ('a -> 'b) fn
+                                        -> ('a -> 'b) typ
 and _ fn =
   (* The flag indicates whether we should check errno *)
   | Returns  : bool * 'a typ   -> 'a fn
@@ -213,8 +214,8 @@ and build : 'a. 'a typ -> offset:int -> Raw.raw_pointer -> 'a
           pbyte_offset = 0;
           reftype;
           pmanaged = None })
-    | FunctionPointer f ->
-      let build_fun = build_function f in
+    | FunctionPointer (name, f) ->
+      let build_fun = build_function ?name f in
       (fun ~offset buf -> build_fun (Raw.read RawTypes.pointer ~offset buf))
     | View { read; ty } ->
       let buildty = build ty in
@@ -235,7 +236,7 @@ and write : 'a. 'a typ -> offset:int -> 'a -> Raw.raw_pointer -> unit
       (fun ~offset { raw_ptr; pbyte_offset } ->
         Raw.write RawTypes.pointer ~offset
           (RawTypes.PtrType.(add raw_ptr (of_int pbyte_offset))))
-    | FunctionPointer fn ->
+    | FunctionPointer (_, fn) ->
       let cs' = Raw.allocate_callspec () in
       let cs = build_callspec fn cs' in
       (fun ~offset f ->
@@ -478,14 +479,6 @@ let ( +:+ ) (Union u) ftype =
     { ftype; foffset = 0 }
   end
 
-let foreign ?from symbol typ =
-  let addr = Dl.dlsym ?handle:from ~symbol in
-  build_function ~name:symbol typ addr
-
-let foreign_value ?from symbol reftype =
-  let raw_ptr = Dl.dlsym ?handle:from ~symbol in
-  { reftype; raw_ptr; pbyte_offset = 0; pmanaged = None }
-
 let void = Void
 let char = Primitive RawTypes.char
 let schar = Primitive RawTypes.schar
@@ -528,12 +521,15 @@ let returning v =
   else
     Returns (false, v)
 let returning_checking_errno v = Returns (true, v)
-let funptr f = FunctionPointer f
+let funptr ?name f = FunctionPointer (name, f)
 
-let strlen = foreign "strlen" (ptr char @-> returning size_t)
+let strlen p =
+  let i = ref 0 in
+  while !@(p +@ !i) <> '\000' do incr i done;
+  !i
 
 let string_of_char_ptr charp =
-    let length = Unsigned.Size_t.to_int (strlen charp) in
+    let length = strlen charp in
     let s = String.create length in
     for i = 0 to length - 1 do
       s.[i] <- !@ (charp +@ i)

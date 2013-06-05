@@ -194,20 +194,24 @@ open FTS
                  int ( *compar)(const FTSENT **, const FTSENT ** ));
 *)
 let compar_type = ptr FTSENT.t @-> ptr FTSENT.t @-> returning int
-let _fts_open = foreign "fts_open"
+let _fts_open = Foreign.foreign "fts_open"
   (ptr string @-> int @-> funptr_opt compar_type @-> returning (ptr fts))
 
 (* FTSENT *fts_read(FTS *ftsp); *)
-let _fts_read = foreign "fts_read" (ptr fts @-> returning_checking_errno (ptr ftsent))
+let _fts_read = Foreign.foreign "fts_read"
+  (ptr fts @-> returning_checking_errno (ptr ftsent))
 
 (* FTSENT *fts_children(FTS *ftsp, int options); *)
-let _fts_children = foreign "fts_children" (ptr fts @-> int @-> returning (ptr ftsent))
+let _fts_children = Foreign.foreign "fts_children"
+  (ptr fts @-> int @-> returning (ptr ftsent))
 
 (* int fts_set(FTS *ftsp, FTSENT *f, int options); *)
-let _fts_set = foreign "fts_set" (ptr fts @-> ptr (ftsent) @-> int @-> returning_checking_errno int)
+let _fts_set = Foreign.foreign "fts_set"
+  (ptr fts @-> ptr (ftsent) @-> int @-> returning_checking_errno int)
 
 (* int fts_close(FTS *ftsp); *)
-let _fts_close = foreign "fts_close" (ptr fts @-> returning_checking_errno int) 
+let _fts_close = Foreign.foreign "fts_close"
+  (ptr fts @-> returning_checking_errno int)
 
 let crush_options f : 'a list -> int = List.fold_left (fun i o -> i lor (f o)) 0
 

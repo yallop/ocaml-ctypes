@@ -34,9 +34,9 @@ let test_passing_struct () =
     let p = simple *:* ptr simple
     let () = seal simple
       
-    let accept_struct = foreign "accept_struct" (simple @-> returning int)
-      ~from:testlib
-      
+    let accept_struct = Foreign.foreign "accept_struct" ~from:testlib
+      (simple @-> returning int)
+
     let s = make simple
 
     let () = begin
@@ -76,8 +76,8 @@ let test_returning_struct () =
     let p = simple *:* ptr simple
     let () = seal simple
 
-    let return_struct = foreign "return_struct" (void @-> returning simple)
-      ~from:testlib
+    let return_struct = Foreign.foreign "return_struct" ~from:testlib
+      (void @-> returning simple)
 
     let s = return_struct ()
 

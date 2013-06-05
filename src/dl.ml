@@ -5,9 +5,6 @@
  * See the file LICENSE for details.
  *)
 
-(* TODO: we could write this using the foreign function library itself
-   rather than having C bindings. *)
-
 type library
 
 type flag = 
@@ -25,7 +22,7 @@ external _dlopen : ?filename:string -> flags:int -> library option
   = "ctypes_dlopen"
     
 (* void *dlsym(void *handle, const char *symbol); *)
-external _dlsym : ?handle:library -> symbol:string -> Ctypes_raw.Types.voidp option
+external _dlsym : ?handle:library -> symbol:string -> int64 option
   = "ctypes_dlsym"
 
 (* int dlclose(void *handle); *)
@@ -58,6 +55,5 @@ let dlclose ~handle =
 
 let dlsym ?handle ~symbol =
   match _dlsym ?handle ~symbol with
-    | Some symbol -> symbol
+    | Some symbol -> Ctypes_raw.Types.PtrType.of_int64 symbol
     | None        -> _report_dl_error ()
-

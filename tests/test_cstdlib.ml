@@ -8,6 +8,7 @@
 open OUnit
 open Ctypes
 open Unsigned
+open Foreign
 
 
 (*

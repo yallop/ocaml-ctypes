@@ -170,7 +170,7 @@ let test_passing_pointer_to_array_of_structs () =
   in
 
   let accepts_pointer_to_array_of_structs =
-    foreign "accepts_pointer_to_array_of_structs"
+    Foreign.foreign "accepts_pointer_to_array_of_structs"
       (ptr (array 5 s) @-> returning double)
       ~from:testlib in
 

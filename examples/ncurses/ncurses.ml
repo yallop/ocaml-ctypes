@@ -6,6 +6,7 @@
  *)
 
 open Ctypes
+open Foreign
 
 type window = unit ptr
 let window : window typ = ptr void

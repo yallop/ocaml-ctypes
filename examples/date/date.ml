@@ -7,6 +7,7 @@
 
 open Ctypes
 open PosixTypes
+open Foreign
 
 type tm
 let tm = structure "tm"

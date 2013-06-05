@@ -9,8 +9,8 @@
 
     The main points of interest are the set of functions for describing C
     types (see {!types}) and the set of functions for accessing C values (see
-    {!values}).  The {!foreign} function for binding to native functions is
-    the main entry point for the library.
+    {!values}).  The {!Foreign.foreign} function uses C type descriptions
+    to bind external C values.
 *)
 
 open Signed
@@ -26,7 +26,7 @@ type 'a typ
     There are various uses of [typ] values, including
 
     - constructing function types for binding native functions using
-    {!foreign}
+    {!Foreign.foreign}
 
     - constructing pointers for reading and writing locations in C-managed
     storage using {!ptr}
@@ -156,10 +156,13 @@ val ptr_opt : 'a typ -> 'a ptr option typ
 val string : string typ
 (** A high-level representation of the string type.
 
-    On the C side this behaves like [char *]; on the OCaml side values read and written using {!string} are simply native OCaml strings.
+    On the C side this behaves like [char *]; on the OCaml side values read
+    and written using {!string} are simply native OCaml strings.
 
-    To avoid problems with the garbage collector, values passed using {!string} are copied into immovable C-managed storage before being passed to C.
- *)
+    To avoid problems with the garbage collector, values passed using
+    {!string} are copied into immovable C-managed storage before being passed
+    to C.
+*)
 
 (** {3 Array types} *)
 
@@ -199,7 +202,7 @@ val returning_checking_errno : 'a typ -> 'a fn
     except that calls to functions bound using [returning_checking_errno] check
     whether errno has been updated and raise {!Unix.Unix_error} if so. *)
 
-val funptr : ('a -> 'b) fn -> ('a -> 'b) typ
+val funptr : ?name:string -> ('a -> 'b) fn -> ('a -> 'b) typ
 (** Construct a function pointer type from a function type.
 
     The ctypes library, like C itself, distinguishes functions and function
@@ -324,17 +327,7 @@ val alignment : 'a typ -> int
 (** [alignment t] computes the alignment requirements of the type [t].  The
     exception [IncompleteType] is raised if [t] is incomplete. *)
 
-(** {2:values Binding C functions and values} *)
-
-val foreign : ?from:Dl.library -> string -> ('a -> 'b) fn -> ('a -> 'b)
-(** [foreign name typ] exposes the C function of type [typ] named by [name] as
-    an OCaml value.  The argument [?from], if supplied, is a library handle
-    returned by {!Dl.dlopen}.  *)
-
-val foreign_value : ?from:Dl.library -> string -> 'a typ -> 'a ptr
-(** [foreign_value name typ] exposes the C value of type [typ] named by [name]
-    as an OCaml value.  The argument [?from], if supplied, is a library handle
-    returned by {!Dl.dlopen}.  *)
+(** {2:types Values representing C types} *)
 
 (** {3 Pointer values} *)
 
@@ -407,7 +400,8 @@ sig
 
       You can also write [a.(n) <- v] instead of [Array.set a n v].
 
-      Raise [Invalid_argument "index out of bounds"] if [n] is outside of the range [0] to [(Array.length a - 1)]. *)
+      Raise [Invalid_argument "index out of bounds"] if [n] is outside of the
+      range [0] to [(Array.length a - 1)]. *)
 
   val unsafe_get : 'a t -> int -> 'a
   (** [unsafe_get a n] behaves like [get a n] except that the check that [n]
@@ -453,8 +447,9 @@ val setf : ((_, _) structured as 's) -> ('a, 's) field -> 'a -> unit
     union [s] with [v]. *)
 
 val getf : ((_, _) structured as 's) -> ('a, 's) field -> 'a
-(** [getf s f] retrieves the value of the field [f] in the structure or union [s].  The
-      semantics for non-scalar types are non-copying, as for {!(!@)}.*)
+(** [getf s f] retrieves the value of the field [f] in the structure or union
+    [s].  The semantics for non-scalar types are non-copying, as for
+    {!(!@)}.*)
 
 val (@.) : ((_, _) structured as 's) -> ('a, 's) field -> 'a ptr
 (** [s @. f] computes the address of the field [f] in the structure or union

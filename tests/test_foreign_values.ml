@@ -20,7 +20,7 @@ let test_retrieving_struct () =
   let len = s *:* size_t in
   let str = s *:* array 1 char in
   let () = seal s in
-  let global_struct = foreign_value "global_struct" s ~from:testlib in
+  let global_struct = Foreign.foreign_value "global_struct" s ~from:testlib in
   let p = Array.start (getf !@global_struct str) in
   let stringp = from_voidp string (to_voidp (allocate (ptr char) p)) in
   begin

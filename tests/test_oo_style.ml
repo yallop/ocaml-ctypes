@@ -103,7 +103,7 @@ let test_oo_hierarchy () =
       end;
       new camelc ~cinstance:(addr c)
 
-    let check_name = foreign "check_name" ~from:testlib
+    let check_name = Foreign.foreign "check_name" ~from:testlib
       (ptr animal @-> string @-> returning int)
 
     let () =
@@ -125,7 +125,7 @@ let test_oo_hierarchy () =
     let colour_num = function
     White -> 0 | Red -> 1 | Black -> 2 | Pale -> 3
 
-    let new_chorse = foreign "new_chorse" ~from:testlib
+    let new_chorse = Foreign.foreign "new_chorse" ~from:testlib
       (int @-> returning (ptr animal)) 
 
     class chorse ~colour =

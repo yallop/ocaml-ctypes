@@ -21,7 +21,7 @@ let testlib = Dl.(dlopen ~filename:"clib/test_functions.so" ~flags:[RTLD_NOW])
   parameter.  Examine the output buffer using a cast to a string view.
 *)
 let test_passing_string_array () =
-  let concat = foreign "concat_strings" ~from:testlib
+  let concat = Foreign.foreign "concat_strings" ~from:testlib
     (ptr string @-> int @-> ptr char @-> returning void) in
 
   let l = ["the "; "quick "; "brown "; "fox "; "etc. "; "etc. "; ] in
@@ -47,7 +47,7 @@ let test_passing_string_array () =
 *)
 let test_passing_chars_as_ints () =
   let charish = view ~read:Char.chr ~write:Char.code int in
-  let toupper = foreign "toupper" (charish @-> returning charish) in
+  let toupper = Foreign.foreign "toupper" (charish @-> returning charish) in
 
   assert_equal ~msg:"toupper('x') = 'X'"
     'X' (toupper 'x');
@@ -65,10 +65,10 @@ let test_passing_chars_as_ints () =
 let test_nullable_function_pointer_view () =
   let nullable_intptr = funptr_opt (int @-> int @-> returning int) in
   let returning_funptr =
-    foreign "returning_funptr" ~from:testlib
+    Foreign.foreign "returning_funptr" ~from:testlib
       (int @-> returning nullable_intptr)
   and accepting_possibly_null_funptr =
-    foreign "accepting_possibly_null_funptr" ~from:testlib
+    Foreign.foreign "accepting_possibly_null_funptr" ~from:testlib
       (nullable_intptr @-> int @-> int @-> returning int)
   in
   begin

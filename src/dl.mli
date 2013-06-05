@@ -11,7 +11,9 @@ type library
 (** The type of dynamic libraries, as returned by {!dlopen}. *)
 
 exception DL_error of string
-(** An error condition occurred when calling {!dlopen}, {!dlclose} or {!dlsym}.  The argument is the string returned by the [dlerror] function. *)
+(** An error condition occurred when calling {!dlopen}, {!dlclose} or
+    {!dlsym}.  The argument is the string returned by the [dlerror]
+    function. *)
 
 (** Flags for {!dlopen} *)
 type flag = 
