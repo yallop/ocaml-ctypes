@@ -9,7 +9,6 @@
 <link title="Index of module types" rel=Appendix href="index_module_types.html">
 <link title="Unsigned" rel="Chapter" href="Unsigned.html">
 <link title="Signed" rel="Chapter" href="Signed.html">
-<link title="Dl" rel="Chapter" href="Dl.html">
 <link title="Ctypes" rel="Chapter" href="Ctypes.html">
 <link title="PosixTypes" rel="Chapter" href="PosixTypes.html"><title>Signed</title>
 </head>
@@ -57,6 +56,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;minus_one&nbsp;:&nbsp;t<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;min_int&nbsp;:&nbsp;t<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;shift_right_logical&nbsp;:&nbsp;t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;t<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;of_int64&nbsp;:&nbsp;int64&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;t<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;to_int64&nbsp;:&nbsp;t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;int64<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">end</span><br>
 &nbsp;&nbsp;<span class="keyword">module</span>&nbsp;<span class="constructor">Int32</span>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">sig</span><br>
@@ -100,6 +101,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;minus_one&nbsp;:&nbsp;t<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;min_int&nbsp;:&nbsp;t<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;shift_right_logical&nbsp;:&nbsp;t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;t<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;of_int64&nbsp;:&nbsp;int64&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;t<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;to_int64&nbsp;:&nbsp;t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;int64<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">end</span><br>
 &nbsp;&nbsp;<span class="keyword">module</span>&nbsp;<span class="constructor">Int64</span>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">sig</span><br>
@@ -143,6 +146,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;minus_one&nbsp;:&nbsp;t<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;min_int&nbsp;:&nbsp;t<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;shift_right_logical&nbsp;:&nbsp;t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;t<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;of_int64&nbsp;:&nbsp;int64&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;t<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;to_int64&nbsp;:&nbsp;t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;int64<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">end</span><br>
 &nbsp;&nbsp;<span class="keyword">module</span>&nbsp;<span class="constructor">Long</span>&nbsp;:&nbsp;<span class="constructor">S</span><br>
 &nbsp;&nbsp;<span class="keyword">module</span>&nbsp;<span class="constructor">LLong</span>&nbsp;:&nbsp;<span class="constructor">S</span><br>

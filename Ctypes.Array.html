@@ -12,7 +12,6 @@
 <link title="Index of module types" rel=Appendix href="index_module_types.html">
 <link title="Unsigned" rel="Chapter" href="Unsigned.html">
 <link title="Signed" rel="Chapter" href="Signed.html">
-<link title="Dl" rel="Chapter" href="Dl.html">
 <link title="Ctypes" rel="Chapter" href="Ctypes.html">
 <link title="PosixTypes" rel="Chapter" href="PosixTypes.html"><title>Ctypes.Array</title>
 </head>
@@ -45,7 +44,8 @@ Operations on C arrays.<br>
       You can also write <code class="code">a.(n) &lt;- v</code> instead of <code class="code">Array.set a n v</code>.
 <p>
 
-      Raise <code class="code">Invalid_argument "index out of bounds"</code> if <code class="code">n</code> is outside of the range <code class="code">0</code> to <code class="code">(Array.length a - 1)</code>.<br>
+      Raise <code class="code">Invalid_argument "index out of bounds"</code> if <code class="code">n</code> is outside of the
+      range <code class="code">0</code> to <code class="code">(Array.length a - 1)</code>.<br>
 </div>
 <pre><span id="VALunsafe_get"><span class="keyword">val</span> unsafe_get</span> : <code class="type">'a <a href="Ctypes.Array.html#TYPEt">t</a> -> int -> 'a</code></pre><div class="info">
 <code class="code">unsafe_get a n</code> behaves like <code class="code">get a n</code> except that the check that <code class="code">n</code>

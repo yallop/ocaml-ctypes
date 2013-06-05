@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="style.css" type="text/css">
 <meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
 <link rel="Start" href="index.html">
-<link rel="previous" href="Dl.html">
+<link rel="previous" href="Signed.html">
 <link rel="next" href="PosixTypes.html">
 <link rel="Up" href="index.html">
 <link title="Index of types" rel=Appendix href="index_types.html">
@@ -14,10 +14,9 @@
 <link title="Index of module types" rel=Appendix href="index_module_types.html">
 <link title="Unsigned" rel="Chapter" href="Unsigned.html">
 <link title="Signed" rel="Chapter" href="Signed.html">
-<link title="Dl" rel="Chapter" href="Dl.html">
 <link title="Ctypes" rel="Chapter" href="Ctypes.html">
 <link title="PosixTypes" rel="Chapter" href="PosixTypes.html"><link title="Values representing C types" rel="Section" href="#types">
-<link title="Binding C functions and values" rel="Section" href="#values">
+<link title="Values representing C types" rel="Section" href="#types">
 <link title="Exceptions" rel="Section" href="#2_Exceptions">
 <link title="The void type" rel="Subsection" href="#3_Thevoidtype">
 <link title="Scalar types" rel="Subsection" href="#3_Scalartypes">
@@ -33,7 +32,7 @@
 <title>Ctypes</title>
 </head>
 <body>
-<div class="navbar"><a class="pre" href="Dl.html" title="Dl">Previous</a>
+<div class="navbar"><a class="pre" href="Signed.html" title="Signed">Previous</a>
 &nbsp;<a class="up" href="index.html" title="Index">Up</a>
 &nbsp;<a class="post" href="PosixTypes.html" title="PosixTypes">Next</a>
 </div>
@@ -44,8 +43,8 @@ The core ctypes module.
 
     The main points of interest are the set of functions for describing C
     types (see <a href="Ctypes.html#types"><i>Values representing C types</i></a>) and the set of functions for accessing C values (see
-    <a href="Ctypes.html#values"><i>Binding C functions and values</i></a>).  The <a href="Ctypes.html#VALforeign"><code class="code">Ctypes.foreign</code></a> function for binding to native functions is
-    the main entry point for the library.<br>
+    <code class="code">values</code>).  The <code class="code">Foreign.foreign</code> function uses C type descriptions
+    to bind external C values.<br>
 </div>
 <hr width="100%">
 <br>
@@ -60,7 +59,7 @@ The type of values representing C types.  There are two types associated
 <p>
 <ul>
 <li>constructing function types for binding native functions using
-    <a href="Ctypes.html#VALforeign"><code class="code">Ctypes.foreign</code></a></li>
+    <code class="code">Foreign.foreign</code></li>
 </ul>
 <ul>
 <li>constructing pointers for reading and writing locations in C-managed
@@ -196,10 +195,13 @@ Construct a pointer type from an existing type (called the <i>reference
 A high-level representation of the string type.
 <p>
 
-    On the C side this behaves like <code class="code">char *</code>; on the OCaml side values read and written using <a href="Ctypes.html#VALstring"><code class="code">Ctypes.string</code></a> are simply native OCaml strings.
+    On the C side this behaves like <code class="code">char *</code>; on the OCaml side values read
+    and written using <a href="Ctypes.html#VALstring"><code class="code">Ctypes.string</code></a> are simply native OCaml strings.
 <p>
 
-    To avoid problems with the garbage collector, values passed using <a href="Ctypes.html#VALstring"><code class="code">Ctypes.string</code></a> are copied into immovable C-managed storage before being passed to C.<br>
+    To avoid problems with the garbage collector, values passed using
+    <a href="Ctypes.html#VALstring"><code class="code">Ctypes.string</code></a> are copied into immovable C-managed storage before being passed
+    to C.<br>
 </div>
 <br>
 <h3 id="3_Arraytypes">Array types</h3><br>
@@ -244,7 +246,7 @@ Give the return type of a C function.  This behaves like <a href="Ctypes.html#VA
     except that calls to functions bound using <code class="code">returning_checking_errno</code> check
     whether errno has been updated and raise <code class="code">Unix.Unix_error</code> if so.<br>
 </div>
-<pre><span id="VALfunptr"><span class="keyword">val</span> funptr</span> : <code class="type">('a -> 'b) <a href="Ctypes.html#TYPEfn">fn</a> -> ('a -> 'b) <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info">
+<pre><span id="VALfunptr"><span class="keyword">val</span> funptr</span> : <code class="type">?name:string -> ('a -> 'b) <a href="Ctypes.html#TYPEfn">fn</a> -> ('a -> 'b) <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info">
 Construct a function pointer type from a function type.
 <p>
 
@@ -389,17 +391,7 @@ Create an abstract type specification from the size and alignment
     exception <code class="code">IncompleteType</code> is raised if <code class="code">t</code> is incomplete.<br>
 </div>
 <br>
-<h2 id="values">Binding C functions and values</h2><br>
-<pre><span id="VALforeign"><span class="keyword">val</span> foreign</span> : <code class="type">?from:<a href="Dl.html#TYPElibrary">Dl.library</a> -> string -> ('a -> 'b) <a href="Ctypes.html#TYPEfn">fn</a> -> 'a -> 'b</code></pre><div class="info">
-<code class="code">foreign name typ</code> exposes the C function of type <code class="code">typ</code> named by <code class="code">name</code> as
-    an OCaml value.  The argument <code class="code">?from</code>, if supplied, is a library handle
-    returned by <a href="Dl.html#VALdlopen"><code class="code">Dl.dlopen</code></a>.<br>
-</div>
-<pre><span id="VALforeign_value"><span class="keyword">val</span> foreign_value</span> : <code class="type">?from:<a href="Dl.html#TYPElibrary">Dl.library</a> -> string -> 'a <a href="Ctypes.html#TYPEtyp">typ</a> -> 'a <a href="Ctypes.html#TYPEptr">ptr</a></code></pre><div class="info">
-<code class="code">foreign_value name typ</code> exposes the C value of type <code class="code">typ</code> named by <code class="code">name</code>
-    as an OCaml value.  The argument <code class="code">?from</code>, if supplied, is a library handle
-    returned by <a href="Dl.html#VALdlopen"><code class="code">Dl.dlopen</code></a>.<br>
-</div>
+<h2 id="types">Values representing C types</h2><br>
 <br>
 <h3 id="3_Pointervalues">Pointer values</h3><br>
 <pre><span id="VALnull"><span class="keyword">val</span> null</span> : <code class="type">unit <a href="Ctypes.html#TYPEptr">ptr</a></code></pre><div class="info">
@@ -447,6 +439,9 @@ If <code class="code">p</code> and <code class="code">q</code> are pointers to e
     negative if <code class="code">i</code> is less than <code class="code">j</code>, positive if <code class="code">i</code> is greater than <code class="code">j</code>, and
     zero if <code class="code">i</code> and <code class="code">j</code> are equal.<br>
 </div>
+<pre><span id="VALptr_of_raw_address"><span class="keyword">val</span> ptr_of_raw_address</span> : <code class="type">int64 -> unit <a href="Ctypes.html#TYPEptr">ptr</a></code></pre><div class="info">
+Convert the numeric representation of an address to a pointer<br>
+</div>
 <br>
 <h3 id="3_Arrayvalues">Array values</h3><br>
 <pre><span class="keyword">module</span> <a href="Ctypes.Array.html">Array</a>: <code class="code">sig</code> <a href="Ctypes.Array.html">..</a> <code class="code">end</code></pre><div class="info">
@@ -462,8 +457,9 @@ Allocate a fresh, uninitialised structure or union value.<br>
     union <code class="code">s</code> with <code class="code">v</code>.<br>
 </div>
 <pre><span id="VALgetf"><span class="keyword">val</span> getf</span> : <code class="type">('b, 'c) <a href="Ctypes.html#TYPEstructured">structured</a> -><br>       ('a, ('b, 'c) <a href="Ctypes.html#TYPEstructured">structured</a>) <a href="Ctypes.html#TYPEfield">field</a> -> 'a</code></pre><div class="info">
-<code class="code">getf s f</code> retrieves the value of the field <code class="code">f</code> in the structure or union <code class="code">s</code>.  The
-      semantics for non-scalar types are non-copying, as for <a href="Ctypes.html#VAL(!@)"><code class="code">Ctypes.(!@)</code></a>.<br>
+<code class="code">getf s f</code> retrieves the value of the field <code class="code">f</code> in the structure or union
+    <code class="code">s</code>.  The semantics for non-scalar types are non-copying, as for
+    <a href="Ctypes.html#VAL(!@)"><code class="code">Ctypes.(!@)</code></a>.<br>
 </div>
 <pre><span id="VAL(@.)"><span class="keyword">val</span> (@.)</span> : <code class="type">('b, 'c) <a href="Ctypes.html#TYPEstructured">structured</a> -><br>       ('a, ('b, 'c) <a href="Ctypes.html#TYPEstructured">structured</a>) <a href="Ctypes.html#TYPEfield">field</a> -> 'a <a href="Ctypes.html#TYPEptr">ptr</a></code></pre><div class="info">
 <code class="code">s @. f</code> computes the address of the field <code class="code">f</code> in the structure or union
