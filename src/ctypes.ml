@@ -351,6 +351,10 @@ let allocate : 'a. 'a typ -> 'a -> 'a ptr
 let ptr_compare {raw_ptr = lp; pbyte_offset = loff} {raw_ptr = rp; pbyte_offset = roff}
     = RawTypes.PtrType.(compare (add lp (of_int loff)) (add rp (of_int roff)))
 
+let ptr_of_raw_address addr =
+  { reftype = Void; raw_ptr = RawTypes.PtrType.of_int64 addr;
+    pmanaged = None; pbyte_offset = 0 }
+
 module Array =
 struct
   type 'a t = 'a array

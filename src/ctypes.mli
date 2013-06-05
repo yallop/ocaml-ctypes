@@ -383,6 +383,9 @@ val ptr_compare : 'a ptr -> 'a ptr -> int
     negative if [i] is less than [j], positive if [i] is greater than [j], and
     zero if [i] and [j] are equal. *)
 
+val ptr_of_raw_address : int64 -> unit ptr
+(** Convert the numeric representation of an address to a pointer *)
+
 (** {3 Array values} *)
 
 module Array :
