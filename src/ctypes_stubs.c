@@ -537,22 +537,6 @@ value ctypes_complete_structspec(value bufferspec_)
   }
 }
 
-/* pointer_plus : raw_pointer -> int -> raw_pointer */
-value ctypes_pointer_plus(value ptr, value i)
-{
-  CAMLparam2(ptr, i);
-  CAMLreturn(CTYPES_PTR_PLUS(ptr, Int_val(i)));
-}
-
-
-/* pointer_diff : raw_pointer -> int -> raw_pointer -> int -> int */
-value ctypes_pointer_diff(value lp, value loff, value rp, value roff)
-{
-  char *l = (char*)CTYPES_TO_PTR(lp) + Int_val(loff);
-  char *r = (char*)CTYPES_TO_PTR(rp) + Int_val(roff);
-  return Val_int(r - l);
-}
-
 
 /* memcpy : dest:raw_pointer -> dest_offset:int ->
             src:raw_pointer -> src_offset:int ->

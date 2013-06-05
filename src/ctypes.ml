@@ -234,7 +234,7 @@ and write : 'a. 'a typ -> offset:int -> 'a -> Raw.raw_pointer -> unit
     | Pointer _ ->
       (fun ~offset { raw_ptr; pbyte_offset } ->
         Raw.write RawTypes.pointer ~offset
-          (Raw.pointer_plus raw_ptr pbyte_offset))
+          (RawTypes.PtrType.(add raw_ptr (of_int pbyte_offset))))
     | FunctionPointer fn ->
       let cs' = Raw.allocate_callspec () in
       let cs = build_callspec fn cs' in
@@ -312,7 +312,10 @@ let ptr_diff { raw_ptr = lp; pbyte_offset = loff; reftype }
     { raw_ptr = rp; pbyte_offset = roff } =
     (* We assume the pointers are properly aligned, or at least that
        the difference is a multiple of sizeof reftype. *)
-  Raw.pointer_diff lp loff rp roff / sizeof reftype
+    let open RawTypes.PtrType in
+     let l = add lp (of_int loff)
+     and r = add rp (of_int roff) in
+     to_int (sub r l) / sizeof reftype
 
 let (+@) : 'a. 'a ptr -> int -> 'a ptr
   = fun ({ pbyte_offset; reftype } as p) x ->
@@ -346,7 +349,7 @@ let allocate : 'a. 'a typ -> 'a -> 'a ptr
     end
 
 let ptr_compare {raw_ptr = lp; pbyte_offset = loff} {raw_ptr = rp; pbyte_offset = roff}
-    = compare (Raw.pointer_plus lp loff) (Raw.pointer_plus rp roff)
+    = RawTypes.PtrType.(compare (add lp (of_int loff)) (add rp (of_int roff)))
 
 module Array =
 struct

@@ -16,7 +16,8 @@ sig
   external sizeof : _ ctype -> int = "ctypes_sizeof"
   external alignment : _ ctype -> int = "ctypes_alignment"
 
-  type voidp
+  module PtrType : Signed.S
+  type voidp = PtrType.t
   val null : voidp
 
   val pointer : voidp ctype
@@ -51,7 +52,6 @@ struct
   open Signed
 
   type 'a ctype
-  type voidp
 
   external sizeof : _ ctype -> int = "ctypes_sizeof"
 
@@ -72,7 +72,13 @@ struct
   external _double_type_info : unit -> float ctype = "ctypes_double_type_info"
   let double = _double_type_info ()
 
-  external _voidp_type_info : unit -> voidp ctype = "ctypes_voidp_type_info"
+  external _voidp_type_info : unit -> _ ctype = "ctypes_voidp_type_info"
+
+  module PtrType = (val match sizeof (_voidp_type_info ()) with
+      4 -> (module Signed.Int32 : Signed.S)
+    | 8 -> (module Signed.Int64 : Signed.S)
+    | _ -> failwith "No suitable type available to represent pointers.")
+  type voidp = PtrType.t
   let pointer = _voidp_type_info ()
 
   external _void_type_info : unit -> unit ctype = "ctypes_void_type_info"
@@ -208,15 +214,6 @@ external allocate : int -> managed_buffer
 (* Obtain the address of the managed block. *)
 external block_address : managed_buffer -> raw_pointer
   = "ctypes_block_address"
-
-(* Pointer arithmetic. *)
-external pointer_plus : raw_pointer -> int -> raw_pointer
-  = "ctypes_pointer_plus"
-
-(* Pointer difference. *)
-external pointer_diff : raw_pointer -> int -> raw_pointer -> int
-  -> int
-  = "ctypes_pointer_diff"
 
 external memcpy :
   dst:raw_pointer -> dst_offset:int ->
