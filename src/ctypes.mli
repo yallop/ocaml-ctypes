@@ -174,6 +174,7 @@ val array : int -> 'a typ -> 'a array typ
 (** Construct a sized array type from a length and an existing type (called
     the {i element type}). *)
 
+
 (** {3 Function types} *)
 
 type 'a fn
@@ -376,6 +377,9 @@ val ptr_compare : 'a ptr -> 'a ptr -> int
     negative if [i] is less than [j], positive if [i] is greater than [j], and
     zero if [i] and [j] are equal. *)
 
+val reference_type : 'a ptr -> 'a typ
+(** Retrieve the reference type of a pointer. *)
+
 val ptr_of_raw_address : int64 -> unit ptr
 (** Convert the numeric representation of an address to a pointer *)
 
@@ -431,9 +435,12 @@ sig
       address [p]. *)
 
   val make : 'a typ -> ?initial:'a -> int -> 'a t
-(** [make t n] creates an [n]-length array of type [t].  If the optional
-    argument [?initial] is supplied, it indicates a value that should be used to
-    initialise every element of the array.  *)
+  (** [make t n] creates an [n]-length array of type [t].  If the optional
+      argument [?initial] is supplied, it indicates a value that should be used
+      to initialise every element of the array.  *)
+
+  val element_type : 'a array -> 'a typ
+  (** Retrieve the element type of an array. *)
 end
 (** Operations on C arrays. *)
 

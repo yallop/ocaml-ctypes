@@ -352,6 +352,8 @@ let allocate : 'a. 'a typ -> 'a -> 'a ptr
 let ptr_compare {raw_ptr = lp; pbyte_offset = loff} {raw_ptr = rp; pbyte_offset = roff}
     = RawTypes.PtrType.(compare (add lp (of_int loff)) (add rp (of_int roff)))
 
+let reference_type { reftype } = reftype
+
 let ptr_of_raw_address addr =
   { reftype = Void; raw_ptr = RawTypes.PtrType.of_int64 addr;
     pmanaged = None; pbyte_offset = 0 }
@@ -389,6 +391,8 @@ struct
       match initial with
         | None -> arr
         | Some v -> fill arr v; arr
+
+  let element_type { astart } = reference_type astart 
 
   let of_list typ list =
     let arr = make typ (List.length list) in
