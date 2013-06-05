@@ -75,13 +75,43 @@
   UINT_PRIMOP(add, BITS,  +)                                                 \
   UINT_PRIMOP(sub, BITS,  -)                                                 \
   UINT_PRIMOP(mul, BITS,  *)                                                 \
-  UINT_PRIMOP(div, BITS,  /)                                                 \
-  UINT_PRIMOP(rem, BITS,  %)                                                 \
   UINT_PRIMOP(logand, BITS,  &)                                              \
   UINT_PRIMOP(logor, BITS,  |)                                               \
   UINT_PRIMOP(logxor, BITS,  ^)                                              \
-  UINT_PRIMOP(shift_left, BITS,  <<)                                         \
-  UINT_PRIMOP(shift_right, BITS,  >>)                                        \
+                                                                             \
+  /* div : t -> t -> t */                                                    \
+  value ctypes_uint ## BITS ## _div(value n_, value d_)                      \
+  {                                                                          \
+    TYPE(BITS) n = Uint_custom_val(TYPE(BITS), n_);                          \
+    TYPE(BITS) d = Uint_custom_val(TYPE(BITS), d_);                          \
+    if (d == (TYPE(BITS)) 0)                                                 \
+        caml_raise_zero_divide();                                            \
+    return ctypes_copy_uint ## BITS (n / d);                                 \
+  }                                                                          \
+                                                                             \
+  /* rem : t -> t -> t */                                                    \
+  value ctypes_uint ## BITS ## _rem(value n_, value d_)                      \
+  {                                                                          \
+    TYPE(BITS) n = Uint_custom_val(TYPE(BITS), n_);                          \
+    TYPE(BITS) d = Uint_custom_val(TYPE(BITS), d_);                          \
+    if (d == (TYPE(BITS)) 0)                                                 \
+        caml_raise_zero_divide();                                            \
+    return ctypes_copy_uint ## BITS (n % d);                                 \
+  }                                                                          \
+                                                                             \
+  /* shift_left : t -> int -> t */                                           \
+  value ctypes_uint ## BITS ## _shift_left(value a, value b)                 \
+  {                                                                          \
+    return ctypes_copy_uint ## BITS(Uint_custom_val(uint ## BITS ## _t, a)   \
+                                    << Int_val(b));                          \
+  }                                                                          \
+                                                                             \
+  /* shift_right : t -> int -> t */                                          \
+  value ctypes_uint ## BITS ## _shift_right(value a, value b)                \
+  {                                                                          \
+    return ctypes_copy_uint ## BITS(Uint_custom_val(uint ## BITS ## _t, a)   \
+                                    >> Int_val(b));                          \
+  }                                                                          \
                                                                              \
   /* of_int : int -> t */                                                    \
   value ctypes_uint ## BITS ## _of_int(value a)                              \
