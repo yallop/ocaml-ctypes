@@ -5,12 +5,18 @@
  * See the file LICENSE for details.
  *)
 
-(** [TODO] *)
+(** The core ctypes module. 
+
+    The main points of interest are the set of functions for describing C
+    types (see {!types}) and the set of functions for accessing C values (see
+    {!values}).  The {!foreign} function for binding to native functions is
+    the main entry point for the library.
+*)
 
 open Signed
 open Unsigned
 
-(** {2 Values representing C types} *)
+(** {2:types Values representing C types} *)
 
 type 'a typ
 (** The type of values representing C types.  There are two types associated
@@ -143,7 +149,12 @@ val ptr_opt : 'a typ -> 'a ptr option typ
     as [None]. *)
 
 val string : string typ
-(** [TODO] *)
+(** A high-level representation of the string type.
+
+    On the C side this behaves like [char *]; on the OCaml side values read and written using {!string} are simply native OCaml strings.
+
+    To avoid problems with the garbage collector, values passed using {!string} are copied into immovable C-managed storage before being passed to C.
+ *)
 
 (** {3 Array types} *)
 
@@ -199,11 +210,7 @@ val funptr_opt : ('a -> 'b) fn -> ('a -> 'b) option typ
     This behaves like {!funptr}, except that null pointers appear in OCaml as
     [None]. *)
 
-(** {3 Struct and union types} 
-
-    [TODO: example]
-
-*)
+(** {3 Struct and union types} *)
 
 type ('a, 'kind) structured
 (** The base type of values representing C struct and union types.  The
@@ -265,15 +272,42 @@ val seal : (_, _) structured typ -> unit
 (** {3 View types} *)
 
 val view : read:('a -> 'b) -> write:('b -> 'a) -> 'a typ -> 'b typ
-(** [TODO] *)
+(** [view ~read:r ~write:w t] creates a C type representation [t'] which
+    behaves like [t] except that values read using [t'] are subsequently
+    transformed using the function [r] and values written using [t'] are first
+    transformed using the function [w].
+
+    For example, given suitable definitions of [string_of_char_ptr] and
+    [char_ptr_of_string], the type representation
+
+    [view ~read:string_of_char_ptr ~write:char_ptr_of_string (ptr char)] 
+
+    can be used to pass OCaml strings directly to and from bound C functions,
+    or to read and write string members in structs and arrays.  (In fact, the
+    {!string} type representation is defined in exactly this way.)
+*)
 
 (** {3 Abstract types} *)
 
 type 'a abstract
-(** [TODO] *)
+(** The type of abstract values.  The purpose of the [abstract] type is to
+    represent values whose type varies from platform to platform.
+
+    For example, the type {!Posix.pthread_t} is a pointer on some platforms,
+    an integer on other platforms, and a struct on a third set of platforms.
+    One way to deal with this kind of situation is to have
+    possibly-platform-specific code which interrogates the C type in some way
+    to help determine an appropriate representation.  Another way is to use
+    [abstract], leaving the representation opaque.
+
+    (Note, however, that although [pthread_t] is a convenient example, since
+    the type used to implement it varies significantly across platforms, it's
+    not actually a good match for [abstract], since values of type [pthread_t]
+    are passed and returned by value.) *)
 
 val abstract : size:int -> alignment:int -> 'a abstract typ
-(** [TODO] *)
+(** Create an abstract type specification from the size and alignment
+    requirements for the type. *)
 
 (** {3 Operations on types} *)
 
@@ -285,7 +319,7 @@ val alignment : 'a typ -> int
 (** [alignment t] computes the alignment requirements of the type [t].  The
     exception [IncompleteType] is raised if [t] is incomplete. *)
 
-(** {2 Binding C functions and values} *)
+(** {2:values Binding C functions and values} *)
 
 val foreign : ?from:Dl.library -> string -> ('a -> 'b) fn -> ('a -> 'b)
 (** [foreign name typ] exposes the C function of type [typ] named by [name] as

@@ -39,10 +39,10 @@ module type S = sig
   (** Bitwise logical exclusive or. *)
 
   val shift_left : t -> int -> t
-  (** {!shift_left x y} shifts [x] to the left by [y] bits. *)
+  (** {!shift_left} [x] [y] shifts [x] to the left by [y] bits. *)
 
   val shift_right : t -> int -> t
-  (** {!shift_right x y} shifts [x] to the right by [y] bits. *)
+  (** {!shift_right} [x] [y] shifts [x] to the right by [y] bits. *)
 
   val of_int : int -> t
   (** Convert the given int value to an unsigned integer. *)
