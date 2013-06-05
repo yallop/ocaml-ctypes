@@ -100,9 +100,8 @@ let test_string_functions () =
   assert_equal "efg" (strchr "abcdefg" (Char.code 'e'))
     ~printer:(fun x -> x);
 
-  (* non-word-aligned pointers trigger exceptions (for now) *)
-  assert_raises Ctypes_raw.Misaligned_pointer
-    (fun () -> strchr "abcdefg" (Char.code 'd'));
+  (* non-word-aligned pointers do not trigger exceptions *)
+  assert_equal "defg" (strchr "abcdefg" (Char.code 'd'));
 
   assert_bool "strcmp('abc', 'def') < 0"
     (strcmp "abc" "def" < 0);

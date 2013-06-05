@@ -41,8 +41,8 @@ external resolve_flag : flag -> int
 
 let _report_dl_error () =
   match _dlerror () with
-    | None -> failwith "dl_error: expected error, but no error reported"
-    | Some error       -> raise (DL_error (error))
+    | None       -> failwith "dl_error: expected error, but no error reported"
+    | Some error -> raise (DL_error (error))
 
 let crush_flags f : 'a list -> int = List.fold_left (fun i o -> i lor (f o)) 0
 

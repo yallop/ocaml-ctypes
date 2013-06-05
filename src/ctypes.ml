@@ -61,7 +61,7 @@ and _ fn =
   | Returns  : bool * 'a typ   -> 'a fn
   | Function : 'a typ * 'b fn  -> ('a -> 'b) fn
 and 'a ptr = { reftype      : 'a typ;
-               raw_ptr      : Raw.immediate_pointer;
+               raw_ptr      : Raw.raw_pointer;
                pmanaged     : Raw.managed_buffer option;
                pbyte_offset : int }
 and 'a array = { astart : 'a ptr; alength : int }
@@ -74,8 +74,8 @@ and ('a, 'b) view = { read : 'b -> 'a; write : 'a -> 'b; ty: 'b typ }
 type ('a, 's) field = { ftype: 'a typ; foffset: int }
 
 type _ ccallspec =
-    Call : bool * (Raw.immediate_pointer -> 'a) -> 'a ccallspec
-  | WriteArg : ('a -> Raw.immediate_pointer -> unit) * 'b ccallspec -> ('a -> 'b) ccallspec
+    Call : bool * (Raw.raw_pointer -> 'a) -> 'a ccallspec
+  | WriteArg : ('a -> Raw.raw_pointer -> unit) * 'b ccallspec -> ('a -> 'b) ccallspec
 
 type arg_type = ArgType : 'b RawTypes.ctype -> arg_type
 
@@ -147,9 +147,9 @@ let rec arg_type : 'a. 'a typ -> arg_type
 *)
 let rec invoke : 'a. string option ->
                      'a ccallspec ->
-                     (Raw.immediate_pointer -> unit) list ->
+                     (Raw.raw_pointer -> unit) list ->
                      Raw.bufferspec ->
-                     Raw.immediate_pointer ->
+                     Raw.raw_pointer ->
                     'a
   = fun name (type a) (fn : a ccallspec) -> match fn with
     | Call (check_errno, read_return_value) ->
@@ -191,10 +191,10 @@ and build_callspec : 'a. 'a fn -> Raw.bufferspec -> 'a -> Raw.boxedfn
       fun f -> Raw.Fn (fun buf -> box (f (read buf)))
 
 (* Describes how to read a value, e.g. from a return buffer *)
-and build : 'a. 'a typ -> offset:int -> Raw.immediate_pointer -> 'a
+and build : 'a. 'a typ -> offset:int -> Raw.raw_pointer -> 'a
   = fun (type a) (t : a typ) -> match t with
     | Void ->
-      (Raw.read RawTypes.void : offset:int -> Raw.immediate_pointer -> a)
+      (Raw.read RawTypes.void : offset:int -> Raw.raw_pointer -> a)
     | Primitive p ->
       Raw.read p
     | Struct { spec = Incomplete _ } ->
@@ -225,7 +225,7 @@ and build : 'a. 'a typ -> offset:int -> Raw.immediate_pointer -> 'a
     | Array _ -> assert false
     | Abstract _ -> assert false
 
-and write : 'a. 'a typ -> offset:int -> 'a -> Raw.immediate_pointer -> unit
+and write : 'a. 'a typ -> offset:int -> 'a -> Raw.raw_pointer -> unit
   = fun (type a) (t : a typ) -> match t with
     | Void ->
       ((fun ~offset _ _ -> ()) : offset:int -> a -> _ -> _)

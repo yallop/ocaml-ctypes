@@ -141,17 +141,16 @@ open Types
 (* A specification of argument C-types and C-return values *)
 type bufferspec
 
-(* An immediate pointer to a block of memory, not managed by the
-   garbage collector, into which we can read/write C values.  Note:
-   the pointer *must* be word-aligned. *)
-type immediate_pointer = voidp
+(* A raw pointer to a block of memory, not managed by the garbage collector,
+   into which we can read/write C values. *)
+type raw_pointer = voidp
 
 (* Read a C value from a block of memory *)
-external read : 'a ctype -> offset:int -> immediate_pointer -> 'a
+external read : 'a ctype -> offset:int -> raw_pointer -> 'a
   = "ctypes_read"
 
 (* Write a C value to a block of memory *)
-external write :  'a ctype -> offset:int -> 'a -> immediate_pointer -> unit
+external write :  'a ctype -> offset:int -> 'a -> raw_pointer -> unit
   = "ctypes_write"
 
 (* Allocate a new C call specification *)
@@ -165,13 +164,13 @@ external prep_callspec : bufferspec -> _ ctype -> unit
 (* Call the function specified by `bufferspec' at the given address.
    The callback functions write the arguments to the buffer and read
    the return value. *)
-external call : immediate_pointer -> bufferspec ->
-  (immediate_pointer -> unit) -> (immediate_pointer -> 'a) -> 'a
+external call : raw_pointer -> bufferspec -> (raw_pointer -> unit) ->
+  (raw_pointer -> 'a) -> 'a
   = "ctypes_call"
 
 (* As ctypes_call, but check errno and raise Unix_error if the call failed. *)
-external call_errno : string -> immediate_pointer -> bufferspec ->
-  (immediate_pointer -> unit) -> (immediate_pointer -> 'a) -> 'a
+external call_errno : string -> raw_pointer -> bufferspec ->
+  (raw_pointer -> unit) -> (raw_pointer -> 'a) -> 'a
   = "ctypes_call_errno"
 
 type managed_buffer
@@ -195,11 +194,11 @@ external add_unpassable_argument : bufferspec -> size:int -> alignment:int -> in
 
 (* nary callbacks *)
 type boxedfn =
-  | Done of (immediate_pointer -> unit) * bufferspec
-  | Fn of (immediate_pointer -> boxedfn)
+  | Done of (raw_pointer -> unit) * bufferspec
+  | Fn of (raw_pointer -> boxedfn)
 
 (* Construct a pointer to a boxed n-ary function *)
-external make_function_pointer : bufferspec -> boxedfn -> immediate_pointer
+external make_function_pointer : bufferspec -> boxedfn -> raw_pointer
   = "ctypes_make_function_pointer"
 
 (* Allocate a region of stable memory managed by a custom block. *)
@@ -207,21 +206,21 @@ external allocate : int -> managed_buffer
   = "ctypes_allocate"
 
 (* Obtain the address of the managed block. *)
-external block_address : managed_buffer -> immediate_pointer
+external block_address : managed_buffer -> raw_pointer
   = "ctypes_block_address"
 
 (* Pointer arithmetic. *)
-external pointer_plus : immediate_pointer -> int -> immediate_pointer
+external pointer_plus : raw_pointer -> int -> raw_pointer
   = "ctypes_pointer_plus"
 
 (* Pointer difference. *)
-external pointer_diff : immediate_pointer -> int -> immediate_pointer -> int
+external pointer_diff : raw_pointer -> int -> raw_pointer -> int
   -> int
   = "ctypes_pointer_diff"
 
 external memcpy :
-  dst:immediate_pointer -> dst_offset:int ->
-  src:immediate_pointer -> src_offset:int ->
+  dst:raw_pointer -> dst_offset:int ->
+  src:raw_pointer -> src_offset:int ->
     size:int -> unit
   = "ctypes_memcpy"
 
@@ -230,7 +229,3 @@ external memcpy :
 exception Ffi_internal_error of string
 let () = Callback.register_exception "FFI_internal_error"
   (Ffi_internal_error "")
-
-exception Misaligned_pointer
-let () = Callback.register_exception "Misaligned_pointer"
-  Misaligned_pointer

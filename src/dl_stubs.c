@@ -14,6 +14,8 @@
 
 #include <assert.h>
 
+#include "raw_pointer.h"
+
 #define Val_none Val_int(0)
 #define Some_val(v) Field(v, 0)
 
@@ -81,7 +83,7 @@ value ctypes_dlsym(value handle_option, value symbol)
 
   char *s = String_val(symbol);
   void *result = dlsym(handle, s);
-  CAMLreturn(result == NULL ? Val_none : Val_some((value)result));
+  CAMLreturn(result == NULL ? Val_none : Val_some(CTYPES_FROM_PTR(result)));
 }
 
 

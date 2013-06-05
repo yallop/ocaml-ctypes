@@ -20,6 +20,7 @@
 #include "managed_buffer_stubs.h"
 #include "unsigned_stubs.h"
 #include "type_info_stubs.h"
+#include "raw_pointer.h"
 
 #define make_primitive_interface(VAL_X, X_VAL, CTYPE, MUNGENAME, FFITYPE)      \
   static value raw_read_ ## MUNGENAME(struct type_info * _, void *p)           \
@@ -165,13 +166,6 @@ value ctypes_allocate_struct_type_info(ffi_type ***args)
 }
 
 
-static value Cast_from_voidp(void *p) { return (value)p; }
-static void *Cast_to_voidp(value v) {
-  void *p = (void *)v;
-  CTYPES_ENSURE_WORD_ALIGNED(p);
-  return p;
-}
-
 make_primitive_interface(Val_int, Int_val, int8_t, int8_t, ffi_type_sint8)
 make_primitive_interface(Val_int, Int_val, int16_t, int16_t, ffi_type_sint16)
 make_primitive_interface(Val_int, Int_val, signed char, schar, ffi_type_schar)
@@ -186,7 +180,7 @@ make_primitive_interface(caml_copy_int32, Int32_val, int32_t, int32_t, ffi_type_
 make_primitive_interface(caml_copy_int64, Int64_val, int64_t, int64_t, ffi_type_sint64)
 make_primitive_interface(caml_copy_double, Double_val, double, double, ffi_type_double)
 make_primitive_interface(caml_copy_double, Double_val, float, float, ffi_type_float)
-make_primitive_interface(Cast_from_voidp, Cast_to_voidp, void *, voidp, ffi_type_pointer)
+make_primitive_interface(CTYPES_FROM_PTR, CTYPES_TO_PTR, void *, voidp, ffi_type_pointer)
 make_primitive_interface(caml_copy_nativeint, Nativeint_val, int, nativeint, ffi_type_sint)
 make_primitive_interface(ctypes_copy_uint8, Uint8_val, uint8_t, uint8_t, ffi_type_uint8)
 make_primitive_interface(ctypes_copy_uint16, Uint16_val, uint16_t, uint16_t, ffi_type_uint16)
@@ -288,7 +282,7 @@ value ctypes_read(value ctype, value offset_, value buffer_)
   struct type_info *type_info = Data_custom_val(ctype);
   int offset = Int_val(offset_);
 
-  CAMLreturn(type_info->raw_read(type_info, (char *)buffer_ + offset));
+  CAMLreturn(type_info->raw_read(type_info, (char *)CTYPES_TO_PTR(buffer_) + offset));
 }
 
 
@@ -300,5 +294,5 @@ value ctypes_write(value ctype, value offset_, value v, value buffer_)
   struct type_info *type_info = Data_custom_val(ctype);
   int offset = Int_val(offset_);
 
-  CAMLreturn(type_info->raw_write(type_info, (char *)buffer_ + offset, v));
+  CAMLreturn(type_info->raw_write(type_info, (char *)CTYPES_TO_PTR(buffer_) + offset, v));
 }

@@ -28,5 +28,5 @@ val dlopen : ?filename:string -> flags:flag list -> library
 val dlclose : handle:library -> unit
 (** Close a dynamic library. *)
 
-val dlsym : ?handle:library -> symbol:string -> Ctypes_raw.immediate_pointer
+val dlsym : ?handle:library -> symbol:string -> Ctypes_raw.raw_pointer
 (** Look up a symbol in a dynamic library. *)

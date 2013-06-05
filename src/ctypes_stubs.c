@@ -22,6 +22,7 @@
 
 #include "managed_buffer_stubs.h"
 #include "type_info_stubs.h"
+#include "raw_pointer.h"
 
 /* TODO: support callbacks that raise exceptions?  e.g. using
    caml_callback_exn etc.  */
@@ -41,7 +42,7 @@ static value allocate_custom(struct custom_operations *ops, size_t size,
 /* null_value : unit -> voidp */
 value ctypes_null_value(value unit)
 {
-  return (value)NULL;
+  return CTYPES_FROM_PTR(NULL);
 }
 
 static void check_ffi_status(ffi_status status)
@@ -360,14 +361,14 @@ value ctypes_prep_callspec(value callspec_, value rtype)
 
 /* Call the function specified by `callspec', passing arguments and return
    values in `buffer' */
-/* call : immediate_pointer -> bufferspec -> (immediate_pointer -> unit) ->
-          (immediate_pointer -> 'a) -> 'a */
+/* call : raw_pointer -> bufferspec -> (raw_pointer -> unit) ->
+          (raw_pointer -> 'a) -> 'a */
 value ctypes_call(value function, value callspec_, value argwriter,
                   value rvreader)
 {
   CAMLparam4(function, callspec_, argwriter, rvreader);
 
-  void (*cfunction)(void) = (void (*)(void))(void *)function;
+  void (*cfunction)(void) = (void (*)(void)) CTYPES_TO_PTR(function);
   struct callspec *callspec = Data_custom_val(callspec_);
   struct bufferspec *bufferspec = (struct bufferspec *)callspec;
   int roffset = callspec->roffset;
@@ -383,20 +384,20 @@ value ctypes_call(value function, value callspec_, value argwriter,
   populate_arg_array(bufferspec, (struct callbuffer *)callbuffer,
                      (void **)(callbuffer + arg_array_offset));
 
-  caml_callback(argwriter, (value)callbuffer);
+  caml_callback(argwriter, CTYPES_FROM_PTR(callbuffer));
 
   ffi_call(callspec->cif,
            cfunction,
            return_slot,
            (void **)(callbuffer + arg_array_offset));
 
-  CAMLreturn(caml_callback(rvreader, (value)return_slot));
+  CAMLreturn(caml_callback(rvreader, CTYPES_FROM_PTR(return_slot)));
 }
 
 
-/* call_errno : string -> immediate_pointer -> bufferspec -> 
-               (immediate_pointer -> unit) ->
-               (immediate_pointer -> 'a) -> 'a */
+/* call_errno : string -> raw_pointer -> bufferspec -> 
+               (raw_pointer -> unit) ->
+               (raw_pointer -> 'a) -> 'a */
 value ctypes_call_errno(value fnname, value function, value callspec_,
                         value argwriter, value rvreader)
 {
@@ -444,19 +445,19 @@ static void callback_handler(ffi_cif *cif,
     void *cvalue = args[i];
     assert (Tag_val(boxedfn) == Fn);
     /* unbox and call */
-    boxedfn = caml_callback(Field(boxedfn, 0), (value)cvalue);
+    boxedfn = caml_callback(Field(boxedfn, 0), CTYPES_FROM_PTR(cvalue));
   }
 
   /* now store the return value */
   assert (Tag_val(boxedfn) == Done);
-  caml_callback(Field(boxedfn, 0), (value)ret);
+  caml_callback(Field(boxedfn, 0), CTYPES_FROM_PTR(ret));
 
   CAMLreturn0;
 }
 
 
 /* Construct a pointer to a boxed n-ary function */
-/* make_function_pointer : bufferspec -> boxedfn -> immediate_pointer */
+/* make_function_pointer : bufferspec -> boxedfn -> raw_pointer */
 value ctypes_make_function_pointer(value callspec_, value boxedfn)
 {
   CAMLparam2(callspec_, boxedfn);
@@ -486,7 +487,7 @@ value ctypes_make_function_pointer(value callspec_, value boxedfn)
 
     check_ffi_status(status);
 
-    CAMLreturn ((value)(void *)code_address);
+    CAMLreturn (CTYPES_FROM_PTR((void *)code_address));
   }
 }
 
@@ -536,33 +537,32 @@ value ctypes_complete_structspec(value bufferspec_)
   }
 }
 
-/* pointer_plus : immediate_pointer -> int -> immediate_pointer */
+/* pointer_plus : raw_pointer -> int -> raw_pointer */
 value ctypes_pointer_plus(value ptr, value i)
 {
-  char *p = (((char*)ptr) + Int_val(i));
-  CTYPES_ENSURE_WORD_ALIGNED(p);
-  return (value)p;
+  CAMLparam2(ptr, i);
+  CAMLreturn(CTYPES_PTR_PLUS(ptr, Int_val(i)));
 }
 
 
-/* pointer_diff : immediate_pointer -> int -> immediate_pointer -> int -> int */
+/* pointer_diff : raw_pointer -> int -> raw_pointer -> int -> int */
 value ctypes_pointer_diff(value lp, value loff, value rp, value roff)
 {
-  char *l = (char*)lp + Int_val(loff);
-  char *r = (char*)rp + Int_val(roff);
+  char *l = (char*)CTYPES_TO_PTR(lp) + Int_val(loff);
+  char *r = (char*)CTYPES_TO_PTR(rp) + Int_val(roff);
   return Val_int(r - l);
 }
 
 
-/* memcpy : dest:immediate_pointer -> dest_offset:int ->
-            src:immediate_pointer -> src_offset:int ->
+/* memcpy : dest:raw_pointer -> dest_offset:int ->
+            src:raw_pointer -> src_offset:int ->
             size:int -> unit */
 value ctypes_memcpy(value dst, value dst_offset,
                     value src, value src_offset, value size)
 {
   CAMLparam5(dst, dst_offset, src, src_offset, size);
-  memcpy((char *)dst + Int_val(dst_offset),
-         (void *)src + Int_val(src_offset),
+  memcpy((char *)CTYPES_TO_PTR(dst) + Int_val(dst_offset),
+         (char *)CTYPES_TO_PTR(src) + Int_val(src_offset),
          Int_val(size));
   CAMLreturn(Val_unit);
 }

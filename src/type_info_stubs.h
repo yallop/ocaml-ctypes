@@ -66,11 +66,4 @@ extern value ctypes_read(value ctype, value offset, value buffer);
 /* write : 'a ctype -> offset:int -> 'a -> immediate_pointer -> unit */
 extern value ctypes_write(value ctype, value offset, value v, value buffer);
 
-/* Raise Misaligned_pointer unless the argument is word-aligned */
-#define CTYPES_IS_WORD_ALIGNED(p) (((intptr_t)p & (sizeof (int) - 1)) == 0)
-#define CTYPES_ENSURE_WORD_ALIGNED(p)                         \
-  (CTYPES_IS_WORD_ALIGNED(p)                                  \
-   ? (void)0                                                  \
-   : raise_constant(*caml_named_value("Misaligned_pointer")))
-
 #endif /* TYPE_INFO_STUBS_H */

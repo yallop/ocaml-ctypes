@@ -12,6 +12,8 @@
 
 #include <stdint.h>
 
+#include "raw_pointer.h"
+
 static void finalize_free(value v)
 {
   free(*((void **)Data_custom_val(v)));
@@ -60,5 +62,5 @@ value ctypes_allocate(value size_)
 /* block_address : managed_buffer -> immediate_pointer */
 value ctypes_block_address(value managed_buffer)
 {
-  return (value)(*(void **)Data_custom_val(managed_buffer));
+  return CTYPES_FROM_PTR(*(void **)Data_custom_val(managed_buffer));
 }
