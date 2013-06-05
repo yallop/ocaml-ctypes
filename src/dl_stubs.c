@@ -13,8 +13,7 @@
 #include <caml/alloc.h>
 
 #include <assert.h>
-
-#include "raw_pointer.h"
+#include <stdint.h>
 
 #define Val_none Val_int(0)
 #define Some_val(v) Field(v, 0)

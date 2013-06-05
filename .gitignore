@@ -4,7 +4,9 @@ setup.data
 setup.log
 src/META
 src/ctypes.mllib
+src/ctypes-foreign.mllib
 src/libctypes_stubs.clib
+src/libctypes-foreign_stubs.clib
 examples/fts/META
 examples/fts/fts.mllib
 examples/sigset/META

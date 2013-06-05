@@ -1,8 +1,8 @@
 # OASIS_START
-# DO NOT EDIT (digest: 264d355b46519ec755d9aa1ee8f0b6fa)
+# DO NOT EDIT (digest: 2205771aa27b4a0870cfe9a4dffe3150)
 version = "0.1"
 description = "Combinators for binding to C libraries without writing any C."
-requires = "ctypes"
+requires = "ctypes ctypes.foreign"
 archive(byte) = "ncurses.cma"
 archive(byte, plugin) = "ncurses.cma"
 archive(native) = "ncurses.cmxa"
