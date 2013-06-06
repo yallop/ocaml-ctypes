@@ -287,11 +287,7 @@ value ctypes_add_argument(value bufferspec_, value argument_)
     if (bufferspec->nelements + 2 >= bufferspec->capacity) {
       size_t new_size = ((bufferspec->capacity + increment_size)
                          * sizeof *bufferspec->args);
-      void *temp = realloc(bufferspec->args, new_size);
-      if (temp == NULL) {
-        caml_raise_out_of_memory();
-      }
-      bufferspec->args = temp;
+      bufferspec->args = caml_stat_resize(bufferspec->args, new_size);
       bufferspec->capacity += increment_size;
     }
     bufferspec->args[bufferspec->nelements] = argtype;
@@ -327,10 +323,7 @@ value ctypes_prep_callspec(value callspec_, value rtype)
   ffi_type *rffitype = (((struct type_info *)Data_custom_val(rtype)))->ffitype;
 
   /* Allocate the cif structure */
-  callspec->cif = malloc(sizeof *callspec->cif);
-  if (callspec->cif == NULL) {
-    caml_raise_out_of_memory();
-  }
+  callspec->cif = caml_stat_alloc(sizeof *callspec->cif);
 
   /* Add the (aligned) space needed for the return value */
   callspec->roffset = aligned_offset(callspec->bufferspec.bytes,

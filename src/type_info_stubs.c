@@ -13,7 +13,6 @@
 #include <caml/memory.h>
 #include <caml/custom.h>
 #include <caml/alloc.h>
-#include <caml/fail.h>
 
 #include <ffi.h>
 
@@ -149,10 +148,7 @@ value ctypes_allocate_struct_type_info(ffi_type ***args)
 
   struct struct_type_info *t = Data_custom_val(block);
 
-  ffi_type *s = t->type_info.ffitype = malloc(sizeof *s);
-  if (s == NULL) {
-    caml_raise_out_of_memory();
-  }
+  ffi_type *s = t->type_info.ffitype = caml_stat_alloc(sizeof *s);
 
   s->type = FFI_TYPE_STRUCT;
   s->size = s->alignment = 0;
