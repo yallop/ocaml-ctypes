@@ -50,10 +50,7 @@ value ctypes_allocate(value size_)
   int size = Int_val(size_);
   CAMLlocal1(block);
   block = caml_alloc_custom(&managed_buffer_custom_ops, sizeof(void*), 0, 1);
-  void *p = malloc(size);
-  if (p == NULL) {
-    caml_raise_out_of_memory();
-  }
+  void *p = caml_stat_alloc(size);
   void **d = (void **)Data_custom_val(block);
   *d = p;
   CAMLreturn(block);
