@@ -33,5 +33,7 @@ let () = begin
   let time = time timep in
   assert (time = !@timep);
   let tm = localtime timep in
+  Printf.printf "tm.tm_mon  = %d\n" (getf !@tm tm_mon);
+  Printf.printf "tm.tm_year = %d\n" (getf !@tm tm_year);
   print_endline (asctime tm)
 end
