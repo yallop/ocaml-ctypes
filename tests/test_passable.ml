@@ -121,11 +121,13 @@ let test_function_pointers_are_passable () =
 let test_abstract_values_are_not_passable () = begin
   assert_raises ~msg:"Abstract type rejected as argument"
     (Unsupported "Unsupported argument type")
-    (fun () -> (abstract ~size:1 ~alignment:1) @-> returning void);
+    (fun () ->
+      (abstract ~name:"abstract" ~size:1 ~alignment:1) @-> returning void);
 
   assert_raises ~msg:"Abstract type rejected as return type"
     (Unsupported "Unsupported return type")
-    (fun () -> void @-> returning (abstract ~size:1 ~alignment:1));
+    (fun () ->
+      void @-> returning (abstract ~name:"abstract" ~size:1 ~alignment:1));
 end
 
 
@@ -167,7 +169,7 @@ let test_struct_passability () =
     let () = seal s5
 
     let s6 : s6 structure typ = structure "s6"
-    let _ = s6 *:* abstract ~size:1 ~alignment:1
+    let _ = s6 *:* abstract ~name:"abstract" ~size:1 ~alignment:1
     let () = seal s6
 
     let _ = begin

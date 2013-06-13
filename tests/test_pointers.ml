@@ -278,6 +278,7 @@ let test_writing_through_pointer_to_abstract_type () =
   let arrb = Array.make int 2 in
   let absptr a =
     from_voidp (abstract
+                  ~name:"absptr"
                   ~size:(2 * sizeof int)
                   ~alignment:(alignment (array 2 int)))
       (to_voidp (Array.start a)) in

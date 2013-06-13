@@ -116,7 +116,7 @@ let test_sizeof_structs () =
 let test_sizeof_abstract () =
   for i = 1 to 10 do
     assert_equal
-      i (sizeof (abstract ~size:i ~alignment:(11 - i)))
+      i (sizeof (abstract ~name:"abstract" ~size:i ~alignment:(11 - i)))
   done
 
 

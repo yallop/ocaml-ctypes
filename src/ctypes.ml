@@ -42,6 +42,7 @@ type 'a union_type = {
 }
 
 type abstract_type = {
+  aname : string;
   asize : int;
   aalignment : int;
 }
@@ -515,8 +516,8 @@ let ( @->) f t =
     raise (Unsupported "Unsupported argument type")
   else
     Function (f, t)
-let abstract ~size ~alignment = 
-  Abstract { asize = size; aalignment = alignment }
+let abstract ~name ~size ~alignment = 
+  Abstract { aname = name; asize = size; aalignment = alignment }
 let view ~read ~write ty = View { read; write; ty }
 
 let returning v =

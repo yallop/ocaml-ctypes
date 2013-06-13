@@ -314,7 +314,7 @@ type 'a abstract
     not actually a good match for [abstract], since values of type [pthread_t]
     are passed and returned by value.) *)
 
-val abstract : size:int -> alignment:int -> 'a abstract typ
+val abstract : name:string -> size:int -> alignment:int -> 'a abstract typ
 (** Create an abstract type specification from the size and alignment
     requirements for the type. *)
 
