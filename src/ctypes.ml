@@ -18,29 +18,6 @@ type 'a structspec =
     Incomplete of Raw.bufferspec
   | Complete of 'a Raw.structure RawTypes.ctype
 
-type box = Box : 'a -> box
-
-type 'a structure_type = {
-  tag: string;
-  (* Whether the struct can be passed or returned by value.  For the
-     moment, at least, we don't support passing structs that contain
-     unions or arrays as members *)
-  mutable passable: bool;
-
-  mutable spec: 'a structspec;
-
-  (* We keep the field type values around, since functions such as
-     complete_struct_type may need to access the underlying C values. *)
-  mutable fields : box list;
-}
-
-type 'a union_type = {
-  utag: string;
-  mutable ucomplete: bool;
-  mutable usize: int;
-  mutable ualignment: int;
-}
-
 type abstract_type = {
   aname : string;
   asize : int;
@@ -72,8 +49,29 @@ and 'a union = ('a, [`Union]) structured
 and 'a structure = ('a, [`Struct]) structured
 and 'a abstract = { abstract : 'a abstract ptr }
 and ('a, 'b) view = { read : 'b -> 'a; write : 'a -> 'b; ty: 'b typ }
+and ('a, 's) field = { ftype: 'a typ; foffset: int }
+and 'a structure_type = {
+  tag: string;
+  (* Whether the struct can be passed or returned by value.  For the
+     moment, at least, we don't support passing structs that contain
+     unions or arrays as members *)
+  mutable passable: bool;
 
-type ('a, 's) field = { ftype: 'a typ; foffset: int }
+  mutable spec: 'a structspec;
+
+  (* We keep the field type values around, since functions such as
+     complete_struct_type may need to access the underlying C values. *)
+  mutable fields : boxed_typ list;
+}
+and 'a union_type = {
+  utag: string;
+  mutable ucomplete: bool;
+  mutable usize: int;
+  mutable ualignment: int;
+  mutable ufields : boxed_typ list;
+}
+and boxed_typ = BoxedType : 'a typ -> boxed_typ
+
 
 type _ ccallspec =
     Call : bool * (Raw.raw_pointer -> 'a) -> 'a ccallspec
@@ -137,6 +135,126 @@ let rec arg_type : 'a. 'a typ -> arg_type
     | Array _                        -> assert false
     | Abstract _                     -> assert false
     | Struct { spec = Incomplete _ } -> assert false
+
+
+(* The format context affects the formatting of pointer, struct and union
+   types.  There are three printing contexts: *)
+type format_context = [
+(* In the top-level context struct and union types are printed in full, with
+   member lists.  Pointer types are unparenthesized; for example,
+   pointer-to-void is printed as "void *", not as "void ( * )". *)
+| `toplevel
+(* In the array context, struct and union types are printed in abbreviated
+   form, which consists of just a keyword and the tag name.  Pointer types are
+   parenthesized; for example, pointer-to-array-of-int is printed as
+   "int ( * )[]", not as "int *[]". *)
+| `array
+(* In the non-array context, struct and union types are printed in abbreviated
+   form and pointer types are unparenthesized. *)
+| `nonarray]
+
+let rec format_typ : 'a. 'a typ ->
+  (format_context -> Format.formatter -> unit) ->
+  (format_context -> Format.formatter -> unit) =
+  let fprintf = Format.fprintf in 
+  fun (type a) (t : a typ) k context fmt -> match t with
+    | Void ->
+      fprintf fmt "void%t" (k `nonarray)
+    | Primitive p ->
+      fprintf fmt "%s%t" (RawTypes.ctype_name p) (k `nonarray)
+    | View { ty } ->
+      format_typ ty k context fmt
+    | Abstract { aname } ->
+      fprintf fmt "%s%t" aname (k `nonarray)
+    | Struct { tag ; spec; fields } ->
+      begin match spec, context with
+        | Complete _, `toplevel ->
+          begin
+            fprintf fmt "struct %s {@;<1 2>@[" tag;
+            format_fields fields fmt;
+            fprintf fmt "@]@;}%t" (k `nonarray)
+          end
+        | _ -> fprintf fmt "struct %s%t" tag (k `nonarray)
+      end
+    | Union { utag; ucomplete; ufields } ->
+      begin match ucomplete, context with
+        | true, `toplevel ->
+          begin
+            fprintf fmt "union %s {@;<1 2>@[" utag;
+            format_fields ufields fmt;
+            fprintf fmt "@]@;}%t" (k `nonarray)
+          end
+        | _ -> fprintf fmt "union %s%t" utag (k `nonarray)
+      end
+    | Pointer ty ->
+      format_typ ty
+        (fun context fmt ->
+          match context with
+            | `array -> fprintf fmt "(*%t)" (k `nonarray)
+            | _      -> fprintf fmt "*%t" (k `nonarray))
+        `nonarray fmt
+    | FunctionPointer (_, fn) ->
+      format_fn fn (fun fmt -> fprintf fmt "(*%t)" (k `nonarray)) fmt
+    | Array (ty, n) ->
+      format_typ ty (fun _ fmt -> fprintf fmt "%t[%d]" (k `array) n) `nonarray
+        fmt
+and format_fields fields fmt =
+  let open Format in
+      List.iteri
+        (fun i (BoxedType t) ->
+          fprintf fmt "@[";
+          format_typ t (fun _ fmt -> fprintf fmt " field_%d" i) `nonarray fmt;
+          fprintf fmt "@];@;")
+        (List.rev fields)
+  and format_parameter_list parameters k fmt =
+    Format.fprintf fmt "%t(@[@[" k;
+    if parameters = [] then Format.fprintf fmt "void" else
+      List.iteri
+        (fun i (BoxedType t) ->
+          if i <> 0 then Format.fprintf fmt "@], @[";
+          format_typ t (fun _ _ -> ()) `nonarray fmt)
+        parameters;
+    Format.fprintf fmt "@]@])"
+  and format_fn : 'a. 'a fn ->
+    (Format.formatter -> unit) ->
+    (Format.formatter -> unit) =
+    let rec gather : 'a. 'a fn -> boxed_typ list * boxed_typ =
+      fun (type a) (fn : a fn) -> match fn with
+        | Returns (_, ty) -> [], BoxedType ty
+        | Function (Void, fn) -> gather fn
+        | Function (p, fn) -> let ps, r = gather fn in BoxedType p :: ps, r in
+    fun fn k fmt ->
+      let ps, BoxedType r = gather fn in
+      format_typ r (fun context fmt -> format_parameter_list ps k fmt)
+        `nonarray fmt
+
+let format_name ?name fmt =
+  match name with
+    | Some name -> Format.fprintf fmt " %s" name
+    | None      -> ()
+
+let format_typ : ?name:string -> Format.formatter -> 'a typ -> unit
+  = fun ?name fmt typ ->
+    Format.fprintf fmt "@[";
+    format_typ typ (fun context -> format_name ?name) `toplevel fmt;
+    Format.fprintf fmt "@]"
+
+let format_fn : ?name:string -> Format.formatter -> 'a fn -> unit
+  = fun ?name fmt fn ->
+    Format.fprintf fmt "@[";
+    format_fn fn (format_name ?name) fmt;
+    Format.fprintf fmt "@]"
+
+let string_of format v = 
+  let buf = Buffer.create 100 in
+  let fmt = Format.formatter_of_buffer buf in begin
+    format fmt v;
+    Format.pp_print_flush fmt ();
+    Buffer.contents buf
+  end
+
+let string_of_typ ?name ty = string_of (format_typ ?name) ty
+let string_of_fn ?name fn = string_of (format_fn ?name) fn
 
 (*
   call addr callspec
@@ -423,31 +541,33 @@ let bufferspec { tag; spec } = match spec with
   | Incomplete s -> s
   | Complete _   -> raise (ModifyingSealedType tag)
     
-let add_field field s = s.fields <- Box field :: s.fields
+let add_field typ s = s.fields <- BoxedType typ :: s.fields
 
 let ( *:* ) (type b) (Struct s) (ftype : b typ) =
     let bufspec = bufferspec s in
-    let add_member t = 
-      add_field t s;
+    let add_member typ t =
+      add_field typ s;
       Raw.add_argument bufspec t
-    and add_unpassable_member t = Raw.add_unpassable_argument
-      bufspec ~size:(sizeof t) ~alignment:(alignment t) in
+    and add_unpassable_member t =
+      add_field t s;
+      Raw.add_unpassable_argument
+        bufspec ~size:(sizeof t) ~alignment:(alignment t) in
     let rec offset : 'a. 'a typ -> int
       = fun (type a) (ty : a typ) -> match ty with
       | Void                           -> raise IncompleteType
       | Array _ as a                   -> (s.passable <- false;
                                            add_unpassable_member a)
-      | Primitive p                    -> add_member p
-      | Pointer _                      -> add_member RawTypes.pointer
+      | Primitive p                    -> add_member ty p
+      | Pointer _                      -> add_member ty RawTypes.pointer
       | Struct { spec = Incomplete _ } -> raise IncompleteType
       | Struct { spec = Complete t; passable } 
                                        -> (s.passable <- s.passable && passable;
-                                           add_member t)
+                                           add_member ty t)
       | Union _  as u                  -> (s.passable <- false;
                                            add_unpassable_member u)
       | Abstract _  as a               -> (s.passable <- false;
                                            add_unpassable_member a)
-      | FunctionPointer _              -> add_member RawTypes.pointer
+      | FunctionPointer _              -> add_member ty RawTypes.pointer
       | View { ty }                    -> offset ty
     in
     { ftype; foffset = offset ftype }
@@ -456,7 +576,8 @@ let addr { structured } = structured
 
 let offsetof { foffset } = foffset
 
-let union utag = Union { utag; usize = 0; ualignment = 0; ucomplete = false }
+let union utag = Union { utag; usize = 0; ualignment = 0; ucomplete = false;
+                         ufields = [] }
 
 let ensure_unsealed { ucomplete; utag } =
   if ucomplete then raise (ModifyingSealedType utag)
@@ -481,6 +602,7 @@ let ( +:+ ) (Union u) ftype =
     ensure_unsealed u;
     u.usize <- max u.usize (sizeof ftype);
     u.ualignment <- max u.ualignment (alignment ftype);
+    u.ufields <- BoxedType ftype :: u.ufields;
     { ftype; foffset = 0 }
   end
 

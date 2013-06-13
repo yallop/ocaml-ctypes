@@ -35,7 +35,7 @@
   }                                                                            \
                                                                                \
   static struct type_info _ ## MUNGENAME ## _type_info = {                     \
-    #MUNGENAME,                                                                \
+    #CTYPE ,                                                                   \
     &FFITYPE,                                                                  \
     raw_read_ ## MUNGENAME,                                                    \
     raw_write_ ## MUNGENAME,                                                   \
@@ -126,7 +126,6 @@ static void finalize_struct_type_info(value v)
 }
 
 
-
 static struct custom_operations struct_type_info_custom_ops = {
   /* the same as type_info, except for the finalizer */
   "ocaml-ctypes:struct_type_info",
@@ -166,9 +165,9 @@ make_primitive_interface(Val_int, Int_val, int8_t, int8_t, ffi_type_sint8)
 make_primitive_interface(Val_int, Int_val, int16_t, int16_t, ffi_type_sint16)
 make_primitive_interface(Val_int, Int_val, signed char, schar, ffi_type_schar)
 #if CHAR_MIN < 0
-make_primitive_interface(Val_int, Int_val, signed char, char, ffi_type_schar)
+make_primitive_interface(Val_int, Int_val, char, char, ffi_type_schar)
 #else
-make_primitive_interface(Val_int, Int_val, unsigned char, char, ffi_type_uchar)
+make_primitive_interface(Val_int, Int_val, char, char, ffi_type_uchar)
 #endif
 make_primitive_interface(Val_int, Int_val, int, int, ffi_type_sint)
 make_primitive_interface(Val_int, Int_val, short, short, ffi_type_sshort)
@@ -291,4 +290,14 @@ value ctypes_write(value ctype, value offset_, value v, value buffer_)
   int offset = Int_val(offset_);
 
   CAMLreturn(type_info->raw_write(type_info, (char *)CTYPES_TO_PTR(buffer_) + offset, v));
+}
+
+/* Return the name of a type */
+/* typename : _ ctype -> string */
+value ctypes_typename(value ctype)
+{
+  CAMLparam1(ctype);
+  struct type_info *type_info = Data_custom_val(ctype);
+
+  CAMLreturn(caml_copy_string(type_info->name));
 }

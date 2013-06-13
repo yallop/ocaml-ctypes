@@ -328,6 +328,19 @@ val alignment : 'a typ -> int
 (** [alignment t] computes the alignment requirements of the type [t].  The
     exception [IncompleteType] is raised if [t] is incomplete. *)
 
+val format_typ : ?name:string -> Format.formatter -> 'a typ -> unit
+(** Pretty-print a C representation of the type to the specified formatter. *)
+
+val format_fn : ?name:string -> Format.formatter -> 'a fn -> unit
+(** Pretty-print a C representation of the function type to the specified
+    formatter. *)
+
+val string_of_typ : ?name:string -> 'a typ -> string
+(** Return a C representation of the type. *)
+
+val string_of_fn : ?name:string -> 'a fn -> string
+(** Return a C representation of the function type. *)
+
 (** {2:types Values representing C types} *)
 
 (** {3 Pointer values} *)

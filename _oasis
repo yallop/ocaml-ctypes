@@ -207,6 +207,15 @@ Executable test_ctypes_oo_style
   BuildDepends:     unix,ctypes,ctypes.foreign,oUnit
   Custom:           true
 
+Executable test_ctypes_type_printing
+  Path:             tests
+  MainIs:           test_type_printing.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     unix,str,ctypes,ctypes.foreign,oUnit
+  Custom:           true
+
 Executable date_example
   Path:             examples/date
   MainIs:           date.ml
@@ -296,6 +305,11 @@ Test test_foreign_values
 Test test_oo_style
   Run$:             flag(tests)
   Command:          $test_ctypes_oo_style
+  WorkingDirectory: tests
+
+Test test_type_printing
+  Run$:             flag(tests)
+  Command:          $test_ctypes_type_printing
   WorkingDirectory: tests
 
 Document ctypes
