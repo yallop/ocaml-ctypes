@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: cde5274c92af1c70af1a38e4362c537a)
+# DO NOT EDIT (digest: 04c10f16116ece0016cfabfa684c0330)
 # Ignore VCS directories, you can use the same kind of rule outside 
 # OASIS_START/STOP if you want to exclude directories that contains 
 # useless stuff for the build process
@@ -46,6 +46,11 @@
 # Library ncurses
 "examples/ncurses/ncurses.cmxs": use_ncurses
 <examples/ncurses/ncurses.{cma,cmxa}>: oasis_library_ncurses_cclib
+# Library ctypes_top
+"top/ctypes_top.cmxs": use_ctypes_top
+<top/*.ml{,i}>: use_ctypes
+<top/*.ml{,i}>: pkg_unix
+<top/*.ml{,i}>: pkg_compiler-libs.toplevel
 # Executable ncurses_cmd
 <examples/ncurses/ncurses_cmd.{native,byte}>: use_ncurses
 <examples/ncurses/ncurses_cmd.{native,byte}>: use_ctypes-foreign

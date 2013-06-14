@@ -55,6 +55,15 @@ Library ncurses
   CCLib:            -lncurses
   Install:          false
 
+Library ctypes_top
+  Path:               top
+  FindlibName:        top
+  FindlibParent:      ctypes
+  Modules:            Ctypes_printers,Install_printers
+  BuildDepends:       compiler-libs.toplevel,ctypes
+  XMETARequires:      ctypes
+  XMETADescription:   Toplevel printers for C types
+
 Executable ncurses_cmd
    Path:            examples/ncurses
    MainIs:          ncurses_cmd.ml

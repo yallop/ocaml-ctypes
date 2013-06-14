@@ -1,5 +1,5 @@
 (* OASIS_START *)
-(* DO NOT EDIT (digest: 9e3c2cf4b0849a328032a7f5513f7cf4) *)
+(* DO NOT EDIT (digest: ae9dc70d3c7ee392f0f397fbce576500) *)
 module OASISGettext = struct
 (* # 21 "/home/jeremy/.opam/4.00.1+short-types/build/oasis.0.3.0/src/oasis/OASISGettext.ml" *)
 
@@ -483,7 +483,8 @@ let package_default =
           ("ctypes-foreign", ["src"]);
           ("fts", ["examples/fts"]);
           ("sigset", ["examples/sigset"]);
-          ("ncurses", ["examples/ncurses"])
+          ("ncurses", ["examples/ncurses"]);
+          ("ctypes_top", ["top"])
        ];
      lib_c =
        [
@@ -536,6 +537,7 @@ let package_default =
        ];
      includes =
        [
+          ("top", ["src"]);
           ("tests", ["src"]);
           ("examples/sigset", ["src"]);
           ("examples/ncurses", ["src"]);
@@ -547,7 +549,7 @@ let package_default =
 
 let dispatch_default = MyOCamlbuildBase.dispatch_default package_default;;
 
-# 551 "myocamlbuild.ml"
+# 553 "myocamlbuild.ml"
 (* OASIS_STOP *)
 
 open Ocamlbuild_plugin
