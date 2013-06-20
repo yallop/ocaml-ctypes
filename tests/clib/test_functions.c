@@ -340,3 +340,21 @@ int accepting_pointer_from_callback(pintfun2 *f)
   *p = 12;
   return q;
 }
+
+
+static int (*global_stored_callback)(int) = NULL;
+
+void store_callback(int (*callback)(int))
+{
+  global_stored_callback = callback;
+}
+
+int invoke_stored_callback(int x)
+{
+  return global_stored_callback(x);
+}
+
+vintfun *return_callback(vintfun *callback)
+{
+  return callback;
+}

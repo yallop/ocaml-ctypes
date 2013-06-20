@@ -497,3 +497,7 @@ exception IncompleteType
     pointer arithmetic.  Additionally, incomplete struct and union types
     cannot be used as argument or return types.
 *)
+
+exception CallToExpiredClosure
+(** A closure passed to C was collected by the OCaml garbage collector before
+    it was called. *)
