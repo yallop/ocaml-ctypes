@@ -19,13 +19,13 @@ let mkAbstract : 'a. 'a Ctypes.typ -> (module Abstract)
        let t = ty
      end : Abstract)
 
-let mkAbstractSized : size:int -> alignment:int -> (module Abstract)
-  = fun ~size ~alignment:a ->
+let mkAbstractSized : name:string -> size:int -> alignment:int -> (module Abstract)
+  = fun ~name ~size ~alignment:a ->
     (module
      struct
        open Ctypes
        type t = unit Ctypes.abstract
-       let t = abstract ~size ~alignment:a
+       let t = abstract ~name ~size ~alignment:a
      end : Abstract)
 
 type arithmetic =
@@ -165,18 +165,18 @@ external alignmentof_pthread_rwlock_t : unit -> int = "ctypes_alignmentof_pthrea
 external alignmentof_pthread_rwlockattr_t : unit -> int = "ctypes_alignmentof_pthread_rwlockattr_t"
 external alignmentof_sigset_t : unit -> int = "ctypes_alignmentof_sigset_t"
 
-module Key = (val mkAbstractSized ~size:(sizeof_key_t ()) ~alignment:(alignmentof_key_t ()) : Abstract)
-module Pthread = (val mkAbstractSized ~size:(sizeof_pthread_t ()) ~alignment:(alignmentof_pthread_t ()) : Abstract)
-module Pthread_attr = (val mkAbstractSized ~size:(sizeof_pthread_attr_t ()) ~alignment:(alignmentof_pthread_attr_t ()) : Abstract)
-module Pthread_cond = (val mkAbstractSized ~size:(sizeof_pthread_cond_t ()) ~alignment:(alignmentof_pthread_cond_t ()) : Abstract)
-module Pthread_condattr = (val mkAbstractSized ~size:(sizeof_pthread_condattr_t ()) ~alignment:(alignmentof_pthread_condattr_t ()) : Abstract)
-module Pthread_key = (val mkAbstractSized ~size:(sizeof_pthread_key_t ()) ~alignment:(alignmentof_pthread_key_t ()) : Abstract)
-module Pthread_mutex = (val mkAbstractSized ~size:(sizeof_pthread_mutex_t ()) ~alignment:(alignmentof_pthread_mutex_t ()) : Abstract)
-module Pthread_mutexattr = (val mkAbstractSized ~size:(sizeof_pthread_mutexattr_t ()) ~alignment:(alignmentof_pthread_mutexattr_t ()) : Abstract)
-module Pthread_once = (val mkAbstractSized ~size:(sizeof_pthread_once_t ()) ~alignment:(alignmentof_pthread_once_t ()) : Abstract)
-module Pthread_rwlock = (val mkAbstractSized ~size:(sizeof_pthread_rwlock_t ()) ~alignment:(alignmentof_pthread_rwlock_t ()) : Abstract)
-module Pthread_rwlockattr = (val mkAbstractSized ~size:(sizeof_pthread_rwlockattr_t ()) ~alignment:(alignmentof_pthread_rwlockattr_t ()) : Abstract)
-module Sigset = (val mkAbstractSized ~size:(sizeof_sigset_t ()) ~alignment:(alignmentof_sigset_t ()) : Abstract)
+module Key = (val mkAbstractSized ~name:"key_t" ~size:(sizeof_key_t ()) ~alignment:(alignmentof_key_t ()) : Abstract)
+module Pthread = (val mkAbstractSized ~name:"pthread_t" ~size:(sizeof_pthread_t ()) ~alignment:(alignmentof_pthread_t ()) : Abstract)
+module Pthread_attr = (val mkAbstractSized ~name:"pthread_attr_t" ~size:(sizeof_pthread_attr_t ()) ~alignment:(alignmentof_pthread_attr_t ()) : Abstract)
+module Pthread_cond = (val mkAbstractSized ~name:"pthread_cond_t" ~size:(sizeof_pthread_cond_t ()) ~alignment:(alignmentof_pthread_cond_t ()) : Abstract)
+module Pthread_condattr = (val mkAbstractSized ~name:"pthread_condattr_t" ~size:(sizeof_pthread_condattr_t ()) ~alignment:(alignmentof_pthread_condattr_t ()) : Abstract)
+module Pthread_key = (val mkAbstractSized ~name:"pthread_key_t" ~size:(sizeof_pthread_key_t ()) ~alignment:(alignmentof_pthread_key_t ()) : Abstract)
+module Pthread_mutex = (val mkAbstractSized ~name:"pthread_mutex_t" ~size:(sizeof_pthread_mutex_t ()) ~alignment:(alignmentof_pthread_mutex_t ()) : Abstract)
+module Pthread_mutexattr = (val mkAbstractSized ~name:"pthread_mutexattr_t" ~size:(sizeof_pthread_mutexattr_t ()) ~alignment:(alignmentof_pthread_mutexattr_t ()) : Abstract)
+module Pthread_once = (val mkAbstractSized ~name:"pthread_once_t" ~size:(sizeof_pthread_once_t ()) ~alignment:(alignmentof_pthread_once_t ()) : Abstract)
+module Pthread_rwlock = (val mkAbstractSized ~name:"pthread_rwlock_t" ~size:(sizeof_pthread_rwlock_t ()) ~alignment:(alignmentof_pthread_rwlock_t ()) : Abstract)
+module Pthread_rwlockattr = (val mkAbstractSized ~name:"pthread_rwlockattr_t" ~size:(sizeof_pthread_rwlockattr_t ()) ~alignment:(alignmentof_pthread_rwlockattr_t ()) : Abstract)
+module Sigset = (val mkAbstractSized ~name:"sigset_t" ~size:(sizeof_sigset_t ()) ~alignment:(alignmentof_sigset_t ()) : Abstract)
 
 type key_t = Key.t
 type pthread_t = Pthread.t

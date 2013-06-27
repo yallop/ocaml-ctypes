@@ -19,6 +19,7 @@ struct type_info {
   ffi_type   *ffitype;
   value     (*raw_read)(struct type_info *, void *);
   value     (*raw_write)(struct type_info *, void *, value);
+  value     (*format)(struct type_info *, value);
 };
 
 /* allocate_struct_type_info : ffitype*** -> _ ctype */
@@ -38,7 +39,6 @@ extern value ctypes_short_type_info(value unit);
 extern value ctypes_schar_type_info(value unit);
 extern value ctypes_uchar_type_info(value unit);
 extern value ctypes_char_type_info(value unit);
-extern value ctypes_string_type_info(value unit);
 extern value ctypes_uint8_t_type_info(value unit);
 extern value ctypes_uint16_t_type_info(value unit);
 extern value ctypes_uint32_t_type_info(value unit);

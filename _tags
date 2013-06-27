@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 56640850f6c23433eb2be17847567ce4)
+# DO NOT EDIT (digest: 68309f1e9536e82371610da17c460906)
 # Ignore VCS directories, you can use the same kind of rule outside 
 # OASIS_START/STOP if you want to exclude directories that contains 
 # useless stuff for the build process
@@ -46,6 +46,11 @@
 # Library ncurses
 "examples/ncurses/ncurses.cmxs": use_ncurses
 <examples/ncurses/ncurses.{cma,cmxa}>: oasis_library_ncurses_cclib
+# Library ctypes_top
+"top/ctypes_top.cmxs": use_ctypes_top
+<top/*.ml{,i}>: use_ctypes
+<top/*.ml{,i}>: pkg_unix
+<top/*.ml{,i}>: pkg_compiler-libs.toplevel
 # Executable ncurses_cmd
 <examples/ncurses/ncurses_cmd.{native,byte}>: use_ncurses
 <examples/ncurses/ncurses_cmd.{native,byte}>: use_ctypes-foreign
@@ -155,11 +160,26 @@
 <tests/test_oo_style.{native,byte}>: use_ctypes
 <tests/test_oo_style.{native,byte}>: pkg_unix
 <tests/test_oo_style.{native,byte}>: pkg_oUnit
+<tests/test_oo_style.{native,byte}>: custom
+# Executable test_ctypes_type_printing
+<tests/test_type_printing.{native,byte}>: use_ctypes-foreign
+<tests/test_type_printing.{native,byte}>: use_ctypes
+<tests/test_type_printing.{native,byte}>: pkg_unix
+<tests/test_type_printing.{native,byte}>: pkg_oUnit
+<tests/test_type_printing.{native,byte}>: pkg_str
+<tests/test_type_printing.{native,byte}>: custom
+# Executable test_ctypes_value_printing
+<tests/test_value_printing.{native,byte}>: use_ctypes-foreign
+<tests/test_value_printing.{native,byte}>: use_ctypes
+<tests/test_value_printing.{native,byte}>: pkg_unix
+<tests/test_value_printing.{native,byte}>: pkg_oUnit
+<tests/test_value_printing.{native,byte}>: pkg_str
 <tests/*.ml{,i}>: use_ctypes-foreign
 <tests/*.ml{,i}>: use_ctypes
 <tests/*.ml{,i}>: pkg_unix
 <tests/*.ml{,i}>: pkg_oUnit
-<tests/test_oo_style.{native,byte}>: custom
+<tests/*.ml{,i}>: pkg_str
+<tests/test_value_printing.{native,byte}>: custom
 # Executable date_example
 <examples/date/date.{native,byte}>: use_ctypes-foreign
 <examples/date/date.{native,byte}>: use_ctypes

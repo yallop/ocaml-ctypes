@@ -91,7 +91,7 @@ let test_returning_struct () =
     let () = assert_equal 12.5 !@(t |-> f)
       ~printer:string_of_float
 
-    let () = assert_equal !@(t |-> p) t
+    let () = assert_equal (to_voidp !@(t |-> p)) (to_voidp t)
 
   end in ()
 

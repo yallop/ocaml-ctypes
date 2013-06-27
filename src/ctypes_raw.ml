@@ -15,6 +15,7 @@ sig
   type 'a ctype
   external sizeof : _ ctype -> int = "ctypes_sizeof"
   external alignment : _ ctype -> int = "ctypes_alignment"
+  external ctype_name : _ ctype -> string = "ctypes_typename"
 
   module PtrType : Signed.S
   type voidp = PtrType.t
@@ -56,6 +57,8 @@ struct
   external sizeof : _ ctype -> int = "ctypes_sizeof"
 
   external alignment : _ ctype -> int = "ctypes_alignment"
+
+  external ctype_name : _ ctype -> string = "ctypes_typename"
 
   external _int_type_info : unit -> int ctype = "ctypes_int_type_info"
   let int = _int_type_info ()
@@ -158,6 +161,9 @@ external read : 'a ctype -> offset:int -> raw_pointer -> 'a
 (* Write a C value to a block of memory *)
 external write :  'a ctype -> offset:int -> 'a -> raw_pointer -> unit
   = "ctypes_write"
+
+(* Return a string representation of a C value *)
+external string_of : 'a ctype -> 'a -> string = "ctypes_string_of"
 
 (* Allocate a new C call specification *)
 external allocate_callspec : unit -> bufferspec

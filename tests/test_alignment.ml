@@ -54,7 +54,7 @@ end
 let test_abstract_alignment () =
   for i = 1 to 10 do
     assert_equal
-      i (alignment (abstract ~size:(11 - i) ~alignment:i))
+      i (alignment (abstract ~name:"abstract" ~size:(11 - i) ~alignment:i))
   done
 
 
@@ -107,7 +107,7 @@ let test_struct_alignment () =
                 alignment double])
       (alignment struct_a)
 
-    let abs = abstract ~size:33 ~alignment:33
+    let abs = abstract ~name:"abs" ~size:33 ~alignment:33
     let charish = view ~read:(fun _ -> ()) ~write:(fun () -> 'c') char
 
     let struct_b = structure "A"

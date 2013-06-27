@@ -5,7 +5,7 @@
  * See the file LICENSE for details.
  *)
 
-(** The core ctypes module. 
+(** The core ctypes module.
 
     The main points of interest are the set of functions for describing C
     types (see {!types}) and the set of functions for accessing C values (see
@@ -51,7 +51,7 @@ val void  : unit typ
     The scalar types consist of the {!arithmetic_types} and the {!pointer_types}.
 *)
 
-(** {4:arithmetic_types Arithmetic types} 
+(** {4:arithmetic_types Arithmetic types}
 
     The arithmetic types consist of the signed and unsigned integer types
     (including character types) and the floating types.  There are values
@@ -289,7 +289,7 @@ val view : read:('a -> 'b) -> write:('b -> 'a) -> 'a typ -> 'b typ
     For example, given suitable definitions of [string_of_char_ptr] and
     [char_ptr_of_string], the type representation
 
-    [view ~read:string_of_char_ptr ~write:char_ptr_of_string (ptr char)] 
+    [view ~read:string_of_char_ptr ~write:char_ptr_of_string (ptr char)]
 
     can be used to pass OCaml strings directly to and from bound C functions,
     or to read and write string members in structs and arrays.  (In fact, the
@@ -314,7 +314,7 @@ type 'a abstract
     not actually a good match for [abstract], since values of type [pthread_t]
     are passed and returned by value.) *)
 
-val abstract : size:int -> alignment:int -> 'a abstract typ
+val abstract : name:string -> size:int -> alignment:int -> 'a abstract typ
 (** Create an abstract type specification from the size and alignment
     requirements for the type. *)
 
@@ -328,7 +328,26 @@ val alignment : 'a typ -> int
 (** [alignment t] computes the alignment requirements of the type [t].  The
     exception [IncompleteType] is raised if [t] is incomplete. *)
 
-(** {2:types Values representing C types} *)
+val format_typ : ?name:string -> Format.formatter -> 'a typ -> unit
+(** Pretty-print a C representation of the type to the specified formatter. *)
+
+val format_fn : ?name:string -> Format.formatter -> 'a fn -> unit
+(** Pretty-print a C representation of the function type to the specified
+    formatter. *)
+
+val string_of_typ : ?name:string -> 'a typ -> string
+(** Return a C representation of the type. *)
+
+val string_of_fn : ?name:string -> 'a fn -> string
+(** Return a C representation of the function type. *)
+
+(** {2:values Values representing C values} *)
+
+val format : 'a typ -> Format.formatter -> 'a -> unit
+(** Pretty-print a representation of the C value to the specified formatter. *)
+
+val string_of : 'a typ -> 'a -> string
+(** Return a string representation of the C value. *)
 
 (** {3 Pointer values} *)
 
@@ -440,7 +459,7 @@ sig
       to initialise every element of the array.  *)
 
   val element_type : 'a array -> 'a typ
-  (** Retrieve the element type of an array. *)
+(** Retrieve the element type of an array. *)
 end
 (** Operations on C arrays. *)
 

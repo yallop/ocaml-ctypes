@@ -11,6 +11,7 @@ examples/fts/META
 examples/fts/fts.mllib
 examples/sigset/META
 examples/sigset/sigset.mllib
+top/ctypes_top.mllib
 _build
 build
 tests/clib/*
