@@ -5,7 +5,7 @@
  * See the file LICENSE for details.
  *)
 
-(** The core ctypes module. 
+(** The core ctypes module.
 
     The main points of interest are the set of functions for describing C
     types (see {!types}) and the set of functions for accessing C values (see
@@ -51,7 +51,7 @@ val void  : unit typ
     The scalar types consist of the {!arithmetic_types} and the {!pointer_types}.
 *)
 
-(** {4:arithmetic_types Arithmetic types} 
+(** {4:arithmetic_types Arithmetic types}
 
     The arithmetic types consist of the signed and unsigned integer types
     (including character types) and the floating types.  There are values
@@ -289,7 +289,7 @@ val view : read:('a -> 'b) -> write:('b -> 'a) -> 'a typ -> 'b typ
     For example, given suitable definitions of [string_of_char_ptr] and
     [char_ptr_of_string], the type representation
 
-    [view ~read:string_of_char_ptr ~write:char_ptr_of_string (ptr char)] 
+    [view ~read:string_of_char_ptr ~write:char_ptr_of_string (ptr char)]
 
     can be used to pass OCaml strings directly to and from bound C functions,
     or to read and write string members in structs and arrays.  (In fact, the
@@ -341,7 +341,7 @@ val string_of_typ : ?name:string -> 'a typ -> string
 val string_of_fn : ?name:string -> 'a fn -> string
 (** Return a C representation of the function type. *)
 
-(** {2:types Values representing C types} *)
+(** {2:values Values representing C values} *)
 
 (** {3 Pointer values} *)
 
