@@ -79,62 +79,58 @@ type _ ccallspec =
 
 type arg_type = ArgType : 'b RawTypes.ctype -> arg_type
 
-let rec sizeof : 'a. 'a typ -> int
-  = fun (type a) (t : a typ) -> match t with
-      Void                           -> raise IncompleteType
-    | Primitive p                    -> RawTypes.sizeof p
-    | Struct { spec = Incomplete _ } -> raise IncompleteType
-    | Struct { spec = Complete p }   -> RawTypes.sizeof p
-    | Union { ucomplete = false }    -> raise IncompleteType
-    | Union { usize }                -> usize
-    | Array (t, i)                   -> i * sizeof t
-    | Abstract { asize }             -> asize
-    | Pointer _                      -> RawTypes.(sizeof pointer)
-    | FunctionPointer _              -> RawTypes.(sizeof pointer)
-    | View { ty }                    -> sizeof ty
+let rec sizeof : type a. a typ -> int = function
+    Void                           -> raise IncompleteType
+  | Primitive p                    -> RawTypes.sizeof p
+  | Struct { spec = Incomplete _ } -> raise IncompleteType
+  | Struct { spec = Complete p }   -> RawTypes.sizeof p
+  | Union { ucomplete = false }    -> raise IncompleteType
+  | Union { usize }                -> usize
+  | Array (t, i)                   -> i * sizeof t
+  | Abstract { asize }             -> asize
+  | Pointer _                      -> RawTypes.(sizeof pointer)
+  | FunctionPointer _              -> RawTypes.(sizeof pointer)
+  | View { ty }                    -> sizeof ty
 
-let rec alignment : 'a. 'a typ -> int
-  = fun (type a) (t : a typ) -> match t with
-      Void                           -> raise IncompleteType
-    | Primitive p                    -> RawTypes.alignment p
-    | Struct { spec = Incomplete _ } -> raise IncompleteType
-    | Struct { spec = Complete p }   -> RawTypes.alignment p
-    | Union { ucomplete = false }    -> raise IncompleteType
-    | Union { ualignment }           -> ualignment
-    | Array (t, _)                   -> alignment t
-    | Abstract { aalignment }        -> aalignment
-    | Pointer _                      -> RawTypes.(alignment pointer)
-    | FunctionPointer _              -> RawTypes.(alignment pointer)
-    | View { ty }                    -> alignment ty
+let rec alignment : type a. a typ -> int = function
+    Void                           -> raise IncompleteType
+  | Primitive p                    -> RawTypes.alignment p
+  | Struct { spec = Incomplete _ } -> raise IncompleteType
+  | Struct { spec = Complete p }   -> RawTypes.alignment p
+  | Union { ucomplete = false }    -> raise IncompleteType
+  | Union { ualignment }           -> ualignment
+  | Array (t, _)                   -> alignment t
+  | Abstract { aalignment }        -> aalignment
+  | Pointer _                      -> RawTypes.(alignment pointer)
+  | FunctionPointer _              -> RawTypes.(alignment pointer)
+  | View { ty }                    -> alignment ty
 
-let rec passable : 'a. 'a typ -> bool
-  = fun (type a) (t : a typ) -> match t with
-      Void                           -> true
-    | Primitive _                    -> true
-    | Struct { spec = Incomplete _ } -> raise IncompleteType
-    | Struct { passable }            -> passable
-    | Union { ucomplete = false }    -> raise IncompleteType
-    | Union _                        -> false
-    | Array _                        -> false
-    | Pointer _                      -> true
-    | Abstract _                     -> false
-    | FunctionPointer _              -> true
-    | View { ty }                    -> passable ty
+let rec passable : type a. a typ -> bool = function
+    Void                           -> true
+  | Primitive _                    -> true
+  | Struct { spec = Incomplete _ } -> raise IncompleteType
+  | Struct { passable }            -> passable
+  | Union { ucomplete = false }    -> raise IncompleteType
+  | Union _                        -> false
+  | Array _                        -> false
+  | Pointer _                      -> true
+  | Abstract _                     -> false
+  | FunctionPointer _              -> true
+  | View { ty }                    -> passable ty
 
-let rec arg_type : 'a. 'a typ -> arg_type
-  = fun (type a) (t : a typ) -> match t with
-    | Void                           -> ArgType RawTypes.void
-    | Primitive p                    -> ArgType p
-    | Struct { spec = Complete p }   -> ArgType p
-    | Pointer _                      -> ArgType RawTypes.pointer
-    | FunctionPointer _              -> ArgType RawTypes.pointer
-    | View { ty }                    -> arg_type ty
-    (* The following cases should never happen; aggregate types other than
-       complete struct types are excluded during type construction. *)
-    | Union _                        -> assert false
-    | Array _                        -> assert false
-    | Abstract _                     -> assert false
-    | Struct { spec = Incomplete _ } -> assert false
+let rec arg_type : type a. a typ -> arg_type = function
+    Void                           -> ArgType RawTypes.void
+  | Primitive p                    -> ArgType p
+  | Struct { spec = Complete p }   -> ArgType p
+  | Pointer _                      -> ArgType RawTypes.pointer
+  | FunctionPointer _              -> ArgType RawTypes.pointer
+  | View { ty }                    -> arg_type ty
+  (* The following cases should never happen; aggregate types other than
+     complete struct types are excluded during type construction. *)
+  | Union _                        -> assert false
+  | Array _                        -> assert false
+  | Abstract _                     -> assert false
+  | Struct { spec = Incomplete _ } -> assert false
 
 
 (* The format context affects the formatting of pointer, struct and union
@@ -153,11 +149,11 @@ type format_context = [
    form and pointer types are unparenthesized. *)
 | `nonarray]
 
-let rec format_typ : 'a. 'a typ ->
+let rec format_typ : type a. a typ ->
   (format_context -> Format.formatter -> unit) ->
   (format_context -> Format.formatter -> unit) =
   let fprintf = Format.fprintf in 
-  fun (type a) (t : a typ) k context fmt -> match t with
+  fun t k context fmt -> match t with
     | Void ->
       fprintf fmt "void%t" (k `nonarray)
     | Primitive p ->
@@ -218,8 +214,8 @@ and format_fields fields fmt =
   and format_fn : 'a. 'a fn ->
     (Format.formatter -> unit) ->
     (Format.formatter -> unit) =
-    let rec gather : 'a. 'a fn -> boxed_typ list * boxed_typ =
-      fun (type a) (fn : a fn) -> match fn with
+    let rec gather : type a. a fn -> boxed_typ list * boxed_typ =
+      function
         | Returns (_, ty) -> [], BoxedType ty
         | Function (Void, fn) -> gather fn
         | Function (p, fn) -> let ps, r = gather fn in BoxedType p :: ps, r in
@@ -265,13 +261,13 @@ let string_of_fn ?name fn = string_of (format_fn ?name) fn
         write arg_n buffer v_n)
    read_return_value
 *)
-let rec invoke : 'a. string option ->
-                     'a ccallspec ->
-                     (Raw.raw_pointer -> unit) list ->
-                     Raw.bufferspec ->
-                     Raw.raw_pointer ->
-                    'a
-  = fun name (type a) (fn : a ccallspec) -> match fn with
+let rec invoke : type a. string option ->
+                         a ccallspec ->
+                         (Raw.raw_pointer -> unit) list ->
+                         Raw.bufferspec ->
+                         Raw.raw_pointer ->
+                      a
+  = fun name -> function
     | Call (check_errno, read_return_value) ->
       let call = match check_errno, name with
         | true, Some name -> Raw.call_errno name
@@ -287,19 +283,19 @@ let rec invoke : 'a. string option ->
       fun writers callspec addr v ->
         next (write v :: writers) callspec addr
 
-let rec prep_callspec : 'a. Raw.bufferspec -> 'a typ -> unit
+let rec prep_callspec : type a. Raw.bufferspec -> a typ -> unit
   = fun callspec ty ->
     let ArgType ctype = arg_type ty in
     Raw.prep_callspec callspec ctype
 
-and add_argument : 'a. Raw.bufferspec -> 'a typ -> int
-  = fun callspec (type a) (ty : a typ) -> match ty with
+and add_argument : type a. Raw.bufferspec -> a typ -> int
+  = fun callspec -> function
     | Void -> 0
-    | _    -> let ArgType ctype = arg_type ty in
+    | ty   -> let ArgType ctype = arg_type ty in
               Raw.add_argument callspec ctype
 
-and build_callspec : 'a. 'a fn -> Raw.bufferspec -> 'a -> Raw.boxedfn
-  = fun (type a) fn callspec -> match (fn : a fn) with
+and build_callspec : type a. a fn -> Raw.bufferspec -> a -> Raw.boxedfn
+  = fun fn callspec -> match fn with
     | Returns (_, ty) ->
       let _ = prep_callspec callspec ty in
       let write_rv = write ty in
@@ -311,8 +307,8 @@ and build_callspec : 'a. 'a fn -> Raw.bufferspec -> 'a -> Raw.boxedfn
       fun f -> Raw.Fn (fun buf -> box (f (read buf)))
 
 (* Describes how to read a value, e.g. from a return buffer *)
-and build : 'a. 'a typ -> offset:int -> Raw.raw_pointer -> 'a
-  = fun (type a) (t : a typ) -> match t with
+and build : type a. a typ -> offset:int -> Raw.raw_pointer -> a
+ = function
     | Void ->
       (Raw.read RawTypes.void : offset:int -> Raw.raw_pointer -> a)
     | Primitive p ->
@@ -345,10 +341,10 @@ and build : 'a. 'a typ -> offset:int -> Raw.raw_pointer -> 'a
     | Array _ -> assert false
     | Abstract _ -> assert false
 
-and write : 'a. 'a typ -> offset:int -> 'a -> Raw.raw_pointer -> unit
-  = fun (type a) (t : a typ) -> match t with
+and write : type a. a typ -> offset:int -> a -> Raw.raw_pointer -> unit
+  = function
     | Void ->
-      ((fun ~offset _ _ -> ()) : offset:int -> a -> _ -> _)
+      (fun ~offset _ _ -> ())
     | Primitive p ->
       Raw.write p
     | Pointer _ ->
@@ -391,8 +387,8 @@ and write : 'a. 'a typ -> offset:int -> 'a -> Raw.raw_pointer -> unit
   add_argument callspec argn
   prep_callspec callspec rettype
 *)
-and build_ccallspec : 'a. 'a fn -> Raw.bufferspec -> 'a ccallspec
-  = fun (type a) (fn : a fn) callspec -> match fn with
+and build_ccallspec : type a. a fn -> Raw.bufferspec -> a ccallspec
+  = fun fn callspec -> match fn with
     | Returns (check_errno, t) ->
       let () = prep_callspec callspec t in
       (Call (check_errno, build t ~offset:0) : a ccallspec)
@@ -401,7 +397,7 @@ and build_ccallspec : 'a. 'a fn -> Raw.bufferspec -> 'a ccallspec
       let rest = build_ccallspec f callspec in
       WriteArg (write p ~offset, rest)
 
-and build_function : 'a. ?name:string -> 'a fn -> RawTypes.voidp -> 'a
+and build_function : type a. ?name:string -> a fn -> RawTypes.voidp -> a
   = fun ?name fn ->
     let c = Raw.allocate_callspec () in
     let e = build_ccallspec fn c in
@@ -412,8 +408,8 @@ let null : unit ptr = { raw_ptr = RawTypes.null;
                         pbyte_offset = 0;
                         pmanaged = None }
 
-let rec (!@) : 'a. 'a ptr -> 'a
-  = fun (type a) ({ raw_ptr; reftype; pbyte_offset = offset } as ptr : a ptr) ->
+let rec (!@) : type a. a ptr -> a
+  = fun ({ raw_ptr; reftype; pbyte_offset = offset } as ptr) ->
     match reftype with
       | Void -> raise IncompleteType
       | Union { ucomplete = false } -> raise IncompleteType
@@ -437,32 +433,32 @@ let ptr_diff { raw_ptr = lp; pbyte_offset = loff; reftype }
      and r = add rp (of_int roff) in
      to_int (sub r l) / sizeof reftype
 
-let (+@) : 'a. 'a ptr -> int -> 'a ptr
+let (+@) : type a. a ptr -> int -> a ptr
   = fun ({ pbyte_offset; reftype } as p) x ->
     { p with pbyte_offset = pbyte_offset + (x * sizeof reftype) }
 
-let (-@) : 'a. 'a ptr -> int -> 'a ptr
+let (-@) : type a. a ptr -> int -> a ptr
   = fun p x -> p +@ (-x)
 
-let (<-@) : 'a. 'a ptr -> 'a -> unit
-  = fun (type a) ({ reftype; raw_ptr; pbyte_offset = offset } : a ptr) ->
+let (<-@) : type a. a ptr -> a -> unit
+  = fun { reftype; raw_ptr; pbyte_offset = offset } ->
     fun v -> write reftype ~offset v raw_ptr
 
-let from_voidp : 'a. 'a typ -> unit ptr -> 'a ptr
+let from_voidp : type a. a typ -> unit ptr -> a ptr
   = fun reftype p -> { p with reftype }
 
-let to_voidp : 'a. 'a ptr -> unit ptr
+let to_voidp : type a. a ptr -> unit ptr
   = fun p -> { p with reftype = Void }
 
-let allocate_n : 'a. 'a typ -> count:int -> 'a ptr
-  = fun (type a) (reftype : a typ) ~count ->
+let allocate_n : type a. a typ -> count:int -> a ptr
+  = fun reftype ~count ->
     let pmanaged = Raw.allocate (count * sizeof reftype) in
     { reftype; pbyte_offset = 0;
       raw_ptr = Raw.block_address pmanaged;
       pmanaged = Some pmanaged }
 
-let allocate : 'a. 'a typ -> 'a -> 'a ptr
-  = fun (type a) (reftype : a typ) (v : a) ->
+let allocate : type a. a typ -> a -> a ptr
+  = fun reftype v ->
     let p = allocate_n ~count:1 reftype in begin
       p <-@ v;
       p
@@ -503,7 +499,7 @@ struct
   let fill ({ alength } as arr) v =
     for i = 0 to alength - 1 do unsafe_set arr i v done
 
-  let make : 'a. 'a typ -> ?initial:'a -> int -> 'a t
+  let make : type a. a typ -> ?initial:a -> int -> a t
     = fun reftype ?initial count ->
       let arr = { astart = allocate_n ~count reftype;
                   alength = count } in
@@ -552,8 +548,8 @@ let ( *:* ) (type b) (Struct s) (ftype : b typ) =
       add_field t s;
       Raw.add_unpassable_argument
         bufspec ~size:(sizeof t) ~alignment:(alignment t) in
-    let rec offset : 'a. 'a typ -> int
-      = fun (type a) (ty : a typ) -> match ty with
+    let rec offset : type a. a typ -> int
+      = fun ty -> match ty with
       | Void                           -> raise IncompleteType
       | Array _ as a                   -> (s.passable <- false;
                                            add_unpassable_member a)
