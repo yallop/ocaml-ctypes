@@ -9,6 +9,9 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <limits.h>
+#include <inttypes.h>
+#include <float.h>
 #include <assert.h>
 #include <string.h>
 
@@ -340,3 +343,38 @@ int accepting_pointer_from_callback(pintfun2 *f)
   *p = 12;
   return q;
 }
+
+signed char retrieve_SCHAR_MIN(void) { return SCHAR_MIN; }
+signed char retrieve_SCHAR_MAX(void) { return SCHAR_MAX; }
+unsigned char retrieve_UCHAR_MAX(void) { return UCHAR_MAX; }
+char retrieve_CHAR_MIN(void) { return CHAR_MIN; }
+char retrieve_CHAR_MAX(void) { return CHAR_MAX; }
+short retrieve_SHRT_MIN(void) { return SHRT_MIN; }
+short retrieve_SHRT_MAX(void) { return SHRT_MAX; }
+unsigned short retrieve_USHRT_MAX(void) { return USHRT_MAX; }
+int retrieve_INT_MIN(void) { return INT_MIN; }
+int retrieve_INT_MAX(void) { return INT_MAX; }
+unsigned int retrieve_UINT_MAX(void) { return UINT_MAX; }
+long retrieve_LONG_MAX(void) { return LONG_MAX; }
+long retrieve_LONG_MIN(void) { return LONG_MIN; }
+unsigned long retrieve_ULONG_MAX(void) { return ULONG_MAX; }
+long long retrieve_LLONG_MAX(void) { return LLONG_MAX; }
+long long retrieve_LLONG_MIN(void) { return LLONG_MIN; }
+unsigned long long retrieve_ULLONG_MAX(void) { return ULLONG_MAX; }
+int8_t retrieve_INT8_MIN(void) { return INT8_MIN; }
+int16_t retrieve_INT16_MIN(void) { return INT16_MIN; }
+int32_t retrieve_INT32_MIN(void) { return INT32_MIN; }
+int64_t retrieve_INT64_MIN(void) { return INT64_MIN; }
+int8_t retrieve_INT8_MAX(void) { return INT8_MAX; }
+int16_t retrieve_INT16_MAX(void) { return INT16_MAX; }
+int32_t retrieve_INT32_MAX(void) { return INT32_MAX; }
+int64_t retrieve_INT64_MAX(void) { return INT64_MAX; }
+uint8_t retrieve_UINT8_MAX(void) { return UINT8_MAX; }
+uint16_t retrieve_UINT16_MAX(void) { return UINT16_MAX; }
+uint32_t retrieve_UINT32_MAX(void) { return UINT32_MAX; }
+uint64_t retrieve_UINT64_MAX(void) { return UINT64_MAX; }
+size_t retrieve_SIZE_MAX(void) { return SIZE_MAX; }
+float retrieve_FLT_MIN(void) { return FLT_MIN; }
+float retrieve_FLT_MAX(void) { return FLT_MAX; }
+double retrieve_DBL_MIN(void) { return DBL_MIN; }
+double retrieve_DBL_MAX(void) { return DBL_MAX; }
