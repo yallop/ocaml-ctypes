@@ -23,6 +23,8 @@ sig
 
   val pointer : voidp ctype
 
+  external string_of_ptr : voidp -> string = "ctypes_string_of_ptr"
+
   val void : unit ctype
   val char : char ctype
   val schar : int ctype
@@ -83,6 +85,8 @@ struct
     | _ -> failwith "No suitable type available to represent pointers.")
   type voidp = PtrType.t
   let pointer = _voidp_type_info ()
+
+  external string_of_ptr : voidp -> string = "ctypes_string_of_ptr"
 
   external _void_type_info : unit -> unit ctype = "ctypes_void_type_info"
   let void = _void_type_info ()

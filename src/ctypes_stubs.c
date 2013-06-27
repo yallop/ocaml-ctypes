@@ -8,6 +8,7 @@
 #include <errno.h>
 #include <assert.h>
 #include <string.h>
+#include <stdio.h>
 
 #include <caml/mlvalues.h>
 #include <caml/memory.h>
@@ -542,4 +543,15 @@ value ctypes_memcpy(value dst, value dst_offset,
          (char *)CTYPES_TO_PTR(src) + Int_val(src_offset),
          Int_val(size));
   CAMLreturn(Val_unit);
+}
+
+
+/* string_of_ptr : voidp -> string */
+value ctypes_string_of_ptr(value ptr)
+{
+  CAMLparam1(ptr);
+  void *p = CTYPES_TO_PTR(ptr);
+  char buf[32];
+  snprintf(buf, sizeof buf, "%p", p);
+  CAMLreturn (caml_copy_string(buf));
 }

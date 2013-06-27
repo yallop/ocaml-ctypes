@@ -396,6 +396,12 @@ val reference_type : 'a ptr -> 'a typ
 val ptr_of_raw_address : int64 -> unit ptr
 (** Convert the numeric representation of an address to a pointer *)
 
+val format_ptr : Format.formatter -> 'a ptr -> unit
+(** Pretty-print a representation of the pointer to the specified formatter. *)
+
+val string_of_ptr : 'a ptr -> string
+(** Return a string representation of the pointer. *)
+
 (** {3 Array values} *)
 
 module Array :

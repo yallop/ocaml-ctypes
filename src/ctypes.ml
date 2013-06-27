@@ -473,6 +473,14 @@ let ptr_of_raw_address addr =
   { reftype = Void; raw_ptr = RawTypes.PtrType.of_int64 addr;
     pmanaged = None; pbyte_offset = 0 }
 
+let format_ptr fmt {raw_ptr; reftype; pbyte_offset} =
+  Format.fprintf fmt "(%a) %s"
+    (fun fmt -> format_typ fmt)
+    (Pointer reftype)
+    RawTypes.(string_of_ptr (PtrType.(add raw_ptr (of_int pbyte_offset))))
+
+let string_of_ptr p = string_of format_ptr p
+
 module Array =
 struct
   type 'a t = 'a array
