@@ -23,8 +23,6 @@ sig
 
   val pointer : voidp ctype
 
-  external string_of_ptr : voidp -> string = "ctypes_string_of_ptr"
-
   val void : unit ctype
   val char : char ctype
   val schar : int ctype
@@ -85,8 +83,6 @@ struct
     | _ -> failwith "No suitable type available to represent pointers.")
   type voidp = PtrType.t
   let pointer = _voidp_type_info ()
-
-  external string_of_ptr : voidp -> string = "ctypes_string_of_ptr"
 
   external _void_type_info : unit -> unit ctype = "ctypes_void_type_info"
   let void = _void_type_info ()
@@ -165,6 +161,9 @@ external read : 'a ctype -> offset:int -> raw_pointer -> 'a
 (* Write a C value to a block of memory *)
 external write :  'a ctype -> offset:int -> 'a -> raw_pointer -> unit
   = "ctypes_write"
+
+(* Return a string representation of a C value *)
+external string_of : 'a ctype -> 'a -> string = "ctypes_string_of"
 
 (* Allocate a new C call specification *)
 external allocate_callspec : unit -> bufferspec

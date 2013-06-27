@@ -61,17 +61,17 @@ and 'a structure_type = {
 
   (* We keep the field type values around, since functions such as
      complete_struct_type may need to access the underlying C values. *)
-  mutable fields : boxed_typ list;
+  mutable fields : boxed_field list;
 }
 and 'a union_type = {
   utag: string;
   mutable ucomplete: bool;
   mutable usize: int;
   mutable ualignment: int;
-  mutable ufields : boxed_typ list;
+  mutable ufields : boxed_field list;
 }
-and boxed_typ = BoxedType : 'a typ -> boxed_typ
-
+and boxed_field = BoxedField : ('a, 's) field -> boxed_field
+type boxed_typ = BoxedType : 'a typ -> boxed_typ
 
 type _ ccallspec =
     Call : bool * (Raw.raw_pointer -> 'a) -> 'a ccallspec
@@ -197,7 +197,7 @@ let rec format_typ : type a. a typ ->
 and format_fields fields fmt =
   let open Format in
       List.iteri
-        (fun i (BoxedType t) ->
+        (fun i (BoxedField {ftype=t}) ->
           fprintf fmt "@[";
           format_typ t (fun _ fmt -> fprintf fmt " field_%d" i) `nonarray fmt;
           fprintf fmt "@];@;")
@@ -473,14 +473,6 @@ let ptr_of_raw_address addr =
   { reftype = Void; raw_ptr = RawTypes.PtrType.of_int64 addr;
     pmanaged = None; pbyte_offset = 0 }
 
-let format_ptr fmt {raw_ptr; reftype; pbyte_offset} =
-  Format.fprintf fmt "(%a) %s"
-    (fun fmt -> format_typ fmt)
-    (Pointer reftype)
-    RawTypes.(string_of_ptr (PtrType.(add raw_ptr (of_int pbyte_offset))))
-
-let string_of_ptr p = string_of format_ptr p
-
 module Array =
 struct
   type 'a t = 'a array
@@ -545,17 +537,20 @@ let bufferspec { tag; spec } = match spec with
   | Incomplete s -> s
   | Complete _   -> raise (ModifyingSealedType tag)
     
-let add_field typ s = s.fields <- BoxedType typ :: s.fields
+let add_field f s = s.fields <- BoxedField f :: s.fields
 
 let ( *:* ) (type b) (Struct s) (ftype : b typ) =
     let bufspec = bufferspec s in
-    let add_member typ t =
-      add_field typ s;
-      Raw.add_argument bufspec t
-    and add_unpassable_member t =
-      add_field t s;
-      Raw.add_unpassable_argument
-        bufspec ~size:(sizeof t) ~alignment:(alignment t) in
+    let add_member ftype t =
+      let foffset = Raw.add_argument bufspec t in
+      add_field {ftype; foffset} s;
+      foffset
+    and add_unpassable_member ftype =
+      let foffset = Raw.add_unpassable_argument
+        bufspec ~size:(sizeof ftype) ~alignment:(alignment ftype) in
+      add_field {ftype; foffset} s;
+      foffset
+    in
     let rec offset : type a. a typ -> int
       = fun ty -> match ty with
       | Void                           -> raise IncompleteType
@@ -577,6 +572,59 @@ let ( *:* ) (type b) (Struct s) (ftype : b typ) =
     { ftype; foffset = offset ftype }
 
 let addr { structured } = structured
+
+let rec format : type a. a typ -> Format.formatter -> a -> unit
+  = fun typ fmt v -> match typ with
+    Void -> Format.pp_print_string fmt (Raw.string_of RawTypes.void v)
+  | Primitive p -> Format.pp_print_string fmt (Raw.string_of p v)
+  | Pointer _ -> format_ptr fmt v
+  | Struct _ -> format_struct fmt v
+  | Union _ -> format_union fmt v
+  | Array (a, n) -> format_array fmt v
+  | Abstract abs -> Format.pp_print_string fmt "<abstract>"
+    (* For now, just print the underlying value in a view *)
+  | View {write; ty} -> format ty fmt (write v)
+  | FunctionPointer (name, fn) -> Format.pp_print_string fmt "<fun>"
+and format_struct : type a. Format.formatter -> a structure -> unit
+  = fun fmt ({structured = {reftype = Struct {fields}}} as s) ->
+    let open Format in
+    fprintf fmt "{@;<1 2>@[";
+    format_fields "," fields fmt s;
+    fprintf fmt "@]@;<1 0>}"
+and format_union : type a. Format.formatter -> a union -> unit
+  = fun fmt ({structured = {reftype = Union {ufields}}} as u) ->
+    let open Format in
+    fprintf fmt "{@;<1 2>@[";
+    format_fields " |" ufields fmt u;
+    fprintf fmt "@]@;<1 0>}"
+and format_array : type a. Format.formatter -> a array -> unit
+  = fun fmt ({astart = {reftype}; alength} as arr) ->
+    let open Format in
+    fprintf fmt "{@;<1 2>@[";
+    for i = 0 to alength - 1 do
+      format reftype fmt (Array.get arr i);
+      if i <> alength - 1 then
+        fprintf fmt ",@;"
+    done;
+    fprintf fmt "@]@;<1 0>}"
+and format_fields : type a b. string -> boxed_field list -> Format.formatter
+                              -> (a, b) structured -> unit
+  = fun sep fields fmt s ->
+    let last_field = List.length fields - 1 in
+    let open Format in
+    List.iteri
+      (fun i (BoxedField ({ftype; foffset} as f)) ->
+        fprintf fmt "@[%a@]%s@;" (format ftype) (getf s f) 
+          (if i <> last_field then sep else ""))
+      (List.rev fields)
+and format_ptr : type a. Format.formatter -> a ptr -> unit
+  = fun fmt {raw_ptr; reftype; pbyte_offset} ->
+    Format.fprintf fmt "%s"
+      (Raw.string_of
+         RawTypes.pointer
+         (RawTypes.PtrType.(add raw_ptr (of_int pbyte_offset))))
+
+let string_of typ v = string_of (format typ) v
 
 let offsetof { foffset } = foffset
 
@@ -606,8 +654,9 @@ let ( +:+ ) (Union u) ftype =
     ensure_unsealed u;
     u.usize <- max u.usize (sizeof ftype);
     u.ualignment <- max u.ualignment (alignment ftype);
-    u.ufields <- BoxedType ftype :: u.ufields;
-    { ftype; foffset = 0 }
+    let field = { ftype; foffset = 0 } in
+    u.ufields <- BoxedField field :: u.ufields;
+    field
   end
 
 let void = Void

@@ -24,3 +24,13 @@ let format_ulong fmt v =
   Format.fprintf fmt "<ulong %s>" (Unsigned.ULong.to_string v)
 let format_ullong fmt v =
   Format.fprintf fmt "<ullong %s>" (Unsigned.ULLong.to_string v)
+let format_pointer fmt v =
+  let open Ctypes in
+  let typ = ptr (reference_type v) in
+  Format.fprintf fmt "(%a) %a" (fun fmt -> format_typ fmt) typ (format typ) v
+let format_struct fmt v =
+  Ctypes.(format (reference_type (addr v)) fmt v)
+let format_union fmt v =
+  Ctypes.(format (reference_type (addr v)) fmt v)
+let format_array fmt v =
+  Ctypes.(format Array.(array (length v) (reference_type (start v))) fmt v)

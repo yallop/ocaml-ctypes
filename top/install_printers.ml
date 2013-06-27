@@ -14,7 +14,11 @@ let printers = [ "Ctypes_printers.format_typ";
                  "Ctypes_printers.format_uint";
                  "Ctypes_printers.format_ulong";
                  "Ctypes_printers.format_ullong";
-                 "Ctypes.format_ptr"; ]
+                 "Ctypes_printers.format_pointer";
+                 "Ctypes_printers.format_struct";
+                 "Ctypes_printers.format_union";
+                 "Ctypes_printers.format_array";
+               ]
 
 let eval_string
       ?(print_outcome = false) ?(err_formatter = Format.err_formatter) str =

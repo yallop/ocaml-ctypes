@@ -343,6 +343,12 @@ val string_of_fn : ?name:string -> 'a fn -> string
 
 (** {2:values Values representing C values} *)
 
+val format : 'a typ -> Format.formatter -> 'a -> unit
+(** Pretty-print a representation of the C value to the specified formatter. *)
+
+val string_of : 'a typ -> 'a -> string
+(** Return a string representation of the C value. *)
+
 (** {3 Pointer values} *)
 
 val null : unit ptr
@@ -395,12 +401,6 @@ val reference_type : 'a ptr -> 'a typ
 
 val ptr_of_raw_address : int64 -> unit ptr
 (** Convert the numeric representation of an address to a pointer *)
-
-val format_ptr : Format.formatter -> 'a ptr -> unit
-(** Pretty-print a representation of the pointer to the specified formatter. *)
-
-val string_of_ptr : 'a ptr -> string
-(** Return a string representation of the pointer. *)
 
 (** {3 Array values} *)
 
@@ -459,7 +459,7 @@ sig
       to initialise every element of the array.  *)
 
   val element_type : 'a array -> 'a typ
-  (** Retrieve the element type of an array. *)
+(** Retrieve the element type of an array. *)
 end
 (** Operations on C arrays. *)
 
