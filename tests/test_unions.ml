@@ -165,6 +165,16 @@ let test_updating_sealed_union () =
     (fun () -> utyp +:+ char)
 
 
+(*
+  Test that attempting to seal an empty union is treated as an error.
+*)
+let test_sealing_empty_union () =
+  let empty = union "empty" in
+
+  assert_raises (Unsupported "union with no fields")
+    (fun () -> seal empty)
+
+
 let suite = "Union tests" >:::
   ["inspecting float representation"
    >:: test_inspecting_float;
@@ -180,6 +190,9 @@ let suite = "Union tests" >:::
 
    "updating sealed union"
    >:: test_updating_sealed_union;
+
+   "sealing empty union"
+   >:: test_sealing_empty_union;
   ]
 
 
