@@ -640,9 +640,11 @@ let compute_union_padding { usize; ualignment } =
   else usize - overhang + ualignment
 
 let seal (type a) (type s) : (a, s) structured typ -> unit = function
+  | Struct { fields = [] } -> raise (Unsupported "struct with no fields")
   | Struct s ->
     let bufspec = bufferspec s in
     s.spec <- Complete (Raw.complete_struct_type bufspec)
+  | Union { ufields = [] } -> raise (Unsupported "union with no fields")
   | Union u -> begin
     ensure_unsealed u;
     u.usize <- compute_union_padding u;
