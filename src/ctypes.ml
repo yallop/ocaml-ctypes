@@ -30,9 +30,9 @@ type _ typ =
   | Pointer         : 'a typ            -> 'a ptr typ
   | Struct          : 'a structure_type -> 'a structure typ
   | Union           : 'a union_type     -> 'a union typ
-  | Array           : 'a typ * int      -> 'a array typ
   | Abstract        : abstract_type     -> 'a abstract typ
   | View            : ('a, 'b) view     -> 'a typ
+  | Array           : 'a typ * int      -> 'a array typ
   | FunctionPointer : string option * ('a -> 'b) fn
                                         -> ('a -> 'b) typ
 and _ fn =
@@ -47,7 +47,7 @@ and 'a array = { astart : 'a ptr; alength : int }
 and ('a, 'kind) structured = { structured : ('a, 'kind) structured ptr }
 and 'a union = ('a, [`Union]) structured
 and 'a structure = ('a, [`Struct]) structured
-and 'a abstract = { abstract : 'a abstract ptr }
+and 'a abstract = ('a, [`Abstract]) structured
 and ('a, 'b) view = { read : 'b -> 'a; write : 'a -> 'b; ty: 'b typ }
 and ('a, 's) field = { ftype: 'a typ; foffset: int }
 and 'a structure_type = {
@@ -343,11 +343,12 @@ and build : type a. a typ -> offset:int -> Raw.raw_pointer -> a
     | Abstract _ -> assert false
 
 and write : type a. a typ -> offset:int -> a -> Raw.raw_pointer -> unit
-  = function
-    | Void ->
-      (fun ~offset _ _ -> ())
-    | Primitive p ->
-      Raw.write p
+  = let write_aggregate size =
+      (fun ~offset { structured = { raw_ptr; pbyte_offset = src_offset } } dst ->
+        Raw.memcpy ~size ~dst ~dst_offset:offset ~src:raw_ptr ~src_offset) in
+    function
+    | Void -> (fun ~offset _ _ -> ())
+    | Primitive p -> Raw.write p
     | Pointer _ ->
       (fun ~offset { raw_ptr; pbyte_offset } ->
         Raw.write RawTypes.pointer ~offset
@@ -358,24 +359,15 @@ and write : type a. a typ -> offset:int -> a -> Raw.raw_pointer -> unit
       (fun ~offset f ->
         Raw.write RawTypes.pointer ~offset
           (Raw.make_function_pointer cs' (cs f)))
-    | Struct { spec = Incomplete _ } ->
-      raise IncompleteType
-    | Struct { spec = Complete _ } as s ->
-      let size = sizeof s in
-      (fun ~offset { structured = { raw_ptr; pbyte_offset = src_offset } } dst ->
-        Raw.memcpy ~size ~dst ~dst_offset:offset ~src:raw_ptr ~src_offset)
-    | Union { ucomplete=false } ->
-      raise IncompleteType
-    | Union { usize = size } ->
-      (fun ~offset { structured = { raw_ptr = src; pbyte_offset = src_offset } } dst ->
-        Raw.memcpy ~size ~dst ~dst_offset:offset ~src ~src_offset)
-    | Abstract { asize = size } ->
-      (fun ~offset { abstract = { raw_ptr = src; pbyte_offset = src_offset } } dst ->
-        Raw.memcpy ~size ~dst ~dst_offset:offset ~src ~src_offset)
+    | Struct { spec = Incomplete _ } -> raise IncompleteType
+    | Struct { spec = Complete _ } as s -> write_aggregate (sizeof s)
+    | Union { ucomplete=false } -> raise IncompleteType
+    | Union { usize } -> write_aggregate usize
+    | Abstract { asize } -> write_aggregate asize
     | Array _ as a ->
       let size = sizeof a in
-      (fun ~offset { astart = { raw_ptr = src; pbyte_offset = src_offset } } dst ->
-        Raw.memcpy ~size ~dst ~dst_offset:offset ~src ~src_offset)
+      (fun ~offset { astart = { raw_ptr; pbyte_offset = src_offset } } dst ->
+        Raw.memcpy ~size ~dst ~dst_offset:offset ~src:raw_ptr ~src_offset)
     | View { write = w; ty } ->
       let writety = write ty in
       (fun ~offset v -> writety ~offset (w v))
@@ -421,7 +413,7 @@ let rec (!@) : type a. a ptr -> a
       | Struct _ -> { structured = ptr }
       | Array (elemtype, alength) ->
         { astart = { ptr with reftype = elemtype }; alength }
-      | Abstract _ -> { abstract = ptr }
+      | Abstract _ -> { structured = ptr }
       (* If it's a value type then we cons a new value. *)
       | _ -> build reftype ~offset raw_ptr
 
