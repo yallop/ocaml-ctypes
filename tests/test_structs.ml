@@ -280,6 +280,16 @@ let test_updating_sealed_struct () =
     (fun () -> styp *:* char)
 
 
+(*
+  Test that attempting to seal an empty struct is treated as an error.
+*)
+let test_sealing_empty_struct () =
+  let empty = structure "empty" in
+
+  assert_raises (Unsupported "struct with no fields")
+    (fun () -> seal empty)
+
+
 (* 
    Check that references to fields aren't garbage collected while they're
    still needed.
@@ -333,6 +343,9 @@ let suite = "Struct tests" >:::
 
    "updating sealed struct"
    >:: test_updating_sealed_struct;
+
+   "sealing empty struct"
+   >:: test_sealing_empty_struct;
 
    "field references not invalidated"
    >:: test_field_references_not_invalidated;
