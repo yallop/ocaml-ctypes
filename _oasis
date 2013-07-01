@@ -27,10 +27,10 @@ Library "ctypes-foreign"
   Path:             src/
   Findlibname:      foreign
   Findlibparent:    ctypes
-  Modules:          Dl,Foreign
+  Modules:          Dl,Foreign,Verify_struct_layout
   CSources:         dl_stubs.c
   CCOpt:            -fPIC -Wall -Wno-unused-variable -g
-  BuildDepends:     unix,ctypes
+  BuildDepends:     unix,str,ctypes
   Install:          true
 
 Library fts
