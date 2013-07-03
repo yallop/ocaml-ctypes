@@ -15,6 +15,7 @@ sig
   type 'a ctype
   external sizeof : _ ctype -> int = "ctypes_sizeof"
   external alignment : _ ctype -> int = "ctypes_alignment"
+  external passable : _ ctype -> bool = "ctypes_passable"
 
   module PtrType : Signed.S
   type voidp = PtrType.t
@@ -56,6 +57,8 @@ struct
   external sizeof : _ ctype -> int = "ctypes_sizeof"
 
   external alignment : _ ctype -> int = "ctypes_alignment"
+
+  external passable : _ ctype -> bool = "ctypes_passable"
 
   external _int_type_info : unit -> int ctype = "ctypes_int_type_info"
   let int = _int_type_info ()

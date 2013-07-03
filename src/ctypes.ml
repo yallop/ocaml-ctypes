@@ -111,7 +111,7 @@ let rec alignment : 'a. 'a typ -> int
 let rec passable : 'a. 'a typ -> bool
   = fun (type a) (t : a typ) -> match t with
       Void                           -> true
-    | Primitive _                    -> true
+    | Primitive p                    -> RawTypes.passable p
     | Struct { spec = Incomplete _ } -> raise IncompleteType
     | Struct { passable }            -> passable
     | Union { ucomplete = false }    -> raise IncompleteType

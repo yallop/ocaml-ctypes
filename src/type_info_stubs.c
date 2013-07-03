@@ -36,6 +36,7 @@
                                                                                \
   static struct type_info _ ## MUNGENAME ## _type_info = {                     \
     #MUNGENAME,                                                                \
+    PASSABLE,                                                                  \
     &FFITYPE,                                                                  \
     raw_read_ ## MUNGENAME,                                                    \
     raw_write_ ## MUNGENAME,                                                   \
@@ -111,6 +112,7 @@ static struct struct_type_info {
   ffi_type       **args;
 } _struct_type_info_prototype = {
   { "struct",
+    STRUCT,
     NULL,
     raw_read_struct,
     raw_write_struct },
@@ -240,6 +242,7 @@ static value raw_write_void(struct type_info *ti, void *buf, value cv) { return 
 
 static struct type_info _void_type_info = {
   "void",
+  UNPASSABLE,
   &ffi_type_void,
   raw_read_void,
   raw_write_void,
@@ -251,6 +254,14 @@ value ctypes_void_type_info(value unit)
   return allocate_custom(&type_info_custom_ops,
                          sizeof(struct type_info),
                          &_void_type_info);
+}
+
+
+/* passable : _ ctype -> bool */
+value ctypes_passable(value typespec)
+{
+  struct type_info *ti = (struct type_info *)Data_custom_val(typespec);
+  return Val_int(ti->passable == PASSABLE);
 }
 
 

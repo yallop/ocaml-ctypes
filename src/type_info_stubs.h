@@ -16,6 +16,7 @@
 
 struct type_info {
   const char *name;
+  enum { PASSABLE, UNPASSABLE, STRUCT } passable;
   ffi_type   *ffitype;
   value     (*raw_read)(struct type_info *, void *);
   value     (*raw_write)(struct type_info *, void *, value);
