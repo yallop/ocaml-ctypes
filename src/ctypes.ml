@@ -748,3 +748,5 @@ let nullable_view t =
 let funptr_opt fn = nullable_view (funptr fn)
 
 let ptr_opt t = nullable_view (ptr t)
+
+let string_opt = nullable_view string

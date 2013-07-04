@@ -164,6 +164,11 @@ val string : string typ
     to C.
 *)
 
+val string_opt : string option typ
+(** A high-level representation of the string type.  This behaves like {!string},
+	except that null pointers appear in OCaml as [None].
+*)
+
 (** {3 Array types} *)
 
 type 'a array
