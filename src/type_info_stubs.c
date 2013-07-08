@@ -299,22 +299,6 @@ value ctypes_passable(value typespec)
 }
 
 
-/* passable : _ ctype -> bool */
-value ctypes_passable(value typespec)
-{
-  struct type_info *ti = (struct type_info *)Data_custom_val(typespec);
-  return Val_int(ti->passable == PASSABLE);
-}
-
-
-/* passable : _ ctype -> bool */
-value ctypes_passable(value typespec)
-{
-  struct type_info *ti = (struct type_info *)Data_custom_val(typespec);
-  return Val_int(ti->passable == PASSABLE);
-}
-
-
 /* sizeof : _ ctype -> int */
 value ctypes_sizeof(value typespec)
 {
