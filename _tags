@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 56640850f6c23433eb2be17847567ce4)
+# DO NOT EDIT (digest: 0a653ac04d4d19a10409763a8889ffe9)
 # Ignore VCS directories, you can use the same kind of rule outside 
 # OASIS_START/STOP if you want to exclude directories that contains 
 # useless stuff for the build process
@@ -20,12 +20,14 @@
 "src/managed_buffer_stubs.c": oasis_library_ctypes_ccopt
 "src/type_info_stubs.c": oasis_library_ctypes_ccopt
 "src/ctypes_stubs.c": oasis_library_ctypes_ccopt
+"src/ctypes_complex_stubs.c": oasis_library_ctypes_ccopt
 "src/posix_types_stubs.c": oasis_library_ctypes_ccopt
 <src/ctypes.{cma,cmxa}>: use_libctypes_stubs
 "src/unsigned_stubs.c": pkg_unix
 "src/managed_buffer_stubs.c": pkg_unix
 "src/type_info_stubs.c": pkg_unix
 "src/ctypes_stubs.c": pkg_unix
+"src/ctypes_complex_stubs.c": pkg_unix
 "src/posix_types_stubs.c": pkg_unix
 # Library ctypes-foreign
 "src/ctypes-foreign.cmxs": use_ctypes-foreign
@@ -155,11 +157,17 @@
 <tests/test_oo_style.{native,byte}>: use_ctypes
 <tests/test_oo_style.{native,byte}>: pkg_unix
 <tests/test_oo_style.{native,byte}>: pkg_oUnit
+<tests/test_oo_style.{native,byte}>: custom
+# Executable test_ctypes_complex
+<tests/test_complex.{native,byte}>: use_ctypes-foreign
+<tests/test_complex.{native,byte}>: use_ctypes
+<tests/test_complex.{native,byte}>: pkg_unix
+<tests/test_complex.{native,byte}>: pkg_oUnit
 <tests/*.ml{,i}>: use_ctypes-foreign
 <tests/*.ml{,i}>: use_ctypes
 <tests/*.ml{,i}>: pkg_unix
 <tests/*.ml{,i}>: pkg_oUnit
-<tests/test_oo_style.{native,byte}>: custom
+<tests/test_complex.{native,byte}>: custom
 # Executable date_example
 <examples/date/date.{native,byte}>: use_ctypes-foreign
 <examples/date/date.{native,byte}>: use_ctypes

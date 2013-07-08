@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include <assert.h>
 #include <string.h>
+#include <complex.h>
 
 
 typedef int intfun(int, int);
@@ -339,4 +340,25 @@ int accepting_pointer_from_callback(pintfun2 *f)
   int q = *p;
   *p = 12;
   return q;
+}
+
+
+void add_complexd(double complex *l, double complex *r, double complex *out)
+{
+  *out = *l + *r;
+}
+
+void mul_complexd(double complex *l, double complex *r, double complex *out)
+{
+  *out = *l * *r;
+}
+
+void add_complexf(float complex *l, float complex *r, float complex *out)
+{
+  *out = *l + *r;
+}
+
+void mul_complexf(float complex *l, float complex *r, float complex *out)
+{
+  *out = *l * *r;
 }

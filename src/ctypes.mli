@@ -138,6 +138,14 @@ val float : float typ
 val double : float typ
 (** Value representing the C type [double]. *)
 
+(** {5 Complex types} *)
+
+val complex32 : Complex.t typ
+(** Value representing the C99 single-precision [float complex] type. *)
+
+val complex64 : Complex.t typ
+(** Value representing the C99 double-precision [double complex] type. *)
+
 (** {4:pointer_types Pointer types} *)
 
 type 'a ptr

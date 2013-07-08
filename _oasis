@@ -18,6 +18,7 @@ Library ctypes
                     managed_buffer_stubs.h,managed_buffer_stubs.c,
                     type_info_stubs.h,type_info_stubs.c,
                     ctypes_stubs.c,
+                    ctypes_complex_stubs.c,
                     posix_types_stubs.c
   CCOpt:            -fPIC -Wall -Wno-unused-variable -g
   BuildDepends:     unix
@@ -207,6 +208,15 @@ Executable test_ctypes_oo_style
   BuildDepends:     unix,ctypes,ctypes.foreign,oUnit
   Custom:           true
 
+Executable test_ctypes_complex
+  Path:             tests
+  MainIs:           test_complex.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     unix,ctypes,ctypes.foreign,oUnit
+  Custom:           true
+
 Executable date_example
   Path:             examples/date
   MainIs:           date.ml
@@ -296,6 +306,11 @@ Test test_foreign_values
 Test test_oo_style
   Run$:             flag(tests)
   Command:          $test_ctypes_oo_style
+  WorkingDirectory: tests
+
+Test test_complex
+  Run$:             flag(tests)
+  Command:          $test_ctypes_complex
   WorkingDirectory: tests
 
 Document ctypes

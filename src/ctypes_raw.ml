@@ -47,6 +47,8 @@ sig
   val uint : uint ctype
   val ulong : ulong ctype
   val ullong : ullong ctype
+  val complex32 : Complex.t ctype
+  val complex64 : Complex.t ctype
 end =
 struct
   open Unsigned
@@ -140,6 +142,12 @@ struct
 
   external _ullong_type_info : unit -> ullong ctype = "ctypes_ullong_type_info"
   let ullong = _ullong_type_info ()
+
+  external _complex32_type_info : unit -> Complex.t ctype = "ctypes_float_complex_type_info"
+  let complex32 = _complex32_type_info ()
+
+  external _complex64_type_info : unit -> Complex.t ctype = "ctypes_double_complex_type_info"
+  let complex64 = _complex64_type_info ()
 
   external _null : unit -> voidp = "ctypes_null_value"
   let null = _null ()

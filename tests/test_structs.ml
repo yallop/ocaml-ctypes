@@ -160,13 +160,20 @@ let test_structs_with_union_members () =
   let module M = struct
     type u and s
 
+    let complex64_eq =
+      let open Complex in
+      let eps = 1e-12 in
+      fun { re = lre; im = lim } { re = rre; im = rim } ->
+        abs_float (lre -. rre) < eps && abs_float (lim -. rim) < eps
+
     let utyp : u union typ = union "u"
     let uc = utyp +:+ char
     let ui = utyp +:+ int
-    let uf = utyp +:+ double
+    let uz = utyp +:+ complex64
     let () = seal utyp
 
     let u = make utyp
+
     let () = begin
       setf u ui 14;
       assert_equal ~msg:"u.ui = 14" ~printer:string_of_int
@@ -176,9 +183,9 @@ let test_structs_with_union_members () =
       assert_equal ~msg:"u.uc = 'x'" ~printer:(String.make 1)
         'x' (getf u uc);
 
-      setf u uf 5.55;
-      assert_equal ~msg:"u.uf = 5.5" ~printer:string_of_float
-        5.55 (getf u uf);
+      setf u uz { Complex.re = 5.55; im = -3.3 };
+      assert_equal ~msg:"u.uz = 5.55 - 3.3i" ~cmp:complex64_eq
+        { Complex.re = 5.55; im = -3.3 } (getf u uz);
     end
 
     let styp : s structure typ = structure "s"
@@ -197,8 +204,8 @@ let test_structs_with_union_members () =
       assert_equal ~msg:"s.si = 22" ~printer:string_of_int
         22 (getf s si);
       
-      assert_equal ~msg:"s.su.uc = 5.55" ~printer:string_of_float
-        5.55 (getf (getf s su) uf);
+      assert_equal ~msg:"s.su.uc = 0.0 - 3.3i" ~cmp:complex64_eq
+        { Complex.re = 5.55; im = -3.3 } (getf (getf s su) uz);
 
       assert_equal ~msg:"s.sc = 'z'" ~printer:(String.make 1)
         'z' (getf s sc);
