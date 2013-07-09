@@ -258,10 +258,15 @@ let test_atomic_printing () =
   Size_t.(assert_equal (string_of size_t _SIZE_MAX) (to_string _SIZE_MAX));
 
   (* nativeint *)
-  let retrieve_nINT_MIN = Foreign.foreign "retrieve_INT_MIN" ~from:testlib
+  let min_name, max_name = match sizeof (ptr void) with
+    | 4 -> "retrieve_INT32_MIN", "retrieve_INT32_MAX"
+    | 8 -> "retrieve_INT64_MIN", "retrieve_INT64_MAX"
+    | _ -> assert false in
+
+  let retrieve_nINT_MIN = Foreign.foreign min_name ~from:testlib
       (void @-> returning nativeint) in
   let _nINT_MIN = retrieve_nINT_MIN () in
-  let retrieve_nINT_MAX = Foreign.foreign "retrieve_INT_MAX" ~from:testlib
+  let retrieve_nINT_MAX = Foreign.foreign max_name ~from:testlib
       (void @-> returning nativeint) in
   let _nINT_MAX = retrieve_nINT_MAX () in
 
