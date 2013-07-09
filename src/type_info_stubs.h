@@ -35,6 +35,7 @@ extern value ctypes_float_type_info(value unit);
 extern value ctypes_nativeint_type_info(value unit);
 extern value ctypes_voidp_type_info(value unit);
 extern value ctypes_int_type_info(value unit);
+extern value ctypes_camlint_type_info(value unit);
 extern value ctypes_short_type_info(value unit);
 extern value ctypes_schar_type_info(value unit);
 extern value ctypes_uchar_type_info(value unit);

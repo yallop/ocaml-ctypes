@@ -51,7 +51,7 @@ let test_atomic_printing () =
     assert_typ_printed_as "long long"
       llong;
 
-    assert_typ_printed_as ~name:"d" "int d"
+    assert_typ_printed_as ~name:"d" "intnat d"
       nativeint;
 
     assert_typ_printed_as "int8_t"
