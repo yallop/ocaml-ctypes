@@ -119,6 +119,51 @@ let test_nullable_pointer_view () =
   end
 
 
+(*
+  Use a polar form view of complex numbers.
+*)
+let test_polar_form_view () =
+  let module M =
+  struct
+    open Complex
+
+    type polar = {norm: float; arg: float}
+    let pi = 4.0 *. atan 1.0
+
+    let polar_of_cartesian c = { norm = norm c; arg = arg c}
+    let cartesian_of_polar { norm; arg } = polar norm arg
+
+    let polar64 = view complex64
+      ~read:polar_of_cartesian
+      ~write:cartesian_of_polar 
+
+    let eps = 1e-9
+
+    let complex64_eq { re = lre; im = lim } { re = rre; im = rim } =
+      abs_float (lre -. rre) < eps && abs_float (lim -. rim) < eps
+
+    let polar64_eq { norm = lnorm; arg = larg } { norm = rnorm; arg = rarg } =
+      abs_float (lnorm -. rnorm) < eps && abs_float (larg -. rarg) < eps
+
+    let polp = allocate polar64 { norm = 0.0; arg = 0.0 }
+    let carp = from_voidp complex64 (to_voidp polp)
+
+    let () = begin
+      assert_equal !@polp { norm = 0.0; arg = 0.0 } ~cmp:polar64_eq;
+      assert_equal !@carp { re = 0.0; im = 0.0 } ~cmp:complex64_eq;
+      
+      carp <-@ { re = 1.0; im = 0.0 };
+      assert_equal !@polp { norm = 1.0; arg = 0.0 } ~cmp:polar64_eq;
+
+      carp <-@ { re = 0.0; im = 2.5 };
+      assert_equal !@polp { norm = 2.5; arg = pi /. 2. } ~cmp:polar64_eq;
+
+      polp <-@ { norm = 4.1e5; arg = pi *. 1.5 };
+      assert_equal !@carp { re = 0.0; im = -4.1e5 } ~cmp:complex64_eq;
+    end
+  end in ()
+
+
 let suite = "View tests" >:::
   ["passing array of strings"
    >:: test_passing_string_array;
@@ -131,6 +176,9 @@ let suite = "View tests" >:::
 
    "nullable pointers"
    >:: test_nullable_pointer_view;
+
+   "polar form view"
+   >:: test_polar_form_view;
   ]
 
 

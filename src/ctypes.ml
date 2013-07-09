@@ -107,7 +107,7 @@ let rec alignment : type a. a typ -> int = function
 
 let rec passable : type a. a typ -> bool = function
     Void                           -> true
-  | Primitive _                    -> true
+  | Primitive p                    -> RawTypes.passable p
   | Struct { spec = Incomplete _ } -> raise IncompleteType
   | Struct { passable }            -> passable
   | Union { ucomplete = false }    -> raise IncompleteType
@@ -666,6 +666,8 @@ let char = Primitive RawTypes.char
 let schar = Primitive RawTypes.schar
 let float = Primitive RawTypes.float
 let double = Primitive RawTypes.double
+let complex32 = Primitive RawTypes.complex32
+let complex64 = Primitive RawTypes.complex64
 let short = Primitive RawTypes.short
 let int = Primitive RawTypes.int
 let long = Primitive RawTypes.long

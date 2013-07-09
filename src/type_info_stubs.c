@@ -46,7 +46,8 @@
   }                                                                            \
                                                                                \
   static struct type_info _ ## MUNGENAME ## _type_info = {                     \
-    #CTYPE ,                                                                   \
+    #CTYPE,                                                                    \
+    PASSABLE,                                                                  \
     &FFITYPE,                                                                  \
     raw_read_ ## MUNGENAME,                                                    \
     raw_write_ ## MUNGENAME,                                                   \
@@ -55,9 +56,7 @@
                                                                                \
   value ctypes_ ## MUNGENAME ## _type_info(value unit)                         \
   {                                                                            \
-    return allocate_custom(&type_info_custom_ops,                              \
-                            sizeof(struct type_info),                          \
-                            &_ ## MUNGENAME ## _type_info);                    \
+    return ctypes_allocate_type_info(&_ ## MUNGENAME ## _type_info);           \
   }                                                                            \
 
 
@@ -69,7 +68,6 @@ static value allocate_custom(struct custom_operations *ops, size_t size,
   memcpy(Data_custom_val(block), prototype, size);
   return block;
 }
-
 
 static value raw_read_struct(struct type_info * ti, void *buf)
 {
@@ -124,11 +122,18 @@ static struct custom_operations type_info_custom_ops = {
 };
 
 
+value ctypes_allocate_type_info(struct type_info *ti)
+{
+  return allocate_custom(&type_info_custom_ops, sizeof *ti, ti);
+}
+
+
 static struct struct_type_info {
   struct type_info type_info;
   ffi_type       **args;
 } _struct_type_info_prototype = {
   { "struct",
+    STRUCT,
     NULL,
     raw_read_struct,
     raw_write_struct,
@@ -272,6 +277,7 @@ static value format_void(struct type_info *ti, value cv) { return caml_copy_stri
 
 static struct type_info _void_type_info = {
   "void",
+  UNPASSABLE,
   &ffi_type_void,
   raw_read_void,
   raw_write_void,
@@ -281,9 +287,15 @@ static struct type_info _void_type_info = {
 
 value ctypes_void_type_info(value unit)
 {
-  return allocate_custom(&type_info_custom_ops,
-                         sizeof(struct type_info),
-                         &_void_type_info);
+  return ctypes_allocate_type_info(&_void_type_info);
+}
+
+
+/* passable : _ ctype -> bool */
+value ctypes_passable(value typespec)
+{
+  struct type_info *ti = (struct type_info *)Data_custom_val(typespec);
+  return Val_int(ti->passable == PASSABLE);
 }
 
 

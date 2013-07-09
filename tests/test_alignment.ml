@@ -45,6 +45,12 @@ let test_primitive_alignment () = begin
 
   assert_equal ~msg:"alignmentof(int64_t) == alignmentof(uint64_t)"
     (alignment int64_t) (alignment uint64_t);
+
+  assert_equal ~msg:"alignmentof(complex32) == alignmentof(float)"
+    (alignment complex32) (alignment float);
+
+  assert_equal ~msg:"alignmentof(complex64) == alignmentof(double)"
+    (alignment complex64) (alignment double);
 end
 
 

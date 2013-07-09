@@ -14,6 +14,7 @@
 #include <float.h>
 #include <assert.h>
 #include <string.h>
+#include <complex.h>
 
 
 typedef int intfun(int, int);
@@ -378,3 +379,23 @@ float retrieve_FLT_MIN(void) { return FLT_MIN; }
 float retrieve_FLT_MAX(void) { return FLT_MAX; }
 double retrieve_DBL_MIN(void) { return DBL_MIN; }
 double retrieve_DBL_MAX(void) { return DBL_MAX; }
+
+void add_complexd(double complex *l, double complex *r, double complex *out)
+{
+  *out = *l + *r;
+}
+
+void mul_complexd(double complex *l, double complex *r, double complex *out)
+{
+  *out = *l * *r;
+}
+
+void add_complexf(float complex *l, float complex *r, float complex *out)
+{
+  *out = *l + *r;
+}
+
+void mul_complexf(float complex *l, float complex *r, float complex *out)
+{
+  *out = *l * *r;
+}

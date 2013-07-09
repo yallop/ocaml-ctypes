@@ -64,6 +64,27 @@ let test_unions_are_not_passable () =
 
 
 (*
+  Test that complex values are not passable
+*)
+let test_complex_values_are_not_passable () =
+  assert_raises ~msg:"complex32 type rejected as argument"
+    (Unsupported "Unsupported argument type")
+    (fun () -> complex32 @-> returning void);
+
+  assert_raises ~msg:"complex64 type rejected as argument"
+    (Unsupported "Unsupported argument type")
+    (fun () -> complex64 @-> returning void);
+  
+  assert_raises ~msg:"complex32 type rejected as return type"
+    (Unsupported "Unsupported return type")
+    (fun () -> void @-> returning complex32);
+
+  assert_raises ~msg:"complex64 type rejected as return type"
+    (Unsupported "Unsupported return type")
+    (fun () -> void @-> returning complex64)
+
+
+(*
   Test that arrays are not passable
 *)
 let test_arrays_are_not_passable () =
@@ -252,6 +273,9 @@ let suite = "Passability tests" >:::
 
    "unions are not passable"
     >:: test_unions_are_not_passable;
+
+   "complex values are not passable"
+    >:: test_complex_values_are_not_passable;
 
    "arrays are not passable"
     >:: test_arrays_are_not_passable;

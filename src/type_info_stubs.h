@@ -16,6 +16,7 @@
 
 struct type_info {
   const char *name;
+  enum { PASSABLE, UNPASSABLE, STRUCT } passable;
   ffi_type   *ffitype;
   value     (*raw_read)(struct type_info *, void *);
   value     (*raw_write)(struct type_info *, void *, value);
@@ -24,6 +25,9 @@ struct type_info {
 
 /* allocate_struct_type_info : ffitype*** -> _ ctype */
 value ctypes_allocate_struct_type_info(ffi_type ***args);
+
+/* allocate_type_info : struct type_info* -> _ ctype */
+value ctypes_allocate_type_info(struct type_info *ti);
 
 /* X_type_info : unit -> _ ctype */
 extern value ctypes_int8_t_type_info(value unit);
