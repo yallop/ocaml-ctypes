@@ -202,6 +202,17 @@ make_primitive_interface(ctypes_copy_uint32, Uint32_val, uint32_t, uint32_t, ffi
 make_primitive_interface(ctypes_copy_uint64, Uint64_val, uint64_t, uint64_t, ffi_type_uint64, "%" PRIu64)
 make_primitive_interface(ctypes_copy_uint8, Uint8_val, unsigned char, uchar, ffi_type_uchar, "%d")
 
+/* We need a pointer-sized integer type.  SIZEOF_PTR is from caml/config.h. */
+#if SIZEOF_PTR == 4
+#define ctypes_ffi_type_camlint ffi_type_sint32
+#elif SIZEOF_PTR == 8
+#define ctypes_ffi_type_camlint ffi_type_sint64
+#else
+#error "No suitable pointer-sized integer type available"
+#endif
+make_primitive_interface(Val_int, Int_val, intnat, camlint, ctypes_ffi_type_camlint,
+                         "%" ARCH_INTNAT_PRINTF_FORMAT "d")
+
 /* short is at least 16 bits. */
 #if USHRT_MAX == 65535U
   make_primitive_interface(ctypes_copy_uint16, Uint16_val, unsigned short, ushort, ffi_type_uint16, "%hu")

@@ -31,6 +31,7 @@ sig
   val double : float ctype
   val short : int ctype
   val int : int ctype
+  val camlint : int ctype
   val long : long ctype
   val llong : llong ctype
   val nativeint : nativeint ctype
@@ -62,6 +63,9 @@ struct
 
   external _int_type_info : unit -> int ctype = "ctypes_int_type_info"
   let int = _int_type_info ()
+
+  external _camlint_type_info : unit -> int ctype = "ctypes_camlint_type_info"
+  let camlint = _camlint_type_info ()
 
   external _long_type_info : unit -> long ctype = "ctypes_long_type_info"
   let long = _long_type_info ()
