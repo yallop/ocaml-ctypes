@@ -296,6 +296,15 @@ Executable test_stubs
   BuildDepends:     unix,ctypes,ctypes.foreign,oUnit
   Custom:           true
 
+Executable test_ctypes_bigarrays
+  Path:             tests
+  MainIs:           test_bigarrays.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     unix,ctypes,ctypes.foreign,oUnit
+  Custom:           true
+
 Executable date_example
   Path:             examples/date
   MainIs:           date.ml
@@ -415,6 +424,11 @@ Test test_complex
 Test test_callback_lifetime
   Run$:             flag(tests)
   Command:          $test_ctypes_callback_lifetime
+  WorkingDirectory: tests
+
+Test test_bigarrays
+  Run$:             flag(tests)
+  Command:          $test_ctypes_bigarrays
   WorkingDirectory: tests
 
 Document ctypes

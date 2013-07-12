@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 34af07ae2fc070b198df9ce347e07e73)
+# DO NOT EDIT (digest: 67380628ed4c80a037c1317628c355a5)
 # Ignore VCS directories, you can use the same kind of rule outside 
 # OASIS_START/STOP if you want to exclude directories that contains 
 # useless stuff for the build process
@@ -274,13 +274,21 @@
 <tests/test_stubs.{native,byte}>: pkg_oUnit
 <tests/test_stubs.{native,byte}>: pkg_threads
 <tests/test_stubs.{native,byte}>: pkg_bigarray
+<tests/test_stubs.{native,byte}>: custom
+# Executable test_ctypes_bigarrays
+<tests/test_bigarrays.{native,byte}>: use_ctypes-foreign
+<tests/test_bigarrays.{native,byte}>: use_ctypes
+<tests/test_bigarrays.{native,byte}>: pkg_unix
+<tests/test_bigarrays.{native,byte}>: pkg_oUnit
+<tests/test_bigarrays.{native,byte}>: pkg_threads
+<tests/test_bigarrays.{native,byte}>: pkg_bigarray
 <tests/*.ml{,i}>: use_ctypes-foreign
 <tests/*.ml{,i}>: use_ctypes
 <tests/*.ml{,i}>: pkg_unix
 <tests/*.ml{,i}>: pkg_oUnit
 <tests/*.ml{,i}>: pkg_threads
 <tests/*.ml{,i}>: pkg_bigarray
-<tests/test_stubs.{native,byte}>: custom
+<tests/test_bigarrays.{native,byte}>: custom
 # Executable date_example
 <examples/date/date.{native,byte}>: use_ctypes-foreign
 <examples/date/date.{native,byte}>: use_ctypes
