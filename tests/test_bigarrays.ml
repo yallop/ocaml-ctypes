@@ -380,6 +380,90 @@ let test_returning_bigarrays () =
                    [ 1.;  2.;  3.; 4.; 5.]])))
 
 
+(*
+  Test that bigarrays are not collected while there's a ctypes pointer pointing
+  into them.
+*)
+let test_bigarray_lifetime_with_ctypes_reference () =
+  let state = ref `Not_safe_to_collect in
+  let finalise ba =
+    begin
+      assert_equal `Safe_to_collect !state;
+      assert_equal 1 ba.{0, 0};
+      state := `Collected;
+    end
+  in
+  let () =
+    let pointer =
+      (* Allocate a bigarray and attach a ctypes pointer *)
+      let ba = Bigarray.(Array2.create int c_layout) 1024 1024 in
+      begin
+        ba.{0,0} <- 1;
+        Gc.finalise finalise ba;
+        bigarray_start array2 ba
+      end
+    in
+    (* The bigarray is out of scope, but the ctypes object is still live, so
+       the memory shouldn't be reclaimed. *)
+    begin
+      Gc.major ();
+      Gc.major ();
+      assert_equal !state `Not_safe_to_collect;
+      assert_equal 1 !@pointer;
+    end
+  in
+  (* Both the bigarray and the ctypes object are unreachable, so the finaliser
+     should (or, at least, could) run. *)
+  begin
+    state := `Safe_to_collect;
+    Gc.major ();
+    Gc.major ();
+    assert_equal !state `Collected
+  end
+
+
+(*
+  Test that ctypes-allocated memory is not collected while there's a bigarray
+  associated with it.
+*)
+let test_ctypes_memory_lifetime_with_bigarray_reference () =
+  let state = ref `Not_safe_to_collect in
+  let finalise a =
+    begin
+      assert_equal `Safe_to_collect !state;
+      assert_equal [1L; 2L; 3L; 4L; 5L] (Array.to_list a);
+      state := `Collected
+    end
+  in
+  let () =
+    (* Allocate a chunk of ctypes-managed memory, and view it as a bigarray *)
+    let ba =
+      let a = Array.make ~finalise int64_t 5 in
+      begin
+        for i = 0 to 4 do a.(i) <- Int64.(add (of_int i) one) done;
+        bigarray_of_array array1 BA.int64 a
+      end
+    in
+    (* The ctypes object is out of scope, but the bigarray is still live, so
+       the memory shouldn't be reclaimed. *)
+    begin
+      Gc.major ();
+      Gc.major ();
+      assert_equal !state `Not_safe_to_collect;
+      assert_equal ba.{0} 1L;
+      assert_equal ba.{3} 4L;
+    end
+  in
+  (* Both the ctypes object and the bigarray are unreachable, so the finaliser
+     should (or, at least, could) run. *)
+  begin
+    state := `Safe_to_collect;
+    Gc.major ();
+    Gc.major ();
+    assert_equal !state `Collected
+  end
+
+
 let suite = "Bigarray tests" >:::
   [
     "View ctypes-managed memory using bigarrays"
@@ -387,6 +471,12 @@ let suite = "Bigarray tests" >:::
 
     "View bigarray-managed memory using ctypes"
     >:: test_ctypes_array_of_bigarray;
+
+    "Bigarrays live at least as long as ctypes references to them"
+    >:: test_bigarray_lifetime_with_ctypes_reference;
+
+    "Ctypes-allocated memory lives while there's a bigarray reference to it"
+    >:: test_ctypes_memory_lifetime_with_bigarray_reference;
 
     "Passing bigarrays to C"
     >:: test_passing_bigarrays;
