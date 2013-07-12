@@ -29,6 +29,7 @@ let array_of_list3 typ list3 =
 
 let castp typ p = from_voidp typ (to_voidp p)
 
+
 (*
   View ctypes-managed memory through a bigarray lens.
 *)
@@ -148,10 +149,178 @@ let test_bigarray_of_ctypes_array () =
   ()
 
 
+(*
+  View bigarray-managed memory through a ctypes lens
+*)
+let test_ctypes_array_of_bigarray () =
+
+  (* One-dimensional Genarrays *)
+  let b1_dim = 6 in
+  let b1 = BA.(Genarray.create float32 c_layout) [| b1_dim |] in
+  let a1 = array_of_bigarray genarray b1 in
+  begin
+    assert_equal (BA.Genarray.nth_dim b1 0) (Array.length a1);
+
+    List.iteri (fun i -> BA.Genarray.set b1 [| i |])
+      [ 6.; 5.; 4.; 3.; 2.; 1. ];
+    
+    for i = 0 to b1_dim - 1 do
+      assert_equal (BA.Genarray.get b1 [| i |]) a1.(i)
+    done
+  end;
+
+  (* Array1 *)
+  let b2_dim = 7 in
+  let b2 = BA.(Array1.create int8_unsigned c_layout) b2_dim in
+  let a2 = array_of_bigarray array1 b2 in
+  begin
+    assert_equal (BA.Array1.dim b2) (Array.length a2);
+
+    List.iteri (fun i ->
+      fun v -> b2.{i} <- v)
+      [ 2; 4; 6; 8; 10; 12; 14 ];
+    
+    for i = 0 to b2_dim - 1 do
+      assert_equal b2.{i} a2.(i)
+    done
+  end;
+
+  (* Two-dimensional Genarrays *)
+  let b3_dim1 = 4 and b3_dim2 = 2 in
+  let b3 = BA.(Genarray.create int16_signed c_layout) [| b3_dim1; b3_dim2 |] in
+  let a3 = Array.from_ptr
+    (castp (array b3_dim2 int16_t) (bigarray_start genarray b3))
+    b3_dim1 in
+  begin
+    assert_equal (BA.Genarray.nth_dim b3 0) (Array.length a3);
+    assert_equal (BA.Genarray.nth_dim b3 1) (Array.length a3.(0));
+
+    List.iteri (fun i ->
+      List.iteri (fun j ->
+        BA.Genarray.set b3 [| i; j |]))
+      [[-1; -2];
+       [-3; -4];
+       [-5; -6];
+       [-7; -8]];
+
+    for i = 0 to b3_dim1 - 1 do
+      for j = 0 to b3_dim2 - 1 do
+        assert_equal (BA.Genarray.get b3 [| i; j |]) a3.(i).(j)
+      done
+    done
+  end;
+
+  (* Array2 *)
+  let b4_dim1 = 3 and b4_dim2 = 4 in
+  let b4 = BA.(Array2.create int32 c_layout) b4_dim1 b4_dim2 in
+  let a4 = array_of_bigarray array2 b4 in
+  begin
+    assert_equal (BA.Array2.dim1 b4) (Array.length a4);
+    assert_equal (BA.Array2.dim2 b4) (Array.length a4.(0));
+
+    List.iteri (fun i ->
+      List.iteri (fun j ->
+        fun v -> b4.{i, j} <- v))
+      [[17l; 15l; 13l; 11l];
+       [9l; 7l; 5l; 3l];
+       [1l; -1l; -3l; -5l]];
+
+    for i = 0 to b4_dim1 - 1 do
+      for j = 0 to b4_dim2 - 1 do
+        assert_equal b4.{i, j} a4.(i).(j)
+      done
+    done
+  end;
+
+  (* Three-dimensional Genarrays *)
+  let b5_dim1 = 4 and b5_dim2 = 2 and b5_dim3 = 5 in
+  let b5 = BA.(Genarray.create int c_layout) [| b5_dim1; b5_dim2; b5_dim3 |] in
+  let a5 = Array.from_ptr
+    (castp (array b5_dim2 (array b5_dim3 camlint)) (bigarray_start genarray b5))
+    b5_dim1 in
+  begin
+    assert_equal
+      (BA.Genarray.nth_dim b5 0) (Array.length a5);
+    assert_equal
+      (BA.Genarray.nth_dim b5 1) (Array.length a5.(0));
+    assert_equal
+      (BA.Genarray.nth_dim b5 2) (Array.length a5.(0).(0));
+
+    List.iteri (fun i ->
+      List.iteri (fun j ->
+        List.iteri (fun k ->
+          BA.Genarray.set b5 [| i; j; k |])))
+      [[[1; 2; 3; 4; 5];
+        [6; 7; 8; 9; 10]];
+       [[11; 12; 13; 14; 15];
+        [16; 17; 18; 19; 20]];
+       [[21; 22; 23; 24; 25];
+        [26; 27; 28; 29; 30]];
+       [[31; 32; 33; 34; 35];
+        [36; 37; 38; 39; 40]]];
+
+    for i = 0 to b5_dim1 - 1 do
+      for j = 0 to b5_dim2 - 1 do
+        for k = 0 to b5_dim3 - 1 do
+          assert_equal
+            (BA.Genarray.get b5 [| i; j; k |]) a5.(i).(j).(k)
+        done
+      done
+    done
+  end;
+
+  (* Array3 *)
+  let eps64 = 1e-12 in
+  let complex64_eq =
+    let open Complex in
+    fun { re = lre; im = lim } { re = rre; im = rim } ->
+      abs_float (lre -. rre) < eps64 && abs_float (lim -. rim) < eps64 in
+  let b6_dim1 = 3 and b6_dim2 = 4 and b6_dim3 = 2 in
+  let b6 = BA.(Array3.create complex64 c_layout) b6_dim1 b6_dim2 b6_dim3 in
+  let a6 = array_of_bigarray array3 b6 in
+  begin
+    assert_equal (BA.Array3.dim1 b6) (Array.length a6);
+    assert_equal (BA.Array3.dim2 b6) (Array.length a6.(0));
+    assert_equal (BA.Array3.dim3 b6) (Array.length a6.(0).(0));
+
+    let open Complex in
+    List.iteri (fun i ->
+      List.iteri (fun j  ->
+        List.iteri (fun k ->
+          fun v -> b6.{i, j, k} <- v)))
+        [[[{re = 1.; im = 10.}; {re = 1e2; im = 0.0}];
+          [{re = 2.; im = 20.}; {re = 2e2; im = 0.0}];
+          [{re = 3.; im = 30.}; {re = 3e2; im = 0.0}];
+          [{re = 4.; im = 40.}; {re = 4e2; im = 0.0}]];
+         
+         [[{re = 5.; im = 50.}; {re = 5e2; im = 0.1}];
+          [{re = 6.; im = 60.}; {re = 6e2; im = 0.1}];
+          [{re = 7.; im = 70.}; {re = 7e2; im = 0.1}];
+          [{re = 8.; im = 80.}; {re = 8e2; im = 0.1}]];
+         
+         [[{re = 9.; im = 90.}; {re = 9e2; im = 0.2}];
+          [{re = 10.; im = 100.}; {re = 1e3; im = 0.2}];
+          [{re = 11.; im = 110.}; {re = 1.1e3; im = 0.2}];
+          [{re = 12.; im = 120.}; {re = 1.2e3; im = 0.2}]]];
+
+    for i = 0 to b6_dim1 - 1 do
+      for j = 0 to b6_dim2 - 1 do
+        for k = 0 to b6_dim3 - 1 do
+          assert_equal b6.{i, j, k} a6.(i).(j).(k)
+            ~cmp:complex64_eq
+        done
+      done
+    done
+  end
+
+
 let suite = "Bigarray tests" >:::
   [
     "View ctypes-managed memory using bigarrays"
     >:: test_bigarray_of_ctypes_array;
+
+    "View bigarray-managed memory using ctypes"
+    >:: test_ctypes_array_of_bigarray;
   ]
 
 
