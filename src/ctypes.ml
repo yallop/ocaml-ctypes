@@ -30,9 +30,9 @@ type _ typ =
   | Pointer         : 'a typ            -> 'a ptr typ
   | Struct          : 'a structure_type -> 'a structure typ
   | Union           : 'a union_type     -> 'a union typ
-  | Array           : 'a typ * int      -> 'a array typ
   | Abstract        : abstract_type     -> 'a abstract typ
   | View            : ('a, 'b) view     -> 'a typ
+  | Array           : 'a typ * int      -> 'a array typ
   | FunctionPointer : string option * ('a -> 'b) fn
                                         -> ('a -> 'b) typ
 and _ fn =
@@ -47,7 +47,7 @@ and 'a array = { astart : 'a ptr; alength : int }
 and ('a, 'kind) structured = { structured : ('a, 'kind) structured ptr }
 and 'a union = ('a, [`Union]) structured
 and 'a structure = ('a, [`Struct]) structured
-and 'a abstract = { abstract : 'a abstract ptr }
+and 'a abstract = ('a, [`Abstract]) structured
 and ('a, 'b) view = { read : 'b -> 'a; write : 'a -> 'b; ty: 'b typ }
 and ('a, 's) field = { ftype: 'a typ; foffset: int }
 and 'a structure_type = {
@@ -252,6 +252,7 @@ let string_of format v =
 let string_of_typ ?name ty = string_of (format_typ ?name) ty
 let string_of_fn ?name fn = string_of (format_fn ?name) fn
 
+
 (*
   call addr callspec
    (fun buffer ->
@@ -342,11 +343,12 @@ and build : type a. a typ -> offset:int -> Raw.raw_pointer -> a
     | Abstract _ -> assert false
 
 and write : type a. a typ -> offset:int -> a -> Raw.raw_pointer -> unit
-  = function
-    | Void ->
-      (fun ~offset _ _ -> ())
-    | Primitive p ->
-      Raw.write p
+  = let write_aggregate size =
+      (fun ~offset { structured = { raw_ptr; pbyte_offset = src_offset } } dst ->
+        Raw.memcpy ~size ~dst ~dst_offset:offset ~src:raw_ptr ~src_offset) in
+    function
+    | Void -> (fun ~offset _ _ -> ())
+    | Primitive p -> Raw.write p
     | Pointer _ ->
       (fun ~offset { raw_ptr; pbyte_offset } ->
         Raw.write RawTypes.pointer ~offset
@@ -357,24 +359,15 @@ and write : type a. a typ -> offset:int -> a -> Raw.raw_pointer -> unit
       (fun ~offset f ->
         Raw.write RawTypes.pointer ~offset
           (Raw.make_function_pointer cs' (cs f)))
-    | Struct { spec = Incomplete _ } ->
-      raise IncompleteType
-    | Struct { spec = Complete _ } as s ->
-      let size = sizeof s in
-      (fun ~offset { structured = { raw_ptr; pbyte_offset = src_offset } } dst ->
-        Raw.memcpy ~size ~dst ~dst_offset:offset ~src:raw_ptr ~src_offset)
-    | Union { ucomplete=false } ->
-      raise IncompleteType
-    | Union { usize = size } ->
-      (fun ~offset { structured = { raw_ptr = src; pbyte_offset = src_offset } } dst ->
-        Raw.memcpy ~size ~dst ~dst_offset:offset ~src ~src_offset)
-    | Abstract { asize = size } ->
-      (fun ~offset { abstract = { raw_ptr = src; pbyte_offset = src_offset } } dst ->
-        Raw.memcpy ~size ~dst ~dst_offset:offset ~src ~src_offset)
+    | Struct { spec = Incomplete _ } -> raise IncompleteType
+    | Struct { spec = Complete _ } as s -> write_aggregate (sizeof s)
+    | Union { ucomplete=false } -> raise IncompleteType
+    | Union { usize } -> write_aggregate usize
+    | Abstract { asize } -> write_aggregate asize
     | Array _ as a ->
       let size = sizeof a in
-      (fun ~offset { astart = { raw_ptr = src; pbyte_offset = src_offset } } dst ->
-        Raw.memcpy ~size ~dst ~dst_offset:offset ~src ~src_offset)
+      (fun ~offset { astart = { raw_ptr; pbyte_offset = src_offset } } dst ->
+        Raw.memcpy ~size ~dst ~dst_offset:offset ~src:raw_ptr ~src_offset)
     | View { write = w; ty } ->
       let writety = write ty in
       (fun ~offset v -> writety ~offset (w v))
@@ -420,7 +413,7 @@ let rec (!@) : type a. a ptr -> a
       | Struct _ -> { structured = ptr }
       | Array (elemtype, alength) ->
         { astart = { ptr with reftype = elemtype }; alength }
-      | Abstract _ -> { abstract = ptr }
+      | Abstract _ -> { structured = ptr }
       (* If it's a value type then we cons a new value. *)
       | _ -> build reftype ~offset raw_ptr
 
@@ -450,16 +443,23 @@ let from_voidp : type a. a typ -> unit ptr -> a ptr
 let to_voidp : type a. a ptr -> unit ptr
   = fun p -> { p with reftype = Void }
 
-let allocate_n : type a. a typ -> count:int -> a ptr
-  = fun reftype ~count ->
-    let pmanaged = Raw.allocate (count * sizeof reftype) in
-    { reftype; pbyte_offset = 0;
-      raw_ptr = Raw.block_address pmanaged;
-      pmanaged = Some pmanaged }
+let allocate_n : type a. ?finalise:(a ptr -> unit) -> a typ -> count:int -> a ptr
+  = fun ?finalise reftype ~count ->
+    let package p =
+      { reftype; pbyte_offset = 0; raw_ptr = Raw.block_address p;
+        pmanaged = Some p } in
+    let finalise = match finalise with
+      | Some f -> Gc.finalise (fun p -> f (package p))
+      | None -> ignore
+    in
+    let p = Raw.allocate (count * sizeof reftype) in begin
+      finalise p;
+      package p
+    end
 
-let allocate : type a. a typ -> a -> a ptr
-  = fun reftype v ->
-    let p = allocate_n ~count:1 reftype in begin
+let allocate : type a. ?finalise:(a ptr -> unit) -> a typ -> a -> a ptr
+  = fun ?finalise reftype v ->
+    let p = allocate_n ?finalise ~count:1 reftype in begin
       p <-@ v;
       p
     end
@@ -499,9 +499,13 @@ struct
   let fill ({ alength } as arr) v =
     for i = 0 to alength - 1 do unsafe_set arr i v done
 
-  let make : type a. a typ -> ?initial:a -> int -> a t
-    = fun reftype ?initial count ->
-      let arr = { astart = allocate_n ~count reftype;
+  let make : type a. ?finalise:(a t -> unit) -> a typ -> ?initial:a -> int -> a t
+    = fun ?finalise reftype ?initial count ->
+      let finalise = match finalise with
+        | Some f -> Some (fun astart -> f { astart; alength = count } )
+        | None -> None
+      in
+      let arr = { astart = allocate_n ?finalise ~count reftype;
                   alength = count } in
       match initial with
         | None -> arr
@@ -522,7 +526,11 @@ struct
     !l
 end
 
-let make s = { structured = allocate_n s ~count:1 }
+let make ?finalise s =
+  let finalise = match finalise with
+    | Some f -> Some (fun structured -> f { structured })
+    | None -> None in
+  { structured = allocate_n ?finalise s ~count:1 }
 let (|->) p { ftype = reftype; foffset } =
   { p with reftype; pbyte_offset = p.pbyte_offset + foffset }
 let (@.) { structured = p } f = p |-> f
@@ -677,6 +685,7 @@ let int8_t = Primitive RawTypes.int8_t
 let int16_t = Primitive RawTypes.int16_t
 let int32_t = Primitive RawTypes.int32_t
 let int64_t = Primitive RawTypes.int64_t
+let camlint = Primitive RawTypes.camlint
 let uchar = Primitive RawTypes.uchar
 let uint8_t = Primitive RawTypes.uint8_t
 let uint16_t = Primitive RawTypes.uint16_t

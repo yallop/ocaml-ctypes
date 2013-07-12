@@ -118,6 +118,15 @@ Executable test_ctypes_structs
   BuildDepends:     unix,ctypes,ctypes.foreign,oUnit
   Custom:           true
 
+Executable test_ctypes_finalisers
+  Path:             tests
+  MainIs:           test_finalisers.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     unix,ctypes,ctypes.foreign,oUnit
+  Custom:           true
+
 Executable test_ctypes_cstdlib
   Path:             tests
   MainIs:           test_cstdlib.ml
@@ -278,6 +287,11 @@ Test test_ctypes_higher_order
 Test test_ctypes_structs
   Run$:             flag(tests)
   Command:          $test_ctypes_structs
+  WorkingDirectory: tests
+
+Test test_ctypes_finalisers
+  Run$:             flag(tests)
+  Command:          $test_ctypes_finalisers
   WorkingDirectory: tests
 
 Test test_ctypes_cstdlib
