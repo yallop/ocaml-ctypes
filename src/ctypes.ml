@@ -443,16 +443,23 @@ let from_voidp : type a. a typ -> unit ptr -> a ptr
 let to_voidp : type a. a ptr -> unit ptr
   = fun p -> { p with reftype = Void }
 
-let allocate_n : type a. a typ -> count:int -> a ptr
-  = fun reftype ~count ->
-    let pmanaged = Raw.allocate (count * sizeof reftype) in
-    { reftype; pbyte_offset = 0;
-      raw_ptr = Raw.block_address pmanaged;
-      pmanaged = Some pmanaged }
+let allocate_n : type a. ?finalise:(a ptr -> unit) -> a typ -> count:int -> a ptr
+  = fun ?finalise reftype ~count ->
+    let package p =
+      { reftype; pbyte_offset = 0; raw_ptr = Raw.block_address p;
+        pmanaged = Some p } in
+    let finalise = match finalise with
+      | Some f -> Gc.finalise (fun p -> f (package p))
+      | None -> ignore
+    in
+    let p = Raw.allocate (count * sizeof reftype) in begin
+      finalise p;
+      package p
+    end
 
-let allocate : type a. a typ -> a -> a ptr
-  = fun reftype v ->
-    let p = allocate_n ~count:1 reftype in begin
+let allocate : type a. ?finalise:(a ptr -> unit) -> a typ -> a -> a ptr
+  = fun ?finalise reftype v ->
+    let p = allocate_n ?finalise ~count:1 reftype in begin
       p <-@ v;
       p
     end
@@ -492,9 +499,13 @@ struct
   let fill ({ alength } as arr) v =
     for i = 0 to alength - 1 do unsafe_set arr i v done
 
-  let make : type a. a typ -> ?initial:a -> int -> a t
-    = fun reftype ?initial count ->
-      let arr = { astart = allocate_n ~count reftype;
+  let make : type a. ?finalise:(a t -> unit) -> a typ -> ?initial:a -> int -> a t
+    = fun ?finalise reftype ?initial count ->
+      let finalise = match finalise with
+        | Some f -> Some (fun astart -> f { astart; alength = count } )
+        | None -> None
+      in
+      let arr = { astart = allocate_n ?finalise ~count reftype;
                   alength = count } in
       match initial with
         | None -> arr
@@ -515,7 +526,11 @@ struct
     !l
 end
 
-let make s = { structured = allocate_n s ~count:1 }
+let make ?finalise s =
+  let finalise = match finalise with
+    | Some f -> Some (fun structured -> f { structured })
+    | None -> None in
+  { structured = allocate_n ?finalise s ~count:1 }
 let (|->) p { ftype = reftype; foffset } =
   { p with reftype; pbyte_offset = p.pbyte_offset + foffset }
 let (@.) { structured = p } f = p |-> f

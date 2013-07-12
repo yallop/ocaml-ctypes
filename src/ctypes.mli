@@ -399,13 +399,15 @@ val from_voidp : 'a typ -> unit ptr -> 'a ptr
 val to_voidp : _ ptr -> unit ptr
 (** Conversion to [void *]. *)
 
-val allocate : 'a typ -> 'a -> 'a ptr
-(** [allocate t v] allocates a fresh value of type [t], initialises it with [v]
-      and returns its address. *)
+val allocate : ?finalise:('a ptr -> unit) -> 'a typ -> 'a -> 'a ptr
+(** [allocate t v] allocates a fresh value of type [t], initialises it with
+    [v] and returns its address.  The argument [?finalise], if present, will be
+    called just before the memory is freed.  *)
 
-val allocate_n : 'a typ -> count:int -> 'a ptr
-(** [allocate_n t ~count:n] allocates a fresh array with element type [t]
-    and length [n], and returns its address. *)
+val allocate_n : ?finalise:('a ptr -> unit) -> 'a typ -> count:int -> 'a ptr
+(** [allocate_n t ~count:n] allocates a fresh array with element type [t] and
+    length [n], and returns its address.  The argument [?finalise], if present,
+    will be called just before the memory is freed.  *)
 
 val ptr_compare : 'a ptr -> 'a ptr -> int
 (** If [p] and [q] are pointers to elements [i] and [j] of the same array then
@@ -470,10 +472,11 @@ sig
   (** [from_ptr p n] creates an [n]-length array reference to the memory at
       address [p]. *)
 
-  val make : 'a typ -> ?initial:'a -> int -> 'a t
+  val make : ?finalise:('a t -> unit) -> 'a typ -> ?initial:'a -> int -> 'a t
   (** [make t n] creates an [n]-length array of type [t].  If the optional
-      argument [?initial] is supplied, it indicates a value that should be used
-      to initialise every element of the array.  *)
+      argument [?initial] is supplied, it indicates a value that should be
+      used to initialise every element of the array.  The argument [?finalise],
+      if present, will be called just before the memory is freed. *)
 
   val element_type : 'a array -> 'a typ
 (** Retrieve the element type of an array. *)
@@ -482,8 +485,10 @@ end
 
 (** {3 Struct and union values} *)
 
-val make : ((_, _) structured as 's) typ -> 's
-(** Allocate a fresh, uninitialised structure or union value. *)
+val make : ?finalise:('s -> unit) -> ((_, _) structured as 's) typ -> 's
+(** Allocate a fresh, uninitialised structure or union value.  The argument
+    [?finalise], if present, will be called just before the underlying memory is
+    freed. *)
 
 val setf : ((_, _) structured as 's) -> ('a, 's) field -> 'a -> unit
 (** [setf s f v] overwrites the value of the field [f] in the structure or
