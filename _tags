@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 44e4665b0e425a7b19a5f72bbc1e5f13)
+# DO NOT EDIT (digest: 37b00e766a718091cd0c05c022d6ad25)
 # Ignore VCS directories, you can use the same kind of rule outside 
 # OASIS_START/STOP if you want to exclude directories that contains 
 # useless stuff for the build process
@@ -97,6 +97,12 @@
 <tests/test_structs.{native,byte}>: pkg_unix
 <tests/test_structs.{native,byte}>: pkg_oUnit
 <tests/test_structs.{native,byte}>: custom
+# Executable test_ctypes_finalisers
+<tests/test_finalisers.{native,byte}>: use_ctypes-foreign
+<tests/test_finalisers.{native,byte}>: use_ctypes
+<tests/test_finalisers.{native,byte}>: pkg_unix
+<tests/test_finalisers.{native,byte}>: pkg_oUnit
+<tests/test_finalisers.{native,byte}>: custom
 # Executable test_ctypes_cstdlib
 <tests/test_cstdlib.{native,byte}>: use_ctypes-foreign
 <tests/test_cstdlib.{native,byte}>: use_ctypes
