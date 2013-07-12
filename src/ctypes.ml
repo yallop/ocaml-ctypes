@@ -670,6 +670,7 @@ let int8_t = Primitive RawTypes.int8_t
 let int16_t = Primitive RawTypes.int16_t
 let int32_t = Primitive RawTypes.int32_t
 let int64_t = Primitive RawTypes.int64_t
+let camlint = Primitive RawTypes.camlint
 let uchar = Primitive RawTypes.uchar
 let uint8_t = Primitive RawTypes.uint8_t
 let uint16_t = Primitive RawTypes.uint16_t
