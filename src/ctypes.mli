@@ -96,6 +96,10 @@ val int32_t : int32 typ
 val int64_t : int64 typ
 (** Value representing a 64-bit signed integer C type. *)
 
+val camlint : int typ
+(** Value representing an integer type with the same storage requirements as
+    an OCaml [int]. *)
+
 (** {5 Unsigned integer types} *)
 
 val uchar : uchar typ
