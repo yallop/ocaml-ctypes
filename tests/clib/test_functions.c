@@ -418,7 +418,6 @@ vintfun *return_callback(vintfun *callback)
   return callback;
 }
 
-
 struct one_int {
   int i;
 };
@@ -428,3 +427,31 @@ struct one_int return_struct_by_value(void)
   struct one_int v = { 3 };
   return v;
 };
+
+/* naive matrix operations */
+void matrix_mul(int lrows, int lcols, int rcols,
+                double *l, double *r, double *prod)
+{
+  int i, j, k;
+  for (i = 0; i < lrows; i++) {
+    for (j = 0; j < rcols; j++) {
+      prod[i * rcols + j] = 0.0;
+      for (k = 0; k < lcols; k++) {
+        prod[i * rcols + j] += l[i * lcols + k] * r[k * rcols + j];
+      }
+    }
+  }
+}
+
+double *matrix_transpose(int rows, int cols, double *matrix)
+{
+  int i, j;
+  double *rv = malloc(rows * cols * sizeof *rv);
+
+  for (i = 0; i < rows; i++)
+    for (j = 0; j < cols; j++)
+      rv[j * rows + i] = matrix[i * cols + j];
+
+  return rv;
+}
+

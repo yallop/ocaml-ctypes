@@ -27,6 +27,13 @@ let array_of_list3 typ list3 =
   let atyp = array dim2 (array dim3 typ) in
   Array.of_list atyp (List.map (array_of_list2 typ) list3)
 
+let list2_of_array array =
+  List.map Array.to_list (Array.to_list array)
+
+let matrix l = bigarray_of_array array2 BA.float64 (array_of_list2 double l)
+
+let unmatrix m = list2_of_array (array_of_bigarray array2 m)
+
 let castp typ p = from_voidp typ (to_voidp p)
 
 
@@ -314,6 +321,65 @@ let test_ctypes_array_of_bigarray () =
   end
 
 
+(*
+  Test passing bigarrays to c functions.
+*)
+let test_passing_bigarrays () =
+  let matrix_mul = Foreign.foreign "matrix_mul" ~from:testlib
+    (int @-> int @-> int @->
+     ptr double @-> ptr double @-> ptr double @->
+     returning void) in
+  let mul l r =
+    let m = BA.Array2.dim1 l and n = BA.Array2.dim2 l in
+    let o = BA.Array2.dim1 r and p = BA.Array2.dim2 r in
+    assert (n = o);
+    let product = BA.(Array2.(create (kind l)) c_layout) m p in
+    let addr = bigarray_start array2 in
+    matrix_mul m n p (addr l) (addr r) (addr product);
+    product in
+  assert_equal
+    [[-6.;  11.];
+     [-3.; -3.]]
+    (unmatrix
+       (mul
+          (matrix [[1.; 6.];
+                   [9.; 3.]])
+          (matrix [[ 0.; -1.];
+                   [-1.;  2.]])));
+  assert_equal
+    [[460.; 520.; 580.; 640.; 700.];
+     [1000.; 1150.; 1300.; 1450.; 1600.]]
+    (unmatrix (mul
+                 (matrix [[10.; 20.; 30.];
+                          [40.; 50.; 60.]])
+                 (matrix [[ 1.;  2.;  3.;  4.;  5.];
+                          [ 6.;  7.;  8.;  9.; 10.];
+                          [11.; 12.; 13.; 14.; 15.]])))
+
+
+(*
+  Test returning bigarrays from c functions.
+*)
+let test_returning_bigarrays () =
+  let matrix_transpose = Foreign.foreign "matrix_transpose" ~from:testlib
+    (int @-> int @-> ptr double @-> returning (ptr double)) in
+  let transpose m =
+    (* For the purposes of the test we'll just leak the allocated memory. *)
+    let rows = BA.Array2.dim1 m and cols = BA.Array2.dim2 m in
+    bigarray_of_ptr array2 (cols, rows) BA.float64
+      (matrix_transpose rows cols (bigarray_start array2 m)) in
+  assert_equal
+    [[25.; 1.];
+     [15.; 2.];
+     [10.; 3.];
+     [ 5.; 4.];
+     [ 0.; 5.]]
+    (unmatrix
+       (transpose
+          (matrix [[25.; 15.; 10.; 5.; 0.];
+                   [ 1.;  2.;  3.; 4.; 5.]])))
+
+
 let suite = "Bigarray tests" >:::
   [
     "View ctypes-managed memory using bigarrays"
@@ -321,6 +387,12 @@ let suite = "Bigarray tests" >:::
 
     "View bigarray-managed memory using ctypes"
     >:: test_ctypes_array_of_bigarray;
+
+    "Passing bigarrays to C"
+    >:: test_passing_bigarrays;
+
+    "Returning bigarrays from C"
+    >:: test_returning_bigarrays;
   ]
 
 
