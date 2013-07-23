@@ -224,8 +224,8 @@ type boxedfn =
   | Done of (raw_pointer -> unit) * bufferspec
   | Fn of (raw_pointer -> boxedfn)
 
-(* Construct a pointer to a boxed n-ary function *)
-external make_function_pointer : bufferspec -> boxedfn -> raw_pointer
+(* Construct a pointer to an OCaml function represented by an identifier *)
+external make_function_pointer : bufferspec -> int -> raw_pointer
   = "ctypes_make_function_pointer"
 
 (* Allocate a region of stable memory managed by a custom block. *)
@@ -236,14 +236,25 @@ external allocate : int -> managed_buffer
 external block_address : managed_buffer -> raw_pointer
   = "ctypes_block_address"
 
+(* Set the function used to retrieve functions by identifier. *)
+external set_closure_callback : (int -> boxedfn) -> unit
+  = "ctypes_set_closure_callback"
+
+(* Copy [size] bytes from [src + src_offset] to [dst + dst_offset]. *)
 external memcpy :
   dst:raw_pointer -> dst_offset:int ->
   src:raw_pointer -> src_offset:int ->
     size:int -> unit
   = "ctypes_memcpy"
 
-(* An internal error: for example, an `ffi_type' object passed to
-   ffi_prep_cif was incorrect. *)
+(* An internal error: for example, an `ffi_type' object passed to ffi_prep_cif
+   was incorrect. *)
 exception Ffi_internal_error of string
 let () = Callback.register_exception "FFI_internal_error"
   (Ffi_internal_error "")
+
+(* A closure passed to C was collected by the OCaml garbage collector before
+   it was called. *)
+exception CallToExpiredClosure
+let () = Callback.register_exception "CallToExpiredClosure"
+  CallToExpiredClosure

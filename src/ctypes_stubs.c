@@ -29,6 +29,36 @@
 
 /* TODO: thread support */
 
+/* An OCaml function that converts resolves identifiers to OCaml functions */
+static value retrieve_closure_;
+
+/* Resolve identifiers to OCaml functions */
+static value retrieve_closure(int key)
+{
+  CAMLparam0 ();
+  CAMLlocal1(result);
+  result = caml_callback_exn(retrieve_closure_, Val_int(key));
+
+  if (Is_exception_result(result)) {
+    caml_raise_constant(*caml_named_value("CallToExpiredClosure"));
+  }
+
+  CAMLreturn (result);
+}
+
+/* Register the function used to resolve closure identifiers */ 
+/* set_closure_callback : (int -> boxedfn) -> unit */
+value ctypes_set_closure_callback(value retrieve)
+{
+  CAMLparam1(retrieve);
+
+  caml_register_global_root(&retrieve_closure_);
+  retrieve_closure_ = retrieve;
+
+  CAMLreturn(Val_unit);  
+}
+
+
 static value allocate_custom(struct custom_operations *ops, size_t size,
                              void *prototype)
 {
@@ -413,7 +443,7 @@ typedef struct closure closure;
 struct closure
 {
   ffi_closure closure;
-  value       fn;
+  int         fnkey;
 };
 
 enum boxedfn_tags { Done, Fn };
@@ -421,18 +451,14 @@ enum boxedfn_tags { Done, Fn };
 static void callback_handler(ffi_cif *cif,
                              void *ret,
                              void **args,
-                             void *user_data_)
+                             void *user_data)
 {
   CAMLparam0 ();
 
-  int arity = cif->nargs;
-
-  value *user_data = user_data_;
-
   CAMLlocal1(boxedfn);
-  boxedfn = *user_data;
+  boxedfn = retrieve_closure(*(int *)user_data);
 
-  int i;
+  int i, arity = cif->nargs;
   for (i = 0; i < arity; i++)
   {
     void *cvalue = args[i];
@@ -449,33 +475,30 @@ static void callback_handler(ffi_cif *cif,
 }
 
 
-/* Construct a pointer to a boxed n-ary function */
-/* make_function_pointer : bufferspec -> boxedfn -> raw_pointer */
-value ctypes_make_function_pointer(value callspec_, value boxedfn)
+/* Construct a pointer to an OCaml function represented by an identifier */
+/* make_function_pointer : bufferspec -> int -> raw_pointer */
+value ctypes_make_function_pointer(value callspec_, value fnid)
 {
-  CAMLparam2(callspec_, boxedfn);
+  CAMLparam2(callspec_, fnid);
   struct callspec *callspec = Data_custom_val(callspec_);
 
   assert(callspec->bufferspec.state == CALLSPEC);
 
   void (*code_address)(void) = NULL;
 
+  /* TODO: we need to call ffi_closure_free at some point. */
   closure *closure = ffi_closure_alloc(sizeof *closure, (void *)&code_address);
 
   if (closure == NULL) {
     caml_raise_out_of_memory();
   } else {
-    closure->fn = boxedfn;
-   /* TODO: what should be the lifetime of OCaml functions passed to C
-      (ffi_closure objects)?  When can we call ffi_closure_free and
-      caml_unregister_generational_global_root? */
-    caml_register_generational_global_root(&(closure->fn));
+    closure->fnkey = Int_val(fnid);
 
     ffi_status status =  ffi_prep_closure_loc
       ((ffi_closure *)closure,
        callspec->cif,
        callback_handler,
-       &closure->fn,
+       &closure->fnkey,
        (void *)code_address);
 
     check_ffi_status(status);
