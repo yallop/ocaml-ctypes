@@ -8,11 +8,99 @@
 (* TODO: better array support, perhaps based on bigarrays integration *)
 
 exception IncompleteType
+exception CallToExpiredClosure = Ctypes_raw.CallToExpiredClosure
 exception ModifyingSealedType of string
 exception Unsupported of string
 
 module Raw = Ctypes_raw
 module RawTypes = Ctypes_raw.Types
+
+module HashPhysical = Hashtbl.Make
+  (struct
+    type t = Obj.t
+    let hash = Hashtbl.hash
+    let equal = (==)
+   end)
+
+module Identify_closure :
+sig
+  val record : Obj.t -> Ctypes_raw.boxedfn -> int
+end =
+struct
+  (* A single mutex guards both tables *)
+  let tables_lock = Mutex.create ()
+
+  (* Map integer identifiers to functions. *)
+  let function_by_id = Hashtbl.create 10
+
+  (* Map functions (not closures) to identifiers. *)
+  let id_by_function = HashPhysical.create 10
+
+  (* (The caller must hold tables_lock) *)
+  let store_non_closure_function fn boxed_fn id =
+    try
+      (* Return the existing identifier, if any. *)
+      HashPhysical.find id_by_function fn
+    with Not_found ->
+      (* Add entries to both tables *)
+      HashPhysical.add id_by_function fn id;
+      Hashtbl.add function_by_id id boxed_fn;
+      id
+
+  let fresh () = Oo.id (object end)
+
+  let finalise key =
+    (* GC can be triggered while the lock is already held, in which case we
+       abandon the attempt and re-install the finaliser. *)
+    let rec cleanup fn =
+      begin
+        if Mutex.try_lock tables_lock then begin
+          Hashtbl.remove function_by_id key;
+          Mutex.unlock tables_lock;
+        end
+        else Gc.finalise cleanup fn;
+      end
+    in cleanup
+
+  let record closure boxed_closure : int =
+    let key = fresh () in
+    try
+      (* For closures we add an entry to function_by_id and a finaliser that
+         removes the entry. *)
+      Gc.finalise (finalise key) closure;
+      begin
+        Mutex.lock tables_lock;
+        Hashtbl.add function_by_id key boxed_closure;
+        Mutex.unlock tables_lock;
+      end;
+      key
+    with Invalid_argument "Gc.finalise" ->
+      (* For non-closures we add entries to function_by_id and
+         id_by_function. *)
+      begin
+        Mutex.lock tables_lock;
+        let id = store_non_closure_function closure boxed_closure key in
+        Mutex.unlock tables_lock;
+        id
+      end
+
+  let retrieve id =
+    begin
+      Mutex.lock tables_lock;
+      let f =
+        try Hashtbl.find function_by_id id
+        with Not_found ->
+          Mutex.unlock tables_lock;
+          raise Not_found
+      in begin
+        Mutex.unlock tables_lock;
+        f
+      end
+    end
+
+  (* Register the lookup function with C. *)
+  let () = Raw.set_closure_callback retrieve
+end
 
 type 'a structspec =
     Incomplete of Raw.bufferspec
@@ -295,17 +383,19 @@ and add_argument : type a. Raw.bufferspec -> a typ -> int
     | ty   -> let ArgType ctype = arg_type ty in
               Raw.add_argument callspec ctype
 
-and build_callspec : type a. a fn -> Raw.bufferspec -> a -> Raw.boxedfn
+and box_function : type a. a fn -> Raw.bufferspec -> a WeakRef.t -> Raw.boxedfn
   = fun fn callspec -> match fn with
     | Returns (_, ty) ->
       let _ = prep_callspec callspec ty in
       let write_rv = write ty in
-      fun f -> Raw.Done (write_rv ~offset:0 f, callspec)
+      fun f -> Raw.Done (write_rv ~offset:0 (WeakRef.get f), callspec)
     | Function (p, f) ->
       let _ = add_argument callspec p in
-      let box = build_callspec f callspec in
+      let box = box_function f callspec in
       let read = build p ~offset:0 in
-      fun f -> Raw.Fn (fun buf -> box (f (read buf)))
+      fun f -> Raw.Fn (fun buf ->
+        try box (WeakRef.make (WeakRef.get f (read buf)))
+        with WeakRef.EmptyWeakReference -> raise CallToExpiredClosure)
 
 (* Describes how to read a value, e.g. from a return buffer *)
 and build : type a. a typ -> offset:int -> Raw.raw_pointer -> a
@@ -355,10 +445,12 @@ and write : type a. a typ -> offset:int -> a -> Raw.raw_pointer -> unit
           (RawTypes.PtrType.(add raw_ptr (of_int pbyte_offset))))
     | FunctionPointer (_, fn) ->
       let cs' = Raw.allocate_callspec () in
-      let cs = build_callspec fn cs' in
+      let cs = box_function fn cs' in
       (fun ~offset f ->
-        Raw.write RawTypes.pointer ~offset
-          (Raw.make_function_pointer cs' (cs f)))
+       let boxed = cs (WeakRef.make f) in
+       let id = Identify_closure.record (Obj.repr f) boxed in
+       Raw.write RawTypes.pointer ~offset
+         (Raw.make_function_pointer cs' id))
     | Struct { spec = Incomplete _ } -> raise IncompleteType
     | Struct { spec = Complete _ } as s -> write_aggregate (sizeof s)
     | Union { ucomplete=false } -> raise IncompleteType

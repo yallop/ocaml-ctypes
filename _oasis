@@ -12,7 +12,7 @@ Library ctypes
   Path:             src/
   Findlibname:      ctypes
   Modules:          Unsigned,Signed,Ctypes,PosixTypes
-  InternalModules:  Ctypes_raw
+  InternalModules:  Ctypes_raw,WeakRef
   CSources:         raw_pointer.h,
                     unsigned_stubs.h,unsigned_stubs.c,
                     managed_buffer_stubs.h,managed_buffer_stubs.c,
@@ -21,7 +21,7 @@ Library ctypes
                     ctypes_complex_stubs.c,
                     posix_types_stubs.c
   CCOpt:            -fPIC -Wall -Wno-unused-variable -g
-  BuildDepends:     unix
+  BuildDepends:     unix,threads
   Install:          true
 
 Library "ctypes-foreign"
@@ -253,6 +253,15 @@ Executable test_ctypes_complex
   BuildDepends:     unix,ctypes,ctypes.foreign,oUnit
   Custom:           true
 
+Executable test_ctypes_callback_lifetime
+  Path:             tests
+  MainIs:           test_callback_lifetime.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     unix,ctypes,ctypes.foreign,oUnit
+  Custom:           true
+
 Executable date_example
   Path:             examples/date
   MainIs:           date.ml
@@ -362,6 +371,11 @@ Test test_value_printing
 Test test_complex
   Run$:             flag(tests)
   Command:          $test_ctypes_complex
+  WorkingDirectory: tests
+
+Test test_callback_lifetime
+  Run$:             flag(tests)
+  Command:          $test_ctypes_callback_lifetime
   WorkingDirectory: tests
 
 Document ctypes

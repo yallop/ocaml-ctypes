@@ -345,6 +345,7 @@ int accepting_pointer_from_callback(pintfun2 *f)
   return q;
 }
 
+
 signed char retrieve_SCHAR_MIN(void) { return SCHAR_MIN; }
 signed char retrieve_SCHAR_MAX(void) { return SCHAR_MAX; }
 unsigned char retrieve_UCHAR_MAX(void) { return UCHAR_MAX; }
@@ -398,4 +399,21 @@ void add_complexf(float complex *l, float complex *r, float complex *out)
 void mul_complexf(float complex *l, float complex *r, float complex *out)
 {
   *out = *l * *r;
+}
+
+static int (*global_stored_callback)(int) = NULL;
+
+void store_callback(int (*callback)(int))
+{
+  global_stored_callback = callback;
+}
+
+int invoke_stored_callback(int x)
+{
+  return global_stored_callback(x);
+}
+
+vintfun *return_callback(vintfun *callback)
+{
+  return callback;
 }
