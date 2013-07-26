@@ -1,4 +1,4 @@
-CFLAGS=-fPIC -g -Wall
+CFLAGS=-fPIC -O3 -Wall
 
 all: build
 
@@ -31,4 +31,4 @@ doc: setup.ml setup.data
 ctestlib: tests/clib/test_functions.so
 
 tests/clib/test_functions.so: tests/clib/test_functions.o
-	cd tests/clib && cc -g -shared -o test_functions.so test_functions.o
+	cd tests/clib && cc -O3 -shared -o test_functions.so test_functions.o
