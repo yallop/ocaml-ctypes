@@ -20,7 +20,7 @@ Library ctypes
                     ctypes_stubs.c,
                     ctypes_complex_stubs.c,
                     posix_types_stubs.c
-  CCOpt:            -fPIC -Wall -Wno-unused-variable -g
+  CCOpt:            -fPIC -Wall -Wno-unused-variable -O3
   BuildDepends:     unix,threads
   Install:          true
 
@@ -30,7 +30,7 @@ Library "ctypes-foreign"
   Findlibparent:    ctypes
   Modules:          Dl,Foreign
   CSources:         dl_stubs.c
-  CCOpt:            -fPIC -Wall -Wno-unused-variable -g
+  CCOpt:            -fPIC -Wall -Wno-unused-variable -O3
   BuildDepends:     unix,ctypes
   Install:          true
 
