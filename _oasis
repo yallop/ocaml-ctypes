@@ -31,6 +31,7 @@ Library "ctypes-foreign"
   Modules:          Dl,Foreign
   CSources:         dl_stubs.c
   CCOpt:            -fPIC -Wall -Wno-unused-variable -O3
+  XMETADescription: Dynamic linking of C functions
   BuildDepends:     unix,ctypes
   Install:          true
 
@@ -39,6 +40,7 @@ Library fts
   Findlibname:      fts
   Modules:          Fts
   BuildDepends:     ctypes,ctypes.foreign
+  XMETADescription: Example ctypes bindings to the FTS functions
   Install:          false
 
 Library sigset
@@ -46,6 +48,7 @@ Library sigset
   Findlibname:      sigset
   Modules:          Sigset
   BuildDepends:     ctypes,ctypes.foreign
+  XMETADescription: Example ctypes bindings to the sigset interface
   Install:          false
 
 Library ncurses
@@ -54,6 +57,7 @@ Library ncurses
   Modules:          Ncurses
   BuildDepends:     ctypes,ctypes.foreign
   CCLib:            -lncurses
+  XMETADescription: ctypes-based ncurses example
   Install:          false
 
 Library ctypes_top
