@@ -158,7 +158,7 @@ let test_union_address () =
 *)
 let test_updating_sealed_union () =
   let utyp = union "sealed" in
-  let i = utyp +:+ int in
+  let _ = utyp +:+ int in
   let () = seal utyp in
 
   assert_raises (ModifyingSealedType "sealed")

@@ -370,6 +370,7 @@ let test_union_printing () =
   let ua = u +:+ array 4 uint8_t in
   let () = seal u in
   let v = make u in
+  ignore (i, j, us);
   setf v ua (Array.make ~initial:(Unsigned.UInt8.of_int 0) uint8_t 4);
   assert_bool "union printing"
     (equal_ignoring_whitespace "{{0, 0} | {0, 0, 0, 0}}" (string_of u v))
