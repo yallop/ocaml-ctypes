@@ -1,0 +1,33 @@
+# OASIS_START
+# DO NOT EDIT (digest: f72a827285ca66af4a63bf5768afaf43)
+version = "0.1"
+description = "Combinators for binding to C libraries without writing any C."
+requires = "unix threads"
+archive(byte) = "ctypes.cma"
+archive(byte, plugin) = "ctypes.cma"
+archive(native) = "ctypes.cmxa"
+archive(native, plugin) = "ctypes.cmxs"
+exists_if = "ctypes.cma"
+package "top" (
+ version = "0.1"
+ description = "Toplevel printers for C types"
+ requires = "ctypes"
+ archive(byte) = "ctypes_top.cma"
+ archive(byte, plugin) = "ctypes_top.cma"
+ archive(native) = "ctypes_top.cmxa"
+ archive(native, plugin) = "ctypes_top.cmxs"
+ exists_if = "ctypes_top.cma"
+)
+
+package "foreign" (
+ version = "0.1"
+ description = "Dynamic linking of C functions"
+ requires = "unix ctypes"
+ archive(byte) = "ctypes-foreign.cma"
+ archive(byte, plugin) = "ctypes-foreign.cma"
+ archive(native) = "ctypes-foreign.cmxa"
+ archive(native, plugin) = "ctypes-foreign.cmxs"
+ exists_if = "ctypes-foreign.cma"
+)
+# OASIS_STOP
+
