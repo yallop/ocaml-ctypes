@@ -146,7 +146,11 @@ struct
 end
 
 
-module UInt32 : S = 
+module UInt32 : sig
+  include S
+  external of_int32 : int32 -> t = "ctypes_uint32_of_int32"
+  external to_int32 : t -> int32 = "ctypes_int32_of_uint32"
+end = 
 struct
   module B =
   struct
@@ -171,10 +175,16 @@ struct
   include B
   include Extras(B)
   module Infix = MakeInfix(B)
+  external of_int32 : int32 -> t = "ctypes_uint32_of_int32"
+  external to_int32 : t -> int32 = "ctypes_int32_of_uint32"
 end
 
 
-module UInt64 : S = 
+module UInt64 : sig
+  include S
+  external of_int64 : int64 -> t = "ctypes_uint64_of_int64"
+  external to_int64 : t -> int64 = "ctypes_int64_of_uint64"
+end = 
 struct
   module B =
   struct
@@ -199,6 +209,8 @@ struct
   include B
   include Extras(B)
   module Infix = MakeInfix(B)
+  external of_int64 : int64 -> t = "ctypes_uint64_of_int64"
+  external to_int64 : t -> int64 = "ctypes_int64_of_uint64"
 end
 
 

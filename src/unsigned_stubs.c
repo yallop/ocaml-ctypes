@@ -162,3 +162,7 @@ value ctypes_ushort_size (value _) { return Val_int(sizeof (unsigned short)); }
 value ctypes_uint_size (value _) { return Val_int(sizeof (unsigned int)); }
 value ctypes_ulong_size (value _) { return Val_int(sizeof (unsigned long)); }
 value ctypes_ulonglong_size (value _) { return Val_int(sizeof (unsigned long long)); }
+value ctypes_uint32_of_int32 (value i) { return ctypes_copy_uint32(Int32_val(i)); }
+value ctypes_int32_of_uint32 (value u) { return caml_copy_int32(Uint_custom_val(uint32_t, u)); }
+value ctypes_uint64_of_int64 (value i) { return ctypes_copy_uint64(Int64_val(i)); }
+value ctypes_int64_of_uint64 (value u) { return caml_copy_int64(Uint_custom_val(uint64_t, u)); }

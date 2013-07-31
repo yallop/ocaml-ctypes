@@ -121,10 +121,18 @@ module UInt8 : S
 module UInt16 : S
 (** Unsigned 16-bit integer type and operations. *)
 
-module UInt32 : S
+module UInt32 : sig
+  include S
+  val of_int32 : int32 -> t
+  val to_int32 : t -> int32
+end
 (** Unsigned 32-bit integer type and operations. *)
 
-module UInt64 : S
+module UInt64 : sig
+  include S
+  val of_int64 : int64 -> t
+  val to_int64 : t -> int64
+end
 (** Unsigned 64-bit integer type and operations. *)
 
 module Size_t : S
