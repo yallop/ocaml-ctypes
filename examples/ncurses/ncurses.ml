@@ -42,4 +42,4 @@ let box =
   foreign "box" (window @-> int @-> int @-> (returning void))
 
 let cbreak =
-  foreign "cbreak" (void @-> (returning void))
+  foreign "cbreak" (void @-> (returning int))
