@@ -39,7 +39,7 @@ let mvwaddstr =
   foreign "mvwaddstr" (window @-> int @-> int @-> string @-> (returning void))
 
 let box =
-  foreign "box" (window @-> int @-> int @-> (returning void))
+  foreign "box" (window @-> char @-> char @-> (returning void))
 
 let cbreak =
   foreign "cbreak" (void @-> (returning int))
