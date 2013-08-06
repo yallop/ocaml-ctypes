@@ -517,6 +517,9 @@ val offsetof : (_, (_, [`Struct]) structured) field -> int
 (** [offsetof f] returns the offset, in bytes, of the field [f] from the
     beginning of the associated struct type. *)
 
+val field_type : ('a, _) field -> 'a typ
+(** [field_type f] returns the type of the field [f]. *)
+
 val addr : ((_, _) structured as 's) -> 's ptr
 (** [addr s] returns the address of the structure or union [s]. *)
 

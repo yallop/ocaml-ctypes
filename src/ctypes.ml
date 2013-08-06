@@ -731,6 +731,7 @@ and format_ptr : type a. Format.formatter -> a ptr -> unit
 let string_of typ v = string_of (format typ) v
 
 let offsetof { foffset } = foffset
+let field_type { ftype } = ftype
 
 let union utag = Union { utag; usize = 0; ualignment = 0; ucomplete = false;
                          ufields = [] }
