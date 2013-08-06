@@ -37,6 +37,10 @@ let test_storing_function_reference () =
 (*
   Check that if a closure passed to C is collected before it's called then
   CallToExpiredClosure is raised.
+  
+  The value of this test is questionable: calling an expired closure does not
+  have defined behaviour, since the structures needed to make the call may
+  have been garbage collected.
 *)
 let test_calling_collected_closure_raises_exception () =
   let callback_type = int @-> returning int in

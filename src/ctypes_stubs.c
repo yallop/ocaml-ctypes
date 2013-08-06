@@ -486,7 +486,10 @@ value ctypes_make_function_pointer(value callspec_, value fnid)
 
   void (*code_address)(void) = NULL;
 
-  /* TODO: we need to call ffi_closure_free at some point. */
+  /* TODO: we need to call ffi_closure_free at some point.  This function
+     should return a managed object to which we can attach a finaliser for the
+     closure.
+  */
   closure *closure = ffi_closure_alloc(sizeof *closure, (void *)&code_address);
 
   if (closure == NULL) {
