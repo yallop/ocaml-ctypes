@@ -566,3 +566,24 @@ value ctypes_memcpy(value dst, value dst_offset,
          Int_val(size));
   CAMLreturn(Val_unit);
 }
+
+
+/* string_of_cstring : raw_ptr -> int -> string */
+value ctypes_string_of_cstring(value p, value offset)
+{
+  return caml_copy_string(CTYPES_TO_PTR(p) + Int_val(offset));
+}
+
+/* cstring_of_string : string -> managed_buffer */
+value ctypes_cstring_of_string(value s)
+{
+  CAMLparam1(s);
+  CAMLlocal1(buffer);
+  int len = caml_string_length(s);
+  buffer = ctypes_allocate(Val_int(len + 1));
+  char *dst = CTYPES_TO_PTR(ctypes_block_address(buffer));
+  char *ss = String_val(s);
+  memcpy(dst, ss, len);
+  dst[len] = '\0';
+  CAMLreturn(buffer);
+}

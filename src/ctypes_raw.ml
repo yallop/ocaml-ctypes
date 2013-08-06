@@ -247,6 +247,14 @@ external memcpy :
     size:int -> unit
   = "ctypes_memcpy"
 
+(* Convert a C string to an OCaml string *)
+external string_of_cstring : raw_pointer -> int -> string
+  = "ctypes_string_of_cstring"
+
+(* Convert an OCaml string to a C string *)
+external cstring_of_string : string -> managed_buffer
+  = "ctypes_cstring_of_string"
+
 (* An internal error: for example, an `ffi_type' object passed to ffi_prep_cif
    was incorrect. *)
 exception Ffi_internal_error of string
