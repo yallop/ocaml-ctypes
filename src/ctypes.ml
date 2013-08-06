@@ -149,16 +149,16 @@ and 'a structure_type = {
 
   (* We keep the field type values around, since functions such as
      complete_struct_type may need to access the underlying C values. *)
-  mutable fields : boxed_field list;
+  mutable fields : 'a structure boxed_field list;
 }
 and 'a union_type = {
   utag: string;
   mutable ucomplete: bool;
   mutable usize: int;
   mutable ualignment: int;
-  mutable ufields : boxed_field list;
+  mutable ufields : 'a union boxed_field list;
 }
-and boxed_field = BoxedField : ('a, 's) field -> boxed_field
+and 's boxed_field = BoxedField : ('a, 's) field -> 's boxed_field
 type boxed_typ = BoxedType : 'a typ -> boxed_typ
 
 type _ ccallspec =
@@ -166,6 +166,9 @@ type _ ccallspec =
   | WriteArg : ('a -> Raw.raw_pointer -> unit) * 'b ccallspec -> ('a -> 'b) ccallspec
 
 type arg_type = ArgType : 'b RawTypes.ctype -> arg_type
+
+let fold_boxed_field_list (o : < f : 't. 'a -> ('t, 's) field -> 'a >) a l =
+  List.fold_left (fun a (BoxedField f) -> o#f a f) a l
 
 let rec sizeof : type a. a typ -> int = function
     Void                           -> raise IncompleteType
@@ -282,7 +285,8 @@ let rec format_typ : type a. a typ ->
     | Array (ty, n) ->
       format_typ ty (fun _ fmt -> fprintf fmt "%t[%d]" (k `array) n) `nonarray
         fmt
-and format_fields fields fmt =
+and format_fields : type a. a boxed_field list -> Format.formatter -> unit =
+  fun fields fmt ->
   let open Format in
       List.iteri
         (fun i (BoxedField {ftype=t}) ->
@@ -707,8 +711,8 @@ and format_array : type a. Format.formatter -> a array -> unit
         fprintf fmt ",@;"
     done;
     fprintf fmt "@]@;<1 0>}"
-and format_fields : type a b. string -> boxed_field list -> Format.formatter
-                              -> (a, b) structured -> unit
+and format_fields : type a b. string -> (a, b) structured boxed_field list ->
+                              Format.formatter -> (a, b) structured -> unit
   = fun sep fields fmt s ->
     let last_field = List.length fields - 1 in
     let open Format in
@@ -727,6 +731,7 @@ and format_ptr : type a. Format.formatter -> a ptr -> unit
 let string_of typ v = string_of (format typ) v
 
 let offsetof { foffset } = foffset
+let field_type { ftype } = ftype
 
 let union utag = Union { utag; usize = 0; ualignment = 0; ucomplete = false;
                          ufields = [] }
@@ -750,6 +755,13 @@ let seal (type a) (type s) : (a, s) structured typ -> unit = function
     u.usize <- compute_union_padding u;
     u.ucomplete <- true
   end
+
+let fold_fields (type k)
+    (o : < f : 't. _ -> ('t, (_, k) structured) field -> _ >) a
+    (s : (_, k) structured typ) = match s with
+  | Struct { fields } -> fold_boxed_field_list o a fields
+  | Union { ufields } -> fold_boxed_field_list o a ufields
+  | Abstract _        -> a
 
 let ( +:+ ) (Union u) ftype =
   begin
