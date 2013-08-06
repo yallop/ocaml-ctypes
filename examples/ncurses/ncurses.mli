@@ -34,7 +34,7 @@ val wrefresh : window -> unit
 (** Initially the terminal may or may not be in [cbreak] mode, as the mode is
   inherited; therefore, a program should call [cbreak] explicitly.  Most interactive
   programs will need to be in this mode. *)
-val cbreak : unit -> unit
+val cbreak : unit -> int
 
 (** [newwin nlines ncols begin_y begin_x] creates and returns a pointer to a new
   [window] with the [nlines] lines and [ncols] columns. The upper left-hand corner
@@ -58,4 +58,4 @@ val mvwaddch : window -> int -> int -> char -> unit
 val mvwaddstr : window -> int -> int -> string -> unit 
 
 (** [box TODO TODO] draws a border around the [window] *)
-val box : window -> int -> int -> unit
+val box : window -> char -> char -> unit
