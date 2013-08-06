@@ -149,16 +149,16 @@ and 'a structure_type = {
 
   (* We keep the field type values around, since functions such as
      complete_struct_type may need to access the underlying C values. *)
-  mutable fields : boxed_field list;
+  mutable fields : 'a structure boxed_field list;
 }
 and 'a union_type = {
   utag: string;
   mutable ucomplete: bool;
   mutable usize: int;
   mutable ualignment: int;
-  mutable ufields : boxed_field list;
+  mutable ufields : 'a union boxed_field list;
 }
-and boxed_field = BoxedField : ('a, 's) field -> boxed_field
+and 's boxed_field = BoxedField : ('a, 's) field -> 's boxed_field
 type boxed_typ = BoxedType : 'a typ -> boxed_typ
 
 type _ ccallspec =
@@ -282,7 +282,8 @@ let rec format_typ : type a. a typ ->
     | Array (ty, n) ->
       format_typ ty (fun _ fmt -> fprintf fmt "%t[%d]" (k `array) n) `nonarray
         fmt
-and format_fields fields fmt =
+and format_fields : type a. a boxed_field list -> Format.formatter -> unit =
+  fun fields fmt ->
   let open Format in
       List.iteri
         (fun i (BoxedField {ftype=t}) ->
@@ -707,8 +708,8 @@ and format_array : type a. Format.formatter -> a array -> unit
         fprintf fmt ",@;"
     done;
     fprintf fmt "@]@;<1 0>}"
-and format_fields : type a b. string -> boxed_field list -> Format.formatter
-                              -> (a, b) structured -> unit
+and format_fields : type a b. string -> (a, b) structured boxed_field list ->
+                              Format.formatter -> (a, b) structured -> unit
   = fun sep fields fmt s ->
     let last_field = List.length fields - 1 in
     let open Format in
