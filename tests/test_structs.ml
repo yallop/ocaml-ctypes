@@ -329,6 +329,51 @@ let test_field_references_not_invalidated () =
   end in ()
 
 
+(* 
+   Test folds over struct fields.
+*)
+let test_folding_over_struct_fields () =
+  let module M = struct
+    module FieldInfo =
+    struct
+      type t = {
+        typ : string ;
+        offset : int ; 
+      }
+      let compare = Pervasives.compare
+    end
+
+    module FieldSet = Set.Make(FieldInfo)
+
+    let collect_fields : 's. 's structure typ -> FieldSet.t =
+      fun (type s) (s : s structure typ) ->
+        fold_fields (object
+          method f : 't. _ -> ('t, s structure) field -> _ =
+            fun fieldset field -> 
+              FieldSet.add { typ = string_of_typ (field_type field) ;
+                             offset = offsetof field } fieldset
+        end) FieldSet.empty s
+
+    type s
+    let s : s structure typ = structure "s"
+    let a = s *:* int
+    let b = s *:* array 3 float
+    let c = s *:* ptr void
+    let d = s *:* ptr (ptr s)
+    let () = seal s
+      
+    let expected = FieldSet.of_list
+      [{offset = offsetof a; typ = string_of_typ int};
+       {offset = offsetof b; typ = string_of_typ (array 3 float)};
+       {offset = offsetof c; typ = string_of_typ (ptr void)};
+       {offset = offsetof d; typ = string_of_typ (ptr (ptr s))}]
+
+    let () = begin
+      assert_equal ~cmp:FieldSet.equal expected (collect_fields s)
+    end
+  end in ()
+
+
 let suite = "Struct tests" >:::
   ["passing struct"
     >:: test_passing_struct;
@@ -356,6 +401,9 @@ let suite = "Struct tests" >:::
 
    "field references not invalidated"
    >:: test_field_references_not_invalidated;
+
+   "folding over struct fields"
+   >:: test_folding_over_struct_fields;
   ]
 
 

@@ -295,6 +295,12 @@ val seal : (_, _) structured typ -> unit
     in a way that involves their size or alignment; see the documentation for
     {!IncompleteType} for further details.  *)
 
+val fold_fields : (< f : 't. 'a -> ('t, 's) field -> 'a >) ->
+                  'a -> ((_, _) structured as 's) typ -> 'a
+(** [fold_fields o a s] folds [o#f] over the fields of [s], using the
+    accumulator [a].  For a structured type with fields [f1], [f2], ..., [fn]
+    it is equivalent to [o#f (... (o#f (o#f a f1) f2) ...) fn]. *)
+
 (** {3 View types} *)
 
 val view : read:('a -> 'b) -> write:('b -> 'a) -> 'a typ -> 'b typ
@@ -507,9 +513,12 @@ val (|->) : ((_, _) structured as 's) ptr -> ('a, 's) field -> 'a ptr
 (** [p |-> f] computes the address of the field [f] in the structure or union
     value pointed to by [p]. *)
 
-val offsetof : (_, (_, [`Struct]) structured) field -> int
+val offsetof : (_, _ structure) field -> int
 (** [offsetof f] returns the offset, in bytes, of the field [f] from the
     beginning of the associated struct type. *)
+
+val field_type : ('a, _) field -> 'a typ
+(** [field_type f] returns the type of the field [f]. *)
 
 val addr : ((_, _) structured as 's) -> 's ptr
 (** [addr s] returns the address of the structure or union [s]. *)
