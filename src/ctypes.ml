@@ -825,22 +825,15 @@ let strlen p =
   while !@(p +@ !i) <> '\000' do incr i done;
   !i
 
-let string_of_char_ptr charp =
-    let length = strlen charp in
-    let s = String.create length in
-    for i = 0 to length - 1 do
-      s.[i] <- !@ (charp +@ i)
-    done;
-    s
+let string_of_char_ptr {raw_ptr; pbyte_offset} =
+  Raw.string_of_cstring raw_ptr pbyte_offset
 
 let char_ptr_of_string s =
-  let len = String.length s in
-  let p = allocate_n ~count:(len + 1) char in
-  for i = 0 to len - 1 do
-    (p +@ i <-@ s.[i])
-  done;
-  (p +@ len <-@ '\000');
-  p
+  let buf = Raw.cstring_of_string s in
+  { reftype = char;
+    pmanaged = Some buf;
+    raw_ptr = Raw.block_address buf;
+    pbyte_offset = 0 }
 
 let string = view ~read:string_of_char_ptr ~write:char_ptr_of_string
   (ptr char)
