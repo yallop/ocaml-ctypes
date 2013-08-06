@@ -167,6 +167,9 @@ type _ ccallspec =
 
 type arg_type = ArgType : 'b RawTypes.ctype -> arg_type
 
+let fold_boxed_field_list (o : < f : 't. 'a -> ('t, 's) field -> 'a >) a l =
+  List.fold_left (fun a (BoxedField f) -> o#f a f) a l
+
 let rec sizeof : type a. a typ -> int = function
     Void                           -> raise IncompleteType
   | Primitive p                    -> RawTypes.sizeof p
@@ -751,6 +754,13 @@ let seal (type a) (type s) : (a, s) structured typ -> unit = function
     u.usize <- compute_union_padding u;
     u.ucomplete <- true
   end
+
+let fold_fields (type k)
+    (o : < f : 't. _ -> ('t, (_, k) structured) field -> _ >) a
+    (s : (_, k) structured typ) = match s with
+  | Struct { fields } -> fold_boxed_field_list o a fields
+  | Union { ufields } -> fold_boxed_field_list o a ufields
+  | Abstract _        -> a
 
 let ( +:+ ) (Union u) ftype =
   begin
