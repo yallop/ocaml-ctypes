@@ -513,7 +513,7 @@ val (|->) : ((_, _) structured as 's) ptr -> ('a, 's) field -> 'a ptr
 (** [p |-> f] computes the address of the field [f] in the structure or union
     value pointed to by [p]. *)
 
-val offsetof : (_, (_, [`Struct]) structured) field -> int
+val offsetof : (_, _ structure) field -> int
 (** [offsetof f] returns the offset, in bytes, of the field [f] from the
     beginning of the associated struct type. *)
 
