@@ -334,16 +334,15 @@ let test_field_references_not_invalidated () =
 *)
 let test_folding_over_struct_fields () =
   let module M = struct
-    module FieldInfo =
-    struct
-      type t = {
-        typ : string ;
-        offset : int ; 
-      }
-      let compare = Pervasives.compare
-    end
+    type field_info = {
+      typ : string ;
+      offset : int ; 
+    }
 
-    module FieldSet = Set.Make(FieldInfo)
+    module FieldSet = Set.Make(struct
+      type t = field_info
+      let compare = Pervasives.compare
+    end)
 
     let collect_fields : 's. 's structure typ -> FieldSet.t =
       fun (type s) (s : s structure typ) ->
@@ -362,11 +361,12 @@ let test_folding_over_struct_fields () =
     let d = s *:* ptr (ptr s)
     let () = seal s
       
-    let expected = FieldSet.of_list
+    let expected = List.fold_right FieldSet.add
       [{offset = offsetof a; typ = string_of_typ int};
        {offset = offsetof b; typ = string_of_typ (array 3 float)};
        {offset = offsetof c; typ = string_of_typ (ptr void)};
        {offset = offsetof d; typ = string_of_typ (ptr (ptr s))}]
+      FieldSet.empty
 
     let () = begin
       assert_equal ~cmp:FieldSet.equal expected (collect_fields s)

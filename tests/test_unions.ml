@@ -180,15 +180,14 @@ let test_sealing_empty_union () =
 *)
 let test_folding_over_union_fields () =
   let module M = struct
-    module FieldInfo =
-    struct
-      type t = {
-        typ : string ;
-      }
-      let compare = Pervasives.compare
-    end
+    type field_info = {
+      typ : string ;
+    }
 
-    module FieldSet = Set.Make(FieldInfo)
+    module FieldSet = Set.Make(struct
+      type t = field_info
+      let compare = Pervasives.compare
+    end)
 
     let collect_fields : 's. 's union typ -> FieldSet.t =
       fun (type s) (s : s union typ) ->
@@ -206,11 +205,12 @@ let test_folding_over_union_fields () =
     let d = u +:+ ptr (ptr u)
     let () = seal u
       
-    let expected = FieldSet.of_list
+    let expected = List.fold_right FieldSet.add
       [{typ = string_of_typ int};
        {typ = string_of_typ (array 3 float)};
        {typ = string_of_typ (ptr void)};
        {typ = string_of_typ (ptr (ptr u))}]
+      FieldSet.empty
 
     let () = begin
       assert_equal ~cmp:FieldSet.equal expected (collect_fields u)
