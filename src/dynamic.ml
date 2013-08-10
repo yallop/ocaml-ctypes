@@ -174,7 +174,7 @@ and box_function : type a. a fn -> Raw.bufferspec -> a WeakRef.t -> Raw.boxedfn
 and build : type a. a typ -> offset:int -> Raw.raw_pointer -> a
  = function
     | Void ->
-      (Raw.read RawTypes.void : offset:int -> Raw.raw_pointer -> a)
+      Raw.read RawTypes.void
     | Primitive p ->
       Raw.read p
     | Struct { spec = Incomplete _ } ->
@@ -249,7 +249,7 @@ and build_ccallspec : type a. a fn -> Raw.bufferspec -> a ccallspec
   = fun fn callspec -> match fn with
     | Returns (check_errno, t) ->
       let () = prep_callspec callspec t in
-      (Call (check_errno, build t ~offset:0) : a ccallspec)
+      Call (check_errno, build t ~offset:0)
     | Function (p, f) ->
       let offset = add_argument callspec p in
       let rest = build_ccallspec f callspec in
@@ -274,7 +274,7 @@ let rec (!@) : type a. a ptr -> a
       | Struct { spec = Incomplete _ } -> raise IncompleteType
       | View { read; ty = reftype } -> read (!@ { ptr with reftype })
       (* If it's a reference type then we take a reference *)
-      | Union _ -> ({ structured = ptr } : a)
+      | Union _ -> { structured = ptr }
       | Struct _ -> { structured = ptr }
       | Array (elemtype, alength) ->
         { astart = { ptr with reftype = elemtype }; alength }
