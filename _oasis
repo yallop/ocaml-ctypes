@@ -22,6 +22,7 @@ Library ctypes
                     Dynamic_stubs,
                     Dynamic,
                     Value_printing,
+                    Std_view_stubs,
                     Std_views
   CSources:         raw_pointer.h,
                     unsigned_stubs.h,unsigned_stubs.c,

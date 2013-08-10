@@ -75,12 +75,3 @@ external make_function_pointer : bufferspec -> int -> raw_pointer
 (* Set the function used to retrieve functions by identifier. *)
 external set_closure_callback : (int -> Obj.t) -> unit
   = "ctypes_set_closure_callback"
-
-
-(* Convert a C string to an OCaml string *)
-external string_of_cstring : raw_pointer -> int -> string
-  = "ctypes_string_of_cstring"
-
-(* Convert an OCaml string to a C string *)
-external cstring_of_string : string -> managed_buffer
-  = "ctypes_cstring_of_string"
