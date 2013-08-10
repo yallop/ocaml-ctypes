@@ -68,7 +68,7 @@
                                                                              \
   value ctypes_copy_uint ## BITS(TYPE(BITS) u)                               \
   {                                                                          \
-    value res = caml_alloc_custom(&caml_uint ## BITS ## _ops, 4, 0, 1);      \
+    value res = caml_alloc_custom(&caml_uint ## BITS ## _ops, BYTES, 0, 1);  \
     Uint_custom_val(TYPE(BITS), res) = u;                                    \
     return res;                                                              \
   }                                                                          \
