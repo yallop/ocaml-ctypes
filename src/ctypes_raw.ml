@@ -237,7 +237,7 @@ external block_address : managed_buffer -> raw_pointer
   = "ctypes_block_address"
 
 (* Set the function used to retrieve functions by identifier. *)
-external set_closure_callback : (int -> boxedfn) -> unit
+external set_closure_callback : (int -> Obj.t) -> unit
   = "ctypes_set_closure_callback"
 
 (* Copy [size] bytes from [src + src_offset] to [dst + dst_offset]. *)
