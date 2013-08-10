@@ -77,9 +77,6 @@ type _ ccallspec =
     Call : bool * (Raw.raw_pointer -> 'a) -> 'a ccallspec
   | WriteArg : ('a -> Raw.raw_pointer -> unit) * 'b ccallspec -> ('a -> 'b) ccallspec
 
-type arg_type = ArgType : 'b RawTypes.ctype -> arg_type
-
-
 let rec sizeof : type a. a typ -> int = function
     Void                           -> raise IncompleteType
   | Primitive p                    -> RawTypes.sizeof p
@@ -118,20 +115,6 @@ let rec passable : type a. a typ -> bool = function
   | Abstract _                     -> false
   | FunctionPointer _              -> true
   | View { ty }                    -> passable ty
-
-let rec arg_type : type a. a typ -> arg_type = function
-    Void                           -> ArgType RawTypes.void
-  | Primitive p                    -> ArgType p
-  | Struct { spec = Complete p }   -> ArgType p
-  | Pointer _                      -> ArgType RawTypes.pointer
-  | FunctionPointer _              -> ArgType RawTypes.pointer
-  | View { ty }                    -> arg_type ty
-  (* The following cases should never happen; aggregate types other than
-     complete struct types are excluded during type construction. *)
-  | Union _                        -> assert false
-  | Array _                        -> assert false
-  | Abstract _                     -> assert false
-  | Struct { spec = Incomplete _ } -> assert false
 
 let void = Void
 let char = Primitive RawTypes.char
