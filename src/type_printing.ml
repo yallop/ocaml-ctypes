@@ -116,13 +116,5 @@ let format_fn : ?name:string -> Format.formatter -> 'a fn -> unit
     format_fn fn (format_name ?name) fmt;
     Format.fprintf fmt "@]"
 
-let string_of format v = 
-  let buf = Buffer.create 100 in
-  let fmt = Format.formatter_of_buffer buf in begin
-    format fmt v;
-    Format.pp_print_flush fmt ();
-    Buffer.contents buf
-  end
-
-let string_of_typ ?name ty = string_of (format_typ ?name) ty
-let string_of_fn ?name fn = string_of (format_fn ?name) fn
+let string_of_typ ?name ty = Common.string_of (format_typ ?name) ty
+let string_of_fn ?name fn = Common.string_of (format_fn ?name) fn

@@ -7,6 +7,8 @@
 
 include Static
 
+include Type_printing
+
 include Dynamic
 
 include Std_views

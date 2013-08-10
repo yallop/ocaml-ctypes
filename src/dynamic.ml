@@ -404,8 +404,6 @@ let getf s field = !@(s @. field)
 
 let addr { structured } = structured
 
-include Formatters
-
 let rec format : type a. a typ -> Format.formatter -> a -> unit
   = fun typ fmt v -> match typ with
     Void -> Format.pp_print_string fmt (Raw.string_of RawTypes.void v)
@@ -457,4 +455,4 @@ and format_ptr : type a. Format.formatter -> a ptr -> unit
          RawTypes.pointer
          (RawTypes.PtrType.(add raw_ptr (of_int pbyte_offset))))
 
-let string_of typ v = string_of (format typ) v
+let string_of typ v = Common.string_of (format typ) v
