@@ -31,7 +31,7 @@ let rec format_typ : type a. a typ ->
     | Void ->
       fprintf fmt "void%t" (k `nonarray)
     | Primitive p ->
-      fprintf fmt "%s%t" (Ctypes_raw.Types.ctype_name p) (k `nonarray)
+      fprintf fmt "%s%t" (Static_stubs.ctype_name p) (k `nonarray)
     | View { ty } ->
       format_typ ty k context fmt
     | Abstract { aname } ->

@@ -11,6 +11,8 @@ exception CallToExpiredClosure = Ctypes_raw.CallToExpiredClosure
 
 open Static
 
+module Raw = Ctypes_raw
+
 (* Register the closure lookup function with C. *)
 let () = Raw.set_closure_callback Closure_properties.retrieve
 

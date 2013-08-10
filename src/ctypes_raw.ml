@@ -13,10 +13,6 @@ sig
   open Unsigned
 
   type 'a ctype
-  external sizeof : _ ctype -> int = "ctypes_sizeof"
-  external alignment : _ ctype -> int = "ctypes_alignment"
-  external ctype_name : _ ctype -> string = "ctypes_typename"
-  external passable : _ ctype -> bool = "ctypes_passable"
 
   module PtrType : Signed.S
   type voidp = PtrType.t
@@ -59,12 +55,6 @@ struct
   type 'a ctype
 
   external sizeof : _ ctype -> int = "ctypes_sizeof"
-
-  external alignment : _ ctype -> int = "ctypes_alignment"
-
-  external ctype_name : _ ctype -> string = "ctypes_typename"
-
-  external passable : _ ctype -> bool = "ctypes_passable"
 
   external _int_type_info : unit -> int ctype = "ctypes_int_type_info"
   let int = _int_type_info ()
@@ -203,21 +193,9 @@ external call_errno : string -> raw_pointer -> bufferspec ->
 type managed_buffer
 type _ structure = managed_buffer
 
-(* Allocate a new C typed buffer specification *)
-external allocate_bufferspec : unit -> bufferspec
-  = "ctypes_allocate_bufferspec"
-
-(* Produce a structure type representation from the buffer specification. *)
-external complete_struct_type : bufferspec -> _ structure ctype
-  = "ctypes_complete_structspec"
-
 (* Add an argument to the C buffer specification *)
 external add_argument : bufferspec -> _ ctype -> int
   = "ctypes_add_argument"
-
-(* add_unpassable_argument : bufferspec -> size:int -> alignment:int -> int *)
-external add_unpassable_argument : bufferspec -> size:int -> alignment:int -> int
-  = "ctypes_add_unpassable_argument"
 
 (* nary callbacks *)
 type boxedfn =
