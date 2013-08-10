@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 8d245631acf7b9d34ed6469f3b39a22f)
+# DO NOT EDIT (digest: 7dc838716d862f6f71d5d2bd2d1b1107)
 Unsigned
 Signed
 Ctypes
@@ -10,5 +10,6 @@ Static
 Type_printing
 WeakRef
 Dynamic
+Value_printing
 Std_views
 # OASIS_STOP

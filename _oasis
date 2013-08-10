@@ -18,6 +18,7 @@ Library ctypes
                     Type_printing,
                     WeakRef,
                     Dynamic,
+                    Value_printing,
                     Std_views
   CSources:         raw_pointer.h,
                     unsigned_stubs.h,unsigned_stubs.c,
