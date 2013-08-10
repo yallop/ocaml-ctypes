@@ -12,7 +12,7 @@ Library ctypes
   Path:             src/
   Findlibname:      ctypes
   Modules:          Unsigned,Signed,Ctypes,PosixTypes
-  InternalModules:  Ctypes_raw,WeakRef
+  InternalModules:  Ctypes_raw,Static,Formatters,WeakRef
   CSources:         raw_pointer.h,
                     unsigned_stubs.h,unsigned_stubs.c,
                     managed_buffer_stubs.h,managed_buffer_stubs.c,

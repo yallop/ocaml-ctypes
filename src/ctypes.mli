@@ -18,7 +18,7 @@ open Unsigned
 
 (** {2:types Values representing C types} *)
 
-type 'a typ
+type 'a typ = 'a Static.typ
 (** The type of values representing C types.  There are two types associated
     with each [typ] value: the C type used to store and pass values, and the
     corresponding OCaml type.  The type parameter indicates the OCaml type, so a
