@@ -19,6 +19,7 @@ Library ctypes
                     Type_printing,
                     WeakRef,
                     Closure_properties,
+                    Dynamic_stubs,
                     Dynamic,
                     Value_printing,
                     Std_views

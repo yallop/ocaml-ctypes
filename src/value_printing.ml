@@ -10,8 +10,8 @@ open Dynamic
 
 let rec format : type a. a typ -> Format.formatter -> a -> unit
   = fun typ fmt v -> match typ with
-    Void -> Format.pp_print_string fmt (Raw.string_of RawTypes.void v)
-  | Primitive p -> Format.pp_print_string fmt (Raw.string_of p v)
+    Void -> Format.pp_print_string fmt (Dynamic_stubs.string_of RawTypes.void v)
+  | Primitive p -> Format.pp_print_string fmt (Dynamic_stubs.string_of p v)
   | Pointer _ -> format_ptr fmt v
   | Struct _ -> format_struct fmt v
   | Union _ -> format_union fmt v
@@ -55,7 +55,7 @@ and format_fields : type a b. string -> (a, b) structured boxed_field list ->
 and format_ptr : type a. Format.formatter -> a ptr -> unit
   = fun fmt {raw_ptr; reftype; pbyte_offset} ->
     Format.fprintf fmt "%s"
-      (Raw.string_of
+      (Dynamic_stubs.string_of
          RawTypes.pointer
          (RawTypes.PtrType.(add raw_ptr (of_int pbyte_offset))))
 

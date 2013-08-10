@@ -9,13 +9,13 @@ open Static
 open Dynamic
 
 let string_of_char_ptr {raw_ptr; pbyte_offset} =
-  Raw.string_of_cstring raw_ptr pbyte_offset
+  Dynamic_stubs.string_of_cstring raw_ptr pbyte_offset
 
 let char_ptr_of_string s =
-  let buf = Raw.cstring_of_string s in
+  let buf = Dynamic_stubs.cstring_of_string s in
   { reftype = char;
     pmanaged = Some buf;
-    raw_ptr = Raw.block_address buf;
+    raw_ptr = Dynamic_stubs.block_address buf;
     pbyte_offset = 0 }
 
 let string = view (ptr char)

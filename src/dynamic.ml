@@ -11,10 +11,11 @@ exception CallToExpiredClosure = Ctypes_raw.CallToExpiredClosure
 
 open Static
 
+module Stubs = Dynamic_stubs
 module Raw = Ctypes_raw
 
 (* Register the closure lookup function with C. *)
-let () = Raw.set_closure_callback Closure_properties.retrieve
+let () = Stubs.set_closure_callback Closure_properties.retrieve
 
 type arg_type = ArgType : 'b RawTypes.ctype -> arg_type
 
@@ -50,9 +51,9 @@ let rec invoke : type a. string option ->
   = fun name -> function
     | Call (check_errno, read_return_value) ->
       let call = match check_errno, name with
-        | true, Some name -> Raw.call_errno name
-        | true, None      -> Raw.call_errno ""
-        | false, _        -> Raw.call
+        | true, Some name -> Stubs.call_errno name
+        | true, None      -> Stubs.call_errno ""
+        | false, _        -> Stubs.call
       in
       fun writers callspec addr ->
         call addr callspec
@@ -66,25 +67,25 @@ let rec invoke : type a. string option ->
 let rec prep_callspec : type a. Raw.bufferspec -> a typ -> unit
   = fun callspec ty ->
     let ArgType ctype = arg_type ty in
-    Raw.prep_callspec callspec ctype
+    Stubs.prep_callspec callspec ctype
 
 and add_argument : type a. Raw.bufferspec -> a typ -> int
   = fun callspec -> function
     | Void -> 0
     | ty   -> let ArgType ctype = arg_type ty in
-              Raw.add_argument callspec ctype
+              Stubs.add_argument callspec ctype
 
-and box_function : type a. a fn -> Raw.bufferspec -> a WeakRef.t -> Raw.boxedfn
+and box_function : type a. a fn -> Raw.bufferspec -> a WeakRef.t -> Stubs.boxedfn
   = fun fn callspec -> match fn with
     | Returns (_, ty) ->
       let _ = prep_callspec callspec ty in
       let write_rv = write ty in
-      fun f -> Raw.Done (write_rv ~offset:0 (WeakRef.get f), callspec)
+      fun f -> Stubs.Done (write_rv ~offset:0 (WeakRef.get f), callspec)
     | Function (p, f) ->
       let _ = add_argument callspec p in
       let box = box_function f callspec in
       let read = build p ~offset:0 in
-      fun f -> Raw.Fn (fun buf ->
+      fun f -> Stubs.Fn (fun buf ->
         try box (WeakRef.make (WeakRef.get f (read buf)))
         with WeakRef.EmptyWeakReference -> raise CallToExpiredClosure)
 
@@ -92,28 +93,28 @@ and box_function : type a. a fn -> Raw.bufferspec -> a WeakRef.t -> Raw.boxedfn
 and build : type a. a typ -> offset:int -> Raw.raw_pointer -> a
  = function
     | Void ->
-      Raw.read RawTypes.void
+      Stubs.read RawTypes.void
     | Primitive p ->
-      Raw.read p
+      Stubs.read p
     | Struct { spec = Incomplete _ } ->
       raise IncompleteType
     | Struct { spec = Complete p } as reftype ->
       (fun ~offset buf ->
-        let m = Raw.read p ~offset buf in
+        let m = Stubs.read p ~offset buf in
         { structured =
             { pmanaged = Some m;
               reftype;
-              raw_ptr = Raw.block_address m;
+              raw_ptr = Stubs.block_address m;
               pbyte_offset = 0 } })
     | Pointer reftype ->
       (fun ~offset buf ->
-        { raw_ptr = Raw.read RawTypes.pointer ~offset buf;
+        { raw_ptr = Stubs.read RawTypes.pointer ~offset buf;
           pbyte_offset = 0;
           reftype;
           pmanaged = None })
     | FunctionPointer (name, f) ->
       let build_fun = build_function ?name f in
-      (fun ~offset buf -> build_fun (Raw.read RawTypes.pointer ~offset buf))
+      (fun ~offset buf -> build_fun (Stubs.read RawTypes.pointer ~offset buf))
     | View { read; ty } ->
       let buildty = build ty in
       (fun ~offset buf -> read (buildty ~offset buf))
@@ -126,22 +127,22 @@ and build : type a. a typ -> offset:int -> Raw.raw_pointer -> a
 and write : type a. a typ -> offset:int -> a -> Raw.raw_pointer -> unit
   = let write_aggregate size =
       (fun ~offset { structured = { raw_ptr; pbyte_offset = src_offset } } dst ->
-        Raw.memcpy ~size ~dst ~dst_offset:offset ~src:raw_ptr ~src_offset) in
+        Stubs.memcpy ~size ~dst ~dst_offset:offset ~src:raw_ptr ~src_offset) in
     function
     | Void -> (fun ~offset _ _ -> ())
-    | Primitive p -> Raw.write p
+    | Primitive p -> Stubs.write p
     | Pointer _ ->
       (fun ~offset { raw_ptr; pbyte_offset } ->
-        Raw.write RawTypes.pointer ~offset
+        Stubs.write RawTypes.pointer ~offset
           (RawTypes.PtrType.(add raw_ptr (of_int pbyte_offset))))
     | FunctionPointer (_, fn) ->
-      let cs' = Raw.allocate_callspec () in
+      let cs' = Stubs.allocate_callspec () in
       let cs = box_function fn cs' in
       (fun ~offset f ->
        let boxed = cs (WeakRef.make f) in
        let id = Closure_properties.record (Obj.repr f) (Obj.repr boxed) in
-       Raw.write RawTypes.pointer ~offset
-         (Raw.make_function_pointer cs' id))
+       Stubs.write RawTypes.pointer ~offset
+         (Stubs.make_function_pointer cs' id))
     | Struct { spec = Incomplete _ } -> raise IncompleteType
     | Struct { spec = Complete _ } as s -> write_aggregate (sizeof s)
     | Union { ucomplete=false } -> raise IncompleteType
@@ -150,7 +151,7 @@ and write : type a. a typ -> offset:int -> a -> Raw.raw_pointer -> unit
     | Array _ as a ->
       let size = sizeof a in
       (fun ~offset { astart = { raw_ptr; pbyte_offset = src_offset } } dst ->
-        Raw.memcpy ~size ~dst ~dst_offset:offset ~src:raw_ptr ~src_offset)
+        Stubs.memcpy ~size ~dst ~dst_offset:offset ~src:raw_ptr ~src_offset)
     | View { write = w; ty } ->
       let writety = write ty in
       (fun ~offset v -> writety ~offset (w v))
@@ -175,7 +176,7 @@ and build_ccallspec : type a. a fn -> Raw.bufferspec -> a ccallspec
 
 and build_function : type a. ?name:string -> a fn -> RawTypes.voidp -> a
   = fun ?name fn ->
-    let c = Raw.allocate_callspec () in
+    let c = Stubs.allocate_callspec () in
     let e = build_ccallspec fn c in
     invoke name e [] c
 
@@ -229,13 +230,13 @@ let to_voidp : type a. a ptr -> unit ptr
 let allocate_n : type a. ?finalise:(a ptr -> unit) -> a typ -> count:int -> a ptr
   = fun ?finalise reftype ~count ->
     let package p =
-      { reftype; pbyte_offset = 0; raw_ptr = Raw.block_address p;
+      { reftype; pbyte_offset = 0; raw_ptr = Stubs.block_address p;
         pmanaged = Some p } in
     let finalise = match finalise with
       | Some f -> Gc.finalise (fun p -> f (package p))
       | None -> ignore
     in
-    let p = Raw.allocate (count * sizeof reftype) in begin
+    let p = Stubs.allocate (count * sizeof reftype) in begin
       finalise p;
       package p
     end

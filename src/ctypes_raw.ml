@@ -5,7 +5,7 @@
  * See the file LICENSE for details.
  *)
 
-(* Low-level unsafe interface for calling functions using libffi. *)
+(* Interface to primitive types defined in C, and some exceptions. *)
 
 module Types :
 sig
@@ -159,79 +159,8 @@ type bufferspec
    into which we can read/write C values. *)
 type raw_pointer = voidp
 
-(* Read a C value from a block of memory *)
-external read : 'a ctype -> offset:int -> raw_pointer -> 'a
-  = "ctypes_read"
-
-(* Write a C value to a block of memory *)
-external write :  'a ctype -> offset:int -> 'a -> raw_pointer -> unit
-  = "ctypes_write"
-
-(* Return a string representation of a C value *)
-external string_of : 'a ctype -> 'a -> string = "ctypes_string_of"
-
-(* Allocate a new C call specification *)
-external allocate_callspec : unit -> bufferspec
-  = "ctypes_allocate_callspec"
-
-(* Pass the return type and conclude the specification preparation *)
-external prep_callspec : bufferspec -> _ ctype -> unit
-  = "ctypes_prep_callspec"
-
-(* Call the function specified by `bufferspec' at the given address.
-   The callback functions write the arguments to the buffer and read
-   the return value. *)
-external call : raw_pointer -> bufferspec -> (raw_pointer -> unit) ->
-  (raw_pointer -> 'a) -> 'a
-  = "ctypes_call"
-
-(* As ctypes_call, but check errno and raise Unix_error if the call failed. *)
-external call_errno : string -> raw_pointer -> bufferspec ->
-  (raw_pointer -> unit) -> (raw_pointer -> 'a) -> 'a
-  = "ctypes_call_errno"
-
 type managed_buffer
 type _ structure = managed_buffer
-
-(* Add an argument to the C buffer specification *)
-external add_argument : bufferspec -> _ ctype -> int
-  = "ctypes_add_argument"
-
-(* nary callbacks *)
-type boxedfn =
-  | Done of (raw_pointer -> unit) * bufferspec
-  | Fn of (raw_pointer -> boxedfn)
-
-(* Construct a pointer to an OCaml function represented by an identifier *)
-external make_function_pointer : bufferspec -> int -> raw_pointer
-  = "ctypes_make_function_pointer"
-
-(* Allocate a region of stable memory managed by a custom block. *)
-external allocate : int -> managed_buffer
-  = "ctypes_allocate"
-
-(* Obtain the address of the managed block. *)
-external block_address : managed_buffer -> raw_pointer
-  = "ctypes_block_address"
-
-(* Set the function used to retrieve functions by identifier. *)
-external set_closure_callback : (int -> Obj.t) -> unit
-  = "ctypes_set_closure_callback"
-
-(* Copy [size] bytes from [src + src_offset] to [dst + dst_offset]. *)
-external memcpy :
-  dst:raw_pointer -> dst_offset:int ->
-  src:raw_pointer -> src_offset:int ->
-    size:int -> unit
-  = "ctypes_memcpy"
-
-(* Convert a C string to an OCaml string *)
-external string_of_cstring : raw_pointer -> int -> string
-  = "ctypes_string_of_cstring"
-
-(* Convert an OCaml string to a C string *)
-external cstring_of_string : string -> managed_buffer
-  = "ctypes_cstring_of_string"
 
 (* An internal error: for example, an `ffi_type' object passed to ffi_prep_cif
    was incorrect. *)
