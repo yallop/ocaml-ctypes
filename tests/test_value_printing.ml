@@ -330,9 +330,9 @@ let test_pointer_printing () =
 *)
 let test_struct_printing () =
   let s = structure "s" in
-  let a = s *:* array 3 int in
-  let d = s *:* double in
-  let f = s *:* funptr (int @-> returning int) in
+  let a = field "arr" (s *:* array 3 int) in
+  let d = field "dbl" (s *:* double) in
+  let f = field "ptr" (s *:* funptr (int @-> returning int)) in
   let () = seal s in
 
   let t = structure "t" in
@@ -352,7 +352,8 @@ let test_struct_printing () =
     setf vt ti 14;
 
     assert_bool "struct printing"
-      (equal_ignoring_whitespace "{{ {4, 5, 6}, nan, <fun> }, 14}"
+      (equal_ignoring_whitespace
+         "{{ arr = {4, 5, 6}, dbl = nan, ptr = <fun> }, 14}"
          (string_of t vt))
   end
 

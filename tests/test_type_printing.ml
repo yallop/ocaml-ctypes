@@ -222,16 +222,16 @@ let test_struct_and_union_printing () =
 
     (* Structs and unions containing primitives *)
     let s_prims = structure "s_prims" in
-    let _ = s_prims *:* int in
-    let _ = s_prims *:* ulong in
-    let _ = s_prims *:* float in
+    let _ = field "i" (s_prims *:* int) in
+    let _ = field "l" (s_prims *:* ulong) in
+    let _ = field "z" (s_prims *:* float) in
     seal s_prims;
 
     assert_typ_printed_as ~name:"b"
                           "struct s_prims {
-                              int field_0;
-                              unsigned long field_1;
-                              float field_2;
+                              int i;
+                              unsigned long l;
+                              float z;
                            } b"
       s_prims;
 
@@ -277,14 +277,14 @@ let test_struct_and_union_printing () =
     (* Structs and unions containing arrays and pointers to functions *)
     let mixture = structure "mixture" in
     let _ = mixture *:* array 10 (array 12 (ptr mixture)) in
-    let _ = mixture *:* funptr (ptr mixture @-> returning void) in
+    let _ = field "fn" (mixture *:* funptr (ptr mixture @-> returning void)) in
     let _ = mixture *:* int in
     seal mixture;
       
     assert_typ_printed_as ~name:"d" 
                           "struct mixture {
                               struct mixture *field_0[10][12];
-                              void (*field_1)(struct mixture *);
+                              void (*fn)(struct mixture *);
                               int field_2;
                            } d"
       mixture;
