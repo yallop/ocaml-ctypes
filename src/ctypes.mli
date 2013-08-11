@@ -289,7 +289,7 @@ val ( +:+ ) : 's union typ -> 'a typ -> ('a, 's union) field
     Attempting to add a field to a union type that has been sealed with [seal]
     is an error, and will raise [ModifyingSealedType]. *)
 
-val seal : (_, _) structured typ -> unit
+val seal : (_, [< `Struct | `Union]) structured typ -> unit
 (** [seal t] completes the struct or union type [t] so that no further fields
     can be added.  Struct and union types must be sealed before they can be used
     in a way that involves their size or alignment; see the documentation for
