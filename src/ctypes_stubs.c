@@ -69,12 +69,6 @@ static value allocate_custom(struct custom_operations *ops, size_t size,
 }
 
 
-/* null_value : unit -> voidp */
-value ctypes_null_value(value unit)
-{
-  return CTYPES_FROM_PTR(NULL);
-}
-
 static void check_ffi_status(ffi_status status)
 {
   switch (status) {
@@ -240,7 +234,7 @@ static void populate_arg_array(struct bufferspec *bufferspec,
 
 
 /* Allocate a new C buffer specification */
-/* allocate_buffer : unit -> bufferspec */
+/* allocate_bufferspec : unit -> bufferspec */
 value ctypes_allocate_bufferspec(value unit)
 {
   return allocate_custom(&bufferspec_custom_ops,
@@ -249,7 +243,7 @@ value ctypes_allocate_bufferspec(value unit)
 }
 
 /* Allocate a new C call specification */
-/* allocate_callspec : unit -> bufferspec */
+/* allocate_callspec : unit -> callspec */
 value ctypes_allocate_callspec(value unit)
 {
   return allocate_custom(&bufferspec_custom_ops,
@@ -344,7 +338,7 @@ value ctypes_add_argument(value bufferspec_, value argument_)
 
 
 /* Pass the return type and conclude the specification preparation */
-/* prep_callspec : bufferspec -> 'a ctype -> unit */
+/* prep_callspec : callspec -> 'a ctype -> unit */
 value ctypes_prep_callspec(value callspec_, value rtype)
 {
   CAMLparam2(callspec_, rtype);
@@ -384,7 +378,7 @@ value ctypes_prep_callspec(value callspec_, value rtype)
 
 /* Call the function specified by `callspec', passing arguments and return
    values in `buffer' */
-/* call : raw_pointer -> bufferspec -> (raw_pointer -> unit) ->
+/* call : raw_pointer -> callspec -> (raw_pointer -> unit) ->
           (raw_pointer -> 'a) -> 'a */
 value ctypes_call(value function, value callspec_, value argwriter,
                   value rvreader)
@@ -418,7 +412,7 @@ value ctypes_call(value function, value callspec_, value argwriter,
 }
 
 
-/* call_errno : string -> raw_pointer -> bufferspec -> 
+/* call_errno : string -> raw_pointer -> callspec -> 
                (raw_pointer -> unit) ->
                (raw_pointer -> 'a) -> 'a */
 value ctypes_call_errno(value fnname, value function, value callspec_,
@@ -476,7 +470,7 @@ static void callback_handler(ffi_cif *cif,
 
 
 /* Construct a pointer to an OCaml function represented by an identifier */
-/* make_function_pointer : bufferspec -> int -> raw_pointer */
+/* make_function_pointer : callspec -> int -> raw_pointer */
 value ctypes_make_function_pointer(value callspec_, value fnid)
 {
   CAMLparam2(callspec_, fnid);
@@ -554,39 +548,4 @@ value ctypes_complete_structspec(value bufferspec_)
     assert (0);
   }
   }
-}
-
-
-/* memcpy : dest:raw_pointer -> dest_offset:int ->
-            src:raw_pointer -> src_offset:int ->
-            size:int -> unit */
-value ctypes_memcpy(value dst, value dst_offset,
-                    value src, value src_offset, value size)
-{
-  CAMLparam5(dst, dst_offset, src, src_offset, size);
-  memcpy((char *)CTYPES_TO_PTR(dst) + Int_val(dst_offset),
-         (char *)CTYPES_TO_PTR(src) + Int_val(src_offset),
-         Int_val(size));
-  CAMLreturn(Val_unit);
-}
-
-
-/* string_of_cstring : raw_ptr -> int -> string */
-value ctypes_string_of_cstring(value p, value offset)
-{
-  return caml_copy_string(CTYPES_TO_PTR(p) + Int_val(offset));
-}
-
-/* cstring_of_string : string -> managed_buffer */
-value ctypes_cstring_of_string(value s)
-{
-  CAMLparam1(s);
-  CAMLlocal1(buffer);
-  int len = caml_string_length(s);
-  buffer = ctypes_allocate(Val_int(len + 1));
-  char *dst = CTYPES_TO_PTR(ctypes_block_address(buffer));
-  char *ss = String_val(s);
-  memcpy(dst, ss, len);
-  dst[len] = '\0';
-  CAMLreturn(buffer);
 }
