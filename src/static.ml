@@ -211,10 +211,13 @@ let union utag = Union { utag; usize = 0; ualignment = 0; ucomplete = false;
 let ensure_unsealed { ucomplete; utag } =
   if ucomplete then raise (ModifyingSealedType utag)
 
+let aligned_offset offset alignment =
+  match offset mod alignment with
+    0 -> offset
+  | overhang -> offset - overhang + alignment
+
 let compute_union_padding { usize; ualignment } =
-  let overhang = usize mod ualignment in
-  if overhang = 0 then usize
-  else usize - overhang + ualignment
+  aligned_offset usize ualignment
 
 let seal (type a) (type s) : (a, s) structured typ -> unit = function
   | Struct { fields = [] } -> raise (Unsupported "struct with no fields")
