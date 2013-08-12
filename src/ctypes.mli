@@ -18,7 +18,7 @@ open Unsigned
 
 (** {2:types Values representing C types} *)
 
-type 'a typ
+type 'a typ = 'a Static.typ
 (** The type of values representing C types.  There are two types associated
     with each [typ] value: the C type used to store and pass values, and the
     corresponding OCaml type.  The type parameter indicates the OCaml type, so a
@@ -289,7 +289,7 @@ val ( +:+ ) : 's union typ -> 'a typ -> ('a, 's union) field
     Attempting to add a field to a union type that has been sealed with [seal]
     is an error, and will raise [ModifyingSealedType]. *)
 
-val seal : (_, _) structured typ -> unit
+val seal : (_, [< `Struct | `Union]) structured typ -> unit
 (** [seal t] completes the struct or union type [t] so that no further fields
     can be added.  Struct and union types must be sealed before they can be used
     in a way that involves their size or alignment; see the documentation for

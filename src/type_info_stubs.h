@@ -15,8 +15,6 @@
 #include <ffi.h>
 
 struct type_info {
-  const char *name;
-  enum { PASSABLE, UNPASSABLE, STRUCT } passable;
   ffi_type   *ffitype;
   value     (*raw_read)(struct type_info *, void *);
   value     (*raw_write)(struct type_info *, void *, value);
@@ -56,12 +54,6 @@ extern value ctypes_long_type_info(value unit);
 extern value ctypes_llong_type_info(value unit);
 extern value ctypes_size_t_type_info(value unit);
 extern value ctypes_void_type_info(value unit);
-
-/* sizeof : _ctype -> int */
-extern value ctypes_sizeof(value ctype);
-
-/* alignment : _ ctype -> int */
-extern value ctypes_alignment(value ctype);
 
 /* Read a C value from a block of memory */
 /* read : 'a ctype -> offset:int -> immediate_pointer -> 'a */

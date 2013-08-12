@@ -12,8 +12,19 @@ Library ctypes
   Path:             src/
   Findlibname:      ctypes
   Modules:          Unsigned,Signed,Ctypes,PosixTypes
-  InternalModules:  Ctypes_raw,WeakRef
-  CSources:         raw_pointer.h,
+  InternalModules:  Common,
+                    Ctypes_raw,
+                    Static_stubs,
+                    Static,
+                    Type_printing,
+                    WeakRef,
+                    Closure_properties,
+                    Dynamic_stubs,
+                    Dynamic,
+                    Value_printing,
+                    Std_view_stubs,
+                    Std_views
+  CSources:         raw_pointer.h,raw_pointer_stubs.c,
                     unsigned_stubs.h,unsigned_stubs.c,
                     managed_buffer_stubs.h,managed_buffer_stubs.c,
                     type_info_stubs.h,type_info_stubs.c,
