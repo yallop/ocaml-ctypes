@@ -1,5 +1,6 @@
 # OASIS_START
-# DO NOT EDIT (digest: 10866b09bad98508200ab6d0ac8bffda)
+# DO NOT EDIT (digest: c80c2fa89be4ffd4513de8fefb9aa723)
+raw_pointer_stubs.o
 unsigned_stubs.o
 managed_buffer_stubs.o
 type_info_stubs.o

@@ -24,7 +24,7 @@ Library ctypes
                     Value_printing,
                     Std_view_stubs,
                     Std_views
-  CSources:         raw_pointer.h,
+  CSources:         raw_pointer.h,raw_pointer_stubs.c,
                     unsigned_stubs.h,unsigned_stubs.c,
                     managed_buffer_stubs.h,managed_buffer_stubs.c,
                     type_info_stubs.h,type_info_stubs.c,
