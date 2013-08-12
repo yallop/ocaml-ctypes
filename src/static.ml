@@ -217,31 +217,30 @@ let all_passable fields =
 let seal (type a) (type s) : (a, s) structured typ -> unit = function
   | Struct { fields = [] } -> raise (Unsupported "struct with no fields")
   | Struct { spec = Complete _; tag } -> raise (ModifyingSealedType tag)
-  | Struct ({ spec = Incomplete { isize } } as s) ->
+  | Struct ({ spec = Incomplete { isize } } as s) 
+      when all_passable s.fields ->
     s.fields <- List.rev s.fields;
     let bufspec = Static_stubs.allocate_bufferspec () in
     let () = 
       List.iter
         (fun (BoxedField {ftype; foffset}) ->
-          let offset =
-            if passable ftype then
-              let ArgType t = arg_type ftype in
-              Static_stubs.add_argument bufspec t
-            else
-              Static_stubs.add_unpassable_argument
-                bufspec ~size:(sizeof ftype) ~alignment:(alignment ftype)
-          in
+          let ArgType t = arg_type ftype in
+          let offset = Static_stubs.add_argument bufspec t in
           assert (offset = foffset))
         s.fields
     in
-    let max_alignment = max_field_alignment s.fields
-    and passable = all_passable s.fields
-    and raw = Static_stubs.complete_struct_type bufspec in
-    s.spec <- Complete { RawTypes.raw;
-                         size = aligned_offset isize max_alignment;
-                         alignment = max_alignment;
-                         name = "struct " ^ s.tag;
-                         passable = passable }
+    let alignment = max_field_alignment s.fields in
+    let size = aligned_offset isize alignment in
+    let raw = Static_stubs.complete_struct_type bufspec in
+    s.spec <- Complete { RawTypes.raw; size; alignment; passable = true;
+                         name = "struct " ^ s.tag }
+  | Struct ({ spec = Incomplete { isize } } as s) ->
+    s.fields <- List.rev s.fields;
+    let alignment = max_field_alignment s.fields in
+    let size = aligned_offset isize alignment in
+    let raw = Static_stubs.make_unpassable_structspec ~size ~alignment in
+    s.spec <- Complete { RawTypes.raw; size; alignment; passable = false;
+                         name = "struct " ^ s.tag }
   | Union { ufields = [] } -> raise (Unsupported "union with no fields")
   | Union u -> begin
     ensure_unsealed u;

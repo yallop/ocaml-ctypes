@@ -24,6 +24,9 @@ struct type_info {
 /* allocate_struct_type_info : ffitype*** -> _ ctype */
 value ctypes_allocate_struct_type_info(ffi_type ***args);
 
+/* allocate_unpassable_struct_type_info : (size, alignment) -> _ ctype */
+value ctypes_allocate_unpassable_struct_type_info(int size, int alignment);
+
 /* allocate_type_info : struct type_info* -> _ ctype */
 value ctypes_allocate_type_info(struct type_info *ti);
 
