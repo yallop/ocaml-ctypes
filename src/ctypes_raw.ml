@@ -171,15 +171,11 @@ end
 
 open Types
 
-(* A specification of argument C-types and C-return values *)
-type bufferspec
-
 (* A raw pointer to a block of memory, not managed by the garbage collector,
    into which we can read/write C values. *)
 type raw_pointer = voidp
 
 type managed_buffer
-type _ structure = managed_buffer
 
 (* An internal error: for example, an `ffi_type' object passed to ffi_prep_cif
    was incorrect. *)

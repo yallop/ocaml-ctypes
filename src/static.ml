@@ -14,8 +14,8 @@ exception Unsupported of string
 module RawTypes = Ctypes_raw.Types
 
 type 'a structspec =
-    Incomplete of Ctypes_raw.bufferspec
-  | Complete of 'a Ctypes_raw.structure RawTypes.ctype
+    Incomplete of Static_stubs.bufferspec
+  | Complete of 'a Static_stubs.structure RawTypes.ctype
 
 type abstract_type = {
   aname : string;
@@ -81,7 +81,7 @@ let rec sizeof : type a. a typ -> int = function
     Void                           -> raise IncompleteType
   | Primitive { RawTypes.size }    -> size
   | Struct { spec = Incomplete _ } -> raise IncompleteType
-  | Struct { spec = Complete 
+  | Struct { spec = Complete
                { RawTypes.size } } -> size
   | Union { ucomplete = false }    -> raise IncompleteType
   | Union { usize }                -> usize
@@ -95,7 +95,7 @@ let rec alignment : type a. a typ -> int = function
     Void                             -> raise IncompleteType
   | Primitive { RawTypes.alignment } -> alignment
   | Struct { spec = Incomplete _ }   -> raise IncompleteType
-  | Struct { spec = Complete 
+  | Struct { spec = Complete
              {RawTypes.alignment } } -> alignment
   | Union { ucomplete = false }      -> raise IncompleteType
   | Union { ualignment }             -> ualignment

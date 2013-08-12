@@ -13,6 +13,12 @@ external sizeof : _ Types.ctype_io -> int = "ctypes_sizeof"
 
 external alignment : _ Types.ctype_io -> int = "ctypes_alignment"
 
+(* A struct layout specification *)
+type bufferspec
+
+(* The type of struct values *)
+type _ structure = Ctypes_raw.managed_buffer
+
 (* Allocate a new C typed buffer specification *)
 external allocate_bufferspec : unit -> bufferspec
   = "ctypes_allocate_bufferspec"

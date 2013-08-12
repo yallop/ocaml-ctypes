@@ -240,7 +240,7 @@ static void populate_arg_array(struct bufferspec *bufferspec,
 
 
 /* Allocate a new C buffer specification */
-/* allocate_buffer : unit -> bufferspec */
+/* allocate_bufferspec : unit -> bufferspec */
 value ctypes_allocate_bufferspec(value unit)
 {
   return allocate_custom(&bufferspec_custom_ops,
@@ -249,7 +249,7 @@ value ctypes_allocate_bufferspec(value unit)
 }
 
 /* Allocate a new C call specification */
-/* allocate_callspec : unit -> bufferspec */
+/* allocate_callspec : unit -> callspec */
 value ctypes_allocate_callspec(value unit)
 {
   return allocate_custom(&bufferspec_custom_ops,
@@ -344,7 +344,7 @@ value ctypes_add_argument(value bufferspec_, value argument_)
 
 
 /* Pass the return type and conclude the specification preparation */
-/* prep_callspec : bufferspec -> 'a ctype -> unit */
+/* prep_callspec : callspec -> 'a ctype -> unit */
 value ctypes_prep_callspec(value callspec_, value rtype)
 {
   CAMLparam2(callspec_, rtype);
@@ -384,7 +384,7 @@ value ctypes_prep_callspec(value callspec_, value rtype)
 
 /* Call the function specified by `callspec', passing arguments and return
    values in `buffer' */
-/* call : raw_pointer -> bufferspec -> (raw_pointer -> unit) ->
+/* call : raw_pointer -> callspec -> (raw_pointer -> unit) ->
           (raw_pointer -> 'a) -> 'a */
 value ctypes_call(value function, value callspec_, value argwriter,
                   value rvreader)
@@ -418,7 +418,7 @@ value ctypes_call(value function, value callspec_, value argwriter,
 }
 
 
-/* call_errno : string -> raw_pointer -> bufferspec -> 
+/* call_errno : string -> raw_pointer -> callspec -> 
                (raw_pointer -> unit) ->
                (raw_pointer -> 'a) -> 'a */
 value ctypes_call_errno(value fnname, value function, value callspec_,
@@ -476,7 +476,7 @@ static void callback_handler(ffi_cif *cif,
 
 
 /* Construct a pointer to an OCaml function represented by an identifier */
-/* make_function_pointer : bufferspec -> int -> raw_pointer */
+/* make_function_pointer : callspec -> int -> raw_pointer */
 value ctypes_make_function_pointer(value callspec_, value fnid)
 {
   CAMLparam2(callspec_, fnid);

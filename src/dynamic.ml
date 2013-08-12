@@ -45,7 +45,7 @@ let rec arg_type : type a. a typ -> arg_type = function
 let rec invoke : type a. string option ->
                          a ccallspec ->
                          (Raw.raw_pointer -> unit) list ->
-                         Raw.bufferspec ->
+                         Dynamic_stubs.callspec ->
                          Raw.raw_pointer ->
                       a
   = fun name -> function
@@ -64,18 +64,18 @@ let rec invoke : type a. string option ->
       fun writers callspec addr v ->
         next (write v :: writers) callspec addr
 
-let rec prep_callspec : type a. Raw.bufferspec -> a typ -> unit
+let rec prep_callspec : type a. Dynamic_stubs.callspec -> a typ -> unit
   = fun callspec ty ->
     let ArgType ctype = arg_type ty in
     Stubs.prep_callspec callspec ctype
 
-and add_argument : type a. Raw.bufferspec -> a typ -> int
+and add_argument : type a. Dynamic_stubs.callspec -> a typ -> int
   = fun callspec -> function
     | Void -> 0
     | ty   -> let ArgType ctype = arg_type ty in
               Stubs.add_argument callspec ctype
 
-and box_function : type a. a fn -> Raw.bufferspec -> a WeakRef.t -> Stubs.boxedfn
+and box_function : type a. a fn -> Dynamic_stubs.callspec -> a WeakRef.t -> Stubs.boxedfn
   = fun fn callspec -> match fn with
     | Returns (_, ty) ->
       let _ = prep_callspec callspec ty in
@@ -164,7 +164,7 @@ and write : type a. a typ -> offset:int -> a -> Raw.raw_pointer -> unit
   add_argument callspec argn
   prep_callspec callspec rettype
 *)
-and build_ccallspec : type a. a fn -> Raw.bufferspec -> a ccallspec
+and build_ccallspec : type a. a fn -> Dynamic_stubs.callspec -> a ccallspec
   = fun fn callspec -> match fn with
     | Returns (check_errno, t) ->
       let () = prep_callspec callspec t in
