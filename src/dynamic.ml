@@ -17,14 +17,14 @@ module Raw = Ctypes_raw
 (* Register the closure lookup function with C. *)
 let () = Stubs.set_closure_callback Closure_properties.retrieve
 
-type arg_type = ArgType : 'b RawTypes.ctype -> arg_type
+type arg_type = ArgType : 'b RawTypes.ctype_io -> arg_type
 
 let rec arg_type : type a. a typ -> arg_type = function
-    Void                           -> ArgType RawTypes.void
-  | Primitive p                    -> ArgType p
-  | Struct { spec = Complete p }   -> ArgType p
-  | Pointer _                      -> ArgType RawTypes.pointer
-  | FunctionPointer _              -> ArgType RawTypes.pointer
+    Void                           -> ArgType RawTypes.(void.raw)
+  | Primitive p                    -> ArgType p.RawTypes.raw
+  | Struct { spec = Complete p }   -> ArgType p.RawTypes.raw
+  | Pointer _                      -> ArgType RawTypes.(pointer.raw)
+  | FunctionPointer _              -> ArgType RawTypes.(pointer.raw)
   | View { ty }                    -> arg_type ty
   (* The following cases should never happen; aggregate types other than
      complete struct types are excluded during type construction. *)
@@ -37,7 +37,7 @@ let rec arg_type : type a. a typ -> arg_type = function
   call addr callspec
    (fun buffer ->
         write arg_1 buffer v_1
-        write arg_2 buffer v_2
+        write arg buffer v
         ...
         write arg_n buffer v_n)
    read_return_value
@@ -93,14 +93,14 @@ and box_function : type a. a fn -> Raw.bufferspec -> a WeakRef.t -> Stubs.boxedf
 and build : type a. a typ -> offset:int -> Raw.raw_pointer -> a
  = function
     | Void ->
-      Stubs.read RawTypes.void
-    | Primitive p ->
-      Stubs.read p
+      Stubs.read RawTypes.(void.raw)
+    | Primitive { RawTypes.raw } ->
+      Stubs.read raw
     | Struct { spec = Incomplete _ } ->
       raise IncompleteType
-    | Struct { spec = Complete p } as reftype ->
+    | Struct { spec = Complete { RawTypes.raw } } as reftype ->
       (fun ~offset buf ->
-        let m = Stubs.read p ~offset buf in
+        let m = Stubs.read raw ~offset buf in
         { structured =
             { pmanaged = Some m;
               reftype;
@@ -108,13 +108,13 @@ and build : type a. a typ -> offset:int -> Raw.raw_pointer -> a
               pbyte_offset = 0 } })
     | Pointer reftype ->
       (fun ~offset buf ->
-        { raw_ptr = Stubs.read RawTypes.pointer ~offset buf;
+        { raw_ptr = Stubs.read RawTypes.(pointer.raw) ~offset buf;
           pbyte_offset = 0;
           reftype;
           pmanaged = None })
     | FunctionPointer (name, f) ->
       let build_fun = build_function ?name f in
-      (fun ~offset buf -> build_fun (Stubs.read RawTypes.pointer ~offset buf))
+      (fun ~offset buf -> build_fun (Stubs.read RawTypes.(pointer.raw) ~offset buf))
     | View { read; ty } ->
       let buildty = build ty in
       (fun ~offset buf -> read (buildty ~offset buf))
@@ -130,10 +130,10 @@ and write : type a. a typ -> offset:int -> a -> Raw.raw_pointer -> unit
         Stubs.memcpy ~size ~dst ~dst_offset:offset ~src:raw_ptr ~src_offset) in
     function
     | Void -> (fun ~offset _ _ -> ())
-    | Primitive p -> Stubs.write p
+    | Primitive { RawTypes.raw } -> Stubs.write raw
     | Pointer _ ->
       (fun ~offset { raw_ptr; pbyte_offset } ->
-        Stubs.write RawTypes.pointer ~offset
+        Stubs.write RawTypes.(pointer.raw) ~offset
           (RawTypes.PtrType.(add raw_ptr (of_int pbyte_offset))))
     | FunctionPointer (_, fn) ->
       let cs' = Stubs.allocate_callspec () in
@@ -141,7 +141,7 @@ and write : type a. a typ -> offset:int -> a -> Raw.raw_pointer -> unit
       (fun ~offset f ->
        let boxed = cs (WeakRef.make f) in
        let id = Closure_properties.record (Obj.repr f) (Obj.repr boxed) in
-       Stubs.write RawTypes.pointer ~offset
+       Stubs.write RawTypes.(pointer.raw) ~offset
          (Stubs.make_function_pointer cs' id))
     | Struct { spec = Incomplete _ } -> raise IncompleteType
     | Struct { spec = Complete _ } as s -> write_aggregate (sizeof s)

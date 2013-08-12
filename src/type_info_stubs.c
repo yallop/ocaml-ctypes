@@ -46,8 +46,6 @@
   }                                                                            \
                                                                                \
   static struct type_info _ ## MUNGENAME ## _type_info = {                     \
-    #CTYPE,                                                                    \
-    PASSABLE,                                                                  \
     &FFITYPE,                                                                  \
     raw_read_ ## MUNGENAME,                                                    \
     raw_write_ ## MUNGENAME,                                                   \
@@ -132,9 +130,7 @@ static struct struct_type_info {
   struct type_info type_info;
   ffi_type       **args;
 } _struct_type_info_prototype = {
-  { "struct",
-    STRUCT,
-    NULL,
+  { NULL,
     raw_read_struct,
     raw_write_struct,
     format_struct, },
@@ -276,8 +272,6 @@ static value raw_write_void(struct type_info *ti, void *buf, value cv) { return 
 static value format_void(struct type_info *ti, value cv) { return caml_copy_string(""); }
 
 static struct type_info _void_type_info = {
-  "void",
-  UNPASSABLE,
   &ffi_type_void,
   raw_read_void,
   raw_write_void,
@@ -288,14 +282,6 @@ static struct type_info _void_type_info = {
 value ctypes_void_type_info(value unit)
 {
   return ctypes_allocate_type_info(&_void_type_info);
-}
-
-
-/* passable : _ ctype -> bool */
-value ctypes_passable(value typespec)
-{
-  struct type_info *ti = (struct type_info *)Data_custom_val(typespec);
-  return Val_int(ti->passable == PASSABLE);
 }
 
 
@@ -339,22 +325,11 @@ value ctypes_write(value ctype, value offset_, value v, value buffer_)
 }
 
 
-/* Write a C value to a block of memory */
+/* Format a C value */
 /* string_of : 'a ctype -> 'a -> string */
 value ctypes_string_of(value ctype, value v)
 {
   CAMLparam2(ctype, v);
   struct type_info *type_info = Data_custom_val(ctype);
   CAMLreturn(type_info->format(type_info, v));
-}
-
-
-/* Return the name of a type */
-/* typename : _ ctype -> string */
-value ctypes_typename(value ctype)
-{
-  CAMLparam1(ctype);
-  struct type_info *type_info = Data_custom_val(ctype);
-
-  CAMLreturn(caml_copy_string(type_info->name));
 }

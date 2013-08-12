@@ -18,11 +18,11 @@ external block_address : managed_buffer -> raw_pointer
   = "ctypes_block_address"
 
 (* Read a C value from a block of memory *)
-external read : 'a Types.ctype -> offset:int -> raw_pointer -> 'a
+external read : 'a Types.ctype_io -> offset:int -> raw_pointer -> 'a
   = "ctypes_read"
 
 (* Write a C value to a block of memory *)
-external write :  'a Types.ctype -> offset:int -> 'a -> raw_pointer -> unit
+external write :  'a Types.ctype_io -> offset:int -> 'a -> raw_pointer -> unit
   = "ctypes_write"
 
 (* Copy [size] bytes from [src + src_offset] to [dst + dst_offset]. *)
@@ -34,7 +34,7 @@ external memcpy :
 
 
 (* Return a string representation of a C value *)
-external string_of : 'a Types.ctype -> 'a -> string =
+external string_of : 'a Types.ctype_io -> 'a -> string =
     "ctypes_string_of"
 
 
@@ -43,11 +43,11 @@ external allocate_callspec : unit -> bufferspec
   = "ctypes_allocate_callspec"
 
 (* Add an argument to the C buffer specification *)
-external add_argument : bufferspec -> _ Types.ctype -> int
+external add_argument : bufferspec -> _ Types.ctype_io -> int
   = "ctypes_add_argument"
 
 (* Pass the return type and conclude the specification preparation *)
-external prep_callspec : bufferspec -> _ Types.ctype -> unit
+external prep_callspec : bufferspec -> _ Types.ctype_io -> unit
   = "ctypes_prep_callspec"
 
 (* Call the function specified by `bufferspec' at the given address.

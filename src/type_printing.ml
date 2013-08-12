@@ -30,8 +30,8 @@ let rec format_typ : type a. a typ ->
   fun t k context fmt -> match t with
     | Void ->
       fprintf fmt "void%t" (k `nonarray)
-    | Primitive p ->
-      fprintf fmt "%s%t" (Static_stubs.ctype_name p) (k `nonarray)
+    | Primitive { RawTypes.name } ->
+      fprintf fmt "%s%t" name (k `nonarray)
     | View { ty } ->
       format_typ ty k context fmt
     | Abstract { aname } ->

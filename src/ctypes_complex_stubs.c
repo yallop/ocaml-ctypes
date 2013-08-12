@@ -47,8 +47,6 @@ struct float_complex_alignment {
 static ffi_type float_complex_ffi_type;
 
 static struct type_info _float_complex_type_info = {
-  "float complex",
-  UNPASSABLE,
   &float_complex_ffi_type,
   raw_read_float_complex,
   raw_write_float_complex,
@@ -92,8 +90,6 @@ struct double_complex_alignment {
 static ffi_type double_complex_ffi_type;
 
 static struct type_info _double_complex_type_info = {
-  "double complex",
-  UNPASSABLE,
   &double_complex_ffi_type,
   raw_read_double_complex,
   raw_write_double_complex,

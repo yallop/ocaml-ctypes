@@ -9,20 +9,16 @@
 
 open Ctypes_raw
 
-external sizeof : _ Types.ctype -> int = "ctypes_sizeof"
+external sizeof : _ Types.ctype_io -> int = "ctypes_sizeof"
 
-external alignment : _ Types.ctype -> int = "ctypes_alignment"
-
-external ctype_name : _ Types.ctype -> string = "ctypes_typename"
-
-external passable : _ Types.ctype -> bool = "ctypes_passable"
+external alignment : _ Types.ctype_io -> int = "ctypes_alignment"
 
 (* Allocate a new C typed buffer specification *)
 external allocate_bufferspec : unit -> bufferspec
   = "ctypes_allocate_bufferspec"
 
 (* Add an argument to the C buffer specification *)
-external add_argument : bufferspec -> _ Types.ctype -> int
+external add_argument : bufferspec -> _ Types.ctype_io -> int
   = "ctypes_add_argument"
 
 (* Add an argument that makes the buffer unpassable to the C buffer
@@ -31,5 +27,5 @@ external add_unpassable_argument : bufferspec -> size:int -> alignment:int -> in
   = "ctypes_add_unpassable_argument"
 
 (* Produce a structure type representation from the buffer specification. *)
-external complete_struct_type : bufferspec -> _ structure Types.ctype
+external complete_struct_type : bufferspec -> _ structure Types.ctype_io
   = "ctypes_complete_structspec"

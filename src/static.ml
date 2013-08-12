@@ -79,42 +79,44 @@ type _ ccallspec =
 
 let rec sizeof : type a. a typ -> int = function
     Void                           -> raise IncompleteType
-  | Primitive p                    -> Static_stubs.sizeof p
+  | Primitive { RawTypes.size }    -> size
   | Struct { spec = Incomplete _ } -> raise IncompleteType
-  | Struct { spec = Complete p }   -> Static_stubs.sizeof p
+  | Struct { spec = Complete 
+               { RawTypes.size } } -> size
   | Union { ucomplete = false }    -> raise IncompleteType
   | Union { usize }                -> usize
   | Array (t, i)                   -> i * sizeof t
   | Abstract { asize }             -> asize
-  | Pointer _                      -> Static_stubs.sizeof RawTypes.pointer
-  | FunctionPointer _              -> Static_stubs.sizeof RawTypes.pointer
+  | Pointer _                      -> RawTypes.(pointer.size)
+  | FunctionPointer _              -> RawTypes.(pointer.size)
   | View { ty }                    -> sizeof ty
 
 let rec alignment : type a. a typ -> int = function
-    Void                           -> raise IncompleteType
-  | Primitive p                    -> Static_stubs.alignment p
-  | Struct { spec = Incomplete _ } -> raise IncompleteType
-  | Struct { spec = Complete p }   -> Static_stubs.alignment p
-  | Union { ucomplete = false }    -> raise IncompleteType
-  | Union { ualignment }           -> ualignment
-  | Array (t, _)                   -> alignment t
-  | Abstract { aalignment }        -> aalignment
-  | Pointer _                      -> Static_stubs.alignment RawTypes.pointer
-  | FunctionPointer _              -> Static_stubs.alignment RawTypes.pointer
-  | View { ty }                    -> alignment ty
+    Void                             -> raise IncompleteType
+  | Primitive { RawTypes.alignment } -> alignment
+  | Struct { spec = Incomplete _ }   -> raise IncompleteType
+  | Struct { spec = Complete 
+             {RawTypes.alignment } } -> alignment
+  | Union { ucomplete = false }      -> raise IncompleteType
+  | Union { ualignment }             -> ualignment
+  | Array (t, _)                     -> alignment t
+  | Abstract { aalignment }          -> aalignment
+  | Pointer _                        -> RawTypes.(pointer.alignment)
+  | FunctionPointer _                -> RawTypes.(pointer.alignment)
+  | View { ty }                      -> alignment ty
 
 let rec passable : type a. a typ -> bool = function
-    Void                           -> true
-  | Primitive p                    -> Static_stubs.passable p
-  | Struct { spec = Incomplete _ } -> raise IncompleteType
-  | Struct { passable }            -> passable
-  | Union { ucomplete = false }    -> raise IncompleteType
-  | Union _                        -> false
-  | Array _                        -> false
-  | Pointer _                      -> true
-  | Abstract _                     -> false
-  | FunctionPointer _              -> true
-  | View { ty }                    -> passable ty
+    Void                            -> true
+  | Primitive { RawTypes.passable } -> passable
+  | Struct { spec = Incomplete _ }  -> raise IncompleteType
+  | Struct { passable }             -> passable
+  | Union { ucomplete = false }     -> raise IncompleteType
+  | Union _                         -> false
+  | Array _                         -> false
+  | Pointer _                       -> true
+  | Abstract _                      -> false
+  | FunctionPointer _               -> true
+  | View { ty }                     -> passable ty
 
 let void = Void
 let char = Primitive RawTypes.char
@@ -173,7 +175,7 @@ let add_field f s = s.fields <- BoxedField f :: s.fields
 
 let ( *:* ) (type b) (Struct s) (ftype : b typ) =
     let bufspec = bufferspec s in
-    let add_member ftype t =
+    let add_member ftype { RawTypes.raw = t} =
       let foffset = Static_stubs.add_argument bufspec t in
       add_field {ftype; foffset} s;
       foffset
@@ -218,7 +220,12 @@ let seal (type a) (type s) : (a, s) structured typ -> unit = function
   | Struct { fields = [] } -> raise (Unsupported "struct with no fields")
   | Struct s ->
     let bufspec = bufferspec s in
-    s.spec <- Complete (Static_stubs.complete_struct_type bufspec)
+    let raw = Static_stubs.complete_struct_type bufspec in
+    s.spec <- Complete { RawTypes.raw;
+                         size = Static_stubs.sizeof raw;
+                         alignment = Static_stubs.alignment raw;
+                         name = "struct " ^ s.tag;
+                         passable = s.passable }
   | Union { ufields = [] } -> raise (Unsupported "union with no fields")
   | Union u -> begin
     ensure_unsealed u;
