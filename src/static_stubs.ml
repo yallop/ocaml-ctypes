@@ -9,10 +9,6 @@
 
 open Ctypes_raw
 
-external sizeof : _ Types.ctype_io -> int = "ctypes_sizeof"
-
-external alignment : _ Types.ctype_io -> int = "ctypes_alignment"
-
 (* A struct layout specification *)
 type bufferspec
 
