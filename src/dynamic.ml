@@ -17,22 +17,6 @@ module Raw = Ctypes_raw
 (* Register the closure lookup function with C. *)
 let () = Stubs.set_closure_callback Closure_properties.retrieve
 
-type arg_type = ArgType : 'b RawTypes.ctype_io -> arg_type
-
-let rec arg_type : type a. a typ -> arg_type = function
-    Void                           -> ArgType RawTypes.(void.raw)
-  | Primitive p                    -> ArgType p.RawTypes.raw
-  | Struct { spec = Complete p }   -> ArgType p.RawTypes.raw
-  | Pointer _                      -> ArgType RawTypes.(pointer.raw)
-  | FunctionPointer _              -> ArgType RawTypes.(pointer.raw)
-  | View { ty }                    -> arg_type ty
-  (* The following cases should never happen; aggregate types other than
-     complete struct types are excluded during type construction. *)
-  | Union _                        -> assert false
-  | Array _                        -> assert false
-  | Abstract _                     -> assert false
-  | Struct { spec = Incomplete _ } -> assert false
-
 (*
   call addr callspec
    (fun buffer ->

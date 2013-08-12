@@ -17,6 +17,8 @@ type 'a structspec =
     Incomplete of Static_stubs.bufferspec
   | Complete of 'a Static_stubs.structure RawTypes.ctype
 
+type arg_type = ArgType : 'b RawTypes.ctype_io -> arg_type
+
 type abstract_type = {
   aname : string;
   asize : int;
@@ -117,6 +119,20 @@ let rec passable : type a. a typ -> bool = function
   | Abstract _                      -> false
   | FunctionPointer _               -> true
   | View { ty }                     -> passable ty
+
+let rec arg_type : type a. a typ -> arg_type = function
+    Void                           -> ArgType RawTypes.(void.raw)
+  | Primitive p                    -> ArgType p.RawTypes.raw
+  | Struct { spec = Complete p }   -> ArgType p.RawTypes.raw
+  | Pointer _                      -> ArgType RawTypes.(pointer.raw)
+  | FunctionPointer _              -> ArgType RawTypes.(pointer.raw)
+  | View { ty }                    -> arg_type ty
+  (* The following cases should never happen; aggregate types other than
+     complete struct types are excluded during type construction. *)
+  | Union _                        -> assert false
+  | Array _                        -> assert false
+  | Abstract _                     -> assert false
+  | Struct { spec = Incomplete _ } -> assert false
 
 let void = Void
 let char = Primitive RawTypes.char
