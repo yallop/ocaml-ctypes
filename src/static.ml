@@ -52,7 +52,11 @@ and 'a union = ('a, [`Union]) structured
 and 'a structure = ('a, [`Struct]) structured
 and 'a abstract = ('a, [`Abstract]) structured
 and ('a, 'b) view = { read : 'b -> 'a; write : 'a -> 'b; ty: 'b typ }
-and ('a, 's) field = { ftype: 'a typ; foffset: int }
+and ('a, 's) field = {
+  ftype: 'a typ;
+  foffset: int;
+  mutable fname: string option
+}
 and 'a structure_type = {
   tag: string;
   mutable spec: 'a structspec;
@@ -188,7 +192,7 @@ let ( *:* ) (type b) (Struct s) (ftype : b typ) =
   match s.spec with
   | Incomplete spec ->
     let foffset = aligned_offset spec.isize (alignment ftype) in
-    let field = {ftype; foffset} in
+    let field = {ftype; foffset; fname = None} in
     begin
       spec.isize <- foffset + sizeof ftype;
       s.fields <- BoxedField field :: s.fields;
@@ -264,10 +268,11 @@ let ( +:+ ) (Union u) ftype =
     ensure_unsealed u;
     u.usize <- max u.usize (sizeof ftype);
     u.ualignment <- max u.ualignment (alignment ftype);
-    let field = { ftype; foffset = 0 } in
+    let field = { ftype; foffset = 0; fname = None } in
     u.ufields <- BoxedField field :: u.ufields;
     field
   end
 
 let offsetof { foffset } = foffset
 let field_type { ftype } = ftype
+let field name f = f.fname <- Some name; f
