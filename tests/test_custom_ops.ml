@@ -44,17 +44,17 @@ let test_type_info_hashing_and_equality () =
     type s
     let s : s structure typ = structure "s"
     let _ = begin
-      ignore (s *:* double);
-      ignore (s *:* ptr s);
-      ignore (seal s)
+      ignore (field s "d" double);
+      ignore (field s "p" (ptr s));
+      seal s
     end
       
     type t
     let t : t structure typ = structure "s"
     let _ = begin
-      ignore (t *:* double);
-      ignore (t *:* ptr t);
-      ignore (seal t)
+      ignore (field t "d" double);
+      ignore (field t "p" (ptr t));
+      seal t
     end
       
     let () = begin

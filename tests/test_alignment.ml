@@ -73,8 +73,8 @@ let test_incomplete_alignment () =
 
   let module M = struct
     let t = structure "t"
-    let i = t *:* int
-      
+    let i = field t "i" int
+
     let () =
       assert_raises IncompleteType
         (fun () -> alignment t)
@@ -82,8 +82,8 @@ let test_incomplete_alignment () =
 
   let module M = struct
     let u = union "u"
-    let i = u +:+ int
-      
+    let i = field u "i" int
+
     let () =
       assert_raises IncompleteType
         (fun () -> alignment u)
@@ -102,9 +102,10 @@ let test_struct_alignment () =
     let maximum = List.fold_left max 0
 
     let struct_a = structure "A"
-    let _ = struct_a *:* char
-    let _ = struct_a *:* int
-    let _ = struct_a *:* double
+    let (-:) ty label = field struct_a label ty
+    let _ = char   -: "_"
+    let _ = int    -: "_"
+    let _ = double -: "_"
     let () = seal struct_a
 
     let () = assert_equal
@@ -117,10 +118,11 @@ let test_struct_alignment () =
     let charish = view ~read:(fun _ -> ()) ~write:(fun () -> 'c') char
 
     let struct_b = structure "A"
-    let _ = struct_b *:* charish
-    let _ = struct_b *:* funptr (int @-> returning int)
-    let _ = struct_b *:* abs
-    let _ = struct_b *:* double
+    let (-:) ty label = field struct_b label ty
+    let _ = charish                        -: "_"
+    let _ = funptr (int @-> returning int) -: "_"
+    let _ = abs                            -: "_"
+    let _ = double                         -: "_"
     let () = seal struct_b
 
     let () = assert_equal
@@ -155,18 +157,21 @@ let test_struct_tail_padding () =
     type a and b and u
 
     let struct_a = structure "A"
-    let a = struct_a *:* char
-    let b = struct_a *:* int
-    let c = struct_a *:* char
+    let (-:) ty label = field struct_a label ty
+    let a = char -: "a"
+    let b = int  -: "b"
+    let c = char -: "c"
     let () = seal (struct_a : a structure typ)
 
     let u = union "U"
-    let x = u +:+ char
+    let (-:) ty label = field u label ty
+    let x = char -: "x"
     let () = seal (u : u union typ)
 
     let struct_b = structure "B"
-    let d = struct_b *:* struct_a
-    let e = struct_b *:* u
+    let (-:) ty label = field struct_b label ty
+    let d = struct_a -: "d"
+    let e = u        -: "e"
     let () = seal (struct_b : b structure typ)
 
     let char_ptr p = from_voidp char (to_voidp p)

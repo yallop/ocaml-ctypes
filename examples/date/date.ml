@@ -11,15 +11,16 @@ open Foreign
 
 type tm
 let tm = structure "tm"
-let tm_sec   = tm *:* int (* seconds *)
-let tm_min   = tm *:* int (* minutes *)
-let tm_hour  = tm *:* int (* hours *)
-let tm_mday  = tm *:* int (* day of the month *)
-let tm_mon   = tm *:* int (* month *)
-let tm_year  = tm *:* int (* year *)
-let tm_wday  = tm *:* int (* day of the week *)
-let tm_yday  = tm *:* int (* day in the year *)
-let tm_isdst = tm *:* int (* daylight saving time *)
+let (-:) ty label = field tm label ty
+let tm_sec   = int -: "tm_sec"   (* seconds *)
+let tm_min   = int -: "tm_min"   (* minutes *)
+let tm_hour  = int -: "tm_hour"  (* hours *)
+let tm_mday  = int -: "tm_mday"  (* day of the month *)
+let tm_mon   = int -: "tm_mon"   (* month *)
+let tm_year  = int -: "tm_year"  (* year *)
+let tm_wday  = int -: "tm_wday"  (* day of the week *)
+let tm_yday  = int -: "tm_yday"  (* day in the year *)
+let tm_isdst = int -: "tm_isdst" (* daylight saving time *)
 let () = seal (tm : tm structure typ)
 
 let time = foreign "time" (ptr time_t @-> returning_checking_errno time_t)

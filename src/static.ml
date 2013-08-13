@@ -55,7 +55,7 @@ and ('a, 'b) view = { read : 'b -> 'a; write : 'a -> 'b; ty: 'b typ }
 and ('a, 's) field = {
   ftype: 'a typ;
   foffset: int;
-  mutable fname: string option
+  fname: string;
 }
 and 'a structure_type = {
   tag: string;
@@ -188,20 +188,27 @@ let aligned_offset offset alignment =
 let structure tag =
   Struct { spec = Incomplete { isize = 0 }; tag; fields = [] }
 
-let ( *:* ) (type b) (Struct s) (ftype : b typ) =
-  match s.spec with
-  | Incomplete spec ->
+let union utag = Union { utag; usize = 0; ualignment = 0; ucomplete = false;
+                         ufields = [] }
+
+let field (type k) (structured : (_, k) structured typ) label ftype =
+  match structured with
+  | Struct ({ spec = Incomplete spec } as s) ->
     let foffset = aligned_offset spec.isize (alignment ftype) in
-    let field = {ftype; foffset; fname = None} in
+    let field = { ftype; foffset; fname = label } in
     begin
       spec.isize <- foffset + sizeof ftype;
       s.fields <- BoxedField field :: s.fields;
       field
     end
-  | Complete _ -> raise (ModifyingSealedType s.tag)
-
-let union utag = Union { utag; usize = 0; ualignment = 0; ucomplete = false;
-                         ufields = [] }
+  | Union u when not u.ucomplete ->
+    u.usize <- max u.usize (sizeof ftype);
+    u.ualignment <- max u.ualignment (alignment ftype);
+    let field = { ftype; foffset = 0; fname = label } in
+    u.ufields <- BoxedField field :: u.ufields;
+    field
+  | Struct { tag; spec = Complete _ } -> raise (ModifyingSealedType tag)
+  | Union { utag } -> raise (ModifyingSealedType utag)
 
 let ensure_unsealed { ucomplete; utag } =
   if ucomplete then raise (ModifyingSealedType utag)
@@ -263,16 +270,13 @@ let fold_fields (type k)
   | Union { ufields } -> fold_boxed_field_list o a ufields
   | Abstract _        -> a
 
-let ( +:+ ) (Union u) ftype =
-  begin
-    ensure_unsealed u;
-    u.usize <- max u.usize (sizeof ftype);
-    u.ualignment <- max u.ualignment (alignment ftype);
-    let field = { ftype; foffset = 0; fname = None } in
-    u.ufields <- BoxedField field :: u.ufields;
-    field
-  end
-
 let offsetof { foffset } = foffset
 let field_type { ftype } = ftype
-let field name f = f.fname <- Some name; f
+
+let ( *:* ) s t =
+  Common.warn "'s *:* t' is deprecated; use 'field s label t' instead";
+  field s "<unknown>" t
+
+let ( +:+ ) s t =
+  Common.warn "'s +:+ t' is deprecated; use 'field s label t' instead";
+  field s "<unknown>" t

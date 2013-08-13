@@ -46,9 +46,10 @@ let test_unions_are_not_passable () =
     type u
 
     let u : u union typ = union "u"
-    let c = u +:+ int
-    let f = u +:+ double
-    let p = u +:+ ptr u
+    let (-:) ty label = field u label ty
+    let c = int    -: "c"
+    let f = double -: "f"
+    let p = ptr u  -: "p"
     let () = seal u
 
     let _ = begin
@@ -112,12 +113,12 @@ let test_pointers_are_passable () =
     type s1 and u
 
     let s1 : s1 structure typ = structure "s1"
-    let _ = s1 *:* int
-    let _ = s1 *:* ptr s1
+    let _ = field s1 "_" int
+    let _ = field s1 "_" (ptr s1)
     let () = seal s1
 
     let u : u union typ = union "u"
-    let _ = u +:+ int
+    let _ = field u "_" int
     let () = seal u
   end in
   let open M in
@@ -161,36 +162,43 @@ let test_struct_passability () =
     type s1 and s2 and s3 and s4 and s5 and s6 and u
 
     let s1 : s1 structure typ = structure "s1"
-    let _ = s1 *:* int
-    let _ = s1 *:* double
-    let _ = s1 *:* ptr s1
-    let _ = s1 *:* funptr (int @-> returning int)
+    let (-:) ty label = field s1 label ty
+    let _ = int -: "_"
+    let _ = double -: "_"
+    let _ = ptr s1 -: "_"
+    let _ = funptr (int @-> returning int) -: "_"
     let () = seal s1
 
     let s2 : s2 structure typ = structure "s2"
-    let _ = s2 *:* s1
-    let _ = s2 *:* double
-    let _ = s2 *:* ptr (array 10 int)
+    let (-:) ty label = field s2 label ty
+    let _ = s1 -: "_"
+    let _ = double -: "_"
+    let _ = ptr (array 10 int) -: "_"
     let () = seal s2
 
     let s3 : s3 structure typ = structure "s3"
-    let _ = s3 *:* array 10 (ptr char)
+    let (-:) ty label = field s3 label ty
+    let _ = array 10 (ptr char) -: "_"
     let () = seal s3
 
     let s4 : s4 structure typ = structure "s4"
-    let _ = s4 *:* s3
+    let (-:) ty label = field s4 label ty
+    let _ = s3 -: "_"
     let () = seal s4
 
     let u : u union typ = union "u"
-    let _ = u +:+ int
+    let (-:) ty label = field u label ty
+    let _ = int -: "_"
     let () = seal u
 
     let s5 : s5 structure typ = structure "s5"
-    let _ = s5 *:* u
+    let (-:) ty label = field s5 label ty
+    let _ = u -: "_"
     let () = seal s5
 
     let s6 : s6 structure typ = structure "s6"
-    let _ = s6 *:* abstract ~name:"abstract" ~size:1 ~alignment:1
+    let (-:) ty label = field s6 label ty
+    let _ = abstract ~name:"abstract" ~size:1 ~alignment:1 -: "_"
     let () = seal s6
 
     let _ = begin

@@ -12,3 +12,8 @@ let string_of format v =
     Format.pp_print_flush fmt ();
     Buffer.contents buf
   end
+
+let warn fmt = Printf.(
+  fprintf stderr "Warning: ";
+  fprintf stderr fmt;
+  fprintf stderr "\n")
