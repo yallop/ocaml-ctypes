@@ -7,6 +7,8 @@
 
 include Static
 
+include Structs_computed
+
 include Type_printing
 
 include Dynamic
@@ -14,3 +16,11 @@ include Dynamic
 include Std_views
 
 include Value_printing
+
+let ( *:* ) s t =
+  Common.warn "'s *:* t' is deprecated; use 'field s label t' instead";
+  field s "<unknown>" t
+
+let ( +:+ ) s t =
+  Common.warn "'s +:+ t' is deprecated; use 'field s label t' instead";
+  field s "<unknown>" t

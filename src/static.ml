@@ -191,25 +191,6 @@ let structure tag =
 let union utag = Union { utag; usize = 0; ualignment = 0; ucomplete = false;
                          ufields = [] }
 
-let field (type k) (structured : (_, k) structured typ) label ftype =
-  match structured with
-  | Struct ({ spec = Incomplete spec } as s) ->
-    let foffset = aligned_offset spec.isize (alignment ftype) in
-    let field = { ftype; foffset; fname = label } in
-    begin
-      spec.isize <- foffset + sizeof ftype;
-      s.fields <- BoxedField field :: s.fields;
-      field
-    end
-  | Union u when not u.ucomplete ->
-    u.usize <- max u.usize (sizeof ftype);
-    u.ualignment <- max u.ualignment (alignment ftype);
-    let field = { ftype; foffset = 0; fname = label } in
-    u.ufields <- BoxedField field :: u.ufields;
-    field
-  | Struct { tag; spec = Complete _ } -> raise (ModifyingSealedType tag)
-  | Union { utag } -> raise (ModifyingSealedType utag)
-
 let ensure_unsealed { ucomplete; utag } =
   if ucomplete then raise (ModifyingSealedType utag)
 
@@ -225,41 +206,6 @@ let all_passable fields =
     true
     fields
 
-let seal (type a) (type s) : (a, s) structured typ -> unit = function
-  | Struct { fields = [] } -> raise (Unsupported "struct with no fields")
-  | Struct { spec = Complete _; tag } -> raise (ModifyingSealedType tag)
-  | Struct ({ spec = Incomplete { isize } } as s) 
-      when all_passable s.fields ->
-    s.fields <- List.rev s.fields;
-    let bufspec = Static_stubs.allocate_bufferspec () in
-    let () = 
-      List.iter
-        (fun (BoxedField {ftype; foffset}) ->
-          let ArgType t = arg_type ftype in
-          let offset = Static_stubs.add_argument bufspec t in
-          assert (offset = foffset))
-        s.fields
-    in
-    let alignment = max_field_alignment s.fields in
-    let size = aligned_offset isize alignment in
-    let raw = Static_stubs.complete_struct_type bufspec in
-    s.spec <- Complete { RawTypes.raw; size; alignment; passable = true;
-                         name = "struct " ^ s.tag }
-  | Struct ({ spec = Incomplete { isize } } as s) ->
-    s.fields <- List.rev s.fields;
-    let alignment = max_field_alignment s.fields in
-    let size = aligned_offset isize alignment in
-    let raw = Static_stubs.make_unpassable_structspec ~size ~alignment in
-    s.spec <- Complete { RawTypes.raw; size; alignment; passable = false;
-                         name = "struct " ^ s.tag }
-  | Union { ufields = [] } -> raise (Unsupported "union with no fields")
-  | Union u -> begin
-    ensure_unsealed u;
-    u.ufields <- List.rev u.ufields;
-    u.usize <- aligned_offset u.usize u.ualignment;
-    u.ucomplete <- true
-  end
-
 let fold_boxed_field_list (o : < f : 't. 'a -> ('t, 's) field -> 'a >) a l =
   List.fold_left (fun a (BoxedField f) -> o#f a f) a l
 
@@ -273,10 +219,3 @@ let fold_fields (type k)
 let offsetof { foffset } = foffset
 let field_type { ftype } = ftype
 
-let ( *:* ) s t =
-  Common.warn "'s *:* t' is deprecated; use 'field s label t' instead";
-  field s "<unknown>" t
-
-let ( +:+ ) s t =
-  Common.warn "'s +:+ t' is deprecated; use 'field s label t' instead";
-  field s "<unknown>" t
