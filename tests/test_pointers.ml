@@ -399,8 +399,8 @@ let test_pointer_arithmetic () =
   done;
 
   let twoints = structure "s" in
-  let i1 = twoints *:* int in
-  let i2 = twoints *:* int in
+  let i1 = field twoints "i" int in
+  let i2 = field twoints "j" int in
   let () = seal twoints in
   
   (* Traverse the array using a 'struct twoints' pointer *)
@@ -462,9 +462,9 @@ let test_pointer_comparison () =
     (canonicalize p > canonicalize (p -@ 1));
 
   let s3 = structure "s3" in
-  let i = s3 *:* int in
-  let j = s3 *:* int in
-  let k = s3 *:* int in
+  let i = field s3 "i" int in
+  let j = field s3 "j" int in
+  let k = field s3 "k" int in
   let () = seal s3 in
 
   let sp = addr (make s3) in
@@ -526,10 +526,11 @@ let test_pointer_differences () =
   in
 
   let s = structure "s" in
-  let i = s *:* int in
-  let j = s *:* array 17 char in
-  let k = s *:* double in
-  let l = s *:* char in
+  let (-:) ty label = field s label ty in
+  let i = int           -: "i" in
+  let j = array 17 char -: "j" in
+  let k = double        -: "k" in
+  let l = char          -: "l" in
   let () = seal s in
 
   let v = make s in

@@ -141,11 +141,11 @@ let test_pointer_printing () =
 
     (* Pointers to complete structs and unions *)
     let s_complete = structure "s_complete" in
-    let _ = s_complete *:* int in
+    let _ = field s_complete "i" int in
     seal s_complete;
 
     let u_complete = union "u_complete" in 
-    let _ = u_complete +:+ int in
+    let _ = field u_complete "i" int in
     seal u_complete;
 
     assert_typ_printed_as ~name:"d" "struct s_complete *d"
@@ -222,9 +222,10 @@ let test_struct_and_union_printing () =
 
     (* Structs and unions containing primitives *)
     let s_prims = structure "s_prims" in
-    let _ = field "i" (s_prims *:* int) in
-    let _ = field "l" (s_prims *:* ulong) in
-    let _ = field "z" (s_prims *:* float) in
+    let (-:) ty label = field s_prims label ty in
+    let _ = int   -: "i" in
+    let _ = ulong -: "l" in
+    let _ = float -: "z" in
     seal s_prims;
 
     assert_typ_printed_as ~name:"b"
@@ -236,117 +237,123 @@ let test_struct_and_union_printing () =
       s_prims;
 
     let u_prims = union "u_prims" in
-    let _ = u_prims +:+ int32_t in
-    let _ = u_prims +:+ int64_t in
-    let _ = u_prims +:+ double in
+    let (-:) ty label = field u_prims label ty in
+    let _ = int32_t -: "i32" in
+    let _ = int64_t -: "i64" in
+    let _ = double  -: "d" in
     seal u_prims;
 
     assert_typ_printed_as "union u_prims {
-                              int32_t field_0;
-                              int64_t field_1;
-                              double field_2;
+                              int32_t i32;
+                              int64_t i64;
+                              double d;
                            }"
       u_prims;
 
     (* Structs and unions containing pointers to themselves *)
     let selfish = structure "selfish" in
-    let _ = selfish *:* ptr selfish in
-    let _ = selfish *:* ptr int in
-    let _ = selfish *:* ptr (ptr selfish) in
+    let (-:) ty label = field selfish label ty in
+    let _ = ptr selfish       -: "s" in
+    let _ = ptr int           -: "i" in
+    let _ = ptr (ptr selfish) -: "p" in
     seal selfish;
 
     assert_typ_printed_as ~name:"c"
                           "struct selfish {
-                              struct selfish *field_0;
-                              int *field_1;
-                              struct selfish **field_2;
+                              struct selfish *s;
+                              int *i;
+                              struct selfish **p;
                            } c"
       selfish;
 
     let u_selfish = union "u_selfish" in
-    let _ = u_selfish +:+ ptr u_selfish in
-    let _ = u_selfish +:+ ptr (union "other") in
+    let (-:) ty label = field u_selfish label ty in
+    let _ = ptr u_selfish       -: "self" in
+    let _ = ptr (union "other") -: "other" in
     seal u_selfish;
 
     assert_typ_printed_as "union u_selfish {
-                              union u_selfish *field_0;
-                              union other *field_1;
+                              union u_selfish *self;
+                              union other *other;
                            }"
       u_selfish;
 
     (* Structs and unions containing arrays and pointers to functions *)
     let mixture = structure "mixture" in
-    let _ = mixture *:* array 10 (array 12 (ptr mixture)) in
-    let _ = field "fn" (mixture *:* funptr (ptr mixture @-> returning void)) in
-    let _ = mixture *:* int in
+    let (-:) ty label = field mixture label ty in
+    let _ = array 10 (array 12 (ptr mixture))       -: "parr" in
+    let _ = funptr (ptr mixture @-> returning void) -: "fn" in
+    let _ = int                                     -: "i" in
     seal mixture;
       
     assert_typ_printed_as ~name:"d" 
                           "struct mixture {
-                              struct mixture *field_0[10][12];
+                              struct mixture *parr[10][12];
                               void (*fn)(struct mixture *);
-                              int field_2;
+                              int i;
                            } d"
       mixture;
 
     let u_mixture = union "u_mixture" in
-    let _ = u_mixture +:+ float in
-    let _ = u_mixture +:+ ptr (array 3
-                                 (funptr
-                                    (float @-> returning float))) in
+    let (-:) ty label = field u_mixture label ty in
+    let _ = float -: "fl" in
+    let _ = ptr (array 3
+                   (funptr
+                      (float @-> returning float)))
+                  -: "p" in
     seal u_mixture;
       
     assert_typ_printed_as ~name:"e"
                           "union u_mixture {
-                              float field_0;
-                              float (*(*field_1)[3])(float);
+                              float fl;
+                              float (*(*p)[3])(float);
                            } e"
       u_mixture;
       
     (* Structs and unions containing struct and union members *)
     let inner_s = structure "inner_s" in
-    let _ = inner_s *:* int in
+    let _ = field inner_s "_" int in
     seal inner_s;
 
     let inner_u = union "inner_u" in
-    let _ = inner_u +:+ int in
+    let _ = field inner_u "_" int in
     seal inner_u;
 
     let struct_containing_struct = structure "scs" in
-    let _ = struct_containing_struct *:* inner_s in
+    let _ = field struct_containing_struct "inner" inner_s in
     seal struct_containing_struct;
 
     let union_containing_struct = union "ucs" in
-    let _ = union_containing_struct +:+ inner_s in
+    let _ = field union_containing_struct "uinner" inner_s in
     seal union_containing_struct;
 
     let struct_containing_union = structure "scu" in
-    let _ = struct_containing_union *:* inner_u in
+    let _ = field struct_containing_union "scuf" inner_u in
     seal struct_containing_union;
 
     let union_containing_union = union "ucu" in
-    let _ = union_containing_union +:+ inner_u in
+    let _ = field union_containing_union "ucuf" inner_u in
     seal union_containing_union;
 
     assert_typ_printed_as "struct scs {
-                              struct inner_s field_0;
+                              struct inner_s inner;
                            }"
       struct_containing_struct;
 
     assert_typ_printed_as ~name:"f" 
                           "union ucs {
-                              struct inner_s field_0;
+                              struct inner_s uinner;
                            } f"
       union_containing_struct;
 
     assert_typ_printed_as "struct scu {
-                              union inner_u field_0;
+                              union inner_u scuf;
                            }"
       struct_containing_union;
 
     assert_typ_printed_as ~name:"g" 
                           "union ucu {
-                              union inner_u field_0;
+                              union inner_u ucuf;
                            } g"
       union_containing_union;
   end
@@ -392,7 +399,7 @@ let test_function_printing () =
        returning (funptr (int @-> returning int)));
 
     let s = structure "s" in
-    let _ = s *:* int in
+    let _ = field s "_" int in
     seal s;
     
     assert_fn_printed_as "struct s(struct s)"

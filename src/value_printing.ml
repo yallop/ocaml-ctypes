@@ -51,14 +51,8 @@ and format_fields : type a b. string -> (a, b) structured boxed_field list ->
     let open Format in
     List.iteri
       (fun i (BoxedField ({ftype; foffset; fname} as f)) ->
-        let suffix = if i <> last_field then sep else "" in
-        match fname with
-        | None -> 
-          fprintf fmt "@[%a@]%s@;"
-            (format ftype) (getf s f) suffix
-        | Some name -> 
-          fprintf fmt "@[%s@] = @[%a@]%s@;"
-            name (format ftype) (getf s f) suffix)
+        fprintf fmt "@[%s@] = @[%a@]%s@;" fname (format ftype) (getf s f)
+          (if i <> last_field then sep else ""))
       fields
 and format_ptr : type a. Format.formatter -> a ptr -> unit
   = fun fmt {raw_ptr; reftype; pbyte_offset} ->

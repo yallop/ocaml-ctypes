@@ -35,12 +35,13 @@ let test_oo_hierarchy () =
     and animal : animal structure typ = structure "animal" 
 
     (* class layout (vtable pointer, no instance variables) *)
-    let animal_vtable = animal *:* ptr animal_methods
+    let animal_vtable = field animal "animal_vtable" (ptr animal_methods)
     let () = seal animal
       
     (* method table layout (two virtual methods) *)
-    let say = animal_methods *:* funptr (ptr animal @-> returning string)
-    let identify = animal_methods *:* funptr (ptr animal @-> returning string)
+    let (-:) ty label = field animal_methods label ty
+    let say = funptr (ptr animal @-> returning string)      -: "say"
+    let identify = funptr (ptr animal @-> returning string) -: "identify"
     let () = seal animal_methods
 
     let call_say cinstance =
@@ -62,13 +63,15 @@ let test_oo_hierarchy () =
     and camel : camel structure typ = structure "camel"
 
     (* class layout (vtable pointer, one instance variable) *)
-    let camel_vtable = camel *:* ptr camel_methods
-    let nhumps = camel *:* int
+    let (-:) ty label = field camel label ty 
+    let camel_vtable = ptr camel_methods -: "camel_vtable"
+    let nhumps       = int               -: "nhumps"
     let () = seal camel
 
     (* method table layout (one additional virtual method) *) 
-    let _ = camel_methods *:* animal_methods
-    let humps = camel_methods *:* funptr (ptr camel @-> returning int)
+    let (-:) ty label = field camel_methods label ty 
+    let _     = animal_methods                       -: "_"
+    let humps = funptr (ptr camel @-> returning int) -: "humps"
     let () = seal camel_methods
 
     let call_humps cinstance =

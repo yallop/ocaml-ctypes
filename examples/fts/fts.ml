@@ -78,26 +78,27 @@ struct
 
   type ftsent
   let ftsent : ftsent structure typ = structure "ftsent"
-  let fts_cycle   = ftsent *:* ptr ftsent
-  let fts_parent  = ftsent *:* ptr ftsent
-  let fts_link    = ftsent *:* ptr ftsent
-  let fts_number  = ftsent *:* int
-  let fts_pointer = ftsent *:* ptr void
-  let fts_accpath = ftsent *:* string
-  let fts_path    = ftsent *:* string
-  let fts_errno   = ftsent *:* int
-  let fts_symfd   = ftsent *:* int
-  let fts_pathlen = ftsent *:* ushort
-  let fts_namelen = ftsent *:* ushort
-  let fts_ino     = ftsent *:* ino_t
-  let fts_dev     = ftsent *:* dev_t
-  let fts_nlink   = ftsent *:* nlink_t
-  let fts_level   = ftsent *:* short
-  let fts_info    = ftsent *:* ushort
-  let fts_flags   = ftsent *:* ushort
-  let fts_instr   = ftsent *:* ushort
-  let fts_statp   = ftsent *:* ptr void (* really a struct stat * *)
-  let fts_name    = ftsent *:* char
+  let ( -: ) ty label = field ftsent label ty
+  let fts_cycle   = ptr ftsent -: "fts_cycle"
+  let fts_parent  = ptr ftsent -: "fts_parent"
+  let fts_link    = ptr ftsent -: "fts_link"
+  let fts_number  = int        -: "fts_number"
+  let fts_pointer = ptr void   -: "fts_pointer"
+  let fts_accpath = string     -: "fts_accpath"
+  let fts_path    = string     -: "fts_path"
+  let fts_errno   = int        -: "fts_errno"
+  let fts_symfd   = int        -: "fts_symfd"
+  let fts_pathlen = ushort     -: "fts_pathlen"
+  let fts_namelen = ushort     -: "fts_namelen"
+  let fts_ino     = ino_t      -: "fts_ino"
+  let fts_dev     = dev_t      -: "fts_dev"
+  let fts_nlink   = nlink_t    -: "fts_nlink"
+  let fts_level   = short      -: "fts_level"
+  let fts_info    = ushort     -: "fts_info"
+  let fts_flags   = ushort     -: "fts_flags"
+  let fts_instr   = ushort     -: "fts_instr"
+  let fts_statp   = ptr void   -: "fts_statp" (* really a struct stat * *)
+  let fts_name    = char       -: "fts_name"
   let () = seal ftsent
 
   type t = ftsent structure ptr
@@ -151,18 +152,19 @@ struct
 
   type fts
   let fts : fts structure typ = structure "fts"
-  let fts_cur     = fts *:* ptr ftsent
-  let fts_child   = fts *:* ptr ftsent
-  let fts_array   = fts *:* ptr (ptr ftsent)
-  let fts_dev     = fts *:* dev_t
-  let fts_path    = fts *:* string
-  let fts_rfd     = fts *:* int
-  let fts_pathlen = fts *:* int
-  let fts_nitems  = fts *:* int
-  let fts_compar  = fts *:* funptr
-    (ptr FTSENT.t @-> ptr FTSENT.t @-> returning int)
+  let ( -: ) ty label = field fts label ty
+  let fts_cur     = ptr ftsent       -: "fts_cur"
+  let fts_child   = ptr ftsent       -: "fts_child"
+  let fts_array   = ptr (ptr ftsent) -: "fts_array"
+  let fts_dev     = dev_t            -: "fts_dev"
+  let fts_path    = string           -: "fts_path"
+  let fts_rfd     = int              -: "fts_rfd"
+  let fts_pathlen = int              -: "fts_pathlen"
+  let fts_nitems  = int              -: "fts_nitems"
+  let fts_compar  = funptr  (ptr FTSENT.t @-> ptr FTSENT.t @-> returning int)
+                                     -: "fts_compar"
   (* fts_options would work well as a view *)
-  let fts_options = fts *:* int
+  let fts_options = int              -: "fts_options"
   let () = seal fts
 
   type t = fts structure ptr
