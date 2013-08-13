@@ -53,7 +53,7 @@ and format_fields : type a b. string -> (a, b) structured boxed_field list ->
       (fun i (BoxedField ({ftype; foffset} as f)) ->
         fprintf fmt "@[%a@]%s@;" (format ftype) (getf s f)
           (if i <> last_field then sep else ""))
-      (List.rev fields)
+      fields
 and format_ptr : type a. Format.formatter -> a ptr -> unit
   = fun fmt {raw_ptr; reftype; pbyte_offset} ->
     Format.fprintf fmt "%s"

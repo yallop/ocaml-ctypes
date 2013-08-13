@@ -76,7 +76,7 @@ and format_fields : type a. a boxed_field list -> Format.formatter -> unit =
           fprintf fmt "@[";
           format_typ t (fun _ fmt -> fprintf fmt " field_%d" i) `nonarray fmt;
           fprintf fmt "@];@;")
-        (List.rev fields)
+        fields
   and format_parameter_list parameters k fmt =
     Format.fprintf fmt "%t(@[@[" k;
     if parameters = [] then Format.fprintf fmt "void" else

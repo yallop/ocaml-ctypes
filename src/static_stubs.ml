@@ -9,10 +9,6 @@
 
 open Ctypes_raw
 
-external sizeof : _ Types.ctype_io -> int = "ctypes_sizeof"
-
-external alignment : _ Types.ctype_io -> int = "ctypes_alignment"
-
 (* A struct layout specification *)
 type bufferspec
 
@@ -27,11 +23,10 @@ external allocate_bufferspec : unit -> bufferspec
 external add_argument : bufferspec -> _ Types.ctype_io -> int
   = "ctypes_add_argument"
 
-(* Add an argument that makes the buffer unpassable to the C buffer
-   specification *)
-external add_unpassable_argument : bufferspec -> size:int -> alignment:int -> int
-  = "ctypes_add_unpassable_argument"
-
 (* Produce a structure type representation from the buffer specification. *)
 external complete_struct_type : bufferspec -> _ structure Types.ctype_io
   = "ctypes_complete_structspec"
+
+external make_unpassable_structspec : size:int -> alignment:int ->
+  _ structure Types.ctype_io
+    = "ctypes_make_unpassable_structspec"

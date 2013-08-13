@@ -181,6 +181,25 @@ value ctypes_allocate_struct_type_info(ffi_type ***args)
 }
 
 
+/* allocate_unpassable_struct_type_info : () -> _ ctype */
+value ctypes_allocate_unpassable_struct_type_info(int size, int alignment)
+{
+  value block = allocate_custom(&struct_type_info_custom_ops,
+                                sizeof(struct struct_type_info),
+                                &_struct_type_info_prototype);
+
+  struct struct_type_info *t = Data_custom_val(block);
+
+  ffi_type *s = t->type_info.ffitype = caml_stat_alloc(sizeof *s);
+
+  s->type = FFI_TYPE_STRUCT;
+  s->size = size;
+  s->alignment = alignment;
+  s->elements = NULL;
+  return block;
+}
+
+
 make_primitive_interface(Val_int, Int_val, int8_t, int8_t, ffi_type_sint8, "%" PRId8)
 make_primitive_interface(Val_int, Int_val, int16_t, int16_t, ffi_type_sint16, "%" PRId16)
 make_primitive_interface(Val_int, Int_val, signed char, schar, ffi_type_schar, "%d")

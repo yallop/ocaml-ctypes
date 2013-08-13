@@ -13,9 +13,13 @@ exception Unsupported of string
 
 module RawTypes = Ctypes_raw.Types
 
+type incomplete_size = { mutable isize: int }
+
 type 'a structspec =
-    Incomplete of Static_stubs.bufferspec
+    Incomplete of incomplete_size
   | Complete of 'a Static_stubs.structure RawTypes.ctype
+
+type arg_type = ArgType : 'b RawTypes.ctype_io -> arg_type
 
 type abstract_type = {
   aname : string;
@@ -51,15 +55,8 @@ and ('a, 'b) view = { read : 'b -> 'a; write : 'a -> 'b; ty: 'b typ }
 and ('a, 's) field = { ftype: 'a typ; foffset: int }
 and 'a structure_type = {
   tag: string;
-  (* Whether the struct can be passed or returned by value.  For the
-     moment, at least, we don't support passing structs that contain
-     unions or arrays as members *)
-  mutable passable: bool;
-
   mutable spec: 'a structspec;
-
-  (* We keep the field type values around, since functions such as
-     complete_struct_type may need to access the underlying C values. *)
+  (* fields are in reverse order iff the struct type is incomplete *)
   mutable fields : 'a structure boxed_field list;
 }
 and 'a union_type = {
@@ -67,6 +64,7 @@ and 'a union_type = {
   mutable ucomplete: bool;
   mutable usize: int;
   mutable ualignment: int;
+  (* fields are in reverse order iff the union type is incomplete *)
   mutable ufields : 'a union boxed_field list;
 }
 and 's boxed_field = BoxedField : ('a, 's) field -> 's boxed_field
@@ -109,7 +107,8 @@ let rec passable : type a. a typ -> bool = function
     Void                            -> true
   | Primitive { RawTypes.passable } -> passable
   | Struct { spec = Incomplete _ }  -> raise IncompleteType
-  | Struct { passable }             -> passable
+  | Struct { spec = Complete
+      { RawTypes.passable } }       -> passable
   | Union { ucomplete = false }     -> raise IncompleteType
   | Union _                         -> false
   | Array _                         -> false
@@ -117,6 +116,20 @@ let rec passable : type a. a typ -> bool = function
   | Abstract _                      -> false
   | FunctionPointer _               -> true
   | View { ty }                     -> passable ty
+
+let rec arg_type : type a. a typ -> arg_type = function
+    Void                           -> ArgType RawTypes.(void.raw)
+  | Primitive p                    -> ArgType p.RawTypes.raw
+  | Struct { spec = Complete p }   -> ArgType p.RawTypes.raw
+  | Pointer _                      -> ArgType RawTypes.(pointer.raw)
+  | FunctionPointer _              -> ArgType RawTypes.(pointer.raw)
+  | View { ty }                    -> arg_type ty
+  (* The following cases should never happen; aggregate types other than
+     complete struct types are excluded during type construction. *)
+  | Union _                        -> assert false
+  | Array _                        -> assert false
+  | Abstract _                     -> assert false
+  | Struct { spec = Incomplete _ } -> assert false
 
 let void = Void
 let char = Primitive RawTypes.char
@@ -163,47 +176,25 @@ let returning v =
 let returning_checking_errno v = Returns (true, v)
 let funptr ?name f = FunctionPointer (name, f)
 
+let aligned_offset offset alignment =
+  match offset mod alignment with
+    0 -> offset
+  | overhang -> offset - overhang + alignment
+
 let structure tag =
-  Struct { spec = Incomplete (Static_stubs.allocate_bufferspec ()); tag;
-           passable = true; fields = [] }
-
-let bufferspec { tag; spec } = match spec with
-  | Incomplete s -> s
-  | Complete _   -> raise (ModifyingSealedType tag)
-
-let add_field f s = s.fields <- BoxedField f :: s.fields
+  Struct { spec = Incomplete { isize = 0 }; tag; fields = [] }
 
 let ( *:* ) (type b) (Struct s) (ftype : b typ) =
-    let bufspec = bufferspec s in
-    let add_member ftype { RawTypes.raw = t} =
-      let foffset = Static_stubs.add_argument bufspec t in
-      add_field {ftype; foffset} s;
-      foffset
-    and add_unpassable_member ftype =
-      let foffset = Static_stubs.add_unpassable_argument
-        bufspec ~size:(sizeof ftype) ~alignment:(alignment ftype) in
-      add_field {ftype; foffset} s;
-      foffset
-    in
-    let rec offset : type a. a typ -> int
-      = fun ty -> match ty with
-      | Void                           -> raise IncompleteType
-      | Array _ as a                   -> (s.passable <- false;
-                                           add_unpassable_member a)
-      | Primitive p                    -> add_member ty p
-      | Pointer _                      -> add_member ty RawTypes.pointer
-      | Struct { spec = Incomplete _ } -> raise IncompleteType
-      | Struct { spec = Complete t; passable }
-                                       -> (s.passable <- s.passable && passable;
-                                           add_member ty t)
-      | Union _  as u                  -> (s.passable <- false;
-                                           add_unpassable_member u)
-      | Abstract _  as a               -> (s.passable <- false;
-                                           add_unpassable_member a)
-      | FunctionPointer _              -> add_member ty RawTypes.pointer
-      | View { ty }                    -> offset ty
-    in
-    { ftype; foffset = offset ftype }
+  match s.spec with
+  | Incomplete spec ->
+    let foffset = aligned_offset spec.isize (alignment ftype) in
+    let field = {ftype; foffset} in
+    begin
+      spec.isize <- foffset + sizeof ftype;
+      s.fields <- BoxedField field :: s.fields;
+      field
+    end
+  | Complete _ -> raise (ModifyingSealedType s.tag)
 
 let union utag = Union { utag; usize = 0; ualignment = 0; ucomplete = false;
                          ufields = [] }
@@ -211,25 +202,50 @@ let union utag = Union { utag; usize = 0; ualignment = 0; ucomplete = false;
 let ensure_unsealed { ucomplete; utag } =
   if ucomplete then raise (ModifyingSealedType utag)
 
-let compute_union_padding { usize; ualignment } =
-  let overhang = usize mod ualignment in
-  if overhang = 0 then usize
-  else usize - overhang + ualignment
+let max_field_alignment fields =
+  List.fold_left
+    (fun align (BoxedField {ftype; foffset}) -> max align (alignment ftype))
+    0
+    fields
+
+let all_passable fields =
+  List.fold_left
+    (fun pass (BoxedField {ftype; foffset}) -> (pass && passable ftype))
+    true
+    fields
 
 let seal (type a) (type s) : (a, s) structured typ -> unit = function
   | Struct { fields = [] } -> raise (Unsupported "struct with no fields")
-  | Struct s ->
-    let bufspec = bufferspec s in
+  | Struct { spec = Complete _; tag } -> raise (ModifyingSealedType tag)
+  | Struct ({ spec = Incomplete { isize } } as s) 
+      when all_passable s.fields ->
+    s.fields <- List.rev s.fields;
+    let bufspec = Static_stubs.allocate_bufferspec () in
+    let () = 
+      List.iter
+        (fun (BoxedField {ftype; foffset}) ->
+          let ArgType t = arg_type ftype in
+          let offset = Static_stubs.add_argument bufspec t in
+          assert (offset = foffset))
+        s.fields
+    in
+    let alignment = max_field_alignment s.fields in
+    let size = aligned_offset isize alignment in
     let raw = Static_stubs.complete_struct_type bufspec in
-    s.spec <- Complete { RawTypes.raw;
-                         size = Static_stubs.sizeof raw;
-                         alignment = Static_stubs.alignment raw;
-                         name = "struct " ^ s.tag;
-                         passable = s.passable }
+    s.spec <- Complete { RawTypes.raw; size; alignment; passable = true;
+                         name = "struct " ^ s.tag }
+  | Struct ({ spec = Incomplete { isize } } as s) ->
+    s.fields <- List.rev s.fields;
+    let alignment = max_field_alignment s.fields in
+    let size = aligned_offset isize alignment in
+    let raw = Static_stubs.make_unpassable_structspec ~size ~alignment in
+    s.spec <- Complete { RawTypes.raw; size; alignment; passable = false;
+                         name = "struct " ^ s.tag }
   | Union { ufields = [] } -> raise (Unsupported "union with no fields")
   | Union u -> begin
     ensure_unsealed u;
-    u.usize <- compute_union_padding u;
+    u.ufields <- List.rev u.ufields;
+    u.usize <- aligned_offset u.usize u.ualignment;
     u.ucomplete <- true
   end
 
