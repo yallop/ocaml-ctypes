@@ -3,7 +3,8 @@ setup.data
 setup.log
 _build
 build
-tests/clib/*
+tests/clib/test_functions.o
+tests/clib/test_functions.so
 src/ctypes_config.h
 src/ctypes_config.ml
 *.native
