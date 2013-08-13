@@ -29,9 +29,10 @@ let test_passing_struct () =
   let module M = struct
     type simple
     let simple : simple structure typ = structure "simple"
-    let c = simple *:* int
-    let f = simple *:* double
-    let p = simple *:* ptr simple
+    let (-:) ty label = field simple label ty
+    let c = int        -: "c"
+    let f = double     -: "f"
+    let p = ptr simple -: "p"
     let () = seal simple
       
     let accept_struct = Foreign.foreign "accept_struct" ~from:testlib
@@ -71,9 +72,10 @@ let test_returning_struct () =
     type simple
 
     let simple : simple structure typ = structure "simple"
-    let c = simple *:* int
-    let f = simple *:* double
-    let p = simple *:* ptr simple
+    let (-:) ty label = field simple label ty
+    let c = int        -: "c"
+    let f = double     -: "f"
+    let p = ptr simple -: "p"
     let () = seal simple
 
     let return_struct = Foreign.foreign "return_struct" ~from:testlib
@@ -103,13 +105,13 @@ let test_incomplete_struct_members () =
   let s = structure "s" in begin
 
     assert_raises IncompleteType
-      (fun () -> s *:* void);
+      (fun () -> field s "_" void);
 
     assert_raises IncompleteType
-      (fun () -> s *:* structure "incomplete");
+      (fun () -> field s "_" (structure "incomplete"));
 
     assert_raises IncompleteType
-      (fun () -> s *:* union "incomplete");
+      (fun () -> field s "_" (union "incomplete"));
   end
 
 
@@ -121,9 +123,10 @@ let test_pointers_to_struct_members () =
     type s
 
     let styp : s structure typ = structure "s"
-    let i = styp *:* int
-    let j = styp *:* int
-    let k = styp *:* ptr int
+    let (-:) ty label = field styp label ty
+    let i = int     -: "i"
+    let j = int     -: "j"
+    let k = ptr int -: "k"
     let () = seal styp
 
     let s = make styp
@@ -167,9 +170,10 @@ let test_structs_with_union_members () =
         abs_float (lre -. rre) < eps && abs_float (lim -. rim) < eps
 
     let utyp : u union typ = union "u"
-    let uc = utyp +:+ char
-    let ui = utyp +:+ int
-    let uz = utyp +:+ complex64
+    let (-:) ty label = field utyp label ty
+    let uc = char      -: "uc"
+    let ui = int       -: "ui"
+    let uz = complex64 -: "uz"
     let () = seal utyp
 
     let u = make utyp
@@ -189,9 +193,10 @@ let test_structs_with_union_members () =
     end
 
     let styp : s structure typ = structure "s"
-    let si = styp *:* int
-    let su = styp *:* utyp
-    let sc = styp *:* char
+    let (-:) ty label = field styp label ty
+    let si = int  -: "si"
+    let su = utyp -: "su"
+    let sc = char -: "sc"
     let () = seal styp
 
     let s = make styp
@@ -221,9 +226,10 @@ let test_structs_with_array_members () =
     type u and s
 
     let styp : s structure typ = structure "s"
-    let i = styp *:* int
-    let a = styp *:* array 3 double
-    let c = styp *:* char
+    let (-:) ty label = field styp label ty
+    let i = int            -: "i"
+    let a = array 3 double -: "a"
+    let c = char           -: "c"
     let () = seal styp
 
     let s = make styp
@@ -280,11 +286,11 @@ let test_structs_with_array_members () =
 *)
 let test_updating_sealed_struct () =
   let styp = structure "sealed" in
-  let _ = styp *:* int in
+  let _ = field styp "_" int in
   let () = seal styp in
 
   assert_raises (ModifyingSealedType "sealed")
-    (fun () -> styp *:* char)
+    (fun () -> field styp "_" char)
 
 
 (*
@@ -315,9 +321,9 @@ let test_field_references_not_invalidated () =
     let s1 : s1 structure typ = structure "s1"
     let () = (fun () ->
       let s2 : s2 structure typ = structure "s2" in
-      let _ = s2 *:* int in
+      let _ = field s2 "i" int in
       let () = seal s2 in
-      let _ = s1 *:* s2 in
+      let _ = field s1 "_" s2 in
       ()
     ) ()
     let () = begin
@@ -355,10 +361,11 @@ let test_folding_over_struct_fields () =
 
     type s
     let s : s structure typ = structure "s"
-    let a = s *:* int
-    let b = s *:* array 3 float
-    let c = s *:* ptr void
-    let d = s *:* ptr (ptr s)
+    let (-:) ty label = field s label ty
+    let a = int           -: "a"
+    let b = array 3 float -: "b"
+    let c = ptr void      -: "c"
+    let d = ptr (ptr s)   -: "d"
     let () = seal s
       
     let expected = List.fold_right FieldSet.add

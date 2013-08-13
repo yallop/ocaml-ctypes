@@ -269,29 +269,25 @@ val structure : string -> 's structure typ
     [let tagname : tagname structure typ = structure "tagname"]
 *)
 
-val ( *:* ) : 's structure typ -> 'a typ -> ('a, 's structure) field
-(** [s *:* t] adds a field of type [t] to the structure type [s] and returns
-    a field value that can be used to read and write the field in structure
-    instances (e.g. using [getf] and [setf]).
-
-    Attempting to add a field to a structure type that has been sealed with
-    [seal] is an error, and will raise [ModifyingSealedType]. *)
-
 val union : string -> 's union typ
 (** Construct a new union type.  This behaves analogously to {!structure};
     fields are added with {!(+:+)}. *)
 
-val ( +:+ ) : 's union typ -> 'a typ -> ('a, 's union) field
-(** [u +:+ t] adds a field of type [t] to the union type [u] and returns a
-    field value that can be used to read and write the field in union
-    instances (e.g. using [getf] and [setf]).
+val field : 't typ -> string -> 'a typ ->
+  ('a, (('s, [<`Struct | `Union]) structured as 't)) field
+(** [field ty label ty'] adds a field of type [ty'] with label [label] to the
+    structure or union type [ty] and returns a field value that can be used to
+    read and write the field in structure or union instances (e.g. using
+    {!getf} and {!setf}).
 
     Attempting to add a field to a union type that has been sealed with [seal]
-    is an error, and will raise [ModifyingSealedType]. *)
+    is an error, and will raise {!ModifyingSealedType}. *)
 
-val field : string -> ((_, _) field as 'f) -> 'f
-(** Set the name of a field.  Field names are used in various circumstances,
-    including type printing, value printing, and stub generation. *)
+val ( *:* ) : 't typ -> 'a typ -> ('a, (('s, [`Struct]) structured as 't)) field
+(** @deprecated Add an anonymous field to a structure.  Use {!field} instead. *)
+
+val ( +:+ ) : 't typ -> 'a typ -> ('a, (('s, [`Union]) structured as 't)) field
+(** @deprecated Add an anonymous field to a union.  Use {!field} instead. *)
 
 val seal : (_, [< `Struct | `Union]) structured typ -> unit
 (** [seal t] completes the struct or union type [t] so that no further fields

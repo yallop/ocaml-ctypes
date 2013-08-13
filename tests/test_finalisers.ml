@@ -47,8 +47,8 @@ let test_struct_finaliser () =
   let module M = struct
     type s
     let s : s structure typ = structure "s"
-    let i = s *:* int32_t
-    let c = s *:* char
+    let i = field s "i" int32_t
+    let c = field s "c" char
     let () = seal s
 
     let finaliser_completed = ref false

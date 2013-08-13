@@ -73,12 +73,8 @@ and format_fields : type a. a boxed_field list -> Format.formatter -> unit =
   let open Format in
       List.iteri
         (fun i (BoxedField {ftype=t; fname}) ->
-          let name = match fname with
-            | None -> Printf.sprintf "field_%d" i
-            | Some name -> name 
-          in
           fprintf fmt "@[";
-          format_typ t (fun _ fmt -> fprintf fmt " %s" name) `nonarray fmt;
+          format_typ t (fun _ fmt -> fprintf fmt " %s" fname) `nonarray fmt;
           fprintf fmt "@];@;")
         fields
   and format_parameter_list parameters k fmt =

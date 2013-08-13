@@ -330,14 +330,16 @@ let test_pointer_printing () =
 *)
 let test_struct_printing () =
   let s = structure "s" in
-  let a = field "arr" (s *:* array 3 int) in
-  let d = field "dbl" (s *:* double) in
-  let f = field "ptr" (s *:* funptr (int @-> returning int)) in
+  let (-:) ty label = field s label ty in
+  let a = array 3 int                    -: "arr" in
+  let d = double                         -: "dbl" in
+  let f = funptr (int @-> returning int) -: "ptr" in
   let () = seal s in
 
   let t = structure "t" in
-  let ts = t *:* s in
-  let ti = t *:* int in
+  let (-:) ty label = field t label ty in
+  let ts = s   -: "ts" in
+  let ti = int -: "ti" in
   let () = seal t in
 
   let vt = make t in
@@ -353,7 +355,7 @@ let test_struct_printing () =
 
     assert_bool "struct printing"
       (equal_ignoring_whitespace
-         "{{ arr = {4, 5, 6}, dbl = nan, ptr = <fun> }, 14}"
+         "{ts = { arr = {4, 5, 6}, dbl = nan, ptr = <fun> }, ti = 14}"
          (string_of t vt))
   end
 
@@ -363,18 +365,20 @@ let test_struct_printing () =
 *)
 let test_union_printing () =
   let s = structure "s" in
-  let i = s *:* uint16_t in
-  let j = s *:* uint16_t in
+  let (-:) ty label = field s label ty in
+  let i = uint16_t -: "i" in
+  let j = uint16_t -: "j" in
   let () = seal s in
   let u = union "u" in
-  let us = u +:+ s in
-  let ua = u +:+ array 4 uint8_t in
+  let (-:) ty label = field u label ty in
+  let us = s               -: "us" in
+  let ua = array 4 uint8_t -: "ua" in
   let () = seal u in
   let v = make u in
   ignore (i, j, us);
   setf v ua (Array.make ~initial:(Unsigned.UInt8.of_int 0) uint8_t 4);
   assert_bool "union printing"
-    (equal_ignoring_whitespace "{{0, 0} | {0, 0, 0, 0}}" (string_of u v))
+    (equal_ignoring_whitespace "{ us = {i = 0, j = 0} | ua = {0, 0, 0, 0}}" (string_of u v))
 
 
 (*

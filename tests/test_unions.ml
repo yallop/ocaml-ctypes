@@ -26,8 +26,9 @@ let test_inspecting_float () =
   let module M = struct
     type u
     let utyp : u union typ = union "u"
-    let f = utyp +:+ double
-    let i = utyp +:+ int64_t
+    let (-:) ty label = field utyp label ty
+    let f = double  -: "f"
+    let i = int64_t -: "i"
     let () = seal utyp
 
     let pi = 3.14
@@ -59,8 +60,9 @@ let test_endian_detection () =
   let module M = struct
     type e
     let etyp : e union typ = union "e"
-    let i = etyp +:+ int64_t
-    let c = etyp +:+ array (sizeof int64_t) uchar
+    let (-:) ty label = field etyp label ty
+    let i = int64_t                      -: "i"
+    let c = array (sizeof int64_t) uchar -: "c"
     let () = seal etyp
 
     let updated_char_index =
@@ -92,8 +94,9 @@ let test_union_padding () =
   let module M = struct
     type padded
     let padded : padded union typ = union "padded"
-    let i = padded +:+ int64_t
-    let a = padded +:+ array (sizeof int64_t + 1) char
+    let (-:) ty label = field padded label ty
+    let i = int64_t                         -: "i"
+    let a = array (sizeof int64_t + 1) char -: "a"
     let () = seal padded
 
     let sum_union_components = Foreign.foreign "sum_union_components"
@@ -132,9 +135,10 @@ let test_union_address () =
   let module M = struct
     type u
     let u : u union typ = union "u"
-    let i = u +:+ int64_t
-    let c = u +:+ char
-    let s = u +:+ ptr (structure "incomplete")
+    let (-:) ty label = field u label ty
+    let i = int64_t                      -: "i"
+    let c = char                         -: "c"
+    let s = ptr (structure "incomplete") -: "s"
     let () = seal u
 
     let up = addr (make u)
@@ -158,11 +162,11 @@ let test_union_address () =
 *)
 let test_updating_sealed_union () =
   let utyp = union "sealed" in
-  let _ = utyp +:+ int in
+  let _ = field utyp "_" int in
   let () = seal utyp in
 
   assert_raises (ModifyingSealedType "sealed")
-    (fun () -> utyp +:+ char)
+    (fun () -> field utyp "_" char)
 
 
 (*
@@ -199,10 +203,11 @@ let test_folding_over_union_fields () =
 
     type u
     let u : u union typ = union "u"
-    let a = u +:+ int
-    let b = u +:+ array 3 float
-    let c = u +:+ ptr void
-    let d = u +:+ ptr (ptr u)
+    let (-:) ty label = field u label ty
+    let a = int           -: "a"
+    let b = array 3 float -: "b"
+    let c = ptr void      -: "c"
+    let d = ptr (ptr u)   -: "d"
     let () = seal u
       
     let expected = List.fold_right FieldSet.add

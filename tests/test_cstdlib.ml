@@ -144,8 +144,9 @@ let test_div () =
   let module M = struct
     type div_t
     let div_t : div_t structure typ = structure "div_t"
-    let quot = div_t *:* int
-    let rem = div_t *:* int
+    let (-:) ty label = field div_t label ty
+    let quot = int -: "quot"
+    let rem  = int -: "rem"
     let () = seal div_t
 
     let div = foreign "div" (int @-> int @-> returning div_t)
@@ -230,8 +231,9 @@ let test_bsearch () =
     *)
     type mi
     let mi = structure "mi"
-    let mr   = mi *:* int
-    let name = mi *:* ptr char
+    let (-:) ty label = field mi label ty
+    let mr   = int      -: "mr"
+    let name = ptr char -: "name"
     let () = seal (mi : mi structure typ)
 
   let of_string : string -> char array =
