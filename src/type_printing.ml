@@ -46,9 +46,9 @@ let rec format_typ : type a. a typ ->
           end
         | _ -> fprintf fmt "struct %s%t" tag (k `nonarray)
       end
-    | Union { utag; ucomplete; ufields } ->
-      begin match ucomplete, context with
-        | true, `toplevel ->
+    | Union { utag; uspec; ufields } ->
+      begin match uspec, context with
+        | Some _, `toplevel ->
           begin
             fprintf fmt "union %s {@;<1 2>@[" utag;
             format_fields ufields fmt;

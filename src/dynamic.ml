@@ -129,8 +129,8 @@ and write : type a. a typ -> offset:int -> a -> Raw.raw_pointer -> unit
          (Stubs.make_function_pointer cs' id))
     | Struct { spec = Incomplete _ } -> raise IncompleteType
     | Struct { spec = Complete _ } as s -> write_aggregate (sizeof s)
-    | Union { ucomplete=false } -> raise IncompleteType
-    | Union { usize } -> write_aggregate usize
+    | Union { uspec = None } -> raise IncompleteType
+    | Union { uspec = Some { usize } } -> write_aggregate usize
     | Abstract { asize } -> write_aggregate asize
     | Array _ as a ->
       let size = sizeof a in
@@ -173,7 +173,7 @@ let rec (!@) : type a. a ptr -> a
   = fun ({ raw_ptr; reftype; pbyte_offset = offset } as ptr) ->
     match reftype with
       | Void -> raise IncompleteType
-      | Union { ucomplete = false } -> raise IncompleteType
+      | Union { uspec = None } -> raise IncompleteType
       | Struct { spec = Incomplete _ } -> raise IncompleteType
       | View { read; ty = reftype } -> read (!@ { ptr with reftype })
       (* If it's a reference type then we take a reference *)

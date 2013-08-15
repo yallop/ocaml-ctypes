@@ -17,9 +17,7 @@ let field (type k) (structured : (_, k) structured typ) label ftype =
       s.fields <- BoxedField field :: s.fields;
       field
     end
-  | Union u when not u.ucomplete ->
-    u.usize <- max u.usize (sizeof ftype);
-    u.ualignment <- max u.ualignment (alignment ftype);
+  | Union ({ uspec = None } as u) ->
     let field = { ftype; foffset = 0; fname = label } in
     u.ufields <- BoxedField field :: u.ufields;
     field
@@ -53,10 +51,16 @@ let seal (type a) (type s) : (a, s) structured typ -> unit = function
     let raw = Static_stubs.make_unpassable_structspec ~size ~alignment in
     s.spec <- Complete { RawTypes.raw; size; alignment; passable = false;
                          name = "struct " ^ s.tag }
-  | Union { ufields = [] } -> raise (Unsupported "union with no fields")
-  | Union u when u.ucomplete -> raise (ModifyingSealedType u.utag)
+  | Union { utag; uspec = Some _ } ->
+    raise (ModifyingSealedType utag)
+  | Union { ufields = [] } ->
+    raise (Unsupported "union with no fields")
   | Union u -> begin
     u.ufields <- List.rev u.ufields;
-    u.usize <- aligned_offset u.usize u.ualignment;
-    u.ucomplete <- true
+    let usize = max_field_size u.ufields
+    and ualignment = max_field_alignment u.ufields in
+    u.uspec <- Some {
+      usize = aligned_offset usize ualignment;
+      ualignment = ualignment
+    }
   end

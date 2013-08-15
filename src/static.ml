@@ -19,6 +19,8 @@ type 'a structspec =
     Incomplete of incomplete_size
   | Complete of 'a Static_stubs.structure RawTypes.ctype
 
+type unionspec = { usize: int; ualignment: int }
+
 type arg_type = ArgType : 'b RawTypes.ctype_io -> arg_type
 
 type abstract_type = {
@@ -65,9 +67,7 @@ and 'a structure_type = {
 }
 and 'a union_type = {
   utag: string;
-  mutable ucomplete: bool;
-  mutable usize: int;
-  mutable ualignment: int;
+  mutable uspec: unionspec option;
   (* fields are in reverse order iff the union type is incomplete *)
   mutable ufields : 'a union boxed_field list;
 }
@@ -85,8 +85,9 @@ let rec sizeof : type a. a typ -> int = function
   | Struct { spec = Incomplete _ } -> raise IncompleteType
   | Struct { spec = Complete
                { RawTypes.size } } -> size
-  | Union { ucomplete = false }    -> raise IncompleteType
-  | Union { usize }                -> usize
+  | Union { uspec = None }         -> raise IncompleteType
+  | Union { uspec = Some { usize } }
+                                   -> usize
   | Array (t, i)                   -> i * sizeof t
   | Abstract { asize }             -> asize
   | Pointer _                      -> RawTypes.(pointer.size)
@@ -99,8 +100,9 @@ let rec alignment : type a. a typ -> int = function
   | Struct { spec = Incomplete _ }   -> raise IncompleteType
   | Struct { spec = Complete
              {RawTypes.alignment } } -> alignment
-  | Union { ucomplete = false }      -> raise IncompleteType
-  | Union { ualignment }             -> ualignment
+  | Union { uspec = None }      -> raise IncompleteType
+  | Union { uspec = Some { ualignment } }
+                                     -> ualignment
   | Array (t, _)                     -> alignment t
   | Abstract { aalignment }          -> aalignment
   | Pointer _                        -> RawTypes.(pointer.alignment)
@@ -113,7 +115,7 @@ let rec passable : type a. a typ -> bool = function
   | Struct { spec = Incomplete _ }  -> raise IncompleteType
   | Struct { spec = Complete
       { RawTypes.passable } }       -> passable
-  | Union { ucomplete = false }     -> raise IncompleteType
+  | Union { uspec = None }          -> raise IncompleteType
   | Union _                         -> false
   | Array _                         -> false
   | Pointer _                       -> true
@@ -188,15 +190,17 @@ let aligned_offset offset alignment =
 let structure tag =
   Struct { spec = Incomplete { isize = 0 }; tag; fields = [] }
 
-let union utag = Union { utag; usize = 0; ualignment = 0; ucomplete = false;
-                         ufields = [] }
-
-let ensure_unsealed { ucomplete; utag } =
-  if ucomplete then raise (ModifyingSealedType utag)
+let union utag = Union { utag; uspec = None; ufields = [] }
 
 let max_field_alignment fields =
   List.fold_left
-    (fun align (BoxedField {ftype; foffset}) -> max align (alignment ftype))
+    (fun align (BoxedField {ftype}) -> max align (alignment ftype))
+    0
+    fields
+
+let max_field_size fields =
+  List.fold_left
+    (fun size (BoxedField {ftype}) -> max size (sizeof ftype))
     0
     fields
 
