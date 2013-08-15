@@ -295,12 +295,6 @@ val seal : (_, [< `Struct | `Union]) structured typ -> unit
     in a way that involves their size or alignment; see the documentation for
     {!IncompleteType} for further details.  *)
 
-val fold_fields : (< f : 't. 'a -> ('t, 's) field -> 'a >) ->
-                  'a -> ((_, _) structured as 's) typ -> 'a
-(** [fold_fields o a s] folds [o#f] over the fields of [s], using the
-    accumulator [a].  For a structured type with fields [f1], [f2], ..., [fn]
-    it is equivalent to [o#f (... (o#f (o#f a f1) f2) ...) fn]. *)
-
 (** {3 View types} *)
 
 val view : ?format_typ:((Format.formatter -> unit) -> Format.formatter -> unit) ->

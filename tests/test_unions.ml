@@ -179,50 +179,6 @@ let test_sealing_empty_union () =
     (fun () -> seal empty)
 
 
-(* 
-   Test folds over union fields.
-*)
-let test_folding_over_union_fields () =
-  let module M = struct
-    type field_info = {
-      typ : string ;
-    }
-
-    module FieldSet = Set.Make(struct
-      type t = field_info
-      let compare = Pervasives.compare
-    end)
-
-    let collect_fields : 's. 's union typ -> FieldSet.t =
-      fun (type s) (s : s union typ) ->
-        fold_fields (object
-          method f : 't. _ -> ('t, s union) field -> _ =
-            fun fieldset field ->
-              FieldSet.add { typ = string_of_typ (field_type field) } fieldset
-        end) FieldSet.empty s
-
-    type u
-    let u : u union typ = union "u"
-    let (-:) ty label = field u label ty
-    let a = int           -: "a"
-    let b = array 3 float -: "b"
-    let c = ptr void      -: "c"
-    let d = ptr (ptr u)   -: "d"
-    let () = seal u
-      
-    let expected = List.fold_right FieldSet.add
-      [{typ = string_of_typ int};
-       {typ = string_of_typ (array 3 float)};
-       {typ = string_of_typ (ptr void)};
-       {typ = string_of_typ (ptr (ptr u))}]
-      FieldSet.empty
-
-    let () = begin
-      assert_equal ~cmp:FieldSet.equal expected (collect_fields u)
-    end
-  end in ()
-
-
 let suite = "Union tests" >:::
   ["inspecting float representation"
    >:: test_inspecting_float;
@@ -241,9 +197,6 @@ let suite = "Union tests" >:::
 
    "sealing empty union"
    >:: test_sealing_empty_union;
-
-   "folding over union fields"
-   >:: test_folding_over_union_fields;
   ]
 
 

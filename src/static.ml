@@ -205,15 +205,5 @@ let all_passable fields =
     true
     fields
 
-let fold_boxed_field_list (o : < f : 't. 'a -> ('t, 's) field -> 'a >) a l =
-  List.fold_left (fun a (BoxedField f) -> o#f a f) a l
-
-let fold_fields (type k)
-    (o : < f : 't. _ -> ('t, (_, k) structured) field -> _ >) a
-    (s : (_, k) structured typ) = match s with
-  | Struct { fields } -> fold_boxed_field_list o a fields
-  | Union { ufields } -> fold_boxed_field_list o a ufields
-  | Abstract _        -> a
-
 let offsetof { foffset } = foffset
 let field_type { ftype } = ftype
