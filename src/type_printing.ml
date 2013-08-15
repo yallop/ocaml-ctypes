@@ -32,6 +32,8 @@ let rec format_typ : type a. a typ ->
       fprintf fmt "void%t" (k `nonarray)
     | Primitive { RawTypes.name } ->
       fprintf fmt "%s%t" name (k `nonarray)
+    | View { format_typ = Some format } ->
+      format (k `nonarray) fmt
     | View { ty } ->
       format_typ ty k context fmt
     | Abstract { aname } ->

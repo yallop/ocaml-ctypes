@@ -53,7 +53,12 @@ and ('a, 'kind) structured = { structured : ('a, 'kind) structured ptr }
 and 'a union = ('a, [`Union]) structured
 and 'a structure = ('a, [`Struct]) structured
 and 'a abstract = ('a, [`Abstract]) structured
-and ('a, 'b) view = { read : 'b -> 'a; write : 'a -> 'b; ty: 'b typ }
+and ('a, 'b) view = {
+  read : 'b -> 'a;
+  write : 'a -> 'b;
+  format_typ: ((Format.formatter -> unit) -> Format.formatter -> unit) option;
+  ty: 'b typ;
+}
 and ('a, 's) field = {
   ftype: 'a typ;
   foffset: int;
@@ -173,7 +178,7 @@ let ( @->) f t =
     Function (f, t)
 let abstract ~name ~size ~alignment =
   Abstract { aname = name; asize = size; aalignment = alignment }
-let view ~read ~write ty = View { read; write; ty }
+let view ?format_typ ~read ~write ty = View { read; write; format_typ; ty }
 let returning v =
   if not (passable v) then
     raise (Unsupported "Unsupported return type")
