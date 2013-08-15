@@ -1,13 +1,15 @@
 # OASIS_START
-# DO NOT EDIT (digest: ad63da8288d87e43ece947d562e9c8fe)
+# DO NOT EDIT (digest: 244299450c22caf1c34c1a91de73cc01)
 Unsigned
 Signed
+Structs
 Ctypes
 PosixTypes
 Common
 Ctypes_raw
 Static_stubs
 Static
+Structs_computed
 Type_printing
 WeakRef
 Closure_properties
