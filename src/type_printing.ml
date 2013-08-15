@@ -32,6 +32,8 @@ let rec format_typ : type a. a typ ->
       fprintf fmt "void%t" (k `nonarray)
     | Primitive { RawTypes.name } ->
       fprintf fmt "%s%t" name (k `nonarray)
+    | View { format_typ = Some format } ->
+      format (k `nonarray) fmt
     | View { ty } ->
       format_typ ty k context fmt
     | Abstract { aname } ->
@@ -63,8 +65,6 @@ let rec format_typ : type a. a typ ->
             | `array -> fprintf fmt "(*%t)" (k `nonarray)
             | _      -> fprintf fmt "*%t" (k `nonarray))
         `nonarray fmt
-    | FunctionPointer (_, fn) ->
-      format_fn fn (fun fmt -> fprintf fmt "(*%t)" (k `nonarray)) fmt
     | Array (ty, n) ->
       format_typ ty (fun _ fmt -> fprintf fmt "%t[%d]" (k `array) n) `nonarray
         fmt
@@ -77,27 +77,27 @@ and format_fields : type a. a boxed_field list -> Format.formatter -> unit =
           format_typ t (fun _ fmt -> fprintf fmt " %s" fname) `nonarray fmt;
           fprintf fmt "@];@;")
         fields
-  and format_parameter_list parameters k fmt =
-    Format.fprintf fmt "%t(@[@[" k;
-    if parameters = [] then Format.fprintf fmt "void" else
-      List.iteri
-        (fun i (BoxedType t) ->
-          if i <> 0 then Format.fprintf fmt "@], @[";
-          format_typ t (fun _ _ -> ()) `nonarray fmt)
-        parameters;
-    Format.fprintf fmt "@]@])"
-  and format_fn : 'a. 'a fn ->
-    (Format.formatter -> unit) ->
-    (Format.formatter -> unit) =
-    let rec gather : type a. a fn -> boxed_typ list * boxed_typ =
-      function
-        | Returns (_, ty) -> [], BoxedType ty
-        | Function (Void, fn) -> gather fn
-        | Function (p, fn) -> let ps, r = gather fn in BoxedType p :: ps, r in
-    fun fn k fmt ->
-      let ps, BoxedType r = gather fn in
-      format_typ r (fun context fmt -> format_parameter_list ps k fmt)
-        `nonarray fmt
+and format_parameter_list parameters k fmt =
+  Format.fprintf fmt "%t(@[@[" k;
+  if parameters = [] then Format.fprintf fmt "void" else
+    List.iteri
+      (fun i (BoxedType t) ->
+        if i <> 0 then Format.fprintf fmt "@], @[";
+        format_typ t (fun _ _ -> ()) `nonarray fmt)
+      parameters;
+  Format.fprintf fmt "@]@])"
+and format_fn' : 'a. 'a fn ->
+  (Format.formatter -> unit) ->
+  (Format.formatter -> unit) =
+  let rec gather : type a. a fn -> boxed_typ list * boxed_typ =
+    function
+      | Returns (_, ty) -> [], BoxedType ty
+      | Function (Void, fn) -> gather fn
+      | Function (p, fn) -> let ps, r = gather fn in BoxedType p :: ps, r in
+  fun fn k fmt ->
+    let ps, BoxedType r = gather fn in
+    format_typ r (fun context fmt -> format_parameter_list ps k fmt)
+      `nonarray fmt
 
 let format_name ?name fmt =
   match name with
@@ -113,7 +113,7 @@ let format_typ : ?name:string -> Format.formatter -> 'a typ -> unit
 let format_fn : ?name:string -> Format.formatter -> 'a fn -> unit
   = fun ?name fmt fn ->
     Format.fprintf fmt "@[";
-    format_fn fn (format_name ?name) fmt;
+    format_fn' fn (format_name ?name) fmt;
     Format.fprintf fmt "@]"
 
 let string_of_typ ?name ty = Common.string_of (format_typ ?name) ty

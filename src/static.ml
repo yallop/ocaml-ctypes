@@ -38,12 +38,6 @@ type _ typ =
   | Abstract        : abstract_type     -> 'a abstract typ
   | View            : ('a, 'b) view     -> 'a typ
   | Array           : 'a typ * int      -> 'a array typ
-  | FunctionPointer : string option * ('a -> 'b) fn
-                                        -> ('a -> 'b) typ
-and _ fn =
-  (* The flag indicates whether we should check errno *)
-  | Returns  : bool * 'a typ   -> 'a fn
-  | Function : 'a typ * 'b fn  -> ('a -> 'b) fn
 and 'a ptr = { reftype      : 'a typ;
                raw_ptr      : Ctypes_raw.raw_pointer;
                pmanaged     : Ctypes_raw.managed_buffer option;
@@ -53,7 +47,12 @@ and ('a, 'kind) structured = { structured : ('a, 'kind) structured ptr }
 and 'a union = ('a, [`Union]) structured
 and 'a structure = ('a, [`Struct]) structured
 and 'a abstract = ('a, [`Abstract]) structured
-and ('a, 'b) view = { read : 'b -> 'a; write : 'a -> 'b; ty: 'b typ }
+and ('a, 'b) view = {
+  read : 'b -> 'a;
+  write : 'a -> 'b;
+  format_typ: ((Format.formatter -> unit) -> Format.formatter -> unit) option;
+  ty: 'b typ;
+}
 and ('a, 's) field = {
   ftype: 'a typ;
   foffset: int;
@@ -72,12 +71,13 @@ and 'a union_type = {
   mutable ufields : 'a union boxed_field list;
 }
 and 's boxed_field = BoxedField : ('a, 's) field -> 's boxed_field
-type boxed_typ = BoxedType : 'a typ -> boxed_typ
 
-type _ ccallspec =
-    Call : bool * (Ctypes_raw.raw_pointer -> 'a) -> 'a ccallspec
-  | WriteArg : ('a -> Ctypes_raw.raw_pointer -> unit) * 'b ccallspec ->
-               ('a -> 'b) ccallspec
+type _ fn =
+  (* The flag indicates whether we should check errno *)
+  | Returns  : bool * 'a typ   -> 'a fn
+  | Function : 'a typ * 'b fn  -> ('a -> 'b) fn
+
+type boxed_typ = BoxedType : 'a typ -> boxed_typ
 
 let rec sizeof : type a. a typ -> int = function
     Void                           -> raise IncompleteType
@@ -91,7 +91,6 @@ let rec sizeof : type a. a typ -> int = function
   | Array (t, i)                   -> i * sizeof t
   | Abstract { asize }             -> asize
   | Pointer _                      -> RawTypes.(pointer.size)
-  | FunctionPointer _              -> RawTypes.(pointer.size)
   | View { ty }                    -> sizeof ty
 
 let rec alignment : type a. a typ -> int = function
@@ -106,7 +105,6 @@ let rec alignment : type a. a typ -> int = function
   | Array (t, _)                     -> alignment t
   | Abstract { aalignment }          -> aalignment
   | Pointer _                        -> RawTypes.(pointer.alignment)
-  | FunctionPointer _                -> RawTypes.(pointer.alignment)
   | View { ty }                      -> alignment ty
 
 let rec passable : type a. a typ -> bool = function
@@ -120,7 +118,6 @@ let rec passable : type a. a typ -> bool = function
   | Array _                         -> false
   | Pointer _                       -> true
   | Abstract _                      -> false
-  | FunctionPointer _               -> true
   | View { ty }                     -> passable ty
 
 let rec arg_type : type a. a typ -> arg_type = function
@@ -128,7 +125,6 @@ let rec arg_type : type a. a typ -> arg_type = function
   | Primitive p                    -> ArgType p.RawTypes.raw
   | Struct { spec = Complete p }   -> ArgType p.RawTypes.raw
   | Pointer _                      -> ArgType RawTypes.(pointer.raw)
-  | FunctionPointer _              -> ArgType RawTypes.(pointer.raw)
   | View { ty }                    -> arg_type ty
   (* The following cases should never happen; aggregate types other than
      complete struct types are excluded during type construction. *)
@@ -173,14 +169,13 @@ let ( @->) f t =
     Function (f, t)
 let abstract ~name ~size ~alignment =
   Abstract { aname = name; asize = size; aalignment = alignment }
-let view ~read ~write ty = View { read; write; ty }
+let view ?format_typ ~read ~write ty = View { read; write; format_typ; ty }
 let returning v =
   if not (passable v) then
     raise (Unsupported "Unsupported return type")
   else
     Returns (false, v)
 let returning_checking_errno v = Returns (true, v)
-let funptr ?name f = FunctionPointer (name, f)
 
 let aligned_offset offset alignment =
   match offset mod alignment with
@@ -222,4 +217,3 @@ let fold_fields (type k)
 
 let offsetof { foffset } = foffset
 let field_type { ftype } = ftype
-

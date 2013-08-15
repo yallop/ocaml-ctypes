@@ -331,9 +331,9 @@ let test_pointer_printing () =
 let test_struct_printing () =
   let s = structure "s" in
   let (-:) ty label = field s label ty in
-  let a = array 3 int                    -: "arr" in
-  let d = double                         -: "dbl" in
-  let f = funptr (int @-> returning int) -: "ptr" in
+  let a = array 3 int -: "arr" in
+  let d = double      -: "dbl" in
+  let c = char        -: "chr" in
   let () = seal s in
 
   let t = structure "t" in
@@ -348,14 +348,14 @@ let test_struct_printing () =
   begin
     setf vs a (Array.of_list int [4; 5; 6]);
     setf vs d nan;
-    setf vs f succ;
+    setf vs c 'a';
 
     setf vt ts vs;
     setf vt ti 14;
 
     assert_bool "struct printing"
       (equal_ignoring_whitespace
-         "{ts = { arr = {4, 5, 6}, dbl = nan, ptr = <fun> }, ti = 14}"
+         "{ts = { arr = {4, 5, 6}, dbl = nan, chr = 'a' }, ti = 14}"
          (string_of t vt))
   end
 
@@ -392,15 +392,6 @@ let test_array_printing () =
        (string_of (array 2 (array 3 int)) arrarr))
 
 
-(*
-  Test the printing of function types.
-*)
-let test_function_printing () =
-  assert_equal
-    "<fun>"
-    (string_of (funptr (int @-> returning int)) succ)
-
-
 let suite = "Value printing tests" >:::
   ["printing atomic values"
     >:: test_atomic_printing;
@@ -416,9 +407,6 @@ let suite = "Value printing tests" >:::
 
    "printing arrays"
     >:: test_array_printing;
-
-   "printing functions"
-    >:: test_function_printing;
   ]
 
 
