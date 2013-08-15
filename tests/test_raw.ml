@@ -6,7 +6,8 @@
  *)
 
 open OUnit
-
+open Dynamic_stubs
+open Std_view_stubs
 
 (* Tests for the low-level module on which the public high-level
    interface is based.  
@@ -18,7 +19,7 @@ open OUnit
         double fabs(double)
 *)
 let test_fabs () =
-  Dynamic_stubs.(Ctypes_raw.Types.(
+  Ctypes_raw.Types.(
     let callspec = allocate_callspec () in
     let arg_1_offset = add_argument callspec double.raw in
     let () = prep_callspec callspec double.raw in
@@ -34,7 +35,7 @@ let test_fabs () =
     assert_equal 2.0 (fabs (-2.0)) ~printer:string_of_float;
     assert_equal 12.0 (fabs (12.0)) ~printer:string_of_float;
     assert_equal 0.0 (fabs 0.0) ~printer:string_of_float;
-  ))
+  )
 
 
 (* Call the C function
@@ -42,7 +43,7 @@ let test_fabs () =
         double pow(double, double)
 *)
 let test_pow () =
-  Dynamic_stubs.(Ctypes_raw.Types.(
+  Ctypes_raw.Types.(
     let callspec = allocate_callspec () in
     let arg_1_offset = add_argument callspec double.raw in
     let arg_2_offset = add_argument callspec double.raw in
@@ -60,7 +61,7 @@ let test_pow () =
 
     assert_equal 8.0 (pow 2.0 3.0);
     assert_equal 1.0 (pow 10.0 0.0);
-  ))
+  )
 
 
 let suite = "Raw interface tests" >:::

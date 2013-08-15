@@ -21,7 +21,6 @@ let rec format : type a. a typ -> Format.formatter -> a -> unit
   | Abstract abs -> Format.pp_print_string fmt "<abstract>"
     (* For now, just print the underlying value in a view *)
   | View {write; ty} -> format ty fmt (write v)
-  | FunctionPointer (name, fn) -> Format.pp_print_string fmt "<fun>"
 and format_struct : type a. Format.formatter -> a structure -> unit
   = fun fmt ({structured = {reftype = Struct {fields}}} as s) ->
     let open Format in

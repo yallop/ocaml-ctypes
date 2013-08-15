@@ -412,6 +412,8 @@ let test_function_printing () =
 *)
 let test_view_printing () =
   begin
+    (* By default, views are printed as the underlying type *)
+
     assert_typ_printed_as ~name:"a" "char *a"
       string;
 
@@ -419,7 +421,20 @@ let test_view_printing () =
       (funptr (void @-> returning void)) in
     
     assert_typ_printed_as "void (*)(void)"
-      v
+      v;
+
+    (* The format_typ optional argument can be used to provide custom
+       printing for views. *)
+    let w : unit typ = view (funptr (int @-> returning float))
+      ~format_typ:(fun k fmt -> Format.fprintf fmt "unit%t" k)
+      ~read:(fun _ -> ())
+      ~write:(fun () _ -> 0.0) in
+
+    assert_typ_printed_as "unit"
+      w;
+
+    assert_fn_printed_as ~name:"g" "unit g(unit)"
+      (w @-> returning w)
   end
 
 

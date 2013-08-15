@@ -303,7 +303,8 @@ val fold_fields : (< f : 't. 'a -> ('t, 's) field -> 'a >) ->
 
 (** {3 View types} *)
 
-val view : read:('a -> 'b) -> write:('b -> 'a) -> 'a typ -> 'b typ
+val view : ?format_typ:((Format.formatter -> unit) -> Format.formatter -> unit) ->
+           read:('a -> 'b) -> write:('b -> 'a) -> 'a typ -> 'b typ
 (** [view ~read:r ~write:w t] creates a C type representation [t'] which
     behaves like [t] except that values read using [t'] are subsequently
     transformed using the function [r] and values written using [t'] are first
@@ -317,6 +318,11 @@ val view : read:('a -> 'b) -> write:('b -> 'a) -> 'a typ -> 'b typ
     can be used to pass OCaml strings directly to and from bound C functions,
     or to read and write string members in structs and arrays.  (In fact, the
     {!string} type representation is defined in exactly this way.)
+
+    The optional argument [format_typ] is used by the {!Ctypes.format_typ} and
+    {!string_of_typ) functions to print the type at the top level and
+    elsewhere.  If [format_typ] is not supplied the printer for [t] is used
+    instead.
 *)
 
 (** {3 Abstract types} *)

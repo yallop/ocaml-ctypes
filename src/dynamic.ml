@@ -7,74 +7,13 @@
 
 (* TODO: better array support, perhaps based on bigarrays integration *)
 
-exception CallToExpiredClosure = Ctypes_raw.CallToExpiredClosure
-
 open Static
 
 module Stubs = Dynamic_stubs
 module Raw = Ctypes_raw
 
-(* Register the closure lookup function with C. *)
-let () = Stubs.set_closure_callback Closure_properties.retrieve
-
-(*
-  call addr callspec
-   (fun buffer ->
-        write arg_1 buffer v_1
-        write arg buffer v
-        ...
-        write arg_n buffer v_n)
-   read_return_value
-*)
-let rec invoke : type a. string option ->
-                         a ccallspec ->
-                         (Raw.raw_pointer -> unit) list ->
-                         Dynamic_stubs.callspec ->
-                         Raw.raw_pointer ->
-                      a
-  = fun name -> function
-    | Call (check_errno, read_return_value) ->
-      let call = match check_errno, name with
-        | true, Some name -> Stubs.call_errno name
-        | true, None      -> Stubs.call_errno ""
-        | false, _        -> Stubs.call
-      in
-      fun writers callspec addr ->
-        call addr callspec
-          (fun buf -> List.iter (fun w -> w buf) writers)
-          read_return_value
-    | WriteArg (write, ccallspec) ->
-      let next = invoke name ccallspec in
-      fun writers callspec addr v ->
-        next (write v :: writers) callspec addr
-
-let rec prep_callspec : type a. Dynamic_stubs.callspec -> a typ -> unit
-  = fun callspec ty ->
-    let ArgType ctype = arg_type ty in
-    Stubs.prep_callspec callspec ctype
-
-and add_argument : type a. Dynamic_stubs.callspec -> a typ -> int
-  = fun callspec -> function
-    | Void -> 0
-    | ty   -> let ArgType ctype = arg_type ty in
-              Stubs.add_argument callspec ctype
-
-and box_function : type a. a fn -> Dynamic_stubs.callspec -> a WeakRef.t -> Stubs.boxedfn
-  = fun fn callspec -> match fn with
-    | Returns (_, ty) ->
-      let _ = prep_callspec callspec ty in
-      let write_rv = write ty in
-      fun f -> Stubs.Done (write_rv ~offset:0 (WeakRef.get f), callspec)
-    | Function (p, f) ->
-      let _ = add_argument callspec p in
-      let box = box_function f callspec in
-      let read = build p ~offset:0 in
-      fun f -> Stubs.Fn (fun buf ->
-        try box (WeakRef.make (WeakRef.get f (read buf)))
-        with WeakRef.EmptyWeakReference -> raise CallToExpiredClosure)
-
 (* Describes how to read a value, e.g. from a return buffer *)
-and build : type a. a typ -> offset:int -> Raw.raw_pointer -> a
+let rec build : type a. a typ -> offset:int -> Raw.raw_pointer -> a
  = function
     | Void ->
       Stubs.read RawTypes.(void.raw)
@@ -96,9 +35,6 @@ and build : type a. a typ -> offset:int -> Raw.raw_pointer -> a
           pbyte_offset = 0;
           reftype;
           pmanaged = None })
-    | FunctionPointer (name, f) ->
-      let build_fun = build_function ?name f in
-      (fun ~offset buf -> build_fun (Stubs.read RawTypes.(pointer.raw) ~offset buf))
     | View { read; ty } ->
       let buildty = build ty in
       (fun ~offset buf -> read (buildty ~offset buf))
@@ -108,7 +44,7 @@ and build : type a. a typ -> offset:int -> Raw.raw_pointer -> a
     | Array _ -> assert false
     | Abstract _ -> assert false
 
-and write : type a. a typ -> offset:int -> a -> Raw.raw_pointer -> unit
+let rec write : type a. a typ -> offset:int -> a -> Raw.raw_pointer -> unit
   = let write_aggregate size =
       (fun ~offset { structured = { raw_ptr; pbyte_offset = src_offset } } dst ->
         Stubs.memcpy ~size ~dst ~dst_offset:offset ~src:raw_ptr ~src_offset) in
@@ -119,14 +55,6 @@ and write : type a. a typ -> offset:int -> a -> Raw.raw_pointer -> unit
       (fun ~offset { raw_ptr; pbyte_offset } ->
         Stubs.write RawTypes.(pointer.raw) ~offset
           (RawTypes.PtrType.(add raw_ptr (of_int pbyte_offset))))
-    | FunctionPointer (_, fn) ->
-      let cs' = Stubs.allocate_callspec () in
-      let cs = box_function fn cs' in
-      (fun ~offset f ->
-       let boxed = cs (WeakRef.make f) in
-       let id = Closure_properties.record (Obj.repr f) (Obj.repr boxed) in
-       Stubs.write RawTypes.(pointer.raw) ~offset
-         (Stubs.make_function_pointer cs' id))
     | Struct { spec = Incomplete _ } -> raise IncompleteType
     | Struct { spec = Complete _ } as s -> write_aggregate (sizeof s)
     | Union { uspec = None } -> raise IncompleteType
@@ -139,30 +67,6 @@ and write : type a. a typ -> offset:int -> a -> Raw.raw_pointer -> unit
     | View { write = w; ty } ->
       let writety = write ty in
       (fun ~offset v -> writety ~offset (w v))
-
-(*
-  callspec = allocate_callspec ()
-  add_argument callspec arg1
-  add_argument callspec arg2
-  ...
-  add_argument callspec argn
-  prep_callspec callspec rettype
-*)
-and build_ccallspec : type a. a fn -> Dynamic_stubs.callspec -> a ccallspec
-  = fun fn callspec -> match fn with
-    | Returns (check_errno, t) ->
-      let () = prep_callspec callspec t in
-      Call (check_errno, build t ~offset:0)
-    | Function (p, f) ->
-      let offset = add_argument callspec p in
-      let rest = build_ccallspec f callspec in
-      WriteArg (write p ~offset, rest)
-
-and build_function : type a. ?name:string -> a fn -> RawTypes.voidp -> a
-  = fun ?name fn ->
-    let c = Stubs.allocate_callspec () in
-    let e = build_ccallspec fn c in
-    invoke name e [] c
 
 let null : unit ptr = { raw_ptr = RawTypes.null;
                         reftype = Void;
