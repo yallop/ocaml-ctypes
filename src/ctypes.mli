@@ -238,7 +238,7 @@ val funptr_opt : ('a -> 'b) fn -> ('a -> 'b) option typ
 
 (** {3 Struct and union types} *)
 
-type ('a, 'kind) structured
+type ('a, 'kind) structured = ('a, 'kind) Static.structured
 (** The base type of values representing C struct and union types.  The
     ['kind] parameter is a polymorphic variant type indicating whether the type
     represents a struct ([`Struct]) or a union ([`Union]). *)
