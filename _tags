@@ -252,5 +252,6 @@
 <examples/date/date.{native,byte}>: custom
 # OASIS_STOP
 <tests/clib/*>: not_hygienic
+<primitive_details.*>: not_hygienic
 <src/*>: use_C_libffi
 true: annot

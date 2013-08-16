@@ -12,7 +12,8 @@ let rec format : type a. a typ -> Format.formatter -> a -> unit
   = fun typ fmt v -> match typ with
     Void -> Format.pp_print_string fmt
       (Dynamic_stubs.string_of RawTypes.(void.raw) v)
-  | Primitive { RawTypes.raw } ->
+  | Primitive p ->
+    let { RawTypes.raw } = Raw.ctype_of_prim p in
     Format.pp_print_string fmt (Dynamic_stubs.string_of raw v)
   | Pointer _ -> format_ptr fmt v
   | Struct _ -> format_struct fmt v

@@ -304,22 +304,6 @@ value ctypes_void_type_info(value unit)
 }
 
 
-/* sizeof : _ ctype -> int */
-value ctypes_sizeof(value typespec)
-{
-  struct type_info *ti = (struct type_info *)Data_custom_val(typespec);
-  return Val_int(ti->ffitype->size);
-}
-
-
-/* alignment : _ ctype -> int */
-value ctypes_alignment(value typespec)
-{
-  struct type_info *ti = (struct type_info *)Data_custom_val(typespec);
-  return Val_int(ti->ffitype->alignment);
-}
-
-
 /* Read a C value from a block of memory */
 /* read : 'a ctype -> offset:int -> immediate_pointer -> 'a */
 value ctypes_read(value ctype, value offset_, value buffer_)
