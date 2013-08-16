@@ -16,23 +16,22 @@ module Raw = Ctypes_raw
 let rec build : type a. a typ -> offset:int -> Raw.raw_pointer -> a
  = function
     | Void ->
-      Stubs.read RawTypes.(void.raw)
-    | Primitive p ->
-      let { RawTypes.raw } = Raw.ctype_of_prim p in
-      Stubs.read raw
+      fun ~offset _ -> ()
+    | Primitive p -> Stubs.read p
     | Struct { spec = Incomplete _ } ->
       raise IncompleteType
-    | Struct { spec = Complete { sraw_io } } as reftype ->
+    | Struct { spec = Complete { size } } as reftype ->
       (fun ~offset buf ->
-        let m = Stubs.read sraw_io ~offset buf in
+        let m = Stubs.allocate size in
+        let raw_ptr = Stubs.block_address m in
+        let () = Stubs.memcpy ~size
+          ~dst:raw_ptr ~dst_offset:0
+          ~src:buf ~src_offset:offset in
         { structured =
-            { pmanaged = Some m;
-              reftype;
-              raw_ptr = Stubs.block_address m;
-              pbyte_offset = 0 } })
+            { pmanaged = Some m; reftype; raw_ptr; pbyte_offset = 0 } })
     | Pointer reftype ->
       (fun ~offset buf ->
-        { raw_ptr = Stubs.read RawTypes.(pointer.raw) ~offset buf;
+        { raw_ptr = Stubs.read_pointer ~offset buf;
           pbyte_offset = 0;
           reftype;
           pmanaged = None })
@@ -51,17 +50,15 @@ let rec write : type a. a typ -> offset:int -> a -> Raw.raw_pointer -> unit
         Stubs.memcpy ~size ~dst ~dst_offset:offset ~src:raw_ptr ~src_offset) in
     function
     | Void -> (fun ~offset _ _ -> ())
-    | Primitive p ->
-      let { RawTypes.raw } = Raw.ctype_of_prim p in
-      Stubs.write raw
+    | Primitive p -> Stubs.write p
     | Pointer _ ->
-      (fun ~offset { raw_ptr; pbyte_offset } ->
-        Stubs.write RawTypes.(pointer.raw) ~offset
-          (RawTypes.PtrType.(add raw_ptr (of_int pbyte_offset))))
+      (fun ~offset { raw_ptr; pbyte_offset } dst ->
+        Stubs.write_pointer ~offset
+          (Raw.PtrType.(add raw_ptr (of_int pbyte_offset))) dst)
     | Struct { spec = Incomplete _ } -> raise IncompleteType
     | Struct { spec = Complete _ } as s -> write_aggregate (sizeof s)
     | Union { uspec = None } -> raise IncompleteType
-    | Union { uspec = Some { usize } } -> write_aggregate usize
+    | Union { uspec = Some { size } } -> write_aggregate size
     | Abstract { asize } -> write_aggregate asize
     | Array _ as a ->
       let size = sizeof a in
@@ -71,7 +68,7 @@ let rec write : type a. a typ -> offset:int -> a -> Raw.raw_pointer -> unit
       let writety = write ty in
       (fun ~offset v -> writety ~offset (w v))
 
-let null : unit ptr = { raw_ptr = RawTypes.null;
+let null : unit ptr = { raw_ptr = Raw.null;
                         reftype = Void;
                         pbyte_offset = 0;
                         pmanaged = None }
@@ -96,7 +93,7 @@ let ptr_diff { raw_ptr = lp; pbyte_offset = loff; reftype }
     { raw_ptr = rp; pbyte_offset = roff } =
     (* We assume the pointers are properly aligned, or at least that
        the difference is a multiple of sizeof reftype. *)
-    let open RawTypes.PtrType in
+    let open Raw.PtrType in
      let l = add lp (of_int loff)
      and r = add rp (of_int roff) in
      to_int (sub r l) / sizeof reftype
@@ -140,12 +137,12 @@ let allocate : type a. ?finalise:(a ptr -> unit) -> a typ -> a -> a ptr
     end
 
 let ptr_compare {raw_ptr = lp; pbyte_offset = loff} {raw_ptr = rp; pbyte_offset = roff}
-    = RawTypes.PtrType.(compare (add lp (of_int loff)) (add rp (of_int roff)))
+    = Raw.PtrType.(compare (add lp (of_int loff)) (add rp (of_int roff)))
 
 let reference_type { reftype } = reftype
 
 let ptr_of_raw_address addr =
-  { reftype = Void; raw_ptr = RawTypes.PtrType.of_int64 addr;
+  { reftype = Void; raw_ptr = Raw.PtrType.of_int64 addr;
     pmanaged = None; pbyte_offset = 0 }
 
 module Array =

@@ -19,17 +19,18 @@ open Std_view_stubs
         double fabs(double)
 *)
 let test_fabs () =
-  Ctypes_raw.Types.(
+  Ffi_stubs.(
+    let double_ffitype = primitive_ffitype Primitives.Double in
     let callspec = allocate_callspec () in
-    let arg_1_offset = add_argument callspec double.raw in
-    let () = prep_callspec callspec double.raw in
+    let arg_1_offset = add_argument callspec double_ffitype in
+    let () = prep_callspec callspec double_ffitype in
     
     let dlfabs = Dl.dlsym "fabs" in
     
     let fabs x =
       call dlfabs callspec
-        (write double.raw ~offset:arg_1_offset x)
-        (read double.raw ~offset:0)
+        (write Primitives.Double ~offset:arg_1_offset x)
+        (read Primitives.Double ~offset:0)
     in
 
     assert_equal 2.0 (fabs (-2.0)) ~printer:string_of_float;
@@ -43,20 +44,21 @@ let test_fabs () =
         double pow(double, double)
 *)
 let test_pow () =
-  Ctypes_raw.Types.(
+  Ffi_stubs.(
+    let double_ffitype = primitive_ffitype Primitives.Double in
     let callspec = allocate_callspec () in
-    let arg_1_offset = add_argument callspec double.raw in
-    let arg_2_offset = add_argument callspec double.raw in
-    let () = prep_callspec callspec double.raw in
+    let arg_1_offset = add_argument callspec double_ffitype in
+    let arg_2_offset = add_argument callspec double_ffitype in
+    let () = prep_callspec callspec double_ffitype in
     
     let dlpow = Dl.dlsym "pow" in
     
     let pow x y =
       call dlpow callspec
         (fun buffer ->
-          write double.raw ~offset:arg_1_offset x buffer;
-          write double.raw ~offset:arg_2_offset y buffer)
-        (read ~offset:0 double.raw)
+          write Primitives.Double ~offset:arg_1_offset x buffer;
+          write Primitives.Double ~offset:arg_2_offset y buffer)
+        (read ~offset:0 Primitives.Double)
     in
 
     assert_equal 8.0 (pow 2.0 3.0);

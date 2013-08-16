@@ -18,11 +18,11 @@ external block_address : managed_buffer -> raw_pointer
   = "ctypes_block_address"
 
 (* Read a C value from a block of memory *)
-external read : 'a Types.ctype_io -> offset:int -> raw_pointer -> 'a
+external read : 'a Primitives.prim -> offset:int -> raw_pointer -> 'a
   = "ctypes_read"
 
 (* Write a C value to a block of memory *)
-external write :  'a Types.ctype_io -> offset:int -> 'a -> raw_pointer -> unit
+external write :  'a Primitives.prim -> offset:int -> 'a -> raw_pointer -> unit
   = "ctypes_write"
 
 (* Copy [size] bytes from [src + src_offset] to [dst + dst_offset]. *)
@@ -34,5 +34,15 @@ external memcpy :
 
 
 (* Return a string representation of a C value *)
-external string_of : 'a Types.ctype_io -> 'a -> string =
+external string_of : 'a Primitives.prim -> 'a -> string =
     "ctypes_string_of"
+
+external read_pointer : offset:int -> raw_pointer -> raw_pointer
+  = "ctypes_read_pointer"
+
+external write_pointer : offset:int -> raw_pointer -> raw_pointer -> unit
+  = "ctypes_write_pointer"
+
+external string_of_pointer : raw_pointer -> string
+  = "ctypes_string_of_pointer"
+

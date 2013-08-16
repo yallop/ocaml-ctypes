@@ -11,24 +11,13 @@ exception IncompleteType
 exception ModifyingSealedType of string
 exception Unsupported of string
 
-module RawTypes = Ctypes_raw.Types
-
 type incomplete_size = { mutable isize: int }
 
-type complete_structspec = { 
-  ssize: int;
-  salign: int;
-  sraw_io: Ctypes_raw.managed_buffer RawTypes.ctype_io;
-  spassable: bool;
-}
+type structured_spec = { size: int; align: int; }
 
 type 'a structspec =
     Incomplete of incomplete_size
-  | Complete of complete_structspec
-
-type unionspec = { usize: int; ualignment: int }
-
-type arg_type = ArgType : 'a RawTypes.ctype_io -> arg_type
+  | Complete of structured_spec
 
 type abstract_type = {
   aname : string;
@@ -73,7 +62,7 @@ and 'a structure_type = {
 }
 and 'a union_type = {
   utag: string;
-  mutable uspec: unionspec option;
+  mutable uspec: structured_spec option;
   (* fields are in reverse order iff the union type is incomplete *)
   mutable ufields : 'a union boxed_field list;
 }
@@ -91,10 +80,10 @@ let rec sizeof : type a. a typ -> int = function
   | Primitive p                    -> Primitive_details.sizeof p
   | Struct { spec = Incomplete _ } -> raise IncompleteType
   | Struct { spec = Complete
-      { ssize } }                  -> ssize
+      { size } }                   -> size
   | Union { uspec = None }         -> raise IncompleteType
-  | Union { uspec = Some { usize } }
-                                   -> usize
+  | Union { uspec = Some { size } }
+                                   -> size
   | Array (t, i)                   -> i * sizeof t
   | Abstract { asize }             -> asize
   | Pointer _                      -> Primitive_details.pointer_size
@@ -105,10 +94,9 @@ let rec alignment : type a. a typ -> int = function
   | Primitive p                      -> Primitive_details.alignment p
   | Struct { spec = Incomplete _ }   -> raise IncompleteType
   | Struct { spec = Complete
-             { salign } }            -> salign
+      { align } }                    -> align
   | Union { uspec = None }           -> raise IncompleteType
-  | Union { uspec = Some { ualignment } }
-                                     -> ualignment
+  | Union { uspec = Some { align } } -> align
   | Array (t, _)                     -> alignment t
   | Abstract { aalignment }          -> aalignment
   | Pointer _                        -> Primitive_details.pointer_alignment 
@@ -116,31 +104,19 @@ let rec alignment : type a. a typ -> int = function
 
 let rec passable : type a. a typ -> bool = function
     Void                            -> true
-  | Primitive p                     -> let ct = Ctypes_raw.ctype_of_prim p in
-                                       ct.RawTypes.passable
+  | Primitive Primitives.Complex32  -> false
+  | Primitive Primitives.Complex64  -> false
+  | Primitive p                     -> true 
   | Struct { spec = Incomplete _ }  -> raise IncompleteType
-  | Struct { spec = Complete
-      { spassable } }               -> spassable
+  | Struct { fields }               -> List.for_all passable_boxed_field fields
   | Union { uspec = None }          -> raise IncompleteType
   | Union _                         -> false
   | Array _                         -> false
   | Pointer _                       -> true
   | Abstract _                      -> false
   | View { ty }                     -> passable ty
-
-let rec arg_type : type a. a typ -> arg_type = function
-    Void                           -> ArgType RawTypes.(void.raw)
-  | Primitive p                    -> let p = Ctypes_raw.ctype_of_prim p in
-                                      ArgType p.RawTypes.raw
-  | Struct { spec = Complete p }   -> ArgType p.sraw_io
-  | Pointer _                      -> ArgType RawTypes.(pointer.raw)
-  | View { ty }                    -> arg_type ty
-  (* The following cases should never happen; aggregate types other than
-     complete struct types are excluded during type construction. *)
-  | Union _                        -> assert false
-  | Array _                        -> assert false
-  | Abstract _                     -> assert false
-  | Struct { spec = Incomplete _ } -> assert false
+and passable_boxed_field : type s. s boxed_field -> bool =
+   fun (BoxedField { ftype } ) -> passable ftype
 
 let void = Void
 let char = Primitive Primitives.Char
@@ -186,33 +162,10 @@ let returning v =
     Returns (false, v)
 let returning_checking_errno v = Returns (true, v)
 
-let aligned_offset offset alignment =
-  match offset mod alignment with
-    0 -> offset
-  | overhang -> offset - overhang + alignment
-
 let structure tag =
   Struct { spec = Incomplete { isize = 0 }; tag; fields = [] }
 
 let union utag = Union { utag; uspec = None; ufields = [] }
-
-let max_field_alignment fields =
-  List.fold_left
-    (fun align (BoxedField {ftype}) -> max align (alignment ftype))
-    0
-    fields
-
-let max_field_size fields =
-  List.fold_left
-    (fun size (BoxedField {ftype}) -> max size (sizeof ftype))
-    0
-    fields
-
-let all_passable fields =
-  List.fold_left
-    (fun pass (BoxedField {ftype; foffset}) -> (pass && passable ftype))
-    true
-    fields
 
 let offsetof { foffset } = foffset
 let field_type { ftype } = ftype

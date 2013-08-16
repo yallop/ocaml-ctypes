@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: a6b2b1dd18bfb6a7fd4dd71bc46351b4)
+# DO NOT EDIT (digest: b9895a3417ec6af6dc504b86347e8647)
 Unsigned
 Signed
 Structs
@@ -9,7 +9,6 @@ Common
 Primitives
 Primitive_details
 Ctypes_raw
-Static_stubs
 Static
 Structs_computed
 Type_printing
@@ -18,6 +17,8 @@ Closure_properties
 Dynamic_stubs
 Dynamic
 Value_printing
+Ffi_stubs
+Ffi
 Std_view_stubs
 Std_views
 # OASIS_STOP

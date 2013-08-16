@@ -9,7 +9,7 @@ open Dl
 open Ctypes
 
 let ptr_of_raw_ptr p = 
-  Ctypes.ptr_of_raw_address (Ctypes_raw.Types.PtrType.to_int64 p)
+  Ctypes.ptr_of_raw_address (Ctypes_raw.PtrType.to_int64 p)
 
 let foreign_value ?from symbol t =
   from_voidp t (ptr_of_raw_ptr (dlsym ?handle:from ~symbol))

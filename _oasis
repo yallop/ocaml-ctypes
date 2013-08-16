@@ -17,7 +17,6 @@ Library ctypes
                     Primitives,
                     Primitive_details,
                     Ctypes_raw,
-                    Static_stubs,
                     Static,
                     Structs_computed,
                     Type_printing,
@@ -26,14 +25,17 @@ Library ctypes
                     Dynamic_stubs,
                     Dynamic,
                     Value_printing,
+                    Ffi_stubs,
+                    Ffi,
                     Std_view_stubs,
                     Std_views
-  CSources:         raw_pointer.h,raw_pointer_stubs.c,
+  CSources:         primitives.h,
+                    raw_pointer.h,raw_pointer_stubs.c,
                     unsigned_stubs.h,unsigned_stubs.c,
                     managed_buffer_stubs.h,managed_buffer_stubs.c,
                     type_info_stubs.h,type_info_stubs.c,
+                    arg_info_stubs.c,
                     ctypes_stubs.c,
-                    ctypes_complex_stubs.c,
                     posix_types_stubs.c
   CCOpt:            -fPIC -Wall -Wno-unused-variable -O3
   BuildDepends:     unix,threads

@@ -34,9 +34,8 @@ let test_managed_buffer_hashing_and_equality () =
 (*
   Test type info hashing and equality.
 
-  Hashing and equality are based on the addresses of malloc-allocated
-  objects, so even structurally-equal values should have different
-  hashes and compare unequal.
+  Equality is structural, so distinct but structurally-equal values
+  should have equal hashes and compare equal.
 *)
 
 let test_type_info_hashing_and_equality () =
@@ -45,7 +44,7 @@ let test_type_info_hashing_and_equality () =
     let s : s structure typ = structure "s"
     let _ = begin
       ignore (field s "d" double);
-      ignore (field s "p" (ptr s));
+      ignore (field s "p" (ptr void));
       seal s
     end
       
@@ -53,7 +52,7 @@ let test_type_info_hashing_and_equality () =
     let t : t structure typ = structure "s"
     let _ = begin
       ignore (field t "d" double);
-      ignore (field t "p" (ptr t));
+      ignore (field t "p" (ptr void));
       seal t
     end
       
@@ -75,16 +74,16 @@ let test_type_info_hashing_and_equality () =
       assert_bool "Distinct array types do not compare equal"
         (array 3 (array 4 int) <> array 3 (array 5 int));
 
-      (* Structure equality is address-based in ctypes *)
+      (* Structure equality is structural *)
       assert_equal (hash s) (hash s);
 
       assert_bool
-        "equal-but-not-identical structure types have distinct hashes"
-        (hash s <> hash t);
+        "equal-but-not-identical structure types have equal hashes"
+        (hash s = hash t);
 
       assert_bool
-        "equal-but-not-identical structure types do not compare equal"
-        (Obj.repr s <> Obj.repr t);
+        "equal-but-not-identical structure types compare equal"
+        (Obj.repr s = Obj.repr t);
     end
   end in ()
 

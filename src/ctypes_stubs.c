@@ -69,7 +69,7 @@ static value allocate_custom(struct custom_operations *ops, size_t size,
 }
 
 
-static void check_ffi_status(ffi_status status)
+void ctypes_check_ffi_status(ffi_status status)
 {
   switch (status) {
   case FFI_OK:
@@ -118,7 +118,6 @@ static struct bufferspec {
   
   /* The state of the bufferspec value. */
   enum { BUILDING,
-         STRUCTSPEC,
          CALLSPEC } state;
   
   /* A null-terminated array of size `nelements' types */
@@ -231,15 +230,6 @@ static void populate_arg_array(struct bufferspec *bufferspec,
 }
 
 
-/* Allocate a new C buffer specification */
-/* allocate_bufferspec : unit -> bufferspec */
-value ctypes_allocate_bufferspec(value unit)
-{
-  return allocate_custom(&bufferspec_custom_ops,
-                         sizeof(struct bufferspec),
-                         &bufferspec_prototype);
-}
-
 /* Allocate a new C call specification */
 /* allocate_callspec : unit -> callspec */
 value ctypes_allocate_callspec(value unit)
@@ -251,15 +241,14 @@ value ctypes_allocate_callspec(value unit)
 
 
 /* Add an argument to the C call specification */
-/* add_argument : bufferspec -> 'a ctype -> int */
+/* add_argument : bufferspec -> 'a ffitype -> int */
 value ctypes_add_argument(value bufferspec_, value argument_)
 {
   static const size_t increment_size = 8;
 
   CAMLparam2(bufferspec_, argument_);
   struct bufferspec *bufferspec = Data_custom_val(bufferspec_);
-  struct type_info *ti = (struct type_info *)Data_custom_val(argument_);
-  ffi_type *argtype = ti->ffitype;
+  ffi_type *argtype = CTYPES_TO_PTR(argument_);
 
   assert (bufferspec->state == BUILDING);
 
@@ -286,13 +275,13 @@ value ctypes_add_argument(value bufferspec_, value argument_)
 
 
 /* Pass the return type and conclude the specification preparation */
-/* prep_callspec : callspec -> 'a ctype -> unit */
+/* prep_callspec : callspec -> 'a ffitype -> unit */
 value ctypes_prep_callspec(value callspec_, value rtype)
 {
   CAMLparam2(callspec_, rtype);
 
   struct callspec *callspec = Data_custom_val(callspec_);
-  ffi_type *rffitype = (((struct type_info *)Data_custom_val(rtype)))->ffitype;
+  ffi_type *rffitype = CTYPES_TO_PTR(rtype);
 
   /* Allocate the cif structure */
   callspec->cif = caml_stat_alloc(sizeof *callspec->cif);
@@ -318,7 +307,7 @@ value ctypes_prep_callspec(value callspec_, value rtype)
                                    rffitype,
                                    callspec->bufferspec.args);
 
-  check_ffi_status(status);
+  ctypes_check_ffi_status(status);
 
   callspec->bufferspec.state = CALLSPEC;
   CAMLreturn(Val_unit);
@@ -446,46 +435,8 @@ value ctypes_make_function_pointer(value callspec_, value fnid)
        &closure->fnkey,
        (void *)code_address);
 
-    check_ffi_status(status);
+    ctypes_check_ffi_status(status);
 
     CAMLreturn (CTYPES_FROM_PTR((void *)code_address));
   }
-}
-
-
-/* _complete_struct_type : bufferspec -> _ structure ctype */
-value ctypes_complete_structspec(value bufferspec_)
-{
-  CAMLparam1(bufferspec_);
-
-  struct bufferspec *bufferspec = Data_custom_val(bufferspec_);
-
-  CAMLlocal1(block);
-  /* Allocate a struct_type_info, transferring ownership of `args' */
-  block = ctypes_allocate_struct_type_info(&bufferspec->args);
-  struct type_info *t = Data_custom_val(block);
-
-  assert (bufferspec->state == BUILDING);
-  /* We'll use prep_ffi_cif to trigger computation of the size and alignment
-     of the struct type rather than repeating what's already in libffi.
-     It'd be nice if the initialize_aggregate function were exposed so that
-     we could do without the dummy cif.
-  */
-  ffi_cif _dummy_cif;
-  ffi_status status = ffi_prep_cif(&_dummy_cif, FFI_DEFAULT_ABI, 0,
-                                   t->ffitype, NULL);
-
-  check_ffi_status(status);
-
-  bufferspec->state = STRUCTSPEC;
-
-  CAMLreturn(block);
-}
-
-/* make_unpassable_structspec : size:int -> alignment:int -> _ structure ctype */
-value ctypes_make_unpassable_structspec(value size_, value alignment_)
-{
-  int size = Int_val(size_);
-  int alignment = Int_val(alignment_);
-  return ctypes_allocate_unpassable_struct_type_info(size, alignment);
 }
