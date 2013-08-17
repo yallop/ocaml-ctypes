@@ -25,20 +25,20 @@ let string_of_char_ptr {Static.raw_ptr; pbyte_offset} =
 let char_ptr_of_string s =
   let buf = Std_view_stubs.cstring_of_string s in
   { Static.reftype = Static.char;
-    pmanaged = Some buf;
-    raw_ptr = Dynamic_stubs.block_address buf;
+    pmanaged = Some (Obj.repr buf);
+    raw_ptr = Memory_stubs.block_address buf;
     pbyte_offset = 0 }
 
 let string = Static.(view (ptr char))
   ~read:string_of_char_ptr ~write:char_ptr_of_string
 
-let castp typ p = Dynamic.(from_voidp typ (to_voidp p))
+let castp typ p = Memory.(from_voidp typ (to_voidp p))
 
-let read_nullable t p = Dynamic.(
+let read_nullable t p = Memory.(
   if p = null then None
   else Some !@(castp t (allocate Static.(ptr void) p)))
 
-let write_nullable t = Dynamic.(function
+let write_nullable t = Memory.(function
   | None -> null
   | Some f -> !@(castp Static.(ptr void) (allocate t f)))
 

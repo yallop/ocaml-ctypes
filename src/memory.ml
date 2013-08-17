@@ -9,11 +9,11 @@
 
 open Static
 
-module Stubs = Dynamic_stubs
+module Stubs = Memory_stubs
 module Raw = Ctypes_raw
 
 (* Describes how to read a value, e.g. from a return buffer *)
-let rec build : type a. a typ -> offset:int -> Raw.raw_pointer -> a
+let rec build : type a. a typ -> offset:int -> Raw.voidp -> a
  = function
     | Void ->
       fun ~offset _ -> ()
@@ -28,10 +28,10 @@ let rec build : type a. a typ -> offset:int -> Raw.raw_pointer -> a
           ~dst:raw_ptr ~dst_offset:0
           ~src:buf ~src_offset:offset in
         { structured =
-            { pmanaged = Some m; reftype; raw_ptr; pbyte_offset = 0 } })
+            { pmanaged = Some (Obj.repr m); reftype; raw_ptr; pbyte_offset = 0 } })
     | Pointer reftype ->
       (fun ~offset buf ->
-        { raw_ptr = Stubs.read_pointer ~offset buf;
+        { raw_ptr = Stubs.Pointer.read ~offset buf;
           pbyte_offset = 0;
           reftype;
           pmanaged = None })
@@ -44,7 +44,7 @@ let rec build : type a. a typ -> offset:int -> Raw.raw_pointer -> a
     | Array _ -> assert false
     | Abstract _ -> assert false
 
-let rec write : type a. a typ -> offset:int -> a -> Raw.raw_pointer -> unit
+let rec write : type a. a typ -> offset:int -> a -> Raw.voidp -> unit
   = let write_aggregate size =
       (fun ~offset { structured = { raw_ptr; pbyte_offset = src_offset } } dst ->
         Stubs.memcpy ~size ~dst ~dst_offset:offset ~src:raw_ptr ~src_offset) in
@@ -53,7 +53,7 @@ let rec write : type a. a typ -> offset:int -> a -> Raw.raw_pointer -> unit
     | Primitive p -> Stubs.write p
     | Pointer _ ->
       (fun ~offset { raw_ptr; pbyte_offset } dst ->
-        Stubs.write_pointer ~offset
+        Stubs.Pointer.write ~offset
           (Raw.PtrType.(add raw_ptr (of_int pbyte_offset))) dst)
     | Struct { spec = Incomplete _ } -> raise IncompleteType
     | Struct { spec = Complete _ } as s -> write_aggregate (sizeof s)
@@ -119,7 +119,7 @@ let allocate_n : type a. ?finalise:(a ptr -> unit) -> a typ -> count:int -> a pt
   = fun ?finalise reftype ~count ->
     let package p =
       { reftype; pbyte_offset = 0; raw_ptr = Stubs.block_address p;
-        pmanaged = Some p } in
+        pmanaged = Some (Obj.repr p) } in
     let finalise = match finalise with
       | Some f -> Gc.finalise (fun p -> f (package p))
       | None -> ignore

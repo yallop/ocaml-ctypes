@@ -11,8 +11,8 @@ open Static
 let () = Ffi_stubs.set_closure_callback Closure_properties.retrieve
 
 type _ ccallspec =
-    Call : bool * (Ctypes_raw.raw_pointer -> 'a) -> 'a ccallspec
-  | WriteArg : ('a -> Ctypes_raw.raw_pointer -> unit) * 'b ccallspec ->
+    Call : bool * (Ctypes_raw.voidp -> 'a) -> 'a ccallspec
+  | WriteArg : ('a -> Ctypes_raw.voidp -> unit) * 'b ccallspec ->
                ('a -> 'b) ccallspec
 
 type arg_type = ArgType : 'a Ffi_stubs.ffitype -> arg_type
@@ -62,9 +62,9 @@ and struct_arg_type : type s. s structure_type -> arg_type =
 *)
 let rec invoke : type a. string option ->
                          a ccallspec ->
-                         (Ctypes_raw.raw_pointer -> unit) list ->
+                         (Ctypes_raw.voidp -> unit) list ->
                          Ffi_stubs.callspec ->
-                         Ctypes_raw.raw_pointer ->
+                         Ctypes_raw.voidp ->
                       a
   = fun name -> function
     | Call (check_errno, read_return_value) ->
@@ -96,12 +96,12 @@ let rec box_function : type a. a fn -> Ffi_stubs.callspec -> a WeakRef.t -> Ffi_
   = fun fn callspec -> match fn with
     | Returns (_, ty) ->
       let () = prep_callspec callspec ty in
-      let write_rv = Dynamic.write ty in
+      let write_rv = Memory.write ty in
       fun f -> Ffi_stubs.Done (write_rv ~offset:0 (WeakRef.get f), callspec)
     | Function (p, f) ->
       let _ = add_argument callspec p in
       let box = box_function f callspec in
-      let read = Dynamic.build p ~offset:0 in
+      let read = Memory.build p ~offset:0 in
       fun f -> Ffi_stubs.Fn (fun buf ->
         try box (WeakRef.make (WeakRef.get f (read buf)))
         with WeakRef.EmptyWeakReference ->
@@ -119,11 +119,11 @@ let rec build_ccallspec : type a. a fn -> Ffi_stubs.callspec -> a ccallspec
   = fun fn callspec -> match fn with
     | Returns (check_errno, t) ->
       let () = prep_callspec callspec t in
-      Call (check_errno, Dynamic.build t ~offset:0)
+      Call (check_errno, Memory.build t ~offset:0)
     | Function (p, f) ->
       let offset = add_argument callspec p in
       let rest = build_ccallspec f callspec in
-      WriteArg (Dynamic.write p ~offset, rest)
+      WriteArg (Memory.write p ~offset, rest)
 
 let build_function ?name fn =
   let c = Ffi_stubs.allocate_callspec () in

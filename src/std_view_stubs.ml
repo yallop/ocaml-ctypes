@@ -7,12 +7,10 @@
 
 (* Stubs for standard views. *)
 
-open Ctypes_raw
-
 (* Convert a C string to an OCaml string *)
-external string_of_cstring : raw_pointer -> int -> string
+external string_of_cstring : Ctypes_raw.voidp -> int -> string
   = "ctypes_string_of_cstring"
 
 (* Convert an OCaml string to a C string *)
-external cstring_of_string : string -> managed_buffer
+external cstring_of_string : string -> Memory_stubs.managed_buffer
   = "ctypes_cstring_of_string"

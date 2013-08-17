@@ -6,7 +6,7 @@
  *)
 
 open OUnit
-open Dynamic_stubs
+open Memory_stubs
 open Std_view_stubs
 
 (* Tests for the low-level module on which the public high-level

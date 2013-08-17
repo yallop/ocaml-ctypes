@@ -55,23 +55,23 @@ external prep_callspec : callspec -> _ ffitype -> unit
 (* Call the function specified by `callspec' at the given address.
    The callback functions write the arguments to the buffer and read
    the return value. *)
-external call : raw_pointer -> callspec -> (raw_pointer -> unit) ->
-  (raw_pointer -> 'a) -> 'a
+external call : voidp -> callspec -> (voidp -> unit) ->
+  (voidp -> 'a) -> 'a
   = "ctypes_call"
 
 (* As ctypes_call, but check errno and raise Unix_error if the call failed. *)
-external call_errno : string -> raw_pointer -> callspec ->
-  (raw_pointer -> unit) -> (raw_pointer -> 'a) -> 'a
+external call_errno : string -> voidp -> callspec ->
+  (voidp -> unit) -> (voidp -> 'a) -> 'a
   = "ctypes_call_errno"
 
 
 (* nary callbacks *)
 type boxedfn =
-  | Done of (raw_pointer -> unit) * callspec
-  | Fn of (raw_pointer -> boxedfn)
+  | Done of (voidp -> unit) * callspec
+  | Fn of (voidp -> boxedfn)
 
 (* Construct a pointer to an OCaml function represented by an identifier *)
-external make_function_pointer : callspec -> int -> raw_pointer
+external make_function_pointer : callspec -> int -> voidp
   = "ctypes_make_function_pointer"
 
 (* Set the function used to retrieve functions by identifier. *)

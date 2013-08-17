@@ -22,8 +22,8 @@ Library ctypes
                     Type_printing,
                     WeakRef,
                     Closure_properties,
-                    Dynamic_stubs,
-                    Dynamic,
+                    Memory_stubs,
+                    Memory,
                     Value_printing,
                     Ffi_stubs,
                     Ffi,
@@ -34,8 +34,8 @@ Library ctypes
                     unsigned_stubs.h,unsigned_stubs.c,
                     managed_buffer_stubs.h,managed_buffer_stubs.c,
                     type_info_stubs.h,type_info_stubs.c,
-                    arg_info_stubs.c,
-                    ctypes_stubs.c,
+                    ffi_type_stubs.c,
+                    ffi_call_stubs.c,
                     posix_types_stubs.c
   CCOpt:            -fPIC -Wall -Wno-unused-variable -O3
   BuildDepends:     unix,threads

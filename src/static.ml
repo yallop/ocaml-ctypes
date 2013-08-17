@@ -35,8 +35,8 @@ type _ typ =
   | View            : ('a, 'b) view      -> 'a typ
   | Array           : 'a typ * int       -> 'a array typ
 and 'a ptr = { reftype      : 'a typ;
-               raw_ptr      : Ctypes_raw.raw_pointer;
-               pmanaged     : Ctypes_raw.managed_buffer option;
+               raw_ptr      : Ctypes_raw.voidp;
+               pmanaged     : Obj.t option;
                pbyte_offset : int }
 and 'a array = { astart : 'a ptr; alength : int }
 and ('a, 'kind) structured = { structured : ('a, 'kind) structured ptr }
