@@ -10,7 +10,7 @@
 open Ctypes_raw
 
 (* The type of structure types *)
-type 'a ffitype (* a pointer *)
+type 'a ffitype = voidp
 type struct_ffitype
 
 external primitive_ffitype : 'a Primitives.prim -> 'a ffitype

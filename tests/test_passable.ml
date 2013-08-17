@@ -53,36 +53,54 @@ let test_unions_are_not_passable () =
     let () = seal u
 
     let _ = begin
-      assert_raises ~msg:"Union type rejected as argument"
-        (Unsupported "Unsupported argument type")
-        (fun () -> u @-> returning void);
+      (* union types can be used as argument types *)
+      ignore (u @-> returning void);
+
+      assert_raises ~msg:"Foreign rejects union types as argument types"
+        (Unsupported "libffi does not support passing unions")
+        (fun () -> Foreign.funptr (u @-> returning void));
       
-      assert_raises ~msg:"Union type rejected as return type"
-        (Unsupported "Unsupported return type")
-        (fun () -> void @-> returning u);
+      (* union types can be used as return types *)
+      ignore (u @-> returning void);
+
+      assert_raises ~msg:"Foreign rejects union types as return types"
+        (Unsupported "libffi does not support passing unions")
+        (fun () -> Foreign.funptr (void @-> returning u));
     end
   end in ()
 
 
 (*
-  Test that complex values are not passable
+  Test the passability of complex values
 *)
-let test_complex_values_are_not_passable () =
-  assert_raises ~msg:"complex32 type rejected as argument"
-    (Unsupported "Unsupported argument type")
-    (fun () -> complex32 @-> returning void);
+let test_complex_value_passability () =
+  (* complex32 can be used as an argument type *)
+  ignore (complex32 @-> returning void);
 
-  assert_raises ~msg:"complex64 type rejected as argument"
-    (Unsupported "Unsupported argument type")
-    (fun () -> complex64 @-> returning void);
+  assert_raises ~msg:"Foreign rejects complex32 type as argument"
+    (Unsupported "libffi does not support passing float _Complex")
+    (fun () -> Foreign.funptr (complex32 @-> returning void));
+
+  (* complex64 can be used as an argument type *)
+  ignore (complex64 @-> returning void);
+
+  assert_raises ~msg:"Foreign rejects complex64 type as argument"
+    (Unsupported "libffi does not support passing double _Complex")
+    (fun () -> Foreign.funptr (complex64 @-> returning void));
   
-  assert_raises ~msg:"complex32 type rejected as return type"
-    (Unsupported "Unsupported return type")
-    (fun () -> void @-> returning complex32);
+  (* complex32 can be used as a return type *)
+  ignore (void @-> returning complex32);
 
-  assert_raises ~msg:"complex64 type rejected as return type"
-    (Unsupported "Unsupported return type")
-    (fun () -> void @-> returning complex64)
+  assert_raises ~msg:"Foreign rejects complex32 type as return type"
+    (Unsupported "libffi does not support passing float _Complex")
+    (fun () -> Foreign.funptr (void @-> returning complex32));
+
+  (* complex64 can be used as a return type *)
+  ignore (void @-> returning complex64);
+
+  assert_raises ~msg:"Foreign rejects complex64 type as return type"
+    (Unsupported "libffi does not support passing double _Complex")
+    (fun () -> Foreign.funptr (void @-> returning complex64))
 
 
 (*
@@ -210,45 +228,63 @@ let test_struct_passability () =
       ignore (void @-> returning s1);
       ignore (void @-> returning s2);
 
-      assert_raises
-        ~msg:"Structs with array members rejected as arguments"
-        (Unsupported "Unsupported argument type")
-        (fun () -> s3 @-> returning void);
+      (* Structs with array members can be arguments *)
+      ignore (s3 @-> returning void);
 
       assert_raises
-        ~msg:"Structs with array members rejected as return types"
-        (Unsupported "Unsupported return type")
-        (fun () -> void @-> returning s3);
+        ~msg:"Foreign rejects structs with array members as arguments"
+        (Unsupported "libffi does not support passing arrays")
+        (fun () -> Foreign.funptr (s3 @-> returning void));
+
+      (* Structs with array members can be return types *)
+      ignore (void @-> returning s3);
 
       assert_raises
-        ~msg:"Structs with unpassable struct members rejected as arguments"
-        (Unsupported "Unsupported argument type")
-        (fun () -> s4 @-> returning void);
+        ~msg:"Foreign rejects structs with array members as return types"
+        (Unsupported "libffi does not support passing arrays")
+        (fun () -> Foreign.funptr (void @-> returning s3));
+
 
       assert_raises
-        ~msg:"Structs with unpassable struct members rejected as return types"
-        (Unsupported "Unsupported return type")
-        (fun () -> void @-> returning s4);
+        ~msg:"Foreign rejects structs with unpassable struct members as arguments"
+        (Unsupported "libffi does not support passing arrays")
+        (fun () -> Foreign.funptr (s4 @-> returning void));
 
       assert_raises
-        ~msg:"Structs with union members rejected as arguments"
-        (Unsupported "Unsupported argument type")
-        (fun () -> s5 @-> returning void);
+        ~msg:"Foreign rejects structs with unpassable struct members as return types"
+        (Unsupported "libffi does not support passing arrays")
+        (fun () -> Foreign.funptr (void @-> returning s4));
+ 
+      (* Structs with union members can be arguments *)
+      ignore (s5 @-> returning void);
 
       assert_raises
-        ~msg:"Structs with union members rejected as return types"
-        (Unsupported "Unsupported return type")
-        (fun () -> void @-> returning s5);
+        ~msg:"Foreign rejects structs with union members as arguments"
+        (Unsupported "libffi does not support passing unions")
+        (fun () -> Foreign.funptr (s5 @-> returning void));
+ 
+      (* Structs with union members can be return types *)
+      ignore (void @-> returning s5);
 
       assert_raises
-        ~msg:"Structs with abstract members rejected as arguments"
-        (Unsupported "Unsupported argument type")
-        (fun () -> s6 @-> returning void);
+        ~msg:"Foreign rejects structs with union members as return types"
+        (Unsupported "libffi does not support passing unions")
+        (fun () -> Foreign.funptr (void @-> returning s5));
+
+      (* Structs with abstract members can be arguments *)
+      ignore (s6 @-> returning void);
 
       assert_raises
-        ~msg:"Structs with abstract members rejected as return types"
-        (Unsupported "Unsupported return type")
-        (fun () -> void @-> returning s6);
+        ~msg:"Foreign rejects structs with abstract members as arguments"
+        (Unsupported "libffi does not support passing values of abstract type")
+        (fun () -> Foreign.funptr (s6 @-> returning void));
+ 
+      ignore (void @-> returning s6);
+
+      assert_raises
+        ~msg:"Foreign rejects structs with abstract members as return types"
+        (Unsupported "libffi does not support passing values of abstract type")
+        (fun () -> Foreign.funptr (void @-> returning s6));
     end
   end in ()
 
@@ -282,8 +318,8 @@ let suite = "Passability tests" >:::
    "unions are not passable"
     >:: test_unions_are_not_passable;
 
-   "complex values are not passable"
-    >:: test_complex_values_are_not_passable;
+   "complex values passability"
+    >:: test_complex_value_passability;
 
    "arrays are not passable"
     >:: test_arrays_are_not_passable;
