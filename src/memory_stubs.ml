@@ -27,10 +27,6 @@ external read : 'a Primitives.prim -> offset:int -> Ctypes_raw.voidp -> 'a
 external write :  'a Primitives.prim -> offset:int -> 'a -> Ctypes_raw.voidp -> unit
   = "ctypes_write"
 
-(* Return a string representation of a C value *)
-external string_of : 'a Primitives.prim -> 'a -> string =
-    "ctypes_string_of"
-
 module Pointer =
 struct
   external read : offset:int -> Ctypes_raw.voidp -> Ctypes_raw.voidp
@@ -38,9 +34,6 @@ struct
 
   external write : offset:int -> Ctypes_raw.voidp -> Ctypes_raw.voidp -> unit
   = "ctypes_write_pointer"
-
-  external string_of : Ctypes_raw.voidp -> string
-    = "ctypes_string_of_pointer"
 end
 
 (* Copy [size] bytes from [src + src_offset] to [dst + dst_offset]. *)

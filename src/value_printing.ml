@@ -12,7 +12,7 @@ let rec format : type a. a typ -> Format.formatter -> a -> unit
   = fun typ fmt v -> match typ with
     Void -> Format.pp_print_string fmt ""
   | Primitive p ->
-    Format.pp_print_string fmt (Memory_stubs.string_of p v)
+    Format.pp_print_string fmt (Value_printing_stubs.string_of_prim p v)
   | Pointer _ -> format_ptr fmt v
   | Struct _ -> format_struct fmt v
   | Union _ -> format_union fmt v
@@ -55,7 +55,7 @@ and format_fields : type a b. string -> (a, b) structured boxed_field list ->
 and format_ptr : type a. Format.formatter -> a ptr -> unit
   = fun fmt {raw_ptr; reftype; pbyte_offset} ->
     Format.fprintf fmt "%s"
-      (Memory_stubs.Pointer.string_of
+      (Value_printing_stubs.string_of_pointer
          (Raw.PtrType.(add raw_ptr (of_int pbyte_offset))))
 
 let string_of typ v = Common.string_of (format typ) v

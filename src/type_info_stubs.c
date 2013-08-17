@@ -121,8 +121,8 @@ value ctypes_write(value prim_, value offset_, value v, value buffer_)
 }
 
 /* Format a C value */
-/* string_of : 'a prim -> 'a -> string */
-value ctypes_string_of(value prim_, value v)
+/* string_of_prim : 'a prim -> 'a -> string */
+value ctypes_string_of_prim(value prim_, value v)
 {
   CAMLparam2(prim_, v);
   char buf[64];

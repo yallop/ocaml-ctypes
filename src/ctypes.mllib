@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: c99f1c328d3af79620e14908509c2c35)
+# DO NOT EDIT (digest: 24d7a3eda499b52946820a6e700246c3)
 Unsigned
 Signed
 Structs
@@ -16,6 +16,7 @@ WeakRef
 Closure_properties
 Memory_stubs
 Memory
+Value_printing_stubs
 Value_printing
 Ffi_stubs
 Ffi

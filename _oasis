@@ -24,6 +24,7 @@ Library ctypes
                     Closure_properties,
                     Memory_stubs,
                     Memory,
+                    Value_printing_stubs,
                     Value_printing,
                     Ffi_stubs,
                     Ffi,
