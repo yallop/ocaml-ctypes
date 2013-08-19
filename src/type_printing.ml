@@ -30,7 +30,8 @@ let rec format_typ : type a. a typ ->
   fun t k context fmt -> match t with
     | Void ->
       fprintf fmt "void%t" (k `nonarray)
-    | Primitive { RawTypes.name } ->
+    | Primitive p ->
+      let { RawTypes.name } = Ctypes_raw.ctype_of_prim p in
       fprintf fmt "%s%t" name (k `nonarray)
     | View { format_typ = Some format } ->
       format (k `nonarray) fmt

@@ -12,3 +12,8 @@ src/ctypes_config.ml
 #
 *~
 ctypes.odocl
+primitive_details
+primitive_details.cmi
+primitive_details.cmo
+primitive_details.o
+src/primitive_details.ml

@@ -39,18 +39,17 @@ let seal (type a) (type s) : (a, s) structured typ -> unit = function
           assert (offset = foffset))
         s.fields
     in
-    let alignment = max_field_alignment s.fields in
-    let size = aligned_offset isize alignment in
-    let raw = Static_stubs.complete_struct_type bufspec in
-    s.spec <- Complete { RawTypes.raw; size; alignment; passable = true;
-                         name = "struct " ^ s.tag }
+    let salign = max_field_alignment s.fields in
+    let ssize = aligned_offset isize salign in
+    let sraw_io = Static_stubs.complete_struct_type bufspec in
+    s.spec <- Complete { sraw_io; ssize; salign; spassable = true }
   | Struct ({ spec = Incomplete { isize } } as s) ->
     s.fields <- List.rev s.fields;
     let alignment = max_field_alignment s.fields in
     let size = aligned_offset isize alignment in
-    let raw = Static_stubs.make_unpassable_structspec ~size ~alignment in
-    s.spec <- Complete { RawTypes.raw; size; alignment; passable = false;
-                         name = "struct " ^ s.tag }
+    let sraw_io = Static_stubs.make_unpassable_structspec ~size ~alignment in
+    s.spec <- Complete { sraw_io; ssize = size; salign = alignment;
+                         spassable = false }
   | Union { utag; uspec = Some _ } ->
     raise (ModifyingSealedType utag)
   | Union { ufields = [] } ->

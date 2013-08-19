@@ -16,8 +16,6 @@ sig
   type 'a ctype = {
     raw: 'a ctype_io;
     name: string;
-    size: int;
-    alignment: int;
     passable: bool;
   }
 
@@ -64,16 +62,12 @@ struct
   type 'a ctype = {
     raw: 'a ctype_io;
     name: string;
-    size: int;
-    alignment: int;
     passable: bool;
   }
 
-  external sizeof : _ ctype_io -> int = "ctypes_sizeof"
-  external alignment : _ ctype_io -> int = "ctypes_alignment"
 
   let initialize ?(passable=true) name raw = 
-    { raw; name; size = sizeof raw; alignment = alignment raw; passable }
+    { raw; name; passable }
 
   external _int_type_info : unit -> int ctype_io = "ctypes_int_type_info"
   let int = initialize "int" (_int_type_info ())
@@ -95,7 +89,7 @@ struct
 
   external _voidp_type_info : unit -> _ ctype_io = "ctypes_voidp_type_info"
 
-  module PtrType = (val match sizeof (_voidp_type_info ()) with
+  module PtrType = (val match Primitive_details.pointer_size with
       4 -> (module Signed.Int32 : Signed.S)
     | 8 -> (module Signed.Int64 : Signed.S)
     | _ -> failwith "No suitable type available to represent pointers.")
@@ -188,3 +182,32 @@ let () = Callback.register_exception "FFI_internal_error"
 exception CallToExpiredClosure
 let () = Callback.register_exception "CallToExpiredClosure"
   CallToExpiredClosure
+
+let ctype_of_prim : type a. a Primitives.prim -> a ctype = Primitives.(function
+ | Char -> char
+ | Schar -> schar
+ | Uchar -> uchar
+ | Short -> short
+ | Int -> int
+ | Long -> long
+ | Llong -> llong
+ | Ushort -> ushort
+ | Uint -> uint
+ | Ulong -> ulong
+ | Ullong -> ullong
+ | Size_t -> size_t
+ | Int8_t -> int8_t
+ | Int16_t -> int16_t
+ | Int32_t -> int32_t
+ | Int64_t -> int64_t
+ | Uint8_t -> uint8_t
+ | Uint16_t -> uint16_t
+ | Uint32_t -> uint32_t
+ | Uint64_t -> uint64_t
+ | Camlint -> camlint
+ | Nativeint -> nativeint
+ | Float -> float
+ | Double -> double
+ | Complex32 -> complex32
+ | Complex64 -> complex64
+)
