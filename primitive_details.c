@@ -15,10 +15,11 @@
 #include <caml/mlvalues.h>
 
 #define ALIGNMENT(T) (offsetof(struct { char c; T t; }, t))
-#define FULL_ENTRY(T, SIZE, ALIGNMENT) { #T, SIZE, ALIGNMENT }
-#define ENTRY(ABBREV, T) FULL_ENTRY(ABBREV, sizeof(T), ALIGNMENT(T))
+#define FULL_ENTRY(CTOR, T, SIZE, ALIGNMENT) { #CTOR, #T, SIZE, ALIGNMENT }
+#define ENTRY(CTOR, T) FULL_ENTRY(CTOR, T, sizeof(T), ALIGNMENT(T))
 
 static struct details {
+  const char *constructor;
   const char *name;
   int size, alignment;
 } details[] = {
@@ -42,7 +43,7 @@ static struct details {
   ENTRY(Uint16_t, uint16_t),
   ENTRY(Uint32_t, uint32_t),
   ENTRY(Uint64_t, uint64_t),
-  ENTRY(Camlint, intnat),
+  FULL_ENTRY(Camlint, camlint, sizeof(intnat), ALIGNMENT(intnat)),
   ENTRY(Nativeint, intnat),
   ENTRY(Float, float),
   ENTRY(Double, double),
@@ -50,13 +51,13 @@ static struct details {
   ENTRY(Complex64, double complex),
 };
 
-void generate_function(FILE *fp, const char *name,
+void generate_function(FILE *fp, char *name, char *type,
                        void (*cse)(FILE *fp, struct details*))
 {
   int i;
-  fprintf(fp, "let %s : type a. a prim -> int = function\n", name);
+  fprintf(fp, "let %s : type a. a prim -> %s = function\n", name, type);
   for (i = 0; i < sizeof details / sizeof *details; i++) {
-    fprintf(fp, " | %s -> ", details[i].name);
+    fprintf(fp, " | %s -> ", details[i].constructor);
     cse(fp, &details[i]);
     fprintf(fp, "\n");
   }
@@ -70,6 +71,11 @@ void print_size(FILE *fp, struct details *d)
 void print_alignment(FILE *fp, struct details *d)
 {
   fprintf(fp, "%d", d->alignment);
+}
+
+void print_name(FILE *fp, struct details *d)
+{
+  fprintf(fp, "\"%s\"", d->name);
 }
 
 int main(int argc, char **argv)
@@ -86,8 +92,9 @@ int main(int argc, char **argv)
   }
   else {
     fprintf(fp, "open Primitives\n");
-    generate_function(fp, "sizeof", print_size);
-    generate_function(fp, "alignment", print_alignment);
+    generate_function(fp, "sizeof", "int", print_size);
+    generate_function(fp, "alignment", "int", print_alignment);
+    generate_function(fp, "name", "string", print_name);
     fprintf(fp, "let pointer_size = %d\n", (int)sizeof(void *));
     fprintf(fp, "let pointer_alignment = %d\n", (int)ALIGNMENT(void *));
     fclose(fp);

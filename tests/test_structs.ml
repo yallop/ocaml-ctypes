@@ -335,6 +335,30 @@ let test_field_references_not_invalidated () =
   end in ()
 
 
+(* 
+   Check that references to ffi_type values for structs aren't collected while
+   they're still needed
+*)
+let test_struct_ffi_type_lifetime () =
+  let module M = struct
+    let f =
+      let t = 
+        void @->
+        returning
+          (begin
+            let s = structure "one_int" in
+            let i = field s "i" int in
+            let () = seal s in
+            s
+           end)
+      in
+      Foreign.foreign ~from:testlib "return_struct_by_value" t
+
+    let () = Gc.major()
+    let x = f ()
+  end in ()
+
+
 let suite = "Struct tests" >:::
   ["passing struct"
     >:: test_passing_struct;
@@ -362,6 +386,9 @@ let suite = "Struct tests" >:::
 
    "field references not invalidated"
    >:: test_field_references_not_invalidated;
+
+   "test struct ffi_type lifetime"
+   >:: test_struct_ffi_type_lifetime;
   ]
 
 

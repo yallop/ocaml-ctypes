@@ -13,13 +13,6 @@
 #include "type_info_stubs.h"
 #include "raw_pointer.h"
 
-/* null_value : unit -> voidp */
-value ctypes_null_value(value unit)
-{
-  return CTYPES_FROM_PTR(NULL);
-}
-
-
 /* memcpy : dest:raw_pointer -> dest_offset:int ->
             src:raw_pointer -> src_offset:int ->
             size:int -> unit */
