@@ -17,13 +17,14 @@ let rec build : type a. a typ -> offset:int -> Raw.raw_pointer -> a
  = function
     | Void ->
       Stubs.read RawTypes.(void.raw)
-    | Primitive { RawTypes.raw } ->
+    | Primitive p ->
+      let { RawTypes.raw } = Raw.ctype_of_prim p in
       Stubs.read raw
     | Struct { spec = Incomplete _ } ->
       raise IncompleteType
-    | Struct { spec = Complete { RawTypes.raw } } as reftype ->
+    | Struct { spec = Complete { sraw_io } } as reftype ->
       (fun ~offset buf ->
-        let m = Stubs.read raw ~offset buf in
+        let m = Stubs.read sraw_io ~offset buf in
         { structured =
             { pmanaged = Some m;
               reftype;
@@ -50,7 +51,9 @@ let rec write : type a. a typ -> offset:int -> a -> Raw.raw_pointer -> unit
         Stubs.memcpy ~size ~dst ~dst_offset:offset ~src:raw_ptr ~src_offset) in
     function
     | Void -> (fun ~offset _ _ -> ())
-    | Primitive { RawTypes.raw } -> Stubs.write raw
+    | Primitive p ->
+      let { RawTypes.raw } = Raw.ctype_of_prim p in
+      Stubs.write raw
     | Pointer _ ->
       (fun ~offset { raw_ptr; pbyte_offset } ->
         Stubs.write RawTypes.(pointer.raw) ~offset

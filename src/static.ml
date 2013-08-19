@@ -15,13 +15,20 @@ module RawTypes = Ctypes_raw.Types
 
 type incomplete_size = { mutable isize: int }
 
+type complete_structspec = { 
+  ssize: int;
+  salign: int;
+  sraw_io: Ctypes_raw.managed_buffer RawTypes.ctype_io;
+  spassable: bool;
+}
+
 type 'a structspec =
     Incomplete of incomplete_size
-  | Complete of 'a Static_stubs.structure RawTypes.ctype
+  | Complete of complete_structspec
 
 type unionspec = { usize: int; ualignment: int }
 
-type arg_type = ArgType : 'b RawTypes.ctype_io -> arg_type
+type arg_type = ArgType : 'a RawTypes.ctype_io -> arg_type
 
 type abstract_type = {
   aname : string;
@@ -30,14 +37,14 @@ type abstract_type = {
 }
 
 type _ typ =
-    Void            :                      unit typ
-  | Primitive       : 'a RawTypes.ctype -> 'a typ
-  | Pointer         : 'a typ            -> 'a ptr typ
-  | Struct          : 'a structure_type -> 'a structure typ
-  | Union           : 'a union_type     -> 'a union typ
-  | Abstract        : abstract_type     -> 'a abstract typ
-  | View            : ('a, 'b) view     -> 'a typ
-  | Array           : 'a typ * int      -> 'a array typ
+    Void            :                       unit typ
+  | Primitive       : 'a Primitives.prim -> 'a typ 
+  | Pointer         : 'a typ             -> 'a ptr typ
+  | Struct          : 'a structure_type  -> 'a structure typ
+  | Union           : 'a union_type      -> 'a union typ
+  | Abstract        : abstract_type      -> 'a abstract typ
+  | View            : ('a, 'b) view      -> 'a typ
+  | Array           : 'a typ * int       -> 'a array typ
 and 'a ptr = { reftype      : 'a typ;
                raw_ptr      : Ctypes_raw.raw_pointer;
                pmanaged     : Ctypes_raw.managed_buffer option;
@@ -81,38 +88,39 @@ type boxed_typ = BoxedType : 'a typ -> boxed_typ
 
 let rec sizeof : type a. a typ -> int = function
     Void                           -> raise IncompleteType
-  | Primitive { RawTypes.size }    -> size
+  | Primitive p                    -> Primitive_details.sizeof p
   | Struct { spec = Incomplete _ } -> raise IncompleteType
   | Struct { spec = Complete
-               { RawTypes.size } } -> size
+      { ssize } }                  -> ssize
   | Union { uspec = None }         -> raise IncompleteType
   | Union { uspec = Some { usize } }
                                    -> usize
   | Array (t, i)                   -> i * sizeof t
   | Abstract { asize }             -> asize
-  | Pointer _                      -> RawTypes.(pointer.size)
+  | Pointer _                      -> Primitive_details.pointer_size
   | View { ty }                    -> sizeof ty
 
 let rec alignment : type a. a typ -> int = function
     Void                             -> raise IncompleteType
-  | Primitive { RawTypes.alignment } -> alignment
+  | Primitive p                      -> Primitive_details.alignment p
   | Struct { spec = Incomplete _ }   -> raise IncompleteType
   | Struct { spec = Complete
-             {RawTypes.alignment } } -> alignment
-  | Union { uspec = None }      -> raise IncompleteType
+             { salign } }            -> salign
+  | Union { uspec = None }           -> raise IncompleteType
   | Union { uspec = Some { ualignment } }
                                      -> ualignment
   | Array (t, _)                     -> alignment t
   | Abstract { aalignment }          -> aalignment
-  | Pointer _                        -> RawTypes.(pointer.alignment)
+  | Pointer _                        -> Primitive_details.pointer_alignment 
   | View { ty }                      -> alignment ty
 
 let rec passable : type a. a typ -> bool = function
     Void                            -> true
-  | Primitive { RawTypes.passable } -> passable
+  | Primitive p                     -> let ct = Ctypes_raw.ctype_of_prim p in
+                                       ct.RawTypes.passable
   | Struct { spec = Incomplete _ }  -> raise IncompleteType
   | Struct { spec = Complete
-      { RawTypes.passable } }       -> passable
+      { spassable } }               -> spassable
   | Union { uspec = None }          -> raise IncompleteType
   | Union _                         -> false
   | Array _                         -> false
@@ -122,8 +130,9 @@ let rec passable : type a. a typ -> bool = function
 
 let rec arg_type : type a. a typ -> arg_type = function
     Void                           -> ArgType RawTypes.(void.raw)
-  | Primitive p                    -> ArgType p.RawTypes.raw
-  | Struct { spec = Complete p }   -> ArgType p.RawTypes.raw
+  | Primitive p                    -> let p = Ctypes_raw.ctype_of_prim p in
+                                      ArgType p.RawTypes.raw
+  | Struct { spec = Complete p }   -> ArgType p.sraw_io
   | Pointer _                      -> ArgType RawTypes.(pointer.raw)
   | View { ty }                    -> arg_type ty
   (* The following cases should never happen; aggregate types other than
@@ -134,32 +143,32 @@ let rec arg_type : type a. a typ -> arg_type = function
   | Struct { spec = Incomplete _ } -> assert false
 
 let void = Void
-let char = Primitive RawTypes.char
-let schar = Primitive RawTypes.schar
-let float = Primitive RawTypes.float
-let double = Primitive RawTypes.double
-let complex32 = Primitive RawTypes.complex32
-let complex64 = Primitive RawTypes.complex64
-let short = Primitive RawTypes.short
-let int = Primitive RawTypes.int
-let long = Primitive RawTypes.long
-let llong = Primitive RawTypes.llong
-let nativeint = Primitive RawTypes.nativeint
-let int8_t = Primitive RawTypes.int8_t
-let int16_t = Primitive RawTypes.int16_t
-let int32_t = Primitive RawTypes.int32_t
-let int64_t = Primitive RawTypes.int64_t
-let camlint = Primitive RawTypes.camlint
-let uchar = Primitive RawTypes.uchar
-let uint8_t = Primitive RawTypes.uint8_t
-let uint16_t = Primitive RawTypes.uint16_t
-let uint32_t = Primitive RawTypes.uint32_t
-let uint64_t = Primitive RawTypes.uint64_t
-let size_t = Primitive RawTypes.size_t
-let ushort = Primitive RawTypes.ushort
-let uint = Primitive RawTypes.uint
-let ulong = Primitive RawTypes.ulong
-let ullong = Primitive RawTypes.ullong
+let char = Primitive Primitives.Char
+let schar = Primitive Primitives.Schar
+let float = Primitive Primitives.Float
+let double = Primitive Primitives.Double
+let complex32 = Primitive Primitives.Complex32
+let complex64 = Primitive Primitives.Complex64
+let short = Primitive Primitives.Short
+let int = Primitive Primitives.Int
+let long = Primitive Primitives.Long
+let llong = Primitive Primitives.Llong
+let nativeint = Primitive Primitives.Nativeint
+let int8_t = Primitive Primitives.Int8_t
+let int16_t = Primitive Primitives.Int16_t
+let int32_t = Primitive Primitives.Int32_t
+let int64_t = Primitive Primitives.Int64_t
+let camlint = Primitive Primitives.Camlint
+let uchar = Primitive Primitives.Uchar
+let uint8_t = Primitive Primitives.Uint8_t
+let uint16_t = Primitive Primitives.Uint16_t
+let uint32_t = Primitive Primitives.Uint32_t
+let uint64_t = Primitive Primitives.Uint64_t
+let size_t = Primitive Primitives.Size_t
+let ushort = Primitive Primitives.Ushort
+let uint = Primitive Primitives.Uint
+let ulong = Primitive Primitives.Ulong
+let ullong = Primitive Primitives.Ullong
 let array i t = Array (t, i)
 let ptr t = Pointer t
 let ( @->) f t =
