@@ -25,11 +25,11 @@ type arg_type = ArgType : 'a Ffi_stubs.ffitype -> arg_type
 let keep_alive w ~while_live:v = Gc.finalise (fun _ -> w; ()) v
 
 let rec arg_type : type a. a typ -> arg_type = function
-  | Void                             -> ArgType (Ffi_stubs.void_ffitype ()) 
+  | Void                             -> ArgType (Ffi_stubs.void_ffitype ())
   | Primitive p                      -> ArgType (Ffi_stubs.primitive_ffitype p)
   | Struct ({ spec = Complete _ } as s)
     -> struct_arg_type s
-  | Pointer _                        -> ArgType (Ffi_stubs.pointer_ffitype ()) 
+  | Pointer _                        -> ArgType (Ffi_stubs.pointer_ffitype ())
   | View { ty }                      -> arg_type ty
   (* The following cases should never happen; aggregate types other than
      complete struct types are excluded during type construction. *)
@@ -133,12 +133,14 @@ let build_function ?name fn =
 let ptr_of_rawptr raw_ptr =
   { raw_ptr ; pbyte_offset = 0; reftype = void; pmanaged = None }
 
-let function_of_pointer ?name fn {raw_ptr} =
-  build_function ?name fn raw_ptr
+let function_of_pointer ?name fn =
+  let f = build_function ?name fn in
+  fun {raw_ptr} -> f raw_ptr
 
-let pointer_of_function fn f =
+let pointer_of_function fn =
   let cs' = Ffi_stubs.allocate_callspec () in
   let cs = box_function fn cs' in
-  let boxed = cs (WeakRef.make f) in
-  let id = Closure_properties.record (Obj.repr f) (Obj.repr boxed) in
-  ptr_of_rawptr (Ffi_stubs.make_function_pointer cs' id)
+  fun f ->
+    let boxed = cs (WeakRef.make f) in
+    let id = Closure_properties.record (Obj.repr f) (Obj.repr boxed) in
+    ptr_of_rawptr (Ffi_stubs.make_function_pointer cs' id)
