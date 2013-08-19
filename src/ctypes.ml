@@ -11,7 +11,7 @@ include Structs_computed
 
 include Type_printing
 
-include Dynamic
+include Memory
 
 include Std_views
 

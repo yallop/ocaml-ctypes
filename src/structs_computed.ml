@@ -7,6 +7,23 @@
 
 open Static
 
+let max_field_alignment fields =
+  List.fold_left
+    (fun align (BoxedField {ftype}) -> max align (alignment ftype))
+    0
+    fields
+
+let max_field_size fields =
+  List.fold_left
+    (fun size (BoxedField {ftype}) -> max size (sizeof ftype))
+    0
+    fields
+
+let aligned_offset offset alignment =
+  match offset mod alignment with
+    0 -> offset
+  | overhang -> offset - overhang + alignment
+
 let field (type k) (structured : (_, k) structured typ) label ftype =
   match structured with
   | Struct ({ spec = Incomplete spec } as s) ->
@@ -27,39 +44,18 @@ let field (type k) (structured : (_, k) structured typ) label ftype =
 let seal (type a) (type s) : (a, s) structured typ -> unit = function
   | Struct { fields = [] } -> raise (Unsupported "struct with no fields")
   | Struct { spec = Complete _; tag } -> raise (ModifyingSealedType tag)
-  | Struct ({ spec = Incomplete { isize } } as s) 
-      when all_passable s.fields ->
-    s.fields <- List.rev s.fields;
-    let bufspec = Static_stubs.allocate_bufferspec () in
-    let () = 
-      List.iter
-        (fun (BoxedField {ftype; foffset}) ->
-          let ArgType t = arg_type ftype in
-          let offset = Static_stubs.add_argument bufspec t in
-          assert (offset = foffset))
-        s.fields
-    in
-    let salign = max_field_alignment s.fields in
-    let ssize = aligned_offset isize salign in
-    let sraw_io = Static_stubs.complete_struct_type bufspec in
-    s.spec <- Complete { sraw_io; ssize; salign; spassable = true }
   | Struct ({ spec = Incomplete { isize } } as s) ->
     s.fields <- List.rev s.fields;
-    let alignment = max_field_alignment s.fields in
-    let size = aligned_offset isize alignment in
-    let sraw_io = Static_stubs.make_unpassable_structspec ~size ~alignment in
-    s.spec <- Complete { sraw_io; ssize = size; salign = alignment;
-                         spassable = false }
+    let align = max_field_alignment s.fields in
+    let size = aligned_offset isize align in
+    s.spec <- Complete { (* sraw_io;  *)size; align }
   | Union { utag; uspec = Some _ } ->
     raise (ModifyingSealedType utag)
   | Union { ufields = [] } ->
     raise (Unsupported "union with no fields")
   | Union u -> begin
     u.ufields <- List.rev u.ufields;
-    let usize = max_field_size u.ufields
-    and ualignment = max_field_alignment u.ufields in
-    u.uspec <- Some {
-      usize = aligned_offset usize ualignment;
-      ualignment = ualignment
-    }
+    let size = max_field_size u.ufields
+    and align = max_field_alignment u.ufields in
+    u.uspec <- Some { align; size = aligned_offset size align }
   end
