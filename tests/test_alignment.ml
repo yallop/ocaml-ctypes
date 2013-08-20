@@ -120,14 +120,14 @@ let test_struct_alignment () =
     let struct_b = structure "A"
     let (-:) ty label = field struct_b label ty
     let _ = charish                        -: "_"
-    let _ = funptr (int @-> returning int) -: "_"
+    let _ = Foreign.funptr (int @-> returning int) -: "_"
     let _ = abs                            -: "_"
     let _ = double                         -: "_"
     let () = seal struct_b
 
     let () = assert_equal
       (maximum [alignment charish;
-                alignment (funptr (int @-> returning int));
+                alignment (Foreign.funptr (int @-> returning int));
                 alignment abs;
                 alignment double])
       (alignment struct_b)

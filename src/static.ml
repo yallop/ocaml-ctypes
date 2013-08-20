@@ -103,20 +103,16 @@ let rec alignment : type a. a typ -> int = function
   | View { ty }                      -> alignment ty
 
 let rec passable : type a. a typ -> bool = function
-    Void                            -> true
-  | Primitive Primitives.Complex32  -> false
-  | Primitive Primitives.Complex64  -> false
-  | Primitive p                     -> true 
-  | Struct { spec = Incomplete _ }  -> raise IncompleteType
-  | Struct { fields }               -> List.for_all passable_boxed_field fields
-  | Union { uspec = None }          -> raise IncompleteType
-  | Union _                         -> false
-  | Array _                         -> false
-  | Pointer _                       -> true
-  | Abstract _                      -> false
-  | View { ty }                     -> passable ty
-and passable_boxed_field : type s. s boxed_field -> bool =
-   fun (BoxedField { ftype } ) -> passable ftype
+    Void                           -> true
+  | Primitive _                    -> true 
+  | Struct { spec = Incomplete _ } -> raise IncompleteType
+  | Struct { spec = Complete _ }   -> true
+  | Union  { uspec = None }        -> raise IncompleteType
+  | Union  { uspec = Some _ }      -> true
+  | Array _                        -> false
+  | Pointer _                      -> true
+  | Abstract _                     -> false
+  | View { ty }                    -> passable ty
 
 let void = Void
 let char = Primitive Primitives.Char

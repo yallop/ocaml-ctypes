@@ -1,4 +1,6 @@
 # OASIS_START
-# DO NOT EDIT (digest: 54990d04e342cdee5153b0a19f38fc85)
+# DO NOT EDIT (digest: 6a6247b3060067901e61f4e8d6e22ba2)
 dl_stubs.o
+ffi_type_stubs.o
+ffi_call_stubs.o
 # OASIS_STOP

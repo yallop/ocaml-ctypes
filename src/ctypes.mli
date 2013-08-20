@@ -194,7 +194,7 @@ val array : int -> 'a typ -> 'a array typ
 
 (** {3 Function types} *)
 
-type 'a fn
+type 'a fn = 'a Static.fn
 (** The type of values representing C function types.  A value of type [t fn]
     can be used to bind to C functions and to describe type of OCaml functions
     passed to C. *)
@@ -219,22 +219,6 @@ val returning_checking_errno : 'a typ -> 'a fn
 (** Give the return type of a C function.  This behaves like {!returning},
     except that calls to functions bound using [returning_checking_errno] check
     whether errno has been updated and raise {!Unix.Unix_error} if so. *)
-
-val funptr : ?name:string -> ('a -> 'b) fn -> ('a -> 'b) typ
-(** Construct a function pointer type from a function type.
-
-    The ctypes library, like C itself, distinguishes functions and function
-    pointers.  Functions are not first class: it is not possible to use them
-    as arguments or return values of calls, or store them in addressable
-    memory.  Function pointers are first class, and so have none of these
-    restrictions.
-*)
-
-val funptr_opt : ('a -> 'b) fn -> ('a -> 'b) option typ
-(** Construct a function pointer type from a function type.
-
-    This behaves like {!funptr}, except that null pointers appear in OCaml as
-    [None]. *)
 
 (** {3 Struct and union types} *)
 
@@ -547,7 +531,3 @@ exception IncompleteType
     pointer arithmetic.  Additionally, incomplete struct and union types
     cannot be used as argument or return types.
 *)
-
-exception CallToExpiredClosure
-(** A closure passed to C was collected by the OCaml garbage collector before
-    it was called. *)

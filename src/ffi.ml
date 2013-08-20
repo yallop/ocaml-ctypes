@@ -24,19 +24,27 @@ type arg_type = ArgType : 'a Ffi_stubs.ffitype -> arg_type
 *)
 let keep_alive w ~while_live:v = Gc.finalise (fun _ -> w; ()) v
 
+let report_unpassable what =
+  let msg = Printf.sprintf "libffi does not support passing %s" what in
+  raise (Unsupported msg)
+
 let rec arg_type : type a. a typ -> arg_type = function
-  | Void                             -> ArgType (Ffi_stubs.void_ffitype ())
-  | Primitive p                      -> ArgType (Ffi_stubs.primitive_ffitype p)
-  | Struct ({ spec = Complete _ } as s)
-    -> struct_arg_type s
-  | Pointer _                        -> ArgType (Ffi_stubs.pointer_ffitype ())
-  | View { ty }                      -> arg_type ty
-  (* The following cases should never happen; aggregate types other than
-     complete struct types are excluded during type construction. *)
-  | Union _                          -> assert false
-  | Array _                          -> assert false
-  | Abstract _                       -> assert false
-  | Struct { spec = Incomplete _ }   -> assert false
+  | Void                                -> ArgType (Ffi_stubs.void_ffitype ())
+  | Primitive p as prim                 -> let ffitype = Ffi_stubs.primitive_ffitype p in
+                                           if ffitype = Ctypes_raw.null
+                                           then report_unpassable
+                                             (Type_printing.string_of_typ prim)
+                                           else ArgType ffitype
+  | Pointer _                           -> ArgType (Ffi_stubs.pointer_ffitype ())
+  | Union _                             -> report_unpassable "unions"
+  | Struct ({ spec = Complete _ } as s) -> struct_arg_type s
+  | View { ty }                         -> arg_type ty
+  | Array _                             -> report_unpassable "arrays"
+  | Abstract _                          -> (report_unpassable
+                                              "values of abstract type")
+  (* The following case should never happen; incomplete types are excluded
+     during type construction. *)
+  | Struct { spec = Incomplete _ }      -> report_unpassable "incomplete types"
 and struct_arg_type : type s. s structure_type -> arg_type =
    fun ({fields} as s) ->
      let bufspec = Ffi_stubs.allocate_struct_ffitype (List.length fields) in
@@ -49,7 +57,6 @@ and struct_arg_type : type s. s structure_type -> arg_type =
        fields;
      Ffi_stubs.complete_struct_type bufspec;
      ArgType (Ffi_stubs.ffi_type_of_struct_type bufspec)
-
 
 (*
   call addr callspec
