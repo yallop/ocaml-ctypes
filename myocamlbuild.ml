@@ -1,5 +1,5 @@
 (* OASIS_START *)
-(* DO NOT EDIT (digest: 865cf2d4cfb042b03cdff61bfefaacda) *)
+(* DO NOT EDIT (digest: fb4453fc886feddb645db91c667989b1) *)
 module OASISGettext = struct
 (* # 21 "src/oasis/OASISGettext.ml" *)
 
@@ -492,8 +492,8 @@ let package_default =
             "src/",
             [
                "src/primitives.h";
-               "src/raw_pointer.h";
                "src/unsigned_stubs.h";
+               "src/raw_pointer.h";
                "src/managed_buffer_stubs.h";
                "src/type_info_stubs.h"
             ]);

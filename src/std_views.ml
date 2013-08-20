@@ -5,20 +5,6 @@
  * See the file LICENSE for details.
  *)
 
-exception CallToExpiredClosure = Ffi_stubs.CallToExpiredClosure
-
-let format_function_pointer fn k fmt =
-  Type_printing.format_fn' fn
-    (fun fmt -> Format.fprintf fmt "(*%t)" k) fmt
-
-let funptr ?name fn =
-  let open Ffi in
-  let read = function_of_pointer ?name fn
-  and write = pointer_of_function fn
-  and format_typ = format_function_pointer fn in
-  Static.(view ~format_typ ~read ~write (ptr void))
-
-
 let string_of_char_ptr {Static.raw_ptr; pbyte_offset} =
   Std_view_stubs.string_of_cstring raw_ptr pbyte_offset
 
@@ -46,8 +32,6 @@ let nullable_view t =
   let read = read_nullable t
   and write = write_nullable t in
   Static.(view ~read ~write (ptr void))
-
-let funptr_opt fn = nullable_view (funptr fn)
 
 let ptr_opt t = nullable_view (Static.ptr t)
 

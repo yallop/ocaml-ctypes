@@ -1,8 +1,8 @@
 # OASIS_START
-# DO NOT EDIT (digest: f72a827285ca66af4a63bf5768afaf43)
+# DO NOT EDIT (digest: 33f371455a0bf9019aea36d7e3b7bf91)
 version = "0.1"
 description = "Combinators for binding to C libraries without writing any C."
-requires = "unix threads"
+requires = "unix"
 archive(byte) = "ctypes.cma"
 archive(byte, plugin) = "ctypes.cma"
 archive(native) = "ctypes.cmxa"
@@ -22,7 +22,7 @@ package "top" (
 package "foreign" (
  version = "0.1"
  description = "Dynamic linking of C functions"
- requires = "unix ctypes"
+ requires = "threads ctypes"
  archive(byte) = "ctypes-foreign.cma"
  archive(byte, plugin) = "ctypes-foreign.cma"
  archive(native) = "ctypes-foreign.cmxa"

@@ -159,7 +159,7 @@ let test_sizeof_pointers () = begin
   let pointer_size = sizeof (ptr void) in
   assert_equal pointer_size (sizeof (ptr void));
   assert_equal pointer_size (sizeof (ptr int));
-  assert_equal pointer_size (sizeof (funptr (int @-> returning int)));
+  assert_equal pointer_size (sizeof (Foreign.funptr (int @-> returning int)));
   assert_equal pointer_size (sizeof (ptr (ptr void)));
   let module M = struct
     type t

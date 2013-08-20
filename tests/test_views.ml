@@ -63,7 +63,7 @@ let test_passing_chars_as_ints () =
   Use views to create a nullable function pointer.
 *)
 let test_nullable_function_pointer_view () =
-  let nullable_intptr = funptr_opt (int @-> int @-> returning int) in
+  let nullable_intptr = Foreign.funptr_opt (int @-> int @-> returning int) in
   let returning_funptr =
     Foreign.foreign "returning_funptr" ~from:testlib
       (int @-> returning nullable_intptr)

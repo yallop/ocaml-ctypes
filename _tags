@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: db62bb7eec1a0bbe84e6a4f6f33a3f71)
+# DO NOT EDIT (digest: 10b64b6d2039cf2f7168e0e57abe944f)
 # Ignore VCS directories, you can use the same kind of rule outside 
 # OASIS_START/STOP if you want to exclude directories that contains 
 # useless stuff for the build process
@@ -16,32 +16,23 @@
 # Library ctypes
 "src/ctypes.cmxs": use_ctypes
 <src/*.ml{,i}>: oasis_library_ctypes_ccopt
-"src/raw_pointer_stubs.c": oasis_library_ctypes_ccopt
 "src/unsigned_stubs.c": oasis_library_ctypes_ccopt
+"src/raw_pointer_stubs.c": oasis_library_ctypes_ccopt
 "src/managed_buffer_stubs.c": oasis_library_ctypes_ccopt
 "src/type_info_stubs.c": oasis_library_ctypes_ccopt
-"src/ffi_type_stubs.c": oasis_library_ctypes_ccopt
-"src/ffi_call_stubs.c": oasis_library_ctypes_ccopt
 "src/posix_types_stubs.c": oasis_library_ctypes_ccopt
 <src/ctypes.{cma,cmxa}>: use_libctypes_stubs
-"src/raw_pointer_stubs.c": pkg_unix
-"src/raw_pointer_stubs.c": pkg_threads
 "src/unsigned_stubs.c": pkg_unix
-"src/unsigned_stubs.c": pkg_threads
+"src/raw_pointer_stubs.c": pkg_unix
 "src/managed_buffer_stubs.c": pkg_unix
-"src/managed_buffer_stubs.c": pkg_threads
 "src/type_info_stubs.c": pkg_unix
-"src/type_info_stubs.c": pkg_threads
-"src/ffi_type_stubs.c": pkg_unix
-"src/ffi_type_stubs.c": pkg_threads
-"src/ffi_call_stubs.c": pkg_unix
-"src/ffi_call_stubs.c": pkg_threads
 "src/posix_types_stubs.c": pkg_unix
-"src/posix_types_stubs.c": pkg_threads
 # Library ctypes-foreign
 "src/ctypes-foreign.cmxs": use_ctypes-foreign
 <src/*.ml{,i}>: oasis_library_ctypes_foreign_ccopt
 "src/dl_stubs.c": oasis_library_ctypes_foreign_ccopt
+"src/ffi_type_stubs.c": oasis_library_ctypes_foreign_ccopt
+"src/ffi_call_stubs.c": oasis_library_ctypes_foreign_ccopt
 <src/ctypes-foreign.{cma,cmxa}>: use_libctypes-foreign_stubs
 <src/*.ml{,i}>: use_ctypes
 <src/*.ml{,i}>: pkg_unix
@@ -49,6 +40,12 @@
 "src/dl_stubs.c": use_ctypes
 "src/dl_stubs.c": pkg_unix
 "src/dl_stubs.c": pkg_threads
+"src/ffi_type_stubs.c": use_ctypes
+"src/ffi_type_stubs.c": pkg_unix
+"src/ffi_type_stubs.c": pkg_threads
+"src/ffi_call_stubs.c": use_ctypes
+"src/ffi_call_stubs.c": pkg_unix
+"src/ffi_call_stubs.c": pkg_threads
 # Library fts
 "examples/fts/fts.cmxs": use_fts
 # Library sigset
@@ -65,7 +62,6 @@
 <top/*.ml{,i}>: use_ctypes
 <top/*.ml{,i}>: pkg_unix
 <top/*.ml{,i}>: pkg_compiler-libs.toplevel
-<top/*.ml{,i}>: pkg_threads
 # Executable ncurses_cmd
 <examples/ncurses/ncurses_cmd.{native,byte}>: use_ncurses
 <examples/ncurses/ncurses_cmd.{native,byte}>: use_ctypes-foreign
