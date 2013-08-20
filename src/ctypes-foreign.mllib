@@ -1,5 +1,9 @@
 # OASIS_START
-# DO NOT EDIT (digest: 99c2843b40e00c077fd885d333d04154)
+# DO NOT EDIT (digest: 37589ab620676ced029207846347ccb3)
 Dl
 Foreign
+Closure_properties
+WeakRef
+Ffi_stubs
+Ffi
 # OASIS_STOP

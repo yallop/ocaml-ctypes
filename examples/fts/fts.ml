@@ -161,7 +161,7 @@ struct
   let fts_rfd     = int              -: "fts_rfd"
   let fts_pathlen = int              -: "fts_pathlen"
   let fts_nitems  = int              -: "fts_nitems"
-  let fts_compar  = funptr  (ptr FTSENT.t @-> ptr FTSENT.t @-> returning int)
+  let fts_compar  = Foreign.funptr (ptr FTSENT.t @-> ptr FTSENT.t @-> returning int)
                                      -: "fts_compar"
   (* fts_options would work well as a view *)
   let fts_options = int              -: "fts_options"
@@ -197,7 +197,7 @@ open FTS
 *)
 let compar_type = ptr FTSENT.t @-> ptr FTSENT.t @-> returning int
 let _fts_open = Foreign.foreign "fts_open"
-  (ptr string @-> int @-> funptr_opt compar_type @-> returning (ptr fts))
+  (ptr string @-> int @-> Foreign.funptr_opt compar_type @-> returning (ptr fts))
 
 (* FTSENT *fts_read(FTS *ftsp); *)
 let _fts_read = Foreign.foreign "fts_read"

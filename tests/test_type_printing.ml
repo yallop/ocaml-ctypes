@@ -166,39 +166,39 @@ let test_pointer_printing () =
 
     (* Pointers to functions *)
     assert_typ_printed_as "void (*)(void)"
-      (funptr (void @-> returning void));
+      (Foreign.funptr (void @-> returning void));
 
     assert_typ_printed_as ~name:"g" "float (*g)(int, long)"
-      (funptr (int @-> long @-> returning float));
+      (Foreign.funptr (int @-> long @-> returning float));
 
     assert_typ_printed_as "void (*)(int (*)[4])"
-      (funptr (ptr (array 4 int) @-> returning void));
+      (Foreign.funptr (ptr (array 4 int) @-> returning void));
 
     assert_typ_printed_as ~name:"h" "int32_t (*(*h)(void ))(int)"
-      (funptr (void @-> returning (funptr (int @-> returning int32_t))));
+      (Foreign.funptr (void @-> returning (Foreign.funptr (int @-> returning int32_t))));
 
     assert_typ_printed_as
       "unsigned long (*(*)(int, void (*)(float, float)))(long)"
-      (funptr (int @->
-               funptr (float @-> float @-> returning void) @->
-               returning (funptr (long @-> returning ulong))));
+      (Foreign.funptr (int @->
+               Foreign.funptr (float @-> float @-> returning void) @->
+               returning (Foreign.funptr (long @-> returning ulong))));
 
     (* Pointers to pointers to functions *)
     assert_typ_printed_as ~name:"i" "double (**i)(int)"
-      (ptr (funptr (int @-> returning double)));
+      (ptr (Foreign.funptr (int @-> returning double)));
 
     assert_typ_printed_as "double (**)(int)"
-      (ptr (funptr (int @-> returning double)));
+      (ptr (Foreign.funptr (int @-> returning double)));
 
     assert_typ_printed_as ~name:"j" "void (*(*(*(**j)(int))(void))[8])(long, long)"
       (ptr
-         (funptr
+         (Foreign.funptr
             (int @->
-             returning (funptr
+             returning (Foreign.funptr
                           (void @->
                            returning (ptr
                                         (array 8
-                                           (funptr
+                                           (Foreign.funptr
                                               (long @->
                                                long @->
                                                returning void)))))))));
@@ -282,7 +282,7 @@ let test_struct_and_union_printing () =
     let mixture = structure "mixture" in
     let (-:) ty label = field mixture label ty in
     let _ = array 10 (array 12 (ptr mixture))       -: "parr" in
-    let _ = funptr (ptr mixture @-> returning void) -: "fn" in
+    let _ = Foreign.funptr (ptr mixture @-> returning void) -: "fn" in
     let _ = int                                     -: "i" in
     seal mixture;
       
@@ -298,7 +298,7 @@ let test_struct_and_union_printing () =
     let (-:) ty label = field u_mixture label ty in
     let _ = float -: "fl" in
     let _ = ptr (array 3
-                   (funptr
+                   (Foreign.funptr
                       (float @-> returning float)))
                   -: "p" in
     seal u_mixture;
@@ -371,15 +371,15 @@ let test_array_printing () =
       (array 1 (array 2 (array 3 long)));
 
     assert_typ_printed_as ~name:"b" "int (*b[10])(float)"
-      (array 10 (funptr (float @-> returning int)));
+      (array 10 (Foreign.funptr (float @-> returning int)));
 
     let s = structure "s" in
 
     assert_typ_printed_as ~name:"c" "struct s (*(*(*c[1])[2])(int (*)[3]))[4]"
       (array 1
          (ptr (array 2
-                 (funptr (ptr (array 3 int) @->
-                          returning (ptr (array 4 s)))))));
+                 (Foreign.funptr (ptr (array 3 int) @->
+                                  returning (ptr (array 4 s)))))));
   end
 
 
@@ -395,8 +395,8 @@ let test_function_printing () =
       (int @-> char @-> double @-> returning float);
 
     assert_fn_printed_as ~name:"c" "int (*c(void (*)(void)))(int)"
-      (funptr (void @-> returning void) @->
-       returning (funptr (int @-> returning int)));
+      (Foreign.funptr (void @-> returning void) @->
+       returning (Foreign.funptr (int @-> returning int)));
 
     let s = structure "s" in
     let _ = field s "_" int in
@@ -418,14 +418,14 @@ let test_view_printing () =
       string;
 
     let v : unit typ = view ~read:(fun _ -> ()) ~write:(fun () () -> ())
-      (funptr (void @-> returning void)) in
+      (Foreign.funptr (void @-> returning void)) in
     
     assert_typ_printed_as "void (*)(void)"
       v;
 
     (* The format_typ optional argument can be used to provide custom
        printing for views. *)
-    let w : unit typ = view (funptr (int @-> returning float))
+    let w : unit typ = view (Foreign.funptr (int @-> returning float))
       ~format_typ:(fun k fmt -> Format.fprintf fmt "unit%t" k)
       ~read:(fun _ -> ())
       ~write:(fun () _ -> 0.0) in

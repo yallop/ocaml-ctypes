@@ -133,8 +133,8 @@ let test_pointers_are_passable () =
 *)
 let test_function_pointers_are_passable () =
   (* Pointers to primitives are passable *)
-  ignore (funptr (int @-> returning int)
-          @-> returning (funptr (int @-> returning int)))
+  ignore (Foreign.funptr (int @-> returning int)
+          @-> returning (Foreign.funptr (int @-> returning int)))
 
 
 (*
@@ -166,7 +166,7 @@ let test_struct_passability () =
     let _ = int -: "_"
     let _ = double -: "_"
     let _ = ptr s1 -: "_"
-    let _ = funptr (int @-> returning int) -: "_"
+    let _ = Foreign.funptr (int @-> returning int) -: "_"
     let () = seal s1
 
     let s2 : s2 structure typ = structure "s2"

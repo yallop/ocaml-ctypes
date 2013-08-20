@@ -20,26 +20,20 @@ Library ctypes
                     Static,
                     Structs_computed,
                     Type_printing,
-                    WeakRef,
-                    Closure_properties,
                     Memory_stubs,
                     Memory,
                     Value_printing_stubs,
                     Value_printing,
-                    Ffi_stubs,
-                    Ffi,
                     Std_view_stubs,
                     Std_views
   CSources:         primitives.h,
-                    raw_pointer.h,raw_pointer_stubs.c,
                     unsigned_stubs.h,unsigned_stubs.c,
+                    raw_pointer.h,raw_pointer_stubs.c,
                     managed_buffer_stubs.h,managed_buffer_stubs.c,
                     type_info_stubs.h,type_info_stubs.c,
-                    ffi_type_stubs.c,
-                    ffi_call_stubs.c,
                     posix_types_stubs.c
   CCOpt:            -fPIC -Wall -Wno-unused-variable -O3
-  BuildDepends:     unix,threads
+  BuildDepends:     unix
   Install:          true
 
 Library "ctypes-foreign"
@@ -47,10 +41,16 @@ Library "ctypes-foreign"
   Findlibname:      foreign
   Findlibparent:    ctypes
   Modules:          Dl,Foreign
-  CSources:         dl_stubs.c
+  InternalModules:  Closure_properties,
+                    WeakRef,
+                    Ffi_stubs,
+                    Ffi
+  CSources:         dl_stubs.c,
+                    ffi_type_stubs.c,
+                    ffi_call_stubs.c
   CCOpt:            -fPIC -Wall -Wno-unused-variable -O3
   XMETADescription: Dynamic linking of C functions
-  BuildDepends:     unix,ctypes
+  BuildDepends:     threads,ctypes
   Install:          true
 
 Library fts
