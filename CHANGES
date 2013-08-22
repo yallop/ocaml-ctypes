@@ -1,0 +1,26 @@
+ == ctypes 0.2 ==
+
+038420: Tweak passability tests to distinguish libffi's restrictions from C's.
+df10e1: Move funptr and funptr_opt to the Foreign module.
+71a4c7: Struct type equality is now structural, not physical
+510b7a: Compulsory field names (deprecate *:* and +:+)
+349422: Fix bug on 32-bit platforms
+7d0037: More efficient string view implementation.
+8c5b93: Expose field type function.
+2d38bc: UInt32.(of|to)_int32 and UInt64.(of|to)_int64 functions.
+ea135b: Eliminate build-time oasis dependency
+d6fc68: Finalisers for ctypes-allocated memory.
+ea6ef2: Expose the camlint type in the public interface.
+7a7106: Add the 'camlint' basic type.
+9caf55: Treat sealing empty structs or unions as an error.
+84ea43: Support for C99's complex number types.
+e2a42e: Add string_opt view
+8ae5a3: Give the user control over the lifetime of closures passed to C.
+db1ee3: Findlib target for installing top-level pretty printers.
+378a02: Pretty-printing for C values.
+ee178a: Pretty-printing for C types.
+4ce9b5: Abstract types now have names
+
+== ctypes 0.1 ==
+
+initial release
