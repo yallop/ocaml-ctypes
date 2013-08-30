@@ -5,8 +5,6 @@
  * See the file LICENSE for details.
  *)
 
-(* TODO: better array support, perhaps based on bigarrays integration *)
-
 open Static
 
 module Stubs = Memory_stubs
@@ -42,6 +40,7 @@ let rec build : type a. a typ -> offset:int -> Raw.voidp -> a
        types are excluded during type construction. *)
     | Union _ -> assert false
     | Array _ -> assert false
+    | Bigarray _ -> assert false
     | Abstract _ -> assert false
 
 let rec write : type a. a typ -> offset:int -> a -> Raw.voidp -> unit
@@ -64,6 +63,11 @@ let rec write : type a. a typ -> offset:int -> a -> Raw.voidp -> unit
       let size = sizeof a in
       (fun ~offset { astart = { raw_ptr; pbyte_offset = src_offset } } dst ->
         Stubs.memcpy ~size ~dst ~dst_offset:offset ~src:raw_ptr ~src_offset)
+    | Bigarray b as t ->
+      let size = sizeof t in
+      (fun ~offset ba dst ->
+        let src = Ctypes_bigarray.address b ba in
+        Stubs.memcpy ~size ~dst ~dst_offset:offset ~src ~src_offset:0)
     | View { write = w; ty } ->
       let writety = write ty in
       (fun ~offset v -> writety ~offset (w v))
@@ -74,7 +78,7 @@ let null : unit ptr = { raw_ptr = Raw.null;
                         pmanaged = None }
 
 let rec (!@) : type a. a ptr -> a
-  = fun ({ raw_ptr; reftype; pbyte_offset = offset } as ptr) ->
+  = fun ({ raw_ptr; reftype; pbyte_offset = offset; pmanaged = ref } as ptr) ->
     match reftype with
       | Void -> raise IncompleteType
       | Union { uspec = None } -> raise IncompleteType
@@ -85,6 +89,7 @@ let rec (!@) : type a. a ptr -> a
       | Struct _ -> { structured = ptr }
       | Array (elemtype, alength) ->
         { astart = { ptr with reftype = elemtype }; alength }
+      | Bigarray b -> Ctypes_bigarray.view b ?ref ~offset raw_ptr
       | Abstract _ -> { structured = ptr }
       (* If it's a value type then we cons a new value. *)
       | _ -> build reftype ~offset raw_ptr
@@ -145,6 +150,7 @@ let ptr_of_raw_address addr =
   { reftype = Void; raw_ptr = Raw.PtrType.of_int64 addr;
     pmanaged = None; pbyte_offset = 0 }
 
+module Std_array = Array
 module Array =
 struct
   type 'a t = 'a array
@@ -210,3 +216,98 @@ let setf s field v = (s @. field) <-@ v
 let getf s field = !@(s @. field)
 
 let addr { structured } = structured
+
+open Bigarray
+
+let _bigarray_start kind typ ba =
+  let raw_address = Ctypes_bigarray.address typ ba in
+  let reftype = Primitive (Ctypes_bigarray.prim_of_kind kind) in
+  { reftype      = reftype ;
+    raw_ptr      = raw_address ;
+    pmanaged     = Some (Obj.repr ba) ;
+    pbyte_offset = 0 }
+
+let bigarray_start : type a b c d f.
+  < element: a;
+    ba_repr: f;
+    bigarray: b;
+    carray: c;
+    dims: d > bigarray_class -> b -> a ptr
+  = fun spec ba -> match spec with
+  | Genarray ->
+    let kind = Genarray.kind ba in
+    let dims = Genarray.dims ba in
+    _bigarray_start kind (Ctypes_bigarray.bigarray dims kind) ba
+  | Array1 ->
+    let kind = Array1.kind ba in
+    let d = Array1.dim ba in
+    _bigarray_start kind (Ctypes_bigarray.bigarray1 d kind) ba
+  | Array2 ->
+    let kind = Array2.kind ba in
+    let d1 = Array2.dim1 ba and d2 = Array2.dim2 ba in
+    _bigarray_start kind (Ctypes_bigarray.bigarray2 d1 d2 kind) ba
+  | Array3 ->
+    let kind = Array3.kind ba in
+    let d1 = Array3.dim1 ba and d2 = Array3.dim2 ba and d3 = Array3.dim3 ba in
+    _bigarray_start kind (Ctypes_bigarray.bigarray3 d1 d2 d3 kind) ba
+
+let castp reftype p = { p with reftype }
+
+let array_of_bigarray : type a b c d e.
+  < element: a;
+    ba_repr: e;
+    bigarray: b;
+    carray: c;
+    dims: d > bigarray_class -> b -> c
+  = fun spec ba -> 
+    let { reftype } as element_ptr = bigarray_start spec ba in
+    match spec with
+  | Genarray ->
+    let ds = Genarray.dims ba in
+    Array.from_ptr element_ptr (Std_array.fold_left ( * ) 1 ds)
+  | Array1 ->
+    let d = Array1.dim ba in
+    Array.from_ptr element_ptr d
+  | Array2 ->
+    let d1 = Array2.dim1 ba and d2 = Array2.dim2 ba in
+    Array.from_ptr (castp (array d2 reftype) element_ptr) d1
+  | Array3 ->
+    let d1 = Array3.dim1 ba and d2 = Array3.dim2 ba and d3 = Array3.dim3 ba in
+    Array.from_ptr (castp (array d2 (array d3 reftype)) element_ptr) d1
+
+let bigarray_elements : type a b c d f.
+   < element: a;
+     ba_repr: f;
+     bigarray: b;
+     carray: c;
+     dims: d > bigarray_class -> d -> int
+  = fun spec dims -> match spec, dims with
+   | Genarray, ds -> Std_array.fold_left ( * ) 1 ds
+   | Array1, d -> d
+   | Array2, (d1, d2) -> d1 * d2
+   | Array3, (d1, d2, d3) -> d1 * d2 * d3
+
+let bigarray_of_ptr spec dims kind ptr =
+  !@ (castp (bigarray spec dims kind) ptr)
+
+let array_dims : type a b c d f.
+   < element: a;
+     ba_repr: f;
+     bigarray: b;
+     carray: c array;
+     dims: d > bigarray_class -> c array -> d =
+   fun spec a -> match spec with
+   | Genarray -> [| a.alength |]
+   | Array1 -> a.alength
+   | Array2 -> let {reftype = Array (_, n)} = a.astart in (a.alength, n)
+   | Array3 -> let {reftype = Array (Array (_, m), n)} = a.astart in
+               (a.alength, n, m)
+
+let bigarray_of_array spec kind a =
+  let dims = array_dims spec a in
+  !@ (castp (bigarray spec dims kind) (Array.start a))
+
+let genarray = Genarray
+let array1 = Array1
+let array2 = Array2
+let array3 = Array3

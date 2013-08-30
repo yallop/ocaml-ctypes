@@ -69,6 +69,9 @@ let rec format_typ : type a. a typ ->
     | Array (ty, n) ->
       format_typ ty (fun _ fmt -> fprintf fmt "%t[%d]" (k `array) n) `nonarray
         fmt
+    | Bigarray ba ->
+      Format.fprintf fmt "<bigarray %a>%t"
+        Ctypes_bigarray.format ba (k `nonarray)
 and format_fields : type a. a boxed_field list -> Format.formatter -> unit =
   fun fields fmt ->
   let open Format in

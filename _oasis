@@ -16,6 +16,8 @@ Library ctypes
   InternalModules:  Common,
                     Primitives,
                     Primitive_details,
+                    Bigarray_stubs,
+                    Ctypes_bigarray,
                     Ctypes_raw,
                     Static,
                     Structs_computed,
@@ -30,10 +32,11 @@ Library ctypes
                     unsigned_stubs.h,unsigned_stubs.c,
                     raw_pointer.h,raw_pointer_stubs.c,
                     managed_buffer_stubs.h,managed_buffer_stubs.c,
+                    ctypes_bigarray_stubs.c,
                     type_info_stubs.h,type_info_stubs.c,
                     posix_types_stubs.c
   CCOpt:            -fPIC -Wall -Wno-unused-variable -O3
-  BuildDepends:     unix
+  BuildDepends:     unix,bigarray
   Install:          true
 
 Library "ctypes-foreign"
