@@ -106,6 +106,7 @@ let os_type = ref "Unix"
 let ccomp_type = ref "cc"
 let ffi_dir = ref ""
 let is_homebrew = ref false
+let homebrew_prefix = ref "/usr/local"
 
 let log_file = ref ""
 let caml_file = ref ""
@@ -236,7 +237,7 @@ let pkg_config choose flags =
   let cmd () =
     match choose with 
     |`Default -> ksprintf Sys.command "pkg-config %s > %s 2>&1" flags !log_file
-    |`Homebrew ver -> ksprintf Sys.command "env PKG_CONFIG_PATH=/usr/local/Cellar/libffi/%s/lib/pkgconfig /usr/local/bin/pkg-config %s > %s 2>&1" ver flags !log_file
+    |`Homebrew ver -> ksprintf Sys.command "env PKG_CONFIG_PATH=%s/Cellar/libffi/%s/lib/pkgconfig %s/bin/pkg-config %s > %s 2>&1" !homebrew_prefix ver !homebrew_prefix flags !log_file
   in
   if cmd () = 0 then begin
     let ic = open_in !log_file in
@@ -332,13 +333,25 @@ let () =
   is_homebrew := !not_available = [];
   not_available := [];
 
+  let get_homebrew_prefix () =
+    let cmd () = ksprintf Sys.command "brew --prefix > %s" !log_file in
+    if cmd () = 0 then begin
+      let ic = open_in !log_file in
+      let line = input_line ic in
+      close_in ic;
+      line
+    end else
+      raise Exit
+  in
+
   (* Test for pkg-config. If we are on MacOS X, we need the latest pkg-config
    * from Homebrew *)
   (match !is_homebrew with
-  |true -> (* Look in /usr/local for the right pkg-config *)
+  |true -> (* Look in `brew for the right pkg-config *)
+    homebrew_prefix := get_homebrew_prefix ();
     test_feature "pkg-config" ""
       (fun () ->
-         ksprintf Sys.command "/usr/local/bin/pkg-config --version > %s 2>&1" !log_file = 0);
+         ksprintf Sys.command "%s/bin/pkg-config --version > %s 2>&1" !homebrew_prefix !log_file = 0);
   |false ->
     test_feature "pkg-config" ""
       (fun () ->
