@@ -284,6 +284,15 @@ Executable test_ctypes_callback_lifetime
   BuildDepends:     unix,ctypes,ctypes.foreign,oUnit
   Custom:           true
 
+Executable test_stubs
+  Path:             tests
+  MainIs:           test_stubs.ml
+  Build$:           flag(tests)
+  CompiledObject:   best
+  Install:          false
+  BuildDepends:     unix,ctypes,ctypes.foreign,oUnit
+  Custom:           true
+
 Executable date_example
   Path:             examples/date
   MainIs:           date.ml
@@ -333,6 +342,11 @@ Test test_ctypes_cstdlib
 Test test_ctypes_sizeof
   Run$:             flag(tests)
   Command:          $test_ctypes_sizeof
+  WorkingDirectory: tests
+
+Test test_stubs
+  Run$:             flag(tests)
+  Command:          $test_stubs
   WorkingDirectory: tests
 
 Test test_ctypes_arrays

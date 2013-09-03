@@ -44,7 +44,10 @@ let ptr_of_raw_ptr p =
 let foreign_value ?from symbol t =
   from_voidp t (ptr_of_raw_ptr (dlsym ?handle:from ~symbol))
 
-let foreign ?from symbol typ = let open Ctypes in
-  let p = ptr_of_raw_ptr (dlsym ?handle:from ~symbol) in
-  let pp = to_voidp (allocate (ptr void) p) in
-  !@ (from_voidp (funptr ~name:symbol typ) pp)
+let foreign ?(stub = false) ?from symbol typ = let open Ctypes in
+  try
+    let p = ptr_of_raw_ptr (dlsym ?handle:from ~symbol) in
+    let pp = to_voidp (allocate (ptr void) p) in
+    !@ (from_voidp (funptr ~name:symbol typ) pp)
+  with 
+  | exn -> if stub then fun _ -> raise exn else raise exn

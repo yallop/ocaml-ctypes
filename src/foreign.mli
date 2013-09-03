@@ -7,10 +7,17 @@
 
 (** High-level bindings for C functions and values *)
 
-val foreign : ?from:Dl.library -> string -> ('a -> 'b) Ctypes.fn -> ('a -> 'b)
+val foreign : ?stub:bool -> ?from:Dl.library -> string -> 
+  ('a -> 'b) Ctypes.fn -> ('a -> 'b)
 (** [foreign name typ] exposes the C function of type [typ] named by [name] as
     an OCaml value.  The argument [?from], if supplied, is a library handle
-    returned by {!Dl.dlopen}.  *)
+    returned by {!Dl.dlopen}.  The argument [?stub], if [true] (defaults to 
+    [false]), indicates that the function should not raise an exception 
+    if [name] is not found but return an OCaml value that raises an 
+    exception when called. 
+
+    @raise Dl.DL_error if [name] is not found in [?from] and [?stub] is 
+    [false]. *)
 
 val foreign_value : ?from:Dl.library -> string -> 'a Ctypes.typ -> 'a Ctypes.ptr
 (** [foreign_value name typ] exposes the C value of type [typ] named by [name]
