@@ -23,8 +23,8 @@ let tm_yday  = int -: "tm_yday"  (* day in the year *)
 let tm_isdst = int -: "tm_isdst" (* daylight saving time *)
 let () = seal (tm : tm structure typ)
 
-let time = foreign "time" (ptr time_t @-> returning_checking_errno time_t)
-  
+let time = foreign "time" ~check_errno:true (ptr time_t @-> returning time_t)
+
 let asctime = foreign "asctime" (ptr tm @-> returning string)
 
 let localtime = foreign "localtime" (ptr time_t @-> returning (ptr tm))
