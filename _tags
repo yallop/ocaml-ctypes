@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 10b64b6d2039cf2f7168e0e57abe944f)
+# DO NOT EDIT (digest: ee3280c9bac2a7587e9dcbbd3151665d)
 # Ignore VCS directories, you can use the same kind of rule outside 
 # OASIS_START/STOP if you want to exclude directories that contains 
 # useless stuff for the build process
@@ -228,12 +228,19 @@
 <tests/test_callback_lifetime.{native,byte}>: pkg_unix
 <tests/test_callback_lifetime.{native,byte}>: pkg_oUnit
 <tests/test_callback_lifetime.{native,byte}>: pkg_threads
+<tests/test_callback_lifetime.{native,byte}>: custom
+# Executable test_stubs
+<tests/test_stubs.{native,byte}>: use_ctypes-foreign
+<tests/test_stubs.{native,byte}>: use_ctypes
+<tests/test_stubs.{native,byte}>: pkg_unix
+<tests/test_stubs.{native,byte}>: pkg_oUnit
+<tests/test_stubs.{native,byte}>: pkg_threads
 <tests/*.ml{,i}>: use_ctypes-foreign
 <tests/*.ml{,i}>: use_ctypes
 <tests/*.ml{,i}>: pkg_unix
 <tests/*.ml{,i}>: pkg_oUnit
 <tests/*.ml{,i}>: pkg_threads
-<tests/test_callback_lifetime.{native,byte}>: custom
+<tests/test_stubs.{native,byte}>: custom
 # Executable date_example
 <examples/date/date.{native,byte}>: use_ctypes-foreign
 <examples/date/date.{native,byte}>: use_ctypes
