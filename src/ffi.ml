@@ -101,7 +101,7 @@ let prep_callspec callspec ty =
 
 let rec box_function : type a. a fn -> Ffi_stubs.callspec -> a WeakRef.t -> Ffi_stubs.boxedfn
   = fun fn callspec -> match fn with
-    | Returns (_, ty) ->
+    | Returns ty ->
       let () = prep_callspec callspec ty in
       let write_rv = Memory.write ty in
       fun f -> Ffi_stubs.Done (write_rv ~offset:0 (WeakRef.get f), callspec)
@@ -122,26 +122,27 @@ let rec box_function : type a. a fn -> Ffi_stubs.callspec -> a WeakRef.t -> Ffi_
   add_argument callspec argn
   prep_callspec callspec rettype
 *)
-let rec build_ccallspec : type a. a fn -> Ffi_stubs.callspec -> a ccallspec
-  = fun fn callspec -> match fn with
-    | Returns (check_errno, t) ->
+let rec build_ccallspec : type a. check_errno:bool -> a fn -> Ffi_stubs.callspec
+  -> a ccallspec
+  = fun ~check_errno fn callspec -> match fn with
+    | Returns t ->
       let () = prep_callspec callspec t in
       Call (check_errno, Memory.build t ~offset:0)
     | Function (p, f) ->
       let offset = add_argument callspec p in
-      let rest = build_ccallspec f callspec in
+      let rest = build_ccallspec ~check_errno f callspec in
       WriteArg (Memory.write p ~offset, rest)
 
-let build_function ?name fn =
+let build_function ?name ~check_errno fn =
   let c = Ffi_stubs.allocate_callspec () in
-  let e = build_ccallspec fn c in
+  let e = build_ccallspec ~check_errno fn c in
   invoke name e [] c
 
 let ptr_of_rawptr raw_ptr =
   { raw_ptr ; pbyte_offset = 0; reftype = void; pmanaged = None }
 
-let function_of_pointer ?name fn =
-  let f = build_function ?name fn in
+let function_of_pointer ?name ~check_errno fn =
+  let f = build_function ?name ~check_errno fn in
   fun {raw_ptr} -> f raw_ptr
 
 let pointer_of_function fn =

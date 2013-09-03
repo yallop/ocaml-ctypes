@@ -92,7 +92,7 @@ and format_fn' : 'a. 'a fn ->
   (Format.formatter -> unit) =
   let rec gather : type a. a fn -> boxed_typ list * boxed_typ =
     function
-      | Returns (_, ty) -> [], BoxedType ty
+      | Returns ty -> [], BoxedType ty
       | Function (Void, fn) -> gather fn
       | Function (p, fn) -> let ps, r = gather fn in BoxedType p :: ps, r in
   fun fn k fmt ->

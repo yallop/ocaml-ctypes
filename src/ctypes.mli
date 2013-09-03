@@ -215,11 +215,6 @@ val returning : 'a typ -> 'a fn
     to be used together with {!(@->)}; see the documentation for {!(@->)} for an
     example. *)
 
-val returning_checking_errno : 'a typ -> 'a fn
-(** Give the return type of a C function.  This behaves like {!returning},
-    except that calls to functions bound using [returning_checking_errno] check
-    whether errno has been updated and raise {!Unix.Unix_error} if so. *)
-
 (** {3 Struct and union types} *)
 
 type ('a, 'kind) structured = ('a, 'kind) Static.structured

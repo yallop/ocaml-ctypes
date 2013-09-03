@@ -14,9 +14,9 @@ let format_function_pointer fn k fmt =
   Type_printing.format_fn' fn
     (fun fmt -> Format.fprintf fmt "(*%t)" k) fmt
 
-let funptr ?name fn =
+let funptr ?name ?(check_errno=false) fn =
   let open Ffi in
-  let read = function_of_pointer ?name fn
+  let read = function_of_pointer ~check_errno ?name fn
   and write = pointer_of_function fn
   and format_typ = format_function_pointer fn in
   Static.(view ~format_typ ~read ~write (ptr void))
@@ -44,10 +44,10 @@ let ptr_of_raw_ptr p =
 let foreign_value ?from symbol t =
   from_voidp t (ptr_of_raw_ptr (dlsym ?handle:from ~symbol))
 
-let foreign ?(stub = false) ?from symbol typ = let open Ctypes in
+let foreign ?from ?(stub=false) ?(check_errno=false) symbol typ =
   try
     let p = ptr_of_raw_ptr (dlsym ?handle:from ~symbol) in
     let pp = to_voidp (allocate (ptr void) p) in
-    !@ (from_voidp (funptr ~name:symbol typ) pp)
+    !@ (from_voidp (funptr ~name:symbol ~check_errno typ) pp)
   with 
   | exn -> if stub then fun _ -> raise exn else raise exn
