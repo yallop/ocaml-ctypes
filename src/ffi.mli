@@ -9,7 +9,8 @@ open Static
 
 (** Dynamic function calls based on libffi *)
 
-val function_of_pointer : ?name:string -> ('a -> 'b) fn -> unit ptr -> ('a -> 'b)
+val function_of_pointer : ?name:string -> check_errno:bool -> ('a -> 'b) fn ->
+  unit ptr -> ('a -> 'b)
 (** Build an OCaml function from a type specification and a pointer to a C
     function. *)
 

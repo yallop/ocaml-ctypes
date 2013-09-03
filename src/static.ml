@@ -69,8 +69,7 @@ and 'a union_type = {
 and 's boxed_field = BoxedField : ('a, 's) field -> 's boxed_field
 
 type _ fn =
-  (* The flag indicates whether we should check errno *)
-  | Returns  : bool * 'a typ   -> 'a fn
+  | Returns  : 'a typ   -> 'a fn
   | Function : 'a typ * 'b fn  -> ('a -> 'b) fn
 
 type boxed_typ = BoxedType : 'a typ -> boxed_typ
@@ -155,8 +154,7 @@ let returning v =
   if not (passable v) then
     raise (Unsupported "Unsupported return type")
   else
-    Returns (false, v)
-let returning_checking_errno v = Returns (true, v)
+    Returns v
 
 let structure tag =
   Struct { spec = Incomplete { isize = 0 }; tag; fields = [] }
