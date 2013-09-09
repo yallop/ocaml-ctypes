@@ -153,6 +153,54 @@ end
  
 
 (*
+  Test the behaviour of sizeof on bigarray types.
+*)
+let test_sizeof_bigarrays () =
+  let module M = struct
+    module B = Bigarray
+    type k = K : ('a, 'b) Bigarray.kind * int -> k
+    let kind_sizes = [
+      K (B.float32, 4);
+      K (B.float64, 8);
+      K (B.int8_signed, 1);
+      K (B.int8_unsigned, 1);
+      K (B.int16_signed, 2);
+      K (B.int16_unsigned, 2);
+      K (B.int32, 4);
+      K (B.int64, 8);
+      K (B.int, sizeof (ptr void));
+      K (B.nativeint, sizeof (ptr void));
+      K (B.complex32, 8);
+      K (B.complex64, 16);
+      K (B.char, 1);
+    ]
+
+    let () = begin
+      (* Genarray.t sizes *)
+      List.iter (fun (K (kind, size)) ->
+        assert_equal (2 * 3 * 5 * size) (sizeof (bigarray genarray [|2; 3; 5|] kind)))
+        kind_sizes;
+
+      (* Array1.t sizes *)
+      List.iter (fun (K (kind, size)) ->
+        assert_equal (7 * size) (sizeof (bigarray array1 7 kind)))
+        kind_sizes;
+
+      (* Array2.t sizes *)
+      List.iter (fun (K (kind, size)) ->
+        assert_equal (2 * 3 * size) (sizeof (bigarray array2 (2, 3) kind)))
+        kind_sizes;
+
+      (* Array3.t sizes *)
+      List.iter (fun (K (kind, size)) ->
+        assert_equal (2 * 3 * 5 * size) (sizeof (bigarray array3 (2, 3, 5) kind)))
+        kind_sizes;
+    end
+  end in
+  ()
+ 
+
+(*
   Test that all pointers have equal size.
 *)
 let test_sizeof_pointers () = begin
@@ -208,6 +256,9 @@ let suite = "sizeof tests" >:::
 
    "sizeof arrays"
    >:: test_sizeof_arrays;
+
+   "sizeof bigarrays"
+   >:: test_sizeof_bigarrays;
 
    "sizeof pointers"
    >:: test_sizeof_pointers;

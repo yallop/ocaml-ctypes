@@ -40,6 +40,7 @@ let rec arg_type : type a. a typ -> arg_type = function
   | Struct ({ spec = Complete _ } as s) -> struct_arg_type s
   | View { ty }                         -> arg_type ty
   | Array _                             -> report_unpassable "arrays"
+  | Bigarray _                          -> report_unpassable "bigarrays"
   | Abstract _                          -> (report_unpassable
                                               "values of abstract type")
   (* The following case should never happen; incomplete types are excluded

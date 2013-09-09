@@ -1,8 +1,8 @@
 # OASIS_START
-# DO NOT EDIT (digest: 33f371455a0bf9019aea36d7e3b7bf91)
+# DO NOT EDIT (digest: 481feed51ddd9a3351bc4071cc99663a)
 version = "0.1"
 description = "Combinators for binding to C libraries without writing any C."
-requires = "unix"
+requires = "unix bigarray"
 archive(byte) = "ctypes.cma"
 archive(byte, plugin) = "ctypes.cma"
 archive(native) = "ctypes.cmxa"

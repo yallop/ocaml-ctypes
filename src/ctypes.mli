@@ -183,6 +183,11 @@ val string_opt : string option typ
 
 (** {3 Array types} *)
 
+(** {4 C array types} *) 
+
+type 'a std_array = 'a array
+(**/**)
+
 type 'a array
 (** The type of C array values.  A value of type [t array] can be used to read
     and write array objects in C-managed storage. *)
@@ -191,6 +196,53 @@ val array : int -> 'a typ -> 'a array typ
 (** Construct a sized array type from a length and an existing type (called
     the {i element type}). *)
 
+(** {4 Bigarray types} *)
+
+type _ bigarray_class
+(** The type of Bigarray classes.  There are four instances, one for each of
+    the Bigarray submodules. *)
+
+val genarray :
+  < element: 'a;
+    ba_repr: 'b;
+    bigarray: ('a, 'b, Bigarray.c_layout) Bigarray.Genarray.t;
+    carray: 'a array;
+    dims: int std_array > bigarray_class
+(** The class of {!Bigarray.Genarray.t} values *)
+
+val array1 :
+  < element: 'a;
+    ba_repr: 'b;
+    bigarray: ('a, 'b, Bigarray.c_layout) Bigarray.Array1.t;
+    carray: 'a array;
+    dims: int > bigarray_class
+(** The class of {!Bigarray.Array1.t} values *)
+
+val array2 :
+  < element: 'a;
+    ba_repr: 'b;
+    bigarray: ('a, 'b, Bigarray.c_layout) Bigarray.Array2.t;
+    carray: 'a array array;
+    dims: int * int > bigarray_class
+(** The class of {!Bigarray.Array2.t} values *)
+
+val array3 :
+  < element: 'a;
+    ba_repr: 'b;
+    bigarray: ('a, 'b, Bigarray.c_layout) Bigarray.Array3.t;
+    carray: 'a array array array;
+    dims: int * int * int > bigarray_class
+(** The class of {!Bigarray.Array3.t} values *)
+
+val bigarray :
+  < element: 'a;
+    ba_repr: 'b;
+    dims: 'dims;
+    bigarray: 'bigarray;
+    carray: _ > bigarray_class ->
+   'dims -> ('a, 'b) Bigarray.kind -> 'bigarray typ
+(** Construct a sized bigarray type representation from a bigarray class, the
+    dimensions, and the {!Bigarray.kind}. *)
 
 (** {3 Function types} *)
 
@@ -408,6 +460,8 @@ val ptr_of_raw_address : int64 -> unit ptr
 
 (** {3 Array values} *)
 
+(** {4 C array values} *)
+
 module Array :
 sig
   type 'a t = 'a array
@@ -467,6 +521,38 @@ sig
 (** Retrieve the element type of an array. *)
 end
 (** Operations on C arrays. *)
+
+(** {4 Bigarray values} *)
+val bigarray_start : < element: 'a;
+                       ba_repr: _;
+                       bigarray: 'b;
+                       carray: _;
+                       dims: _ > bigarray_class -> 'b -> 'a ptr
+(** Return the address of the first element of the given Bigarray value. *)
+
+val bigarray_of_ptr : < element: 'a;
+                        ba_repr: 'f;
+                        bigarray: 'b;
+                        carray: _;
+                        dims: 'i > bigarray_class ->
+    'i -> ('a, 'f) Bigarray.kind -> 'a ptr -> 'b
+(** Convert a C pointer to a bigarray value. *)
+
+val array_of_bigarray : < element: _;
+                          ba_repr: _;
+                          bigarray: 'b;
+                          carray: 'c;
+                          dims: _ > bigarray_class -> 'b -> 'c
+(** Convert a C array to a Bigarray value. *)
+
+val bigarray_of_array : < element: 'a;
+                          ba_repr: 'f;
+                          bigarray: 'b;
+                          carray: 'c array;
+                          dims: 'i > bigarray_class ->
+    ('a, 'f) Bigarray.kind -> 'c array -> 'b
+(** Convert a Bigarray value to a C array. *)
+
 
 (** {3 Struct and union values} *)
 
