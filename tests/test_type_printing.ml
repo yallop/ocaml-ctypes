@@ -384,6 +384,54 @@ let test_array_printing () =
 
 
 (*
+  Test the printing of bigarray types.
+*)
+let test_bigarray_printing () =
+  begin
+    assert_typ_printed_as "<bigarray float32[10][100]>"
+      (bigarray genarray [|10; 100|] Bigarray.float32);
+
+    assert_typ_printed_as "<bigarray float64[20][30][40]>"
+      (bigarray genarray [|20; 30; 40|] Bigarray.float64);
+
+    assert_typ_printed_as "<bigarray int8_signed[1][3]>"
+      (bigarray genarray [|1; 3|] Bigarray.int8_signed);
+
+    assert_typ_printed_as "<bigarray int8_unsigned[2]>"
+      (bigarray array1 2 Bigarray.int8_unsigned);
+
+    assert_typ_printed_as "<bigarray int16_signed[3]>"
+      (bigarray array1 3 Bigarray.int16_signed);
+
+    assert_typ_printed_as "<bigarray int16_unsigned[4]>"
+      (bigarray array1 4 Bigarray.int16_unsigned);
+
+    assert_typ_printed_as "<bigarray int32[5][6]>"
+      (bigarray array2 (5, 6) Bigarray.int32);
+
+    assert_typ_printed_as "<bigarray int64[7][8]>"
+      (bigarray array2 (7, 8) Bigarray.int64);
+
+    assert_typ_printed_as "<bigarray int[9][10]>"
+      (bigarray array2 (9, 10) Bigarray.int);
+
+    assert_typ_printed_as "<bigarray nativeint[13][14][15]>"
+      (bigarray array3 (13, 14, 15) Bigarray.nativeint);
+
+    assert_typ_printed_as "<bigarray complex32[16][17][18]>"
+      (bigarray array3 (16, 17, 18) Bigarray.complex32);
+
+    assert_typ_printed_as "<bigarray complex64[19][20][21]>"
+      (bigarray array3 (19, 20, 21) Bigarray.complex64);
+
+    assert_typ_printed_as ~name:"b" "int (*b[10])(<bigarray int[5]> *)"
+      (array 10
+         (Foreign.funptr (ptr (bigarray genarray [|5|] Bigarray.int) @->
+                          returning int)));
+  end
+
+
+(*
   Test the printing of function types.
 *)
 let test_function_printing () =
@@ -451,6 +499,9 @@ let suite = "Type printing tests" >:::
 
    "printing arrays"
     >:: test_array_printing;
+
+   "printing bigarrays"
+    >:: test_bigarray_printing;
 
    "printing functions"
     >:: test_function_printing;

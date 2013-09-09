@@ -225,6 +225,55 @@ let test_struct_tail_padding () =
   end in ()
 
 
+(* 
+   Test that the alignment of a bigarray is the same as the alignment
+   of its element type.
+*)
+let test_bigarray_alignment () =
+  let module M = struct
+    module B = Bigarray
+    type k = K : ('a, 'b) Bigarray.kind * int -> k
+    let kind_alignments = [
+      K (B.float32, alignment float);
+      K (B.float64, alignment double);
+      K (B.int8_signed, alignment int8_t);
+      K (B.int8_unsigned, alignment uint8_t);
+      K (B.int16_signed, alignment int16_t);
+      K (B.int16_unsigned, alignment uint16_t);
+      K (B.int32, alignment int32_t);
+      K (B.int64, alignment int64_t);
+      K (B.int, alignment (ptr void));
+      K (B.nativeint, alignment (ptr void));
+      K (B.complex32, alignment complex32);
+      K (B.complex64, alignment complex64);
+      K (B.char, alignment char);
+    ]
+
+    let () = begin
+      (* Genarray.t alignments *)
+      List.iter (fun (K (kind, ealign)) ->
+        assert_equal ealign (alignment (bigarray genarray [|2; 3; 5|] kind)))
+        kind_alignments;
+
+      (* Array1.t alignments *)
+      List.iter (fun (K (kind, ealign)) ->
+        assert_equal ealign (alignment (bigarray array1 7 kind)))
+        kind_alignments;
+
+      (* Array2.t alignments *)
+      List.iter (fun (K (kind, ealign)) ->
+        assert_equal ealign (alignment (bigarray array1 7 kind)))
+        kind_alignments;
+
+      (* Array3.t alignments *)
+      List.iter (fun (K (kind, ealign)) ->
+        assert_equal ealign (alignment (bigarray array3 (2, 3, 5) kind)))
+        kind_alignments;
+    end
+  end in
+  ()
+
+
 let suite = "Alignment tests" >:::
   ["struct tail padding"
     >:: test_struct_tail_padding;
@@ -240,6 +289,9 @@ let suite = "Alignment tests" >:::
 
    "alignment of incomplete types"
    >:: test_incomplete_alignment;
+
+   "alignment of bigarray types"
+   >:: test_bigarray_alignment;
   ]
 
 

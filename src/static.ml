@@ -25,6 +25,8 @@ type abstract_type = {
   aalignment : int;
 }
 
+type 'a std_array = 'a array
+
 type _ typ =
     Void            :                       unit typ
   | Primitive       : 'a Primitives.prim -> 'a typ 
@@ -34,6 +36,8 @@ type _ typ =
   | Abstract        : abstract_type      -> 'a abstract typ
   | View            : ('a, 'b) view      -> 'a typ
   | Array           : 'a typ * int       -> 'a array typ
+  | Bigarray        : (_, 'a) Ctypes_bigarray.t
+                                         -> 'a typ
 and 'a ptr = { reftype      : 'a typ;
                raw_ptr      : Ctypes_raw.voidp;
                pmanaged     : Obj.t option;
@@ -68,6 +72,32 @@ and 'a union_type = {
 }
 and 's boxed_field = BoxedField : ('a, 's) field -> 's boxed_field
 
+type _ bigarray_class =
+  Genarray :
+  < element: 'a;
+    dims: int std_array;
+    ba_repr: 'b;
+    bigarray: ('a, 'b, Bigarray.c_layout) Bigarray.Genarray.t;
+    carray: 'a array > bigarray_class
+| Array1 :
+  < element: 'a;
+    dims: int;
+    ba_repr: 'b;
+    bigarray: ('a, 'b, Bigarray.c_layout) Bigarray.Array1.t;
+    carray: 'a array > bigarray_class
+| Array2 :
+  < element: 'a;
+    dims: int * int;
+    ba_repr: 'b;
+    bigarray: ('a, 'b, Bigarray.c_layout) Bigarray.Array2.t;
+    carray: 'a array array > bigarray_class
+| Array3 :
+  < element: 'a;
+    dims: int * int * int;
+    ba_repr: 'b;
+    bigarray: ('a, 'b, Bigarray.c_layout) Bigarray.Array3.t;
+    carray: 'a array array array > bigarray_class
+
 type _ fn =
   | Returns  : 'a typ   -> 'a fn
   | Function : 'a typ * 'b fn  -> ('a -> 'b) fn
@@ -84,6 +114,7 @@ let rec sizeof : type a. a typ -> int = function
   | Union { uspec = Some { size } }
                                    -> size
   | Array (t, i)                   -> i * sizeof t
+  | Bigarray ba                    -> Ctypes_bigarray.sizeof ba
   | Abstract { asize }             -> asize
   | Pointer _                      -> Primitive_details.pointer_size
   | View { ty }                    -> sizeof ty
@@ -97,6 +128,7 @@ let rec alignment : type a. a typ -> int = function
   | Union { uspec = None }           -> raise IncompleteType
   | Union { uspec = Some { align } } -> align
   | Array (t, _)                     -> alignment t
+  | Bigarray ba                      -> Ctypes_bigarray.alignment ba
   | Abstract { aalignment }          -> aalignment
   | Pointer _                        -> Primitive_details.pointer_alignment 
   | View { ty }                      -> alignment ty
@@ -109,6 +141,7 @@ let rec passable : type a. a typ -> bool = function
   | Union  { uspec = None }        -> raise IncompleteType
   | Union  { uspec = Some _ }      -> true
   | Array _                        -> false
+  | Bigarray _                     -> false
   | Pointer _                      -> true
   | Abstract _                     -> false
   | View { ty }                    -> passable ty
@@ -150,6 +183,20 @@ let ( @->) f t =
 let abstract ~name ~size ~alignment =
   Abstract { aname = name; asize = size; aalignment = alignment }
 let view ?format_typ ~read ~write ty = View { read; write; format_typ; ty }
+let bigarray : type a b c d e.
+  < element: a;
+    dims: b;
+    ba_repr: c;
+    bigarray: d;
+    carray: e > bigarray_class ->
+   b -> (a, c) Bigarray.kind -> d typ =
+  fun spec dims kind -> match spec with
+  | Genarray -> Bigarray (Ctypes_bigarray.bigarray dims kind)
+  | Array1 -> Bigarray (Ctypes_bigarray.bigarray1 dims kind)
+  | Array2 -> let d1, d2 = dims in
+              Bigarray (Ctypes_bigarray.bigarray2 d1 d2 kind)
+  | Array3 -> let d1, d2, d3 = dims in
+              Bigarray (Ctypes_bigarray.bigarray3 d1 d2 d3 kind)
 let returning v =
   if not (passable v) then
     raise (Unsupported "Unsupported return type")

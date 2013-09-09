@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: ee3280c9bac2a7587e9dcbbd3151665d)
+# DO NOT EDIT (digest: 67380628ed4c80a037c1317628c355a5)
 # Ignore VCS directories, you can use the same kind of rule outside 
 # OASIS_START/STOP if you want to exclude directories that contains 
 # useless stuff for the build process
@@ -19,14 +19,22 @@
 "src/unsigned_stubs.c": oasis_library_ctypes_ccopt
 "src/raw_pointer_stubs.c": oasis_library_ctypes_ccopt
 "src/managed_buffer_stubs.c": oasis_library_ctypes_ccopt
+"src/ctypes_bigarray_stubs.c": oasis_library_ctypes_ccopt
 "src/type_info_stubs.c": oasis_library_ctypes_ccopt
 "src/posix_types_stubs.c": oasis_library_ctypes_ccopt
 <src/ctypes.{cma,cmxa}>: use_libctypes_stubs
 "src/unsigned_stubs.c": pkg_unix
+"src/unsigned_stubs.c": pkg_bigarray
 "src/raw_pointer_stubs.c": pkg_unix
+"src/raw_pointer_stubs.c": pkg_bigarray
 "src/managed_buffer_stubs.c": pkg_unix
+"src/managed_buffer_stubs.c": pkg_bigarray
+"src/ctypes_bigarray_stubs.c": pkg_unix
+"src/ctypes_bigarray_stubs.c": pkg_bigarray
 "src/type_info_stubs.c": pkg_unix
+"src/type_info_stubs.c": pkg_bigarray
 "src/posix_types_stubs.c": pkg_unix
+"src/posix_types_stubs.c": pkg_bigarray
 # Library ctypes-foreign
 "src/ctypes-foreign.cmxs": use_ctypes-foreign
 <src/*.ml{,i}>: oasis_library_ctypes_foreign_ccopt
@@ -37,15 +45,19 @@
 <src/*.ml{,i}>: use_ctypes
 <src/*.ml{,i}>: pkg_unix
 <src/*.ml{,i}>: pkg_threads
+<src/*.ml{,i}>: pkg_bigarray
 "src/dl_stubs.c": use_ctypes
 "src/dl_stubs.c": pkg_unix
 "src/dl_stubs.c": pkg_threads
+"src/dl_stubs.c": pkg_bigarray
 "src/ffi_type_stubs.c": use_ctypes
 "src/ffi_type_stubs.c": pkg_unix
 "src/ffi_type_stubs.c": pkg_threads
+"src/ffi_type_stubs.c": pkg_bigarray
 "src/ffi_call_stubs.c": use_ctypes
 "src/ffi_call_stubs.c": pkg_unix
 "src/ffi_call_stubs.c": pkg_threads
+"src/ffi_call_stubs.c": pkg_bigarray
 # Library fts
 "examples/fts/fts.cmxs": use_fts
 # Library sigset
@@ -54,6 +66,7 @@
 <examples/sigset/*.ml{,i}>: use_ctypes
 <examples/sigset/*.ml{,i}>: pkg_unix
 <examples/sigset/*.ml{,i}>: pkg_threads
+<examples/sigset/*.ml{,i}>: pkg_bigarray
 # Library ncurses
 "examples/ncurses/ncurses.cmxs": use_ncurses
 <examples/ncurses/ncurses.{cma,cmxa}>: oasis_library_ncurses_cclib
@@ -62,17 +75,20 @@
 <top/*.ml{,i}>: use_ctypes
 <top/*.ml{,i}>: pkg_unix
 <top/*.ml{,i}>: pkg_compiler-libs.toplevel
+<top/*.ml{,i}>: pkg_bigarray
 # Executable ncurses_cmd
 <examples/ncurses/ncurses_cmd.{native,byte}>: use_ncurses
 <examples/ncurses/ncurses_cmd.{native,byte}>: use_ctypes-foreign
 <examples/ncurses/ncurses_cmd.{native,byte}>: use_ctypes
 <examples/ncurses/ncurses_cmd.{native,byte}>: pkg_unix
 <examples/ncurses/ncurses_cmd.{native,byte}>: pkg_threads
+<examples/ncurses/ncurses_cmd.{native,byte}>: pkg_bigarray
 <examples/ncurses/*.ml{,i}>: use_ncurses
 <examples/ncurses/*.ml{,i}>: use_ctypes-foreign
 <examples/ncurses/*.ml{,i}>: use_ctypes
 <examples/ncurses/*.ml{,i}>: pkg_unix
 <examples/ncurses/*.ml{,i}>: pkg_threads
+<examples/ncurses/*.ml{,i}>: pkg_bigarray
 <examples/ncurses/ncurses_cmd.{native,byte}>: custom
 # Executable fts_cmd
 <examples/fts/fts_cmd.{native,byte}>: use_fts
@@ -80,11 +96,13 @@
 <examples/fts/fts_cmd.{native,byte}>: use_ctypes
 <examples/fts/fts_cmd.{native,byte}>: pkg_unix
 <examples/fts/fts_cmd.{native,byte}>: pkg_threads
+<examples/fts/fts_cmd.{native,byte}>: pkg_bigarray
 <examples/fts/*.ml{,i}>: use_fts
 <examples/fts/*.ml{,i}>: use_ctypes-foreign
 <examples/fts/*.ml{,i}>: use_ctypes
 <examples/fts/*.ml{,i}>: pkg_unix
 <examples/fts/*.ml{,i}>: pkg_threads
+<examples/fts/*.ml{,i}>: pkg_bigarray
 <examples/fts/fts_cmd.{native,byte}>: custom
 # Executable test_ctypes_raw
 <tests/test_raw.{native,byte}>: use_ctypes-foreign
@@ -92,6 +110,7 @@
 <tests/test_raw.{native,byte}>: pkg_unix
 <tests/test_raw.{native,byte}>: pkg_oUnit
 <tests/test_raw.{native,byte}>: pkg_threads
+<tests/test_raw.{native,byte}>: pkg_bigarray
 <tests/test_raw.{native,byte}>: custom
 # Executable test_ctypes_pointers
 <tests/test_pointers.{native,byte}>: use_ctypes-foreign
@@ -99,6 +118,7 @@
 <tests/test_pointers.{native,byte}>: pkg_unix
 <tests/test_pointers.{native,byte}>: pkg_oUnit
 <tests/test_pointers.{native,byte}>: pkg_threads
+<tests/test_pointers.{native,byte}>: pkg_bigarray
 <tests/test_pointers.{native,byte}>: custom
 # Executable test_ctypes_higher_order
 <tests/test_higher_order.{native,byte}>: use_ctypes-foreign
@@ -106,6 +126,7 @@
 <tests/test_higher_order.{native,byte}>: pkg_unix
 <tests/test_higher_order.{native,byte}>: pkg_oUnit
 <tests/test_higher_order.{native,byte}>: pkg_threads
+<tests/test_higher_order.{native,byte}>: pkg_bigarray
 <tests/test_higher_order.{native,byte}>: custom
 # Executable test_ctypes_structs
 <tests/test_structs.{native,byte}>: use_ctypes-foreign
@@ -113,6 +134,7 @@
 <tests/test_structs.{native,byte}>: pkg_unix
 <tests/test_structs.{native,byte}>: pkg_oUnit
 <tests/test_structs.{native,byte}>: pkg_threads
+<tests/test_structs.{native,byte}>: pkg_bigarray
 <tests/test_structs.{native,byte}>: custom
 # Executable test_ctypes_finalisers
 <tests/test_finalisers.{native,byte}>: use_ctypes-foreign
@@ -120,6 +142,7 @@
 <tests/test_finalisers.{native,byte}>: pkg_unix
 <tests/test_finalisers.{native,byte}>: pkg_oUnit
 <tests/test_finalisers.{native,byte}>: pkg_threads
+<tests/test_finalisers.{native,byte}>: pkg_bigarray
 <tests/test_finalisers.{native,byte}>: custom
 # Executable test_ctypes_cstdlib
 <tests/test_cstdlib.{native,byte}>: use_ctypes-foreign
@@ -127,6 +150,7 @@
 <tests/test_cstdlib.{native,byte}>: pkg_unix
 <tests/test_cstdlib.{native,byte}>: pkg_oUnit
 <tests/test_cstdlib.{native,byte}>: pkg_threads
+<tests/test_cstdlib.{native,byte}>: pkg_bigarray
 <tests/test_cstdlib.{native,byte}>: custom
 # Executable test_ctypes_sizeof
 <tests/test_sizeof.{native,byte}>: use_ctypes-foreign
@@ -134,6 +158,7 @@
 <tests/test_sizeof.{native,byte}>: pkg_unix
 <tests/test_sizeof.{native,byte}>: pkg_oUnit
 <tests/test_sizeof.{native,byte}>: pkg_threads
+<tests/test_sizeof.{native,byte}>: pkg_bigarray
 <tests/test_sizeof.{native,byte}>: custom
 # Executable test_ctypes_unions
 <tests/test_unions.{native,byte}>: use_ctypes-foreign
@@ -141,6 +166,7 @@
 <tests/test_unions.{native,byte}>: pkg_unix
 <tests/test_unions.{native,byte}>: pkg_oUnit
 <tests/test_unions.{native,byte}>: pkg_threads
+<tests/test_unions.{native,byte}>: pkg_bigarray
 <tests/test_unions.{native,byte}>: custom
 # Executable test_ctypes_custom_ops
 <tests/test_custom_ops.{native,byte}>: use_ctypes-foreign
@@ -148,6 +174,7 @@
 <tests/test_custom_ops.{native,byte}>: pkg_unix
 <tests/test_custom_ops.{native,byte}>: pkg_oUnit
 <tests/test_custom_ops.{native,byte}>: pkg_threads
+<tests/test_custom_ops.{native,byte}>: pkg_bigarray
 <tests/test_custom_ops.{native,byte}>: custom
 # Executable test_ctypes_arrays
 <tests/test_array.{native,byte}>: use_ctypes-foreign
@@ -155,6 +182,7 @@
 <tests/test_array.{native,byte}>: pkg_unix
 <tests/test_array.{native,byte}>: pkg_oUnit
 <tests/test_array.{native,byte}>: pkg_threads
+<tests/test_array.{native,byte}>: pkg_bigarray
 <tests/test_array.{native,byte}>: custom
 # Executable test_ctypes_errno
 <tests/test_errno.{native,byte}>: use_ctypes-foreign
@@ -162,6 +190,7 @@
 <tests/test_errno.{native,byte}>: pkg_unix
 <tests/test_errno.{native,byte}>: pkg_oUnit
 <tests/test_errno.{native,byte}>: pkg_threads
+<tests/test_errno.{native,byte}>: pkg_bigarray
 <tests/test_errno.{native,byte}>: custom
 # Executable test_ctypes_passable
 <tests/test_passable.{native,byte}>: use_ctypes-foreign
@@ -169,6 +198,7 @@
 <tests/test_passable.{native,byte}>: pkg_unix
 <tests/test_passable.{native,byte}>: pkg_oUnit
 <tests/test_passable.{native,byte}>: pkg_threads
+<tests/test_passable.{native,byte}>: pkg_bigarray
 <tests/test_passable.{native,byte}>: custom
 # Executable test_ctypes_alignment
 <tests/test_alignment.{native,byte}>: use_ctypes-foreign
@@ -176,6 +206,7 @@
 <tests/test_alignment.{native,byte}>: pkg_unix
 <tests/test_alignment.{native,byte}>: pkg_oUnit
 <tests/test_alignment.{native,byte}>: pkg_threads
+<tests/test_alignment.{native,byte}>: pkg_bigarray
 <tests/test_alignment.{native,byte}>: custom
 # Executable test_ctypes_views
 <tests/test_views.{native,byte}>: use_ctypes-foreign
@@ -183,6 +214,7 @@
 <tests/test_views.{native,byte}>: pkg_unix
 <tests/test_views.{native,byte}>: pkg_oUnit
 <tests/test_views.{native,byte}>: pkg_threads
+<tests/test_views.{native,byte}>: pkg_bigarray
 <tests/test_views.{native,byte}>: custom
 # Executable test_ctypes_global_values
 <tests/test_foreign_values.{native,byte}>: use_ctypes-foreign
@@ -190,6 +222,7 @@
 <tests/test_foreign_values.{native,byte}>: pkg_unix
 <tests/test_foreign_values.{native,byte}>: pkg_oUnit
 <tests/test_foreign_values.{native,byte}>: pkg_threads
+<tests/test_foreign_values.{native,byte}>: pkg_bigarray
 <tests/test_foreign_values.{native,byte}>: custom
 # Executable test_ctypes_oo_style
 <tests/test_oo_style.{native,byte}>: use_ctypes-foreign
@@ -197,6 +230,7 @@
 <tests/test_oo_style.{native,byte}>: pkg_unix
 <tests/test_oo_style.{native,byte}>: pkg_oUnit
 <tests/test_oo_style.{native,byte}>: pkg_threads
+<tests/test_oo_style.{native,byte}>: pkg_bigarray
 <tests/test_oo_style.{native,byte}>: custom
 # Executable test_ctypes_type_printing
 <tests/test_type_printing.{native,byte}>: use_ctypes-foreign
@@ -205,6 +239,7 @@
 <tests/test_type_printing.{native,byte}>: pkg_oUnit
 <tests/test_type_printing.{native,byte}>: pkg_str
 <tests/test_type_printing.{native,byte}>: pkg_threads
+<tests/test_type_printing.{native,byte}>: pkg_bigarray
 <tests/test_type_printing.{native,byte}>: custom
 # Executable test_ctypes_value_printing
 <tests/test_value_printing.{native,byte}>: use_ctypes-foreign
@@ -213,6 +248,7 @@
 <tests/test_value_printing.{native,byte}>: pkg_oUnit
 <tests/test_value_printing.{native,byte}>: pkg_str
 <tests/test_value_printing.{native,byte}>: pkg_threads
+<tests/test_value_printing.{native,byte}>: pkg_bigarray
 <tests/*.ml{,i}>: pkg_str
 <tests/test_value_printing.{native,byte}>: custom
 # Executable test_ctypes_complex
@@ -221,6 +257,7 @@
 <tests/test_complex.{native,byte}>: pkg_unix
 <tests/test_complex.{native,byte}>: pkg_oUnit
 <tests/test_complex.{native,byte}>: pkg_threads
+<tests/test_complex.{native,byte}>: pkg_bigarray
 <tests/test_complex.{native,byte}>: custom
 # Executable test_ctypes_callback_lifetime
 <tests/test_callback_lifetime.{native,byte}>: use_ctypes-foreign
@@ -228,6 +265,7 @@
 <tests/test_callback_lifetime.{native,byte}>: pkg_unix
 <tests/test_callback_lifetime.{native,byte}>: pkg_oUnit
 <tests/test_callback_lifetime.{native,byte}>: pkg_threads
+<tests/test_callback_lifetime.{native,byte}>: pkg_bigarray
 <tests/test_callback_lifetime.{native,byte}>: custom
 # Executable test_stubs
 <tests/test_stubs.{native,byte}>: use_ctypes-foreign
@@ -235,23 +273,35 @@
 <tests/test_stubs.{native,byte}>: pkg_unix
 <tests/test_stubs.{native,byte}>: pkg_oUnit
 <tests/test_stubs.{native,byte}>: pkg_threads
+<tests/test_stubs.{native,byte}>: pkg_bigarray
+<tests/test_stubs.{native,byte}>: custom
+# Executable test_ctypes_bigarrays
+<tests/test_bigarrays.{native,byte}>: use_ctypes-foreign
+<tests/test_bigarrays.{native,byte}>: use_ctypes
+<tests/test_bigarrays.{native,byte}>: pkg_unix
+<tests/test_bigarrays.{native,byte}>: pkg_oUnit
+<tests/test_bigarrays.{native,byte}>: pkg_threads
+<tests/test_bigarrays.{native,byte}>: pkg_bigarray
 <tests/*.ml{,i}>: use_ctypes-foreign
 <tests/*.ml{,i}>: use_ctypes
 <tests/*.ml{,i}>: pkg_unix
 <tests/*.ml{,i}>: pkg_oUnit
 <tests/*.ml{,i}>: pkg_threads
-<tests/test_stubs.{native,byte}>: custom
+<tests/*.ml{,i}>: pkg_bigarray
+<tests/test_bigarrays.{native,byte}>: custom
 # Executable date_example
 <examples/date/date.{native,byte}>: use_ctypes-foreign
 <examples/date/date.{native,byte}>: use_ctypes
 <examples/date/date.{native,byte}>: pkg_unix
 <examples/date/date.{native,byte}>: pkg_oUnit
 <examples/date/date.{native,byte}>: pkg_threads
+<examples/date/date.{native,byte}>: pkg_bigarray
 <examples/date/*.ml{,i}>: use_ctypes-foreign
 <examples/date/*.ml{,i}>: use_ctypes
 <examples/date/*.ml{,i}>: pkg_unix
 <examples/date/*.ml{,i}>: pkg_oUnit
 <examples/date/*.ml{,i}>: pkg_threads
+<examples/date/*.ml{,i}>: pkg_bigarray
 <examples/date/date.{native,byte}>: custom
 # OASIS_STOP
 <tests/clib/*>: not_hygienic
