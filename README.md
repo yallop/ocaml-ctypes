@@ -40,3 +40,4 @@ The documentation and source distribution contain more complex examples, involvi
 
 * [Tutorial](https://github.com/ocamllabs/ocaml-ctypes/wiki/ctypes-tutorial)
 * [API documentation](http://ocamllabs.github.io/ocaml-ctypes)
+* [Mailing list](http://lists.ocaml.org/listinfo/ctypes)
