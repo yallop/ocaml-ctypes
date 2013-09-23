@@ -33,9 +33,36 @@ let test_retrieving_struct () =
   end
 
 
+(*
+  Store a reference to an OCaml function as a global function pointer.
+*)
+let test_global_callback () =
+  let open Foreign in
+
+  let plus =
+    foreign_value ~from:testlib "plus_callback"
+      (funptr_opt (int @-> int @-> returning int)) in
+
+  let sum =
+    foreign ~from:testlib "sum_range_with_plus_callback"
+      (int @-> int @-> returning int) in
+  
+  begin
+    assert_equal !@plus None;
+    
+    plus <-@ Some (+);
+    
+    assert_equal (sum 1 10) 55;
+  end
+
+
+
 let suite = "Foreign value tests" >:::
   ["retrieving global struct"
     >:: test_retrieving_struct;
+
+   "global callback function"
+    >:: test_global_callback;
   ]
 
 
