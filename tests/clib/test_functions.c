@@ -455,3 +455,14 @@ double *matrix_transpose(int rows, int cols, double *matrix)
   return rv;
 }
 
+int (*plus_callback)(int) = NULL;
+
+/* Sum the range [a, b] */
+int sum_range_with_plus_callback(int a, int b)
+{
+  int sum = 0, i = 0;
+  for (i = a; i <= b; i++) {
+    sum += i;
+  }
+  return sum;
+}
