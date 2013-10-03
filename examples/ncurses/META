@@ -1,8 +1,8 @@
 # OASIS_START
-# DO NOT EDIT (digest: 7e940f6cd2cb30c88fa72785ab25190f)
+# DO NOT EDIT (digest: ca23a17492fc8ba07bed59eafd39f6f2)
 version = "0.1"
 description = "ctypes-based ncurses example"
-requires = "ctypes ctypes.foreign"
+requires = "ctypes.foreign"
 archive(byte) = "ncurses.cma"
 archive(byte, plugin) = "ncurses.cma"
 archive(native) = "ncurses.cmxa"

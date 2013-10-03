@@ -60,7 +60,7 @@ Library fts
   Path:             examples/fts
   Findlibname:      fts
   Modules:          Fts
-  BuildDepends:     ctypes,ctypes.foreign
+  BuildDepends:     ctypes.foreign
   XMETADescription: Example ctypes bindings to the FTS functions
   Install:          false
 
@@ -68,7 +68,7 @@ Library sigset
   Path:             examples/sigset
   Findlibname:      sigset
   Modules:          Sigset
-  BuildDepends:     ctypes,ctypes.foreign
+  BuildDepends:     ctypes.foreign
   XMETADescription: Example ctypes bindings to the sigset interface
   Install:          false
 
@@ -76,7 +76,7 @@ Library ncurses
   Path:             examples/ncurses
   Findlibname:      ncurses
   Modules:          Ncurses
-  BuildDepends:     ctypes,ctypes.foreign
+  BuildDepends:     ctypes.foreign
   CCLib:            -lncurses
   XMETADescription: ctypes-based ncurses example
   Install:          false
@@ -95,7 +95,7 @@ Executable ncurses_cmd
    MainIs:          ncurses_cmd.ml
    CompiledObject:  best
    Install:         false
-   BuildDepends:    unix,ncurses,ctypes.foreign
+   BuildDepends:    ncurses,ctypes.foreign
    Custom:          true
    Install:         false
 
@@ -104,7 +104,7 @@ Executable fts_cmd
    MainIs:          fts_cmd.ml
    CompiledObject:  best
    Install:         false
-   BuildDepends:    unix,fts
+   BuildDepends:    fts
    Custom:          true
 
 Executable test_ctypes_raw
@@ -113,7 +113,7 @@ Executable test_ctypes_raw
   Build$:           flag(tests)
   CompiledObject:   best
   Install:          false
-  BuildDepends:     unix,ctypes,ctypes.foreign,oUnit
+  BuildDepends:     ctypes.foreign,oUnit
   Custom:           true
 
 Executable test_ctypes_pointers
@@ -122,7 +122,7 @@ Executable test_ctypes_pointers
   Build$:           flag(tests)
   CompiledObject:   best
   Install:          false
-  BuildDepends:     unix,ctypes,ctypes.foreign,oUnit
+  BuildDepends:     ctypes.foreign,oUnit
   Custom:           true
 
 Executable test_ctypes_higher_order
@@ -131,7 +131,7 @@ Executable test_ctypes_higher_order
   Build$:           flag(tests)
   CompiledObject:   best
   Install:          false
-  BuildDepends:     unix,ctypes,ctypes.foreign,oUnit
+  BuildDepends:     ctypes.foreign,oUnit
   Custom:           true
 
 Executable test_ctypes_structs
@@ -140,7 +140,7 @@ Executable test_ctypes_structs
   Build$:           flag(tests)
   CompiledObject:   best
   Install:          false
-  BuildDepends:     unix,ctypes,ctypes.foreign,oUnit
+  BuildDepends:     ctypes.foreign,oUnit
   Custom:           true
 
 Executable test_ctypes_finalisers
@@ -149,7 +149,7 @@ Executable test_ctypes_finalisers
   Build$:           flag(tests)
   CompiledObject:   best
   Install:          false
-  BuildDepends:     unix,ctypes,ctypes.foreign,oUnit
+  BuildDepends:     ctypes.foreign,oUnit
   Custom:           true
 
 Executable test_ctypes_cstdlib
@@ -158,7 +158,7 @@ Executable test_ctypes_cstdlib
   Build$:           flag(tests)
   CompiledObject:   best
   Install:          false
-  BuildDepends:     unix,ctypes,ctypes.foreign,oUnit
+  BuildDepends:     ctypes.foreign,oUnit
   Custom:           true
 
 Executable test_ctypes_sizeof
@@ -167,7 +167,7 @@ Executable test_ctypes_sizeof
   Build$:           flag(tests)
   CompiledObject:   best
   Install:          false
-  BuildDepends:     unix,ctypes,ctypes.foreign,oUnit
+  BuildDepends:     ctypes.foreign,oUnit
   Custom:           true
 
 Executable test_ctypes_unions
@@ -176,7 +176,7 @@ Executable test_ctypes_unions
   Build$:           flag(tests)
   CompiledObject:   best
   Install:          false
-  BuildDepends:     unix,ctypes,ctypes.foreign,oUnit
+  BuildDepends:     ctypes.foreign,oUnit
   Custom:           true
 
 Executable test_ctypes_custom_ops
@@ -185,7 +185,7 @@ Executable test_ctypes_custom_ops
   Build$:           flag(tests)
   CompiledObject:   best
   Install:          false
-  BuildDepends:     unix,ctypes,ctypes.foreign,oUnit
+  BuildDepends:     ctypes.foreign,oUnit
   Custom:           true
 
 Executable test_ctypes_arrays
@@ -194,7 +194,7 @@ Executable test_ctypes_arrays
   Build$:           flag(tests)
   CompiledObject:   best
   Install:          false
-  BuildDepends:     unix,ctypes,ctypes.foreign,oUnit
+  BuildDepends:     ctypes.foreign,oUnit
   Custom:           true
 
 Executable test_ctypes_errno
@@ -203,7 +203,7 @@ Executable test_ctypes_errno
   Build$:           flag(tests)
   CompiledObject:   best
   Install:          false
-  BuildDepends:     unix,ctypes,ctypes.foreign,oUnit
+  BuildDepends:     ctypes.foreign,oUnit
   Custom:           true
 
 Executable test_ctypes_passable
@@ -212,7 +212,7 @@ Executable test_ctypes_passable
   Build$:           flag(tests)
   CompiledObject:   best
   Install:          false
-  BuildDepends:     unix,ctypes,ctypes.foreign,oUnit
+  BuildDepends:     ctypes.foreign,oUnit
   Custom:           true
 
 Executable test_ctypes_alignment
@@ -221,7 +221,7 @@ Executable test_ctypes_alignment
   Build$:           flag(tests)
   CompiledObject:   best
   Install:          false
-  BuildDepends:     unix,ctypes,ctypes.foreign,oUnit
+  BuildDepends:     ctypes.foreign,oUnit
   Custom:           true
 
 Executable test_ctypes_views
@@ -230,7 +230,7 @@ Executable test_ctypes_views
   Build$:           flag(tests)
   CompiledObject:   best
   Install:          false
-  BuildDepends:     unix,ctypes,ctypes.foreign,oUnit
+  BuildDepends:     ctypes.foreign,oUnit
   Custom:           true
 
 Executable test_ctypes_global_values
@@ -239,7 +239,7 @@ Executable test_ctypes_global_values
   Build$:           flag(tests)
   CompiledObject:   best
   Install:          false
-  BuildDepends:     unix,ctypes,ctypes.foreign,oUnit
+  BuildDepends:     ctypes.foreign,oUnit
   Custom:           true
 
 Executable test_ctypes_oo_style
@@ -248,7 +248,7 @@ Executable test_ctypes_oo_style
   Build$:           flag(tests)
   CompiledObject:   best
   Install:          false
-  BuildDepends:     unix,ctypes,ctypes.foreign,oUnit
+  BuildDepends:     ctypes.foreign,oUnit
   Custom:           true
 
 Executable test_ctypes_type_printing
@@ -257,7 +257,7 @@ Executable test_ctypes_type_printing
   Build$:           flag(tests)
   CompiledObject:   best
   Install:          false
-  BuildDepends:     unix,str,ctypes,ctypes.foreign,oUnit
+  BuildDepends:     str,ctypes.foreign,oUnit
   Custom:           true
 
 Executable test_ctypes_value_printing
@@ -266,7 +266,7 @@ Executable test_ctypes_value_printing
   Build$:           flag(tests)
   CompiledObject:   best
   Install:          false
-  BuildDepends:     unix,str,ctypes,ctypes.foreign,oUnit
+  BuildDepends:     str,ctypes.foreign,oUnit
   Custom:           true
 
 Executable test_ctypes_complex
@@ -275,7 +275,7 @@ Executable test_ctypes_complex
   Build$:           flag(tests)
   CompiledObject:   best
   Install:          false
-  BuildDepends:     unix,ctypes,ctypes.foreign,oUnit
+  BuildDepends:     ctypes.foreign,oUnit
   Custom:           true
 
 Executable test_ctypes_callback_lifetime
@@ -284,7 +284,7 @@ Executable test_ctypes_callback_lifetime
   Build$:           flag(tests)
   CompiledObject:   best
   Install:          false
-  BuildDepends:     unix,ctypes,ctypes.foreign,oUnit
+  BuildDepends:     ctypes.foreign,oUnit
   Custom:           true
 
 Executable test_stubs
@@ -293,7 +293,7 @@ Executable test_stubs
   Build$:           flag(tests)
   CompiledObject:   best
   Install:          false
-  BuildDepends:     unix,ctypes,ctypes.foreign,oUnit
+  BuildDepends:     ctypes.foreign,oUnit
   Custom:           true
 
 Executable test_ctypes_bigarrays
@@ -302,7 +302,7 @@ Executable test_ctypes_bigarrays
   Build$:           flag(tests)
   CompiledObject:   best
   Install:          false
-  BuildDepends:     unix,ctypes,ctypes.foreign,oUnit
+  BuildDepends:     ctypes.foreign,oUnit
   Custom:           true
 
 Executable date_example
@@ -310,7 +310,7 @@ Executable date_example
   MainIs:           date.ml
   CompiledObject:   best
   Install:          false
-  BuildDepends:     unix,ctypes,ctypes.foreign,oUnit
+  BuildDepends:     ctypes.foreign,oUnit
   Custom:           true
 
 # Executable struct_subtyping
@@ -318,7 +318,7 @@ Executable date_example
 #   MainIs:           struct_subtyping.ml
 #   CompiledObject:   best
 #   Install:          false
-#   BuildDepends:     unix,ctypes,ctypes.foreign,oUnit
+#   BuildDepends:     ctypes.foreign,oUnit
 #   Custom:           true
 
 Test test_ctypes_raw
@@ -437,4 +437,4 @@ Document ctypes
   BuildTools+:          ocamldoc
   Install:              true
   XOCamlbuildPath:      .
-  XOCamlbuildLibraries: ctypes,ctypes.foreign
+  XOCamlbuildLibraries: ctypes.foreign
