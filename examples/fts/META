@@ -1,5 +1,3 @@
-# OASIS_START
-# DO NOT EDIT (digest: 9f302427d08a040a9b5f231a39017d40)
 version = "0.1"
 description = "Example ctypes bindings to the FTS functions"
 requires = "ctypes.foreign"
@@ -8,5 +6,4 @@ archive(byte, plugin) = "fts.cma"
 archive(native) = "fts.cmxa"
 archive(native, plugin) = "fts.cmxs"
 exists_if = "fts.cma"
-# OASIS_STOP
 

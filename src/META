@@ -1,5 +1,3 @@
-# OASIS_START
-# DO NOT EDIT (digest: 481feed51ddd9a3351bc4071cc99663a)
 version = "0.1"
 description = "Combinators for binding to C libraries without writing any C."
 requires = "unix bigarray"
@@ -29,5 +27,4 @@ package "foreign" (
  archive(native, plugin) = "ctypes-foreign.cmxs"
  exists_if = "ctypes-foreign.cma"
 )
-# OASIS_STOP
 
