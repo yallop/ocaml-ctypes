@@ -7,10 +7,10 @@ License:     MIT
 Plugins:     META (0.3)
 BuildTools:  ocamlbuild
 PostConfCommand: ocaml discover.ml -ocamlc $ocamlc -ext-obj $ext_obj -exec-name $default_executable_name
-PreBuildCommand: ocamlc -custom primitive_details.c primitive_details.ml -o primitive_details && ./primitive_details src/ctypes_primitives.ml
+PreBuildCommand: ocamlc -custom primitive_details.c primitive_details.ml -o primitive_details && ./primitive_details src/ctypes/ctypes_primitives.ml
 
 Library ctypes
-  Path:             src/
+  Path:             src/ctypes
   Findlibname:      ctypes
   Modules:          Unsigned,Signed,Structs,Ctypes,PosixTypes
   InternalModules:  Common,
@@ -40,7 +40,7 @@ Library ctypes
   Install:          true
 
 Library "ctypes-foreign"
-  Path:             src/
+  Path:             src/ctypes-foreign
   Findlibname:      foreign
   Findlibparent:    ctypes
   Modules:          Dl,Foreign
@@ -82,7 +82,7 @@ Library ncurses
   Install:          false
 
 Library ctypes_top
-  Path:               top
+  Path:               src/ctypes-top
   FindlibName:        top
   FindlibParent:      ctypes
   Modules:            Ctypes_printers,Install_printers
@@ -107,204 +107,6 @@ Executable fts_cmd
    BuildDepends:    fts
    Custom:          true
 
-Executable test_ctypes_raw
-  Path:             tests
-  MainIs:           test_raw.ml
-  Build$:           flag(tests)
-  CompiledObject:   best
-  Install:          false
-  BuildDepends:     ctypes.foreign,oUnit
-  Custom:           true
-
-Executable test_ctypes_pointers
-  Path:             tests
-  MainIs:           test_pointers.ml
-  Build$:           flag(tests)
-  CompiledObject:   best
-  Install:          false
-  BuildDepends:     ctypes.foreign,oUnit
-  Custom:           true
-
-Executable test_ctypes_higher_order
-  Path:             tests
-  MainIs:           test_higher_order.ml
-  Build$:           flag(tests)
-  CompiledObject:   best
-  Install:          false
-  BuildDepends:     ctypes.foreign,oUnit
-  Custom:           true
-
-Executable test_ctypes_structs
-  Path:             tests
-  MainIs:           test_structs.ml
-  Build$:           flag(tests)
-  CompiledObject:   best
-  Install:          false
-  BuildDepends:     ctypes.foreign,oUnit
-  Custom:           true
-
-Executable test_ctypes_finalisers
-  Path:             tests
-  MainIs:           test_finalisers.ml
-  Build$:           flag(tests)
-  CompiledObject:   best
-  Install:          false
-  BuildDepends:     ctypes.foreign,oUnit
-  Custom:           true
-
-Executable test_ctypes_cstdlib
-  Path:             tests
-  MainIs:           test_cstdlib.ml
-  Build$:           flag(tests)
-  CompiledObject:   best
-  Install:          false
-  BuildDepends:     ctypes.foreign,oUnit
-  Custom:           true
-
-Executable test_ctypes_sizeof
-  Path:             tests
-  MainIs:           test_sizeof.ml
-  Build$:           flag(tests)
-  CompiledObject:   best
-  Install:          false
-  BuildDepends:     ctypes.foreign,oUnit
-  Custom:           true
-
-Executable test_ctypes_unions
-  Path:             tests
-  MainIs:           test_unions.ml
-  Build$:           flag(tests)
-  CompiledObject:   best
-  Install:          false
-  BuildDepends:     ctypes.foreign,oUnit
-  Custom:           true
-
-Executable test_ctypes_custom_ops
-  Path:             tests
-  MainIs:           test_custom_ops.ml
-  Build$:           flag(tests)
-  CompiledObject:   best
-  Install:          false
-  BuildDepends:     ctypes.foreign,oUnit
-  Custom:           true
-
-Executable test_ctypes_arrays
-  Path:             tests
-  MainIs:           test_array.ml
-  Build$:           flag(tests)
-  CompiledObject:   best
-  Install:          false
-  BuildDepends:     ctypes.foreign,oUnit
-  Custom:           true
-
-Executable test_ctypes_errno
-  Path:             tests
-  MainIs:           test_errno.ml
-  Build$:           flag(tests)
-  CompiledObject:   best
-  Install:          false
-  BuildDepends:     ctypes.foreign,oUnit
-  Custom:           true
-
-Executable test_ctypes_passable
-  Path:             tests
-  MainIs:           test_passable.ml
-  Build$:           flag(tests)
-  CompiledObject:   best
-  Install:          false
-  BuildDepends:     ctypes.foreign,oUnit
-  Custom:           true
-
-Executable test_ctypes_alignment
-  Path:             tests
-  MainIs:           test_alignment.ml
-  Build$:           flag(tests)
-  CompiledObject:   best
-  Install:          false
-  BuildDepends:     ctypes.foreign,oUnit
-  Custom:           true
-
-Executable test_ctypes_views
-  Path:             tests
-  MainIs:           test_views.ml
-  Build$:           flag(tests)
-  CompiledObject:   best
-  Install:          false
-  BuildDepends:     ctypes.foreign,oUnit
-  Custom:           true
-
-Executable test_ctypes_global_values
-  Path:             tests
-  MainIs:           test_foreign_values.ml
-  Build$:           flag(tests)
-  CompiledObject:   best
-  Install:          false
-  BuildDepends:     ctypes.foreign,oUnit
-  Custom:           true
-
-Executable test_ctypes_oo_style
-  Path:             tests
-  MainIs:           test_oo_style.ml
-  Build$:           flag(tests)
-  CompiledObject:   best
-  Install:          false
-  BuildDepends:     ctypes.foreign,oUnit
-  Custom:           true
-
-Executable test_ctypes_type_printing
-  Path:             tests
-  MainIs:           test_type_printing.ml
-  Build$:           flag(tests)
-  CompiledObject:   best
-  Install:          false
-  BuildDepends:     str,ctypes.foreign,oUnit
-  Custom:           true
-
-Executable test_ctypes_value_printing
-  Path:             tests
-  MainIs:           test_value_printing.ml
-  Build$:           flag(tests)
-  CompiledObject:   best
-  Install:          false
-  BuildDepends:     str,ctypes.foreign,oUnit
-  Custom:           true
-
-Executable test_ctypes_complex
-  Path:             tests
-  MainIs:           test_complex.ml
-  Build$:           flag(tests)
-  CompiledObject:   best
-  Install:          false
-  BuildDepends:     ctypes.foreign,oUnit
-  Custom:           true
-
-Executable test_ctypes_callback_lifetime
-  Path:             tests
-  MainIs:           test_callback_lifetime.ml
-  Build$:           flag(tests)
-  CompiledObject:   best
-  Install:          false
-  BuildDepends:     ctypes.foreign,oUnit
-  Custom:           true
-
-Executable test_stubs
-  Path:             tests
-  MainIs:           test_stubs.ml
-  Build$:           flag(tests)
-  CompiledObject:   best
-  Install:          false
-  BuildDepends:     ctypes.foreign,oUnit
-  Custom:           true
-
-Executable test_ctypes_bigarrays
-  Path:             tests
-  MainIs:           test_bigarrays.ml
-  Build$:           flag(tests)
-  CompiledObject:   best
-  Install:          false
-  BuildDepends:     ctypes.foreign,oUnit
-  Custom:           true
-
 Executable date_example
   Path:             examples/date
   MainIs:           date.ml
@@ -312,124 +114,6 @@ Executable date_example
   Install:          false
   BuildDepends:     ctypes.foreign,oUnit
   Custom:           true
-
-# Executable struct_subtyping
-#   Path:             examples/struct-subtyping
-#   MainIs:           struct_subtyping.ml
-#   CompiledObject:   best
-#   Install:          false
-#   BuildDepends:     ctypes.foreign,oUnit
-#   Custom:           true
-
-Test test_ctypes_raw
-  Run$:             flag(tests)
-  Command:          $test_ctypes_raw
-  WorkingDirectory: tests
-
-Test test_ctypes_pointers
-  Run$:             flag(tests)
-  Command:          $test_ctypes_pointers
-  WorkingDirectory: tests
-
-Test test_ctypes_higher_order
-  Run$:             flag(tests)
-  Command:          $test_ctypes_higher_order
-  WorkingDirectory: tests
-
-Test test_ctypes_structs
-  Run$:             flag(tests)
-  Command:          $test_ctypes_structs
-  WorkingDirectory: tests
-
-Test test_ctypes_finalisers
-  Run$:             flag(tests)
-  Command:          $test_ctypes_finalisers
-  WorkingDirectory: tests
-
-Test test_ctypes_cstdlib
-  Run$:             flag(tests)
-  Command:          $test_ctypes_cstdlib
-  WorkingDirectory: tests
-
-Test test_ctypes_sizeof
-  Run$:             flag(tests)
-  Command:          $test_ctypes_sizeof
-  WorkingDirectory: tests
-
-Test test_stubs
-  Run$:             flag(tests)
-  Command:          $test_stubs
-  WorkingDirectory: tests
-
-Test test_ctypes_arrays
-  Run$:             flag(tests)
-  Command:          $test_ctypes_arrays
-  WorkingDirectory: tests
-
-Test test_ctypes_unions
-  Run$:             flag(tests)
-  Command:          $test_ctypes_unions
-  WorkingDirectory: tests
-
-Test test_ctypes_custom_ops
-  Run$:             flag(tests)
-  Command:          $test_ctypes_custom_ops
-  WorkingDirectory: tests
-
-Test test_ctypes_errno
-  Run$:             flag(tests)
-  Command:          $test_ctypes_errno
-  WorkingDirectory: tests
-
-Test test_passable
-  Run$:             flag(tests)
-  Command:          $test_ctypes_passable
-  WorkingDirectory: tests
-
-Test test_alignment
-  Run$:             flag(tests)
-  Command:          $test_ctypes_alignment
-  WorkingDirectory: tests
-
-Test test_views
-  Run$:             flag(tests)
-  Command:          $test_ctypes_views
-  WorkingDirectory: tests
-
-Test test_foreign_values
-  Run$:             flag(tests)
-  Command:          $test_ctypes_global_values
-  WorkingDirectory: tests
-
-Test test_oo_style
-  Run$:             flag(tests)
-  Command:          $test_ctypes_oo_style
-  WorkingDirectory: tests
-
-Test test_type_printing
-  Run$:             flag(tests)
-  Command:          $test_ctypes_type_printing
-  WorkingDirectory: tests
-
-Test test_value_printing
-  Run$:             flag(tests)
-  Command:          $test_ctypes_value_printing
-  WorkingDirectory: tests
-
-Test test_complex
-  Run$:             flag(tests)
-  Command:          $test_ctypes_complex
-  WorkingDirectory: tests
-
-Test test_callback_lifetime
-  Run$:             flag(tests)
-  Command:          $test_ctypes_callback_lifetime
-  WorkingDirectory: tests
-
-Test test_bigarrays
-  Run$:             flag(tests)
-  Command:          $test_ctypes_bigarrays
-  WorkingDirectory: tests
 
 Document ctypes
   Title:                Ctypes docs
