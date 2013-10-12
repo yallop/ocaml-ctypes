@@ -1,9 +1,0 @@
-version = "0.1"
-description = "ctypes-based ncurses example"
-requires = "ctypes.foreign"
-archive(byte) = "ncurses.cma"
-archive(byte, plugin) = "ncurses.cma"
-archive(native) = "ncurses.cmxa"
-archive(native, plugin) = "ncurses.cmxs"
-exists_if = "ncurses.cma"
-

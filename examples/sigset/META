@@ -1,9 +1,0 @@
-version = "0.1"
-description = "Example ctypes bindings to the sigset interface"
-requires = "ctypes.foreign"
-archive(byte) = "sigset.cma"
-archive(byte, plugin) = "sigset.cma"
-archive(native) = "sigset.cmxa"
-archive(native, plugin) = "sigset.cmxs"
-exists_if = "sigset.cma"
-
