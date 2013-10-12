@@ -126,7 +126,6 @@ value ctypes_string_of_prim(value prim_, value v)
 {
   CAMLparam2(prim_, v);
   char buf[64];
-  char *format = NULL;
   switch (Int_val(prim_))
   {
   case Char: snprintf(buf, sizeof buf, "'%c'", Int_val(v)); break;
