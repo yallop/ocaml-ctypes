@@ -91,7 +91,6 @@ value ctypes_dlsym(value handle_option, value symbol)
 /* ctypes_dlclose : handle:library -> int */
 value ctypes_dlclose(value handle)
 {
-  CAMLparam1(handle);
   return Val_int(dlclose((void *)handle));
 }
 
