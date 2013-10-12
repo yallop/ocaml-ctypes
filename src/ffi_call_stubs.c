@@ -59,16 +59,6 @@ value ctypes_set_closure_callback(value retrieve)
 }
 
 
-static value allocate_custom(struct custom_operations *ops, size_t size,
-                             void *prototype)
-{
-  /* http://caml.inria.fr/pub/docs/manual-ocaml-4.00/manual033.html#htoc286 */
-  value block = caml_alloc_custom(ops, size, 0, 1);
-  memcpy(Data_custom_val(block), prototype, size);
-  return block;
-}
-
-
 void ctypes_check_ffi_status(ffi_status status)
 {
   switch (status) {
@@ -293,7 +283,6 @@ value ctypes_call(value function, value callspec_, value argwriter,
 
   void (*cfunction)(void) = (void (*)(void)) CTYPES_TO_PTR(function);
   struct callspec *callspec = Data_custom_val(callspec_);
-  struct bufferspec *bufferspec = (struct bufferspec *)callspec;
   int roffset = callspec->roffset;
 
   assert(callspec->state == CALLSPEC);
