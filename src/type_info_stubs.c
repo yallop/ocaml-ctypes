@@ -180,7 +180,6 @@ value ctypes_read_pointer(value offset_, value src_)
 value ctypes_write_pointer(value offset_, value p_, value dst_)
 {
   CAMLparam3(offset_, p_, dst_);
-  int offset = Int_val(offset_);
   void *dst = (char *)CTYPES_TO_PTR(dst_) + Int_val(offset_);
   *(void **)dst = CTYPES_TO_PTR(p_);
   CAMLreturn(Val_unit);
