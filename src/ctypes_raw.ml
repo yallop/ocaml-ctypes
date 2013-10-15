@@ -7,7 +7,7 @@
 
 (* Boxed pointers to C memory locations . *)
 
-module PtrType = (val match Primitive_details.pointer_size with
+module PtrType = (val match Ctypes_primitives.pointer_size with
   4 -> (module Signed.Int32 : Signed.S)
 | 8 -> (module Signed.Int64 : Signed.S)
 | _ -> failwith "No suitable type available to represent pointers.")

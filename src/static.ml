@@ -106,7 +106,7 @@ type boxed_typ = BoxedType : 'a typ -> boxed_typ
 
 let rec sizeof : type a. a typ -> int = function
     Void                           -> raise IncompleteType
-  | Primitive p                    -> Primitive_details.sizeof p
+  | Primitive p                    -> Ctypes_primitives.sizeof p
   | Struct { spec = Incomplete _ } -> raise IncompleteType
   | Struct { spec = Complete
       { size } }                   -> size
@@ -116,12 +116,12 @@ let rec sizeof : type a. a typ -> int = function
   | Array (t, i)                   -> i * sizeof t
   | Bigarray ba                    -> Ctypes_bigarray.sizeof ba
   | Abstract { asize }             -> asize
-  | Pointer _                      -> Primitive_details.pointer_size
+  | Pointer _                      -> Ctypes_primitives.pointer_size
   | View { ty }                    -> sizeof ty
 
 let rec alignment : type a. a typ -> int = function
     Void                             -> raise IncompleteType
-  | Primitive p                      -> Primitive_details.alignment p
+  | Primitive p                      -> Ctypes_primitives.alignment p
   | Struct { spec = Incomplete _ }   -> raise IncompleteType
   | Struct { spec = Complete
       { align } }                    -> align
@@ -130,7 +130,7 @@ let rec alignment : type a. a typ -> int = function
   | Array (t, _)                     -> alignment t
   | Bigarray ba                      -> Ctypes_bigarray.alignment ba
   | Abstract { aalignment }          -> aalignment
-  | Pointer _                        -> Primitive_details.pointer_alignment 
+  | Pointer _                        -> Ctypes_primitives.pointer_alignment 
   | View { ty }                      -> alignment ty
 
 let rec passable : type a. a typ -> bool = function

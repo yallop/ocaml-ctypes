@@ -7,7 +7,7 @@ License:     MIT
 Plugins:     META (0.3)
 BuildTools:  ocamlbuild
 PostConfCommand: ocaml discover.ml -ocamlc $ocamlc -ext-obj $ext_obj -exec-name $default_executable_name
-PreBuildCommand: ocamlc -custom primitive_details.c primitive_details.ml -o primitive_details && ./primitive_details src/primitive_details.ml
+PreBuildCommand: ocamlc -custom primitive_details.c primitive_details.ml -o primitive_details && ./primitive_details src/ctypes_primitives.ml
 
 Library ctypes
   Path:             src/
@@ -15,7 +15,7 @@ Library ctypes
   Modules:          Unsigned,Signed,Structs,Ctypes,PosixTypes
   InternalModules:  Common,
                     Primitives,
-                    Primitive_details,
+                    Ctypes_primitives,
                     Bigarray_stubs,
                     Ctypes_bigarray,
                     Ctypes_raw,

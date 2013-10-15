@@ -39,9 +39,9 @@ let string_of_kind : type a. a kind -> string
   | Kind_complex64 -> "complex64"
   | Kind_char -> "char"
 
-let bigarray_kind_sizeof k = Primitive_details.sizeof (prim_of_kind k)
+let bigarray_kind_sizeof k = Ctypes_primitives.sizeof (prim_of_kind k)
 
-let bigarray_kind_alignment k = Primitive_details.alignment (prim_of_kind k)
+let bigarray_kind_alignment k = Ctypes_primitives.alignment (prim_of_kind k)
 
 type (_, _) dims = 
 | DimsGen : int array -> ('a, ('a, _, Bigarray.c_layout) Bigarray.Genarray.t) dims

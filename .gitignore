@@ -16,4 +16,4 @@ primitive_details
 primitive_details.cmi
 primitive_details.cmo
 primitive_details.o
-src/primitive_details.ml
+src/ctypes_primitives.ml

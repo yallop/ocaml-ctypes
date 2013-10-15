@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 52f75e33e12c567064414fdac87790cc)
+# DO NOT EDIT (digest: 0de7f117f274bce79799336eaac075bc)
 Unsigned
 Signed
 Structs
@@ -7,7 +7,7 @@ Ctypes
 PosixTypes
 Common
 Primitives
-Primitive_details
+Ctypes_primitives
 Bigarray_stubs
 Ctypes_bigarray
 Ctypes_raw

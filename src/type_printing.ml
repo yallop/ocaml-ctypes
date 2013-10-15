@@ -31,7 +31,7 @@ let rec format_typ : type a. a typ ->
     | Void ->
       fprintf fmt "void%t" (k `nonarray)
     | Primitive p ->
-      let name = Primitive_details.name p in
+      let name = Ctypes_primitives.name p in
       fprintf fmt "%s%t" name (k `nonarray)
     | View { format_typ = Some format } ->
       format (k `nonarray) fmt
