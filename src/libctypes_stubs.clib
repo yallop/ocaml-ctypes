@@ -1,6 +1,0 @@
-unsigned_stubs.o
-raw_pointer_stubs.o
-managed_buffer_stubs.o
-ctypes_bigarray_stubs.o
-type_info_stubs.o
-posix_types_stubs.o
