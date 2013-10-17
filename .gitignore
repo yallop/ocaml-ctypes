@@ -1,8 +1,6 @@
-# Generated files
+_build
 setup.data
+src/ctypes/ctypes_primitives.ml
 src/ctypes_config.h
 src/ctypes_config.ml
-#
 *~
-ctypes.odocl
-src/config/ctypes_primitives.ml

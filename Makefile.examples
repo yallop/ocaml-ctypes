@@ -1,0 +1,31 @@
+# -*- Makefile -*-
+
+# fts subproject
+fts.install = no
+fts.dir = examples/fts
+fts.threads = yes
+fts.deps = bigarray
+fts.subproject_deps = ctypes ctypes-foreign
+fts: PROJECT=fts
+fts: $$(NATIVE_TARGET)
+
+# date subproject
+date.install = no
+date.dir = examples/date
+date.threads = yes
+date.subproject_deps = ctypes ctypes-foreign
+date.deps = bigarray
+date: PROJECT=date
+date: $$(NATIVE_TARGET)
+
+# ncurses subproject
+ncurses.install = no
+ncurses.dir = examples/ncurses
+ncurses.threads = yes
+ncurses.subproject_deps = ctypes ctypes-foreign
+ncurses.deps = bigarray
+ncurses.link_flags = -Wl,-no-as-needed -lncurses
+ncurses: PROJECT=ncurses
+ncurses: $$(NATIVE_TARGET)
+
+PROJECTS += fts date ncurses
