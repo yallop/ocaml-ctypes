@@ -51,53 +51,41 @@ static struct details {
   ENTRY(Complex64, double complex),
 };
 
-void generate_function(FILE *fp, char *name, char *type,
-                       void (*cse)(FILE *fp, struct details*))
+void generate_function(char *name, char *type,
+                       void (*cse)(struct details*))
 {
   int i;
-  fprintf(fp, "let %s : type a. a prim -> %s = function\n", name, type);
+  printf("let %s : type a. a prim -> %s = function\n", name, type);
   for (i = 0; i < sizeof details / sizeof *details; i++) {
-    fprintf(fp, " | %s -> ", details[i].constructor);
-    cse(fp, &details[i]);
-    fprintf(fp, "\n");
+    printf(" | %s -> ", details[i].constructor);
+    cse(&details[i]);
+    printf("\n");
   }
 }
 
-void print_size(FILE *fp, struct details *d)
+void print_size(struct details *d)
 {
-  fprintf(fp, "%d", d->size);
+  printf("%d", d->size);
 }
 
-void print_alignment(FILE *fp, struct details *d)
+void print_alignment(struct details *d)
 {
-  fprintf(fp, "%d", d->alignment);
+  printf("%d", d->alignment);
 }
 
-void print_name(FILE *fp, struct details *d)
+void print_name(struct details *d)
 {
-  fprintf(fp, "\"%s\"", d->name);
+  printf("\"%s\"", d->name);
 }
 
-int main(int argc, char **argv)
+value ctypes_make_primitives(value _unit)
 {
-  FILE *fp;
-
-  if (argc < 2) {
-    fprintf(stderr, "Usage: %s filename\n", argv[0]);
-    return EXIT_FAILURE;
-  }
-  else if ((fp = fopen(argv[1], "wb")) == NULL) {
-    perror("fopen");
-    return EXIT_FAILURE;
-  }
-  else {
-    fprintf(fp, "open Primitives\n");
-    generate_function(fp, "sizeof", "int", print_size);
-    generate_function(fp, "alignment", "int", print_alignment);
-    generate_function(fp, "name", "string", print_name);
-    fprintf(fp, "let pointer_size = %d\n", (int)sizeof(void *));
-    fprintf(fp, "let pointer_alignment = %d\n", (int)ALIGNMENT(void *));
-    fclose(fp);
-    return EXIT_SUCCESS;
-  }
+  printf("open Primitives\n");
+  generate_function("sizeof", "int", print_size);
+  generate_function("alignment", "int", print_alignment);
+  generate_function("name", "string", print_name);
+  printf("let pointer_size = %d\n", (int)sizeof(void *));
+  printf("let pointer_alignment = %d\n", (int)ALIGNMENT(void *));
+  fflush(stdout);
+  return Val_unit;
 }

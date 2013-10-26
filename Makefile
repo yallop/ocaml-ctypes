@@ -63,7 +63,7 @@ configure: $$(NATIVE_TARGET)
 
 # configuration
 src/ctypes/ctypes_primitives.ml: $(BUILDDIR)/configure.native
-	$< $@
+	$< > $@
 
 setup.data: src/discover/discover.ml
 	ocaml $^ -ocamlc "$(OCAMLFIND) ocamlc"

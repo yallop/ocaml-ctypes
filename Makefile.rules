@@ -3,8 +3,8 @@
 .SECONDARY:
 
 C_SOURCE  = $(wildcard $($(PROJECT).dir)/*.c)
-ML_SOURCE = $(shell $(OCAMLDEP) -sort $(wildcard $($(PROJECT).dir)/*.ml) \
-                    $(patsubst %,$($(PROJECT).dir)/%,$($(PROJECT).extra_mls)))
+ML_SOURCE = $(shell $(OCAMLDEP) -sort $(sort $(wildcard $($(PROJECT).dir)/*.ml) \
+                    $(patsubst %,$($(PROJECT).dir)/%,$($(PROJECT).extra_mls))))
 
 NATIVE_OBJECTS = $(ML_SOURCE:$($(PROJECT).dir)/%.ml=$(BUILDDIR)/$($(PROJECT).dir)/%.cmx)
 BYTE_OBJECTS = $(ML_SOURCE:$($(PROJECT).dir)/%.ml=$(BUILDDIR)/$($(PROJECT).dir)/%.cmo)
@@ -38,13 +38,13 @@ OCAMLFIND_PACKAGE_FLAGS=$(patsubst %,-package %,$($(PROJECT).deps)) \
                         $(patsubst %,-package threads,$(THREAD_FLAG))
 
 $(BUILDDIR)/%.cmxa: $$(NATIVE_OBJECTS)
-	$(OCAMLFIND) opt -a $(THREAD_FLAG) $(OCAMLFIND_PACKAGE_FLAGS) $(CMXA_OPTS) $(OCAML_LINK_FLAGS) -o $@ $^
+	$(OCAMLFIND) opt -a -linkall $(THREAD_FLAG) $(OCAMLFIND_PACKAGE_FLAGS) $(CMXA_OPTS) $(OCAML_LINK_FLAGS) -o $@ $(NATIVE_OBJECTS)
 
 $(BUILDDIR)/dll%_stubs.so: $$(C_OBJECTS)
 	$(OCAMLMKLIB) -o $(BUILDDIR)/$*_stubs $^ $(LINK_FLAGS)
 
 $(BUILDDIR)/%.cmxs : $$(NATIVE_OBJECTS)
-	$(OCAMLFIND) opt -shared -linkall $(THREAD_FLAG) $(OCAMLFIND_PACKAGE_FLAGS) $(OCAML_LINK_FLAGS) -o $@ $^
+	$(OCAMLFIND) opt -shared -linkall $(THREAD_FLAG) $(OCAMLFIND_PACKAGE_FLAGS) $(OCAML_LINK_FLAGS) -o $@ $(NATIVE_OBJECTS)
 
 $(BUILDDIR)/%.cma: $$(BYTE_OBJECTS)
 	$(OCAMLFIND) ocamlc -a $(THREAD_FLAG) $(CMA_OPTS) $(OCAMLFIND_PACKAGE_FLAGS) $(OCAML_LINK_FLAGS) -o $@ $(BYTE_OBJECTS)
@@ -55,7 +55,7 @@ $(BUILDDIR)/%.cmo : %.ml
 
 $(BUILDDIR)/%.cmx : %.ml
 	@mkdir -p $(@D)
-	$(OCAMLFIND) opt -c -o $@ $(THREAD_FLAG) $(OCAMLFIND_PACKAGE_FLAGS) $(CMX_OPTS) $(OCAMLINCLUDES) $<
+	$(OCAMLFIND) opt -c -o $@ $(THREAD_FLAG) $(OCAMLFIND_PACKAGE_FLAGS) $(CMX_OPTS) $(OCAMLINCLUDES) $(filter %.ml,$<)
 
 $(BUILDDIR)/%.o : %.c
 	@mkdir -p $(@D)

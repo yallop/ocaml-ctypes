@@ -16,8 +16,8 @@ _build/src/ctypes/structs.cmi : _build/src/ctypes/static.cmo
 _build/src/ctypes/structs_computed.cmi : _build/src/ctypes/structs.cmi \
     _build/src/ctypes/static.cmo
 _build/src/ctypes/unsigned.cmi :
-_build/src/configure/blank.cmo :
-_build/src/configure/blank.cmx :
+_build/src/configure/make_primitive_details.cmo :
+_build/src/configure/make_primitive_details.cmx :
 _build/src/ctypes-foreign/closure_properties.cmo : \
     _build/src/ctypes-foreign/closure_properties.cmi
 _build/src/ctypes-foreign/closure_properties.cmx : \
