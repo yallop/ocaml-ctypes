@@ -8,7 +8,7 @@ VPATH=src examples
 BUILDDIR=_build
 PROJECTS=configure ctypes ctypes-foreign ctypes-top fts date ncurses
 GENERATED=src/ctypes_config.h src/ctypes_config.ml setup.data src/ctypes/ctypes_primitives.ml
-CFLAGS=-fPIC -Wall -O3
+CFLAGS=-fPIC -Wall -O3 $(OCAML_FFI_INCOPTS)
 OCAML_FFI_INCOPTS=$(patsubst "%",%,$(libffi_opt))
 
 # public targets
@@ -39,8 +39,8 @@ ctypes-foreign.threads = yes
 ctypes-foreign.dir = src/ctypes-foreign
 ctypes-foreign.subproject_deps = ctypes
 ctypes-foreign.link_flags = $(libffi_lib:"%"=%)
-ctypes-foreign.cmo_opts = $(OCAML_FFI_INCOPTS)
-ctypes-foreign.cmx_opts = $(OCAML_FFI_INCOPTS)
+ctypes-foreign.cmo_opts = $(OCAML_FFI_INCOPTS:%=-ccopt %)
+ctypes-foreign.cmx_opts = $(OCAML_FFI_INCOPTS:%=-ccopt %)
 
 ctypes-foreign: PROJECT=ctypes-foreign
 ctypes-foreign: $$(LIB_TARGETS)
