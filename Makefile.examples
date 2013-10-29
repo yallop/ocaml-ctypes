@@ -28,4 +28,4 @@ ncurses.link_flags = -Wl,-no-as-needed -lncurses
 ncurses: PROJECT=ncurses
 ncurses: $$(NATIVE_TARGET)
 
-PROJECTS += fts date ncurses
+examples: build ncurses fts date
