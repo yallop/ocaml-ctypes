@@ -6,7 +6,7 @@ OCAMLFIND=ocamlfind
 OCAMLMKLIB=ocamlmklib
 VPATH=src examples
 BUILDDIR=_build
-PROJECTS=configure ctypes ctypes-foreign-base ctypes-foreign-threaded ctypes-top fts date ncurses
+PROJECTS=configure ctypes ctypes-foreign-base ctypes-foreign-threaded ctypes-foreign-unthreaded ctypes-top fts date ncurses
 GENERATED=src/ctypes_config.h src/ctypes_config.ml setup.data src/ctypes/ctypes_primitives.ml
 CFLAGS=-fPIC -Wall -O3 $(OCAML_FFI_INCOPTS)
 OCAML_FFI_INCOPTS=$(patsubst "%",%,$(libffi_opt))
@@ -57,6 +57,19 @@ ctypes-foreign-threaded.cmx_opts = $(OCAML_FFI_INCOPTS)
 
 ctypes-foreign-threaded: PROJECT=ctypes-foreign-threaded
 ctypes-foreign-threaded: $$(LIB_TARGETS)
+
+# ctypes-foreign-unthreaded subproject
+ctypes-foreign-unthreaded.public = foreign
+ctypes-foreign-unthreaded.install = yes
+ctypes-foreign-unthreaded.threads = no
+ctypes-foreign-unthreaded.dir = src/ctypes-foreign-unthreaded
+ctypes-foreign-unthreaded.subproject_deps = ctypes ctypes-foreign-base
+ctypes-foreign-unthreaded.link_flags = $(libffi_lib:"%"=%)
+ctypes-foreign-unthreaded.cmo_opts = $(OCAML_FFI_INCOPTS)
+ctypes-foreign-unthreaded.cmx_opts = $(OCAML_FFI_INCOPTS)
+
+ctypes-foreign-unthreaded: PROJECT=ctypes-foreign-unthreaded
+ctypes-foreign-unthreaded: $$(LIB_TARGETS)
 
 # ctypes-top subproject
 ctypes-top.public = ctypes_printers

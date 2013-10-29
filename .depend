@@ -4,6 +4,9 @@ _build/src/ctypes-foreign-base/weakRef.cmi :
 _build/src/ctypes-foreign-threaded/closure_properties.cmi :
 _build/src/ctypes-foreign-threaded/foreign.cmi : _build/src/ctypes-foreign-base/dl.cmi \
     _build/src/ctypes/ctypes.cmi
+_build/src/ctypes-foreign-unthreaded/closure_properties.cmi :
+_build/src/ctypes-foreign-unthreaded/foreign.cmi : _build/src/ctypes-foreign-base/dl.cmi \
+    _build/src/ctypes/ctypes.cmi
 _build/src/ctypes-top/ctypes_printers.cmi : _build/src/ctypes/unsigned.cmi \
     _build/src/ctypes/signed.cmi _build/src/ctypes/posixTypes.cmi _build/src/ctypes/ctypes.cmi
 _build/src/ctypes/ctypes.cmi : _build/src/ctypes/unsigned.cmi _build/src/ctypes/static.cmo \
@@ -58,6 +61,18 @@ _build/src/ctypes-foreign-threaded/foreign.cmx : \
     _build/src/ctypes-foreign-base/foreign_basis.cmx \
     _build/src/ctypes-foreign-threaded/closure_properties.cmx \
     _build/src/ctypes-foreign-threaded/foreign.cmi
+_build/src/ctypes-foreign-unthreaded/closure_properties.cmo : \
+    _build/src/ctypes-foreign-unthreaded/closure_properties.cmi
+_build/src/ctypes-foreign-unthreaded/closure_properties.cmx : \
+    _build/src/ctypes-foreign-unthreaded/closure_properties.cmi
+_build/src/ctypes-foreign-unthreaded/foreign.cmo : \
+    _build/src/ctypes-foreign-base/foreign_basis.cmo \
+    _build/src/ctypes-foreign-threaded/closure_properties.cmi \
+    _build/src/ctypes-foreign-unthreaded/foreign.cmi
+_build/src/ctypes-foreign-unthreaded/foreign.cmx : \
+    _build/src/ctypes-foreign-base/foreign_basis.cmx \
+    _build/src/ctypes-foreign-threaded/closure_properties.cmx \
+    _build/src/ctypes-foreign-unthreaded/foreign.cmi
 _build/src/ctypes-top/ctypes_printers.cmo : _build/src/ctypes/unsigned.cmi \
     _build/src/ctypes/signed.cmi _build/src/ctypes/posixTypes.cmi _build/src/ctypes/ctypes.cmi \
     _build/src/ctypes-top/ctypes_printers.cmi
@@ -79,17 +94,13 @@ _build/src/ctypes/ctypes.cmx : _build/src/ctypes/value_printing.cmx \
     _build/src/ctypes/std_views.cmx _build/src/ctypes/static.cmx _build/src/ctypes/memory.cmx \
     _build/src/ctypes/common.cmx _build/src/ctypes/ctypes.cmi
 _build/src/ctypes/ctypes_bigarray.cmo : _build/src/ctypes/primitives.cmo \
-    _build/src/ctypes/ctypes_raw.cmo _build/src/ctypes/ctypes_primitives.cmo \
-    _build/src/ctypes/bigarray_stubs.cmo _build/src/ctypes/ctypes_bigarray.cmi
+    _build/src/ctypes/ctypes_raw.cmo _build/src/ctypes/bigarray_stubs.cmo \
+    _build/src/ctypes/ctypes_bigarray.cmi
 _build/src/ctypes/ctypes_bigarray.cmx : _build/src/ctypes/primitives.cmx \
-    _build/src/ctypes/ctypes_raw.cmx _build/src/ctypes/ctypes_primitives.cmx \
-    _build/src/ctypes/bigarray_stubs.cmx _build/src/ctypes/ctypes_bigarray.cmi
-_build/src/ctypes/ctypes_primitives.cmo : _build/src/ctypes/primitives.cmo
-_build/src/ctypes/ctypes_primitives.cmx : _build/src/ctypes/primitives.cmx
-_build/src/ctypes/ctypes_raw.cmo : _build/src/ctypes/signed.cmi \
-    _build/src/ctypes/ctypes_primitives.cmo
-_build/src/ctypes/ctypes_raw.cmx : _build/src/ctypes/signed.cmx \
-    _build/src/ctypes/ctypes_primitives.cmx
+    _build/src/ctypes/ctypes_raw.cmx _build/src/ctypes/bigarray_stubs.cmx \
+    _build/src/ctypes/ctypes_bigarray.cmi
+_build/src/ctypes/ctypes_raw.cmo : _build/src/ctypes/signed.cmi
+_build/src/ctypes/ctypes_raw.cmx : _build/src/ctypes/signed.cmx
 _build/src/ctypes/memory.cmo : _build/src/ctypes/static.cmo _build/src/ctypes/memory_stubs.cmo \
     _build/src/ctypes/ctypes_raw.cmo _build/src/ctypes/ctypes_bigarray.cmi
 _build/src/ctypes/memory.cmx : _build/src/ctypes/static.cmx _build/src/ctypes/memory_stubs.cmx \
@@ -107,9 +118,9 @@ _build/src/ctypes/primitives.cmx : _build/src/ctypes/unsigned.cmx _build/src/cty
 _build/src/ctypes/signed.cmo : _build/src/ctypes/unsigned.cmi _build/src/ctypes/signed.cmi
 _build/src/ctypes/signed.cmx : _build/src/ctypes/unsigned.cmx _build/src/ctypes/signed.cmi
 _build/src/ctypes/static.cmo : _build/src/ctypes/primitives.cmo _build/src/ctypes/ctypes_raw.cmo \
-    _build/src/ctypes/ctypes_primitives.cmo _build/src/ctypes/ctypes_bigarray.cmi
+    _build/src/ctypes/ctypes_bigarray.cmi
 _build/src/ctypes/static.cmx : _build/src/ctypes/primitives.cmx _build/src/ctypes/ctypes_raw.cmx \
-    _build/src/ctypes/ctypes_primitives.cmx _build/src/ctypes/ctypes_bigarray.cmx
+    _build/src/ctypes/ctypes_bigarray.cmx
 _build/src/ctypes/std_view_stubs.cmo : _build/src/ctypes/memory_stubs.cmo \
     _build/src/ctypes/ctypes_raw.cmo
 _build/src/ctypes/std_view_stubs.cmx : _build/src/ctypes/memory_stubs.cmx \
@@ -125,11 +136,9 @@ _build/src/ctypes/structs_computed.cmo : _build/src/ctypes/static.cmo \
 _build/src/ctypes/structs_computed.cmx : _build/src/ctypes/static.cmx \
     _build/src/ctypes/structs_computed.cmi
 _build/src/ctypes/type_printing.cmo : _build/src/ctypes/static.cmo \
-    _build/src/ctypes/ctypes_primitives.cmo _build/src/ctypes/ctypes_bigarray.cmi \
-    _build/src/ctypes/common.cmo
+    _build/src/ctypes/ctypes_bigarray.cmi _build/src/ctypes/common.cmo
 _build/src/ctypes/type_printing.cmx : _build/src/ctypes/static.cmx \
-    _build/src/ctypes/ctypes_primitives.cmx _build/src/ctypes/ctypes_bigarray.cmx \
-    _build/src/ctypes/common.cmx
+    _build/src/ctypes/ctypes_bigarray.cmx _build/src/ctypes/common.cmx
 _build/src/ctypes/unsigned.cmo : _build/src/ctypes/unsigned.cmi
 _build/src/ctypes/unsigned.cmx : _build/src/ctypes/unsigned.cmi
 _build/src/ctypes/value_printing.cmo : _build/src/ctypes/value_printing_stubs.cmo \

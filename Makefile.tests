@@ -5,154 +5,154 @@ VPATH += tests
 test-raw.dir = tests/test-raw
 test-raw.threads = yes
 test-raw.deps = bigarray oUnit
-test-raw.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-threaded
+test-raw.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
 test-raw: PROJECT=test-raw
 test-raw: $$(NATIVE_TARGET)
 
 test-pointers.dir = tests/test-pointers
 test-pointers.threads = yes
 test-pointers.deps = bigarray oUnit
-test-pointers.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-threaded
+test-pointers.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
 test-pointers: PROJECT=test-pointers
 test-pointers: $$(NATIVE_TARGET)
 
 test-higher_order.dir = tests/test-higher_order
 test-higher_order.threads = yes
 test-higher_order.deps = bigarray oUnit
-test-higher_order.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-threaded
+test-higher_order.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
 test-higher_order: PROJECT=test-higher_order
 test-higher_order: $$(NATIVE_TARGET)
 
 test-structs.dir = tests/test-structs
 test-structs.threads = yes
 test-structs.deps = bigarray oUnit
-test-structs.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-threaded
+test-structs.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
 test-structs: PROJECT=test-structs
 test-structs: $$(NATIVE_TARGET)
 
 test-finalisers.dir = tests/test-finalisers
 test-finalisers.threads = yes
 test-finalisers.deps = bigarray oUnit
-test-finalisers.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-threaded
+test-finalisers.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
 test-finalisers: PROJECT=test-finalisers
 test-finalisers: $$(NATIVE_TARGET)
 
 test-cstdlib.dir = tests/test-cstdlib
 test-cstdlib.threads = yes
 test-cstdlib.deps = bigarray oUnit
-test-cstdlib.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-threaded
+test-cstdlib.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
 test-cstdlib: PROJECT=test-cstdlib
 test-cstdlib: $$(NATIVE_TARGET)
 
 test-sizeof.dir = tests/test-sizeof
 test-sizeof.threads = yes
 test-sizeof.deps = bigarray oUnit
-test-sizeof.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-threaded
+test-sizeof.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
 test-sizeof: PROJECT=test-sizeof
 test-sizeof: $$(NATIVE_TARGET)
 
 test-unions.dir = tests/test-unions
 test-unions.threads = yes
 test-unions.deps = bigarray oUnit
-test-unions.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-threaded
+test-unions.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
 test-unions: PROJECT=test-unions
 test-unions: $$(NATIVE_TARGET)
 
 test-custom_ops.dir = tests/test-custom_ops
 test-custom_ops.threads = yes
 test-custom_ops.deps = bigarray oUnit
-test-custom_ops.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-threaded
+test-custom_ops.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
 test-custom_ops: PROJECT=test-custom_ops
 test-custom_ops: $$(NATIVE_TARGET)
 
 test-arrays.dir = tests/test-arrays
 test-arrays.threads = yes
 test-arrays.deps = bigarray oUnit
-test-arrays.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-threaded
+test-arrays.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
 test-arrays: PROJECT=test-arrays
 test-arrays: $$(NATIVE_TARGET)
 
 test-errno.dir = tests/test-errno
 test-errno.threads = yes
 test-errno.deps = bigarray oUnit
-test-errno.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-threaded
+test-errno.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
 test-errno: PROJECT=test-errno
 test-errno: $$(NATIVE_TARGET)
 
 test-passable.dir = tests/test-passable
 test-passable.threads = yes
 test-passable.deps = bigarray oUnit
-test-passable.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-threaded
+test-passable.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
 test-passable: PROJECT=test-passable
 test-passable: $$(NATIVE_TARGET)
 
 test-alignment.dir = tests/test-alignment
 test-alignment.threads = yes
 test-alignment.deps = bigarray oUnit
-test-alignment.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-threaded
+test-alignment.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
 test-alignment: PROJECT=test-alignment
 test-alignment: $$(NATIVE_TARGET)
 
 test-views.dir = tests/test-views
 test-views.threads = yes
 test-views.deps = bigarray oUnit
-test-views.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-threaded
+test-views.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
 test-views: PROJECT=test-views
 test-views: $$(NATIVE_TARGET)
 
 test-global_values.dir = tests/test-global_values
 test-global_values.threads = yes
 test-global_values.deps = bigarray oUnit
-test-global_values.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-threaded
+test-global_values.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
 test-global_values: PROJECT=test-global_values
 test-global_values: $$(NATIVE_TARGET)
 
 test-oo_style.dir = tests/test-oo_style
 test-oo_style.threads = yes
 test-oo_style.deps = bigarray oUnit
-test-oo_style.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-threaded
+test-oo_style.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
 test-oo_style: PROJECT=test-oo_style
 test-oo_style: $$(NATIVE_TARGET)
 
 test-type_printing.dir = tests/test-type_printing
 test-type_printing.threads = yes
 test-type_printing.deps = str bigarray oUnit
-test-type_printing.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-threaded
+test-type_printing.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
 test-type_printing: PROJECT=test-type_printing
 test-type_printing: $$(NATIVE_TARGET)
 
 test-value_printing.dir = tests/test-value_printing
 test-value_printing.threads = yes
 test-value_printing.deps = str bigarray oUnit
-test-value_printing.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-threaded
+test-value_printing.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
 test-value_printing: PROJECT=test-value_printing
 test-value_printing: $$(NATIVE_TARGET)
 
 test-complex.dir = tests/test-complex
 test-complex.threads = yes
 test-complex.deps = bigarray oUnit
-test-complex.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-threaded
+test-complex.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
 test-complex: PROJECT=test-complex
 test-complex: $$(NATIVE_TARGET)
 
 test-callback_lifetime.dir = tests/test-callback_lifetime
 test-callback_lifetime.threads = yes
 test-callback_lifetime.deps = bigarray oUnit
-test-callback_lifetime.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-threaded
+test-callback_lifetime.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
 test-callback_lifetime: PROJECT=test-callback_lifetime
 test-callback_lifetime: $$(NATIVE_TARGET)
 
 test-stubs.dir = tests/test-stubs
 test-stubs.threads = yes
 test-stubs.deps = bigarray oUnit
-test-stubs.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-threaded
+test-stubs.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
 test-stubs: PROJECT=test-stubs
 test-stubs: $$(NATIVE_TARGET)
 
 test-bigarrays.dir = tests/test-bigarrays
 test-bigarrays.threads = yes
 test-bigarrays.deps = bigarray oUnit
-test-bigarrays.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-threaded
+test-bigarrays.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
 test-bigarrays: PROJECT=test-bigarrays
 test-bigarrays: $$(NATIVE_TARGET)
 

@@ -38,5 +38,9 @@ package "foreign" (
  archive(byte, plugin, mt) = "ctypes-foreign-threaded.cma"
  archive(native, mt) = "ctypes-foreign-threaded.cmxa"
  archive(native, plugin, mt) = "ctypes-foreign-threaded.cmxs"
+ archive(byte) = "ctypes-foreign-unthreaded.cma"
+ archive(byte, plugin) = "ctypes-foreign-unthreaded.cma"
+ archive(native) = "ctypes-foreign-unthreaded.cmxa"
+ archive(native, plugin) = "ctypes-foreign-unthreaded.cmxs"
  exists_if = "ctypes-foreign-threaded.cma"
 )
