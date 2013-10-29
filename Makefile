@@ -6,7 +6,7 @@ OCAMLFIND=ocamlfind
 OCAMLMKLIB=ocamlmklib
 VPATH=src examples
 BUILDDIR=_build
-PROJECTS=configure ctypes ctypes-foreign-base ctypes-foreign-threaded ctypes-foreign-unthreaded ctypes-top fts date ncurses
+PROJECTS=configure configured ctypes ctypes-foreign-base ctypes-foreign-threaded ctypes-foreign-unthreaded ctypes-top fts date ncurses
 GENERATED=src/ctypes_config.h src/ctypes_config.ml setup.data src/ctypes/ctypes_primitives.ml
 CFLAGS=-fPIC -Wall -O3 $(OCAML_FFI_INCOPTS)
 OCAML_FFI_INCOPTS=$(patsubst "%",%,$(libffi_opt))
@@ -88,6 +88,8 @@ configure: PROJECT=configure
 configure: $$(NATIVE_TARGET)
 
 # configuration
+configured: src/ctypes/ctypes_primitives.ml
+
 src/ctypes/ctypes_primitives.ml: $(BUILDDIR)/configure.native
 	$< > $@
 
