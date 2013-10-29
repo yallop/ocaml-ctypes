@@ -6,7 +6,7 @@ OCAMLFIND=ocamlfind
 OCAMLMKLIB=ocamlmklib
 VPATH=src examples
 BUILDDIR=_build
-PROJECTS=configure ctypes ctypes-foreign ctypes-top 
+PROJECTS=configure ctypes ctypes-foreign-base ctypes-foreign-threaded ctypes-foreign-unthreaded ctypes-top fts date ncurses
 GENERATED=src/ctypes_config.h src/ctypes_config.ml setup.data src/ctypes/ctypes_primitives.ml
 CFLAGS=-fPIC -Wall -O3 $(OCAML_FFI_INCOPTS)
 OCAML_FFI_INCOPTS=$(patsubst "%",%,$(libffi_opt))
@@ -32,18 +32,44 @@ ctypes.install = yes
 ctypes: PROJECT=ctypes
 ctypes: $(ctypes.dir)/$(ctypes.extra_mls) $$(LIB_TARGETS)
 
-# ctypes-foreign subproject
-ctypes-foreign.public = dl foreign
-ctypes-foreign.install = yes
-ctypes-foreign.threads = yes
-ctypes-foreign.dir = src/ctypes-foreign
-ctypes-foreign.subproject_deps = ctypes
-ctypes-foreign.link_flags = $(libffi_lib:"%"=%)
-ctypes-foreign.cmo_opts = $(OCAML_FFI_INCOPTS:%=-ccopt %)
-ctypes-foreign.cmx_opts = $(OCAML_FFI_INCOPTS:%=-ccopt %)
+# ctypes-foreign-base subproject
+ctypes-foreign-base.public = dl
+ctypes-foreign-base.install = yes
+ctypes-foreign-base.threads = no
+ctypes-foreign-base.dir = src/ctypes-foreign-base
+ctypes-foreign-base.subproject_deps = ctypes
+ctypes-foreign-base.link_flags = $(libffi_lib:"%"=%)
+ctypes-foreign-base.cmo_opts = $(OCAML_FFI_INCOPTS)
+ctypes-foreign-base.cmx_opts = $(OCAML_FFI_INCOPTS)
 
-ctypes-foreign: PROJECT=ctypes-foreign
-ctypes-foreign: $$(LIB_TARGETS)
+ctypes-foreign-base: PROJECT=ctypes-foreign-base
+ctypes-foreign-base: $$(LIB_TARGETS)
+
+# ctypes-foreign-threaded subproject
+ctypes-foreign-threaded.public = foreign
+ctypes-foreign-threaded.install = yes
+ctypes-foreign-threaded.threads = yes
+ctypes-foreign-threaded.dir = src/ctypes-foreign-threaded
+ctypes-foreign-threaded.subproject_deps = ctypes ctypes-foreign-base
+ctypes-foreign-threaded.link_flags = $(libffi_lib:"%"=%)
+ctypes-foreign-threaded.cmo_opts = $(OCAML_FFI_INCOPTS)
+ctypes-foreign-threaded.cmx_opts = $(OCAML_FFI_INCOPTS)
+
+ctypes-foreign-threaded: PROJECT=ctypes-foreign-threaded
+ctypes-foreign-threaded: $$(LIB_TARGETS)
+
+# ctypes-foreign-unthreaded subproject
+ctypes-foreign-unthreaded.public = foreign
+ctypes-foreign-unthreaded.install = yes
+ctypes-foreign-unthreaded.threads = no
+ctypes-foreign-unthreaded.dir = src/ctypes-foreign-unthreaded
+ctypes-foreign-unthreaded.subproject_deps = ctypes ctypes-foreign-base
+ctypes-foreign-unthreaded.link_flags = $(libffi_lib:"%"=%)
+ctypes-foreign-unthreaded.cmo_opts = $(OCAML_FFI_INCOPTS)
+ctypes-foreign-unthreaded.cmx_opts = $(OCAML_FFI_INCOPTS)
+
+ctypes-foreign-unthreaded: PROJECT=ctypes-foreign-unthreaded
+ctypes-foreign-unthreaded: $$(LIB_TARGETS)
 
 # ctypes-top subproject
 ctypes-top.public = ctypes_printers

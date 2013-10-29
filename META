@@ -18,13 +18,29 @@ package "top" (
   exists_if = "ctypes-top.cma"
 )
 
+package "foreign-base" (
+ version = "0.1"
+ description = "Dynamic linking of C functions"
+ requires = "ctypes"
+ archive(byte) = "ctypes-foreign-base.cma"
+ archive(byte, plugin) = "ctypes-foreign-base.cma"
+ archive(native) = "ctypes-foreign-base.cmxa"
+ archive(native, plugin) = "ctypes-foreign-base.cmxs"
+ exists_if = "ctypes-foreign-base.cma"
+)
+
 package "foreign" (
  version = "0.1"
  description = "Dynamic linking of C functions"
- requires = "threads ctypes"
- archive(byte) = "ctypes-foreign.cma"
- archive(byte, plugin) = "ctypes-foreign.cma"
- archive(native) = "ctypes-foreign.cmxa"
- archive(native, plugin) = "ctypes-foreign.cmxs"
- exists_if = "ctypes-foreign.cma"
+ requires = "ctypes ctypes.foreign-base"
+ requires(mt) = "threads ctypes ctypes.foreign-base"
+ archive(byte, mt) = "ctypes-foreign-threaded.cma"
+ archive(byte, plugin, mt) = "ctypes-foreign-threaded.cma"
+ archive(native, mt) = "ctypes-foreign-threaded.cmxa"
+ archive(native, plugin, mt) = "ctypes-foreign-threaded.cmxs"
+ archive(byte) = "ctypes-foreign-unthreaded.cma"
+ archive(byte, plugin) = "ctypes-foreign-unthreaded.cma"
+ archive(native) = "ctypes-foreign-unthreaded.cmxa"
+ archive(native, plugin) = "ctypes-foreign-unthreaded.cmxs"
+ exists_if = "ctypes-foreign-threaded.cma"
 )
