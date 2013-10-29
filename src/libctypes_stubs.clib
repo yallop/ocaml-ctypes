@@ -1,9 +1,0 @@
-# OASIS_START
-# DO NOT EDIT (digest: 1313253a8dc880510d4b9e7f744dd4cb)
-unsigned_stubs.o
-raw_pointer_stubs.o
-managed_buffer_stubs.o
-ctypes_bigarray_stubs.o
-type_info_stubs.o
-posix_types_stubs.o
-# OASIS_STOP

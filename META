@@ -1,5 +1,3 @@
-# OASIS_START
-# DO NOT EDIT (digest: 481feed51ddd9a3351bc4071cc99663a)
 version = "0.1"
 description = "Combinators for binding to C libraries without writing any C."
 requires = "unix bigarray"
@@ -8,15 +6,16 @@ archive(byte, plugin) = "ctypes.cma"
 archive(native) = "ctypes.cmxa"
 archive(native, plugin) = "ctypes.cmxs"
 exists_if = "ctypes.cma"
+
 package "top" (
- version = "0.1"
- description = "Toplevel printers for C types"
- requires = "ctypes"
- archive(byte) = "ctypes_top.cma"
- archive(byte, plugin) = "ctypes_top.cma"
- archive(native) = "ctypes_top.cmxa"
- archive(native, plugin) = "ctypes_top.cmxs"
- exists_if = "ctypes_top.cma"
+  version = "0.1"
+  description = "Toplevel printers for C types"
+  requires = "ctypes"
+  archive(byte) = "ctypes-top.cma"
+  archive(byte, plugin) = "ctypes-top.cma"
+  archive(native) = "ctypes-top.cmxa"
+  archive(native, plugin) = "ctypes-top.cmxs"
+  exists_if = "ctypes-top.cma"
 )
 
 package "foreign" (
@@ -29,5 +28,3 @@ package "foreign" (
  archive(native, plugin) = "ctypes-foreign.cmxs"
  exists_if = "ctypes-foreign.cma"
 )
-# OASIS_STOP
-

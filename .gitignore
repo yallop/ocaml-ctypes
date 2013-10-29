@@ -1,19 +1,6 @@
-# Generated files
-setup.data
-setup.log
 _build
-build
-tests/clib/test_functions.o
-tests/clib/test_functions.so
+setup.data
+src/ctypes/ctypes_primitives.ml
 src/ctypes_config.h
 src/ctypes_config.ml
-*.native
-.*.swp
-#
 *~
-ctypes.odocl
-primitive_details
-primitive_details.cmi
-primitive_details.cmo
-primitive_details.o
-src/ctypes_primitives.ml
