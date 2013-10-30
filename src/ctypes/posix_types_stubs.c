@@ -4,7 +4,7 @@
  * This file is distributed under the terms of the MIT License.
  * See the file LICENSE for details.
  */
-
+#define _XOPEN_SOURCE 500
 #include <caml/mlvalues.h>
 
 #include <assert.h>
