@@ -167,33 +167,37 @@ struct
   let fts_options = int              -: "fts_options"
   let () = seal fts
 
-  type t = fts structure ptr
+  type t = { ptr : fts structure ptr;
+             (* The compar field ties the lifetime of the comparison function
+                to the lifetime of the fts object to prevent untimely
+                collection. *)
+             compar: (FTSENT.t ptr -> FTSENT.t ptr -> int) option }
 
   let cur : t -> FTSENT.t
-    = fun t -> getf !@t fts_cur
+    = fun { ptr } -> getf !@ptr fts_cur
 
   let child : t -> FTSENT.t
-    = fun t -> getf !@t fts_child
+    = fun { ptr } -> getf !@ptr fts_child
 
   let array : t -> FTSENT.t list
-    = fun t ->
-      Array.(to_list (from_ptr (getf !@t fts_array) (getf !@t fts_nitems)))
+    = fun { ptr } ->
+      Array.(to_list (from_ptr (getf !@ptr fts_array) (getf !@ptr fts_nitems)))
 
   let dev : t -> dev_t
-    = fun t -> getf !@t fts_dev
+    = fun { ptr } -> getf !@ptr fts_dev
 
   let path : t -> string
-    = fun t -> getf !@t fts_path
+    = fun { ptr } -> getf !@ptr fts_path
 
   let rfd : t -> int
-    = fun t -> getf !@t fts_rfd
+    = fun { ptr } -> getf !@ptr fts_rfd
 end
 
 open FTSENT
 open FTS
 
 (* FTS *fts_open(char * const *path_argv, int options,
-                 int ( *compar)(const FTSENT **, const FTSENT ** ));
+   int ( *compar)(const FTSENT **, const FTSENT ** ));
 *)
 let compar_type = ptr FTSENT.t @-> ptr FTSENT.t @-> returning int
 let _fts_open = Foreign.foreign "fts_open"
@@ -218,18 +222,18 @@ let _fts_close = Foreign.foreign "fts_close" ~check_errno:true
 let crush_options f : 'a list -> int = List.fold_left (fun i o -> i lor (f o)) 0
 
 let fts_read fts =
-  let p = _fts_read fts in
+  let p = _fts_read fts.ptr in
   if to_voidp p = null then None
   else Some p
 
 let fts_close ftsp =
-  ignore (_fts_close ftsp)
+  ignore (_fts_close ftsp.ptr)
       
 let fts_set ~ftsp ~f ~options =
-  ignore (_fts_set ftsp f (crush_options fts_set_option_value options))
+  ignore (_fts_set ftsp.ptr f (crush_options fts_set_option_value options))
 
 let fts_children ~ftsp ~name_only =
-  _fts_children ftsp (fts_children_option_of_bool name_only)
+  _fts_children ftsp.ptr (fts_children_option_of_bool name_only)
 
 let null_terminated_array_of_ptr_list typ list =
   let nitems = List.length list in
@@ -241,4 +245,4 @@ let null_terminated_array_of_ptr_list typ list =
 let fts_open ~path_argv ?compar ~options = 
   let paths = null_terminated_array_of_ptr_list string path_argv in
   let options = crush_options fts_open_option_value options in
-  _fts_open (Array.start paths) options compar
+  { ptr = _fts_open (Array.start paths) options compar; compar }
