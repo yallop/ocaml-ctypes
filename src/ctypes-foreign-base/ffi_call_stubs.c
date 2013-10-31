@@ -281,7 +281,6 @@ value ctypes_call(value function, value callspec_, value argwriter,
 {
   CAMLparam4(function, callspec_, argwriter, rvreader);
 
-  void (*cfunction)(void) = (void (*)(void)) CTYPES_TO_PTR(function);
   struct callspec *callspec = Data_custom_val(callspec_);
   int roffset = callspec->roffset;
 
@@ -298,7 +297,9 @@ value ctypes_call(value function, value callspec_, value argwriter,
 
   caml_callback(argwriter, CTYPES_FROM_PTR(callbuffer));
 
-  ffi_call(callspec->cif,
+  void (*cfunction)(void) = (void (*)(void)) CTYPES_TO_PTR(function);
+
+  ffi_call(((struct callspec *)Data_custom_val(callspec_))->cif,
            cfunction,
            return_slot,
            (void **)(callbuffer + arg_array_offset));
