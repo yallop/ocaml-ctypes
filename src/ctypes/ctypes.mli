@@ -588,6 +588,25 @@ val field_type : ('a, _) field -> 'a typ
 val addr : ((_, _) structured as 's) -> 's ptr
 (** [addr s] returns the address of the structure or union [s]. *)
 
+(** {3 Coercions} *)
+
+val coerce : 'a typ -> 'b typ -> 'a -> 'b
+(** [coerce t1 t2] returns a coercion function between the types represented
+    by [t1] and [t2].  If [t1] cannot be coerced to [t2], [coerce] raises 
+    {!Uncoerceable}.
+
+    The following coercions are currently supported:
+
+     - All pointer types are intercoerceable.
+     - Any type may be coerced to {!void}
+     - There is a coercion between a {!view} and another type [t] (in either
+       direction) if there is a coercion between the representation type
+       underlying the view and [t].
+
+    The set of supported coercions is subject to change.  Future versions of
+    ctypes may both add new types of coercion and restrict the existing
+    coercions. *)
+
 (** {2 Exceptions} *)
 
 exception Unsupported of string
@@ -612,3 +631,7 @@ exception IncompleteType
     pointer arithmetic.  Additionally, incomplete struct and union types
     cannot be used as argument or return types.
 *)
+
+exception Uncoerceable
+(** An attempt was made to coerce between uncoerceable types.  *)
+

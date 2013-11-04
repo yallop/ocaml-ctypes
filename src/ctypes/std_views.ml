@@ -20,13 +20,13 @@ let string = Static.(view (ptr char))
 
 let castp typ p = Memory.(from_voidp typ (to_voidp p))
 
-let read_nullable t p = Memory.(
-  if p = null then None
-  else Some !@(castp t (allocate Static.(ptr void) p)))
+let read_nullable t =
+  let coerce = Coerce.coerce Static.(ptr void) t in
+  fun p -> Memory.(if p = null then None else Some (coerce p))
 
-let write_nullable t = Memory.(function
-  | None -> null
-  | Some f -> !@(castp Static.(ptr void) (allocate t f)))
+let write_nullable t =
+  let coerce = Coerce.coerce t Static.(ptr void) in
+  Memory.(function None -> null | Some f -> coerce f)
 
 let nullable_view t =
   let read = read_nullable t

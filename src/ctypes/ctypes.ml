@@ -17,6 +17,8 @@ include Std_views
 
 include Value_printing
 
+include Coerce
+
 let ( *:* ) s t =
   Common.warn "'s *:* t' is deprecated; use 'field s label t' instead";
   field s "<unknown>" t

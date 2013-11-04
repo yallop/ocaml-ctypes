@@ -27,20 +27,7 @@ struct
 
   let castp typ p = Memory.(from_voidp typ (to_voidp p))
 
-  let read_nullable t p = Memory.(
-    if p = null then None
-    else Some !@(castp t (allocate Static.(ptr void) p)))
-
-  let write_nullable t = Memory.(function
-    | None -> null
-    | Some f -> !@(castp Static.(ptr void) (allocate t f)))
-
-  let nullable_view t =
-    let read = read_nullable t
-    and write = write_nullable t in
-    Static.(view ~read ~write (ptr void))
-
-  let funptr_opt fn = nullable_view (funptr fn)
+  let funptr_opt fn = Std_views.nullable_view (funptr fn)
 
   let ptr_of_raw_ptr p = 
     Ctypes.ptr_of_raw_address (Ctypes_raw.PtrType.to_int64 p)
@@ -50,9 +37,8 @@ struct
 
   let foreign ?from ?(stub=false) ?(check_errno=false) symbol typ =
     try
-      let p = ptr_of_raw_ptr (dlsym ?handle:from ~symbol) in
-      let pp = to_voidp (allocate (ptr void) p) in
-      !@ (from_voidp (funptr ~name:symbol ~check_errno typ) pp)
+      let coerce = Coerce.coerce (ptr void) (funptr ~name:symbol ~check_errno typ) in
+      coerce (ptr_of_raw_ptr (dlsym ?handle:from ~symbol))
     with 
     | exn -> if stub then fun _ -> raise exn else raise exn
 end
