@@ -258,7 +258,7 @@ let test_bsearch () =
   let mkmi n s =
     let m = make mi in
     setf m mr n;
-    setf m name (Array.start (of_string s));
+    setf m name (Array.start s);
     m
 
   let cmpi m1 m2 =
@@ -268,19 +268,32 @@ let test_bsearch () =
       (as_string (!@(mi1 |-> name)))
       (as_string (!@(mi2 |-> name)))
 
+  let jan = of_string "jan"
+  let feb = of_string "feb"
+  let mar = of_string "mar"
+  let apr = of_string "apr"
+  let may = of_string "may"
+  let jun = of_string "jun"
+  let jul = of_string "jul"
+  let aug = of_string "aug"
+  let sep = of_string "sep"
+  let oct = of_string "oct"
+  let nov = of_string "nov"
+  let dec = of_string "dec"
+
   let months = Array.of_list mi [
-    mkmi 1 "jan";
-    mkmi 2 "feb";
-    mkmi 3 "mar";
-    mkmi 4 "apr";
-    mkmi 5 "may";
-    mkmi 6 "jun";
-    mkmi 7 "jul";
-    mkmi 8 "aug";
-    mkmi 9 "sep";
-    mkmi 10 "oct";
-    mkmi 11 "nov";
-    mkmi 12 "dec";
+    mkmi 1 jan;
+    mkmi 2 feb;
+    mkmi 3 mar;
+    mkmi 4 apr;
+    mkmi 5 may;
+    mkmi 6 jun;
+    mkmi 7 jul;
+    mkmi 8 aug;
+    mkmi 9 sep;
+    mkmi 10 oct;
+    mkmi 11 nov;
+    mkmi 12 dec;
   ]
 
   let () = qsort
@@ -301,30 +314,32 @@ let test_bsearch () =
       if r = null then None
       else Some (!@(from_voidp mi r))
 
-  let find_month_by_name : string -> mi structure option =
+  let find_month_by_name : char array -> mi structure option =
     fun s -> search (mkmi 0 s) months
 
-  let () = match find_month_by_name "dec" with
+  let () = match find_month_by_name dec with
       Some m -> assert_equal 12 (getf m mr)
     | _ -> assert false
 
-  let () = match find_month_by_name "feb" with
+  let () = match find_month_by_name feb with
       Some m -> assert_equal 2 (getf m mr)
     | _ -> assert false
 
-  let () = match find_month_by_name "jan" with
+  let () = match find_month_by_name jan with
       Some m -> assert_equal 1 (getf m mr)
     | _ -> assert false
 
-  let () = match find_month_by_name "may" with
+  let () = match find_month_by_name may with
       Some m -> assert_equal 5 (getf m mr)
     | _ -> assert false
 
+  let missing = of_string "missing"
   let () =
-    assert_equal None (find_month_by_name "missing")
+    assert_equal None (find_month_by_name missing)
 
+  let empty = of_string ""
   let () =
-    assert_equal None (find_month_by_name "")
+    assert_equal None (find_month_by_name empty)
 
   end in ()
 
