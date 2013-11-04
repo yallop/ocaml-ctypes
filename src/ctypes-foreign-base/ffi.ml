@@ -126,9 +126,10 @@ struct
         let box = box_function f callspec in
         let read = Memory.build p ~offset:0 in
         fun f -> Ffi_stubs.Fn (fun buf ->
-          try box (WeakRef.make (WeakRef.get f (read buf)))
-          with WeakRef.EmptyWeakReference ->
-            raise Ffi_stubs.CallToExpiredClosure)
+          let f' = WeakRef.get f (read buf) in
+          let v = box (WeakRef.make f') in
+          let () = Gc.finalise (fun _ -> f'; ()) v in
+          v)
 
   (*
     callspec = allocate_callspec ()
