@@ -156,6 +156,13 @@ test-bigarrays.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthr
 test-bigarrays: PROJECT=test-bigarrays
 test-bigarrays: $$(NATIVE_TARGET)
 
+test-coercions.dir = tests/test-coercions
+test-coercions.threads = yes
+test-coercions.deps = bigarray oUnit
+test-coercions.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
+test-coercions: PROJECT=test-coercions
+test-coercions: $$(NATIVE_TARGET)
+
 TESTS =                         \
   test-raw                      \
   test-pointers                 \
@@ -178,7 +185,8 @@ TESTS =                         \
   test-complex                  \
   test-callback_lifetime        \
   test-stubs                    \
-  test-bigarrays
+  test-bigarrays                \
+  test-coercions
 
 testlib: $(BUILDDIR)/clib/test_functions.so
 $(BUILDDIR)/clib/test_functions.so: $(BUILDDIR)/clib/test_functions.o
