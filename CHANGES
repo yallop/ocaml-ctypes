@@ -1,5 +1,11 @@
  == ctypes 0.2 ==
 
+c8d54a: Basic coercion support
+2552d3: Build fix for Debian Squeeze
+d1131d: Bigarray support
+816b56: Replace returning_checking_errno with an option to Foreign.foreign
+1a8ead: Check homebrew prefix during configuration
+554939: Foreign.foreign, give the choice of not failing if symbol is absent.
 038420: Tweak passability tests to distinguish libffi's restrictions from C's.
 df10e1: Move funptr and funptr_opt to the Foreign module.
 71a4c7: Struct type equality is now structural, not physical
