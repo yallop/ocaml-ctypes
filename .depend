@@ -1,10 +1,9 @@
+_build/src/ctypes-foreign-base/closure_properties.cmi :
 _build/src/ctypes-foreign-base/dl.cmi : _build/src/ctypes/ctypes_raw.cmo
 _build/src/ctypes-foreign-base/ffi.cmi : _build/src/ctypes/static.cmo
 _build/src/ctypes-foreign-base/weakRef.cmi :
-_build/src/ctypes-foreign-threaded/closure_properties.cmi :
 _build/src/ctypes-foreign-threaded/foreign.cmi : _build/src/ctypes-foreign-base/dl.cmi \
     _build/src/ctypes/ctypes.cmi
-_build/src/ctypes-foreign-unthreaded/closure_properties.cmi :
 _build/src/ctypes-foreign-unthreaded/foreign.cmi : _build/src/ctypes-foreign-base/dl.cmi \
     _build/src/ctypes/ctypes.cmi
 _build/src/ctypes-top/ctypes_printers.cmi : _build/src/ctypes/unsigned.cmi \
@@ -22,6 +21,10 @@ _build/src/ctypes/structs_computed.cmi : _build/src/ctypes/structs.cmi \
 _build/src/ctypes/unsigned.cmi :
 _build/src/configure/make_primitive_details.cmo :
 _build/src/configure/make_primitive_details.cmx :
+_build/src/ctypes-foreign-base/closure_properties.cmo : \
+    _build/src/ctypes-foreign-base/closure_properties.cmi
+_build/src/ctypes-foreign-base/closure_properties.cmx : \
+    _build/src/ctypes-foreign-base/closure_properties.cmi
 _build/src/ctypes-foreign-base/dl.cmo : _build/src/ctypes/ctypes_raw.cmo \
     _build/src/ctypes-foreign-base/dl.cmi
 _build/src/ctypes-foreign-base/dl.cmx : _build/src/ctypes/ctypes_raw.cmx \
@@ -50,30 +53,26 @@ _build/src/ctypes-foreign-base/foreign_basis.cmx : _build/src/ctypes/type_printi
     _build/src/ctypes/ctypes.cmx _build/src/ctypes/coerce.cmx
 _build/src/ctypes-foreign-base/weakRef.cmo : _build/src/ctypes-foreign-base/weakRef.cmi
 _build/src/ctypes-foreign-base/weakRef.cmx : _build/src/ctypes-foreign-base/weakRef.cmi
-_build/src/ctypes-foreign-threaded/closure_properties.cmo : \
-    _build/src/ctypes-foreign-threaded/closure_properties.cmi
-_build/src/ctypes-foreign-threaded/closure_properties.cmx : \
-    _build/src/ctypes-foreign-threaded/closure_properties.cmi
 _build/src/ctypes-foreign-threaded/foreign.cmo : \
     _build/src/ctypes-foreign-base/foreign_basis.cmo \
-    _build/src/ctypes-foreign-threaded/closure_properties.cmi \
+    _build/src/ctypes-foreign-base/closure_properties.cmi \
     _build/src/ctypes-foreign-threaded/foreign.cmi
 _build/src/ctypes-foreign-threaded/foreign.cmx : \
     _build/src/ctypes-foreign-base/foreign_basis.cmx \
-    _build/src/ctypes-foreign-threaded/closure_properties.cmx \
+    _build/src/ctypes-foreign-base/closure_properties.cmx \
     _build/src/ctypes-foreign-threaded/foreign.cmi
-_build/src/ctypes-foreign-unthreaded/closure_properties.cmo : \
-    _build/src/ctypes-foreign-unthreaded/closure_properties.cmi
-_build/src/ctypes-foreign-unthreaded/closure_properties.cmx : \
-    _build/src/ctypes-foreign-unthreaded/closure_properties.cmi
 _build/src/ctypes-foreign-unthreaded/foreign.cmo : \
+    _build/src/ctypes-foreign-unthreaded/gc_mutex.cmo \
     _build/src/ctypes-foreign-base/foreign_basis.cmo \
-    _build/src/ctypes-foreign-threaded/closure_properties.cmi \
+    _build/src/ctypes-foreign-base/closure_properties.cmi \
     _build/src/ctypes-foreign-unthreaded/foreign.cmi
 _build/src/ctypes-foreign-unthreaded/foreign.cmx : \
+    _build/src/ctypes-foreign-unthreaded/gc_mutex.cmx \
     _build/src/ctypes-foreign-base/foreign_basis.cmx \
-    _build/src/ctypes-foreign-threaded/closure_properties.cmx \
+    _build/src/ctypes-foreign-base/closure_properties.cmx \
     _build/src/ctypes-foreign-unthreaded/foreign.cmi
+_build/src/ctypes-foreign-unthreaded/gc_mutex.cmo :
+_build/src/ctypes-foreign-unthreaded/gc_mutex.cmx :
 _build/src/ctypes-top/ctypes_printers.cmo : _build/src/ctypes/unsigned.cmi \
     _build/src/ctypes/signed.cmi _build/src/ctypes/posixTypes.cmi _build/src/ctypes/ctypes.cmi \
     _build/src/ctypes-top/ctypes_printers.cmi
@@ -170,6 +169,10 @@ _build/examples/date/date.cmi : _build/src/ctypes/posixTypes.cmi _build/src/ctyp
 _build/examples/fts/fts.cmi : _build/src/ctypes/posixTypes.cmi _build/src/ctypes/ctypes.cmi
 _build/examples/ncurses/ncurses.cmi :
 _build/examples/sigset/sigset.cmi : _build/src/ctypes/posixTypes.cmi _build/src/ctypes/ctypes.cmi
+_build/examples/churny/churny.cmo : _build/src/ctypes-foreign-threaded/foreign.cmi \
+    _build/src/ctypes-foreign-base/dl.cmi _build/src/ctypes/ctypes.cmi
+_build/examples/churny/churny.cmx : _build/src/ctypes-foreign-threaded/foreign.cmx \
+    _build/src/ctypes-foreign-base/dl.cmx _build/src/ctypes/ctypes.cmx
 _build/examples/date/date.cmo : _build/src/ctypes/posixTypes.cmi \
     _build/src/ctypes-foreign-threaded/foreign.cmi _build/src/ctypes/ctypes.cmi \
     _build/examples/date/date.cmi

@@ -5,4 +5,4 @@
  * See the file LICENSE for details.
  *)
 
-include Foreign_basis.Make(Closure_properties)
+include Foreign_basis.Make(Closure_properties.Make(Gc_mutex))
