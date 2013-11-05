@@ -146,7 +146,7 @@ let test_controlling_closure_lifetime () =
   assert_equal 15 (ret 5)
 
 
-let suite = "Struct tests" >:::
+let suite = "Callback lifetime tests" >:::
   ["storing references to OCaml functions"
     >:: test_storing_function_reference;
    
