@@ -10,10 +10,10 @@
 <link title="Index of module types" rel=Appendix href="index_module_types.html">
 <link title="Unsigned" rel="Chapter" href="Unsigned.html">
 <link title="Signed" rel="Chapter" href="Signed.html">
-<link title="Ctypes" rel="Chapter" href="Ctypes.html">
 <link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
 <link title="Dl" rel="Chapter" href="Dl.html">
-<link title="Foreign" rel="Chapter" href="Foreign.html"><title>Index of values</title>
+<link title="Foreign" rel="Chapter" href="Foreign.html">
+<link title="Ctypes" rel="Chapter" href="Ctypes.html"><title>Index of values</title>
 </head>
 <body>
 <div class="navbar">&nbsp;<a class="up" href="index.html" title="Index">Up</a>
@@ -28,10 +28,7 @@ Multiplication.
 </td></tr>
 <tr><td><a href="Ctypes.html#VAL( *:* )">( *:* )</a> [<a href="Ctypes.html">Ctypes</a>]</td>
 <td><div class="info">
-<code class="code">s *:* t</code> adds a field of type <code class="code">t</code> to the structure type <code class="code">s</code> and returns
-    a field value that can be used to read and write the field in structure
-    instances (e.g.
-</div>
+<span class="deprecated"></span></div>
 </td></tr>
 <tr><td><a href="Ctypes.html#VAL(!@)">(!@)</a> [<a href="Ctypes.html">Ctypes</a>]</td>
 <td><div class="info">
@@ -45,10 +42,7 @@ Addition.
 </td></tr>
 <tr><td><a href="Ctypes.html#VAL(+:+)">(+:+)</a> [<a href="Ctypes.html">Ctypes</a>]</td>
 <td><div class="info">
-<code class="code">u +:+ t</code> adds a field of type <code class="code">t</code> to the union type <code class="code">u</code> and returns a
-    field value that can be used to read and write the field in union
-    instances (e.g.
-</div>
+<span class="deprecated"></span></div>
 </td></tr>
 <tr><td><a href="Ctypes.html#VAL(+@)">(+@)</a> [<a href="Ctypes.html">Ctypes</a>]</td>
 <td><div class="info">
@@ -153,14 +147,14 @@ Addition.
 </td></tr>
 <tr><td><a href="Ctypes.html#VALallocate">allocate</a> [<a href="Ctypes.html">Ctypes</a>]</td>
 <td><div class="info">
-<code class="code">allocate t v</code> allocates a fresh value of type <code class="code">t</code>, initialises it with <code class="code">v</code>
-      and returns its address.
+<code class="code">allocate t v</code> allocates a fresh value of type <code class="code">t</code>, initialises it with
+    <code class="code">v</code> and returns its address.
 </div>
 </td></tr>
 <tr><td><a href="Ctypes.html#VALallocate_n">allocate_n</a> [<a href="Ctypes.html">Ctypes</a>]</td>
 <td><div class="info">
-<code class="code">allocate_n t ~count:n</code> allocates a fresh array with element type <code class="code">t</code>
-    and length <code class="code">n</code>, and returns its address.
+<code class="code">allocate_n t ~count:n</code> allocates a fresh array with element type <code class="code">t</code> and
+    length <code class="code">n</code>, and returns its address.
 </div>
 </td></tr>
 <tr><td><a href="Ctypes.html#VALarray">array</a> [<a href="Ctypes.html">Ctypes</a>]</td>
@@ -169,12 +163,59 @@ Construct a sized array type from a length and an existing type (called
     the <i>element type</i>).
 </div>
 </td></tr>
+<tr><td><a href="Ctypes.html#VALarray1">array1</a> [<a href="Ctypes.html">Ctypes</a>]</td>
+<td><div class="info">
+The class of <code class="code">Bigarray.Array1.t</code> values
+</div>
+</td></tr>
+<tr><td><a href="Ctypes.html#VALarray2">array2</a> [<a href="Ctypes.html">Ctypes</a>]</td>
+<td><div class="info">
+The class of <code class="code">Bigarray.Array2.t</code> values
+</div>
+</td></tr>
+<tr><td><a href="Ctypes.html#VALarray3">array3</a> [<a href="Ctypes.html">Ctypes</a>]</td>
+<td><div class="info">
+The class of <code class="code">Bigarray.Array3.t</code> values
+</div>
+</td></tr>
+<tr><td><a href="Ctypes.html#VALarray_of_bigarray">array_of_bigarray</a> [<a href="Ctypes.html">Ctypes</a>]</td>
+<td><div class="info">
+Convert a C array to a Bigarray value.
+</div>
+</td></tr>
 <tr><td align="left"><br>B</td></tr>
+<tr><td><a href="Ctypes.html#VALbigarray">bigarray</a> [<a href="Ctypes.html">Ctypes</a>]</td>
+<td><div class="info">
+Construct a sized bigarray type representation from a bigarray class, the
+    dimensions, and the <code class="code">Bigarray.kind</code>.
+</div>
+</td></tr>
+<tr><td><a href="Ctypes.html#VALbigarray_of_array">bigarray_of_array</a> [<a href="Ctypes.html">Ctypes</a>]</td>
+<td><div class="info">
+Convert a Bigarray value to a C array.
+</div>
+</td></tr>
+<tr><td><a href="Ctypes.html#VALbigarray_of_ptr">bigarray_of_ptr</a> [<a href="Ctypes.html">Ctypes</a>]</td>
+<td><div class="info">
+Convert a C pointer to a bigarray value.
+</div>
+</td></tr>
+<tr><td><a href="Ctypes.html#VALbigarray_start">bigarray_start</a> [<a href="Ctypes.html">Ctypes</a>]</td>
+<td><div class="info">
+Return the address of the first element of the given Bigarray value.
+</div>
+</td></tr>
 <tr><td><a href="PosixTypes.html#VALblkcnt_t">blkcnt_t</a> [<a href="PosixTypes.html">PosixTypes</a>]</td>
 <td></td></tr>
 <tr><td><a href="PosixTypes.html#VALblksize_t">blksize_t</a> [<a href="PosixTypes.html">PosixTypes</a>]</td>
 <td></td></tr>
 <tr><td align="left"><br>C</td></tr>
+<tr><td><a href="Ctypes.html#VALcamlint">camlint</a> [<a href="Ctypes.html">Ctypes</a>]</td>
+<td><div class="info">
+Value representing an integer type with the same storage requirements as
+    an OCaml <code class="code">int</code>.
+</div>
+</td></tr>
 <tr><td><a href="Ctypes.html#VALchar">char</a> [<a href="Ctypes.html">Ctypes</a>]</td>
 <td><div class="info">
 Value representing the C type <code class="code">char</code>.
@@ -182,10 +223,26 @@ Value representing the C type <code class="code">char</code>.
 </td></tr>
 <tr><td><a href="PosixTypes.html#VALclock_t">clock_t</a> [<a href="PosixTypes.html">PosixTypes</a>]</td>
 <td></td></tr>
+<tr><td><a href="Ctypes.html#VALcoerce">coerce</a> [<a href="Ctypes.html">Ctypes</a>]</td>
+<td><div class="info">
+<code class="code">coerce t1 t2</code> returns a coercion function between the types represented
+    by <code class="code">t1</code> and <code class="code">t2</code>.
+</div>
+</td></tr>
 <tr><td><a href="Unsigned.S.html#VALcompare">compare</a> [<a href="Unsigned.S.html">Unsigned.S</a>]</td>
 <td><div class="info">
 The comparison function for unsigned integers, with the same
       specification as <code class="code">Pervasives.compare</code>.
+</div>
+</td></tr>
+<tr><td><a href="Ctypes.html#VALcomplex32">complex32</a> [<a href="Ctypes.html">Ctypes</a>]</td>
+<td><div class="info">
+Value representing the C99 single-precision <code class="code">float complex</code> type.
+</div>
+</td></tr>
+<tr><td><a href="Ctypes.html#VALcomplex64">complex64</a> [<a href="Ctypes.html">Ctypes</a>]</td>
+<td><div class="info">
+Value representing the C99 double-precision <code class="code">double complex</code> type.
 </div>
 </td></tr>
 <tr><td align="left"><br>D</td></tr>
@@ -223,6 +280,18 @@ Retrieve the element type of an array.
 </div>
 </td></tr>
 <tr><td align="left"><br>F</td></tr>
+<tr><td><a href="Ctypes.html#VALfield">field</a> [<a href="Ctypes.html">Ctypes</a>]</td>
+<td><div class="info">
+<code class="code">field ty label ty'</code> adds a field of type <code class="code">ty'</code> with label <code class="code">label</code> to the
+    structure or union type <code class="code">ty</code> and returns a field value that can be used to
+    read and write the field in structure or union instances (e.g.
+</div>
+</td></tr>
+<tr><td><a href="Ctypes.html#VALfield_type">field_type</a> [<a href="Ctypes.html">Ctypes</a>]</td>
+<td><div class="info">
+<code class="code">field_type f</code> returns the type of the field <code class="code">f</code>.
+</div>
+</td></tr>
 <tr><td><a href="Ctypes.html#VALfloat">float</a> [<a href="Ctypes.html">Ctypes</a>]</td>
 <td><div class="info">
 Value representing the C single-precision <code class="code">float</code> type.
@@ -240,6 +309,22 @@ Value representing the C single-precision <code class="code">float</code> type.
     as an OCaml value.
 </div>
 </td></tr>
+<tr><td><a href="Ctypes.html#VALformat">format</a> [<a href="Ctypes.html">Ctypes</a>]</td>
+<td><div class="info">
+Pretty-print a representation of the C value to the specified formatter.
+</div>
+</td></tr>
+<tr><td><a href="Ctypes.html#VALformat_fn">format_fn</a> [<a href="Ctypes.html">Ctypes</a>]</td>
+<td><div class="info">
+Pretty-print a C representation of the function type to the specified
+    formatter.
+</div>
+</td></tr>
+<tr><td><a href="Ctypes.html#VALformat_typ">format_typ</a> [<a href="Ctypes.html">Ctypes</a>]</td>
+<td><div class="info">
+Pretty-print a C representation of the type to the specified formatter.
+</div>
+</td></tr>
 <tr><td><a href="Ctypes.Array.html#VALfrom_ptr">from_ptr</a> [<a href="Ctypes.Array.html">Ctypes.Array</a>]</td>
 <td><div class="info">
 <code class="code">from_ptr p n</code> creates an <code class="code">n</code>-length array reference to the memory at
@@ -255,17 +340,22 @@ Conversion from <code class="code">void *</code>.
 <td></td></tr>
 <tr><td><a href="PosixTypes.html#VALfsfilcnt_t">fsfilcnt_t</a> [<a href="PosixTypes.html">PosixTypes</a>]</td>
 <td></td></tr>
-<tr><td><a href="Ctypes.html#VALfunptr">funptr</a> [<a href="Ctypes.html">Ctypes</a>]</td>
+<tr><td><a href="Foreign.html#VALfunptr">funptr</a> [<a href="Foreign.html">Foreign</a>]</td>
 <td><div class="info">
 Construct a function pointer type from a function type.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes.html#VALfunptr_opt">funptr_opt</a> [<a href="Ctypes.html">Ctypes</a>]</td>
+<tr><td><a href="Foreign.html#VALfunptr_opt">funptr_opt</a> [<a href="Foreign.html">Foreign</a>]</td>
 <td><div class="info">
 Construct a function pointer type from a function type.
 </div>
 </td></tr>
 <tr><td align="left"><br>G</td></tr>
+<tr><td><a href="Ctypes.html#VALgenarray">genarray</a> [<a href="Ctypes.html">Ctypes</a>]</td>
+<td><div class="info">
+The class of <code class="code">Bigarray.Genarray.t</code> values
+</div>
+</td></tr>
 <tr><td><a href="Ctypes.Array.html#VALget">get</a> [<a href="Ctypes.Array.html">Ctypes.Array</a>]</td>
 <td><div class="info">
 <code class="code">get a n</code> returns the <code class="code">n</code>th element of the zero-indexed array <code class="code">a</code>.
@@ -405,11 +495,15 @@ A null pointer.
 Convert the given int value to an unsigned integer.
 </div>
 </td></tr>
+<tr><td><a href="Unsigned.UInt32.html#VALof_int32">of_int32</a> [<a href="Unsigned.UInt32.html">Unsigned.UInt32</a>]</td>
+<td></td></tr>
 <tr><td><a href="Signed.S.html#VALof_int64">of_int64</a> [<a href="Signed.S.html">Signed.S</a>]</td>
 <td><div class="info">
 Convert the given int64 value to a signed integer.
 </div>
 </td></tr>
+<tr><td><a href="Unsigned.UInt64.html#VALof_int64">of_int64</a> [<a href="Unsigned.UInt64.html">Unsigned.UInt64</a>]</td>
+<td></td></tr>
 <tr><td><a href="Ctypes.Array.html#VALof_list">of_list</a> [<a href="Ctypes.Array.html">Ctypes.Array</a>]</td>
 <td><div class="info">
 <code class="code">of_list t l</code> builds an array of type <code class="code">t</code> of the same length as <code class="code">l</code>, and
@@ -506,11 +600,6 @@ Integer remainder.
 Give the return type of a C function.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes.html#VALreturning_checking_errno">returning_checking_errno</a> [<a href="Ctypes.html">Ctypes</a>]</td>
-<td><div class="info">
-Give the return type of a C function.
-</div>
-</td></tr>
 <tr><td align="left"><br>S</td></tr>
 <tr><td><a href="Ctypes.html#VALschar">schar</a> [<a href="Ctypes.html">Ctypes</a>]</td>
 <td><div class="info">
@@ -557,14 +646,14 @@ Value representing the C type (<code class="code">signed</code>) <code class="co
 </td></tr>
 <tr><td><a href="PosixTypes.html#VALsigset_t">sigset_t</a> [<a href="PosixTypes.html">PosixTypes</a>]</td>
 <td></td></tr>
-<tr><td><a href="PosixTypes.html#VALsize_t">size_t</a> [<a href="PosixTypes.html">PosixTypes</a>]</td>
-<td></td></tr>
 <tr><td><a href="Ctypes.html#VALsize_t">size_t</a> [<a href="Ctypes.html">Ctypes</a>]</td>
 <td><div class="info">
 Value representing the C type <code class="code">size_t</code>, an alias for one of the unsigned
     integer types.
 </div>
 </td></tr>
+<tr><td><a href="PosixTypes.html#VALsize_t">size_t</a> [<a href="PosixTypes.html">PosixTypes</a>]</td>
+<td></td></tr>
 <tr><td><a href="Ctypes.html#VALsizeof">sizeof</a> [<a href="Ctypes.html">Ctypes</a>]</td>
 <td><div class="info">
 <code class="code">sizeof t</code> computes the size in bytes of the type <code class="code">t</code>.
@@ -578,6 +667,26 @@ Return the address of the first element of the given array.
 </div>
 </td></tr>
 <tr><td><a href="Ctypes.html#VALstring">string</a> [<a href="Ctypes.html">Ctypes</a>]</td>
+<td><div class="info">
+A high-level representation of the string type.
+</div>
+</td></tr>
+<tr><td><a href="Ctypes.html#VALstring_of">string_of</a> [<a href="Ctypes.html">Ctypes</a>]</td>
+<td><div class="info">
+Return a string representation of the C value.
+</div>
+</td></tr>
+<tr><td><a href="Ctypes.html#VALstring_of_fn">string_of_fn</a> [<a href="Ctypes.html">Ctypes</a>]</td>
+<td><div class="info">
+Return a C representation of the function type.
+</div>
+</td></tr>
+<tr><td><a href="Ctypes.html#VALstring_of_typ">string_of_typ</a> [<a href="Ctypes.html">Ctypes</a>]</td>
+<td><div class="info">
+Return a C representation of the type.
+</div>
+</td></tr>
+<tr><td><a href="Ctypes.html#VALstring_opt">string_opt</a> [<a href="Ctypes.html">Ctypes</a>]</td>
 <td><div class="info">
 A high-level representation of the string type.
 </div>
@@ -607,11 +716,15 @@ Successor.
 Convert the given unsigned integer value to an int.
 </div>
 </td></tr>
+<tr><td><a href="Unsigned.UInt32.html#VALto_int32">to_int32</a> [<a href="Unsigned.UInt32.html">Unsigned.UInt32</a>]</td>
+<td></td></tr>
 <tr><td><a href="Signed.S.html#VALto_int64">to_int64</a> [<a href="Signed.S.html">Signed.S</a>]</td>
 <td><div class="info">
 Convert the given signed integer to an int64 value.
 </div>
 </td></tr>
+<tr><td><a href="Unsigned.UInt64.html#VALto_int64">to_int64</a> [<a href="Unsigned.UInt64.html">Unsigned.UInt64</a>]</td>
+<td></td></tr>
 <tr><td><a href="Ctypes.Array.html#VALto_list">to_list</a> [<a href="Ctypes.Array.html">Ctypes.Array</a>]</td>
 <td><div class="info">
 <code class="code">to_list a</code> builds a list of the same length as <code class="code">a</code> such that each

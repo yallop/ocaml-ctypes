@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="style.css" type="text/css">
 <meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
 <link rel="Start" href="index.html">
-<link rel="previous" href="Ctypes.html">
+<link rel="previous" href="Signed.html">
 <link rel="next" href="Dl.html">
 <link rel="Up" href="index.html">
 <link title="Index of types" rel=Appendix href="index_types.html">
@@ -14,22 +14,23 @@
 <link title="Index of module types" rel=Appendix href="index_module_types.html">
 <link title="Unsigned" rel="Chapter" href="Unsigned.html">
 <link title="Signed" rel="Chapter" href="Signed.html">
-<link title="Ctypes" rel="Chapter" href="Ctypes.html">
 <link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
 <link title="Dl" rel="Chapter" href="Dl.html">
-<link title="Foreign" rel="Chapter" href="Foreign.html"><link title="POSIX arithmetic types" rel="Section" href="#2_POSIXarithmetictypes">
+<link title="Foreign" rel="Chapter" href="Foreign.html">
+<link title="Ctypes" rel="Chapter" href="Ctypes.html"><link title="POSIX arithmetic types" rel="Section" href="#2_POSIXarithmetictypes">
 <link title="POSIX non-arithmetic types" rel="Section" href="#2_POSIXnonarithmetictypes">
 <link title="Values representing POSIX arithmetic types" rel="Subsection" href="#3_ValuesrepresentingPOSIXarithmetictypes">
 <link title="Values representing POSIX non-arithmetic types" rel="Subsection" href="#3_ValuesrepresentingPOSIXnonarithmetictypes">
 <title>PosixTypes</title>
 </head>
 <body>
-<div class="navbar"><a class="pre" href="Ctypes.html" title="Ctypes">Previous</a>
+<div class="navbar"><a class="pre" href="Signed.html" title="Signed">Previous</a>
 &nbsp;<a class="up" href="index.html" title="Index">Up</a>
 &nbsp;<a class="post" href="Dl.html" title="Dl">Next</a>
 </div>
 <h1>Module <a href="type_PosixTypes.html">PosixTypes</a></h1>
-<pre><span class="keyword">module</span> PosixTypes: <code class="code">sig</code> <a href="PosixTypes.html">..</a> <code class="code">end</code></pre><div class="info">
+
+<pre><span class="keyword">module</span> PosixTypes: <code class="code">sig</code> <a href="PosixTypes.html">..</a> <code class="code">end</code></pre><div class="info module top">
 Some POSIX types.<br>
 </div>
 <hr width="100%">
@@ -37,72 +38,134 @@ Some POSIX types.<br>
 Some POSIX types.<br>
 <br>
 <h2 id="2_POSIXarithmetictypes">POSIX arithmetic types</h2><br>
+
 <pre><span id="TYPEblkcnt_t"><span class="keyword">type</span> <code class="type"></code>blkcnt_t</span> </pre>
+
 
 <pre><span id="TYPEblksize_t"><span class="keyword">type</span> <code class="type"></code>blksize_t</span> </pre>
 
+
 <pre><span id="TYPEclock_t"><span class="keyword">type</span> <code class="type"></code>clock_t</span> </pre>
+
 
 <pre><span id="TYPEdev_t"><span class="keyword">type</span> <code class="type"></code>dev_t</span> </pre>
 
+
 <pre><span id="TYPEfsblkcnt_t"><span class="keyword">type</span> <code class="type"></code>fsblkcnt_t</span> </pre>
+
 
 <pre><span id="TYPEfsfilcnt_t"><span class="keyword">type</span> <code class="type"></code>fsfilcnt_t</span> </pre>
 
+
 <pre><span id="TYPEgid_t"><span class="keyword">type</span> <code class="type"></code>gid_t</span> </pre>
+
 
 <pre><span id="TYPEid_t"><span class="keyword">type</span> <code class="type"></code>id_t</span> </pre>
 
+
 <pre><span id="TYPEino_t"><span class="keyword">type</span> <code class="type"></code>ino_t</span> </pre>
+
 
 <pre><span id="TYPEmode_t"><span class="keyword">type</span> <code class="type"></code>mode_t</span> </pre>
 
+
 <pre><span id="TYPEnlink_t"><span class="keyword">type</span> <code class="type"></code>nlink_t</span> </pre>
+
 
 <pre><span id="TYPEoff_t"><span class="keyword">type</span> <code class="type"></code>off_t</span> </pre>
 
+
 <pre><span id="TYPEpid_t"><span class="keyword">type</span> <code class="type"></code>pid_t</span> </pre>
+
 
 <pre><span id="TYPEsize_t"><span class="keyword">type</span> <code class="type"></code>size_t</span> = <code class="type"><a href="Unsigned.html#TYPEsize_t">Unsigned.size_t</a></code> </pre>
 
+
 <pre><span id="TYPEssize_t"><span class="keyword">type</span> <code class="type"></code>ssize_t</span> </pre>
+
 
 <pre><span id="TYPEsuseconds_t"><span class="keyword">type</span> <code class="type"></code>suseconds_t</span> </pre>
 
+
 <pre><span id="TYPEtime_t"><span class="keyword">type</span> <code class="type"></code>time_t</span> </pre>
 
+
 <pre><span id="TYPEuid_t"><span class="keyword">type</span> <code class="type"></code>uid_t</span> </pre>
+
 
 <pre><span id="TYPEuseconds_t"><span class="keyword">type</span> <code class="type"></code>useconds_t</span> </pre>
 
 <br>
 <h3 id="3_ValuesrepresentingPOSIXarithmetictypes">Values representing POSIX arithmetic types</h3><br>
-<pre><span id="VALblkcnt_t"><span class="keyword">val</span> blkcnt_t</span> : <code class="type"><a href="PosixTypes.html#TYPEblkcnt_t">blkcnt_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre><pre><span id="VALblksize_t"><span class="keyword">val</span> blksize_t</span> : <code class="type"><a href="PosixTypes.html#TYPEblksize_t">blksize_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre><pre><span id="VALclock_t"><span class="keyword">val</span> clock_t</span> : <code class="type"><a href="PosixTypes.html#TYPEclock_t">clock_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre><pre><span id="VALdev_t"><span class="keyword">val</span> dev_t</span> : <code class="type"><a href="PosixTypes.html#TYPEdev_t">dev_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre><pre><span id="VALfsblkcnt_t"><span class="keyword">val</span> fsblkcnt_t</span> : <code class="type"><a href="PosixTypes.html#TYPEfsblkcnt_t">fsblkcnt_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre><pre><span id="VALfsfilcnt_t"><span class="keyword">val</span> fsfilcnt_t</span> : <code class="type"><a href="PosixTypes.html#TYPEfsfilcnt_t">fsfilcnt_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre><pre><span id="VALgid_t"><span class="keyword">val</span> gid_t</span> : <code class="type"><a href="PosixTypes.html#TYPEgid_t">gid_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre><pre><span id="VALid_t"><span class="keyword">val</span> id_t</span> : <code class="type"><a href="PosixTypes.html#TYPEid_t">id_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre><pre><span id="VALino_t"><span class="keyword">val</span> ino_t</span> : <code class="type"><a href="PosixTypes.html#TYPEino_t">ino_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre><pre><span id="VALmode_t"><span class="keyword">val</span> mode_t</span> : <code class="type"><a href="PosixTypes.html#TYPEmode_t">mode_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre><pre><span id="VALnlink_t"><span class="keyword">val</span> nlink_t</span> : <code class="type"><a href="PosixTypes.html#TYPEnlink_t">nlink_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre><pre><span id="VALoff_t"><span class="keyword">val</span> off_t</span> : <code class="type"><a href="PosixTypes.html#TYPEoff_t">off_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre><pre><span id="VALpid_t"><span class="keyword">val</span> pid_t</span> : <code class="type"><a href="PosixTypes.html#TYPEpid_t">pid_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre><pre><span id="VALsize_t"><span class="keyword">val</span> size_t</span> : <code class="type"><a href="PosixTypes.html#TYPEsize_t">size_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre><pre><span id="VALssize_t"><span class="keyword">val</span> ssize_t</span> : <code class="type"><a href="PosixTypes.html#TYPEssize_t">ssize_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre><pre><span id="VALsuseconds_t"><span class="keyword">val</span> suseconds_t</span> : <code class="type"><a href="PosixTypes.html#TYPEsuseconds_t">suseconds_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre><pre><span id="VALtime_t"><span class="keyword">val</span> time_t</span> : <code class="type"><a href="PosixTypes.html#TYPEtime_t">time_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre><pre><span id="VALuid_t"><span class="keyword">val</span> uid_t</span> : <code class="type"><a href="PosixTypes.html#TYPEuid_t">uid_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre><pre><span id="VALuseconds_t"><span class="keyword">val</span> useconds_t</span> : <code class="type"><a href="PosixTypes.html#TYPEuseconds_t">useconds_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre><br>
+
+<pre><span id="VALblkcnt_t"><span class="keyword">val</span> blkcnt_t</span> : <code class="type"><a href="PosixTypes.html#TYPEblkcnt_t">blkcnt_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre>
+<pre><span id="VALblksize_t"><span class="keyword">val</span> blksize_t</span> : <code class="type"><a href="PosixTypes.html#TYPEblksize_t">blksize_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre>
+<pre><span id="VALclock_t"><span class="keyword">val</span> clock_t</span> : <code class="type"><a href="PosixTypes.html#TYPEclock_t">clock_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre>
+<pre><span id="VALdev_t"><span class="keyword">val</span> dev_t</span> : <code class="type"><a href="PosixTypes.html#TYPEdev_t">dev_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre>
+<pre><span id="VALfsblkcnt_t"><span class="keyword">val</span> fsblkcnt_t</span> : <code class="type"><a href="PosixTypes.html#TYPEfsblkcnt_t">fsblkcnt_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre>
+<pre><span id="VALfsfilcnt_t"><span class="keyword">val</span> fsfilcnt_t</span> : <code class="type"><a href="PosixTypes.html#TYPEfsfilcnt_t">fsfilcnt_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre>
+<pre><span id="VALgid_t"><span class="keyword">val</span> gid_t</span> : <code class="type"><a href="PosixTypes.html#TYPEgid_t">gid_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre>
+<pre><span id="VALid_t"><span class="keyword">val</span> id_t</span> : <code class="type"><a href="PosixTypes.html#TYPEid_t">id_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre>
+<pre><span id="VALino_t"><span class="keyword">val</span> ino_t</span> : <code class="type"><a href="PosixTypes.html#TYPEino_t">ino_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre>
+<pre><span id="VALmode_t"><span class="keyword">val</span> mode_t</span> : <code class="type"><a href="PosixTypes.html#TYPEmode_t">mode_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre>
+<pre><span id="VALnlink_t"><span class="keyword">val</span> nlink_t</span> : <code class="type"><a href="PosixTypes.html#TYPEnlink_t">nlink_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre>
+<pre><span id="VALoff_t"><span class="keyword">val</span> off_t</span> : <code class="type"><a href="PosixTypes.html#TYPEoff_t">off_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre>
+<pre><span id="VALpid_t"><span class="keyword">val</span> pid_t</span> : <code class="type"><a href="PosixTypes.html#TYPEpid_t">pid_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre>
+<pre><span id="VALsize_t"><span class="keyword">val</span> size_t</span> : <code class="type"><a href="PosixTypes.html#TYPEsize_t">size_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre>
+<pre><span id="VALssize_t"><span class="keyword">val</span> ssize_t</span> : <code class="type"><a href="PosixTypes.html#TYPEssize_t">ssize_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre>
+<pre><span id="VALsuseconds_t"><span class="keyword">val</span> suseconds_t</span> : <code class="type"><a href="PosixTypes.html#TYPEsuseconds_t">suseconds_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre>
+<pre><span id="VALtime_t"><span class="keyword">val</span> time_t</span> : <code class="type"><a href="PosixTypes.html#TYPEtime_t">time_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre>
+<pre><span id="VALuid_t"><span class="keyword">val</span> uid_t</span> : <code class="type"><a href="PosixTypes.html#TYPEuid_t">uid_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre>
+<pre><span id="VALuseconds_t"><span class="keyword">val</span> useconds_t</span> : <code class="type"><a href="PosixTypes.html#TYPEuseconds_t">useconds_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre><br>
 <h2 id="2_POSIXnonarithmetictypes">POSIX non-arithmetic types</h2><br>
+
 <pre><span id="TYPEkey_t"><span class="keyword">type</span> <code class="type"></code>key_t</span> </pre>
+
 
 <pre><span id="TYPEpthread_t"><span class="keyword">type</span> <code class="type"></code>pthread_t</span> </pre>
 
+
 <pre><span id="TYPEpthread_attr_t"><span class="keyword">type</span> <code class="type"></code>pthread_attr_t</span> </pre>
+
 
 <pre><span id="TYPEpthread_cond_t"><span class="keyword">type</span> <code class="type"></code>pthread_cond_t</span> </pre>
 
+
 <pre><span id="TYPEpthread_condattr_t"><span class="keyword">type</span> <code class="type"></code>pthread_condattr_t</span> </pre>
+
 
 <pre><span id="TYPEpthread_key_t"><span class="keyword">type</span> <code class="type"></code>pthread_key_t</span> </pre>
 
+
 <pre><span id="TYPEpthread_mutex_t"><span class="keyword">type</span> <code class="type"></code>pthread_mutex_t</span> </pre>
+
 
 <pre><span id="TYPEpthread_mutexattr_t"><span class="keyword">type</span> <code class="type"></code>pthread_mutexattr_t</span> </pre>
 
+
 <pre><span id="TYPEpthread_once_t"><span class="keyword">type</span> <code class="type"></code>pthread_once_t</span> </pre>
+
 
 <pre><span id="TYPEpthread_rwlock_t"><span class="keyword">type</span> <code class="type"></code>pthread_rwlock_t</span> </pre>
 
+
 <pre><span id="TYPEpthread_rwlockattr_t"><span class="keyword">type</span> <code class="type"></code>pthread_rwlockattr_t</span> </pre>
+
 
 <pre><span id="TYPEsigset_t"><span class="keyword">type</span> <code class="type"></code>sigset_t</span> </pre>
 
 <br>
 <h3 id="3_ValuesrepresentingPOSIXnonarithmetictypes">Values representing POSIX non-arithmetic types</h3><br>
-<pre><span id="VALkey_t"><span class="keyword">val</span> key_t</span> : <code class="type"><a href="PosixTypes.html#TYPEkey_t">key_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre><pre><span id="VALpthread_t"><span class="keyword">val</span> pthread_t</span> : <code class="type"><a href="PosixTypes.html#TYPEpthread_t">pthread_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre><pre><span id="VALpthread_attr_t"><span class="keyword">val</span> pthread_attr_t</span> : <code class="type"><a href="PosixTypes.html#TYPEpthread_attr_t">pthread_attr_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre><pre><span id="VALpthread_cond_t"><span class="keyword">val</span> pthread_cond_t</span> : <code class="type"><a href="PosixTypes.html#TYPEpthread_cond_t">pthread_cond_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre><pre><span id="VALpthread_condattr_t"><span class="keyword">val</span> pthread_condattr_t</span> : <code class="type"><a href="PosixTypes.html#TYPEpthread_condattr_t">pthread_condattr_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre><pre><span id="VALpthread_key_t"><span class="keyword">val</span> pthread_key_t</span> : <code class="type"><a href="PosixTypes.html#TYPEpthread_key_t">pthread_key_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre><pre><span id="VALpthread_mutex_t"><span class="keyword">val</span> pthread_mutex_t</span> : <code class="type"><a href="PosixTypes.html#TYPEpthread_mutex_t">pthread_mutex_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre><pre><span id="VALpthread_mutexattr_t"><span class="keyword">val</span> pthread_mutexattr_t</span> : <code class="type"><a href="PosixTypes.html#TYPEpthread_mutexattr_t">pthread_mutexattr_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre><pre><span id="VALpthread_once_t"><span class="keyword">val</span> pthread_once_t</span> : <code class="type"><a href="PosixTypes.html#TYPEpthread_once_t">pthread_once_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre><pre><span id="VALpthread_rwlock_t"><span class="keyword">val</span> pthread_rwlock_t</span> : <code class="type"><a href="PosixTypes.html#TYPEpthread_rwlock_t">pthread_rwlock_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre><pre><span id="VALpthread_rwlockattr_t"><span class="keyword">val</span> pthread_rwlockattr_t</span> : <code class="type"><a href="PosixTypes.html#TYPEpthread_rwlockattr_t">pthread_rwlockattr_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre><pre><span id="VALsigset_t"><span class="keyword">val</span> sigset_t</span> : <code class="type"><a href="PosixTypes.html#TYPEsigset_t">sigset_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre></body></html>
+
+<pre><span id="VALkey_t"><span class="keyword">val</span> key_t</span> : <code class="type"><a href="PosixTypes.html#TYPEkey_t">key_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre>
+<pre><span id="VALpthread_t"><span class="keyword">val</span> pthread_t</span> : <code class="type"><a href="PosixTypes.html#TYPEpthread_t">pthread_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre>
+<pre><span id="VALpthread_attr_t"><span class="keyword">val</span> pthread_attr_t</span> : <code class="type"><a href="PosixTypes.html#TYPEpthread_attr_t">pthread_attr_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre>
+<pre><span id="VALpthread_cond_t"><span class="keyword">val</span> pthread_cond_t</span> : <code class="type"><a href="PosixTypes.html#TYPEpthread_cond_t">pthread_cond_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre>
+<pre><span id="VALpthread_condattr_t"><span class="keyword">val</span> pthread_condattr_t</span> : <code class="type"><a href="PosixTypes.html#TYPEpthread_condattr_t">pthread_condattr_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre>
+<pre><span id="VALpthread_key_t"><span class="keyword">val</span> pthread_key_t</span> : <code class="type"><a href="PosixTypes.html#TYPEpthread_key_t">pthread_key_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre>
+<pre><span id="VALpthread_mutex_t"><span class="keyword">val</span> pthread_mutex_t</span> : <code class="type"><a href="PosixTypes.html#TYPEpthread_mutex_t">pthread_mutex_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre>
+<pre><span id="VALpthread_mutexattr_t"><span class="keyword">val</span> pthread_mutexattr_t</span> : <code class="type"><a href="PosixTypes.html#TYPEpthread_mutexattr_t">pthread_mutexattr_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre>
+<pre><span id="VALpthread_once_t"><span class="keyword">val</span> pthread_once_t</span> : <code class="type"><a href="PosixTypes.html#TYPEpthread_once_t">pthread_once_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre>
+<pre><span id="VALpthread_rwlock_t"><span class="keyword">val</span> pthread_rwlock_t</span> : <code class="type"><a href="PosixTypes.html#TYPEpthread_rwlock_t">pthread_rwlock_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre>
+<pre><span id="VALpthread_rwlockattr_t"><span class="keyword">val</span> pthread_rwlockattr_t</span> : <code class="type"><a href="PosixTypes.html#TYPEpthread_rwlockattr_t">pthread_rwlockattr_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre>
+<pre><span id="VALsigset_t"><span class="keyword">val</span> sigset_t</span> : <code class="type"><a href="PosixTypes.html#TYPEsigset_t">sigset_t</a> <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre></body></html>

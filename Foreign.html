@@ -5,6 +5,7 @@
 <meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
 <link rel="Start" href="index.html">
 <link rel="previous" href="Dl.html">
+<link rel="next" href="Ctypes.html">
 <link rel="Up" href="index.html">
 <link title="Index of types" rel=Appendix href="index_types.html">
 <link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
@@ -13,28 +14,75 @@
 <link title="Index of module types" rel=Appendix href="index_module_types.html">
 <link title="Unsigned" rel="Chapter" href="Unsigned.html">
 <link title="Signed" rel="Chapter" href="Signed.html">
-<link title="Ctypes" rel="Chapter" href="Ctypes.html">
 <link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
 <link title="Dl" rel="Chapter" href="Dl.html">
-<link title="Foreign" rel="Chapter" href="Foreign.html"><title>Foreign</title>
+<link title="Foreign" rel="Chapter" href="Foreign.html">
+<link title="Ctypes" rel="Chapter" href="Ctypes.html"><title>Foreign</title>
 </head>
 <body>
 <div class="navbar"><a class="pre" href="Dl.html" title="Dl">Previous</a>
 &nbsp;<a class="up" href="index.html" title="Index">Up</a>
-&nbsp;</div>
+&nbsp;<a class="post" href="Ctypes.html" title="Ctypes">Next</a>
+</div>
 <h1>Module <a href="type_Foreign.html">Foreign</a></h1>
-<pre><span class="keyword">module</span> Foreign: <code class="code">sig</code> <a href="Foreign.html">..</a> <code class="code">end</code></pre><div class="info">
+
+<pre><span class="keyword">module</span> Foreign: <code class="code">sig</code> <a href="Foreign.html">..</a> <code class="code">end</code></pre><div class="info module top">
 High-level bindings for C functions and values<br>
 </div>
 <hr width="100%">
-<pre><span id="VALforeign"><span class="keyword">val</span> foreign</span> : <code class="type">?from:<a href="Dl.html#TYPElibrary">Dl.library</a> -> string -> ('a -> 'b) <a href="Ctypes.html#TYPEfn">Ctypes.fn</a> -> 'a -> 'b</code></pre><div class="info">
+
+<pre><span id="VALforeign"><span class="keyword">val</span> foreign</span> : <code class="type">?from:<a href="Dl.html#TYPElibrary">Dl.library</a> -><br>       ?stub:bool -> ?check_errno:bool -> string -> ('a -> 'b) <a href="Ctypes.html#TYPEfn">Ctypes.fn</a> -> 'a -> 'b</code></pre><div class="info ">
 <code class="code">foreign name typ</code> exposes the C function of type <code class="code">typ</code> named by <code class="code">name</code> as
-    an OCaml value.  The argument <code class="code">?from</code>, if supplied, is a library handle
-    returned by <a href="Dl.html#VALdlopen"><code class="code">Dl.dlopen</code></a>.<br>
+    an OCaml value.
+<p>
+
+    The argument <code class="code">?from</code>, if supplied, is a library handle returned by
+    <a href="Dl.html#VALdlopen"><code class="code">Dl.dlopen</code></a>.
+<p>
+
+    The argument <code class="code">?stub</code>, if <code class="code">true</code> (defaults to <code class="code">false</code>), indicates that the
+    function should not raise an exception if <code class="code">name</code> is not found but return
+    an OCaml value that raises an exception when called.
+<p>
+
+    The value <code class="code">?check_errno</code>, which defaults to <code class="code">false</code>, indicates whether
+    <code class="code">Unix.Unix_error</code> should be raised if the C function modifies <code class="code">errno</code>.<br>
+<b>Raises</b> <code>Dl.DL_error</code> if <code class="code">name</code> is not found in <code class="code">?from</code> and <code class="code">?stub</code> is
+    <code class="code">false</code>.<br>
 </div>
-<pre><span id="VALforeign_value"><span class="keyword">val</span> foreign_value</span> : <code class="type">?from:<a href="Dl.html#TYPElibrary">Dl.library</a> -> string -> 'a <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a> -> 'a <a href="Ctypes.html#TYPEptr">Ctypes.ptr</a></code></pre><div class="info">
+
+<pre><span id="VALforeign_value"><span class="keyword">val</span> foreign_value</span> : <code class="type">?from:<a href="Dl.html#TYPElibrary">Dl.library</a> -> string -> 'a <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a> -> 'a <a href="Ctypes.html#TYPEptr">Ctypes.ptr</a></code></pre><div class="info ">
 <code class="code">foreign_value name typ</code> exposes the C value of type <code class="code">typ</code> named by <code class="code">name</code>
     as an OCaml value.  The argument <code class="code">?from</code>, if supplied, is a library handle
     returned by <a href="Dl.html#VALdlopen"><code class="code">Dl.dlopen</code></a>.<br>
+</div>
+
+<pre><span id="VALfunptr"><span class="keyword">val</span> funptr</span> : <code class="type">?name:string -><br>       ?check_errno:bool -> ('a -> 'b) <a href="Ctypes.html#TYPEfn">Ctypes.fn</a> -> ('a -> 'b) <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre><div class="info ">
+Construct a function pointer type from a function type.
+<p>
+
+    The ctypes library, like C itself, distinguishes functions and function
+    pointers.  Functions are not first class: it is not possible to use them
+    as arguments or return values of calls, or store them in addressable
+    memory.  Function pointers are first class, and so have none of these
+    restrictions.
+<p>
+
+    The value <code class="code">?check_errno</code>, which defaults to <code class="code">false</code>, indicates whether
+    <code class="code">Unix.Unix_error</code> should be raised if the C function modifies <code class="code">errno</code>.<br>
+</div>
+
+<pre><span id="VALfunptr_opt"><span class="keyword">val</span> funptr_opt</span> : <code class="type">('a -> 'b) <a href="Ctypes.html#TYPEfn">Ctypes.fn</a> -> ('a -> 'b) option <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre><div class="info ">
+Construct a function pointer type from a function type.
+<p>
+
+    This behaves like <a href="Foreign.html#VALfunptr"><code class="code">Foreign.funptr</code></a>, except that null pointers appear in OCaml as
+    <code class="code">None</code>.<br>
+</div>
+
+<pre><span id="EXCEPTIONCallToExpiredClosure"><span class="keyword">exception</span> CallToExpiredClosure</span></pre>
+<div class="info ">
+A closure passed to C was collected by the OCaml garbage collector before
+    it was called.<br>
 </div>
 </body></html>

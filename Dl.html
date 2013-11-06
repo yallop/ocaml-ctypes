@@ -14,10 +14,10 @@
 <link title="Index of module types" rel=Appendix href="index_module_types.html">
 <link title="Unsigned" rel="Chapter" href="Unsigned.html">
 <link title="Signed" rel="Chapter" href="Signed.html">
-<link title="Ctypes" rel="Chapter" href="Ctypes.html">
 <link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
 <link title="Dl" rel="Chapter" href="Dl.html">
-<link title="Foreign" rel="Chapter" href="Foreign.html"><title>Dl</title>
+<link title="Foreign" rel="Chapter" href="Foreign.html">
+<link title="Ctypes" rel="Chapter" href="Ctypes.html"><title>Dl</title>
 </head>
 <body>
 <div class="navbar"><a class="pre" href="PosixTypes.html" title="PosixTypes">Previous</a>
@@ -25,21 +25,25 @@
 &nbsp;<a class="post" href="Foreign.html" title="Foreign">Next</a>
 </div>
 <h1>Module <a href="type_Dl.html">Dl</a></h1>
-<pre><span class="keyword">module</span> Dl: <code class="code">sig</code> <a href="Dl.html">..</a> <code class="code">end</code></pre><div class="info">
+
+<pre><span class="keyword">module</span> Dl: <code class="code">sig</code> <a href="Dl.html">..</a> <code class="code">end</code></pre><div class="info module top">
 Bindings to the dlopen / dlsym interface.<br>
 </div>
 <hr width="100%">
+
 <pre><span id="TYPElibrary"><span class="keyword">type</span> <code class="type"></code>library</span> </pre>
-<div class="info">
+<div class="info ">
 The type of dynamic libraries, as returned by <a href="Dl.html#VALdlopen"><code class="code">Dl.dlopen</code></a>.<br>
 </div>
 
+
 <pre><span id="EXCEPTIONDL_error"><span class="keyword">exception</span> DL_error</span> <span class="keyword">of</span> <code class="type">string</code></pre>
-<div class="info">
+<div class="info ">
 An error condition occurred when calling <a href="Dl.html#VALdlopen"><code class="code">Dl.dlopen</code></a>, <a href="Dl.html#VALdlclose"><code class="code">Dl.dlclose</code></a> or
     <a href="Dl.html#VALdlsym"><code class="code">Dl.dlsym</code></a>.  The argument is the string returned by the <code class="code">dlerror</code>
     function.<br>
 </div>
+
 <pre><code><span id="TYPEflag"><span class="keyword">type</span> <code class="type"></code>flag</span> = </code></pre><table class="typetable">
 <tr>
 <td align="left" valign="top" >
@@ -84,17 +88,20 @@ An error condition occurred when calling <a href="Dl.html#VALdlopen"><code class
 
 </tr></table>
 
-<div class="info">
+<div class="info ">
 Flags for <a href="Dl.html#VALdlopen"><code class="code">Dl.dlopen</code></a><br>
 </div>
 
-<pre><span id="VALdlopen"><span class="keyword">val</span> dlopen</span> : <code class="type">?filename:string -> flags:<a href="Dl.html#TYPEflag">flag</a> list -> <a href="Dl.html#TYPElibrary">library</a></code></pre><div class="info">
+
+<pre><span id="VALdlopen"><span class="keyword">val</span> dlopen</span> : <code class="type">?filename:string -> flags:<a href="Dl.html#TYPEflag">flag</a> list -> <a href="Dl.html#TYPElibrary">library</a></code></pre><div class="info ">
 Open a dynamic library.<br>
 </div>
-<pre><span id="VALdlclose"><span class="keyword">val</span> dlclose</span> : <code class="type">handle:<a href="Dl.html#TYPElibrary">library</a> -> unit</code></pre><div class="info">
+
+<pre><span id="VALdlclose"><span class="keyword">val</span> dlclose</span> : <code class="type">handle:<a href="Dl.html#TYPElibrary">library</a> -> unit</code></pre><div class="info ">
 Close a dynamic library.<br>
 </div>
-<pre><span id="VALdlsym"><span class="keyword">val</span> dlsym</span> : <code class="type">?handle:<a href="Dl.html#TYPElibrary">library</a> -> symbol:string -> Ctypes_raw.raw_pointer</code></pre><div class="info">
+
+<pre><span id="VALdlsym"><span class="keyword">val</span> dlsym</span> : <code class="type">?handle:<a href="Dl.html#TYPElibrary">library</a> -> symbol:string -> Ctypes_raw.voidp</code></pre><div class="info ">
 Look up a symbol in a dynamic library.<br>
 </div>
 </body></html>

@@ -10,16 +10,23 @@
 <link title="Index of module types" rel=Appendix href="index_module_types.html">
 <link title="Unsigned" rel="Chapter" href="Unsigned.html">
 <link title="Signed" rel="Chapter" href="Signed.html">
-<link title="Ctypes" rel="Chapter" href="Ctypes.html">
 <link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
 <link title="Dl" rel="Chapter" href="Dl.html">
-<link title="Foreign" rel="Chapter" href="Foreign.html"><title>Index of exceptions</title>
+<link title="Foreign" rel="Chapter" href="Foreign.html">
+<link title="Ctypes" rel="Chapter" href="Ctypes.html"><title>Index of exceptions</title>
 </head>
 <body>
 <div class="navbar">&nbsp;<a class="up" href="index.html" title="Index">Up</a>
 &nbsp;</div>
 <h1>Index of exceptions</h1>
 <table>
+<tr><td align="left"><br>C</td></tr>
+<tr><td><a href="Foreign.html#EXCEPTIONCallToExpiredClosure">CallToExpiredClosure</a> [<a href="Foreign.html">Foreign</a>]</td>
+<td><div class="info">
+A closure passed to C was collected by the OCaml garbage collector before
+    it was called.
+</div>
+</td></tr>
 <tr><td align="left"><br>D</td></tr>
 <tr><td><a href="Dl.html#EXCEPTIONDL_error">DL_error</a> [<a href="Dl.html">Dl</a>]</td>
 <td><div class="info">
@@ -42,6 +49,11 @@ An attempt was made to modify a sealed struct or union type
 </div>
 </td></tr>
 <tr><td align="left"><br>U</td></tr>
+<tr><td><a href="Ctypes.html#EXCEPTIONUncoercible">Uncoercible</a> [<a href="Ctypes.html">Ctypes</a>]</td>
+<td><div class="info">
+An attempt was made to coerce between uncoercible types.
+</div>
+</td></tr>
 <tr><td><a href="Ctypes.html#EXCEPTIONUnsupported">Unsupported</a> [<a href="Ctypes.html">Ctypes</a>]</td>
 <td><div class="info">
 An attempt was made to use a feature not currently supported by ctypes.

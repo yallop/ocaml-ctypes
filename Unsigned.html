@@ -13,100 +13,122 @@
 <link title="Index of module types" rel=Appendix href="index_module_types.html">
 <link title="Unsigned" rel="Chapter" href="Unsigned.html">
 <link title="Signed" rel="Chapter" href="Signed.html">
-<link title="Ctypes" rel="Chapter" href="Ctypes.html">
 <link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
 <link title="Dl" rel="Chapter" href="Dl.html">
-<link title="Foreign" rel="Chapter" href="Foreign.html"><title>Unsigned</title>
+<link title="Foreign" rel="Chapter" href="Foreign.html">
+<link title="Ctypes" rel="Chapter" href="Ctypes.html"><title>Unsigned</title>
 </head>
 <body>
 <div class="navbar">&nbsp;<a class="up" href="index.html" title="Index">Up</a>
 &nbsp;<a class="post" href="Signed.html" title="Signed">Next</a>
 </div>
 <h1>Module <a href="type_Unsigned.html">Unsigned</a></h1>
-<pre><span class="keyword">module</span> Unsigned: <code class="code">sig</code> <a href="Unsigned.html">..</a> <code class="code">end</code></pre><div class="info">
+
+<pre><span class="keyword">module</span> Unsigned: <code class="code">sig</code> <a href="Unsigned.html">..</a> <code class="code">end</code></pre><div class="info module top">
 Types and operations for unsigned integers.<br>
 </div>
 <hr width="100%">
+
 <pre><span class="keyword">module type</span> <a href="Unsigned.S.html">S</a> = <code class="code">sig</code> <a href="Unsigned.S.html">..</a> <code class="code">end</code></pre><div class="info">
 Unsigned integer operations.
 </div>
+
 <pre><span class="keyword">module</span> <a href="Unsigned.UChar.html">UChar</a>: <code class="type"><a href="Unsigned.S.html">S</a></code><code class="type"> </code></pre><div class="info">
 Unsigned char type and operations.
 </div>
+
 <pre><span class="keyword">module</span> <a href="Unsigned.UInt8.html">UInt8</a>: <code class="type"><a href="Unsigned.S.html">S</a></code><code class="type"> </code></pre><div class="info">
 Unsigned 8-bit integer type and operations.
 </div>
+
 <pre><span class="keyword">module</span> <a href="Unsigned.UInt16.html">UInt16</a>: <code class="type"><a href="Unsigned.S.html">S</a></code><code class="type"> </code></pre><div class="info">
 Unsigned 16-bit integer type and operations.
 </div>
-<pre><span class="keyword">module</span> <a href="Unsigned.UInt32.html">UInt32</a>: <code class="type"><a href="Unsigned.S.html">S</a></code><code class="type"> </code></pre><div class="info">
+
+<pre><span class="keyword">module</span> <a href="Unsigned.UInt32.html">UInt32</a>: <code class="code">sig</code> <a href="Unsigned.UInt32.html">..</a> <code class="code">end</code></pre><div class="info">
 Unsigned 32-bit integer type and operations.
 </div>
-<pre><span class="keyword">module</span> <a href="Unsigned.UInt64.html">UInt64</a>: <code class="type"><a href="Unsigned.S.html">S</a></code><code class="type"> </code></pre><div class="info">
+
+<pre><span class="keyword">module</span> <a href="Unsigned.UInt64.html">UInt64</a>: <code class="code">sig</code> <a href="Unsigned.UInt64.html">..</a> <code class="code">end</code></pre><div class="info">
 Unsigned 64-bit integer type and operations.
 </div>
+
 <pre><span class="keyword">module</span> <a href="Unsigned.Size_t.html">Size_t</a>: <code class="type"><a href="Unsigned.S.html">S</a></code><code class="type"> </code></pre><div class="info">
 The size_t unsigned integer type and operations.
 </div>
+
 <pre><span class="keyword">module</span> <a href="Unsigned.UShort.html">UShort</a>: <code class="type"><a href="Unsigned.S.html">S</a></code><code class="type"> </code></pre><div class="info">
 The unsigned short integer type and operations.
 </div>
+
 <pre><span class="keyword">module</span> <a href="Unsigned.UInt.html">UInt</a>: <code class="type"><a href="Unsigned.S.html">S</a></code><code class="type"> </code></pre><div class="info">
 The unsigned int type and operations.
 </div>
+
 <pre><span class="keyword">module</span> <a href="Unsigned.ULong.html">ULong</a>: <code class="type"><a href="Unsigned.S.html">S</a></code><code class="type"> </code></pre><div class="info">
 The unsigned long integer type and operations.
 </div>
+
 <pre><span class="keyword">module</span> <a href="Unsigned.ULLong.html">ULLong</a>: <code class="type"><a href="Unsigned.S.html">S</a></code><code class="type"> </code></pre><div class="info">
 The unsigned long long integer type and operations.
 </div>
+
 <pre><span id="TYPEuchar"><span class="keyword">type</span> <code class="type"></code>uchar</span> = <code class="type">UChar.t</code> </pre>
-<div class="info">
+<div class="info ">
 The unsigned char type.<br>
 </div>
 
+
 <pre><span id="TYPEuint8"><span class="keyword">type</span> <code class="type"></code>uint8</span> = <code class="type">UInt8.t</code> </pre>
-<div class="info">
+<div class="info ">
 Unsigned 8-bit integer type.<br>
 </div>
 
+
 <pre><span id="TYPEuint16"><span class="keyword">type</span> <code class="type"></code>uint16</span> = <code class="type">UInt16.t</code> </pre>
-<div class="info">
+<div class="info ">
 Unsigned 16-bit integer type.<br>
 </div>
 
+
 <pre><span id="TYPEuint32"><span class="keyword">type</span> <code class="type"></code>uint32</span> = <code class="type">UInt32.t</code> </pre>
-<div class="info">
+<div class="info ">
 Unsigned 32-bit integer type.<br>
 </div>
 
+
 <pre><span id="TYPEuint64"><span class="keyword">type</span> <code class="type"></code>uint64</span> = <code class="type">UInt64.t</code> </pre>
-<div class="info">
+<div class="info ">
 Unsigned 64-bit integer type.<br>
 </div>
 
+
 <pre><span id="TYPEsize_t"><span class="keyword">type</span> <code class="type"></code>size_t</span> = <code class="type">Size_t.t</code> </pre>
-<div class="info">
+<div class="info ">
 The size_t unsigned integer type.<br>
 </div>
 
+
 <pre><span id="TYPEushort"><span class="keyword">type</span> <code class="type"></code>ushort</span> = <code class="type">UShort.t</code> </pre>
-<div class="info">
+<div class="info ">
 The unsigned short unsigned integer type.<br>
 </div>
 
+
 <pre><span id="TYPEuint"><span class="keyword">type</span> <code class="type"></code>uint</span> = <code class="type">UInt.t</code> </pre>
-<div class="info">
+<div class="info ">
 The unsigned int type.<br>
 </div>
 
+
 <pre><span id="TYPEulong"><span class="keyword">type</span> <code class="type"></code>ulong</span> = <code class="type">ULong.t</code> </pre>
-<div class="info">
+<div class="info ">
 The unsigned long integer type.<br>
 </div>
 
+
 <pre><span id="TYPEullong"><span class="keyword">type</span> <code class="type"></code>ullong</span> = <code class="type">ULLong.t</code> </pre>
-<div class="info">
+<div class="info ">
 The unsigned long long integer type.<br>
 </div>
 

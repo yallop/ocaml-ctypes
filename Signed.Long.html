@@ -14,10 +14,10 @@
 <link title="Index of module types" rel=Appendix href="index_module_types.html">
 <link title="Unsigned" rel="Chapter" href="Unsigned.html">
 <link title="Signed" rel="Chapter" href="Signed.html">
-<link title="Ctypes" rel="Chapter" href="Ctypes.html">
 <link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
 <link title="Dl" rel="Chapter" href="Dl.html">
-<link title="Foreign" rel="Chapter" href="Foreign.html"><title>Signed.Long</title>
+<link title="Foreign" rel="Chapter" href="Foreign.html">
+<link title="Ctypes" rel="Chapter" href="Ctypes.html"><title>Signed.Long</title>
 </head>
 <body>
 <div class="navbar"><a class="pre" href="Signed.Int64.html" title="Signed.Int64">Previous</a>
@@ -25,31 +25,40 @@
 &nbsp;<a class="post" href="Signed.LLong.html" title="Signed.LLong">Next</a>
 </div>
 <h1>Module <a href="type_Signed.Long.html">Signed.Long</a></h1>
-<pre><span class="keyword">module</span> Long: <code class="type"><a href="Signed.S.html">S</a></code><code class="type"> </code></pre><div class="info">
+
+<pre><span class="keyword">module</span> Long: <code class="type"><a href="Signed.S.html">S</a></code><code class="type"> </code></pre><div class="info module top">
 The signed long integer type and operations.<br>
 </div>
 <hr width="100%">
+
 <pre><span class="keyword">include</span> <a href="Unsigned.S.html">Unsigned.S</a></pre>
-<pre><span id="VALneg"><span class="keyword">val</span> neg</span> : <code class="type">t -> t</code></pre><div class="info">
+
+<pre><span id="VALneg"><span class="keyword">val</span> neg</span> : <code class="type">t -> t</code></pre><div class="info ">
 Unary negation.<br>
 </div>
-<pre><span id="VALabs"><span class="keyword">val</span> abs</span> : <code class="type">t -> t</code></pre><div class="info">
+
+<pre><span id="VALabs"><span class="keyword">val</span> abs</span> : <code class="type">t -> t</code></pre><div class="info ">
 Return the absolute value of its argument.<br>
 </div>
-<pre><span id="VALminus_one"><span class="keyword">val</span> minus_one</span> : <code class="type">t</code></pre><div class="info">
+
+<pre><span id="VALminus_one"><span class="keyword">val</span> minus_one</span> : <code class="type">t</code></pre><div class="info ">
 The value -1<br>
 </div>
-<pre><span id="VALmin_int"><span class="keyword">val</span> min_int</span> : <code class="type">t</code></pre><div class="info">
+
+<pre><span id="VALmin_int"><span class="keyword">val</span> min_int</span> : <code class="type">t</code></pre><div class="info ">
 The smallest representable integer.<br>
 </div>
-<pre><span id="VALshift_right_logical"><span class="keyword">val</span> shift_right_logical</span> : <code class="type">t -> int -> t</code></pre><div class="info">
+
+<pre><span id="VALshift_right_logical"><span class="keyword">val</span> shift_right_logical</span> : <code class="type">t -> int -> t</code></pre><div class="info ">
 <a href="Signed.S.html#VALshift_right_logical"><code class="code">Signed.S.shift_right_logical</code></a> <code class="code">x</code> <code class="code">y</code> shifts <code class="code">x</code> to the right by <code class="code">y</code> bits.  See
       <code class="code">Int32.shift_right_logical</code>.<br>
 </div>
-<pre><span id="VALof_int64"><span class="keyword">val</span> of_int64</span> : <code class="type">int64 -> t</code></pre><div class="info">
+
+<pre><span id="VALof_int64"><span class="keyword">val</span> of_int64</span> : <code class="type">int64 -> t</code></pre><div class="info ">
 Convert the given int64 value to a signed integer.<br>
 </div>
-<pre><span id="VALto_int64"><span class="keyword">val</span> to_int64</span> : <code class="type">t -> int64</code></pre><div class="info">
+
+<pre><span id="VALto_int64"><span class="keyword">val</span> to_int64</span> : <code class="type">t -> int64</code></pre><div class="info ">
 Convert the given signed integer to an int64 value.<br>
 </div>
 </body></html>
