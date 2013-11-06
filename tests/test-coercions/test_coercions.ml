@@ -150,10 +150,10 @@ let test_unsupported_coercions () =
       T (abstract ~name:"a" ~size:12 ~alignment:4);
     ]
 
-    (* None of the types in the list are currently intercoerceable. *)
+    (* None of the types in the list are currently intercoercible. *)
     let () = ListLabels.iter2 types types
       ~f:(fun (T t1) (T t2) -> 
-        assert_raises Uncoerceable
+        assert_raises Uncoercible
           (fun () -> coerce t1 t2))
   end in ()
 

@@ -5,6 +5,6 @@
  * See the file LICENSE for details.
  *)
 
-exception Uncoerceable
+exception Uncoercible
 
 val coerce : 'a Static.typ -> 'b Static.typ -> 'a -> 'b

@@ -43,7 +43,7 @@ val void  : unit typ
     produces a function which accepts or returns unit.
 
     Dereferencing a pointer to void is an error, as in C, and will raise
-    [IncompleteType].
+    {!IncompleteType}.
 *)
 
 (** {3 Scalar types}
@@ -185,6 +185,7 @@ val string_opt : string option typ
 
 (** {4 C array types} *) 
 
+(**/**)
 type 'a std_array = 'a array
 (**/**)
 
@@ -345,7 +346,7 @@ val view : ?format_typ:((Format.formatter -> unit) -> Format.formatter -> unit) 
     {!string} type representation is defined in exactly this way.)
 
     The optional argument [format_typ] is used by the {!Ctypes.format_typ} and
-    {!string_of_typ) functions to print the type at the top level and
+    {!string_of_typ} functions to print the type at the top level and
     elsewhere.  If [format_typ] is not supplied the printer for [t] is used
     instead.
 *)
@@ -376,11 +377,11 @@ val abstract : name:string -> size:int -> alignment:int -> 'a abstract typ
 
 val sizeof : 'a typ -> int
 (** [sizeof t] computes the size in bytes of the type [t].  The exception
-    [IncompleteType] is raised if [t] is incomplete. *)
+    {!IncompleteType} is raised if [t] is incomplete. *)
 
 val alignment : 'a typ -> int
 (** [alignment t] computes the alignment requirements of the type [t].  The
-    exception [IncompleteType] is raised if [t] is incomplete. *)
+    exception {!IncompleteType} is raised if [t] is incomplete. *)
 
 val format_typ : ?name:string -> Format.formatter -> 'a typ -> unit
 (** Pretty-print a C representation of the type to the specified formatter. *)
@@ -523,6 +524,7 @@ end
 (** Operations on C arrays. *)
 
 (** {4 Bigarray values} *)
+
 val bigarray_start : < element: 'a;
                        ba_repr: _;
                        bigarray: 'b;
@@ -593,11 +595,11 @@ val addr : ((_, _) structured as 's) -> 's ptr
 val coerce : 'a typ -> 'b typ -> 'a -> 'b
 (** [coerce t1 t2] returns a coercion function between the types represented
     by [t1] and [t2].  If [t1] cannot be coerced to [t2], [coerce] raises 
-    {!Uncoerceable}.
+    {!Uncoercible}.
 
     The following coercions are currently supported:
 
-     - All pointer types are intercoerceable.
+     - All pointer types are intercoercible.
      - Any type may be coerced to {!void}
      - There is a coercion between a {!view} and another type [t] (in either
        direction) if there is a coercion between the representation type
@@ -632,6 +634,6 @@ exception IncompleteType
     cannot be used as argument or return types.
 *)
 
-exception Uncoerceable
-(** An attempt was made to coerce between uncoerceable types.  *)
+exception Uncoercible
+(** An attempt was made to coerce between uncoercible types.  *)
 

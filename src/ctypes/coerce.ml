@@ -9,7 +9,7 @@
 
 open Static
 
-exception Uncoerceable
+exception Uncoercible
 
 let rec coerce : type a b. a typ -> b typ -> a -> b =
   fun atyp btyp -> match atyp, btyp with
@@ -22,4 +22,4 @@ let rec coerce : type a b. a typ -> b typ -> a -> b =
     fun v -> bv.read (coerce v)
   | Pointer _, Pointer b ->
     fun v -> Memory.(from_voidp b (to_voidp v))
-  | _ -> raise Uncoerceable 
+  | _ -> raise Uncoercible 
