@@ -436,7 +436,7 @@ export LIBFFI_LIBS=-L/opt/local/lib
   let setup_data_lines =
     List.fold_left
       (fun lines (name, args) ->
-         sprintf "%s=%S" name (String.concat " " args) :: lines)
+         sprintf "%s=%s" name (String.concat " " args) :: lines)
       setup_data_lines !setup_data
   in
   let oc = open_out "setup.data" in
