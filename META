@@ -1,4 +1,4 @@
-version = "0.1"
+version = "0.2"
 description = "Combinators for binding to C libraries without writing any C."
 requires = "unix bigarray"
 archive(byte) = "ctypes.cma"
@@ -8,7 +8,7 @@ archive(native, plugin) = "ctypes.cmxs"
 exists_if = "ctypes.cma"
 
 package "top" (
-  version = "0.1"
+  version = "0.2"
   description = "Toplevel printers for C types"
   requires = "ctypes"
   archive(byte) = "ctypes-top.cma"
@@ -19,7 +19,7 @@ package "top" (
 )
 
 package "foreign-base" (
- version = "0.1"
+ version = "0.2"
  description = "Dynamic linking of C functions"
  requires = "ctypes"
  archive(byte) = "ctypes-foreign-base.cma"
@@ -30,7 +30,7 @@ package "foreign-base" (
 )
 
 package "foreign" (
- version = "0.1"
+ version = "0.2"
  description = "Dynamic linking of C functions"
  requires = "ctypes ctypes.foreign-base"
  requires(mt) = "threads ctypes ctypes.foreign-base"
