@@ -14,16 +14,9 @@
 #include <caml/alloc.h>
 
 #include "unsigned_stubs.h"
+#include "complex_stubs.h"
 #include "raw_pointer.h"
 #include "primitives.h"
-
-static value allocate_complex_value(double r, double i)
-{
-  value v = caml_alloc(2 * sizeof(double), Double_array_tag);
-  Store_double_field(v, 0, r);
-  Store_double_field(v, 1, i);
-  return v;
-}
 
 /* Read a C value from a block of memory */
 /* read : 'a prim -> offset:int -> raw_pointer -> 'a */
@@ -59,17 +52,9 @@ value ctypes_read(value prim_, value offset_, value buffer_)
    case Nativeint: b = caml_copy_nativeint(*(intnat *)buf); break;
    case Float: b = caml_copy_double(*(float *)buf); break;
    case Double: b = caml_copy_double(*(double *)buf); break;
-  case Complex32: {
-    float complex c = *(float complex *)buf;
-    b = allocate_complex_value(crealf(c), cimagf(c));
-    break;
-  }
-  case Complex64: {
-    double complex c = *(double complex *)buf;
-    b = allocate_complex_value(creal(c), cimag(c));
-    break;
-  }
-  default:
+   case Complex32: b = ctypes_copy_float_complex(*(float complex *)buf); break;
+   case Complex64: b = ctypes_copy_double_complex(*(double complex *)buf); break;
+   default:
     assert(0);
   }
   CAMLreturn(b);
@@ -108,12 +93,8 @@ value ctypes_write(value prim_, value offset_, value v, value buffer_)
    case Nativeint: *(intnat *)buf = Nativeint_val(v); break;
    case Float: *(float *)buf = Double_val(v); break;
    case Double: *(double *)buf = Double_val(v); break;
-   case Complex32:
-     *(float complex *)buf = Double_field(v, 0) + Double_field(v, 1) * I;
-     break;
-   case Complex64:
-     *(double complex *)buf = Double_field(v, 0) + Double_field(v, 1) * I;
-     break;
+   case Complex32: *(float complex *)buf = ctypes_float_complex_val(v); break;
+   case Complex64: *(double complex *)buf = ctypes_double_complex_val(v); break;
    default:
     assert(0);
   }
@@ -154,14 +135,16 @@ value ctypes_string_of_prim(value prim_, value v)
                            (intnat)Nativeint_val(v)); break;
   case Float: snprintf(buf, sizeof buf, "%.12g", Double_val(v)); break;
   case Double: snprintf(buf, sizeof buf, "%.12g", Double_val(v)); break;
-  case Complex32: 
-    snprintf(buf, sizeof buf, "%.12g+%.12gi", Double_field(v, 0),
-             Double_field(v, 1));
+  case Complex32: {
+    float complex c = ctypes_float_complex_val(v);
+    snprintf(buf, sizeof buf, "%.12g+%.12gi", crealf(c), cimagf(c));
     break;
-  case Complex64:
-    snprintf(buf, sizeof buf, "%.12g+%.12gi", Double_field(v, 0),
-             Double_field(v, 1));
+  }
+  case Complex64: {
+    double complex c = ctypes_double_complex_val(v);
+    snprintf(buf, sizeof buf, "%.12g+%.12gi", creal(c), cimag(c));
     break;
+  }
   default:
     assert(0);
   }
