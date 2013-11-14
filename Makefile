@@ -6,15 +6,17 @@ OCAMLFIND=ocamlfind
 OCAMLMKLIB=ocamlmklib
 VPATH=src examples
 BUILDDIR=_build
-PROJECTS=configure configured ctypes ctypes-foreign-base ctypes-foreign-threaded ctypes-foreign-unthreaded ctypes-top
+BASE_PROJECTS=configure configured ctypes ctypes-top
+FOREIGN_PROJECTS=ctypes-foreign-base ctypes-foreign-threaded ctypes-foreign-unthreaded 
+PROJECTS=$(BASE_PROJECTS) $(FOREIGN_PROJECTS)
 GENERATED=src/ctypes_config.h src/ctypes_config.ml setup.data src/ctypes/ctypes_primitives.ml
 CFLAGS=-fPIC -Wall -O3 $(OCAML_FFI_INCOPTS)
 OCAML_FFI_INCOPTS=$(libffi_opt)
 
 # public targets
-all: setup.data build
+all: base $(FOREIGN_PROJECTS)
 
-build: $(PROJECTS)
+base: setup.data $(BASE_PROJECTS)
 
 clean:
 	rm -fr _build
@@ -121,10 +123,12 @@ install-%:
 
 install: META-install $(PROJECTS:%=install-%)
 
+base-install: META-install $(BASE_PROJECTS:%=install-%)
+
 uninstall:
 	$(OCAMLFIND) remove ctypes
 
-.PHONY: depend distclean clean build configure all install $(PROJECTS)
+.PHONY: depend distclean clean base configure all install $(PROJECTS)
 
 include .depend Makefile.rules Makefile.examples Makefile.tests
 -include setup.data
