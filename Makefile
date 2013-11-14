@@ -124,6 +124,7 @@ install-%:
 install: META-install $(PROJECTS:%=install-%)
 
 base-install: META-install $(BASE_PROJECTS:%=install-%)
+foreign-install: $(FOREIGN_PROJECTS:%=install-%)
 
 uninstall:
 	$(OCAMLFIND) remove ctypes
