@@ -9,11 +9,6 @@
 #define TYPE_INFO_STUBS_H
 
 #include <caml/mlvalues.h>
-#include <caml/fail.h>
-#include <caml/callback.h>
-
-/* allocate_unpassable_struct_type_info : (size, alignment) -> _ ctype */
-value ctypes_allocate_unpassable_struct_type_info(int size, int alignment);
 
 /* Read a C value from a block of memory */
 /* read : 'a prim -> offset:int -> raw_pointer -> 'a */
