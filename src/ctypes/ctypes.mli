@@ -545,7 +545,7 @@ val array_of_bigarray : < element: _;
                           bigarray: 'b;
                           carray: 'c;
                           dims: _ > bigarray_class -> 'b -> 'c
-(** Convert a C array to a Bigarray value. *)
+(** Convert a Bigarray value to a C array. *)
 
 val bigarray_of_array : < element: 'a;
                           ba_repr: 'f;
@@ -553,7 +553,7 @@ val bigarray_of_array : < element: 'a;
                           carray: 'c array;
                           dims: 'i > bigarray_class ->
     ('a, 'f) Bigarray.kind -> 'c array -> 'b
-(** Convert a Bigarray value to a C array. *)
+(** Convert a C array to a Bigarray value. *)
 
 
 (** {3 Struct and union values} *)
