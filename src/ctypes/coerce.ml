@@ -50,5 +50,5 @@ let rec coerce : type a b. a typ -> b typ -> a -> b =
     let coerce = coerce a bv.ty in
     fun v -> bv.read (coerce v)
   | Pointer _, Pointer b ->
-    fun v -> Memory.(from_voidp b (to_voidp v))
+    fun p -> { p with reftype = b }
   | _ -> raise Uncoercible 
