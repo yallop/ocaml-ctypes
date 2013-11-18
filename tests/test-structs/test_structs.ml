@@ -347,7 +347,7 @@ let test_struct_ffi_type_lifetime () =
         returning
           (begin
             let s = structure "one_int" in
-            let i = field s "i" int in
+            let _ = field s "i" int in
             let () = seal s in
             s
            end)
