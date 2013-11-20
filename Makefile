@@ -28,6 +28,7 @@ ctypes.dir = src/ctypes
 ctypes.extra_mls = ctypes_primitives.ml
 ctypes.deps = bigarray
 ctypes.install = yes
+ctypes.install_native_objects = yes
 
 ctypes: PROJECT=ctypes
 ctypes: $(ctypes.dir)/$(ctypes.extra_mls) $$(LIB_TARGETS)
@@ -35,6 +36,7 @@ ctypes: $(ctypes.dir)/$(ctypes.extra_mls) $$(LIB_TARGETS)
 # ctypes-foreign-base subproject
 ctypes-foreign-base.public = dl
 ctypes-foreign-base.install = yes
+ctypes-foreign-base.install_native_objects = yes
 ctypes-foreign-base.threads = no
 ctypes-foreign-base.dir = src/ctypes-foreign-base
 ctypes-foreign-base.subproject_deps = ctypes
@@ -54,6 +56,7 @@ ctypes-foreign-threaded.subproject_deps = ctypes ctypes-foreign-base
 ctypes-foreign-threaded.link_flags = $(libffi_lib)
 ctypes-foreign-threaded.cmo_opts = $(OCAML_FFI_INCOPTS:%=-ccopt %)
 ctypes-foreign-threaded.cmx_opts = $(OCAML_FFI_INCOPTS:%=-ccopt %)
+ctypes-foreign-threaded.install_native_objects = no
 
 ctypes-foreign-threaded: PROJECT=ctypes-foreign-threaded
 ctypes-foreign-threaded: $$(LIB_TARGETS)
@@ -67,6 +70,7 @@ ctypes-foreign-unthreaded.subproject_deps = ctypes ctypes-foreign-base
 ctypes-foreign-unthreaded.link_flags = $(libffi_lib)
 ctypes-foreign-unthreaded.cmo_opts = $(OCAML_FFI_INCOPTS:%=-ccopt %)
 ctypes-foreign-unthreaded.cmx_opts = $(OCAML_FFI_INCOPTS:%=-ccopt %)
+ctypes-foreign-threaded.install_native_objects = no
 
 ctypes-foreign-unthreaded: PROJECT=ctypes-foreign-unthreaded
 ctypes-foreign-unthreaded: $$(LIB_TARGETS)
@@ -77,6 +81,7 @@ ctypes-top.dir = src/ctypes-top
 ctypes-top.install = yes
 ctypes-top.deps = compiler-libs
 ctypes-top.subproject_deps = ctypes
+ctypes-top.install_native_objects = yes
 
 ctypes-top: PROJECT=ctypes-top
 ctypes-top: $$(LIB_TARGETS)
@@ -112,7 +117,7 @@ install-%:
 		$(OCAMLFIND) install -add ctypes $^ \
                    $(LIB_TARGETS) $(LIB_TARGET_EXTRAS) \
                    $(INSTALL_MLIS) $(INSTALL_CMIS) \
-                   $(NATIVE_OBJECTS))
+                   $(if $(filter yes,$($(PROJECT).install_native_objects)),$(NATIVE_OBJECTS)))
 
 install: META-install $(PROJECTS:%=install-%)
 
