@@ -70,7 +70,7 @@ ctypes-foreign-unthreaded.subproject_deps = ctypes ctypes-foreign-base
 ctypes-foreign-unthreaded.link_flags = $(libffi_lib)
 ctypes-foreign-unthreaded.cmo_opts = $(OCAML_FFI_INCOPTS:%=-ccopt %)
 ctypes-foreign-unthreaded.cmx_opts = $(OCAML_FFI_INCOPTS:%=-ccopt %)
-ctypes-foreign-threaded.install_native_objects = no
+ctypes-foreign-unthreaded.install_native_objects = no
 
 ctypes-foreign-unthreaded: PROJECT=ctypes-foreign-unthreaded
 ctypes-foreign-unthreaded: $$(LIB_TARGETS)
