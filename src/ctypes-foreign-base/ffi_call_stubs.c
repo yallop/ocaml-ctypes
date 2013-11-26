@@ -20,9 +20,9 @@
 
 #include <ffi.h>
 
-#include "../ctypes/managed_buffer_stubs.h"
-#include "../ctypes/type_info_stubs.h"
-#include "../ctypes/raw_pointer.h"
+#include "../ctypes-base/managed_buffer_stubs.h"
+#include "../ctypes-base/type_info_stubs.h"
+#include "../ctypes-base/raw_pointer.h"
 
 /* TODO: support callbacks that raise exceptions?  e.g. using
    caml_callback_exn etc.  */

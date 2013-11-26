@@ -6,6 +6,11 @@
  *)
 
 open OUnit
+
+open Ctypes_base
+open Ctypes_foreign_base
+open Ctypes_foreign_unthreaded
+
 open Ctypes
 open Foreign
 
@@ -237,7 +242,7 @@ let test_passing_pointer_to_function_pointer () =
       (ptr arg_type @-> returning int)
   in
   assert_equal ~printer:string_of_int
-    5 (accepting_pointer_to_function_pointer 
+    5 (accepting_pointer_to_function_pointer
          (allocate arg_type ( / )))
 
 
@@ -309,7 +314,7 @@ let test_writing_through_pointer_to_abstract_type () =
   end
 
 
-(* 
+(*
    Test for reading and writing global values using the "foreign_value"
    function.
 *)
@@ -333,7 +338,7 @@ let test_allocation () =
   let malloc = foreign "malloc" (size_t @-> returning (ptr void)) in
   let realloc = foreign "realloc" (ptr void @-> size_t @-> returning (ptr void)) in
   let free = foreign "free" (ptr void @-> returning void) in
-  
+
   let pointer = malloc (Size_t.of_int (sizeof int)) in
     let int_pointer = from_voidp int pointer in
     int_pointer <-@ 17;
@@ -363,7 +368,7 @@ let test_allocation () =
   Test a function that returns the address of a global variable.
 *)
 let test_reading_returned_global () =
-  let return_global_address = 
+  let return_global_address =
     foreign "return_global_address" ~from:testlib
       (void @-> returning (ptr int)) in
   assert_equal (!@(return_global_address ())) 100
@@ -374,7 +379,7 @@ let test_reading_returned_global () =
 *)
 let test_passing_pointer_through () =
   let pass_pointer_through = foreign "pass_pointer_through" ~from:testlib
-    (ptr int @-> ptr int @-> int @-> returning (ptr int)) 
+    (ptr int @-> ptr int @-> int @-> returning (ptr int))
   in
   let p1 = allocate int 25 in
   let p2 = allocate int 32 in
@@ -402,7 +407,7 @@ let test_pointer_arithmetic () =
   let i1 = field twoints "i" int in
   let i2 = field twoints "j" int in
   let () = seal twoints in
-  
+
   (* Traverse the array using a 'struct twoints' pointer *)
   let ps = from_voidp twoints (to_voidp p) in
 
@@ -410,10 +415,10 @@ let test_pointer_arithmetic () =
     assert_equal !@((ps +@ i) |-> i1) (2 * i + 1);
     assert_equal !@((ps +@ i) |-> i2) (2 * i + 2);
   done;
-  
+
   (* Traverse the array using a char pointer *)
   let pc = from_voidp char (to_voidp p) in
-  
+
   for i = 0 to 7 do
     let p' = pc +@ i * sizeof int in
     assert_equal !@(from_voidp int (to_voidp p')) (succ i)
@@ -424,7 +429,7 @@ let test_pointer_arithmetic () =
   for i = 0 to 7 do
     assert_equal !@(pend -@ i) (8 - i)
   done
-    
+
 
 (*
   Test pointer comparisons.
@@ -451,13 +456,13 @@ let test_pointer_comparison () =
   (* Canonicalization preserves ordering *)
   assert_bool "p < p+n"
     (p < (p +@ 10));
-    
+
   assert_bool "canonicalize(p) < canonicalize(p+n)"
     (canonicalize p < canonicalize (p +@ 10));
 
   assert_bool "p > p-1"
     (p > (p -@ 1));
-    
+
   assert_bool "canonicalize(p) > canonicalize(p-1)"
     (canonicalize p > canonicalize (p -@ 1));
 

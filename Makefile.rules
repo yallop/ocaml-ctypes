@@ -19,7 +19,7 @@ SUBPROJECT_DEPS = $($(PROJECT).subproject_deps)
 LOCAL_CMXAS = $(SUBPROJECT_DEPS:%=$(BUILDDIR)/%.cmxa)
 CMXA_OPTS = $(if $(C_OBJECTS),-cclib -l$(PROJECT)_stubs)
 
-OCAMLINCLUDES = -I $(BUILDDIR)/$($(PROJECT).dir) \
+OCAMLINCLUDES = -I $(BUILDDIR) -I $(BUILDDIR)/$($(PROJECT).dir) \
                 $($(PROJECT).subproject_deps:%=-I $(BUILDDIR)/src/%)
 NATIVE_LIB=$(BUILDDIR)/$(PROJECT).cmxa
 NATIVE_TARGET=$(BUILDDIR)/$(PROJECT).native
@@ -37,8 +37,12 @@ OCAML_LINK_FLAGS=$(LINK_FLAGS:%=-cclib %)
 OCAMLFIND_PACKAGE_FLAGS=$(patsubst %,-package %,$($(PROJECT).deps)) \
                         $(patsubst %,-package threads,$(THREAD_FLAG))
 
+PACK_CMX = $(BUILDDIR)/$(shell echo $($(PROJECT).packmod).cmx | tr '[:upper:]' '[:lower:]')
+PACK_CMO = $(BUILDDIR)/$(shell echo $($(PROJECT).packmod).cmo | tr '[:upper:]' '[:lower:]')
+
 $(BUILDDIR)/%.cmxa: $$(NATIVE_OBJECTS)
-	$(OCAMLFIND) opt -a -linkall $(THREAD_FLAG) $(OCAMLFIND_PACKAGE_FLAGS) $(CMXA_OPTS) $(OCAML_LINK_FLAGS) -o $@ $(NATIVE_OBJECTS)
+	$(OCAMLFIND) opt -pack -linkall $(THREAD_FLAG) $(OCAMLFIND_PACKAGE_FLAGS) -o $(PACK_CMX) $^
+	$(OCAMLFIND) opt -a -linkall $(THREAD_FLAG) $(OCAMLFIND_PACKAGE_FLAGS) $(CMXA_OPTS) $(OCAML_LINK_FLAGS) -o $@ $(PACK_CMX)
 
 $(BUILDDIR)/dll%_stubs.so: $$(C_OBJECTS)
 	$(OCAMLMKLIB) -o $(BUILDDIR)/$*_stubs $^ $(LINK_FLAGS)
@@ -47,7 +51,8 @@ $(BUILDDIR)/%.cmxs : $$(NATIVE_OBJECTS)
 	$(OCAMLFIND) opt -shared -linkall $(THREAD_FLAG) $(OCAMLFIND_PACKAGE_FLAGS) $(OCAML_LINK_FLAGS) -o $@ $(NATIVE_OBJECTS)
 
 $(BUILDDIR)/%.cma: $$(BYTE_OBJECTS)
-	$(OCAMLFIND) ocamlc -a $(THREAD_FLAG) $(CMA_OPTS) $(OCAMLFIND_PACKAGE_FLAGS) $(OCAML_LINK_FLAGS) -o $@ $(BYTE_OBJECTS)
+	$(OCAMLFIND) ocamlc -pack -linkall $(THREAD_FLAG) -o $(PACK_CMO) $^
+	$(OCAMLFIND) ocamlc -a $(THREAD_FLAG) $(CMA_OPTS) $(OCAMLFIND_PACKAGE_FLAGS) $(OCAML_LINK_FLAGS) -o $@ $(PACK_CMO)
 
 $(BUILDDIR)/%.cmo : %.ml
 	@mkdir -p $(@D)

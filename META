@@ -1,11 +1,11 @@
 version = "0.2.1"
 description = "Combinators for binding to C libraries without writing any C."
 requires = "unix bigarray"
-archive(byte) = "ctypes.cma"
-archive(byte, plugin) = "ctypes.cma"
-archive(native) = "ctypes.cmxa"
-archive(native, plugin) = "ctypes.cmxs"
-exists_if = "ctypes.cma"
+archive(byte) = "ctypes-base.cma"
+archive(byte, plugin) = "ctypes-base.cma"
+archive(native) = "ctypes-base.cmxa"
+archive(native, plugin) = "ctypes-base.cmxs"
+exists_if = "ctypes-base.cma"
 
 package "top" (
   version = "0.2.1"

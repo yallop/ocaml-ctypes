@@ -7,6 +7,8 @@
 
 (* Stubs for binding to libffi. *)
 
+open Ctypes_base
+
 open Ctypes_raw
 
 (* The type of structure types *)

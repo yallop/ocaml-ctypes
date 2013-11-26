@@ -5,6 +5,7 @@
  * See the file LICENSE for details.
  *)
 
+open Ctypes_base
 open Format
 
 val format_typ : formatter -> 'a Ctypes.typ -> unit

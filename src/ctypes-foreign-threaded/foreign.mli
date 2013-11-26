@@ -7,6 +7,9 @@
 
 (** High-level bindings for C functions and values *)
 
+open Ctypes_base
+open Ctypes_foreign_base
+
 val foreign :
   ?from:Dl.library ->
   ?stub:bool -> 

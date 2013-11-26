@@ -1,6 +1,6 @@
 _build
 setup.data
-src/ctypes/ctypes_primitives.ml
+src/ctypes-base/ctypes_primitives.ml
 src/ctypes_config.h
 src/ctypes_config.ml
 *~
