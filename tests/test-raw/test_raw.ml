@@ -5,6 +5,9 @@
  * See the file LICENSE for details.
  *)
 
+open Ctypes_base
+open Ctypes_foreign_base
+
 open OUnit
 open Memory_stubs
 open Std_view_stubs
