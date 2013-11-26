@@ -103,7 +103,7 @@ setup.data: src/discover/discover.ml
 
 # dependencies
 depend: configure
-	$(OCAMLDEP) $(foreach project,$(PROJECTS),-I $($(project).dir)) \
+	$(OCAMLDEP) $(foreach project, $(filter-out configured, $(PROJECTS)),-I $($(project).dir)) \
              src/*/*.mli src/*/*.ml examples/*/*.mli examples/*/*.ml \
            | sed "s!src/!_build/src/!g; s!examples/!_build/examples/!g" > .depend
 
@@ -128,4 +128,3 @@ uninstall:
 
 include .depend Makefile.rules Makefile.examples Makefile.tests
 -include setup.data
-
