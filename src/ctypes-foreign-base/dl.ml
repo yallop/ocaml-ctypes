@@ -5,6 +5,8 @@
  * See the file LICENSE for details.
  *)
 
+open Ctypes_base
+
 type library
 
 type flag = 

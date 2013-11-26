@@ -5,6 +5,8 @@
  * See the file LICENSE for details.
  *)
 
+open Ctypes_base
+
 module type CLOSURE_PROPERTIES =
 sig
   val record : Obj.t -> Obj.t -> int

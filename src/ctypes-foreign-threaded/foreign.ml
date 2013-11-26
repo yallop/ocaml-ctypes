@@ -5,4 +5,6 @@
  * See the file LICENSE for details.
  *)
 
+open Ctypes_foreign_base
+
 include Foreign_basis.Make(Closure_properties.Make(Mutex))
