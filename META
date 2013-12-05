@@ -18,6 +18,17 @@ package "top" (
   exists_if = "ctypes-top.cma"
 )
 
+package "stubs" (
+  version = "0.2.3"
+  description = "Stub generation from C types"
+  requires = "ctypes"
+  archive(byte) = "cstubs.cma"
+  archive(byte, plugin) = "cstubs.cma"
+  archive(native) = "cstubs.cmxa"
+  archive(native, plugin) = "cstubs.cmxs"
+  exists_if = "cstubs.cma"
+)
+
 package "foreign-base" (
  version = "0.2.3"
  description = "Dynamic linking of C functions"
