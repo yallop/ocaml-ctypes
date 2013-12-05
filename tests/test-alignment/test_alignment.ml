@@ -232,21 +232,21 @@ let test_struct_tail_padding () =
 let test_bigarray_alignment () =
   let module M = struct
     module B = Bigarray
-    type k = K : ('a, 'b) Bigarray.kind * int -> k
+    type k = K : < element: _; ba_repr: _; storage_type: _ > bigarray_kind * int -> k
     let kind_alignments = [
-      K (B.float32, alignment float);
-      K (B.float64, alignment double);
-      K (B.int8_signed, alignment int8_t);
-      K (B.int8_unsigned, alignment uint8_t);
-      K (B.int16_signed, alignment int16_t);
-      K (B.int16_unsigned, alignment uint16_t);
-      K (B.int32, alignment int32_t);
-      K (B.int64, alignment int64_t);
-      K (B.int, alignment (ptr void));
-      K (B.nativeint, alignment (ptr void));
-      K (B.complex32, alignment complex32);
-      K (B.complex64, alignment complex64);
-      K (B.char, alignment char);
+      K (ba_float32, alignment float);
+      K (ba_float64, alignment double);
+      K (ba_int8_signed, alignment int8_t);
+      K (ba_int8_unsigned, alignment uint8_t);
+      K (ba_int16_signed, alignment int16_t);
+      K (ba_int16_unsigned, alignment uint16_t);
+      K (ba_int32, alignment int32_t);
+      K (ba_int64, alignment int64_t);
+      K (ba_int, alignment (ptr void));
+      K (ba_nativeint, alignment (ptr void));
+      K (ba_complex32, alignment complex32);
+      K (ba_complex64, alignment complex64);
+      K (ba_char, alignment char);
     ]
 
     let () = begin

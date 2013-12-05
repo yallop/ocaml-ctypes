@@ -158,21 +158,21 @@ end
 let test_sizeof_bigarrays () =
   let module M = struct
     module B = Bigarray
-    type k = K : ('a, 'b) Bigarray.kind * int -> k
+    type k = K : < element: _; ba_repr: _; storage_type: _ > bigarray_kind * int -> k
     let kind_sizes = [
-      K (B.float32, 4);
-      K (B.float64, 8);
-      K (B.int8_signed, 1);
-      K (B.int8_unsigned, 1);
-      K (B.int16_signed, 2);
-      K (B.int16_unsigned, 2);
-      K (B.int32, 4);
-      K (B.int64, 8);
-      K (B.int, sizeof (ptr void));
-      K (B.nativeint, sizeof (ptr void));
-      K (B.complex32, 8);
-      K (B.complex64, 16);
-      K (B.char, 1);
+      K (ba_float32, 4);
+      K (ba_float64, 8);
+      K (ba_int8_signed, 1);
+      K (ba_int8_unsigned, 1);
+      K (ba_int16_signed, 2);
+      K (ba_int16_unsigned, 2);
+      K (ba_int32, 4);
+      K (ba_int64, 8);
+      K (ba_int, sizeof (ptr void));
+      K (ba_nativeint, sizeof (ptr void));
+      K (ba_complex32, 8);
+      K (ba_complex64, 16);
+      K (ba_char, 1);
     ]
 
     let () = begin

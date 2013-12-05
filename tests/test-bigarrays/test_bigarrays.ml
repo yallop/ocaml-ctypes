@@ -30,9 +30,9 @@ let array_of_list3 typ list3 =
 let list2_of_array array =
   List.map Array.to_list (Array.to_list array)
 
-let matrix l = bigarray_of_array array2 BA.float64 (array_of_list2 double l)
+let matrix l = bigarray_of_array array2 ba_float64 (array_of_list2 double l)
 
-let unmatrix m = list2_of_array (array_of_bigarray array2 m)
+let unmatrix m = list2_of_array (array_of_bigarray array2 ba_float64 m)
 
 let castp typ p = from_voidp typ (to_voidp p)
 
@@ -43,7 +43,7 @@ let castp typ p = from_voidp typ (to_voidp p)
 let test_bigarray_of_ctypes_array () =
   (* One-dimensional Genarrays *)
   let a1 = Array.of_list int8_t [10; 20; 30; 40] in
-  let b1 = bigarray_of_array genarray BA.int8_signed a1 in
+  let b1 = bigarray_of_array genarray ba_int8_signed a1 in
   let () = begin
     assert_equal (Array.length a1) (BA.Genarray.nth_dim b1 0);
     for i = 0 to Array.length a1 - 1 do
@@ -62,7 +62,7 @@ let test_bigarray_of_ctypes_array () =
               {re = 0.2; im = 2.0};
               {re = 0.3; im = 3.0};
               {re = 0.4; im = 4.0}]) in
-  let b2 = bigarray_of_array array1 BA.complex32 a2 in
+  let b2 = bigarray_of_array array1 ba_complex32 a2 in
   let () = begin
     assert_equal (Array.length a2) (BA.Array1.dim b2);
     for i = 0 to Array.length a2 - 1 do
@@ -71,30 +71,31 @@ let test_bigarray_of_ctypes_array () =
   end in
 
   (* Two-dimensional Genarrays *)
-  let uint16 = view uint16_t
-    ~read:Unsigned.UInt16.to_int ~write:Unsigned.UInt16.of_int in
-  let a3 = array_of_list2 uint16
-    [[5; 10; 15];
-     [3; 6; 9];
-     [2; 4; 6];
-     [1; 2; 3]] in
-  let b3 = BA.reshape (bigarray_of_array genarray BA.int16_unsigned
+  let a3 = array_of_list2 uint16_t
+    (List.map (List.map Unsigned.UInt16.of_int)
+       [[5; 10; 15];
+	[3; 6; 9];
+	[2; 4; 6];
+	[1; 2; 3]]) in
+  let b3 = BA.reshape (bigarray_of_array genarray ba_int16_unsigned
                          (Array.from_ptr
-                            (castp uint16 (Array.start a3)) 12))
+                            (castp uint16_t (Array.start a3)) 12))
     [| 4; 3 |] in
   let () = begin
     assert_equal (Array.length a3) (BA.Genarray.nth_dim b3 0);
     assert_equal (Array.length a3.(0)) (BA.Genarray.nth_dim b3 1);
     for i = 0 to Array.length a3 - 1 do
       for j = 0 to Array.length a3.(0) - 1 do
-        assert_equal a3.(i).(j) (BA.Genarray.get b3 [|i; j|])
+        assert_equal
+	  (Unsigned.UInt16.to_int a3.(i).(j))
+	  (BA.Genarray.get b3 [|i; j|])
       done
     done
   end in
 
   (* Array2 *)
   let a4 = array_of_list2 nativeint [[5n; 10n]; [3n; 6n]; [1n; 2n]] in
-  let b4 = bigarray_of_array array2 BA.nativeint a4 in
+  let b4 = bigarray_of_array array2 ba_nativeint a4 in
   let () = begin
     assert_equal (Array.length a4) (BA.Array2.dim1 b4);
     assert_equal (Array.length a4.(0)) (BA.Array2.dim2 b4);
@@ -115,7 +116,7 @@ let test_bigarray_of_ctypes_array () =
       [200L; 400L; 600L; 800L; 1000L]]] in
      
   let b5 = BA.reshape
-    (bigarray_of_array genarray BA.int64
+    (bigarray_of_array genarray ba_int64
        (Array.from_ptr (castp int64_t (Array.start a5)) 30)) 
     [| 3; 2; 5 |] in
   let () = begin
@@ -140,7 +141,7 @@ let test_bigarray_of_ctypes_array () =
      [[100.; 200.; 300.; 400.];
       [200.; 400.; 600.; 800.]]] in
      
-  let b6 = bigarray_of_array array3 BA.float64 a6 in
+  let b6 = bigarray_of_array array3 ba_float64 a6 in
   let () = begin
     assert_equal (Array.length a6) (BA.Array3.dim1 b6);
     assert_equal (Array.length a6.(0)) (BA.Array3.dim2 b6);
@@ -164,7 +165,7 @@ let test_ctypes_array_of_bigarray () =
   (* One-dimensional Genarrays *)
   let b1_dim = 6 in
   let b1 = BA.(Genarray.create float32 c_layout) [| b1_dim |] in
-  let a1 = array_of_bigarray genarray b1 in
+  let a1 = array_of_bigarray genarray ba_float32 b1 in
   begin
     assert_equal (BA.Genarray.nth_dim b1 0) (Array.length a1);
 
@@ -179,7 +180,7 @@ let test_ctypes_array_of_bigarray () =
   (* Array1 *)
   let b2_dim = 7 in
   let b2 = BA.(Array1.create int8_unsigned c_layout) b2_dim in
-  let a2 = array_of_bigarray array1 b2 in
+  let a2 = array_of_bigarray array1 ba_int8_unsigned b2 in
   begin
     assert_equal (BA.Array1.dim b2) (Array.length a2);
 
@@ -188,7 +189,7 @@ let test_ctypes_array_of_bigarray () =
       [ 2; 4; 6; 8; 10; 12; 14 ];
     
     for i = 0 to b2_dim - 1 do
-      assert_equal b2.{i} a2.(i)
+      assert_equal b2.{i} (Unsigned.UInt8.to_int a2.(i))
     done
   end;
 
@@ -196,7 +197,7 @@ let test_ctypes_array_of_bigarray () =
   let b3_dim1 = 4 and b3_dim2 = 2 in
   let b3 = BA.(Genarray.create int16_signed c_layout) [| b3_dim1; b3_dim2 |] in
   let a3 = Array.from_ptr
-    (castp (array b3_dim2 int16_t) (bigarray_start genarray b3))
+    (castp (array b3_dim2 int16_t) (bigarray_start genarray ba_int16_signed b3))
     b3_dim1 in
   begin
     assert_equal (BA.Genarray.nth_dim b3 0) (Array.length a3);
@@ -220,7 +221,7 @@ let test_ctypes_array_of_bigarray () =
   (* Array2 *)
   let b4_dim1 = 3 and b4_dim2 = 4 in
   let b4 = BA.(Array2.create int32 c_layout) b4_dim1 b4_dim2 in
-  let a4 = array_of_bigarray array2 b4 in
+  let a4 = array_of_bigarray array2 ba_int32 b4 in
   begin
     assert_equal (BA.Array2.dim1 b4) (Array.length a4);
     assert_equal (BA.Array2.dim2 b4) (Array.length a4.(0));
@@ -243,7 +244,7 @@ let test_ctypes_array_of_bigarray () =
   let b5_dim1 = 4 and b5_dim2 = 2 and b5_dim3 = 5 in
   let b5 = BA.(Genarray.create int c_layout) [| b5_dim1; b5_dim2; b5_dim3 |] in
   let a5 = Array.from_ptr
-    (castp (array b5_dim2 (array b5_dim3 camlint)) (bigarray_start genarray b5))
+    (castp (array b5_dim2 (array b5_dim3 camlint)) (bigarray_start genarray ba_int b5))
     b5_dim1 in
   begin
     assert_equal
@@ -284,7 +285,7 @@ let test_ctypes_array_of_bigarray () =
       abs_float (lre -. rre) < eps64 && abs_float (lim -. rim) < eps64 in
   let b6_dim1 = 3 and b6_dim2 = 4 and b6_dim3 = 2 in
   let b6 = BA.(Array3.create complex64 c_layout) b6_dim1 b6_dim2 b6_dim3 in
-  let a6 = array_of_bigarray array3 b6 in
+  let a6 = array_of_bigarray array3 ba_complex64 b6 in
   begin
     assert_equal (BA.Array3.dim1 b6) (Array.length a6);
     assert_equal (BA.Array3.dim2 b6) (Array.length a6.(0));
@@ -334,7 +335,7 @@ let test_passing_bigarrays () =
     let o = BA.Array2.dim1 r and p = BA.Array2.dim2 r in
     assert (n = o);
     let product = BA.(Array2.(create (kind l)) c_layout) m p in
-    let addr = bigarray_start array2 in
+    let addr = bigarray_start array2 ba_float64 in
     matrix_mul m n p (addr l) (addr r) (addr product);
     product in
   assert_equal
@@ -366,8 +367,8 @@ let test_returning_bigarrays () =
   let transpose m =
     (* For the purposes of the test we'll just leak the allocated memory. *)
     let rows = BA.Array2.dim1 m and cols = BA.Array2.dim2 m in
-    bigarray_of_ptr array2 (cols, rows) BA.float64
-      (matrix_transpose rows cols (bigarray_start array2 m)) in
+    bigarray_of_ptr array2 (cols, rows) ba_float64
+      (matrix_transpose rows cols (bigarray_start array2 ba_float64 m)) in
   assert_equal
     [[25.; 1.];
      [15.; 2.];
@@ -400,7 +401,7 @@ let test_bigarray_lifetime_with_ctypes_reference () =
       begin
         ba.{0,0} <- 1;
         Gc.finalise finalise ba;
-        bigarray_start array2 ba
+        bigarray_start array2 ba_int ba
       end
     in
     (* The bigarray is out of scope, but the ctypes object is still live, so
@@ -441,7 +442,7 @@ let test_ctypes_memory_lifetime_with_bigarray_reference () =
       let a = Array.make ~finalise int64_t 5 in
       begin
         for i = 0 to 4 do a.(i) <- Int64.(add (of_int i) one) done;
-        bigarray_of_array array1 BA.int64 a
+        bigarray_of_array array1 ba_int64 a
       end
     in
     (* The ctypes object is out of scope, but the bigarray is still live, so

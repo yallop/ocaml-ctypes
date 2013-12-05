@@ -178,7 +178,7 @@ val string : string typ
 
 val string_opt : string option typ
 (** A high-level representation of the string type.  This behaves like {!string},
-	except that null pointers appear in OCaml as [None].
+    except that null pointers appear in OCaml as [None].
 *)
 
 (** {3 Array types} *)
@@ -206,44 +206,105 @@ type _ bigarray_class
 val genarray :
   < element: 'a;
     ba_repr: 'b;
+    storage_type: 'c;
     bigarray: ('a, 'b, Bigarray.c_layout) Bigarray.Genarray.t;
-    carray: 'a array;
+    carray: 'c array;
     dims: int std_array > bigarray_class
 (** The class of {!Bigarray.Genarray.t} values *)
 
 val array1 :
   < element: 'a;
     ba_repr: 'b;
+    storage_type: 'c;
     bigarray: ('a, 'b, Bigarray.c_layout) Bigarray.Array1.t;
-    carray: 'a array;
+    carray: 'c array;
     dims: int > bigarray_class
 (** The class of {!Bigarray.Array1.t} values *)
 
 val array2 :
   < element: 'a;
     ba_repr: 'b;
+    storage_type: 'c;
     bigarray: ('a, 'b, Bigarray.c_layout) Bigarray.Array2.t;
-    carray: 'a array array;
+    carray: 'c array array;
     dims: int * int > bigarray_class
 (** The class of {!Bigarray.Array2.t} values *)
 
 val array3 :
   < element: 'a;
     ba_repr: 'b;
+    storage_type: 'c;
     bigarray: ('a, 'b, Bigarray.c_layout) Bigarray.Array3.t;
-    carray: 'a array array array;
+    carray: 'c array array array;
     dims: int * int * int > bigarray_class
 (** The class of {!Bigarray.Array3.t} values *)
+
+type _ bigarray_kind
+
+val ba_float32 : < element: float;
+                   ba_repr: Bigarray.float32_elt;
+                   storage_type: float > bigarray_kind
+
+val ba_float64 : < element: float;
+                   ba_repr: Bigarray.float64_elt;
+                   storage_type: float > bigarray_kind
+
+val ba_complex32 : < element: Complex.t;
+                     ba_repr: Bigarray.complex32_elt;
+                     storage_type: Complex.t > bigarray_kind
+
+val ba_complex64 : < element: Complex.t;
+                     ba_repr: Bigarray.complex64_elt;
+                     storage_type: Complex.t > bigarray_kind
+
+val ba_int8_signed : < element: int;
+                       ba_repr: Bigarray.int8_signed_elt;
+                       storage_type: int > bigarray_kind
+
+val ba_int8_unsigned : < element: int;
+                         ba_repr: Bigarray.int8_unsigned_elt;
+                         storage_type: uint8 > bigarray_kind
+
+val ba_int16_signed : < element: int;
+                        ba_repr: Bigarray.int16_signed_elt;
+                        storage_type: int > bigarray_kind
+
+val ba_int16_unsigned : < element: int;
+                          ba_repr: Bigarray.int16_unsigned_elt;
+                          storage_type: uint16 > bigarray_kind
+
+val ba_int : < element: int;
+               ba_repr: Bigarray.int_elt;
+               storage_type: int > bigarray_kind
+
+val ba_int32 : < element: int32;
+                 ba_repr: Bigarray.int32_elt;
+                 storage_type: int32 > bigarray_kind
+
+val ba_int64 : < element: int64;
+                 ba_repr: Bigarray.int64_elt;
+                 storage_type: int64 > bigarray_kind
+
+val ba_nativeint : < element: nativeint;
+                     ba_repr: Bigarray.nativeint_elt;
+                     storage_type: nativeint > bigarray_kind
+            
+val ba_char : < element: char;
+                ba_repr: Bigarray.int8_unsigned_elt;
+                storage_type: char > bigarray_kind
 
 val bigarray :
   < element: 'a;
     ba_repr: 'b;
+    storage_type: 'c;
     dims: 'dims;
     bigarray: 'bigarray;
     carray: _ > bigarray_class ->
-   'dims -> ('a, 'b) Bigarray.kind -> 'bigarray typ
+   'dims ->
+    < element: 'a; ba_repr: 'b; storage_type: 'c > bigarray_kind ->
+   'bigarray typ
 (** Construct a sized bigarray type representation from a bigarray class, the
-    dimensions, and the {!Bigarray.kind}. *)
+    dimensions, and an element of {!bigarray_kind}. *)
 
 (** {3 Function types} *)
 
@@ -526,33 +587,43 @@ end
 (** {4 Bigarray values} *)
 
 val bigarray_start : < element: 'a;
-                       ba_repr: _;
+                       ba_repr: 'r;
+                       storage_type: 'c;
                        bigarray: 'b;
                        carray: _;
-                       dims: _ > bigarray_class -> 'b -> 'a ptr
+                       dims: _ > bigarray_class ->
+                     < element: 'a;
+                       ba_repr: 'r;
+                       storage_type: 'c > bigarray_kind -> 'b -> 'c ptr
 (** Return the address of the first element of the given Bigarray value. *)
 
 val bigarray_of_ptr : < element: 'a;
                         ba_repr: 'f;
+                        storage_type: 'c;
                         bigarray: 'b;
                         carray: _;
                         dims: 'i > bigarray_class ->
-    'i -> ('a, 'f) Bigarray.kind -> 'a ptr -> 'b
+    'i -> < element: 'a; ba_repr: 'f; storage_type: 'c > bigarray_kind -> 'c ptr -> 'b
 (** Convert a C pointer to a bigarray value. *)
 
-val array_of_bigarray : < element: _;
-                          ba_repr: _;
+val array_of_bigarray : < element: 'e;
+                          ba_repr: 'r;
+                          storage_type: 's;
                           bigarray: 'b;
                           carray: 'c;
-                          dims: _ > bigarray_class -> 'b -> 'c
+                          dims: _ > bigarray_class ->
+                        < element: 'e;
+                          ba_repr: 'r;
+                          storage_type: 's > bigarray_kind -> 'b -> 'c
 (** Convert a Bigarray value to a C array. *)
 
 val bigarray_of_array : < element: 'a;
                           ba_repr: 'f;
+                          storage_type: 's;
                           bigarray: 'b;
                           carray: 'c array;
                           dims: 'i > bigarray_class ->
-    ('a, 'f) Bigarray.kind -> 'c array -> 'b
+    < element: 'a; ba_repr: 'f; storage_type: 's > bigarray_kind -> 'c array -> 'b
 (** Convert a C array to a Bigarray value. *)
 
 

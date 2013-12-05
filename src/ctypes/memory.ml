@@ -219,48 +219,58 @@ let addr { structured } = structured
 
 open Bigarray
 
+include Ctypes_bigarray.Kinds
+
 let _bigarray_start kind typ ba =
   let raw_address = Ctypes_bigarray.address typ ba in
-  let reftype = Primitive (Ctypes_bigarray.prim_of_kind kind) in
+  let reftype = Primitive (Ctypes_bigarray.storage_type_of_kind kind) in
   { reftype      = reftype ;
     raw_ptr      = raw_address ;
     pmanaged     = Some (Obj.repr ba) ;
     pbyte_offset = 0 }
 
-let bigarray_start : type a b c d f.
+let bigarray_start : type a b c d e f.
   < element: a;
     ba_repr: f;
     bigarray: b;
     carray: c;
-    dims: d > bigarray_class -> b -> a ptr
-  = fun spec ba -> match spec with
+    storage_type: e;
+    dims: d > bigarray_class -> 
+  < element: a;
+    ba_repr: f;
+    storage_type: e > Ctypes_bigarray.kind -> b -> e ptr
+  = fun spec k ba -> match spec with
   | Genarray ->
     let kind = Genarray.kind ba in
     let dims = Genarray.dims ba in
-    _bigarray_start kind (Ctypes_bigarray.bigarray dims kind) ba
+    _bigarray_start k (Ctypes_bigarray.bigarray dims kind) ba
   | Array1 ->
     let kind = Array1.kind ba in
     let d = Array1.dim ba in
-    _bigarray_start kind (Ctypes_bigarray.bigarray1 d kind) ba
+    _bigarray_start k (Ctypes_bigarray.bigarray1 d kind) ba
   | Array2 ->
     let kind = Array2.kind ba in
     let d1 = Array2.dim1 ba and d2 = Array2.dim2 ba in
-    _bigarray_start kind (Ctypes_bigarray.bigarray2 d1 d2 kind) ba
+    _bigarray_start k (Ctypes_bigarray.bigarray2 d1 d2 kind) ba
   | Array3 ->
     let kind = Array3.kind ba in
     let d1 = Array3.dim1 ba and d2 = Array3.dim2 ba and d3 = Array3.dim3 ba in
-    _bigarray_start kind (Ctypes_bigarray.bigarray3 d1 d2 d3 kind) ba
+    _bigarray_start k (Ctypes_bigarray.bigarray3 d1 d2 d3 kind) ba
 
 let castp reftype p = { p with reftype }
 
-let array_of_bigarray : type a b c d e.
+let array_of_bigarray : type a b c d e f.
   < element: a;
     ba_repr: e;
+    storage_type: f;
     bigarray: b;
     carray: c;
-    dims: d > bigarray_class -> b -> c
-  = fun spec ba -> 
-    let { reftype } as element_ptr = bigarray_start spec ba in
+    dims: d > bigarray_class ->
+  < element: a;
+    ba_repr: e;
+    storage_type: f > Ctypes_bigarray.kind -> b -> c
+  = fun spec k ba -> 
+    let { reftype } as element_ptr = bigarray_start spec k ba in
     match spec with
   | Genarray ->
     let ds = Genarray.dims ba in
@@ -275,9 +285,10 @@ let array_of_bigarray : type a b c d e.
     let d1 = Array3.dim1 ba and d2 = Array3.dim2 ba and d3 = Array3.dim3 ba in
     Array.from_ptr (castp (array d2 (array d3 reftype)) element_ptr) d1
 
-let bigarray_elements : type a b c d f.
+let bigarray_elements : type a b c d e f.
    < element: a;
      ba_repr: f;
+     storage_type: e;
      bigarray: b;
      carray: c;
      dims: d > bigarray_class -> d -> int
@@ -290,9 +301,10 @@ let bigarray_elements : type a b c d f.
 let bigarray_of_ptr spec dims kind ptr =
   !@ (castp (bigarray spec dims kind) ptr)
 
-let array_dims : type a b c d f.
+let array_dims : type a b c d e f.
    < element: a;
      ba_repr: f;
+     storage_type: e;
      bigarray: b;
      carray: c array;
      dims: d > bigarray_class -> c array -> d =
