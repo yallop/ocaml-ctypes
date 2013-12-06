@@ -401,10 +401,27 @@ export LIBFFI_LIBS=-L/opt/local/lib
 
   fprintf config "#endif\n";
 
+  test_feature "no_as_needed" ""
+    (fun () ->
+      ksprintf Sys.command "
+         touch as_needed_test.ml;
+         ocamlopt -shared -cclib -Wl,--no-as-needed as_needed_test.ml -o as_needed_test.cmxs > %s 2>&1;
+         EXIT=$?;
+         rm as_needed_test.*;
+         exit $EXIT"
+        !log_file = 0);
+
+  if !not_available = [] then
+    setup_data := ("as_needed_flags", ["-Wl,--no-as-needed"]) :: !setup_data
+  else
+    setup_data := ("as_needed_flags", []) :: !setup_data;
+  not_available := [];
+
   (* Our setup.data keys. *)
   let setup_data_keys = [
     "libffi_opt";
     "libffi_lib";
+    "as_needed_flags";
   ] in
 
   (* Load setup.data *)
