@@ -8,3 +8,5 @@
 exception Uncoercible
 
 val coerce : 'a Static.typ -> 'b Static.typ -> 'a -> 'b
+
+val coerce_fn : 'a Static.fn -> 'b Static.fn -> 'a -> 'b

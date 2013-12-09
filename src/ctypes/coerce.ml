@@ -52,3 +52,13 @@ let rec coerce : type a b. a typ -> b typ -> a -> b =
   | Pointer _, Pointer b ->
     fun p -> { p with reftype = b }
   | _ -> raise Uncoercible 
+
+let rec coerce_fn : type a b. a fn -> b fn -> a -> b =
+  fun afn bfn -> match afn, bfn with
+  | Function (af, at), Function (bf, bt) ->
+    let coerce_in = coerce bf af in
+    let coerce_out = coerce_fn at bt in
+    fun f x -> coerce_out (f (coerce_in x))
+  | Returns at, Returns bt -> coerce at bt
+  | _ -> raise Uncoercible
+                  
