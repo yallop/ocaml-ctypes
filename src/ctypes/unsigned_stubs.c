@@ -18,7 +18,6 @@
 
 #define Uint_custom_val(TYPE, V) (*((TYPE *) Data_custom_val(V)))
 #define TYPE(SIZE) uint ## SIZE ## _t
-#define BYTES(SIZE) (SIZE / CHAR_BIT)
 #define BUF_SIZE(TYPE) ((sizeof(TYPE) * CHAR_BIT + 2) / 3 + 1)
 
 #define UINT_PRIMOP(NAME, SIZE, OP)                                        \
@@ -126,7 +125,7 @@
   }                                                                          \
                                                                              \
   /* of_string : string -> t */                                              \
-  value ctypes_uint ## BITS ## _of_string(value a, value b)                  \
+  value ctypes_uint ## BITS ## _of_string(value a)                           \
   {                                                                          \
     TYPE(BITS) u;                                                            \
     if (sscanf(String_val(a), "%" SCNu ## BITS , &u) != 1)                   \
