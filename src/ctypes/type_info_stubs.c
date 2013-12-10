@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <complex.h>
+#include <string.h>
 
 #include <caml/memory.h>
 #include <caml/alloc.h>
@@ -106,49 +107,53 @@ value ctypes_write(value prim_, value offset_, value v, value buffer_)
 value ctypes_string_of_prim(value prim_, value v)
 {
   CAMLparam2(prim_, v);
+  CAMLlocal1(s);
   char buf[64];
+  int len = 0;
   switch (Int_val(prim_))
   {
-  case Char: snprintf(buf, sizeof buf, "'%c'", Int_val(v)); break;
-  case Schar: snprintf(buf, sizeof buf, "%d", Int_val(v)); break;
-  case Uchar: snprintf(buf, sizeof buf, "%d", (unsigned char)Uint8_val(v)); break;
-  case Short: snprintf(buf, sizeof buf, "%hd", (short)Int_val(v)); break;
-  case Int: snprintf(buf, sizeof buf, "%d", Int_val(v)); break;
-  case Long: snprintf(buf, sizeof buf, "%ld", (long)ctypes_long_val(v)); break;
-  case Llong: snprintf(buf, sizeof buf, "%lld", (long long)ctypes_llong_val(v)); break;
-  case Ushort: snprintf(buf, sizeof buf, "%hu", (unsigned short)ctypes_ushort_val(v)); break;
-  case Uint: snprintf(buf, sizeof buf, "%u", (unsigned)ctypes_uint_val(v)); break;
-  case Ulong: snprintf(buf, sizeof buf, "%lu", (unsigned long)ctypes_ulong_val(v)); break;
-  case Ullong: snprintf(buf, sizeof buf, "%llu", (unsigned long long)ctypes_ullong_val(v)); break;
-  case Size_t: snprintf(buf, sizeof buf, "%zu", (size_t)ctypes_size_t_val(v)); break;
-  case Int8_t: snprintf(buf, sizeof buf, "%" PRId8, (int8_t)Int_val(v)); break;
-  case Int16_t: snprintf(buf, sizeof buf, "%" PRId16, (int16_t)Int_val(v)); break;
-  case Int32_t: snprintf(buf, sizeof buf, "%" PRId32, Int32_val(v)); break;
-  case Int64_t: snprintf(buf, sizeof buf, "%" PRId64, Int64_val(v)); break;
-  case Uint8_t: snprintf(buf, sizeof buf, "%" PRIu8, Uint8_val(v)); break;
-  case Uint16_t: snprintf(buf, sizeof buf, "%" PRIu16, Uint16_val(v)); break;
-  case Uint32_t: snprintf(buf, sizeof buf, "%" PRIu32, Uint32_val(v)); break;
-  case Uint64_t: snprintf(buf, sizeof buf, "%" PRIu64, Uint64_val(v)); break;
-  case Camlint: snprintf(buf, sizeof buf, "%" ARCH_INTNAT_PRINTF_FORMAT "d",
+  case Char: len = snprintf(buf, sizeof buf, "'%c'", Int_val(v)); break;
+  case Schar: len = snprintf(buf, sizeof buf, "%d", Int_val(v)); break;
+  case Uchar: len = snprintf(buf, sizeof buf, "%d", (unsigned char)Uint8_val(v)); break;
+  case Short: len = snprintf(buf, sizeof buf, "%hd", (short)Int_val(v)); break;
+  case Int: len = snprintf(buf, sizeof buf, "%d", Int_val(v)); break;
+  case Long: len = snprintf(buf, sizeof buf, "%ld", (long)ctypes_long_val(v)); break;
+  case Llong: len = snprintf(buf, sizeof buf, "%lld", (long long)ctypes_llong_val(v)); break;
+  case Ushort: len = snprintf(buf, sizeof buf, "%hu", (unsigned short)ctypes_ushort_val(v)); break;
+  case Uint: len = snprintf(buf, sizeof buf, "%u", (unsigned)ctypes_uint_val(v)); break;
+  case Ulong: len = snprintf(buf, sizeof buf, "%lu", (unsigned long)ctypes_ulong_val(v)); break;
+  case Ullong: len = snprintf(buf, sizeof buf, "%llu", (unsigned long long)ctypes_ullong_val(v)); break;
+  case Size_t: len = snprintf(buf, sizeof buf, "%zu", (size_t)ctypes_size_t_val(v)); break;
+  case Int8_t: len = snprintf(buf, sizeof buf, "%" PRId8, (int8_t)Int_val(v)); break;
+  case Int16_t: len = snprintf(buf, sizeof buf, "%" PRId16, (int16_t)Int_val(v)); break;
+  case Int32_t: len = snprintf(buf, sizeof buf, "%" PRId32, Int32_val(v)); break;
+  case Int64_t: len = snprintf(buf, sizeof buf, "%" PRId64, Int64_val(v)); break;
+  case Uint8_t: len = snprintf(buf, sizeof buf, "%" PRIu8, Uint8_val(v)); break;
+  case Uint16_t: len = snprintf(buf, sizeof buf, "%" PRIu16, Uint16_val(v)); break;
+  case Uint32_t: len = snprintf(buf, sizeof buf, "%" PRIu32, Uint32_val(v)); break;
+  case Uint64_t: len = snprintf(buf, sizeof buf, "%" PRIu64, Uint64_val(v)); break;
+  case Camlint: len = snprintf(buf, sizeof buf, "%" ARCH_INTNAT_PRINTF_FORMAT "d",
                          (intnat)Int_val(v)); break;
-  case Nativeint: snprintf(buf, sizeof buf, "%" ARCH_INTNAT_PRINTF_FORMAT "d",
+  case Nativeint: len = snprintf(buf, sizeof buf, "%" ARCH_INTNAT_PRINTF_FORMAT "d",
                            (intnat)Nativeint_val(v)); break;
-  case Float: snprintf(buf, sizeof buf, "%.12g", Double_val(v)); break;
-  case Double: snprintf(buf, sizeof buf, "%.12g", Double_val(v)); break;
+  case Float: len = snprintf(buf, sizeof buf, "%.12g", Double_val(v)); break;
+  case Double: len = snprintf(buf, sizeof buf, "%.12g", Double_val(v)); break;
   case Complex32: {
     float complex c = ctypes_float_complex_val(v);
-    snprintf(buf, sizeof buf, "%.12g+%.12gi", crealf(c), cimagf(c));
+    len = snprintf(buf, sizeof buf, "%.12g+%.12gi", crealf(c), cimagf(c));
     break;
   }
   case Complex64: {
     double complex c = ctypes_double_complex_val(v);
-    snprintf(buf, sizeof buf, "%.12g+%.12gi", creal(c), cimag(c));
+    len = snprintf(buf, sizeof buf, "%.12g+%.12gi", creal(c), cimag(c));
     break;
   }
   default:
     assert(0);
   }
-  CAMLreturn (caml_copy_string(buf));
+  s = caml_alloc_string(len);
+  memcpy(String_val(s), buf, len);
+  CAMLreturn (s);
 }
 
 /* read_pointer : offset:int -> raw_pointer -> raw_pointer */
