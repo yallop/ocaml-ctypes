@@ -135,6 +135,40 @@ let test_view_coercions () =
 
 
 (* 
+   Check coercions between functions.
+*)
+let test_function_coercions () =
+  let memchr = Foreign.foreign "memchr"
+    (ptr void @-> int @-> size_t @-> returning (ptr void)) in
+  let isize_t = view size_t
+    ~read:Unsigned.Size_t.to_int ~write:Unsigned.Size_t.of_int in
+  let memchr' = coerce_fn
+    (ptr void @-> int @-> size_t @-> returning (ptr void))
+    (string @-> int8_t @-> isize_t @-> returning string_opt)
+    memchr in
+  begin
+    assert_equal
+      (memchr' "foobar" (Char.code 'b') 4)
+      (Some "bar")
+    ;
+    assert_equal
+      (memchr' "foobar" (Char.code 'b') 2)
+      None
+    ;
+  end
+
+
+(* 
+   Check that identity coercions are cost-free.
+*)
+let test_identity_coercions () =
+  let f = fun x y -> x in
+  let fn = int @-> float @-> returning int in
+  let f' = coerce_fn fn fn f in
+  assert_bool "identity coercions are free" (f' == f)
+
+
+(* 
    Check that coercions between unsupported types raise an exception
 *)
 let test_unsupported_coercions () =
@@ -225,6 +259,12 @@ let suite = "Coercsion tests" >:::
 
    "test view coercions"
     >:: test_view_coercions;
+
+   "test function coercions"
+    >:: test_function_coercions;
+
+   "test identity coercions"
+    >:: test_identity_coercions;
 
    "test unsupported coercions"
     >:: test_unsupported_coercions;
