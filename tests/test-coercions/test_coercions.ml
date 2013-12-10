@@ -33,8 +33,12 @@ let test_pointer_coercions () =
     ]
 
     (* Check that we can construct a coercion between any two pointer types *)
-    let () = ListLabels.iter2 types types
-      ~f:(fun (T t1) (T t2) -> let _ = coerce (ptr t1) (ptr t2) in ())
+    let () =
+      ListLabels.iter types
+        ~f:(fun (T t1) ->
+          ListLabels.iter types
+            ~f:(fun (T t2) ->
+              let _ = coerce (ptr t1) (ptr t2) in ()))
 
     (* Check that pointer coercions are value-preserving. *)
     let v = 10
@@ -137,24 +141,75 @@ let test_unsupported_coercions () =
   let module M = struct
     type boxed_type = T : 'a typ -> boxed_type
     let types = [
-      T int8_t;
-      T uint16_t;
-      T int;
-      T float;
-      T short;
-      T complex64;
-      T (bigarray array1 10 Bigarray.int32);
-      T (array 5 int32_t);
-      T (structure "s");
-      T (union "u");
-      T (abstract ~name:"a" ~size:12 ~alignment:4);
+      T int8_t,
+      [T uint16_t; T float; T complex64; T (bigarray array1 10 Bigarray.int32);
+       T (array 5 int32_t); T (structure "s"); T (union "u");
+       T (abstract ~name:"a" ~size:12 ~alignment:4)];
+
+      T uint16_t,
+      [T int8_t; T int; T float; T short; T complex64;
+       T (bigarray array1 10 Bigarray.int32); T (array 5 int32_t);
+       T (structure "s"); T (union "u");
+       T (abstract ~name:"a" ~size:12 ~alignment:4)];
+
+      T int,
+      [T uint16_t; T float; T complex64; T (bigarray array1 10 Bigarray.int32);
+       T (array 5 int32_t); T (structure "s"); T (union "u");
+       T (abstract ~name:"a" ~size:12 ~alignment:4)];
+
+      T float,
+      [T int8_t; T uint16_t; T int; T short; T complex64;
+       T (bigarray array1 10 Bigarray.int32); T (array 5 int32_t);
+       T (structure "s"); T (union "u");
+       T (abstract ~name:"a" ~size:12 ~alignment:4)];
+
+      T short,
+      [T uint16_t; T float; T complex64; T (bigarray array1 10 Bigarray.int32);
+       T (array 5 int32_t); T (structure "s"); T (union "u");
+       T (abstract ~name:"a" ~size:12 ~alignment:4)];
+
+      T complex64,
+      [T int8_t; T uint16_t; T int; T float; T short;
+       T (bigarray array1 10 Bigarray.int32); T (array 5 int32_t);
+       T (structure "s"); T (union "u");
+       T (abstract ~name:"a" ~size:12 ~alignment:4)];
+
+      T (bigarray array1 10 Bigarray.int32),
+      [T int8_t; T uint16_t; T int; T float; T short; T complex64;
+       T (bigarray array1 10 Bigarray.int32); T (array 5 int32_t);
+       T (structure "s"); T (union "u");
+       T (abstract ~name:"a" ~size:12 ~alignment:4)];
+
+      T (array 5 int32_t),
+      [T int8_t; T uint16_t; T int; T float; T short; T complex64;
+       T (bigarray array1 10 Bigarray.int32); T (array 5 int32_t);
+       T (structure "s"); T (union "u");
+       T (abstract ~name:"a" ~size:12 ~alignment:4)];
+
+      T (structure "s"),
+      [T int8_t; T uint16_t; T int; T float; T short; T complex64;
+       T (bigarray array1 10 Bigarray.int32); T (array 5 int32_t);
+       T (structure "s"); T (union "u");
+       T (abstract ~name:"a" ~size:12 ~alignment:4)];
+
+      T (union "u"),
+      [T int8_t; T uint16_t; T int; T float; T short; T complex64;
+       T (bigarray array1 10 Bigarray.int32); T (array 5 int32_t);
+       T (structure "s"); T (union "u");
+       T (abstract ~name:"a" ~size:12 ~alignment:4)];
+
+      T (abstract ~name:"a" ~size:12 ~alignment:4),
+      [T int8_t; T uint16_t; T int; T float; T short; T complex64;
+       T (bigarray array1 10 Bigarray.int32); T (array 5 int32_t);
+       T (structure "s"); T (union "u");
+       T (abstract ~name:"a" ~size:12 ~alignment:4)];
     ]
 
     (* None of the types in the list are currently intercoercible. *)
-    let () = ListLabels.iter2 types types
-      ~f:(fun (T t1) (T t2) -> 
-        assert_raises Uncoercible
-          (fun () -> coerce t1 t2))
+    let () = 
+      ListLabels.iter types ~f:(fun (T t1, ts) ->
+      ListLabels.iter ts ~f:(fun (T t2) ->
+        assert_raises Uncoercible (fun () -> coerce t1 t2)))
   end in ()
 
 
