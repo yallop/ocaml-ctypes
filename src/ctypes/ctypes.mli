@@ -609,6 +609,25 @@ val coerce : 'a typ -> 'b typ -> 'a -> 'b
     ctypes may both add new types of coercion and restrict the existing
     coercions. *)
 
+val coerce_fn : 'a fn -> 'b fn -> 'a -> 'b
+(** [coerce_fn f1 f2] returns a coercion function between the function
+    types represented by [f1] and [f2].  If [f1] cannot be coerced to
+    [f2], [coerce_fn] raises {!Uncoercible}.
+
+    A function type [f1] may be coerced to another function type [f2]
+    if all of the following hold:
+
+      - the C types described by [f1] and [f2] have the same arity
+
+      - each argument of [f2] may be coerced to the corresponding
+        argument of [f1]
+
+      - the return type of [f1] may be coerced to the return type of [f2]
+
+    The set of supported coercions is subject to change.  Future versions of
+    ctypes may both add new types of coercion and restrict the existing
+    coercions. *)
+
 (** {2 Exceptions} *)
 
 exception Unsupported of string
