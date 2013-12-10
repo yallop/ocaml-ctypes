@@ -40,6 +40,7 @@ let field (type k) (structured : (_, k) structured typ) label ftype =
     field
   | Struct { tag; spec = Complete _ } -> raise (ModifyingSealedType tag)
   | Union { utag } -> raise (ModifyingSealedType utag)
+  | _ -> raise (Unsupported "Adding a field to non-structured type")
 
 let seal (type a) (type s) : (a, s) structured typ -> unit = function
   | Struct { fields = [] } -> raise (Unsupported "struct with no fields")
@@ -59,3 +60,4 @@ let seal (type a) (type s) : (a, s) structured typ -> unit = function
     and align = max_field_alignment u.ufields in
     u.uspec <- Some { align; size = aligned_offset size align }
   end
+  | _ -> raise (Unsupported "Sealing a non-structured type")
