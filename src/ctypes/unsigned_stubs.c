@@ -18,15 +18,14 @@
 
 #define Uint_custom_val(TYPE, V) (*((TYPE *) Data_custom_val(V)))
 #define TYPE(SIZE) uint ## SIZE ## _t
-#define BYTES(SIZE) (SIZE / CHAR_BIT)
 #define BUF_SIZE(TYPE) ((sizeof(TYPE) * CHAR_BIT + 2) / 3 + 1)
 
 #define UINT_PRIMOP(NAME, SIZE, OP)                                        \
   /* OP : t -> t -> t */                                                   \
   value ctypes_uint ## SIZE ## _ ## NAME(value a, value b)                 \
   {                                                                        \
-    return ctypes_copy_uint ## SIZE(Uint_custom_val(uint ## SIZE ## _t, a) \
-                               OP Uint_custom_val(uint ## SIZE ## _t, b)); \
+    return ctypes_copy_uint ## SIZE(Uint_custom_val(TYPE(SIZE), a)         \
+                                 OP Uint_custom_val(TYPE(SIZE), b));       \
   }
 
 #define UINT_DEFS(BITS, BYTES)                                               \
@@ -102,14 +101,14 @@
   /* shift_left : t -> int -> t */                                           \
   value ctypes_uint ## BITS ## _shift_left(value a, value b)                 \
   {                                                                          \
-    return ctypes_copy_uint ## BITS(Uint_custom_val(uint ## BITS ## _t, a)   \
+    return ctypes_copy_uint ## BITS(Uint_custom_val(TYPE(BITS), a)           \
                                     << Int_val(b));                          \
   }                                                                          \
                                                                              \
   /* shift_right : t -> int -> t */                                          \
   value ctypes_uint ## BITS ## _shift_right(value a, value b)                \
   {                                                                          \
-    return ctypes_copy_uint ## BITS(Uint_custom_val(uint ## BITS ## _t, a)   \
+    return ctypes_copy_uint ## BITS(Uint_custom_val(TYPE(BITS), a)           \
                                     >> Int_val(b));                          \
   }                                                                          \
                                                                              \
@@ -126,7 +125,7 @@
   }                                                                          \
                                                                              \
   /* of_string : string -> t */                                              \
-  value ctypes_uint ## BITS ## _of_string(value a, value b)                  \
+  value ctypes_uint ## BITS ## _of_string(value a)                           \
   {                                                                          \
     TYPE(BITS) u;                                                            \
     if (sscanf(String_val(a), "%" SCNu ## BITS , &u) != 1)                   \

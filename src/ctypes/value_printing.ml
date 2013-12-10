@@ -14,25 +14,28 @@ let rec format : type a. a typ -> Format.formatter -> a -> unit
   | Primitive p ->
     Format.pp_print_string fmt (Value_printing_stubs.string_of_prim p v)
   | Pointer _ -> format_ptr fmt v
-  | Struct _ -> format_struct fmt v
-  | Union _ -> format_union fmt v
+  | Struct _ -> format_structured fmt v
+  | Union _ -> format_structured fmt v
   | Array (a, n) -> format_array fmt v
   | Bigarray ba -> Format.fprintf fmt "<bigarray %a>" Ctypes_bigarray.format ba
-  | Abstract abs -> Format.pp_print_string fmt "<abstract>"
+  | Abstract _ -> format_structured fmt v
     (* For now, just print the underlying value in a view *)
   | View {write; ty} -> format ty fmt (write v)
-and format_struct : type a. Format.formatter -> a structure -> unit
-  = fun fmt ({structured = {reftype = Struct {fields}}} as s) ->
+and format_structured : type a b. Format.formatter -> (a, b) structured -> unit
+  = fun fmt ({structured = {reftype}} as s) ->
     let open Format in
-    fprintf fmt "{@;<1 2>@[";
-    format_fields "," fields fmt s;
-    fprintf fmt "@]@;<1 0>}"
-and format_union : type a. Format.formatter -> a union -> unit
-  = fun fmt ({structured = {reftype = Union {ufields}}} as u) ->
-    let open Format in
-    fprintf fmt "{@;<1 2>@[";
-    format_fields " |" ufields fmt u;
-    fprintf fmt "@]@;<1 0>}"
+    match reftype with
+    | Struct {fields} ->
+      fprintf fmt "{@;<1 2>@[";
+      format_fields "," fields fmt s;
+      fprintf fmt "@]@;<1 0>}"
+    | Union {ufields} ->
+      fprintf fmt "{@;<1 2>@[";
+      format_fields " |" ufields fmt s;
+      fprintf fmt "@]@;<1 0>}"
+    | Abstract abs ->
+      pp_print_string fmt "<abstract>"
+    | _ -> raise (Unsupported "unknown structured type")
 and format_array : type a. Format.formatter -> a array -> unit
   = fun fmt ({astart = {reftype}; alength} as arr) ->
     let open Format in

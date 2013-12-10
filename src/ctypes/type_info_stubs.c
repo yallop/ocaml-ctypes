@@ -112,7 +112,7 @@ value ctypes_string_of_prim(value prim_, value v)
   case Char: snprintf(buf, sizeof buf, "'%c'", Int_val(v)); break;
   case Schar: snprintf(buf, sizeof buf, "%d", Int_val(v)); break;
   case Uchar: snprintf(buf, sizeof buf, "%d", (unsigned char)Uint8_val(v)); break;
-  case Short: snprintf(buf, sizeof buf, "%hd", Int_val(v)); break;
+  case Short: snprintf(buf, sizeof buf, "%hd", (short)Int_val(v)); break;
   case Int: snprintf(buf, sizeof buf, "%d", Int_val(v)); break;
   case Long: snprintf(buf, sizeof buf, "%ld", (long)ctypes_long_val(v)); break;
   case Llong: snprintf(buf, sizeof buf, "%lld", (long long)ctypes_llong_val(v)); break;
@@ -121,8 +121,8 @@ value ctypes_string_of_prim(value prim_, value v)
   case Ulong: snprintf(buf, sizeof buf, "%lu", (unsigned long)ctypes_ulong_val(v)); break;
   case Ullong: snprintf(buf, sizeof buf, "%llu", (unsigned long long)ctypes_ullong_val(v)); break;
   case Size_t: snprintf(buf, sizeof buf, "%zu", (size_t)ctypes_size_t_val(v)); break;
-  case Int8_t: snprintf(buf, sizeof buf, "%" PRId8, Int_val(v)); break;
-  case Int16_t: snprintf(buf, sizeof buf, "%" PRId16, Int_val(v)); break;
+  case Int8_t: snprintf(buf, sizeof buf, "%" PRId8, (int8_t)Int_val(v)); break;
+  case Int16_t: snprintf(buf, sizeof buf, "%" PRId16, (int16_t)Int_val(v)); break;
   case Int32_t: snprintf(buf, sizeof buf, "%" PRId32, Int32_val(v)); break;
   case Int64_t: snprintf(buf, sizeof buf, "%" PRId64, Int64_val(v)); break;
   case Uint8_t: snprintf(buf, sizeof buf, "%" PRIu8, Uint8_val(v)); break;

@@ -299,9 +299,16 @@ let array_dims : type a b c d f.
    fun spec a -> match spec with
    | Genarray -> [| a.alength |]
    | Array1 -> a.alength
-   | Array2 -> let {reftype = Array (_, n)} = a.astart in (a.alength, n)
-   | Array3 -> let {reftype = Array (Array (_, m), n)} = a.astart in
-               (a.alength, n, m)
+   | Array2 ->
+     begin match a.astart with 
+     | {reftype = Array (_, n)} -> (a.alength, n)
+     | _ -> raise (Unsupported "taking dimensions of non-array type")
+    end
+   | Array3 ->
+     begin match a.astart with
+     | {reftype = Array (Array (_, m), n)} -> (a.alength, n, m)
+     | _ -> raise (Unsupported "taking dimensions of non-array type")
+     end
 
 let bigarray_of_array spec kind a =
   let dims = array_dims spec a in
