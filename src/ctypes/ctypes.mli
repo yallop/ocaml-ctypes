@@ -245,6 +245,10 @@ val bigarray :
 (** Construct a sized bigarray type representation from a bigarray class, the
     dimensions, and the {!Bigarray.kind}. *)
 
+val typ_of_bigarray_kind : ('a, 'b) Bigarray.kind -> 'a typ
+(** [typ_of_bigarray_kind k] is the type corresponding to the Bigarray kind
+    [k]. *)
+
 (** {3 Function types} *)
 
 type 'a fn = 'a Static.fn

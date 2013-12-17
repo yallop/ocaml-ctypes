@@ -318,3 +318,4 @@ let genarray = Genarray
 let array1 = Array1
 let array2 = Array2
 let array3 = Array3
+let typ_of_bigarray_kind k = Primitive (Ctypes_bigarray.prim_of_kind k)
