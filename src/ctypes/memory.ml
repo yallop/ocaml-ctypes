@@ -150,6 +150,8 @@ let ptr_of_raw_address addr =
   { reftype = Void; raw_ptr = Raw.PtrType.of_int64 addr;
     pmanaged = None; pbyte_offset = 0 }
 
+let raw_address_of_ptr { raw_ptr } = Raw.PtrType.to_int64 raw_ptr
+
 module Std_array = Array
 module Array =
 struct

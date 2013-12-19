@@ -463,6 +463,9 @@ val reference_type : 'a ptr -> 'a typ
 val ptr_of_raw_address : int64 -> unit ptr
 (** Convert the numeric representation of an address to a pointer *)
 
+val raw_address_of_ptr : unit ptr -> int64
+(** Return the numeric representation of an address *)
+
 (** {3 Array values} *)
 
 (** {4 C array values} *)
