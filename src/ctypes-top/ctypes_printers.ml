@@ -40,7 +40,7 @@ let format_struct fmt v =
 let format_union fmt v =
   Ctypes.(format (reference_type (addr v)) fmt v)
 let format_array fmt v =
-  Ctypes.(format Array.(array (length v) (reference_type (start v))) fmt v)
+  Ctypes.(format CArray.(array (length v) (reference_type (start v))) fmt v)
 let format_blkcnt_t fmt v =
   Ctypes.format PosixTypes.blkcnt_t fmt v
 let format_blksize_t fmt v =

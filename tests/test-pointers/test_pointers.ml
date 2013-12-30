@@ -274,6 +274,7 @@ let test_dereferencing_pointers_to_incomplete_types () =
   Writing through a pointer to an abstract type
 *)
 let test_writing_through_pointer_to_abstract_type () =
+  let module Array = CArray in
   let arra = Array.make int 2 in
   let arrb = Array.make int 2 in
   let absptr a =
@@ -390,6 +391,7 @@ let test_passing_pointer_through () =
   Tests for various aspects of pointer arithmetic.
 *)
 let test_pointer_arithmetic () =
+  let module Array = CArray in
   let arr = Array.of_list int [1;2;3;4;5;6;7;8] in
 
   (* Traverse the array using an int pointer *)

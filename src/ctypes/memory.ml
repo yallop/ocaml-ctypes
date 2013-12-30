@@ -152,10 +152,9 @@ let ptr_of_raw_address addr =
 
 let raw_address_of_ptr { raw_ptr } = Raw.PtrType.to_int64 raw_ptr
 
-module Std_array = Array
-module Array =
+module CArray =
 struct
-  type 'a t = 'a array
+  type 'a t = 'a carray
 
   let check_bound { alength } i =
     if i >= alength then
@@ -266,16 +265,16 @@ let array_of_bigarray : type a b c d e.
     match spec with
   | Genarray ->
     let ds = Genarray.dims ba in
-    Array.from_ptr element_ptr (Std_array.fold_left ( * ) 1 ds)
+    CArray.from_ptr element_ptr (Array.fold_left ( * ) 1 ds)
   | Array1 ->
     let d = Array1.dim ba in
-    Array.from_ptr element_ptr d
+    CArray.from_ptr element_ptr d
   | Array2 ->
     let d1 = Array2.dim1 ba and d2 = Array2.dim2 ba in
-    Array.from_ptr (castp (array d2 reftype) element_ptr) d1
+    CArray.from_ptr (castp (array d2 reftype) element_ptr) d1
   | Array3 ->
     let d1 = Array3.dim1 ba and d2 = Array3.dim2 ba and d3 = Array3.dim3 ba in
-    Array.from_ptr (castp (array d2 (array d3 reftype)) element_ptr) d1
+    CArray.from_ptr (castp (array d2 (array d3 reftype)) element_ptr) d1
 
 let bigarray_elements : type a b c d f.
    < element: a;
@@ -284,7 +283,7 @@ let bigarray_elements : type a b c d f.
      carray: c;
      dims: d > bigarray_class -> d -> int
   = fun spec dims -> match spec, dims with
-   | Genarray, ds -> Std_array.fold_left ( * ) 1 ds
+   | Genarray, ds -> Array.fold_left ( * ) 1 ds
    | Array1, d -> d
    | Array2, (d1, d2) -> d1 * d2
    | Array3, (d1, d2, d3) -> d1 * d2 * d3
@@ -296,8 +295,8 @@ let array_dims : type a b c d f.
    < element: a;
      ba_repr: f;
      bigarray: b;
-     carray: c array;
-     dims: d > bigarray_class -> c array -> d =
+     carray: c carray;
+     dims: d > bigarray_class -> c carray -> d =
    fun spec a -> match spec with
    | Genarray -> [| a.alength |]
    | Array1 -> a.alength
@@ -314,7 +313,7 @@ let array_dims : type a b c d f.
 
 let bigarray_of_array spec kind a =
   let dims = array_dims spec a in
-  !@ (castp (bigarray spec dims kind) (Array.start a))
+  !@ (castp (bigarray spec dims kind) (CArray.start a))
 
 let genarray = Genarray
 let array1 = Array1

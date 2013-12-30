@@ -176,7 +176,7 @@ let test_qsort () =
      returning void) in
 
   let sortby (type a) (typ : a typ) (f : a -> a -> int) (l : a list) =
-    let open Array in
+    let open CArray in
     let open Size_t in
     let open Infix in
     let arr = of_list typ l in
@@ -236,8 +236,9 @@ let test_bsearch () =
     let name = ptr char -: "name"
     let () = seal (mi : mi structure typ)
 
-  let of_string : string -> char array =
+  let of_string : string -> char carray =
     fun s ->
+      let module Array = CArray in
       let len = String.length s in
       let arr = Array.make char (len + 1) in
       for i = 0 to len - 1 do
@@ -258,7 +259,7 @@ let test_bsearch () =
   let mkmi n s =
     let m = make mi in
     setf m mr n;
-    setf m name (Array.start s);
+    setf m name (CArray.start s);
     m
 
   let cmpi m1 m2 =
@@ -281,7 +282,7 @@ let test_bsearch () =
   let nov = of_string "nov"
   let dec = of_string "dec"
 
-  let months = Array.of_list mi [
+  let months = CArray.of_list mi [
     mkmi 1 jan;
     mkmi 2 feb;
     mkmi 3 mar;
@@ -297,24 +298,24 @@ let test_bsearch () =
   ]
 
   let () = qsort
-    (to_voidp (Array.start months))
-    (Size_t.of_int (Array.length months))
+    (to_voidp (CArray.start months))
+    (Size_t.of_int (CArray.length months))
     (Size_t.of_int (sizeof mi))
     cmpi
 
-  let search : mi structure -> mi structure array -> mi structure option
+  let search : mi structure -> mi structure carray -> mi structure option
     = fun key array ->
-      let len = Size_t.of_int (Array.length array) in
+      let len = Size_t.of_int (CArray.length array) in
       let size = Size_t.of_int (sizeof mi) in
       let r : unit ptr =
         bsearch
           (to_voidp (addr key))
-          (to_voidp (Array.start array))
+          (to_voidp (CArray.start array))
           len size cmpi in
       if r = null then None
       else Some (!@(from_voidp mi r))
 
-  let find_month_by_name : char array -> mi structure option =
+  let find_month_by_name : char carray -> mi structure option =
     fun s -> search (mkmi 0 s) months
 
   let () = match find_month_by_name dec with

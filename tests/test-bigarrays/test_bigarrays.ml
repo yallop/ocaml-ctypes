@@ -19,16 +19,16 @@ let testlib = Dl.(dlopen ~filename:"clib/test_functions.so" ~flags:[RTLD_NOW])
 let array_of_list2 typ list2 =
   let dim2 = List.length (List.hd list2) in
   let atyp = array dim2 typ in
-  Array.of_list atyp (List.map (Array.of_list typ) list2)
+  CArray.of_list atyp (List.map (CArray.of_list typ) list2)
 
 let array_of_list3 typ list3 =
   let dim2 = List.length (List.hd list3)
   and dim3 = List.length (List.hd (List.hd list3)) in
   let atyp = array dim2 (array dim3 typ) in
-  Array.of_list atyp (List.map (array_of_list2 typ) list3)
+  CArray.of_list atyp (List.map (array_of_list2 typ) list3)
 
 let list2_of_array array =
-  List.map Array.to_list (Array.to_list array)
+  List.map CArray.to_list (CArray.to_list array)
 
 let matrix l = bigarray_of_array array2 BA.float64 (array_of_list2 double l)
 
@@ -42,6 +42,7 @@ let castp typ p = from_voidp typ (to_voidp p)
 *)
 let test_bigarray_of_ctypes_array () =
   (* One-dimensional Genarrays *)
+  let module Array = CArray in
   let a1 = Array.of_list int8_t [10; 20; 30; 40] in
   let b1 = bigarray_of_array genarray BA.int8_signed a1 in
   let () = begin
@@ -160,6 +161,7 @@ let test_bigarray_of_ctypes_array () =
   View bigarray-managed memory through a ctypes lens
 *)
 let test_ctypes_array_of_bigarray () =
+  let module Array = CArray in
 
   (* One-dimensional Genarrays *)
   let b1_dim = 6 in
@@ -427,6 +429,7 @@ let test_bigarray_lifetime_with_ctypes_reference () =
   associated with it.
 *)
 let test_ctypes_memory_lifetime_with_bigarray_reference () =
+  let module Array = CArray in
   let state = ref `Not_safe_to_collect in
   let finalise a =
     begin

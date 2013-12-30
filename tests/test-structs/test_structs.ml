@@ -234,6 +234,7 @@ let test_structs_with_array_members () =
 
     let s = make styp
 
+    module Array = CArray
     let arr = Array.of_list double [3.3; 4.4; 5.5]
 
     let () = begin
