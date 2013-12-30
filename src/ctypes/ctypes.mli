@@ -560,7 +560,11 @@ sig
       if present, will be called just before the memory is freed. *)
 
   val element_type : 'a t -> 'a typ
-(** Retrieve the element type of an array. *)
+  (** Retrieve the element type of an array. *)
+
+  val iter : ('a -> unit) -> 'a t -> unit
+  (** [iter f a] is analogous to [Array.iter f a]: it applies [f] in turn to
+      all the elements of [a]. *)
 end
 (** Operations on C arrays. *)
 
