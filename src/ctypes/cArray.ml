@@ -63,6 +63,11 @@ let iter (type a) (f : a -> unit) a =
     f (unsafe_get a i)
   done
 
+let iteri (type a) (f : int -> a -> unit) a =
+  for i = 0 to length a - 1 do
+    f i (unsafe_get a i)
+  done
+
 open Bigarray
 
 let to_bigarray spec kind a =

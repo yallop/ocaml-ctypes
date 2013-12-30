@@ -565,6 +565,10 @@ sig
   val iter : ('a -> unit) -> 'a t -> unit
   (** [iter f a] is analogous to [Array.iter f a]: it applies [f] in turn to
       all the elements of [a]. *)
+
+  val iteri : (int -> 'a -> unit) -> 'a t -> unit
+  (** [iteri f a] behaves as [iter f a], except that it passes both the index
+      and the element to [f]. *)
 end
 (** Operations on C arrays. *)
 
