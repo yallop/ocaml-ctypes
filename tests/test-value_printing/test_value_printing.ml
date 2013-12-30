@@ -317,8 +317,8 @@ let test_pointer_printing () =
      implementation-dependent.  We can at least run the pointer-formatting
      code, and test that pointers of different types are printed
      equivalently. *)
-  let arr = Array.make int 10 in
-  let p = Array.start arr in
+  let arr = CArray.make int 10 in
+  let p = CArray.start arr in
 
   assert_equal
     (string_of (ptr (reference_type p)) p)
@@ -346,7 +346,7 @@ let test_struct_printing () =
   let vs = make s in
 
   begin
-    setf vs a (Array.of_list int [4; 5; 6]);
+    setf vs a (CArray.of_list int [4; 5; 6]);
     setf vs d nan;
     setf vs c 'a';
 
@@ -376,7 +376,7 @@ let test_union_printing () =
   let () = seal u in
   let v = make u in
   ignore (i, j, us);
-  setf v ua (Array.make ~initial:(Unsigned.UInt8.of_int 0) uint8_t 4);
+  setf v ua (CArray.make ~initial:(Unsigned.UInt8.of_int 0) uint8_t 4);
   assert_bool "union printing"
     (equal_ignoring_whitespace "{ us = {i = 0, j = 0} | ua = {0, 0, 0, 0}}" (string_of u v))
 
@@ -385,8 +385,8 @@ let test_union_printing () =
   Test the printing of array types.
 *)
 let test_array_printing () =
-  let arr = Array.of_list int [-1; 0; 1] in
-  let arrarr = Array.of_list (array 3 int) [arr; arr] in
+  let arr = CArray.of_list int [-1; 0; 1] in
+  let arrarr = CArray.of_list (array 3 int) [arr; arr] in
   assert_bool "array printing"
     (equal_ignoring_whitespace "{{-1, 0, 1}, {-1, 0, 1}}"
        (string_of (array 2 (array 3 int)) arrarr))

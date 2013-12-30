@@ -25,13 +25,13 @@ let test_passing_string_array () =
     (ptr string @-> int @-> ptr char @-> returning void) in
 
   let l = ["the "; "quick "; "brown "; "fox "; "etc. "; "etc. "; ] in
-  let arr = Array.of_list string l in
+  let arr = CArray.of_list string l in
 
   let outlen = List.fold_left (fun a s -> String.length s + a) 1 l in
-  let buf = Array.make char outlen in
+  let buf = CArray.make char outlen in
 
-  let () = Array.(concat (start arr) (length arr) (start buf)) in
-  let buf_addr = allocate (ptr char) (Array.start buf) in
+  let () = CArray.(concat (start arr) (length arr) (start buf)) in
+  let buf_addr = allocate (ptr char) (CArray.start buf) in
   let s = from_voidp string (to_voidp buf_addr) in
 
   assert_equal ~msg:"Check output"

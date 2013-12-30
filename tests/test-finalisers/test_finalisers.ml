@@ -13,6 +13,7 @@ open Ctypes
   Simple finalisation test for arrays.
 *)
 let test_array_finaliser () =
+  let module Array = CArray in
   let finaliser_completed = ref false in
   let finalise a =
     begin

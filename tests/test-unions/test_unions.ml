@@ -74,6 +74,7 @@ let test_endian_detection () =
 
     let arr = getf e c
 
+    module Array = CArray
     let () = assert_equal
       ~msg:"the byte that we expected to change was changed"
       arr.(updated_char_index) UChar.one
@@ -109,7 +110,7 @@ let test_union_padding () =
         setf u i x;
         u
 
-    let arr = Array.of_list padded [
+    let arr = CArray.of_list padded [
       mkPadded 1L;
       mkPadded 2L;
       mkPadded 3L;
@@ -118,8 +119,8 @@ let test_union_padding () =
     ]
       
     let sum = sum_union_components
-      (Array.start arr)
-      (Unsigned.Size_t.of_int (Array.length arr))
+      (CArray.start arr)
+      (Unsigned.Size_t.of_int (CArray.length arr))
 
     let () = assert_equal
       ~msg:"padded union members accessed correctly"

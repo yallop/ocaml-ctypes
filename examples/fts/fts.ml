@@ -180,7 +180,7 @@ struct
 
   let array : t -> FTSENT.t list
     = fun { ptr } ->
-      Array.(to_list (from_ptr (getf !@ptr fts_array) (getf !@ptr fts_nitems)))
+      CArray.(to_list (from_ptr (getf !@ptr fts_array) (getf !@ptr fts_nitems)))
 
   let dev : t -> dev_t
     = fun { ptr } -> getf !@ptr fts_dev
@@ -236,12 +236,12 @@ let fts_children ~ftsp ~name_only =
 
 let null_terminated_array_of_ptr_list typ list =
   let nitems = List.length list in
-  let arr = Array.make typ (1 + nitems) in
-  List.iteri (Array.set arr) list;
-  (castp (ptr void) (Array.start arr +@ nitems)) <-@ null;
+  let arr = CArray.make typ (1 + nitems) in
+  List.iteri (CArray.set arr) list;
+  (castp (ptr void) (CArray.start arr +@ nitems)) <-@ null;
   arr
 
 let fts_open ~path_argv ?compar ~options = 
   let paths = null_terminated_array_of_ptr_list string path_argv in
   let options = crush_options fts_open_option_value options in
-  { ptr = _fts_open (Array.start paths) options compar; compar }
+  { ptr = _fts_open (CArray.start paths) options compar; compar }

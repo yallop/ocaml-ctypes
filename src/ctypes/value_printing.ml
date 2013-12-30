@@ -36,12 +36,12 @@ and format_structured : type a b. Format.formatter -> (a, b) structured -> unit
     | Abstract abs ->
       pp_print_string fmt "<abstract>"
     | _ -> raise (Unsupported "unknown structured type")
-and format_array : type a. Format.formatter -> a array -> unit
+and format_array : type a. Format.formatter -> a carray -> unit
   = fun fmt ({astart = {reftype}; alength} as arr) ->
     let open Format in
     fprintf fmt "{@;<1 2>@[";
     for i = 0 to alength - 1 do
-      format reftype fmt (Array.get arr i);
+      format reftype fmt (CArray.get arr i);
       if i <> alength - 1 then
         fprintf fmt ",@;"
     done;

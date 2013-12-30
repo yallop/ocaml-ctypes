@@ -185,15 +185,11 @@ val string_opt : string option typ
 
 (** {4 C array types} *) 
 
-(**/**)
-type 'a std_array = 'a array
-(**/**)
-
-type 'a array
-(** The type of C array values.  A value of type [t array] can be used to read
+type 'a carray
+(** The type of C array values.  A value of type [t carray] can be used to read
     and write array objects in C-managed storage. *)
 
-val array : int -> 'a typ -> 'a array typ
+val array : int -> 'a typ -> 'a carray typ
 (** Construct a sized array type from a length and an existing type (called
     the {i element type}). *)
 
@@ -207,15 +203,15 @@ val genarray :
   < element: 'a;
     ba_repr: 'b;
     bigarray: ('a, 'b, Bigarray.c_layout) Bigarray.Genarray.t;
-    carray: 'a array;
-    dims: int std_array > bigarray_class
+    carray: 'a carray;
+    dims: int array > bigarray_class
 (** The class of {!Bigarray.Genarray.t} values *)
 
 val array1 :
   < element: 'a;
     ba_repr: 'b;
     bigarray: ('a, 'b, Bigarray.c_layout) Bigarray.Array1.t;
-    carray: 'a array;
+    carray: 'a carray;
     dims: int > bigarray_class
 (** The class of {!Bigarray.Array1.t} values *)
 
@@ -223,7 +219,7 @@ val array2 :
   < element: 'a;
     ba_repr: 'b;
     bigarray: ('a, 'b, Bigarray.c_layout) Bigarray.Array2.t;
-    carray: 'a array array;
+    carray: 'a carray carray;
     dims: int * int > bigarray_class
 (** The class of {!Bigarray.Array2.t} values *)
 
@@ -231,7 +227,7 @@ val array3 :
   < element: 'a;
     ba_repr: 'b;
     bigarray: ('a, 'b, Bigarray.c_layout) Bigarray.Array3.t;
-    carray: 'a array array array;
+    carray: 'a carray carray carray;
     dims: int * int * int > bigarray_class
 (** The class of {!Bigarray.Array3.t} values *)
 
@@ -470,35 +466,37 @@ val raw_address_of_ptr : unit ptr -> int64
 
 (** {4 C array values} *)
 
-module Array :
+module CArray :
 sig
-  type 'a t = 'a array
+  type 'a t = 'a carray
 
   val get : 'a t -> int -> 'a
   (** [get a n] returns the [n]th element of the zero-indexed array [a].  The
       semantics for non-scalar types are non-copying, as for {!(!@)}.
 
-      You can also write [a.(n)] instead of [Array.get a n].
+      If you rebind the [CArray] module to [Array] then you can also use the
+      syntax [a.(n)] instead of [Array.get a n].
 
       Raise [Invalid_argument "index out of bounds"] if [n] is outside of the
-      range [0] to [(Array.length a - 1)]. *)
+      range [0] to [(CArray.length a - 1)]. *)
 
   val set : 'a t -> int -> 'a -> unit
   (** [set a n v] overwrites the [n]th element of the zero-indexed array [a]
       with [v].
 
-      You can also write [a.(n) <- v] instead of [Array.set a n v].
+      If you rebind the [CArray] module to [Array] then you can also use the
+      [a.(n) <- v] syntax instead of [Array.set a n v].
 
       Raise [Invalid_argument "index out of bounds"] if [n] is outside of the
-      range [0] to [(Array.length a - 1)]. *)
+      range [0] to [(CArray.length a - 1)]. *)
 
   val unsafe_get : 'a t -> int -> 'a
   (** [unsafe_get a n] behaves like [get a n] except that the check that [n]
-      between [0] and [(Array.length a - 1)] is not performed. *)
+      between [0] and [(CArray.length a - 1)] is not performed. *)
 
   val unsafe_set : 'a t -> int -> 'a -> unit
   (** [unsafe_set a n v] behaves like [set a n v] except that the check that
-      [n] between [0] and [(Array.length a - 1)] is not performed. *)
+      [n] between [0] and [(CArray.length a - 1)] is not performed. *)
 
   val of_list : 'a typ -> 'a list -> 'a t
   (** [of_list t l] builds an array of type [t] of the same length as [l], and
@@ -525,7 +523,7 @@ sig
       used to initialise every element of the array.  The argument [?finalise],
       if present, will be called just before the memory is freed. *)
 
-  val element_type : 'a array -> 'a typ
+  val element_type : 'a t -> 'a typ
 (** Retrieve the element type of an array. *)
 end
 (** Operations on C arrays. *)
@@ -557,9 +555,9 @@ val array_of_bigarray : < element: _;
 val bigarray_of_array : < element: 'a;
                           ba_repr: 'f;
                           bigarray: 'b;
-                          carray: 'c array;
+                          carray: 'c carray;
                           dims: 'i > bigarray_class ->
-    ('a, 'f) Bigarray.kind -> 'c array -> 'b
+    ('a, 'f) Bigarray.kind -> 'c carray -> 'b
 (** Convert a C array to a Bigarray value. *)
 
 
