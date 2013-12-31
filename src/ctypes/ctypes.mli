@@ -573,6 +573,10 @@ sig
   val fold_left : ('a -> 'b -> 'a) -> 'a -> 'b t -> 'a
   (** [fold_left (<*>) u a] computes
       [( .. ((u <*> a.(0)) <*> a.(1)) <*> ... <*> a.(length a - 1))] *)
+
+  val fold_right : ('b -> 'a -> 'a) -> 'b t -> 'a -> 'a
+  (** [fold_right (<*>) a x] computes
+      [(a.(0) <*> (a.(1) <*> ... <*> (a.(length a - 1) <*> u) .. ))] *)
 end
 (** Operations on C arrays. *)
 

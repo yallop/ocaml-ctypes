@@ -75,6 +75,13 @@ let fold_left (type a) (type b) (f : a -> b -> a) (u : a) a =
   done;
   !result
 
+let fold_right (type a) (type b) (f : b -> a -> a) a (u : a) =
+  let result = ref u in
+  for i = length a - 1 downto 0 do
+    result := f (unsafe_get a i) !result
+  done;
+  !result
+
 open Bigarray
 
 let to_bigarray spec kind a =
