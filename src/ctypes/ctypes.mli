@@ -570,6 +570,11 @@ sig
   (** [iteri f a] behaves as [iter f a], except that it passes both the index
       and the element to [f]. *)
 
+  val map : 'b typ -> ('a -> 'b) -> 'a t -> 'b t
+  (** [map ty f a] creates a new array with element type [ty] and where each
+      element is the result of applying [f] to the corresponding element of
+      [a]. *)
+
   val fold_left : ('a -> 'b -> 'a) -> 'a -> 'b t -> 'a
   (** [fold_left (<*>) u a] computes
       [( .. ((u <*> a.(0)) <*> a.(1)) <*> ... <*> a.(length a - 1))] *)
