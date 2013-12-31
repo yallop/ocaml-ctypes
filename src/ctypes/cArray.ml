@@ -68,6 +68,13 @@ let iteri (type a) (f : int -> a -> unit) a =
     f i (unsafe_get a i)
   done
 
+let fold_left (type a) (type b) (f : a -> b -> a) (u : a) a =
+  let result = ref u in
+  for i = 0 to length a - 1 do
+    result := f !result (unsafe_get a i)
+  done;
+  !result
+
 open Bigarray
 
 let to_bigarray spec kind a =

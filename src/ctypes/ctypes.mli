@@ -569,6 +569,10 @@ sig
   val iteri : (int -> 'a -> unit) -> 'a t -> unit
   (** [iteri f a] behaves as [iter f a], except that it passes both the index
       and the element to [f]. *)
+
+  val fold_left : ('a -> 'b -> 'a) -> 'a -> 'b t -> 'a
+  (** [fold_left (<*>) u a] computes
+      [( .. ((u <*> a.(0)) <*> a.(1)) <*> ... <*> a.(length a - 1))] *)
 end
 (** Operations on C arrays. *)
 
