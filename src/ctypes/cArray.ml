@@ -75,6 +75,14 @@ let map (type a) (type b) (ty : b typ) (f : a -> b) ({ alength } as a : a t) =
   done;
   result
 
+let mapi (type a) (type b) (ty : b typ) (f : int -> a -> b)
+    ({ alength } as a : a t) =
+  let result = make ty alength in
+  for i = 0 to alength - 1 do
+    unsafe_set result i (f i (unsafe_get a i))
+  done;
+  result
+
 let fold_left (type a) (type b) (f : a -> b -> a) (u : a) a =
   let result = ref u in
   for i = 0 to length a - 1 do

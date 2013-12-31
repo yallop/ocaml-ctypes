@@ -575,6 +575,10 @@ sig
       element is the result of applying [f] to the corresponding element of
       [a]. *)
 
+  val mapi : 'b typ -> (int -> 'a -> 'b) -> 'a t -> 'b t
+  (** [mapi ty f a] behaves as [map f a], except that it passes both the index
+      and the element to [f]. *)
+
   val fold_left : ('a -> 'b -> 'a) -> 'a -> 'b t -> 'a
   (** [fold_left (<*>) u a] computes
       [( .. ((u <*> a.(0)) <*> a.(1)) <*> ... <*> a.(length a - 1))] *)
