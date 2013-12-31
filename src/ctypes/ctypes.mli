@@ -562,6 +562,10 @@ sig
   val element_type : 'a t -> 'a typ
   (** Retrieve the element type of an array. *)
 
+  val copy : ?finalise:('a t -> unit) -> 'a t -> 'a t
+  (** [copy a] returns an array of the same length and with the same elements
+      as [a]. *)
+
   val iter : ('a -> unit) -> 'a t -> unit
   (** [iter f a] is analogous to [Array.iter f a]: it applies [f] in turn to
       all the elements of [a]. *)

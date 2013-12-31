@@ -97,6 +97,14 @@ let fold_right (type a) (type b) (f : b -> a -> a) a (u : a) =
   done;
   !result
 
+let copy ?finalise ({ alength; astart = { reftype } } as a) =
+  let arr = make ?finalise reftype alength in
+  (* TODO: eliminate this loop with unsafe_blit. *)
+  for i = 0 to alength - 1 do
+    unsafe_set arr i (unsafe_get a i)
+  done;
+  arr
+
 open Bigarray
 
 let to_bigarray spec kind a =
