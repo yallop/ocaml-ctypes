@@ -22,3 +22,8 @@ include Coerce
 let ( *:* ) s t = field s "<unknown>" t
 
 let ( +:+ ) s t = field s "<unknown>" t
+
+module CArray = CArray
+
+let bigarray_of_array = CArray.to_bigarray
+let array_of_bigarray = CArray.of_bigarray
