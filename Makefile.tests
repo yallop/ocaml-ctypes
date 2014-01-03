@@ -200,5 +200,5 @@ test: testlib $(TESTS) $(TESTS:%=run-%)
 
 run-%:	$*
 	@echo running $*
-	@cd $(BUILDDIR) && ./$*.native -verbose
+	@cd $(BUILDDIR) && ./$*.native
 	@echo
