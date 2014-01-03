@@ -16,6 +16,7 @@
 #include <string.h>
 #include <complex.h>
 
+#include "test_functions.h"
 
 typedef int intfun(int, int);
 
@@ -108,12 +109,6 @@ int *pass_pointer_through(int *a, int *b, int i)
   return (i >= 0) ? a : b;
 }
 
-struct simple {
-  int i;
-  double f;
-  struct simple *self;
-};
-
 int accept_struct(struct simple simple)
 {
   return simple.i + (int)simple.f + (simple.self == NULL ? 1 : 0);
@@ -162,16 +157,6 @@ void concat_strings(const char **sv, int sc, char *buffer)
   *buffer = '\0';
 }
 
-union number {
-  int i;
-  double d;
-};
-
-struct tagged {
-  char tag;
-  union number num;
-};
-
 double accepts_pointer_to_array_of_structs(struct tagged(*arr)[5])
 {
   double sum = 0.0;
@@ -193,12 +178,7 @@ double accepts_pointer_to_array_of_structs(struct tagged(*arr)[5])
   return sum;
 }
 
-#define GLOBAL_STRING "global string"
-
-struct global_struct {
-  size_t len;
-  const char str[sizeof GLOBAL_STRING];
-} global_struct = { sizeof GLOBAL_STRING - 1, GLOBAL_STRING };
+struct global_struct global_struct = { sizeof GLOBAL_STRING - 1, GLOBAL_STRING };
 
 /* OO-style example */
 struct animal_methods;
@@ -417,10 +397,6 @@ vintfun *return_callback(vintfun *callback)
 {
   return callback;
 }
-
-struct one_int {
-  int i;
-};
 
 struct one_int return_struct_by_value(void)
 {
