@@ -20,7 +20,8 @@ LOCAL_CMXAS = $(SUBPROJECT_DEPS:%=$(BUILDDIR)/%.cmxa)
 CMXA_OPTS = $(if $(C_OBJECTS),-cclib -l$(PROJECT)_stubs)
 
 OCAMLINCLUDES = -I $(BUILDDIR)/$($(PROJECT).dir) \
-                $($(PROJECT).subproject_deps:%=-I $(BUILDDIR)/src/%)
+                $(foreach spdep,$($(PROJECT).subproject_deps),\
+                          -I $(BUILDDIR)/$($(spdep).dir))
 NATIVE_LIB=$(BUILDDIR)/$(PROJECT).cmxa
 NATIVE_TARGET=$(BUILDDIR)/$(PROJECT).native
 LIB_TARGETS = $(BUILDDIR)/$(PROJECT).cma \
