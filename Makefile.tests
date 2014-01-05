@@ -185,7 +185,7 @@ $(BUILDDIR)/clib/libtest_functions.so: $(BUILDDIR)/clib/test_functions.o
 	$(CC) -shared $(LDFLAGS) -o $@ $^
 $(BUILDDIR)/clib/test_functions.o: tests/clib/test_functions.c
 	@mkdir -p $(@D)
-	$(CC) -c $(CFLAGS) -o $@ $^
+	$(CC) -c $(CFLAGS) -I `ocamlc -where` -o $@ $^
 tests/clib/test_functions.c: tests/clib/test_functions.h
 
 .PHONY: $(TESTS)

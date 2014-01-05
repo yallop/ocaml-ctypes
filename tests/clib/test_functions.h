@@ -12,6 +12,8 @@
 #include <stdlib.h>
 #include <complex.h>
 
+#include <caml/mlvalues.h>
+
 typedef int intfun(int, int);
 extern int higher_order_1(intfun *, int, int);
 typedef int acceptor(intfun *, int, int);
@@ -73,7 +75,7 @@ extern int accept_pointers(float *,
                            int *,
                            long *,
                            long long *,
-                           int *,
+                           intnat *,
                            int8_t *,
                            int16_t *,
                            int32_t *,
