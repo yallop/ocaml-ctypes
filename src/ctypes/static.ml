@@ -20,6 +20,7 @@ type 'a structspec =
   | Complete of structured_spec
 
 type abstract_type = {
+  aid: int;
   aname : string;
   asize : int;
   aalignment : int;
@@ -46,6 +47,7 @@ and 'a union = ('a, [`Union]) structured
 and 'a structure = ('a, [`Struct]) structured
 and 'a abstract = ('a, [`Abstract]) structured
 and ('a, 'b) view = {
+  id: int;
   read : 'b -> 'a;
   write : 'a -> 'b;
   format_typ: ((Format.formatter -> unit) -> Format.formatter -> unit) option;
@@ -57,12 +59,14 @@ and ('a, 's) field = {
   fname: string;
 }
 and 'a structure_type = {
+  sid: int;
   tag: string;
   mutable spec: 'a structspec;
   (* fields are in reverse order iff the struct type is incomplete *)
   mutable fields : 'a structure boxed_field list;
 }
 and 'a union_type = {
+  uid: int;
   utag: string;
   mutable uspec: structured_spec option;
   (* fields are in reverse order iff the union type is incomplete *)
@@ -178,9 +182,6 @@ let ( @->) f t =
     raise (Unsupported "Unsupported argument type")
   else
     Function (f, t)
-let abstract ~name ~size ~alignment =
-  Abstract { aname = name; asize = size; aalignment = alignment }
-let view ?format_typ ~read ~write ty = View { read; write; format_typ; ty }
 let bigarray : type a b c d e.
   < element: a;
     dims: b;
@@ -201,10 +202,20 @@ let returning v =
   else
     Returns v
 
-let structure tag =
-  Struct { spec = Incomplete { isize = 0 }; tag; fields = [] }
+let fresh_id () = Oo.id (object end)
 
-let union utag = Union { utag; uspec = None; ufields = [] }
+let abstract ~name ~size ~alignment =
+  Abstract { aid = fresh_id ();
+             aname = name; asize = size; aalignment = alignment }
+
+let structure tag =
+  Struct { sid = fresh_id ();
+           spec = Incomplete { isize = 0 }; tag; fields = [] }
+
+let union utag = Union { uid = fresh_id (); utag; uspec = None; ufields = [] }
+
+let view ?format_typ ~read ~write ty =
+  View { id = fresh_id (); read; write; format_typ; ty }
 
 let offsetof { foffset } = foffset
 let field_type { ftype } = ftype
