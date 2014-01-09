@@ -188,8 +188,8 @@ TESTS =                         \
   test-bigarrays                \
   test-coercions
 
-testlib: $(BUILDDIR)/clib/test_functions.so
-$(BUILDDIR)/clib/test_functions.so: $(BUILDDIR)/clib/test_functions.o
+testlib: $(BUILDDIR)/clib/libtest_functions.so
+$(BUILDDIR)/clib/libtest_functions.so: $(BUILDDIR)/clib/test_functions.o
 	$(CC) -shared $(LDFLAGS) -o $@ $^
 $(BUILDDIR)/clib/test_functions.o: tests/clib/test_functions.c
 	@mkdir -p $(@D)

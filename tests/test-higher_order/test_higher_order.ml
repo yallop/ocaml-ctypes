@@ -10,7 +10,7 @@ open OUnit
 open Foreign
 
 
-let testlib = Dl.(dlopen ~filename:"clib/test_functions.so" ~flags:[RTLD_NOW])
+let testlib = Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW])
 
 
 (*
