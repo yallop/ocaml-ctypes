@@ -16,6 +16,7 @@ let testlib = Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW]
   Creating multidimensional arrays, and reading and writing elements.
 *)
 let test_multidimensional_arrays () =
+  let module Array = CArray in
   (* one dimension *)
   let one = Array.make int 10 in
   
@@ -96,6 +97,7 @@ let test_multidimensional_arrays () =
   Test that creating an array initializes all elements appropriately.
 *)
 let test_array_initialiation () =
+  let module Array = CArray in
   let int_array = Array.make int ~initial:33 10 in
   for i = 0 to Array.length int_array - 1 do
     assert_equal 33 int_array.(i)
@@ -113,6 +115,7 @@ let test_array_initialiation () =
   Test that creating an array initializes all elements appropriately.
 *)
 let test_pointer_to_array_arithmetic () =
+  let module Array = CArray in
   (* int ( * )[3] *)
   let p = allocate_n (array 3 int) ~count:4 in
   p <-@ Array.of_list int [1; 2; 3];
@@ -181,8 +184,8 @@ let test_passing_pointer_to_array_of_structs () =
       (from_voidp
          (array 5 s)
          (to_voidp
-            (Array.start
-               (Array.of_list s
+            (CArray.start
+               (CArray.of_list s
                   [box_int 10;
                    box_double 3.5;
                    box_int 12;
