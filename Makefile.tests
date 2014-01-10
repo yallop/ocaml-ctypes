@@ -100,13 +100,6 @@ test-views.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreade
 test-views: PROJECT=test-views
 test-views: $$(NATIVE_TARGET)
 
-test-global_values.dir = tests/test-global_values
-test-global_values.threads = yes
-test-global_values.deps = bigarray oUnit
-test-global_values.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
-test-global_values: PROJECT=test-global_values
-test-global_values: $$(NATIVE_TARGET)
-
 test-oo_style.dir = tests/test-oo_style
 test-oo_style.threads = yes
 test-oo_style.deps = bigarray oUnit
@@ -178,7 +171,6 @@ TESTS =                         \
   test-passable                 \
   test-alignment                \
   test-views                    \
-  test-global_values            \
   test-oo_style                 \
   test-type_printing            \
   test-value_printing           \
