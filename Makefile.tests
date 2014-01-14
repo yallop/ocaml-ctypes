@@ -56,6 +56,38 @@ tests/test-pointers/generated_bindings.ml: $(BUILDDIR)/test-pointers-stub-genera
 	$< --ml-file $@
 
 
+test-builtins-stubs.dir  = tests/test-builtins/stubs
+test-builtins-stubs.threads = yes
+test-builtins-stubs.subproject_deps = ctypes cstubs tests-common
+test-builtins-stubs: PROJECT=test-builtins-stubs
+test-builtins-stubs: $$(LIB_TARGETS)
+
+test-builtins-stub-generator.dir = tests/test-builtins/stub-generator
+test-builtins-stub-generator.threads = yes
+test-builtins-stub-generator.subproject_deps = ctypes cstubs \
+  test-builtins-stubs ctypes-foreign-base ctypes-foreign-unthreaded tests-common
+test-builtins-stub-generator.deps = str bigarray
+test-builtins-stub-generator: PROJECT=test-builtins-stub-generator
+test-builtins-stub-generator: $$(NATIVE_TARGET)
+
+test-builtins.dir = tests/test-builtins
+test-builtins.threads = yes
+test-builtins.deps = str bigarray oUnit
+test-builtins.subproject_deps = ctypes cstubs test-builtins-stubs
+test-builtins.link_flags = -L$(BUILDDIR)/clib -ltest_functions
+test-builtins: PROJECT=test-builtins
+test-builtins: $$(NATIVE_TARGET)
+
+test-builtins-generated: \
+  tests/test-builtins/generated_bindings.ml \
+  tests/test-builtins/generated_stubs.c
+
+tests/test-builtins/generated_stubs.c: $(BUILDDIR)/test-builtins-stub-generator.native
+	$< --c-file $@
+tests/test-builtins/generated_bindings.ml: $(BUILDDIR)/test-builtins-stub-generator.native
+	$< --ml-file $@
+
+
 test-higher_order-stubs.dir  = tests/test-higher_order/stubs
 test-higher_order-stubs.threads = yes
 test-higher_order-stubs.subproject_deps = ctypes cstubs \
@@ -510,6 +542,7 @@ tests/test-coercions/generated_bindings.ml: $(BUILDDIR)/test-coercions-stub-gene
 TESTS =
 TESTS += test-raw
 TESTS += test-pointers-stubs test-pointers-stub-generator test-pointers-generated test-pointers
+TESTS += test-builtins-stubs test-builtins-stub-generator test-builtins-generated test-builtins
 TESTS += test-higher_order-stubs test-higher_order-stub-generator test-higher_order-generated test-higher_order
 TESTS += test-structs-stubs test-structs-stub-generator test-structs-generated test-structs
 TESTS += test-finalisers
