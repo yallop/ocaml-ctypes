@@ -11,6 +11,7 @@
 #include <caml/fail.h>
 
 #include <stdint.h>
+#include <string.h>
 
 #include "raw_pointer.h"
 
@@ -42,6 +43,14 @@ static struct custom_operations managed_buffer_custom_ops = {
   custom_serialize_default,
   custom_deserialize_default
 };
+
+/* copy_bytes : void * -> size_t -> managed_buffer */
+value ctypes_copy_bytes(void *src, size_t size)
+{
+  value block = caml_alloc_custom(&managed_buffer_custom_ops, sizeof(void*), 0, 1);
+  *(void **)Data_custom_val(block) = memcpy(caml_stat_alloc(size), src, size);
+  return block;
+}
 
 /* allocate : int -> managed_buffer */
 value ctypes_allocate(value size_)
