@@ -199,5 +199,3 @@ _build/examples/sigset/sigset.cmo : _build/src/ctypes/posixTypes.cmi \
 _build/examples/sigset/sigset.cmx : _build/src/ctypes/posixTypes.cmx \
     _build/src/ctypes-foreign-threaded/foreign.cmx _build/src/ctypes/ctypes.cmx \
     _build/examples/sigset/sigset.cmi
-_build/examples/struct-subtyping/struct_subtyping.cmo : _build/src/ctypes/ctypes.cmi
-_build/examples/struct-subtyping/struct_subtyping.cmx : _build/src/ctypes/ctypes.cmx
