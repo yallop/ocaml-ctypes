@@ -26,7 +26,7 @@ distclean: clean
 ctypes.public = unsigned signed structs ctypes posixTypes
 ctypes.dir = src/ctypes
 ctypes.extra_mls = ctypes_primitives.ml
-ctypes.deps = bigarray
+ctypes.deps = str bigarray
 ctypes.install = yes
 ctypes.install_native_objects = yes
 
