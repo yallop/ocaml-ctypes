@@ -6,7 +6,7 @@ OCAMLFIND=ocamlfind
 OCAMLMKLIB=ocamlmklib
 VPATH=src examples
 BUILDDIR=_build
-PROJECTS=configure configured ctypes ctypes-foreign-base ctypes-foreign-threaded ctypes-foreign-unthreaded ctypes-top
+PROJECTS=configure configured ctypes cstubs ctypes-foreign-base ctypes-foreign-threaded ctypes-foreign-unthreaded ctypes-top
 GENERATED=src/ctypes_config.h src/ctypes_config.ml setup.data src/ctypes/ctypes_primitives.ml
 CFLAGS=-fPIC -Wall -O3 $(OCAML_FFI_INCOPTS)
 OCAML_FFI_INCOPTS=$(libffi_opt)
@@ -32,6 +32,15 @@ ctypes.install_native_objects = yes
 
 ctypes: PROJECT=ctypes
 ctypes: $(ctypes.dir)/$(ctypes.extra_mls) $$(LIB_TARGETS)
+
+# cstubs subproject
+cstubs.dir = src/cstubs
+cstubs.subproject_deps = ctypes
+cstubs.deps = str
+cstubs.install = yes
+
+cstubs: PROJECT=cstubs
+cstubs: $(cstubs.dir)/$(cstubs.extra_mls) $$(LIB_TARGETS)
 
 # ctypes-foreign-base subproject
 ctypes-foreign-base.public = dl
