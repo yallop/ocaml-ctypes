@@ -152,7 +152,7 @@ val complex64 : Complex.t typ
 
 (** {4:pointer_types Pointer types} *)
 
-type 'a ptr
+type 'a ptr = 'a Static.ptr
 (** The type of pointer values.  A value of type [t ptr] can be used to read
     and write values of type [t] at particular addresses. *)
 
