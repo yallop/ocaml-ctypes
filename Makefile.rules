@@ -32,6 +32,7 @@ LIB_TARGET_EXTRAS = $(if $(STUB_LIB),$(BUILDDIR)/lib$(PROJECT)_stubs.a) \
                     $(BUILDDIR)/$(PROJECT).a
 INSTALL_CMIS = $($(PROJECT).public:%=$(BUILDDIR)/$($(PROJECT).dir)/%.cmi)
 INSTALL_MLIS = $($(PROJECT).public:%=$($(PROJECT).dir)/%.mli)
+INSTALL_HEADERS = $(wildcard $($(PROJECT).dir)/*.h)
 THREAD_FLAG = $(if $(filter yes,$($(PROJECT).threads)),-thread)
 LINK_FLAGS = $($(PROJECT).link_flags)
 OCAML_LINK_FLAGS=$(LINK_FLAGS:%=-cclib %)
