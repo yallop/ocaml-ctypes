@@ -13,9 +13,6 @@ open Ctypes
 module BA = Bigarray
 
 
-let testlib = Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW])
-
-
 let array_of_list2 typ list2 =
   let dim2 = List.length (List.hd list2) in
   let atyp = array dim2 typ in
@@ -323,64 +320,70 @@ let test_ctypes_array_of_bigarray () =
   end
 
 
-(*
-  Test passing bigarrays to c functions.
-*)
-let test_passing_bigarrays () =
-  let matrix_mul = Foreign.foreign "matrix_mul" ~from:testlib
-    (int @-> int @-> int @->
-     ptr double @-> ptr double @-> ptr double @->
-     returning void) in
-  let mul l r =
-    let m = BA.Array2.dim1 l and n = BA.Array2.dim2 l in
-    let o = BA.Array2.dim1 r and p = BA.Array2.dim2 r in
-    assert (n = o);
-    let product = BA.(Array2.(create (kind l)) c_layout) m p in
-    let addr = bigarray_start array2 in
-    matrix_mul m n p (addr l) (addr r) (addr product);
-    product in
-  assert_equal
-    [[-6.;  11.];
-     [-3.; -3.]]
-    (unmatrix
-       (mul
-          (matrix [[1.; 6.];
-                   [9.; 3.]])
-          (matrix [[ 0.; -1.];
-                   [-1.;  2.]])));
-  assert_equal
-    [[460.; 520.; 580.; 640.; 700.];
-     [1000.; 1150.; 1300.; 1450.; 1600.]]
-    (unmatrix (mul
-                 (matrix [[10.; 20.; 30.];
-                          [40.; 50.; 60.]])
-                 (matrix [[ 1.;  2.;  3.;  4.;  5.];
-                          [ 6.;  7.;  8.;  9.; 10.];
-                          [11.; 12.; 13.; 14.; 15.]])))
+module type FOREIGN_SIGNATURES =
+sig
+  val matrix_mul :
+    int -> int -> int -> float ptr -> float ptr -> float ptr -> unit 
+  val matrix_transpose :
+    int -> int -> float ptr -> float ptr 
+end
+
+module Common_tests(S : FOREIGN_SIGNATURES) =
+struct
+  open S
+
+  (*
+    Test passing bigarrays to c functions.
+  *)
+  let test_passing_bigarrays () =
+    let mul l r =
+      let m = BA.Array2.dim1 l and n = BA.Array2.dim2 l in
+      let o = BA.Array2.dim1 r and p = BA.Array2.dim2 r in
+      assert (n = o);
+      let product = BA.(Array2.(create (kind l)) c_layout) m p in
+      let addr = bigarray_start array2 in
+      matrix_mul m n p (addr l) (addr r) (addr product);
+      product in
+    assert_equal
+      [[-6.;  11.];
+       [-3.; -3.]]
+      (unmatrix
+         (mul
+            (matrix [[1.; 6.];
+                     [9.; 3.]])
+            (matrix [[ 0.; -1.];
+                     [-1.;  2.]])));
+    assert_equal
+      [[460.; 520.; 580.; 640.; 700.];
+       [1000.; 1150.; 1300.; 1450.; 1600.]]
+      (unmatrix (mul
+                   (matrix [[10.; 20.; 30.];
+                            [40.; 50.; 60.]])
+                   (matrix [[ 1.;  2.;  3.;  4.;  5.];
+                            [ 6.;  7.;  8.;  9.; 10.];
+                            [11.; 12.; 13.; 14.; 15.]])))
 
 
-(*
-  Test returning bigarrays from c functions.
-*)
-let test_returning_bigarrays () =
-  let matrix_transpose = Foreign.foreign "matrix_transpose" ~from:testlib
-    (int @-> int @-> ptr double @-> returning (ptr double)) in
-  let transpose m =
-    (* For the purposes of the test we'll just leak the allocated memory. *)
-    let rows = BA.Array2.dim1 m and cols = BA.Array2.dim2 m in
-    bigarray_of_ptr array2 (cols, rows) BA.float64
-      (matrix_transpose rows cols (bigarray_start array2 m)) in
-  assert_equal
-    [[25.; 1.];
-     [15.; 2.];
-     [10.; 3.];
-     [ 5.; 4.];
-     [ 0.; 5.]]
-    (unmatrix
-       (transpose
-          (matrix [[25.; 15.; 10.; 5.; 0.];
-                   [ 1.;  2.;  3.; 4.; 5.]])))
-
+  (*
+    Test returning bigarrays from c functions.
+  *)
+  let test_returning_bigarrays () =
+    let transpose m =
+      (* For the purposes of the test we'll just leak the allocated memory. *)
+      let rows = BA.Array2.dim1 m and cols = BA.Array2.dim2 m in
+      bigarray_of_ptr array2 (cols, rows) BA.float64
+        (matrix_transpose rows cols (bigarray_start array2 m)) in
+    assert_equal
+      [[25.; 1.];
+       [15.; 2.];
+       [10.; 3.];
+       [ 5.; 4.];
+       [ 0.; 5.]]
+      (unmatrix
+         (transpose
+            (matrix [[25.; 15.; 10.; 5.; 0.];
+                     [ 1.;  2.;  3.; 4.; 5.]])))
+end
 
 (*
   Test that bigarrays are not collected while there's a ctypes pointer pointing
@@ -467,25 +470,35 @@ let test_ctypes_memory_lifetime_with_bigarray_reference () =
   end
 
 
+module Foreign_tests =
+  Common_tests(Functions.Stubs(Tests_common.Foreign_binder))
+module Stub_tests = Common_tests(Generated_bindings)
+
+
 let suite = "Bigarray tests" >:::
-  [
-    "View ctypes-managed memory using bigarrays"
+  ["View ctypes-managed memory using bigarrays"
     >:: test_bigarray_of_ctypes_array;
 
-    "View bigarray-managed memory using ctypes"
+   "View bigarray-managed memory using ctypes"
     >:: test_ctypes_array_of_bigarray;
 
-    "Bigarrays live at least as long as ctypes references to them"
+   "Bigarrays live at least as long as ctypes references to them"
     >:: test_bigarray_lifetime_with_ctypes_reference;
 
-    "Ctypes-allocated memory lives while there's a bigarray reference to it"
+   "Ctypes-allocated memory lives while there's a bigarray reference to it"
     >:: test_ctypes_memory_lifetime_with_bigarray_reference;
 
-    "Passing bigarrays to C"
-    >:: test_passing_bigarrays;
+   "Passing bigarrays to C (foreign)"
+    >:: Foreign_tests.test_passing_bigarrays;
 
-    "Returning bigarrays from C"
-    >:: test_returning_bigarrays;
+   "Passing bigarrays to C (stubs)"
+    >:: Stub_tests.test_passing_bigarrays;
+
+   "Returning bigarrays from C (foreign)"
+    >:: Foreign_tests.test_returning_bigarrays;
+
+   "Returning bigarrays from C (stubs)"
+    >:: Stub_tests.test_returning_bigarrays;
   ]
 
 

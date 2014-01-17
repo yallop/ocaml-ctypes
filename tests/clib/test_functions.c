@@ -330,6 +330,8 @@ int retrieve_INT_MAX(void) { return INT_MAX; }
 unsigned int retrieve_UINT_MAX(void) { return UINT_MAX; }
 long retrieve_LONG_MAX(void) { return LONG_MAX; }
 long retrieve_LONG_MIN(void) { return LONG_MIN; }
+long retrieve_nLONG_MAX(void) { return LONG_MAX; }
+long retrieve_nLONG_MIN(void) { return LONG_MIN; }
 unsigned long retrieve_ULONG_MAX(void) { return ULONG_MAX; }
 long long retrieve_LLONG_MAX(void) { return LLONG_MAX; }
 long long retrieve_LLONG_MIN(void) { return LLONG_MIN; }

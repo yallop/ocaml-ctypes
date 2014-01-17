@@ -2,110 +2,331 @@
 
 VPATH += tests
 
+CFLAGS += -I $(PWD)/src -I $(PWD)/tests
+
+# tests-common subproject
+tests-common.dir = tests/tests-common
+tests-common.subproject_deps = ctypes cstubs \
+   ctypes-foreign-base ctypes-foreign-unthreaded
+tests-common.install = no
+tests-common.install_native_objects = yes
+
+tests-common: PROJECT=tests-common
+tests-common: $$(LIB_TARGETS)
+
+
 test-raw.dir = tests/test-raw
 test-raw.threads = yes
-test-raw.deps = bigarray oUnit
+test-raw.deps = bigarray oUnit str
 test-raw.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
 test-raw: PROJECT=test-raw
 test-raw: $$(NATIVE_TARGET)
 
+test-pointers-stubs.dir  = tests/test-pointers/stubs
+test-pointers-stubs.threads = yes
+test-pointers-stubs.subproject_deps = ctypes cstubs \
+   ctypes-foreign-base ctypes-foreign-unthreaded tests-common
+test-pointers-stubs: PROJECT=test-pointers-stubs
+test-pointers-stubs: $$(LIB_TARGETS)
+
+test-pointers-stub-generator.dir = tests/test-pointers/stub-generator
+test-pointers-stub-generator.threads = yes
+test-pointers-stub-generator.subproject_deps = ctypes cstubs \
+     ctypes-foreign-base ctypes-foreign-unthreaded test-pointers-stubs tests-common
+test-pointers-stub-generator.deps = str bigarray
+test-pointers-stub-generator: PROJECT=test-pointers-stub-generator
+test-pointers-stub-generator: $$(NATIVE_TARGET)
+
 test-pointers.dir = tests/test-pointers
 test-pointers.threads = yes
-test-pointers.deps = bigarray oUnit
-test-pointers.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
+test-pointers.deps = str bigarray oUnit
+test-pointers.subproject_deps = ctypes ctypes-foreign-base \
+  ctypes-foreign-unthreaded cstubs tests-common test-pointers-stubs
+test-pointers.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-pointers: PROJECT=test-pointers
 test-pointers: $$(NATIVE_TARGET)
 
+test-pointers-generated: \
+  tests/test-pointers/generated_bindings.ml \
+  tests/test-pointers/generated_stubs.c
+
+tests/test-pointers/generated_stubs.c: $(BUILDDIR)/test-pointers-stub-generator.native
+	$< --c-file $@
+tests/test-pointers/generated_bindings.ml: $(BUILDDIR)/test-pointers-stub-generator.native
+	$< --ml-file $@
+
+
+test-higher_order-stubs.dir  = tests/test-higher_order/stubs
+test-higher_order-stubs.threads = yes
+test-higher_order-stubs.subproject_deps = ctypes cstubs \
+   ctypes-foreign-base ctypes-foreign-unthreaded tests-common
+test-higher_order-stubs: PROJECT=test-higher_order-stubs
+test-higher_order-stubs: $$(LIB_TARGETS)
+
+test-higher_order-stub-generator.dir = tests/test-higher_order/stub-generator
+test-higher_order-stub-generator.threads = yes
+test-higher_order-stub-generator.subproject_deps = ctypes cstubs \
+     ctypes-foreign-base ctypes-foreign-unthreaded test-higher_order-stubs tests-common
+test-higher_order-stub-generator.deps = str bigarray
+test-higher_order-stub-generator: PROJECT=test-higher_order-stub-generator
+test-higher_order-stub-generator: $$(NATIVE_TARGET)
+
 test-higher_order.dir = tests/test-higher_order
 test-higher_order.threads = yes
-test-higher_order.deps = bigarray oUnit
-test-higher_order.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
+test-higher_order.deps = str bigarray oUnit
+test-higher_order.subproject_deps = ctypes ctypes-foreign-base \
+  ctypes-foreign-unthreaded cstubs test-higher_order-stubs tests-common
+test-higher_order.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-higher_order: PROJECT=test-higher_order
 test-higher_order: $$(NATIVE_TARGET)
 
+test-higher_order-generated: \
+  tests/test-higher_order/generated_bindings.ml \
+  tests/test-higher_order/generated_stubs.c
+
+tests/test-higher_order/generated_stubs.c: $(BUILDDIR)/test-higher_order-stub-generator.native
+	$< --c-file $@
+tests/test-higher_order/generated_bindings.ml: $(BUILDDIR)/test-higher_order-stub-generator.native
+	$< --ml-file $@
+
+test-structs-stubs.dir  = tests/test-structs/stubs
+test-structs-stubs.threads = yes
+test-structs-stubs.subproject_deps = ctypes cstubs \
+   ctypes-foreign-base ctypes-foreign-unthreaded tests-common
+test-structs-stubs: PROJECT=test-structs-stubs
+test-structs-stubs: $$(LIB_TARGETS)
+
+test-structs-stub-generator.dir = tests/test-structs/stub-generator
+test-structs-stub-generator.threads = yes
+test-structs-stub-generator.subproject_deps = ctypes cstubs \
+     ctypes-foreign-base ctypes-foreign-unthreaded test-structs-stubs tests-common
+test-structs-stub-generator.deps = str bigarray
+test-structs-stub-generator: PROJECT=test-structs-stub-generator
+test-structs-stub-generator: $$(NATIVE_TARGET)
+
 test-structs.dir = tests/test-structs
 test-structs.threads = yes
-test-structs.deps = bigarray oUnit
-test-structs.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
+test-structs.deps = str bigarray oUnit
+test-structs.subproject_deps = ctypes ctypes-foreign-base \
+  ctypes-foreign-unthreaded cstubs test-structs-stubs tests-common
+test-structs.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-structs: PROJECT=test-structs
 test-structs: $$(NATIVE_TARGET)
 
+test-structs-generated: \
+  tests/test-structs/generated_bindings.ml \
+  tests/test-structs/generated_stubs.c
+
+tests/test-structs/generated_stubs.c: $(BUILDDIR)/test-structs-stub-generator.native
+	$< --c-file $@
+tests/test-structs/generated_bindings.ml: $(BUILDDIR)/test-structs-stub-generator.native
+	$< --ml-file $@
+
 test-finalisers.dir = tests/test-finalisers
 test-finalisers.threads = yes
-test-finalisers.deps = bigarray oUnit
+test-finalisers.deps = str bigarray oUnit
 test-finalisers.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
 test-finalisers: PROJECT=test-finalisers
 test-finalisers: $$(NATIVE_TARGET)
 
+test-cstdlib-stubs.dir  = tests/test-cstdlib/stubs
+test-cstdlib-stubs.threads = yes
+test-cstdlib-stubs.subproject_deps = ctypes cstubs \
+   ctypes-foreign-base ctypes-foreign-unthreaded tests-common
+test-cstdlib-stubs: PROJECT=test-cstdlib-stubs
+test-cstdlib-stubs: $$(LIB_TARGETS)
+
+test-cstdlib-stub-generator.dir = tests/test-cstdlib/stub-generator
+test-cstdlib-stub-generator.threads = yes
+test-cstdlib-stub-generator.subproject_deps = ctypes cstubs \
+     ctypes-foreign-base ctypes-foreign-unthreaded test-cstdlib-stubs tests-common
+test-cstdlib-stub-generator.deps = str bigarray
+test-cstdlib-stub-generator: PROJECT=test-cstdlib-stub-generator
+test-cstdlib-stub-generator: $$(NATIVE_TARGET)
+
 test-cstdlib.dir = tests/test-cstdlib
 test-cstdlib.threads = yes
-test-cstdlib.deps = bigarray oUnit
-test-cstdlib.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
+test-cstdlib.deps = str bigarray oUnit
+test-cstdlib.subproject_deps = ctypes ctypes-foreign-base \
+   ctypes-foreign-unthreaded cstubs test-cstdlib-stubs tests-common
+test-cstdlib.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-cstdlib: PROJECT=test-cstdlib
 test-cstdlib: $$(NATIVE_TARGET)
 
+test-cstdlib-generated: \
+  tests/test-cstdlib/generated_bindings.ml \
+  tests/test-cstdlib/generated_stubs.c
+
+tests/test-cstdlib/generated_stubs.c: $(BUILDDIR)/test-cstdlib-stub-generator.native
+	$< --c-file $@
+tests/test-cstdlib/generated_bindings.ml: $(BUILDDIR)/test-cstdlib-stub-generator.native
+	$< --ml-file $@
+
 test-sizeof.dir = tests/test-sizeof
 test-sizeof.threads = yes
-test-sizeof.deps = bigarray oUnit
+test-sizeof.deps = str bigarray oUnit
 test-sizeof.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
 test-sizeof: PROJECT=test-sizeof
 test-sizeof: $$(NATIVE_TARGET)
 
+test-unions-stubs.dir  = tests/test-unions/stubs
+test-unions-stubs.threads = yes
+test-unions-stubs.subproject_deps = ctypes cstubs \
+   ctypes-foreign-base ctypes-foreign-unthreaded tests-common
+test-unions-stubs: PROJECT=test-unions-stubs
+test-unions-stubs: $$(LIB_TARGETS)
+
+test-unions-stub-generator.dir = tests/test-unions/stub-generator
+test-unions-stub-generator.threads = yes
+test-unions-stub-generator.subproject_deps = ctypes cstubs \
+     ctypes-foreign-base ctypes-foreign-unthreaded test-unions-stubs tests-common
+test-unions-stub-generator.deps = str bigarray
+test-unions-stub-generator: PROJECT=test-unions-stub-generator
+test-unions-stub-generator: $$(NATIVE_TARGET)
+
 test-unions.dir = tests/test-unions
 test-unions.threads = yes
-test-unions.deps = bigarray oUnit
-test-unions.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
+test-unions.deps = str bigarray oUnit
+test-unions.subproject_deps = ctypes ctypes-foreign-base \
+   ctypes-foreign-unthreaded cstubs test-unions-stubs tests-common
+test-unions.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-unions: PROJECT=test-unions
 test-unions: $$(NATIVE_TARGET)
 
+test-unions-generated: \
+  tests/test-unions/generated_bindings.ml \
+  tests/test-unions/generated_stubs.c
+
+tests/test-unions/generated_stubs.c: $(BUILDDIR)/test-unions-stub-generator.native
+	$< --c-file $@
+tests/test-unions/generated_bindings.ml: $(BUILDDIR)/test-unions-stub-generator.native
+	$< --ml-file $@
+
 test-custom_ops.dir = tests/test-custom_ops
 test-custom_ops.threads = yes
-test-custom_ops.deps = bigarray oUnit
+test-custom_ops.deps = str bigarray oUnit
 test-custom_ops.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
 test-custom_ops: PROJECT=test-custom_ops
 test-custom_ops: $$(NATIVE_TARGET)
 
+test-arrays-stubs.dir  = tests/test-arrays/stubs
+test-arrays-stubs.threads = yes
+test-arrays-stubs.subproject_deps = ctypes cstubs \
+   ctypes-foreign-base ctypes-foreign-unthreaded tests-common
+test-arrays-stubs: PROJECT=test-arrays-stubs
+test-arrays-stubs: $$(LIB_TARGETS)
+
+test-arrays-stub-generator.dir = tests/test-arrays/stub-generator
+test-arrays-stub-generator.threads = yes
+test-arrays-stub-generator.subproject_deps = ctypes cstubs \
+     ctypes-foreign-base ctypes-foreign-unthreaded test-arrays-stubs tests-common
+test-arrays-stub-generator.deps = str bigarray
+test-arrays-stub-generator: PROJECT=test-arrays-stub-generator
+test-arrays-stub-generator: $$(NATIVE_TARGET)
+
 test-arrays.dir = tests/test-arrays
 test-arrays.threads = yes
-test-arrays.deps = bigarray oUnit
-test-arrays.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
+test-arrays.deps = str bigarray oUnit
+test-arrays.subproject_deps = ctypes ctypes-foreign-base \
+  ctypes-foreign-unthreaded cstubs test-arrays-stubs tests-common
+test-arrays.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-arrays: PROJECT=test-arrays
 test-arrays: $$(NATIVE_TARGET)
 
+test-arrays-generated: \
+  tests/test-arrays/generated_bindings.ml \
+  tests/test-arrays/generated_stubs.c
+
+tests/test-arrays/generated_stubs.c: $(BUILDDIR)/test-arrays-stub-generator.native
+	$< --c-file $@
+tests/test-arrays/generated_bindings.ml: $(BUILDDIR)/test-arrays-stub-generator.native
+	$< --ml-file $@
+
 test-errno.dir = tests/test-errno
 test-errno.threads = yes
-test-errno.deps = bigarray oUnit
+test-errno.deps = str bigarray oUnit
 test-errno.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
 test-errno: PROJECT=test-errno
 test-errno: $$(NATIVE_TARGET)
 
 test-passable.dir = tests/test-passable
 test-passable.threads = yes
-test-passable.deps = bigarray oUnit
+test-passable.deps = str bigarray oUnit
 test-passable.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
 test-passable: PROJECT=test-passable
 test-passable: $$(NATIVE_TARGET)
 
 test-alignment.dir = tests/test-alignment
 test-alignment.threads = yes
-test-alignment.deps = bigarray oUnit
+test-alignment.deps = str bigarray oUnit
 test-alignment.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
 test-alignment: PROJECT=test-alignment
 test-alignment: $$(NATIVE_TARGET)
 
+test-views-stubs.dir  = tests/test-views/stubs
+test-views-stubs.threads = yes
+test-views-stubs.subproject_deps = ctypes cstubs \
+   ctypes-foreign-base ctypes-foreign-unthreaded tests-common
+test-views-stubs: PROJECT=test-views-stubs
+test-views-stubs: $$(LIB_TARGETS)
+
+test-views-stub-generator.dir = tests/test-views/stub-generator
+test-views-stub-generator.threads = yes
+test-views-stub-generator.subproject_deps = ctypes cstubs \
+     ctypes-foreign-base ctypes-foreign-unthreaded test-views-stubs tests-common
+test-views-stub-generator.deps = str bigarray
+test-views-stub-generator: PROJECT=test-views-stub-generator
+test-views-stub-generator: $$(NATIVE_TARGET)
+
 test-views.dir = tests/test-views
 test-views.threads = yes
-test-views.deps = bigarray oUnit
-test-views.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
+test-views.deps = str bigarray oUnit
+test-views.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded cstubs test-views-stubs tests-common
+test-views.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-views: PROJECT=test-views
 test-views: $$(NATIVE_TARGET)
 
+test-views-generated: \
+  tests/test-views/generated_bindings.ml \
+  tests/test-views/generated_stubs.c
+
+tests/test-views/generated_stubs.c: $(BUILDDIR)/test-views-stub-generator.native
+	$< --c-file $@
+tests/test-views/generated_bindings.ml: $(BUILDDIR)/test-views-stub-generator.native
+	$< --ml-file $@
+
+test-oo_style-stubs.dir  = tests/test-oo_style/stubs
+test-oo_style-stubs.threads = yes
+test-oo_style-stubs.subproject_deps = ctypes cstubs \
+   ctypes-foreign-base ctypes-foreign-unthreaded tests-common
+test-oo_style-stubs: PROJECT=test-oo_style-stubs
+test-oo_style-stubs: $$(LIB_TARGETS)
+
+test-oo_style-stub-generator.dir = tests/test-oo_style/stub-generator
+test-oo_style-stub-generator.threads = yes
+test-oo_style-stub-generator.subproject_deps = ctypes cstubs \
+     ctypes-foreign-base ctypes-foreign-unthreaded test-oo_style-stubs tests-common
+test-oo_style-stub-generator.deps = str bigarray
+test-oo_style-stub-generator: PROJECT=test-oo_style-stub-generator
+test-oo_style-stub-generator: $$(NATIVE_TARGET)
+
 test-oo_style.dir = tests/test-oo_style
 test-oo_style.threads = yes
-test-oo_style.deps = bigarray oUnit
-test-oo_style.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
+test-oo_style.deps = str bigarray oUnit
+test-oo_style.subproject_deps = ctypes ctypes-foreign-base \
+   ctypes-foreign-unthreaded cstubs test-oo_style-stubs tests-common
+test-oo_style.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-oo_style: PROJECT=test-oo_style
 test-oo_style: $$(NATIVE_TARGET)
+
+test-oo_style-generated: \
+  tests/test-oo_style/generated_bindings.ml \
+  tests/test-oo_style/generated_stubs.c
+
+tests/test-oo_style/generated_stubs.c: $(BUILDDIR)/test-oo_style-stub-generator.native
+	$< --c-file $@
+tests/test-oo_style/generated_bindings.ml: $(BUILDDIR)/test-oo_style-stub-generator.native
+	$< --ml-file $@
 
 test-type_printing.dir = tests/test-type_printing
 test-type_printing.threads = yes
@@ -114,71 +335,201 @@ test-type_printing.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-u
 test-type_printing: PROJECT=test-type_printing
 test-type_printing: $$(NATIVE_TARGET)
 
+test-value_printing-stubs.dir  = tests/test-value_printing/stubs
+test-value_printing-stubs.threads = yes
+test-value_printing-stubs.subproject_deps = ctypes cstubs \
+   ctypes-foreign-base ctypes-foreign-unthreaded tests-common
+test-value_printing-stubs: PROJECT=test-value_printing-stubs
+test-value_printing-stubs: $$(LIB_TARGETS)
+
+test-value_printing-stub-generator.dir = tests/test-value_printing/stub-generator
+test-value_printing-stub-generator.threads = yes
+test-value_printing-stub-generator.subproject_deps = ctypes cstubs \
+     ctypes-foreign-base ctypes-foreign-unthreaded test-value_printing-stubs tests-common
+test-value_printing-stub-generator.deps = str bigarray
+test-value_printing-stub-generator: PROJECT=test-value_printing-stub-generator
+test-value_printing-stub-generator: $$(NATIVE_TARGET)
+
 test-value_printing.dir = tests/test-value_printing
 test-value_printing.threads = yes
 test-value_printing.deps = str bigarray oUnit
-test-value_printing.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
+test-value_printing.subproject_deps = ctypes ctypes-foreign-base \
+   ctypes-foreign-unthreaded cstubs tests-common test-value_printing-stubs
+test-value_printing.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-value_printing: PROJECT=test-value_printing
 test-value_printing: $$(NATIVE_TARGET)
 
+test-value_printing-generated: \
+  tests/test-value_printing/generated_bindings.ml \
+  tests/test-value_printing/generated_stubs.c
+
+tests/test-value_printing/generated_stubs.c: $(BUILDDIR)/test-value_printing-stub-generator.native
+	$< --c-file $@
+tests/test-value_printing/generated_bindings.ml: $(BUILDDIR)/test-value_printing-stub-generator.native
+	$< --ml-file $@
+
+test-complex-stubs.dir  = tests/test-complex/stubs
+test-complex-stubs.threads = yes
+test-complex-stubs.subproject_deps = ctypes cstubs \
+   ctypes-foreign-base ctypes-foreign-unthreaded tests-common
+test-complex-stubs: PROJECT=test-complex-stubs
+test-complex-stubs: $$(LIB_TARGETS)
+
+test-complex-stub-generator.dir = tests/test-complex/stub-generator
+test-complex-stub-generator.threads = yes
+test-complex-stub-generator.subproject_deps = ctypes cstubs \
+     ctypes-foreign-base ctypes-foreign-unthreaded test-complex-stubs tests-common
+test-complex-stub-generator.deps = str bigarray
+test-complex-stub-generator: PROJECT=test-complex-stub-generator
+test-complex-stub-generator: $$(NATIVE_TARGET)
+
 test-complex.dir = tests/test-complex
 test-complex.threads = yes
-test-complex.deps = bigarray oUnit
-test-complex.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
+test-complex.deps = str bigarray oUnit
+test-complex.subproject_deps = ctypes ctypes-foreign-base \
+  ctypes-foreign-unthreaded cstubs tests-common test-complex-stubs
+test-complex.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-complex: PROJECT=test-complex
 test-complex: $$(NATIVE_TARGET)
 
+test-complex-generated: \
+  tests/test-complex/generated_bindings.ml \
+  tests/test-complex/generated_stubs.c
+
+tests/test-complex/generated_stubs.c: $(BUILDDIR)/test-complex-stub-generator.native
+	$< --c-file $@
+tests/test-complex/generated_bindings.ml: $(BUILDDIR)/test-complex-stub-generator.native
+	$< --ml-file $@
+
+test-callback_lifetime-stubs.dir  = tests/test-callback_lifetime/stubs
+test-callback_lifetime-stubs.threads = yes
+test-callback_lifetime-stubs.subproject_deps = ctypes cstubs \
+   ctypes-foreign-base ctypes-foreign-unthreaded tests-common
+test-callback_lifetime-stubs: PROJECT=test-callback_lifetime-stubs
+test-callback_lifetime-stubs: $$(LIB_TARGETS)
+
+test-callback_lifetime-stub-generator.dir = tests/test-callback_lifetime/stub-generator
+test-callback_lifetime-stub-generator.threads = yes
+test-callback_lifetime-stub-generator.subproject_deps = ctypes cstubs \
+     ctypes-foreign-base ctypes-foreign-unthreaded test-callback_lifetime-stubs tests-common
+test-callback_lifetime-stub-generator.deps = str bigarray
+test-callback_lifetime-stub-generator: PROJECT=test-callback_lifetime-stub-generator
+test-callback_lifetime-stub-generator: $$(NATIVE_TARGET)
+
 test-callback_lifetime.dir = tests/test-callback_lifetime
 test-callback_lifetime.threads = yes
-test-callback_lifetime.deps = bigarray oUnit
-test-callback_lifetime.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
+test-callback_lifetime.deps = str bigarray oUnit
+test-callback_lifetime.subproject_deps = ctypes ctypes-foreign-base \
+  ctypes-foreign-unthreaded cstubs test-callback_lifetime-stubs tests-common
+test-callback_lifetime.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-callback_lifetime: PROJECT=test-callback_lifetime
 test-callback_lifetime: $$(NATIVE_TARGET)
 
+test-callback_lifetime-generated: \
+  tests/test-callback_lifetime/generated_bindings.ml \
+  tests/test-callback_lifetime/generated_stubs.c
+
+tests/test-callback_lifetime/generated_stubs.c: $(BUILDDIR)/test-callback_lifetime-stub-generator.native
+	$< --c-file $@
+tests/test-callback_lifetime/generated_bindings.ml: $(BUILDDIR)/test-callback_lifetime-stub-generator.native
+	$< --ml-file $@
+
 test-stubs.dir = tests/test-stubs
 test-stubs.threads = yes
-test-stubs.deps = bigarray oUnit
+test-stubs.deps = str bigarray oUnit
 test-stubs.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
 test-stubs: PROJECT=test-stubs
 test-stubs: $$(NATIVE_TARGET)
 
+test-bigarrays-stubs.dir  = tests/test-bigarrays/stubs
+test-bigarrays-stubs.threads = yes
+test-bigarrays-stubs.subproject_deps = ctypes cstubs \
+   ctypes-foreign-base ctypes-foreign-unthreaded tests-common
+test-bigarrays-stubs: PROJECT=test-bigarrays-stubs
+test-bigarrays-stubs: $$(LIB_TARGETS)
+
+test-bigarrays-stub-generator.dir = tests/test-bigarrays/stub-generator
+test-bigarrays-stub-generator.threads = yes
+test-bigarrays-stub-generator.subproject_deps = ctypes cstubs \
+     ctypes-foreign-base ctypes-foreign-unthreaded test-bigarrays-stubs tests-common
+test-bigarrays-stub-generator.deps = str bigarray
+test-bigarrays-stub-generator: PROJECT=test-bigarrays-stub-generator
+test-bigarrays-stub-generator: $$(NATIVE_TARGET)
+
 test-bigarrays.dir = tests/test-bigarrays
 test-bigarrays.threads = yes
-test-bigarrays.deps = bigarray oUnit
-test-bigarrays.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
+test-bigarrays.deps = str bigarray oUnit
+test-bigarrays.subproject_deps = ctypes ctypes-foreign-base \
+   ctypes-foreign-unthreaded cstubs tests-common test-bigarrays-stubs
+test-bigarrays.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-bigarrays: PROJECT=test-bigarrays
 test-bigarrays: $$(NATIVE_TARGET)
 
+test-bigarrays-generated: \
+  tests/test-bigarrays/generated_bindings.ml \
+  tests/test-bigarrays/generated_stubs.c
+
+tests/test-bigarrays/generated_stubs.c: $(BUILDDIR)/test-bigarrays-stub-generator.native
+	$< --c-file $@
+tests/test-bigarrays/generated_bindings.ml: $(BUILDDIR)/test-bigarrays-stub-generator.native
+	$< --ml-file $@
+
+test-coercions-stubs.dir  = tests/test-coercions/stubs
+test-coercions-stubs.threads = yes
+test-coercions-stubs.subproject_deps = ctypes cstubs \
+   ctypes-foreign-base ctypes-foreign-unthreaded tests-common
+test-coercions-stubs: PROJECT=test-coercions-stubs
+test-coercions-stubs: $$(LIB_TARGETS)
+
+test-coercions-stub-generator.dir = tests/test-coercions/stub-generator
+test-coercions-stub-generator.threads = yes
+test-coercions-stub-generator.subproject_deps = ctypes cstubs \
+     ctypes-foreign-base ctypes-foreign-unthreaded test-coercions-stubs tests-common
+test-coercions-stub-generator.deps = str bigarray
+test-coercions-stub-generator: PROJECT=test-coercions-stub-generator
+test-coercions-stub-generator: $$(NATIVE_TARGET)
+
 test-coercions.dir = tests/test-coercions
 test-coercions.threads = yes
-test-coercions.deps = bigarray oUnit
-test-coercions.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
+test-coercions.deps = str bigarray oUnit
+test-coercions.subproject_deps = ctypes ctypes-foreign-base \
+   ctypes-foreign-unthreaded cstubs tests-common test-coercions-stubs
+test-coercions.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-coercions: PROJECT=test-coercions
 test-coercions: $$(NATIVE_TARGET)
 
-TESTS =                         \
-  test-raw                      \
-  test-pointers                 \
-  test-higher_order             \
-  test-structs                  \
-  test-finalisers               \
-  test-cstdlib                  \
-  test-sizeof                   \
-  test-unions                   \
-  test-custom_ops               \
-  test-arrays                   \
-  test-errno                    \
-  test-passable                 \
-  test-alignment                \
-  test-views                    \
-  test-oo_style                 \
-  test-type_printing            \
-  test-value_printing           \
-  test-complex                  \
-  test-callback_lifetime        \
-  test-stubs                    \
-  test-bigarrays                \
-  test-coercions
+test-coercions-generated: \
+  tests/test-coercions/generated_bindings.ml \
+  tests/test-coercions/generated_stubs.c
+
+tests/test-coercions/generated_stubs.c: $(BUILDDIR)/test-coercions-stub-generator.native
+	$< --c-file $@
+tests/test-coercions/generated_bindings.ml: $(BUILDDIR)/test-coercions-stub-generator.native
+	$< --ml-file $@
+
+TESTS =
+TESTS += test-raw
+TESTS += test-pointers-stubs test-pointers-stub-generator test-pointers-generated test-pointers
+TESTS += test-higher_order-stubs test-higher_order-stub-generator test-higher_order-generated test-higher_order
+TESTS += test-structs-stubs test-structs-stub-generator test-structs-generated test-structs
+TESTS += test-finalisers
+TESTS += test-cstdlib-stubs test-cstdlib-stub-generator test-cstdlib-generated test-cstdlib
+TESTS += test-sizeof
+TESTS += test-unions-stubs test-unions-stub-generator test-unions-generated test-unions
+TESTS += test-custom_ops
+TESTS += test-arrays-stubs test-arrays-stub-generator test-arrays-generated test-arrays
+TESTS += test-errno
+TESTS += test-passable
+TESTS += test-alignment
+TESTS += test-views-stubs test-views-stub-generator test-views-generated test-views
+TESTS += test-oo_style-stubs test-oo_style-stub-generator test-oo_style-generated test-oo_style
+TESTS += test-type_printing
+TESTS += test-value_printing-stubs test-value_printing-stub-generator test-value_printing-generated test-value_printing
+TESTS += test-complex-stubs test-complex-stub-generator test-complex-generated test-complex
+TESTS += test-callback_lifetime-stubs test-callback_lifetime-stub-generator test-callback_lifetime-generated test-callback_lifetime
+TESTS += test-stubs
+TESTS += test-bigarrays-stubs test-bigarrays-stub-generator test-bigarrays-generated test-bigarrays
+TESTS += test-coercions-stubs test-coercions-stub-generator test-coercions-generated test-coercions
 
 testlib: $(BUILDDIR)/clib/libtest_functions.so
 $(BUILDDIR)/clib/libtest_functions.so: $(BUILDDIR)/clib/test_functions.o
@@ -188,10 +539,13 @@ $(BUILDDIR)/clib/test_functions.o: tests/clib/test_functions.c
 	$(CC) -c $(CFLAGS) -I `ocamlc -where` -o $@ $^
 tests/clib/test_functions.c: tests/clib/test_functions.h
 
-.PHONY: $(TESTS)
-test: testlib $(TESTS) $(TESTS:%=run-%)
+.PHONY: $(TESTS) tests-common
+test: testlib tests-common $(TESTS) $(filter-out %-stubs,\
+				   $(filter-out %-stub-generator,\
+				   $(filter-out %-generated,\
+				     $(TESTS:%=run-%))))
 
 run-%:	$*
 	@echo running $*
-	@cd $(BUILDDIR) && ./$*.native
+	@cd $(BUILDDIR) && LD_LIBRARY_PATH=clib ./$*.native
 	@echo

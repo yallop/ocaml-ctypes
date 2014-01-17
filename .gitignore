@@ -4,3 +4,5 @@ src/ctypes/ctypes_primitives.ml
 src/ctypes_config.h
 src/ctypes_config.ml
 *~
+generated_stubs.c
+generated_bindings.ml

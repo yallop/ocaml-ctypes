@@ -109,6 +109,8 @@ int retrieve_INT_MAX(void);
 unsigned int retrieve_UINT_MAX(void);
 long retrieve_LONG_MAX(void);
 long retrieve_LONG_MIN(void);
+long retrieve_nLONG_MAX(void);
+long retrieve_nLONG_MIN(void);
 unsigned long retrieve_ULONG_MAX(void);
 long long retrieve_LLONG_MAX(void);
 long long retrieve_LLONG_MIN(void);

@@ -12,115 +12,181 @@ open Foreign
 
 let testlib = Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW])
 
+module type FOREIGN_SIGNATURES =
+sig
+  val accept_pointers :
+    float ptr -> float ptr -> int ptr -> int ptr -> Signed.long ptr ->
+    Signed.llong ptr -> nativeint ptr -> int ptr -> int ptr -> int32 ptr ->
+    int64 ptr -> Unsigned.uint8 ptr -> Unsigned.uint16 ptr ->
+    Unsigned.uint32 ptr -> Unsigned.uint64 ptr -> Unsigned.size_t ptr ->
+    Unsigned.ushort ptr -> Unsigned.uint ptr -> Unsigned.ulong ptr ->
+    Unsigned.ullong ptr -> int 
 
-(*
-  Test passing various types of pointers to a function.
-*)
-let test_passing_pointers () =
-  let accept_pointers = foreign "accept_pointers" ~from:testlib
-    (ptr float @->
-     ptr double @->
-     ptr short @->
-     ptr int @->
-     ptr long @->
-     ptr llong @->
-     ptr nativeint @->
-     ptr int8_t @->
-     ptr int16_t @->
-     ptr int32_t @->
-     ptr int64_t @->
-     ptr uint8_t @->
-     ptr uint16_t @->
-     ptr uint32_t @->
-     ptr uint64_t @->
-     ptr size_t @->
-     ptr ushort @->
-     ptr uint @->
-     ptr ulong @->
-     ptr ullong @->
-     returning int) in
-  assert_equal ~msg:"Passing pointers to various numeric types"
-    ~printer:string_of_int
-    (1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 +
-     11 + 12 + 13 + 14 + 15 + 16 + 17 + 18 + 19 + 20)
-    (let open Signed in
-     let open Unsigned in
-     accept_pointers
-       (allocate float 1.0)
-       (allocate double 2.0)
-       (allocate short 3)
-       (allocate int 4)
-       (allocate long (Long.of_int 5))
-       (allocate llong (LLong.of_int 6))
-       (allocate nativeint 7n)
-       (allocate int8_t 8)
-       (allocate int16_t 9)
-       (allocate int32_t 10l)
-       (allocate int64_t 11L)
-       (allocate uint8_t (UInt8.of_int 12))
-       (allocate uint16_t (UInt16.of_int 13))
-       (allocate uint32_t (UInt32.of_int 14))
-       (allocate uint64_t (UInt64.of_int 15))
-       (allocate size_t (Size_t.of_int 16))
-       (allocate ushort (UShort.of_int 17))
-       (allocate uint (UInt.of_int 18))
-       (allocate ulong (ULong.of_int 19))
-       (allocate ullong (ULLong.of_int 20)))
+  val accept_pointers_to_pointers :
+    int ptr -> int ptr ptr -> int ptr ptr ptr -> int ptr ptr ptr ptr -> int
 
+  val malloc : Unsigned.size_t -> unit ptr 
 
-(*
-  Test passing pointers to pointers.
-*)
-let test_passing_pointers_to_pointers () =
-  let accept_pointers_to_pointers =
-    foreign "accept_pointers_to_pointers" ~from:testlib
-      (ptr int @->
-       ptr (ptr int) @->
-       ptr (ptr (ptr int)) @->
-       ptr (ptr (ptr (ptr int))) @->
-       returning int) in
+  val realloc : unit ptr -> Unsigned.size_t -> unit ptr 
+    
+  val free : unit ptr -> unit 
+    
+  val return_global_address : unit -> int ptr 
+    
+  val pass_pointer_through : int ptr -> int ptr -> int -> int ptr 
 
-  let p = allocate int 1
-  and pp = allocate (ptr int) (allocate int 2)
-  and ppp = allocate (ptr (ptr int)) (allocate (ptr int) (allocate int 3))
-  and pppp = allocate (ptr (ptr (ptr int)))
-    (allocate (ptr (ptr int)) (allocate (ptr int) (allocate int 4))) in
+  val passing_pointers_to_callback : Types.pintfun1ptr -> int 
+    
+  val accepting_pointer_from_callback : Types.pintfun2ptr -> int 
+    
+  val accepting_pointer_to_function_pointer : Types.arg_type ptr -> int 
+    
+  val returning_pointer_to_function_pointer : unit -> Types.iiifunptr ptr 
+end
 
-  assert_equal ~msg:"Passing pointers to pointers"
-    Pervasives.(1 + 2 + 3 + 4)
-    (accept_pointers_to_pointers p pp ppp pppp)
+module Common_tests(S : FOREIGN_SIGNATURES) =
+struct
+  open S
 
+  (*
+    Test passing various types of pointers to a function.
+  *)
+  let test_passing_pointers () =
+    assert_equal ~msg:"Passing pointers to various numeric types"
+      ~printer:string_of_int
+      (1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 +
+       11 + 12 + 13 + 14 + 15 + 16 + 17 + 18 + 19 + 20)
+      (let open Signed in
+       let open Unsigned in
+       accept_pointers
+         (allocate float 1.0)
+         (allocate double 2.0)
+         (allocate short 3)
+         (allocate int 4)
+         (allocate long (Long.of_int 5))
+         (allocate llong (LLong.of_int 6))
+         (allocate nativeint 7n)
+         (allocate int8_t 8)
+         (allocate int16_t 9)
+         (allocate int32_t 10l)
+         (allocate int64_t 11L)
+         (allocate uint8_t (UInt8.of_int 12))
+         (allocate uint16_t (UInt16.of_int 13))
+         (allocate uint32_t (UInt32.of_int 14))
+         (allocate uint64_t (UInt64.of_int 15))
+         (allocate size_t (Size_t.of_int 16))
+         (allocate ushort (UShort.of_int 17))
+         (allocate uint (UInt.of_int 18))
+         (allocate ulong (ULong.of_int 19))
+         (allocate ullong (ULLong.of_int 20)))
 
-(*
-  Passing a callback that accepts pointers as arguments.
-*)
-let test_callback_receiving_pointers () =
-  let pintfun1 = ptr int @-> ptr int @-> returning int in
-  let passing_pointers_to_callback =
-    foreign ~from:testlib "passing_pointers_to_callback"
-      (funptr pintfun1 @-> returning int)
-  in
-  assert_equal 7
-    (passing_pointers_to_callback (fun lp rp -> !@lp + !@rp))
+  (*
+    Test passing pointers to pointers.
+  *)
+  let test_passing_pointers_to_pointers () =
+    let p = allocate int 1
+    and pp = allocate (ptr int) (allocate int 2)
+    and ppp = allocate (ptr (ptr int)) (allocate (ptr int) (allocate int 3))
+    and pppp = allocate (ptr (ptr (ptr int)))
+      (allocate (ptr (ptr int)) (allocate (ptr int) (allocate int 4))) in
+
+    assert_equal ~msg:"Passing pointers to pointers"
+      Pervasives.(1 + 2 + 3 + 4)
+      (accept_pointers_to_pointers p pp ppp pppp)
 
 
-(*
-  Passing a callback that returns a pointer.
-*)
-let test_callback_returning_pointers () =
-  let pintfun2 = int @-> int @-> returning (ptr int) in
-  let p = allocate int 17 in
-  let accepting_pointer_from_callback =
-    foreign ~from:testlib "accepting_pointer_from_callback"
-      (funptr pintfun2 @-> returning int)
-  in begin
-    assert_equal 17 !@p;
+  (*
+    Passing a callback that accepts pointers as arguments.
+  *)
+  let test_callback_receiving_pointers () =
+    assert_equal 7
+      (passing_pointers_to_callback (fun lp rp -> !@lp + !@rp))
 
-    assert_equal 56
-      (accepting_pointer_from_callback (fun x y -> p <-@ (x * y); p));
 
-    assert_equal 12 !@p
-  end
+  (*
+    Passing a callback that returns a pointer.
+  *)
+  let test_callback_returning_pointers () =
+    let p = allocate int 17 in
+    begin
+      assert_equal 17 !@p;
+
+      assert_equal 56
+        (accepting_pointer_from_callback (fun x y -> p <-@ (x * y); p));
+
+      assert_equal 12 !@p
+    end
+
+
+  (*
+    Test passing a pointer-to-a-function-pointer as an argument.
+  *)
+  let test_passing_pointer_to_function_pointer () =
+    assert_equal ~printer:string_of_int
+      5 (accepting_pointer_to_function_pointer 
+           (allocate Types.arg_type ( / )))
+
+
+
+  (*
+    Test returning a pointer to a function pointer
+  *)
+  let test_callback_returning_pointer_to_function_pointer () =
+    assert_equal
+      10 (!@(returning_pointer_to_function_pointer ()) 2 5)
+
+
+  (*
+    Test bindings for malloc, realloc and free.
+  *)
+  let test_allocation () =
+    let open Unsigned in
+
+    let pointer = malloc (Size_t.of_int (sizeof int)) in
+      let int_pointer = from_voidp int pointer in
+      int_pointer <-@ 17;
+      assert_equal !@int_pointer 17;
+      int_pointer <-@ -3;
+      assert_equal !@int_pointer (-3);
+
+      let pointer' = realloc pointer (Size_t.of_int (20 * sizeof int)) in
+      assert_bool "realloc succeeded" (pointer' <> null);
+      let int_pointer = from_voidp int pointer' in
+
+      assert_equal ~msg:"realloc copied the existing data over"
+        !@int_pointer (-3);
+
+      for i = 0 to 19 do
+        (int_pointer +@ i) <-@ i
+      done;
+
+      for i = 0 to 19 do
+        assert_equal i !@(int_pointer +@ i)
+      done;
+
+      free pointer'
+
+
+  (*
+    Test a function that returns the address of a global variable.
+  *)
+  let test_reading_returned_global () =
+    assert_equal (!@(return_global_address ())) 100
+
+
+  (*
+    Test a function that returns a pointer passed as argument.
+  *)
+  let test_passing_pointer_through () =
+    let p1 = allocate int 25 in
+    let p2 = allocate int 32 in
+    let rv = pass_pointer_through p1 p2 10 in
+    assert_equal !@rv !@p1;
+    assert_equal 25 !@rv;
+    let rv = pass_pointer_through p1 p2 (-10) in
+    assert_equal !@rv !@p2;
+    assert_equal 32 !@rv
+end
 
 
 (*
@@ -228,33 +294,6 @@ let test_pointer_assignment_with_primitives () =
 
 
 (*
-  Test passing a pointer-to-a-function-pointer as an argument.
-*)
-let test_passing_pointer_to_function_pointer () =
-  let arg_type = funptr (int @-> int @-> returning int) in
-  let accepting_pointer_to_function_pointer =
-    foreign "accepting_pointer_to_function_pointer" ~from:testlib
-      (ptr arg_type @-> returning int)
-  in
-  assert_equal ~printer:string_of_int
-    5 (accepting_pointer_to_function_pointer 
-         (allocate arg_type ( / )))
-
-
-
-(*
-  Test returning a pointer to a function pointer
-*)
-let test_callback_returning_pointer_to_function_pointer () =
-  let returning_pointer_to_function_pointer =
-    foreign "returning_pointer_to_function_pointer" ~from:testlib
-      (void @-> returning (ptr (funptr (int @-> int @-> returning int))))
-  in
-  assert_equal
-    10 (!@(returning_pointer_to_function_pointer ()) 2 5)
-
-
-(*
   Dereferencing pointers to incomplete types
 *)
 let test_dereferencing_pointers_to_incomplete_types () =
@@ -327,67 +366,6 @@ let test_reading_and_writing_global_value () =
 
 
 (*
-  Test bindings for malloc, realloc and free.
-*)
-let test_allocation () =
-  let open Unsigned in
-  let malloc = foreign "malloc" (size_t @-> returning (ptr void)) in
-  let realloc = foreign "realloc" (ptr void @-> size_t @-> returning (ptr void)) in
-  let free = foreign "free" (ptr void @-> returning void) in
-  
-  let pointer = malloc (Size_t.of_int (sizeof int)) in
-    let int_pointer = from_voidp int pointer in
-    int_pointer <-@ 17;
-    assert_equal !@int_pointer 17;
-    int_pointer <-@ -3;
-    assert_equal !@int_pointer (-3);
-
-    let pointer' = realloc pointer (Size_t.of_int (20 * sizeof int)) in
-    assert_bool "realloc succeeded" (pointer' <> null);
-    let int_pointer = from_voidp int pointer' in
-
-    assert_equal ~msg:"realloc copied the existing data over"
-      !@int_pointer (-3);
-
-    for i = 0 to 19 do
-      (int_pointer +@ i) <-@ i
-    done;
-
-    for i = 0 to 19 do
-      assert_equal i !@(int_pointer +@ i)
-    done;
-
-    free pointer'
-
-
-(*
-  Test a function that returns the address of a global variable.
-*)
-let test_reading_returned_global () =
-  let return_global_address = 
-    foreign "return_global_address" ~from:testlib
-      (void @-> returning (ptr int)) in
-  assert_equal (!@(return_global_address ())) 100
-
-
-(*
-  Test a function that returns a pointer passed as argument.
-*)
-let test_passing_pointer_through () =
-  let pass_pointer_through = foreign "pass_pointer_through" ~from:testlib
-    (ptr int @-> ptr int @-> int @-> returning (ptr int)) 
-  in
-  let p1 = allocate int 25 in
-  let p2 = allocate int 32 in
-  let rv = pass_pointer_through p1 p2 10 in
-  assert_equal !@rv !@p1;
-  assert_equal 25 !@rv;
-  let rv = pass_pointer_through p1 p2 (-10) in
-  assert_equal !@rv !@p2;
-  assert_equal 32 !@rv
-
-
-(*
   Tests for various aspects of pointer arithmetic.
 *)
 let test_pointer_arithmetic () =
@@ -404,7 +382,7 @@ let test_pointer_arithmetic () =
   let i1 = field twoints "i" int in
   let i2 = field twoints "j" int in
   let () = seal twoints in
-  
+
   (* Traverse the array using a 'struct twoints' pointer *)
   let ps = from_voidp twoints (to_voidp p) in
 
@@ -412,10 +390,10 @@ let test_pointer_arithmetic () =
     assert_equal !@((ps +@ i) |-> i1) (2 * i + 1);
     assert_equal !@((ps +@ i) |-> i2) (2 * i + 2);
   done;
-  
+
   (* Traverse the array using a char pointer *)
   let pc = from_voidp char (to_voidp p) in
-  
+
   for i = 0 to 7 do
     let p' = pc +@ i * sizeof int in
     assert_equal !@(from_voidp int (to_voidp p')) (succ i)
@@ -426,7 +404,7 @@ let test_pointer_arithmetic () =
   for i = 0 to 7 do
     assert_equal !@(pend -@ i) (8 - i)
   done
-    
+
 
 (*
   Test pointer comparisons.
@@ -453,13 +431,13 @@ let test_pointer_comparison () =
   (* Canonicalization preserves ordering *)
   assert_bool "p < p+n"
     (p < (p +@ 10));
-    
+
   assert_bool "canonicalize(p) < canonicalize(p+n)"
     (canonicalize p < canonicalize (p +@ 10));
 
   assert_bool "p > p-1"
     (p > (p -@ 1));
-    
+
   assert_bool "canonicalize(p) > canonicalize(p-1)"
     (canonicalize p > canonicalize (p -@ 1));
 
@@ -561,28 +539,49 @@ let test_pointer_differences () =
   assert_equal (-offsetof k) (ptr_diff (to_charp (canonicalize (p |-> k))) cp);
   assert_equal (-offsetof l) (ptr_diff (to_charp (canonicalize (p |-> l))) cp)
 
+module Foreign_tests =
+  Common_tests(Functions.Stubs(Tests_common.Foreign_binder))
+module Stub_tests = Common_tests(Generated_bindings)
 
 let suite = "Pointer tests" >:::
-  ["passing pointers"
-    >:: test_passing_pointers;
+  ["passing pointers (foreign)"
+    >:: Foreign_tests.test_passing_pointers;
 
-   "passing pointers to pointers"
-    >:: test_passing_pointers_to_pointers;
+   "passing pointers (stubs)"
+    >:: Stub_tests.test_passing_pointers;
 
-   "callback receiving pointers"
-    >:: test_callback_receiving_pointers;
+   "passing pointers to pointers (foreign)"
+    >:: Foreign_tests.test_passing_pointers_to_pointers;
 
-   "callback returning pointers"
-    >:: test_callback_returning_pointers;
+   "passing pointers to pointers (stubs)"
+    >:: Stub_tests.test_passing_pointers_to_pointers;
+
+   "callback receiving pointers (foreign)"
+    >:: Foreign_tests.test_callback_receiving_pointers;
+
+   "callback receiving pointers (stubs)"
+    >:: Stub_tests.test_callback_receiving_pointers;
+
+   "callback returning pointers (foreign)"
+    >:: Foreign_tests.test_callback_returning_pointers;
+
+   "callback returning pointers (stubs)"
+    >:: Stub_tests.test_callback_returning_pointers;
 
    "pointer assignment with primitives"
     >:: test_pointer_assignment_with_primitives;
 
-   "passing pointer to function pointer"
-    >:: test_passing_pointer_to_function_pointer;
+   "passing pointer to function pointer (foreign)"
+    >:: Foreign_tests.test_passing_pointer_to_function_pointer;
 
-   "callback returning pointer to function pointer"
-    >:: test_callback_returning_pointer_to_function_pointer;
+   "passing pointer to function pointer (stubs)"
+    >:: Stub_tests.test_passing_pointer_to_function_pointer;
+
+   "callback returning pointer to function pointer (foreign)"
+    >:: Foreign_tests.test_callback_returning_pointer_to_function_pointer;
+
+   "callback returning pointer to function pointer (stubs)"
+    >:: Stub_tests.test_callback_returning_pointer_to_function_pointer;
 
    "incomplete types"
     >:: test_dereferencing_pointers_to_incomplete_types;
@@ -593,14 +592,23 @@ let suite = "Pointer tests" >:::
    "global value"
     >:: test_reading_and_writing_global_value;
 
-   "allocation"
-    >:: test_allocation;
+   "allocation (foreign)"
+    >:: Foreign_tests.test_allocation;
 
-   "passing pointers through functions"
-    >:: test_passing_pointer_through;
+   "allocation (stubs)"
+    >:: Stub_tests.test_allocation;
 
-   "returned globals"
-    >:: test_reading_returned_global;
+   "passing pointers through functions (foreign)"
+    >:: Foreign_tests.test_passing_pointer_through;
+
+   "passing pointers through functions (stubs)"
+    >:: Stub_tests.test_passing_pointer_through;
+
+   "returned globals (foreign)"
+    >:: Foreign_tests.test_reading_returned_global;
+
+   "returned globals (stubs)"
+    >:: Stub_tests.test_reading_returned_global;
 
    "arithmetic"
     >:: test_pointer_arithmetic;
@@ -611,6 +619,7 @@ let suite = "Pointer tests" >:::
    "differences"
     >:: test_pointer_differences;
   ]
+
 
 
 let _ =
