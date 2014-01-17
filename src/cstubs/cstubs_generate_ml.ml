@@ -182,7 +182,8 @@ let primname_byte : string -> ml_external_type -> string option =
     else None
 
 let attributes : type a b. (a -> b) fn -> attributes =
-   fun fn -> { float = false; noalloc = false }
+   let open Cstubs_analysis in
+   fun fn -> { float = float fn; noalloc = not (may_allocate fn) }
 
 let managed_buffer = `Ident (path_of_string "Memory_stubs.managed_buffer")
 let voidp = `Ident (path_of_string "Ctypes_raw.voidp")

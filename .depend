@@ -1,3 +1,4 @@
+_build/src/cstubs/cstubs_analysis.cmi : _build/src/ctypes/static.cmo
 _build/src/cstubs/cstubs_generate_c.cmi : _build/src/ctypes/ctypes.cmi
 _build/src/cstubs/cstubs_generate_ml.cmi : _build/src/ctypes/ctypes.cmi
 _build/src/cstubs/cstubs_internals.cmi : _build/src/ctypes/static.cmo \
@@ -29,6 +30,12 @@ _build/src/ctypes/structs_computed.cmi : _build/src/ctypes/structs.cmi \
 _build/src/ctypes/unsigned.cmi :
 _build/src/configure/make_primitive_details.cmo :
 _build/src/configure/make_primitive_details.cmx :
+_build/src/cstubs/cstubs_analysis.cmo : _build/src/ctypes/unsigned.cmi \
+    _build/src/ctypes/static.cmo _build/src/ctypes/signed.cmi _build/src/ctypes/primitives.cmo \
+    _build/src/ctypes/ctypes_bigarray.cmi _build/src/cstubs/cstubs_analysis.cmi
+_build/src/cstubs/cstubs_analysis.cmx : _build/src/ctypes/unsigned.cmx \
+    _build/src/ctypes/static.cmx _build/src/ctypes/signed.cmx _build/src/ctypes/primitives.cmx \
+    _build/src/ctypes/ctypes_bigarray.cmx _build/src/cstubs/cstubs_analysis.cmi
 _build/src/cstubs/cstubs_generate_c.cmo : _build/src/ctypes/static.cmo \
     _build/src/ctypes/primitives.cmo _build/src/ctypes/ctypes.cmi \
     _build/src/cstubs/cstubs_generate_c.cmi
@@ -38,11 +45,11 @@ _build/src/cstubs/cstubs_generate_c.cmx : _build/src/ctypes/static.cmx \
 _build/src/cstubs/cstubs_generate_ml.cmo : _build/src/ctypes/static.cmo \
     _build/src/ctypes/primitives.cmo _build/src/ctypes/ctypes_path.cmi \
     _build/src/ctypes/ctypes.cmi _build/src/cstubs/cstubs_public_name.cmi \
-    _build/src/cstubs/cstubs_generate_ml.cmi
+    _build/src/cstubs/cstubs_analysis.cmi _build/src/cstubs/cstubs_generate_ml.cmi
 _build/src/cstubs/cstubs_generate_ml.cmx : _build/src/ctypes/static.cmx \
     _build/src/ctypes/primitives.cmx _build/src/ctypes/ctypes_path.cmx \
     _build/src/ctypes/ctypes.cmx _build/src/cstubs/cstubs_public_name.cmx \
-    _build/src/cstubs/cstubs_generate_ml.cmi
+    _build/src/cstubs/cstubs_analysis.cmx _build/src/cstubs/cstubs_generate_ml.cmi
 _build/src/cstubs/cstubs_internals.cmo : _build/src/ctypes/static.cmo \
     _build/src/ctypes/memory_stubs.cmo _build/src/ctypes/ctypes_raw.cmo \
     _build/src/ctypes/ctypes.cmi _build/src/cstubs/cstubs_internals.cmi
