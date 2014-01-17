@@ -174,7 +174,7 @@ let rec arity : ml_external_type -> int =
 
 let max_byte_args = 5
 
-let primname_byte : string -> ml_external_type -> string option =
+let byte_stub_name : string -> ml_external_type -> string option =
   fun name t ->
     let arity = arity t in
     if arity > max_byte_args
@@ -182,7 +182,8 @@ let primname_byte : string -> ml_external_type -> string option =
     else None
 
 let attributes : type a b. (a -> b) fn -> attributes =
-   fun fn -> { float = false; noalloc = false }
+   let open Cstubs_analysis in
+   fun fn -> { float = float fn; noalloc = not (may_allocate fn) }
 
 let managed_buffer = `Ident (path_of_string "Memory_stubs.managed_buffer")
 let voidp = `Ident (path_of_string "Ctypes_raw.voidp")
@@ -319,7 +320,7 @@ let fn : type a b. stub_name:string -> external_name:string -> (a -> b) fn -> ex
      ({ ident = external_name;
         typ = typ;
         primname = stub_name;
-        primname_byte = primname_byte stub_name typ;
+        primname_byte = byte_stub_name stub_name typ;
         attributes = attributes fn; },
       wrapper fn external_name)
 
