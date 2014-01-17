@@ -21,8 +21,7 @@ let testlib = Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW]
   parameter.  Examine the output buffer using a cast to a string view.
 *)
 let test_passing_string_array () =
-  let concat = Foreign.foreign "concat_strings" ~from:testlib
-    (ptr string @-> int @-> ptr char @-> returning void) in
+  let open Generated_stub_if in
 
   let l = ["the "; "quick "; "brown "; "fox "; "etc. "; "etc. "; ] in
   let arr = CArray.of_list string l in
@@ -30,7 +29,7 @@ let test_passing_string_array () =
   let outlen = List.fold_left (fun a s -> String.length s + a) 1 l in
   let buf = CArray.make char outlen in
 
-  let () = CArray.(concat (start arr) (length arr) (start buf)) in
+  let () = CArray.(concat_strings (start arr) (length arr) (start buf)) in
   let buf_addr = allocate (ptr char) (CArray.start buf) in
   let s = from_voidp string (to_voidp buf_addr) in
 
@@ -46,8 +45,7 @@ let test_passing_string_array () =
   using a custom view that treats chars as ints.
 *)
 let test_passing_chars_as_ints () =
-  let charish = view ~read:Char.chr ~write:Char.code int in
-  let toupper = Foreign.foreign "toupper" (charish @-> returning charish) in
+  let open Generated_stub_if in
 
   assert_equal ~msg:"toupper('x') = 'X'"
     'X' (toupper 'x');
@@ -63,14 +61,7 @@ let test_passing_chars_as_ints () =
   Use views to create a nullable function pointer.
 *)
 let test_nullable_function_pointer_view () =
-  let nullable_intptr = Foreign.funptr_opt (int @-> int @-> returning int) in
-  let returning_funptr =
-    Foreign.foreign "returning_funptr" ~from:testlib
-      (int @-> returning nullable_intptr)
-  and accepting_possibly_null_funptr =
-    Foreign.foreign "accepting_possibly_null_funptr" ~from:testlib
-      (nullable_intptr @-> int @-> int @-> returning int)
-  in
+  let open Generated_stub_if in
   begin
     let fromSome = function None -> assert false | Some x -> x in
 

@@ -19,20 +19,18 @@ let testlib = Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW]
   since libffi doesn't support passing complex numbers.
 *)
 let test_complex_primitive_operations () =
-  let open Foreign in
-  let wrap typ name =
-    let f = foreign name ~from:testlib
-      (ptr typ @-> ptr typ @-> ptr typ @-> returning void) in
-    fun l r ->
-      let rv = allocate_n ~count:1 typ in
-      f (allocate typ l) (allocate typ r) rv;
-      !@rv
+  let open Generated_stub_if in
+
+  let wrap typ f l r =
+    let rv = allocate_n ~count:1 typ in
+    f (allocate typ l) (allocate typ r) rv;
+    !@rv
   in
 
-  let addz64 = wrap complex64 "add_complexd"
-  and mulz64 = wrap complex64 "mul_complexd"
-  and addz32 = wrap complex32 "add_complexf"
-  and mulz32 = wrap complex32 "mul_complexf"
+  let addz64 = wrap complex64 add_complexd
+  and mulz64 = wrap complex64 mul_complexd
+  and addz32 = wrap complex32 add_complexf
+  and mulz32 = wrap complex32 mul_complexf
   in
 
   begin

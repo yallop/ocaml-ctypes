@@ -136,27 +136,7 @@ let test_pointer_to_array_arithmetic () =
   Test passing pointer to array of structs.
 *)
 let test_passing_pointer_to_array_of_structs () =
-  (* union u {
-        int i;
-        double d;
-     }
-  *)
-  let u = union "u" in
-  let (-:) ty label = field u label ty in
-  let i = int    -: "i" in
-  let d = double -: "d" in
-  let () = seal u in
-
-  (* struct s {
-        char tag;
-        union u data;
-     }
-  *)
-  let s = structure "s" in
-  let (-:) ty label = field s label ty in
-  let tag  = char -: "tag" in
-  let data = u    -: "data" in
-  let () = seal s in
+  let open Types in
 
   let box_int x =
     let v = make s in
@@ -174,10 +154,7 @@ let test_passing_pointer_to_array_of_structs () =
     v
   in
 
-  let accepts_pointer_to_array_of_structs =
-    Foreign.foreign "accepts_pointer_to_array_of_structs"
-      (ptr (array 5 s) @-> returning double)
-      ~from:testlib in
+  let open Generated_stub_if in
 
   let sum = 
     accepts_pointer_to_array_of_structs

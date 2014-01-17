@@ -27,23 +27,15 @@ let testlib = Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW]
 *)
 let test_passing_struct () =
   let module M = struct
-    type simple
-    let simple : simple structure typ = structure "simple"
-    let (-:) ty label = field simple label ty
-    let c = int        -: "c"
-    let f = double     -: "f"
-    let p = ptr simple -: "p"
-    let () = seal simple
-      
-    let accept_struct = Foreign.foreign "accept_struct" ~from:testlib
-      (simple @-> returning int)
+    open Types
+    open Generated_stub_if
 
     let s = make simple
 
     let () = begin
-      setf s c 10;
+      setf s i 10;
       setf s f 14.5;
-      setf s p (from_voidp simple null)
+      setf s self (from_voidp simple null)
     end
       
     let v = accept_struct s
@@ -69,31 +61,22 @@ let test_passing_struct () =
 *)
 let test_returning_struct () =
   let module M = struct
-    type simple
-
-    let simple : simple structure typ = structure "simple"
-    let (-:) ty label = field simple label ty
-    let c = int        -: "c"
-    let f = double     -: "f"
-    let p = ptr simple -: "p"
-    let () = seal simple
-
-    let return_struct = Foreign.foreign "return_struct" ~from:testlib
-      (void @-> returning simple)
+    open Types
+    open Generated_stub_if
 
     let s = return_struct ()
 
-    let () = assert_equal 20 (getf s c)
+    let () = assert_equal 20 (getf s i)
     let () = assert_equal 35.0 (getf s f)
 
-    let t = getf s p
+    let t = getf s self
 
-    let () = assert_equal 10 !@(t |-> c)
+    let () = assert_equal 10 !@(t |-> i)
       ~printer:string_of_int
     let () = assert_equal 12.5 !@(t |-> f)
       ~printer:string_of_float
 
-    let () = assert_equal (to_voidp !@(t |-> p)) (to_voidp t)
+    let () = assert_equal (to_voidp !@(t |-> self)) (to_voidp t)
 
   end in ()
 

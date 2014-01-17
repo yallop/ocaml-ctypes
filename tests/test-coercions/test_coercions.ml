@@ -138,8 +138,7 @@ let test_view_coercions () =
    Check coercions between functions.
 *)
 let test_function_coercions () =
-  let memchr = Foreign.foreign "memchr"
-    (ptr void @-> int @-> size_t @-> returning (ptr void)) in
+  let open Generated_stub_if in
   let isize_t = view size_t
     ~read:Unsigned.Size_t.to_int ~write:Unsigned.Size_t.of_int in
   let memchr' = coerce_fn

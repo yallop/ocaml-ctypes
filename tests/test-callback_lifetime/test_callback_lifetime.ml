@@ -18,11 +18,7 @@ let testlib = Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW]
   invoke it later.
 *)
 let test_storing_function_reference () =
-  let callback_type = int @-> returning int in
-  let store_callback = foreign "store_callback" ~from:testlib
-    (funptr callback_type @-> returning void) in
-  let invoke_stored_callback = foreign "invoke_stored_callback" ~from:testlib
-    (int @-> returning int) in
+  let open Generated_stub_if in
 
   (* This shouldn't be collected in the code that follows. *)
   let double x = x * 2 in
@@ -43,11 +39,7 @@ let test_storing_function_reference () =
   have been garbage collected.
 *)
 let test_calling_collected_closure_raises_exception () =
-  let callback_type = int @-> returning int in
-  let store_callback = foreign "store_callback" ~from:testlib
-    (funptr callback_type @-> returning void) in
-  let invoke_stored_callback = foreign "invoke_stored_callback" ~from:testlib
-    (int @-> returning int) in
+  let open Generated_stub_if in
 
   let closure x y = x * y in
 
@@ -68,10 +60,7 @@ let test_calling_collected_closure_raises_exception () =
   passed to C.
 *)
 let test_controlling_closure_lifetime () =
-  let callback_type = int @-> returning int in
-
-  let return_callback = foreign "return_callback" ~from:testlib
-    (funptr callback_type @-> returning (funptr callback_type)) in
+  let open Generated_stub_if in
 
   (* The return_callback function simply returns its argument.  However, since
      that involves converting an OCaml function ("arg") to a C function

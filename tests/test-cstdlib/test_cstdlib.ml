@@ -27,21 +27,8 @@ open Foreign
      int isisxdigit(int)
 *)
 let test_isX_functions () =
-  let cchar = view ~read:Char.chr ~write:Char.code int in
-  let bool = view ~read:((<>)0) ~write:(fun b -> if b then 1 else 0) int in
-  let t = (cchar @-> returning bool) in
-  let isalnum = foreign "isalnum" t
-  and isalpha = foreign "isalpha" t
-  and iscntrl = foreign "iscntrl" t
-  and isdigit = foreign "isdigit" t
-  and isgraph = foreign "isgraph" t
-  and islower = foreign "islower" t
-  and isprint = foreign "isprint" t
-  and ispunct = foreign "ispunct" t
-  and isspace = foreign "isspace" t
-  and isupper = foreign "isupper" t
-  and isxdigit = foreign "isxdigit" t
-  in begin
+  let open Generated_stub_if in
+  begin
     assert_bool "" (isalnum 'a');
     assert_bool "" (not (isalnum ' '));
 
@@ -84,20 +71,7 @@ let test_isX_functions () =
     int strcmp(const char *str1, const char *str2);
 *)
 let test_string_functions () =
-  (* char *strchr(const char *str, int c);  *)
-  let strchr = foreign "strchr" (string @-> int @-> returning string) in
-
-  (* int strcmp(const char *str1, const char *str2);  *)
-  let strcmp = foreign "strcmp" (string @-> string @-> returning int) in
-
-  (* int memcmp(const void *ptr1, const void *ptr2, size_t num) *)
-  let memcmp = foreign "memcmp"
-    (ptr void @-> ptr void @-> size_t @-> returning int) in
-
-  (* void  *memset(void *ptr, int value, size_t num) *)
-  let memset = foreign "memset"
-    (ptr void @-> int @-> size_t @-> returning (ptr void)) in
-
+  let open Generated_stub_if in
   assert_equal "efg" (strchr "abcdefg" (Char.code 'e'))
     ~printer:(fun x -> x);
 
@@ -170,10 +144,7 @@ let test_div () =
                 int(*compar)(const void *, const void *));
 *)
 let test_qsort () =
-  let comparator = ptr void @-> ptr void @-> returning int in
-  let qsort = foreign "qsort"
-    (ptr void @-> size_t @-> size_t @-> funptr comparator @->
-     returning void) in
+  let open Generated_stub_if in
 
   let sortby (type a) (typ : a typ) (f : a -> a -> int) (l : a list) =
     let open CArray in
@@ -209,15 +180,7 @@ let test_qsort () =
 *)
 let test_bsearch () =
   let module M = struct
-    let comparator = ptr void @-> ptr void @-> returning int
-    let bsearch = foreign "bsearch"
-      (ptr void @-> ptr void @-> size_t @-> size_t @-> funptr comparator @->
-       returning (ptr void))
-
-    let qsort = foreign "qsort"
-      (ptr void @-> size_t @-> size_t @-> funptr comparator @->
-       returning void)
-    let strlen = foreign "strlen" (ptr char @-> returning size_t)
+    open Generated_stub_if
 
     (*
       struct mi {

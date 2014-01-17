@@ -25,11 +25,7 @@ let testlib = Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW]
    as the first argument.
 *)
 let test_higher_order_basic () =
-  let intfun = (int @-> int @-> returning int) in
-
-  let higher_order_1 = foreign ~from:testlib "higher_order_1"
-    (funptr intfun @-> int @-> int @-> returning int)
-  in
+  let open Generated_stub_if in
 
   (* higher_order_1 f x y returns true iff f x y == x + y *)
   assert_equal 1 (higher_order_1 ( + ) 2 3);
@@ -53,14 +49,8 @@ let test_higher_order_basic () =
   as the first and second arguments.
 *)
 let test_higher_higher_order () =
-  let intfun = (int @-> int @-> returning int) in
-  let acceptor = (funptr intfun @-> int @-> int @-> returning int) in
-  let higher_order_3 = foreign ~from:testlib "higher_order_3"
-    (funptr acceptor @-> funptr intfun @-> int @-> int @-> returning int)
-  in
-
   let acceptor op x y = op x (op x y) in
-  (* let add = foreign ~from:testlib "add" intfun in *)
+  let open Generated_stub_if in
 
   assert_equal 10 (higher_order_3 acceptor ( + ) 3 4);
   assert_equal 36 (higher_order_3 acceptor ( * ) 3 4)
@@ -75,10 +65,7 @@ let test_higher_higher_order () =
   call the returned function from OCaml.
 *)
 let test_returning_pointer_to_function () =
-  let intfun = (int @-> int @-> returning int) in
-  let returning_funptr = foreign ~from:testlib "returning_funptr"
-    (int @-> returning (funptr intfun))
-  in
+  let open Generated_stub_if in
 
   let add = returning_funptr 0 in
 
@@ -99,10 +86,7 @@ let test_returning_pointer_to_function () =
   returning a pointer-to-function.)
 *)
 let test_callback_returns_pointer_to_function () =
-  let intfun = (int @-> returning int) in
-  let callback_returns_funptr = foreign ~from:testlib "callback_returns_funptr"
-    (funptr (int @-> returning (funptr intfun)) @-> int @-> returning int)
-  in
+  let open Generated_stub_if in
 
   let callback = function
     | 0 -> ( + ) 10

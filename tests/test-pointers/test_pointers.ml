@@ -17,28 +17,7 @@ let testlib = Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW]
   Test passing various types of pointers to a function.
 *)
 let test_passing_pointers () =
-  let accept_pointers = foreign "accept_pointers" ~from:testlib
-    (ptr float @->
-     ptr double @->
-     ptr short @->
-     ptr int @->
-     ptr long @->
-     ptr llong @->
-     ptr nativeint @->
-     ptr int8_t @->
-     ptr int16_t @->
-     ptr int32_t @->
-     ptr int64_t @->
-     ptr uint8_t @->
-     ptr uint16_t @->
-     ptr uint32_t @->
-     ptr uint64_t @->
-     ptr size_t @->
-     ptr ushort @->
-     ptr uint @->
-     ptr ulong @->
-     ptr ullong @->
-     returning int) in
+  let open Generated_stub_if in
   assert_equal ~msg:"Passing pointers to various numeric types"
     ~printer:string_of_int
     (1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 +
@@ -72,13 +51,7 @@ let test_passing_pointers () =
   Test passing pointers to pointers.
 *)
 let test_passing_pointers_to_pointers () =
-  let accept_pointers_to_pointers =
-    foreign "accept_pointers_to_pointers" ~from:testlib
-      (ptr int @->
-       ptr (ptr int) @->
-       ptr (ptr (ptr int)) @->
-       ptr (ptr (ptr (ptr int))) @->
-       returning int) in
+  let open Generated_stub_if in
 
   let p = allocate int 1
   and pp = allocate (ptr int) (allocate int 2)
@@ -95,11 +68,7 @@ let test_passing_pointers_to_pointers () =
   Passing a callback that accepts pointers as arguments.
 *)
 let test_callback_receiving_pointers () =
-  let pintfun1 = ptr int @-> ptr int @-> returning int in
-  let passing_pointers_to_callback =
-    foreign ~from:testlib "passing_pointers_to_callback"
-      (funptr pintfun1 @-> returning int)
-  in
+  let open Generated_stub_if in
   assert_equal 7
     (passing_pointers_to_callback (fun lp rp -> !@lp + !@rp))
 
@@ -108,12 +77,9 @@ let test_callback_receiving_pointers () =
   Passing a callback that returns a pointer.
 *)
 let test_callback_returning_pointers () =
-  let pintfun2 = int @-> int @-> returning (ptr int) in
+  let open Generated_stub_if in
   let p = allocate int 17 in
-  let accepting_pointer_from_callback =
-    foreign ~from:testlib "accepting_pointer_from_callback"
-      (funptr pintfun2 @-> returning int)
-  in begin
+  begin
     assert_equal 17 !@p;
 
     assert_equal 56
@@ -231,14 +197,10 @@ let test_pointer_assignment_with_primitives () =
   Test passing a pointer-to-a-function-pointer as an argument.
 *)
 let test_passing_pointer_to_function_pointer () =
-  let arg_type = funptr (int @-> int @-> returning int) in
-  let accepting_pointer_to_function_pointer =
-    foreign "accepting_pointer_to_function_pointer" ~from:testlib
-      (ptr arg_type @-> returning int)
-  in
+  let open Generated_stub_if in
   assert_equal ~printer:string_of_int
     5 (accepting_pointer_to_function_pointer 
-         (allocate arg_type ( / )))
+         (allocate Types.arg_type ( / )))
 
 
 
@@ -246,10 +208,7 @@ let test_passing_pointer_to_function_pointer () =
   Test returning a pointer to a function pointer
 *)
 let test_callback_returning_pointer_to_function_pointer () =
-  let returning_pointer_to_function_pointer =
-    foreign "returning_pointer_to_function_pointer" ~from:testlib
-      (void @-> returning (ptr (funptr (int @-> int @-> returning int))))
-  in
+  let open Generated_stub_if in
   assert_equal
     10 (!@(returning_pointer_to_function_pointer ()) 2 5)
 
@@ -331,9 +290,7 @@ let test_reading_and_writing_global_value () =
 *)
 let test_allocation () =
   let open Unsigned in
-  let malloc = foreign "malloc" (size_t @-> returning (ptr void)) in
-  let realloc = foreign "realloc" (ptr void @-> size_t @-> returning (ptr void)) in
-  let free = foreign "free" (ptr void @-> returning void) in
+  let open Generated_stub_if in
   
   let pointer = malloc (Size_t.of_int (sizeof int)) in
     let int_pointer = from_voidp int pointer in
@@ -364,9 +321,7 @@ let test_allocation () =
   Test a function that returns the address of a global variable.
 *)
 let test_reading_returned_global () =
-  let return_global_address = 
-    foreign "return_global_address" ~from:testlib
-      (void @-> returning (ptr int)) in
+  let open Generated_stub_if in
   assert_equal (!@(return_global_address ())) 100
 
 
@@ -374,9 +329,7 @@ let test_reading_returned_global () =
   Test a function that returns a pointer passed as argument.
 *)
 let test_passing_pointer_through () =
-  let pass_pointer_through = foreign "pass_pointer_through" ~from:testlib
-    (ptr int @-> ptr int @-> int @-> returning (ptr int)) 
-  in
+  let open Generated_stub_if in
   let p1 = allocate int 25 in
   let p2 = allocate int 32 in
   let rv = pass_pointer_through p1 p2 10 in
@@ -611,6 +564,7 @@ let suite = "Pointer tests" >:::
    "differences"
     >:: test_pointer_differences;
   ]
+
 
 
 let _ =
