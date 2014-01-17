@@ -9,8 +9,7 @@
 
 type ('a, 'b) t
 (** The type of bigarray values of particular sizes.  A value of type
-    [(a, b) t] can be used to read and write values of type [b] at particular
-    addresses.  *)
+    [(a, b) t] can be used to read and write values of type [b].  *)
 
 (** {3 Type constructors *)
 
@@ -46,6 +45,10 @@ val element_type : ('a, _) t -> 'a Primitives.prim
 
 val dimensions : (_, _) t -> int array
 (** Compute the dimensions of a bigarray type. *)
+
+val type_expression : ('a, 'b) t -> ([> `Appl of Ctypes_path.path * 'c list
+                                     |  `Ident of Ctypes_path.path ] as 'c)
+(** Compute a type expression that denotes a bigarray type. *)
 
 (** {2 Values *)
 
