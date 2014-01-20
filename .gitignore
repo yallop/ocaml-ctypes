@@ -6,3 +6,6 @@ src/ctypes_config.ml
 *~
 generated_stubs.c
 generated_bindings.ml
+ncurses_generated.ml
+ncurses_stubs.c
+
