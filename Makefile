@@ -114,7 +114,7 @@ setup.data: src/discover/discover.ml
 # dependencies
 depend: configure
 	$(OCAMLDEP) $(foreach project,$(PROJECTS),-I $($(project).dir)) \
-             src/*/*.mli src/*/*.ml examples/*/*.mli examples/*/*.ml \
+            $(shell find src examples -name '*.mli' -o -name '*.ml') \
            | sed "s!src/!_build/src/!g; s!examples/!_build/examples/!g" > .depend
 
 #installation
