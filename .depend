@@ -258,10 +258,40 @@ _build/examples/ncurses/foreign/ncurses.cmx : \
     _build/src/ctypes-foreign-threaded/foreign.cmx _build/src/ctypes/ctypes.cmx \
     _build/examples/ncurses/foreign/ncurses.cmi
 _build/examples/ncurses/foreign/ncurses.cmi :
-_build/examples/date/stub-generation/date_generated.cmo : _build/src/ctypes/ctypes_raw.cmo \
-    _build/src/ctypes/ctypes.cmi _build/src/cstubs/cstubs_internals.cmi
-_build/examples/date/stub-generation/date_generated.cmx : _build/src/ctypes/ctypes_raw.cmx \
-    _build/src/ctypes/ctypes.cmx _build/src/cstubs/cstubs_internals.cmx
+_build/examples/date/stub-generation/stub-generator/date.cmo : \
+    _build/examples/date/stub-generation/bindings/date_stubs.cmo \
+    _build/src/cstubs/cstubs.cmi
+_build/examples/date/stub-generation/stub-generator/date.cmx : \
+    _build/examples/date/stub-generation/bindings/date_stubs.cmx \
+    _build/src/cstubs/cstubs.cmx
+_build/examples/date/stub-generation/bindings/date_type.cmo : _build/src/ctypes/ctypes.cmi \
+    _build/src/cstubs/cstubs.cmi
+_build/examples/date/stub-generation/bindings/date_type.cmx : _build/src/ctypes/ctypes.cmx \
+    _build/src/cstubs/cstubs.cmx
+_build/examples/date/stub-generation/bindings/date_stubs.cmo : \
+    _build/src/ctypes/posixTypes.cmi \
+    _build/examples/date/stub-generation/bindings/date_type.cmo \
+    _build/src/ctypes/ctypes.cmi
+_build/examples/date/stub-generation/bindings/date_stubs.cmx : \
+    _build/src/ctypes/posixTypes.cmx \
+    _build/examples/date/stub-generation/bindings/date_type.cmx \
+    _build/src/ctypes/ctypes.cmx
+_build/examples/date/stub-generation/date.cmo : _build/src/ctypes/posixTypes.cmi \
+    _build/examples/date/stub-generation/bindings/date_type.cmo \
+    _build/examples/date/stub-generation/date_generated.cmo _build/src/ctypes/ctypes.cmi \
+    _build/src/ctypes/coerce.cmi
+_build/examples/date/stub-generation/date.cmx : _build/src/ctypes/posixTypes.cmx \
+    _build/examples/date/stub-generation/bindings/date_type.cmx \
+    _build/examples/date/stub-generation/date_generated.cmx _build/src/ctypes/ctypes.cmx \
+    _build/src/ctypes/coerce.cmx
+_build/examples/date/stub-generation/date_generated.cmo : \
+    _build/examples/date/stub-generation/bindings/date_type.cmo \
+    _build/src/ctypes/ctypes_raw.cmo _build/src/ctypes/ctypes.cmi \
+    _build/src/cstubs/cstubs_internals.cmi
+_build/examples/date/stub-generation/date_generated.cmx : \
+    _build/examples/date/stub-generation/bindings/date_type.cmx \
+    _build/src/ctypes/ctypes_raw.cmx _build/src/ctypes/ctypes.cmx \
+    _build/src/cstubs/cstubs_internals.cmx
 _build/examples/date/foreign/date.cmo : _build/src/ctypes/posixTypes.cmi \
     _build/src/ctypes-foreign-threaded/foreign.cmi _build/src/ctypes/ctypes.cmi \
     _build/examples/date/foreign/date.cmi

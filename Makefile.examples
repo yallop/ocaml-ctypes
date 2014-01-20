@@ -8,7 +8,33 @@ fts.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
 fts: PROJECT=fts
 fts: $$(NATIVE_TARGET)
 
-# date subproject
+# subproject: date with stub generation
+date-stubs.install = no
+date-stubs.dir = examples/date/stub-generation/bindings
+date-stubs.subproject_deps = ctypes cstubs
+date-stubs: PROJECT=date-stubs
+date-stubs: $$(LIB_TARGETS)
+
+date-stub-generator.install = no
+date-stub-generator.dir = examples/date/stub-generation/stub-generator
+date-stub-generator.subproject_deps = ctypes cstubs date-stubs
+date-stub-generator.deps = str bigarray
+date-stub-generator: PROJECT=date-stub-generator
+date-stub-generator: $$(NATIVE_TARGET)
+
+date-cmd.install = no
+date-cmd.dir = examples/date/stub-generation
+date-cmd.subproject_deps = ctypes cstubs date-stubs
+date-cmd.deps = str bigarray
+date-cmd.extra_mls = date_generated.ml
+date-cmd: PROJECT=date-cmd
+date-cmd: $$(NATIVE_TARGET)
+
+date-cmd-build: examples/date/stub-generation/date_generated.ml
+examples/date/stub-generation/date_generated.ml:
+	_build/date-stub-generator.native
+
+# subproject: date using dynamic linking (foreign)
 date.install = no
 date.dir = examples/date/foreign
 date.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
@@ -16,6 +42,7 @@ date.deps = bigarray str
 date: PROJECT=date
 date: $$(NATIVE_TARGET)
 
+# subproject: ncurses with stub generation
 ncurses-stubs.install = no
 ncurses-stubs.dir = examples/ncurses/stub-generation/bindings
 ncurses-stubs.subproject_deps = ctypes cstubs
@@ -28,7 +55,7 @@ ncurses-cmd.dir = examples/ncurses/stub-generation
 ncurses-cmd.subproject_deps = ctypes cstubs
 ncurses-cmd.deps = str bigarray
 ncurses-cmd.extra_mls = ncurses_generated.ml
-ncurses.link_flags = -lncurses
+ncurses-cmd.link_flags = -lncurses
 ncurses-cmd: PROJECT=ncurses-cmd
 ncurses-cmd: $$(NATIVE_TARGET)
 
@@ -36,6 +63,7 @@ ncurses-cmd-build: examples/ncurses/stub-generation/ncurses_generated.ml
 examples/ncurses/stub-generation/ncurses_generated.ml:
 	_build/ncurses-stubs.native
 
+# subproject: ncurses using dynamic linking (foreign)
 ncurses.install = no
 ncurses.dir = examples/ncurses/foreign
 ncurses.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
@@ -44,4 +72,4 @@ ncurses.link_flags = -Wl,-no-as-needed -lncurses
 ncurses: PROJECT=ncurses
 ncurses: $$(NATIVE_TARGET)
 
-examples: build ncurses ncurses-stubs ncurses-cmd-build ncurses-cmd fts date
+examples: build ncurses ncurses-stubs ncurses-cmd-build ncurses-cmd fts date date-stubs date-stub-generator date-cmd-build date-cmd

@@ -8,4 +8,6 @@ generated_stubs.c
 generated_bindings.ml
 ncurses_generated.ml
 ncurses_stubs.c
+date_generated.ml
+date_stubs.c
 
