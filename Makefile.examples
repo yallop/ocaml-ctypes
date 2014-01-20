@@ -16,6 +16,26 @@ date.deps = bigarray str
 date: PROJECT=date
 date: $$(NATIVE_TARGET)
 
+ncurses-stubs.install = no
+ncurses-stubs.dir = examples/ncurses/stub-generation/bindings
+ncurses-stubs.subproject_deps = ctypes cstubs
+ncurses-stubs.deps = str bigarray
+ncurses-stubs: PROJECT=ncurses-stubs
+ncurses-stubs: $$(NATIVE_TARGET)
+
+ncurses-cmd.install = no
+ncurses-cmd.dir = examples/ncurses/stub-generation
+ncurses-cmd.subproject_deps = ctypes cstubs
+ncurses-cmd.deps = str bigarray
+ncurses-cmd.extra_mls = ncurses_generated.ml
+ncurses.link_flags = -lncurses
+ncurses-cmd: PROJECT=ncurses-cmd
+ncurses-cmd: $$(NATIVE_TARGET)
+
+ncurses-cmd-build: examples/ncurses/stub-generation/ncurses_generated.ml
+examples/ncurses/stub-generation/ncurses_generated.ml:
+	_build/ncurses-stubs.native
+
 ncurses.install = no
 ncurses.dir = examples/ncurses/foreign
 ncurses.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
@@ -24,4 +44,4 @@ ncurses.link_flags = -Wl,-no-as-needed -lncurses
 ncurses: PROJECT=ncurses
 ncurses: $$(NATIVE_TARGET)
 
-examples: build ncurses fts date
+examples: build ncurses ncurses-stubs ncurses-cmd-build ncurses-cmd fts date

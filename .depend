@@ -233,6 +233,14 @@ _build/examples/fts/foreign/fts.cmo : _build/src/ctypes/unsigned.cmi \
 _build/examples/fts/foreign/fts.cmx : _build/src/ctypes/unsigned.cmx \
     _build/src/ctypes/posixTypes.cmx _build/src/ctypes-foreign-threaded/foreign.cmx \
     _build/src/ctypes/ctypes.cmx _build/src/ctypes/coerce.cmx _build/examples/fts/foreign/fts.cmi
+_build/examples/ncurses/stub-generation/ncurses_cmd.cmo : \
+    _build/examples/ncurses/stub-generation/ncurses_generated.cmo
+_build/examples/ncurses/stub-generation/ncurses_cmd.cmx : \
+    _build/examples/ncurses/stub-generation/ncurses_generated.cmx
+_build/examples/ncurses/stub-generation/bindings/ncurses.cmo : \
+    _build/src/ctypes/ctypes.cmi _build/src/cstubs/cstubs.cmi
+_build/examples/ncurses/stub-generation/bindings/ncurses.cmx : \
+    _build/src/ctypes/ctypes.cmx _build/src/cstubs/cstubs.cmx
 _build/examples/ncurses/stub-generation/ncurses_generated.cmo : \
     _build/src/ctypes/ctypes_raw.cmo _build/src/ctypes/ctypes.cmi \
     _build/src/cstubs/cstubs_internals.cmi
