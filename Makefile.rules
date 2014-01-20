@@ -61,7 +61,7 @@ $(BUILDDIR)/%.cmx : %.ml
 
 $(BUILDDIR)/%.o : %.c
 	@mkdir -p $(@D)
-	cd $(@D) && $(OCAMLFIND) ocamlc -c $(CFLAGS:%=-ccopt %) -o $(@F) ../../../$<
+	cd $(@D) && $(OCAMLFIND) ocamlc -c $(CFLAGS:%=-ccopt %) -o $(@F) $(realpath $<)
 
 $(BUILDDIR)/%.cmi : %.mli
 	@mkdir -p $(@D)
