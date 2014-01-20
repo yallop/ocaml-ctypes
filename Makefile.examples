@@ -2,7 +2,7 @@
 
 # fts subproject
 fts.install = no
-fts.dir = examples/fts
+fts.dir = examples/fts/foreign
 fts.deps = bigarray str
 fts.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
 fts: PROJECT=fts
@@ -10,15 +10,14 @@ fts: $$(NATIVE_TARGET)
 
 # date subproject
 date.install = no
-date.dir = examples/date
+date.dir = examples/date/foreign
 date.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
 date.deps = bigarray str
 date: PROJECT=date
 date: $$(NATIVE_TARGET)
 
-# ncurses subproject
 ncurses.install = no
-ncurses.dir = examples/ncurses
+ncurses.dir = examples/ncurses/foreign
 ncurses.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
 ncurses.deps = bigarray str
 ncurses.link_flags = -Wl,-no-as-needed -lncurses
