@@ -10,4 +10,5 @@ ncurses_generated.ml
 ncurses_stubs.c
 date_generated.ml
 date_stubs.c
-
+fts_generated.ml
+fts_stubs.c
