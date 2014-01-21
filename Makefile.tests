@@ -86,12 +86,12 @@ test-builtins: PROJECT=test-builtins
 test-builtins: $$(NATIVE_TARGET)
 
 test-builtins-generated: \
-  tests/test-builtins/generated_stub_if.ml \
+  tests/test-builtins/generated_bindings.ml \
   tests/test-builtins/generated_stubs.c
 
 tests/test-builtins/generated_stubs.c: $(BUILDDIR)/test-builtins-stub-generator.native
 	$< --c-file $@
-tests/test-builtins/generated_stub_if.ml: $(BUILDDIR)/test-builtins-stub-generator.native
+tests/test-builtins/generated_bindings.ml: $(BUILDDIR)/test-builtins-stub-generator.native
 	$< --ml-file $@
 
 

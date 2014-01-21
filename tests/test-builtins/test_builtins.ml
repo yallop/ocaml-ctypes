@@ -14,7 +14,7 @@ open Ctypes
 *)
 let test_calling_builtins () =
   let open Unsigned.UInt8 in
-  let open Generated_stub_if in
+  let open Generated_bindings in
   let u1 = of_int 0x77
   and u2 = of_int 0x8 in
   let expected = Infix.(u1 lor u2) in
