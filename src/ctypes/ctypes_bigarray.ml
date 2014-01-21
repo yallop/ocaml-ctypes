@@ -57,6 +57,14 @@ let elements : type a b. (b, a) dims -> int = function
   | Dims2 (d1, d2) -> d1 * d2
   | Dims3 (d1, d2, d3) -> d1 * d2 * d3
 
+let element_type (_, k) = prim_of_kind k
+
+let dimensions : type a b. (b, a) t -> int array = function
+| DimsGen dims, _ -> dims
+| Dims1 x, _ -> [| x |]
+| Dims2 (x, y), _ -> [| x; y |]
+| Dims3 (x, y, z), _ -> [| x; y; z |]
+
 let sizeof (d, k) = elements d * bigarray_kind_sizeof k
 
 let alignment (d, k) = bigarray_kind_alignment k
@@ -65,21 +73,6 @@ let bigarray ds k = (DimsGen ds, kind k)
 let bigarray1 d k = (Dims1 d, kind k)
 let bigarray2 d1 d2 k = (Dims2 (d1, d2), kind k)
 let bigarray3 d1 d2 d3 k = (Dims3 (d1, d2, d3), kind k)
-
-let format_kind fmt k = Format.pp_print_string fmt (string_of_kind k)
-
-let format_dims : type a b. _ -> (b, a) dims -> unit
-  = fun fmt t -> match t with
-  | DimsGen ds -> Array.iter (Format.fprintf fmt "[%d]") ds
-  | Dims1 d1 -> Format.fprintf fmt "[%d]" d1
-  | Dims2 (d1, d2) -> Format.fprintf fmt "[%d][%d]" d1 d2
-  | Dims3 (d1, d2, d3) -> Format.fprintf fmt "[%d][%d][%d]" d1 d2 d3
-
-let format fmt (t, ck) =
-  begin
-    format_kind fmt ck;
-    format_dims fmt t
-  end
 
 let prim_of_kind k = prim_of_kind (kind k)
 

@@ -41,8 +41,11 @@ val sizeof : (_, _) t -> int
 val alignment : (_, _) t -> int
 (** Compute the alignment of a bigarray type. *)
 
-val format : Format.formatter -> (_, _) t -> unit
-(** Pretty-print a bigarray type. *)
+val element_type : ('a, _) t -> 'a Primitives.prim
+(** Compute the element type of a bigarray type. *)
+
+val dimensions : (_, _) t -> int array
+(** Compute the dimensions of a bigarray type. *)
 
 (** {2 Values *)
 

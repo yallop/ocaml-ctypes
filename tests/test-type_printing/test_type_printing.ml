@@ -388,43 +388,43 @@ let test_array_printing () =
 *)
 let test_bigarray_printing () =
   begin
-    assert_typ_printed_as "<bigarray float32[10][100]>"
+    assert_typ_printed_as "float[10][100]"
       (bigarray genarray [|10; 100|] Bigarray.float32);
 
-    assert_typ_printed_as "<bigarray float64[20][30][40]>"
+    assert_typ_printed_as "double[20][30][40]"
       (bigarray genarray [|20; 30; 40|] Bigarray.float64);
 
-    assert_typ_printed_as "<bigarray int8_signed[1][3]>"
+    assert_typ_printed_as "int8_t[1][3]"
       (bigarray genarray [|1; 3|] Bigarray.int8_signed);
 
-    assert_typ_printed_as "<bigarray int8_unsigned[2]>"
+    assert_typ_printed_as "uint8_t[2]"
       (bigarray array1 2 Bigarray.int8_unsigned);
 
-    assert_typ_printed_as "<bigarray int16_signed[3]>"
+    assert_typ_printed_as "int16_t[3]"
       (bigarray array1 3 Bigarray.int16_signed);
 
-    assert_typ_printed_as "<bigarray int16_unsigned[4]>"
+    assert_typ_printed_as "uint16_t[4]"
       (bigarray array1 4 Bigarray.int16_unsigned);
 
-    assert_typ_printed_as "<bigarray int32[5][6]>"
+    assert_typ_printed_as "int32_t[5][6]"
       (bigarray array2 (5, 6) Bigarray.int32);
 
-    assert_typ_printed_as "<bigarray int64[7][8]>"
+    assert_typ_printed_as "int64_t[7][8]"
       (bigarray array2 (7, 8) Bigarray.int64);
 
-    assert_typ_printed_as "<bigarray int[9][10]>"
+    assert_typ_printed_as "camlint[9][10]"
       (bigarray array2 (9, 10) Bigarray.int);
 
-    assert_typ_printed_as "<bigarray nativeint[13][14][15]>"
+    assert_typ_printed_as "intnat[13][14][15]"
       (bigarray array3 (13, 14, 15) Bigarray.nativeint);
 
-    assert_typ_printed_as "<bigarray complex32[16][17][18]>"
+    assert_typ_printed_as "float _Complex[16][17][18]"
       (bigarray array3 (16, 17, 18) Bigarray.complex32);
 
-    assert_typ_printed_as "<bigarray complex64[19][20][21]>"
+    assert_typ_printed_as "double _Complex[19][20][21]"
       (bigarray array3 (19, 20, 21) Bigarray.complex64);
 
-    assert_typ_printed_as ~name:"b" "int (*b[10])(<bigarray int[5]> *)"
+    assert_typ_printed_as ~name:"b" "int (*b[10])(camlint(*)[5])"
       (array 10
          (Foreign.funptr (ptr (bigarray genarray [|5|] Bigarray.int) @->
                           returning int)));

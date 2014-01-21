@@ -17,7 +17,8 @@ let rec format : type a. a typ -> Format.formatter -> a -> unit
   | Struct _ -> format_structured fmt v
   | Union _ -> format_structured fmt v
   | Array (a, n) -> format_array fmt v
-  | Bigarray ba -> Format.fprintf fmt "<bigarray %a>" Ctypes_bigarray.format ba
+  | Bigarray ba -> Format.fprintf fmt "<bigarray %a>"
+    (fun fmt -> Type_printing.format_typ fmt) typ
   | Abstract _ -> format_structured fmt v
     (* For now, just print the underlying value in a view *)
   | View {write; ty} -> format ty fmt (write v)
