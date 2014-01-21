@@ -77,6 +77,8 @@ struct
     | _, Union _ -> user_type fmt ty
     | _, Abstract _ -> user_type fmt ty
     | _, View _ -> user_type fmt ty
+    | _, Typedef (name, _) ->
+      format_path fmt (path_of_string name)
 
   let rec fn : type a. appl_parens -> Format.formatter -> a Static.fn -> unit =
     let open Format in
@@ -199,6 +201,7 @@ let rec ml_typ_of_return_typ : type a. a typ -> ml_type =
   | Abstract _  -> managed_buffer
   | Pointer _   -> voidp
   | View { ty } -> ml_typ_of_return_typ ty
+  | Typedef (_, ty) -> ml_typ_of_return_typ ty
   | Array _    as a -> internal_error
     "Unexpected array type in the return type: %s" (Ctypes.string_of_typ a)
   | Bigarray _ as a -> internal_error
@@ -212,6 +215,7 @@ let rec ml_typ_of_arg_typ : type a. a typ -> ml_type = function
   | Union _     -> voidp
   | Abstract _  -> voidp
   | View { ty } -> ml_typ_of_arg_typ ty
+  | Typedef (_, ty) -> ml_typ_of_arg_typ ty
   | Array _    as a -> internal_error
     "Unexpected array in an argument type: %s" (Ctypes.string_of_typ a)
   | Bigarray _ as a -> internal_error
@@ -243,6 +247,7 @@ let rec unwrap_val : type a. a typ -> ml_exp -> ml_exp option =
     | Some e -> Some e
     | None -> Some e
     end
+  | Typedef (_, ty) -> unwrap_val ty e
   | Abstract _ -> internal_error
     "Unexpected abstract type encountered during ML code generation: %s"
     (Ctypes.string_of_typ ty)
@@ -268,6 +273,7 @@ let rec wrap_val : type a. a typ -> ml_exp -> ml_exp option =
     | None ->
       Some (`Coerce (Ty u, Ty ty, x))
     end
+  | Typedef (_, ty) -> unwrap_val ty x
   | Abstract _ -> internal_error
     "Unexpected abstract type encountered during ML code generation: %s"
     (Ctypes.string_of_typ ty)

@@ -70,6 +70,8 @@ struct
   let cast_unnecessary : ty -> cexp -> bool =
     let rec harmless l r = match l, r with
     | Ty (Pointer Void), Ty (Pointer _) -> true
+    | Ty (Typedef (_, ty)), t -> harmless (Ty ty) t
+    | t, Ty (Typedef (_, ty)) -> harmless t (Ty ty)
     | Ty (View { ty }), t -> harmless (Ty ty) t
     | t, Ty (View { ty }) -> harmless t (Ty ty)
     | (Ty (Primitive _) as l), (Ty (Primitive _) as r) -> l = r
@@ -257,6 +259,7 @@ struct
                   `Deref (`Cast (Ty (ptr ty), `Local y))))
     | Abstract _ -> report_unpassable "values of abstract type"
     | View { ty } -> prj ty x
+    | Typedef (_, ty) -> prj ty x
     | Array _ -> report_unpassable "arrays"
     | Bigarray _ -> report_unpassable "bigarrays"
 
@@ -269,6 +272,7 @@ struct
     | Union u -> `App (copy_bytes, [`Addr x; `Int (sizeof ty)])
     | Abstract _ -> report_unpassable "values of abstract type"
     | View { ty } -> inj ty x
+    | Typedef (_, ty) -> inj ty x
     | Array _ -> report_unpassable "arrays"
     | Bigarray _ -> report_unpassable "bigarrays"
       

@@ -36,6 +36,7 @@ let rec build : type a. a typ -> offset:int -> Raw.voidp -> a
     | View { read; ty } ->
       let buildty = build ty in
       (fun ~offset buf -> read (buildty ~offset buf))
+    | Typedef (_, ty) -> build ty
     (* The following cases should never happen; non-struct aggregate
        types are excluded during type construction. *)
     | Union _ -> assert false
@@ -68,6 +69,7 @@ let rec write : type a. a typ -> offset:int -> a -> Raw.voidp -> unit
       (fun ~offset ba dst ->
         let src = Ctypes_bigarray.address b ba in
         Stubs.memcpy ~size ~dst ~dst_offset:offset ~src ~src_offset:0)
+    | Typedef (_, ty) -> write ty
     | View { write = w; ty } ->
       let writety = write ty in
       (fun ~offset v -> writety ~offset (w v))
@@ -84,6 +86,7 @@ let rec (!@) : type a. a ptr -> a
       | Union { uspec = None } -> raise IncompleteType
       | Struct { spec = Incomplete _ } -> raise IncompleteType
       | View { read; ty = reftype } -> read (!@ { ptr with reftype })
+      | Typedef (_, reftype) -> !@ { ptr with reftype }
       (* If it's a reference type then we take a reference *)
       | Union _ -> { structured = ptr }
       | Struct _ -> { structured = ptr }

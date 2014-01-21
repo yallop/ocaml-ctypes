@@ -20,6 +20,7 @@ let rec format : type a. a typ -> Format.formatter -> a -> unit
   | Bigarray ba -> Format.fprintf fmt "<bigarray %a>"
     (fun fmt -> Type_printing.format_typ fmt) typ
   | Abstract _ -> format_structured fmt v
+  | Typedef (_, ty) -> format ty fmt v
     (* For now, just print the underlying value in a view *)
   | View {write; ty} -> format ty fmt (write v)
 and format_structured : type a b. Format.formatter -> (a, b) structured -> unit

@@ -57,6 +57,8 @@ let rec coercion : type a b. a typ -> b typ -> (a, b) coercion =
     | Id -> Coercion bv.read
     | Coercion coerce -> Coercion (fun v -> bv.read (coerce v))
     end
+  | Typedef (_, a), b
+  | a, Typedef (_, b) -> coercion a b
   | Pointer a, Pointer b ->
     begin
       try

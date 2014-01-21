@@ -108,6 +108,7 @@ module ML_type= struct
    | Union _ as t -> union (user_type t)
    | Abstract _ as t -> abstract (user_type t)
    | View _ as t -> user_type t
+   | Typedef (name, _) -> `Ident (path_of_string name)
    | Bigarray ba -> Ctypes_bigarray.type_expression ba
 
   let rec fn : type a. a fn -> _ = function

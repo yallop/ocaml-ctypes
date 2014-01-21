@@ -34,6 +34,7 @@ type _ typ =
   | Union           : 'a union_type      -> 'a union typ
   | Abstract        : abstract_type      -> 'a abstract typ
   | View            : ('a, 'b) view      -> 'a typ
+  | Typedef         : string * 'a typ    -> 'a typ
   | Array           : 'a typ * int       -> 'a carray typ
   | Bigarray        : (_, 'a) Ctypes_bigarray.t
                                          -> 'a typ
@@ -120,6 +121,7 @@ let rec sizeof : type a. a typ -> int = function
   | Abstract { asize }             -> asize
   | Pointer _                      -> Ctypes_primitives.pointer_size
   | View { ty }                    -> sizeof ty
+  | Typedef (_, ty)                -> sizeof ty
 
 let rec alignment : type a. a typ -> int = function
     Void                             -> raise IncompleteType
@@ -134,6 +136,7 @@ let rec alignment : type a. a typ -> int = function
   | Abstract { aalignment }          -> aalignment
   | Pointer _                        -> Ctypes_primitives.pointer_alignment 
   | View { ty }                      -> alignment ty
+  | Typedef (_, ty)                  -> alignment ty
 
 let rec passable : type a. a typ -> bool = function
     Void                           -> true
@@ -147,6 +150,7 @@ let rec passable : type a. a typ -> bool = function
   | Pointer _                      -> true
   | Abstract _                     -> false
   | View { ty }                    -> passable ty
+  | Typedef (_, ty)                -> passable ty
 
 let void = Void
 let char = Primitive Primitives.Char
@@ -216,6 +220,8 @@ let union utag = Union { uid = fresh_id (); utag; uspec = None; ufields = [] }
 
 let view ?format_typ ~read ~write ty =
   View { id = fresh_id (); read; write; format_typ; ty }
+
+let typedef name ty = Typedef (name, ty)
 
 let offsetof { foffset } = foffset
 let field_type { ftype } = ftype

@@ -54,6 +54,7 @@ struct
     | Union _                             -> report_unpassable "unions"
     | Struct ({ spec = Complete _ } as s) -> struct_arg_type s
     | View { ty }                         -> arg_type ty
+    | Typedef (_, ty)                     -> arg_type ty
     | Array _                             -> report_unpassable "arrays"
     | Bigarray _                          -> report_unpassable "bigarrays"
     | Abstract _                          -> (report_unpassable

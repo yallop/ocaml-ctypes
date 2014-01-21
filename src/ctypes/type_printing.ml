@@ -33,6 +33,8 @@ let rec format_typ : type a. a typ ->
     | Primitive p ->
       let name = Ctypes_primitives.name p in
       fprintf fmt "%s%t" name (k `nonarray)
+    | Typedef (name, _) ->
+      fprintf fmt "%s%t" name (k `nonarray)
     | View { format_typ = Some format } ->
       format (k `nonarray) fmt
     | View { ty } ->
