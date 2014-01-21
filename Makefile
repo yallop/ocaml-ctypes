@@ -34,6 +34,7 @@ ctypes: PROJECT=ctypes
 ctypes: $(ctypes.dir)/$(ctypes.extra_mls) $$(LIB_TARGETS)
 
 # cstubs subproject
+cstubs.public = cstubs_internals
 cstubs.dir = src/cstubs
 cstubs.subproject_deps = ctypes
 cstubs.deps = str
