@@ -19,7 +19,7 @@ let testlib = Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW]
   since libffi doesn't support passing complex numbers.
 *)
 let test_complex_primitive_operations () =
-  let open Generated_stub_if in
+  let open Generated_bindings in
 
   let wrap typ f l r =
     let rv = allocate_n ~count:1 typ in

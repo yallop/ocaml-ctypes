@@ -94,7 +94,7 @@ let test_endian_detection () =
 let test_union_padding () =
   let module M = struct
     open Types
-    open Generated_stub_if
+    open Generated_bindings
 
     let mkPadded : int64 -> padded union =
       fun x ->

@@ -21,7 +21,7 @@ let testlib = Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW]
   parameter.  Examine the output buffer using a cast to a string view.
 *)
 let test_passing_string_array () =
-  let open Generated_stub_if in
+  let open Generated_bindings in
 
   let l = ["the "; "quick "; "brown "; "fox "; "etc. "; "etc. "; ] in
   let arr = CArray.of_list string l in
@@ -45,7 +45,7 @@ let test_passing_string_array () =
   using a custom view that treats chars as ints.
 *)
 let test_passing_chars_as_ints () =
-  let open Generated_stub_if in
+  let open Generated_bindings in
 
   assert_equal ~msg:"toupper('x') = 'X'"
     'X' (toupper 'x');
@@ -61,7 +61,7 @@ let test_passing_chars_as_ints () =
   Use views to create a nullable function pointer.
 *)
 let test_nullable_function_pointer_view () =
-  let open Generated_stub_if in
+  let open Generated_bindings in
   begin
     let fromSome = function None -> assert false | Some x -> x in
 

@@ -27,7 +27,7 @@ open Foreign
      int isisxdigit(int)
 *)
 let test_isX_functions () =
-  let open Generated_stub_if in
+  let open Generated_bindings in
   begin
     assert_bool "" (isalnum 'a');
     assert_bool "" (not (isalnum ' '));
@@ -71,7 +71,7 @@ let test_isX_functions () =
     int strcmp(const char *str1, const char *str2);
 *)
 let test_string_functions () =
-  let open Generated_stub_if in
+  let open Generated_bindings in
   assert_equal "efg" (strchr "abcdefg" (Char.code 'e'))
     ~printer:(fun x -> x);
 
@@ -144,7 +144,7 @@ let test_div () =
                 int(*compar)(const void *, const void *));
 *)
 let test_qsort () =
-  let open Generated_stub_if in
+  let open Generated_bindings in
 
   let sortby (type a) (typ : a typ) (f : a -> a -> int) (l : a list) =
     let open CArray in
@@ -180,7 +180,7 @@ let test_qsort () =
 *)
 let test_bsearch () =
   let module M = struct
-    open Generated_stub_if
+    open Generated_bindings
 
     (*
       struct mi {

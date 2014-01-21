@@ -327,7 +327,7 @@ let test_ctypes_array_of_bigarray () =
   Test passing bigarrays to c functions.
 *)
 let test_passing_bigarrays () =
-  let open Generated_stub_if in
+  let open Generated_bindings in
   let mul l r =
     let m = BA.Array2.dim1 l and n = BA.Array2.dim2 l in
     let o = BA.Array2.dim1 r and p = BA.Array2.dim2 r in
@@ -360,7 +360,7 @@ let test_passing_bigarrays () =
   Test returning bigarrays from c functions.
 *)
 let test_returning_bigarrays () =
-  let open Generated_stub_if in
+  let open Generated_bindings in
   let transpose m =
     (* For the purposes of the test we'll just leak the allocated memory. *)
     let rows = BA.Array2.dim1 m and cols = BA.Array2.dim2 m in

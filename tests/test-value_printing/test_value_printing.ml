@@ -26,7 +26,7 @@ let test_atomic_printing () =
   let open Unsigned in
 
   (* char *)
-  let open Generated_stub_if in
+  let open Generated_bindings in
   let _CHAR_MIN = retrieve_CHAR_MIN () in
   let _CHAR_MAX = retrieve_CHAR_MAX () in
 

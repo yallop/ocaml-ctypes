@@ -5,4 +5,4 @@ src/ctypes_config.h
 src/ctypes_config.ml
 *~
 generated_stubs.c
-generated_stub_if.ml
+generated_bindings.ml

@@ -19,7 +19,7 @@ let testlib = Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW]
 let test_oo_hierarchy () =
   let module M = struct
     open Types
-    open Generated_stub_if
+    open Generated_bindings
 
     let camel_vtable_singleton = make camel_methods
     let () = begin

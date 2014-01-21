@@ -18,7 +18,7 @@ let testlib = Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW]
   invoke it later.
 *)
 let test_storing_function_reference () =
-  let open Generated_stub_if in
+  let open Generated_bindings in
 
   (* This shouldn't be collected in the code that follows. *)
   let double x = x * 2 in
@@ -39,7 +39,7 @@ let test_storing_function_reference () =
   have been garbage collected.
 *)
 let test_calling_collected_closure_raises_exception () =
-  let open Generated_stub_if in
+  let open Generated_bindings in
 
   let closure x y = x * y in
 
@@ -60,7 +60,7 @@ let test_calling_collected_closure_raises_exception () =
   passed to C.
 *)
 let test_controlling_closure_lifetime () =
-  let open Generated_stub_if in
+  let open Generated_bindings in
 
   (* The return_callback function simply returns its argument.  However, since
      that involves converting an OCaml function ("arg") to a C function

@@ -17,7 +17,7 @@ let testlib = Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW]
   Test passing various types of pointers to a function.
 *)
 let test_passing_pointers () =
-  let open Generated_stub_if in
+  let open Generated_bindings in
   assert_equal ~msg:"Passing pointers to various numeric types"
     ~printer:string_of_int
     (1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 +
@@ -51,7 +51,7 @@ let test_passing_pointers () =
   Test passing pointers to pointers.
 *)
 let test_passing_pointers_to_pointers () =
-  let open Generated_stub_if in
+  let open Generated_bindings in
 
   let p = allocate int 1
   and pp = allocate (ptr int) (allocate int 2)
@@ -68,7 +68,7 @@ let test_passing_pointers_to_pointers () =
   Passing a callback that accepts pointers as arguments.
 *)
 let test_callback_receiving_pointers () =
-  let open Generated_stub_if in
+  let open Generated_bindings in
   assert_equal 7
     (passing_pointers_to_callback (fun lp rp -> !@lp + !@rp))
 
@@ -77,7 +77,7 @@ let test_callback_receiving_pointers () =
   Passing a callback that returns a pointer.
 *)
 let test_callback_returning_pointers () =
-  let open Generated_stub_if in
+  let open Generated_bindings in
   let p = allocate int 17 in
   begin
     assert_equal 17 !@p;
@@ -197,7 +197,7 @@ let test_pointer_assignment_with_primitives () =
   Test passing a pointer-to-a-function-pointer as an argument.
 *)
 let test_passing_pointer_to_function_pointer () =
-  let open Generated_stub_if in
+  let open Generated_bindings in
   assert_equal ~printer:string_of_int
     5 (accepting_pointer_to_function_pointer 
          (allocate Types.arg_type ( / )))
@@ -208,7 +208,7 @@ let test_passing_pointer_to_function_pointer () =
   Test returning a pointer to a function pointer
 *)
 let test_callback_returning_pointer_to_function_pointer () =
-  let open Generated_stub_if in
+  let open Generated_bindings in
   assert_equal
     10 (!@(returning_pointer_to_function_pointer ()) 2 5)
 
@@ -290,7 +290,7 @@ let test_reading_and_writing_global_value () =
 *)
 let test_allocation () =
   let open Unsigned in
-  let open Generated_stub_if in
+  let open Generated_bindings in
   
   let pointer = malloc (Size_t.of_int (sizeof int)) in
     let int_pointer = from_voidp int pointer in
@@ -321,7 +321,7 @@ let test_allocation () =
   Test a function that returns the address of a global variable.
 *)
 let test_reading_returned_global () =
-  let open Generated_stub_if in
+  let open Generated_bindings in
   assert_equal (!@(return_global_address ())) 100
 
 
@@ -329,7 +329,7 @@ let test_reading_returned_global () =
   Test a function that returns a pointer passed as argument.
 *)
 let test_passing_pointer_through () =
-  let open Generated_stub_if in
+  let open Generated_bindings in
   let p1 = allocate int 25 in
   let p2 = allocate int 32 in
   let rv = pass_pointer_through p1 p2 10 in

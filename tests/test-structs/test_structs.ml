@@ -28,7 +28,7 @@ let testlib = Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW]
 let test_passing_struct () =
   let module M = struct
     open Types
-    open Generated_stub_if
+    open Generated_bindings
 
     let s = make simple
 
@@ -62,7 +62,7 @@ let test_passing_struct () =
 let test_returning_struct () =
   let module M = struct
     open Types
-    open Generated_stub_if
+    open Generated_bindings
 
     let s = return_struct ()
 

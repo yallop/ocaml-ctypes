@@ -154,7 +154,7 @@ let test_passing_pointer_to_array_of_structs () =
     v
   in
 
-  let open Generated_stub_if in
+  let open Generated_bindings in
 
   let sum = 
     accepts_pointer_to_array_of_structs

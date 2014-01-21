@@ -54,12 +54,12 @@ test-pointers: PROJECT=test-pointers
 test-pointers: $$(NATIVE_TARGET)
 
 test-pointers-generated: \
-  tests/test-pointers/generated_stub_if.ml \
+  tests/test-pointers/generated_bindings.ml \
   tests/test-pointers/generated_stubs.c
 
 tests/test-pointers/generated_stubs.c: $(BUILDDIR)/test-pointers-stub-generator.native
 	$< --c-file $@
-tests/test-pointers/generated_stub_if.ml: $(BUILDDIR)/test-pointers-stub-generator.native
+tests/test-pointers/generated_bindings.ml: $(BUILDDIR)/test-pointers-stub-generator.native
 	$< --ml-file $@
 
 
@@ -87,12 +87,12 @@ test-higher_order: PROJECT=test-higher_order
 test-higher_order: $$(NATIVE_TARGET)
 
 test-higher_order-generated: \
-  tests/test-higher_order/generated_stub_if.ml \
+  tests/test-higher_order/generated_bindings.ml \
   tests/test-higher_order/generated_stubs.c
 
 tests/test-higher_order/generated_stubs.c: $(BUILDDIR)/test-higher_order-stub-generator.native
 	$< --c-file $@
-tests/test-higher_order/generated_stub_if.ml: $(BUILDDIR)/test-higher_order-stub-generator.native
+tests/test-higher_order/generated_bindings.ml: $(BUILDDIR)/test-higher_order-stub-generator.native
 	$< --ml-file $@
 
 # test-higher_order.dir = tests/test-higher_order
@@ -126,12 +126,12 @@ test-structs: PROJECT=test-structs
 test-structs: $$(NATIVE_TARGET)
 
 test-structs-generated: \
-  tests/test-structs/generated_stub_if.ml \
+  tests/test-structs/generated_bindings.ml \
   tests/test-structs/generated_stubs.c
 
 tests/test-structs/generated_stubs.c: $(BUILDDIR)/test-structs-stub-generator.native
 	$< --c-file $@
-tests/test-structs/generated_stub_if.ml: $(BUILDDIR)/test-structs-stub-generator.native
+tests/test-structs/generated_bindings.ml: $(BUILDDIR)/test-structs-stub-generator.native
 	$< --ml-file $@
 
 # test-structs.dir = tests/test-structs
@@ -172,12 +172,12 @@ test-cstdlib: PROJECT=test-cstdlib
 test-cstdlib: $$(NATIVE_TARGET)
 
 test-cstdlib-generated: \
-  tests/test-cstdlib/generated_stub_if.ml \
+  tests/test-cstdlib/generated_bindings.ml \
   tests/test-cstdlib/generated_stubs.c
 
 tests/test-cstdlib/generated_stubs.c: $(BUILDDIR)/test-cstdlib-stub-generator.native
 	$< --c-file $@
-tests/test-cstdlib/generated_stub_if.ml: $(BUILDDIR)/test-cstdlib-stub-generator.native
+tests/test-cstdlib/generated_bindings.ml: $(BUILDDIR)/test-cstdlib-stub-generator.native
 	$< --ml-file $@
 
 test-sizeof.dir = tests/test-sizeof
@@ -211,12 +211,12 @@ test-unions: PROJECT=test-unions
 test-unions: $$(NATIVE_TARGET)
 
 test-unions-generated: \
-  tests/test-unions/generated_stub_if.ml \
+  tests/test-unions/generated_bindings.ml \
   tests/test-unions/generated_stubs.c
 
 tests/test-unions/generated_stubs.c: $(BUILDDIR)/test-unions-stub-generator.native
 	$< --c-file $@
-tests/test-unions/generated_stub_if.ml: $(BUILDDIR)/test-unions-stub-generator.native
+tests/test-unions/generated_bindings.ml: $(BUILDDIR)/test-unions-stub-generator.native
 	$< --ml-file $@
 
 # test-unions.dir = tests/test-unions
@@ -257,12 +257,12 @@ test-arrays: PROJECT=test-arrays
 test-arrays: $$(NATIVE_TARGET)
 
 test-arrays-generated: \
-  tests/test-arrays/generated_stub_if.ml \
+  tests/test-arrays/generated_bindings.ml \
   tests/test-arrays/generated_stubs.c
 
 tests/test-arrays/generated_stubs.c: $(BUILDDIR)/test-arrays-stub-generator.native
 	$< --c-file $@
-tests/test-arrays/generated_stub_if.ml: $(BUILDDIR)/test-arrays-stub-generator.native
+tests/test-arrays/generated_bindings.ml: $(BUILDDIR)/test-arrays-stub-generator.native
 	$< --ml-file $@
 
 # test-arrays.dir = tests/test-arrays
@@ -317,12 +317,12 @@ test-views: PROJECT=test-views
 test-views: $$(NATIVE_TARGET)
 
 test-views-generated: \
-  tests/test-views/generated_stub_if.ml \
+  tests/test-views/generated_bindings.ml \
   tests/test-views/generated_stubs.c
 
 tests/test-views/generated_stubs.c: $(BUILDDIR)/test-views-stub-generator.native
 	$< --c-file $@
-tests/test-views/generated_stub_if.ml: $(BUILDDIR)/test-views-stub-generator.native
+tests/test-views/generated_bindings.ml: $(BUILDDIR)/test-views-stub-generator.native
 	$< --ml-file $@
 
 # test-views.dir = tests/test-views
@@ -356,12 +356,12 @@ test-oo_style: PROJECT=test-oo_style
 test-oo_style: $$(NATIVE_TARGET)
 
 test-oo_style-generated: \
-  tests/test-oo_style/generated_stub_if.ml \
+  tests/test-oo_style/generated_bindings.ml \
   tests/test-oo_style/generated_stubs.c
 
 tests/test-oo_style/generated_stubs.c: $(BUILDDIR)/test-oo_style-stub-generator.native
 	$< --c-file $@
-tests/test-oo_style/generated_stub_if.ml: $(BUILDDIR)/test-oo_style-stub-generator.native
+tests/test-oo_style/generated_bindings.ml: $(BUILDDIR)/test-oo_style-stub-generator.native
 	$< --ml-file $@
 
 # test-oo_style.dir = tests/test-oo_style
@@ -402,12 +402,12 @@ test-value_printing: PROJECT=test-value_printing
 test-value_printing: $$(NATIVE_TARGET)
 
 test-value_printing-generated: \
-  tests/test-value_printing/generated_stub_if.ml \
+  tests/test-value_printing/generated_bindings.ml \
   tests/test-value_printing/generated_stubs.c
 
 tests/test-value_printing/generated_stubs.c: $(BUILDDIR)/test-value_printing-stub-generator.native
 	$< --c-file $@
-tests/test-value_printing/generated_stub_if.ml: $(BUILDDIR)/test-value_printing-stub-generator.native
+tests/test-value_printing/generated_bindings.ml: $(BUILDDIR)/test-value_printing-stub-generator.native
 	$< --ml-file $@
 
 # test-value_printing.dir = tests/test-value_printing
@@ -441,12 +441,12 @@ test-complex: PROJECT=test-complex
 test-complex: $$(NATIVE_TARGET)
 
 test-complex-generated: \
-  tests/test-complex/generated_stub_if.ml \
+  tests/test-complex/generated_bindings.ml \
   tests/test-complex/generated_stubs.c
 
 tests/test-complex/generated_stubs.c: $(BUILDDIR)/test-complex-stub-generator.native
 	$< --c-file $@
-tests/test-complex/generated_stub_if.ml: $(BUILDDIR)/test-complex-stub-generator.native
+tests/test-complex/generated_bindings.ml: $(BUILDDIR)/test-complex-stub-generator.native
 	$< --ml-file $@
 
 # test-complex.dir = tests/test-complex
@@ -480,12 +480,12 @@ test-callback_lifetime: PROJECT=test-callback_lifetime
 test-callback_lifetime: $$(NATIVE_TARGET)
 
 test-callback_lifetime-generated: \
-  tests/test-callback_lifetime/generated_stub_if.ml \
+  tests/test-callback_lifetime/generated_bindings.ml \
   tests/test-callback_lifetime/generated_stubs.c
 
 tests/test-callback_lifetime/generated_stubs.c: $(BUILDDIR)/test-callback_lifetime-stub-generator.native
 	$< --c-file $@
-tests/test-callback_lifetime/generated_stub_if.ml: $(BUILDDIR)/test-callback_lifetime-stub-generator.native
+tests/test-callback_lifetime/generated_bindings.ml: $(BUILDDIR)/test-callback_lifetime-stub-generator.native
 	$< --ml-file $@
 
 # test-callback_lifetime.dir = tests/test-callback_lifetime
@@ -526,12 +526,12 @@ test-bigarrays: PROJECT=test-bigarrays
 test-bigarrays: $$(NATIVE_TARGET)
 
 test-bigarrays-generated: \
-  tests/test-bigarrays/generated_stub_if.ml \
+  tests/test-bigarrays/generated_bindings.ml \
   tests/test-bigarrays/generated_stubs.c
 
 tests/test-bigarrays/generated_stubs.c: $(BUILDDIR)/test-bigarrays-stub-generator.native
 	$< --c-file $@
-tests/test-bigarrays/generated_stub_if.ml: $(BUILDDIR)/test-bigarrays-stub-generator.native
+tests/test-bigarrays/generated_bindings.ml: $(BUILDDIR)/test-bigarrays-stub-generator.native
 	$< --ml-file $@
 
 # test-bigarrays.dir = tests/test-bigarrays
@@ -565,12 +565,12 @@ test-coercions: PROJECT=test-coercions
 test-coercions: $$(NATIVE_TARGET)
 
 test-coercions-generated: \
-  tests/test-coercions/generated_stub_if.ml \
+  tests/test-coercions/generated_bindings.ml \
   tests/test-coercions/generated_stubs.c
 
 tests/test-coercions/generated_stubs.c: $(BUILDDIR)/test-coercions-stub-generator.native
 	$< --c-file $@
-tests/test-coercions/generated_stub_if.ml: $(BUILDDIR)/test-coercions-stub-generator.native
+tests/test-coercions/generated_bindings.ml: $(BUILDDIR)/test-coercions-stub-generator.native
 	$< --ml-file $@
 # test-coercions.dir = tests/test-coercions
 # test-coercions.threads = yes
