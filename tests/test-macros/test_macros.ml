@@ -13,7 +13,7 @@ open Ctypes
   Test calling type-generic macros.
 *)
 let test_tg_macros () =
-  let open Generated_stub_if in
+  let open Generated_bindings in
   assert_bool "calling double version of type-generic exp"
     (exp_double 1.0 = exp 1.0);
   assert_bool "calling float version of type-generic exp"

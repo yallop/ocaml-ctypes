@@ -118,12 +118,12 @@ test-macros: PROJECT=test-macros
 test-macros: $$(NATIVE_TARGET)
 
 test-macros-generated: \
-  tests/test-macros/generated_stub_if.ml \
+  tests/test-macros/generated_bindings.ml \
   tests/test-macros/generated_stubs.c
 
 tests/test-macros/generated_stubs.c: $(BUILDDIR)/test-macros-stub-generator.native
 	$< --c-file $@
-tests/test-macros/generated_stub_if.ml: $(BUILDDIR)/test-macros-stub-generator.native
+tests/test-macros/generated_bindings.ml: $(BUILDDIR)/test-macros-stub-generator.native
 	$< --ml-file $@
 
 
