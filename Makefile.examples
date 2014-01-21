@@ -1,6 +1,36 @@
 # -*- Makefile -*-
 
-# fts subproject
+# subproject: fts with stub generation
+fts-stubs.install = no
+fts-stubs.dir = examples/fts/stub-generation/bindings
+fts-stubs.subproject_deps = ctypes cstubs \
+  ctypes-foreign-base ctypes-foreign-unthreaded
+fts-stubs: PROJECT=fts-stubs
+fts-stubs: $$(LIB_TARGETS)
+
+fts-stub-generator.install = no
+fts-stub-generator.dir = examples/fts/stub-generation/stub-generator
+fts-stub-generator.subproject_deps = ctypes cstubs \
+  ctypes-foreign-base ctypes-foreign-unthreaded fts-stubs
+fts-stub-generator.deps = str bigarray
+fts-stub-generator: PROJECT=fts-stub-generator
+fts-stub-generator: $$(NATIVE_TARGET)
+
+fts-cmd.install = no
+fts-cmd.dir = examples/fts/stub-generation
+fts-cmd.subproject_deps = ctypes cstubs \
+  ctypes-foreign-base ctypes-foreign-unthreaded fts-stubs
+fts-cmd.deps = str bigarray
+fts-cmd.extra_mls = fts_generated.ml
+fts-cmd: CFLAGS+=-D_FILE_OFFSET_BITS=32
+fts-cmd: PROJECT=fts-cmd
+fts-cmd: $$(NATIVE_TARGET)
+
+fts-cmd-build: examples/fts/stub-generation/fts_generated.ml
+examples/fts/stub-generation/fts_generated.ml:
+	_build/fts-stub-generator.native
+
+# subproject: fts using dynamic linking (foreign)
 fts.install = no
 fts.dir = examples/fts/foreign
 fts.deps = bigarray str
@@ -72,4 +102,4 @@ ncurses.link_flags = -Wl,-no-as-needed -lncurses
 ncurses: PROJECT=ncurses
 ncurses: $$(NATIVE_TARGET)
 
-examples: build ncurses ncurses-stubs ncurses-cmd-build ncurses-cmd fts date date-stubs date-stub-generator date-cmd-build date-cmd
+examples: build ncurses ncurses-stubs ncurses-cmd-build ncurses-cmd fts fts-stubs fts-stub-generator fts-cmd-build fts-cmd date date-stubs date-stub-generator date-cmd-build date-cmd
