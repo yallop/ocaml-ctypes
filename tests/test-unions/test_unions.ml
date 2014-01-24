@@ -10,9 +10,6 @@ open Ctypes
 open Unsigned
 
 
-let testlib = Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW])
-
-
 (* 
    Check that using a union to inspect the representation of a float (double)
    value gives the same result as Int64.of_bits.
@@ -88,46 +85,51 @@ let test_endian_detection () =
 
 
 
-(* Check that unions are tail-padded sufficiently to satisfy the alignment
-   requirements of all their members.
-*)
-let test_union_padding () =
-  let module M = struct
-    type padded
-    let padded : padded union typ = union "padded"
-    let (-:) ty label = field padded label ty
-    let i = int64_t                         -: "i"
-    let a = array (sizeof int64_t + 1) char -: "a"
-    let () = seal padded
+external sum_union_components : Ctypes_raw.voidp -> Unsigned.size_t -> int64 
+  = "ctypes_test_stubsum_union_components" 
+let sum_union_components : Types.padded Ctypes.union Ctypes.ptr ->
+                           Unsigned.size_t -> int64 
+  = fun x1 x2 -> sum_union_components x1.Cstubs_internals.raw_ptr x2
 
-    let sum_union_components = Foreign.foreign "sum_union_components"
-      (ptr padded @-> size_t @-> returning int64_t)
-      ~from:testlib
+module type FOREIGN_SIGNATURES =
+sig
+  val sum_union_components :
+    Types.padded union ptr -> Unsigned.size_t -> int64 
+end
 
-    let mkPadded : int64 -> padded union =
-      fun x ->
-        let u = make padded in
-        setf u i x;
-        u
+module Common_tests(S : FOREIGN_SIGNATURES) =
+struct
+  open S
+  (* Check that unions are tail-padded sufficiently to satisfy the alignment
+     requirements of all their members.
+  *)
+  let test_union_padding () =
+    let module M = struct
+      open Types
+      let mkPadded : int64 -> padded union =
+        fun x ->
+          let u = make padded in
+          setf u i x;
+          u
 
-    let arr = CArray.of_list padded [
-      mkPadded 1L;
-      mkPadded 2L;
-      mkPadded 3L;
-      mkPadded 4L;
-      mkPadded 5L;
-    ]
-      
-    let sum = sum_union_components
-      (CArray.start arr)
-      (Unsigned.Size_t.of_int (CArray.length arr))
+      let arr = CArray.of_list padded [
+        mkPadded 1L;
+        mkPadded 2L;
+        mkPadded 3L;
+        mkPadded 4L;
+        mkPadded 5L;
+      ]
 
-    let () = assert_equal
-      ~msg:"padded union members accessed correctly"
-      15L sum
-      ~printer:Int64.to_string
-  end in ()
+      let sum = sum_union_components
+        (CArray.start arr)
+        (Unsigned.Size_t.of_int (CArray.length arr))
 
+      let () = assert_equal
+        ~msg:"padded union members accessed correctly"
+        15L sum
+        ~printer:Int64.to_string
+    end in ()
+end
 
 (* Check that the address of a union is equal to the addresses of each
    of its members.
@@ -180,24 +182,32 @@ let test_sealing_empty_union () =
     (fun () -> seal empty)
 
 
+module Foreign_tests =
+  Common_tests(Functions.Stubs(Tests_common.Foreign_binder))
+module Stub_tests = Common_tests(Generated_bindings)
+
+
 let suite = "Union tests" >:::
   ["inspecting float representation"
-   >:: test_inspecting_float;
+    >:: test_inspecting_float;
 
    "detecting endianness"
-   >:: test_endian_detection;
+    >:: test_endian_detection;
 
-   "union padding"
-   >:: test_union_padding;
+   "union padding (foreign)"
+    >:: Foreign_tests.test_union_padding;
+
+   "union padding (stubs)"
+    >:: Stub_tests.test_union_padding;
 
    "union address"
-   >:: test_union_address;
+    >:: test_union_address;
 
    "updating sealed union"
-   >:: test_updating_sealed_union;
+    >:: test_updating_sealed_union;
 
    "sealing empty union"
-   >:: test_sealing_empty_union;
+    >:: test_sealing_empty_union;
   ]
 
 

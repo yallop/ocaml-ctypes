@@ -9,93 +9,89 @@ open OUnit
 open Ctypes
 
 
-let testlib = Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW])
+module type FOREIGN_SIGNATURES =
+sig
+  val concat_strings : string ptr -> int -> char ptr -> unit 
+  val toupper : char -> char 
+  val returning_funptr : int -> Types.nullable_intptr 
+  val accepting_possibly_null_funptr :
+    Types.nullable_intptr -> int ->  int -> int 
+end
+
+module Common_tests(S : FOREIGN_SIGNATURES) =
+struct
+  open S
+
+  (*
+    Call a function of type
+
+       void (char **sv, int sc, char *buffer)
+
+    using strings for input parameters and a char array for an output
+    parameter.  Examine the output buffer using a cast to a string view.
+  *)
+  let test_passing_string_array () =
+    let l = ["the "; "quick "; "brown "; "fox "; "etc. "; "etc. "; ] in
+    let arr = CArray.of_list string l in
+
+    let outlen = List.fold_left (fun a s -> String.length s + a) 1 l in
+    let buf = CArray.make char outlen in
+
+    let () = CArray.(concat_strings (start arr) (length arr) (start buf)) in
+    let buf_addr = allocate (ptr char) (CArray.start buf) in
+    let s = from_voidp string (to_voidp buf_addr) in
+
+    assert_equal ~msg:"Check output"
+      "the quick brown fox etc. etc. " !@s
 
 
-(*
-  Call a function of type
+  (*
+    Call a function of type
 
-     void (char **sv, int sc, char *buffer)
+       int (int)
 
-  using strings for input parameters and a char array for an output
-  parameter.  Examine the output buffer using a cast to a string view.
-*)
-let test_passing_string_array () =
-  let concat = Foreign.foreign "concat_strings" ~from:testlib
-    (ptr string @-> int @-> ptr char @-> returning void) in
+    using a custom view that treats chars as ints.
+  *)
+  let test_passing_chars_as_ints () =
+    assert_equal ~msg:"toupper('x') = 'X'"
+      'X' (toupper 'x');
 
-  let l = ["the "; "quick "; "brown "; "fox "; "etc. "; "etc. "; ] in
-  let arr = CArray.of_list string l in
+    assert_equal ~msg:"toupper('3') = '3'"
+      '3' (toupper '3');
 
-  let outlen = List.fold_left (fun a s -> String.length s + a) 1 l in
-  let buf = CArray.make char outlen in
-
-  let () = CArray.(concat (start arr) (length arr) (start buf)) in
-  let buf_addr = allocate (ptr char) (CArray.start buf) in
-  let s = from_voidp string (to_voidp buf_addr) in
-
-  assert_equal ~msg:"Check output"
-    "the quick brown fox etc. etc. " !@s
+    assert_equal ~msg:"toupper('X') = 'X'"
+      'X' (toupper 'X')
 
 
-(*
-  Call a function of type
+  (*
+    Use views to create a nullable function pointer.
+  *)
+  let test_nullable_function_pointer_view () =
+    begin
+      let fromSome = function None -> assert false | Some x -> x in
 
-     int (int)
+      let add = fromSome (returning_funptr 0)
+      and times = fromSome (returning_funptr 1) in
 
-  using a custom view that treats chars as ints.
-*)
-let test_passing_chars_as_ints () =
-  let charish = view ~read:Char.chr ~write:Char.code int in
-  let toupper = Foreign.foreign "toupper" (charish @-> returning charish) in
+      assert_equal ~msg:"reading non-null function pointer return value"
+        9 (add 5 4);
 
-  assert_equal ~msg:"toupper('x') = 'X'"
-    'X' (toupper 'x');
+      assert_equal ~msg:"reading non-null function pointer return value"
+        20 (times 5 4);
 
-  assert_equal ~msg:"toupper('3') = '3'"
-    '3' (toupper '3');
+      assert_equal ~msg:"reading null function pointer return value"
+        None (returning_funptr 2);
 
-  assert_equal ~msg:"toupper('X') = 'X'"
-    'X' (toupper 'X')
+      assert_equal ~msg:"passing null function pointer"
+        (-1) (accepting_possibly_null_funptr None 2 3);
 
+      assert_equal ~msg:"passing non-null function pointer"
+        5 (accepting_possibly_null_funptr (Some Pervasives.(+)) 2 3);
 
-(*
-  Use views to create a nullable function pointer.
-*)
-let test_nullable_function_pointer_view () =
-  let nullable_intptr = Foreign.funptr_opt (int @-> int @-> returning int) in
-  let returning_funptr =
-    Foreign.foreign "returning_funptr" ~from:testlib
-      (int @-> returning nullable_intptr)
-  and accepting_possibly_null_funptr =
-    Foreign.foreign "accepting_possibly_null_funptr" ~from:testlib
-      (nullable_intptr @-> int @-> int @-> returning int)
-  in
-  begin
-    let fromSome = function None -> assert false | Some x -> x in
-
-    let add = fromSome (returning_funptr 0)
-    and times = fromSome (returning_funptr 1) in
-
-    assert_equal ~msg:"reading non-null function pointer return value"
-      9 (add 5 4);
-
-    assert_equal ~msg:"reading non-null function pointer return value"
-      20 (times 5 4);
-
-    assert_equal ~msg:"reading null function pointer return value"
-      None (returning_funptr 2);
-
-    assert_equal ~msg:"passing null function pointer"
-      (-1) (accepting_possibly_null_funptr None 2 3);
-
-    assert_equal ~msg:"passing non-null function pointer"
-      5 (accepting_possibly_null_funptr (Some Pervasives.(+)) 2 3);
-
-    assert_equal ~msg:"passing non-null function pointer obtained from C"
-      6 (accepting_possibly_null_funptr (returning_funptr 1) 2 3);
-  end
-
+      assert_equal ~msg:"passing non-null function pointer obtained from C"
+        6 (accepting_possibly_null_funptr (returning_funptr 1) 2 3);
+    end
+end
 
 (*
   Use the nullable pointer view to view nulls as Nones.
@@ -164,21 +160,35 @@ let test_polar_form_view () =
   end in ()
 
 
+module Foreign_tests =
+  Common_tests(Functions.Stubs(Tests_common.Foreign_binder))
+module Stub_tests = Common_tests(Generated_bindings)
+
+
 let suite = "View tests" >:::
-  ["passing array of strings"
-   >:: test_passing_string_array;
+  ["passing array of strings (foreign)"
+   >:: Foreign_tests.test_passing_string_array;
 
-   "custom views"
-   >:: test_passing_chars_as_ints;
+   "passing array of strings (stubs)"
+   >:: Stub_tests.test_passing_string_array;
 
-   "nullable function pointers"
-   >:: test_nullable_function_pointer_view;
+   "custom views (foreign)"
+   >:: Foreign_tests.test_passing_chars_as_ints;
+
+   "custom views (stubs)"
+   >:: Stub_tests.test_passing_chars_as_ints;
+
+   "nullable function pointers (foreign)"
+   >:: Foreign_tests.test_nullable_function_pointer_view;
+
+   "nullable function pointers (stubs)"
+   >:: Stub_tests.test_nullable_function_pointer_view;
 
    "nullable pointers"
-   >:: test_nullable_pointer_view;
+    >:: test_nullable_pointer_view;
 
    "polar form view"
-   >:: test_polar_form_view;
+    >:: test_polar_form_view;
   ]
 
 

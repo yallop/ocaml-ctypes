@@ -12,91 +12,81 @@ open Ctypes
 let testlib = Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW])
 
 
-(*
-  Call a function of type
-
-     void (struct simple)
-
-  where
-
-     struct simple {
-       int i;
-       double f;
-       struct simple *self;
-     };
-*)
-let test_passing_struct () =
-  let module M = struct
-    type simple
-    let simple : simple structure typ = structure "simple"
-    let (-:) ty label = field simple label ty
-    let c = int        -: "c"
-    let f = double     -: "f"
-    let p = ptr simple -: "p"
-    let () = seal simple
-      
-    let accept_struct = Foreign.foreign "accept_struct" ~from:testlib
-      (simple @-> returning int)
-
-    let s = make simple
-
-    let () = begin
-      setf s c 10;
-      setf s f 14.5;
-      setf s p (from_voidp simple null)
-    end
-      
-    let v = accept_struct s
-
-    let () = assert_equal 25 v
-      ~printer:string_of_int
-
-  end in ()
+module type FOREIGN_SIGNATURES =
+sig
+  val accept_struct : Types.simple structure -> int 
+  val return_struct : unit -> Types.simple structure 
+end
 
 
-(*
-  Call a function of type
+module Common_tests(S : FOREIGN_SIGNATURES) =
+struct
+  open S
 
-     struct simple(void)
+  (*
+    Call a function of type
 
-  where
+       void (struct simple)
 
-     struct simple {
-       int i;
-       double f;
-       struct simple *self;
-     };
-*)
-let test_returning_struct () =
-  let module M = struct
-    type simple
+    where
 
-    let simple : simple structure typ = structure "simple"
-    let (-:) ty label = field simple label ty
-    let c = int        -: "c"
-    let f = double     -: "f"
-    let p = ptr simple -: "p"
-    let () = seal simple
+       struct simple {
+         int i;
+         double f;
+         struct simple *self;
+       };
+  *)
+  let test_passing_struct () =
+    let module M = struct
+      open Types
+      let s = make simple
 
-    let return_struct = Foreign.foreign "return_struct" ~from:testlib
-      (void @-> returning simple)
+      let () = begin
+        setf s i 10;
+        setf s f 14.5;
+        setf s self (from_voidp simple null)
+      end
 
-    let s = return_struct ()
+      let v = accept_struct s
 
-    let () = assert_equal 20 (getf s c)
-    let () = assert_equal 35.0 (getf s f)
+      let () = assert_equal 25 v
+        ~printer:string_of_int
 
-    let t = getf s p
+    end in ()
 
-    let () = assert_equal 10 !@(t |-> c)
-      ~printer:string_of_int
-    let () = assert_equal 12.5 !@(t |-> f)
-      ~printer:string_of_float
 
-    let () = assert_equal (to_voidp !@(t |-> p)) (to_voidp t)
+  (*
+    Call a function of type
 
-  end in ()
+       struct simple(void)
 
+    where
+
+       struct simple {
+         int i;
+         double f;
+         struct simple *self;
+       };
+  *)
+  let test_returning_struct () =
+    let module M = struct
+      open Types
+      let s = return_struct ()
+
+      let () = assert_equal 20 (getf s i)
+      let () = assert_equal 35.0 (getf s f)
+
+      let t = getf s self
+
+      let () = assert_equal 10 !@(t |-> i)
+        ~printer:string_of_int
+      let () = assert_equal 12.5 !@(t |-> f)
+        ~printer:string_of_float
+
+      let () = assert_equal (to_voidp !@(t |-> self)) (to_voidp t)
+
+    end in ()
+end
 
 (*
   Check that attempts to use incomplete types for struct members are rejected.
@@ -360,12 +350,23 @@ let test_struct_ffi_type_lifetime () =
   end in ()
 
 
+module Foreign_tests =
+  Common_tests(Functions.Stubs(Tests_common.Foreign_binder))
+module Stub_tests = Common_tests(Generated_bindings)
+
+
 let suite = "Struct tests" >:::
-  ["passing struct"
-    >:: test_passing_struct;
-   
-   "returning struct"
-   >:: test_returning_struct;
+  ["passing struct (foreign)"
+   >:: Foreign_tests.test_passing_struct;
+
+   "passing struct (stubs)"
+   >:: Stub_tests.test_passing_struct;
+
+   "returning struct (foreign)"
+   >:: Foreign_tests.test_returning_struct;
+
+   "returning struct (stubs)"
+   >:: Stub_tests.test_returning_struct;
 
    "incomplete struct members rejected"
    >:: test_incomplete_struct_members;

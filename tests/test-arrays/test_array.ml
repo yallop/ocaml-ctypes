@@ -131,84 +131,76 @@ let test_pointer_to_array_arithmetic () =
   assert_equal 12 a.(3).(2);
   assert_equal 1 a.(0).(0)
 
+module type FOREIGN_SIGNATURES =
+sig
+  val accepts_pointer_to_array_of_structs :
+    Types.tagged structure carray ptr -> float 
+end
 
-(*
-  Test passing pointer to array of structs.
-*)
-let test_passing_pointer_to_array_of_structs () =
-  (* union u {
-        int i;
-        double d;
-     }
+
+module Common_tests(S : FOREIGN_SIGNATURES) =
+struct
+  open S
+
+  (*
+    Test passing pointer to array of structs.
   *)
-  let u = union "u" in
-  let (-:) ty label = field u label ty in
-  let i = int    -: "i" in
-  let d = double -: "d" in
-  let () = seal u in
+  let test_passing_pointer_to_array_of_structs () =
+    let open Types in
 
-  (* struct s {
-        char tag;
-        union u data;
-     }
-  *)
-  let s = structure "s" in
-  let (-:) ty label = field s label ty in
-  let tag  = char -: "tag" in
-  let data = u    -: "data" in
-  let () = seal s in
+    let box_int x =
+      let v = make s in
+      setf v tag 'i';
+      let pd = v @. data in
+      (pd |-> i) <-@ x;
+      v
+    in
 
-  let box_int x =
-    let v = make s in
-    setf v tag 'i';
-    let pd = v @. data in
-    (pd |-> i) <-@ x;
-    v
-  in
+    let box_double x =
+      let v = make s in
+      setf v tag 'd';
+      let pd = v @. data in
+      (pd |-> d) <-@ x;
+      v
+    in
 
-  let box_double x =
-    let v = make s in
-    setf v tag 'd';
-    let pd = v @. data in
-    (pd |-> d) <-@ x;
-    v
-  in
+    let sum = 
+      accepts_pointer_to_array_of_structs
+        (from_voidp
+           (array 5 s)
+           (to_voidp
+              (CArray.start
+                 (CArray.of_list s
+                    [box_int 10;
+                     box_double 3.5;
+                     box_int 12;
+                     box_double (-14.1);
+                     box_double (103.25)]))))
+    in
+    assert_equal
+      (103.25 +. (-14.1) +. 12.0 +. 3.5 +. 10.0)
+      sum
+end
 
-  let accepts_pointer_to_array_of_structs =
-    Foreign.foreign "accepts_pointer_to_array_of_structs"
-      (ptr (array 5 s) @-> returning double)
-      ~from:testlib in
-
-  let sum = 
-    accepts_pointer_to_array_of_structs
-      (from_voidp
-         (array 5 s)
-         (to_voidp
-            (CArray.start
-               (CArray.of_list s
-                  [box_int 10;
-                   box_double 3.5;
-                   box_int 12;
-                   box_double (-14.1);
-                   box_double (103.25)]))))
-  in
-  assert_equal
-    (103.25 +. (-14.1) +. 12.0 +. 3.5 +. 10.0)
-    sum
-
+module Foreign_tests =
+  Common_tests(Functions.Stubs(Tests_common.Foreign_binder))
+module Stub_tests = Common_tests(Generated_bindings)
 
 let suite = "Array tests" >:::
   ["multidimensional arrays"
     >:: test_multidimensional_arrays;
 
    "array initialization"
-   >:: test_array_initialiation;
+    >:: test_array_initialiation;
 
    "pointer to array arithmetic"
-   >:: test_pointer_to_array_arithmetic;
+    >:: test_pointer_to_array_arithmetic;
 
-   "passing pointer to array of structs"
-   >:: test_passing_pointer_to_array_of_structs;
+   "passing pointer to array of structs (foreign)"
+    >:: Foreign_tests.test_passing_pointer_to_array_of_structs;
+
+   "passing pointer to array of structs (stubs)"
+    >:: Stub_tests.test_passing_pointer_to_array_of_structs;
   ]
 
 

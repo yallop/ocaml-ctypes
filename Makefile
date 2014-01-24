@@ -6,7 +6,7 @@ OCAMLFIND=ocamlfind
 OCAMLMKLIB=ocamlmklib
 VPATH=src examples
 BUILDDIR=_build
-PROJECTS=configure configured ctypes ctypes-foreign-base ctypes-foreign-threaded ctypes-foreign-unthreaded ctypes-top
+PROJECTS=configure configured ctypes cstubs ctypes-foreign-base ctypes-foreign-threaded ctypes-foreign-unthreaded ctypes-top
 GENERATED=src/ctypes_config.h src/ctypes_config.ml setup.data src/ctypes/ctypes_primitives.ml
 CFLAGS=-fPIC -Wall -O3 $(OCAML_FFI_INCOPTS)
 OCAML_FFI_INCOPTS=$(libffi_opt)
@@ -26,12 +26,22 @@ distclean: clean
 ctypes.public = unsigned signed structs ctypes posixTypes
 ctypes.dir = src/ctypes
 ctypes.extra_mls = ctypes_primitives.ml
-ctypes.deps = bigarray
+ctypes.deps = str bigarray
 ctypes.install = yes
 ctypes.install_native_objects = yes
 
 ctypes: PROJECT=ctypes
 ctypes: $(ctypes.dir)/$(ctypes.extra_mls) $$(LIB_TARGETS)
+
+# cstubs subproject
+cstubs.public = cstubs_internals cstubs
+cstubs.dir = src/cstubs
+cstubs.subproject_deps = ctypes
+cstubs.deps = str
+cstubs.install = yes
+
+cstubs: PROJECT=cstubs
+cstubs: $(cstubs.dir)/$(cstubs.extra_mls) $$(LIB_TARGETS)
 
 # ctypes-foreign-base subproject
 ctypes-foreign-base.public = dl
@@ -104,7 +114,7 @@ setup.data: src/discover/discover.ml
 # dependencies
 depend: configure
 	$(OCAMLDEP) $(foreach project,$(PROJECTS),-I $($(project).dir)) \
-             src/*/*.mli src/*/*.ml examples/*/*.mli examples/*/*.ml \
+            $(shell find src examples -name '*.mli' -o -name '*.ml') \
            | sed "s!src/!_build/src/!g; s!examples/!_build/examples/!g" > .depend
 
 #installation

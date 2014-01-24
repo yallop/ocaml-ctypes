@@ -134,29 +134,36 @@ let test_view_coercions () =
   end in ()
 
 
-(* 
-   Check coercions between functions.
-*)
-let test_function_coercions () =
-  let memchr = Foreign.foreign "memchr"
-    (ptr void @-> int @-> size_t @-> returning (ptr void)) in
-  let isize_t = view size_t
-    ~read:Unsigned.Size_t.to_int ~write:Unsigned.Size_t.of_int in
-  let memchr' = coerce_fn
-    (ptr void @-> int @-> size_t @-> returning (ptr void))
-    (string @-> int8_t @-> isize_t @-> returning string_opt)
-    memchr in
-  begin
-    assert_equal
-      (memchr' "foobar" (Char.code 'b') 4)
-      (Some "bar")
-    ;
-    assert_equal
-      (memchr' "foobar" (Char.code 'b') 2)
-      None
-    ;
-  end
+module type FOREIGN_SIGNATURES =
+sig
+  val memchr : unit ptr -> int -> Unsigned.size_t -> unit ptr
+end
 
+module Common_tests(S : FOREIGN_SIGNATURES) =
+struct
+  open S
+
+  (* 
+     Check coercions between functions.
+  *)
+  let test_function_coercions () =
+    let isize_t = view size_t
+      ~read:Unsigned.Size_t.to_int ~write:Unsigned.Size_t.of_int in
+    let memchr' = coerce_fn
+      (ptr void @-> int @-> size_t @-> returning (ptr void))
+      (string @-> int8_t @-> isize_t @-> returning string_opt)
+      memchr in
+    begin
+      assert_equal
+        (memchr' "foobar" (Char.code 'b') 4)
+        (Some "bar")
+      ;
+      assert_equal
+        (memchr' "foobar" (Char.code 'b') 2)
+        None
+      ;
+    end
+end
 
 (* 
    Check that identity coercions are cost-free.
@@ -247,6 +254,11 @@ let test_unsupported_coercions () =
   end in ()
 
 
+module Foreign_tests =
+  Common_tests(Functions.Stubs(Tests_common.Foreign_binder))
+module Stub_tests = Common_tests(Generated_bindings)
+
+
 let suite = "Coercsion tests" >:::
   ["test pointer coercions"
     >:: test_pointer_coercions;
@@ -260,8 +272,11 @@ let suite = "Coercsion tests" >:::
    "test view coercions"
     >:: test_view_coercions;
 
-   "test function coercions"
-    >:: test_function_coercions;
+   "test function coercions (foreign)"
+    >:: Foreign_tests.test_function_coercions;
+
+   "test function coercions (stubs)"
+    >:: Stub_tests.test_function_coercions;
 
    "test identity coercions"
     >:: test_identity_coercions;

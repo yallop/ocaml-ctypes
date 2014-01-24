@@ -1,6 +1,6 @@
 version = "0.2.3"
 description = "Combinators for binding to C libraries without writing any C."
-requires = "unix bigarray"
+requires = "unix bigarray str"
 archive(byte) = "ctypes.cma"
 archive(byte, plugin) = "ctypes.cma"
 archive(native) = "ctypes.cmxa"
@@ -16,6 +16,17 @@ package "top" (
   archive(native) = "ctypes-top.cmxa"
   archive(native, plugin) = "ctypes-top.cmxs"
   exists_if = "ctypes-top.cma"
+)
+
+package "stubs" (
+  version = "0.2.3"
+  description = "Stub generation from C types"
+  requires = "ctypes"
+  archive(byte) = "cstubs.cma"
+  archive(byte, plugin) = "cstubs.cma"
+  archive(native) = "cstubs.cmxa"
+  archive(native, plugin) = "cstubs.cmxs"
+  exists_if = "cstubs.cma"
 )
 
 package "foreign-base" (
