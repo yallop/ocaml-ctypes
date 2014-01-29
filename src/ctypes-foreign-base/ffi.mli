@@ -20,15 +20,16 @@ end
 module Make(Closure_properties : CLOSURE_PROPERTIES) :
 sig
   open Static
+  open Libffi_abi
 
   (** Dynamic function calls based on libffi *)
 
-  val function_of_pointer : ?name:string -> check_errno:bool -> ('a -> 'b) fn ->
-    unit ptr -> ('a -> 'b)
+  val function_of_pointer : ?name:string -> abi:abi -> check_errno:bool ->
+    ('a -> 'b) fn -> unit ptr -> ('a -> 'b)
   (** Build an OCaml function from a type specification and a pointer to a C
       function. *)
 
-  val pointer_of_function : ('a -> 'b) fn -> ('a -> 'b) -> unit ptr
+  val pointer_of_function : abi:abi -> ('a -> 'b) fn -> ('a -> 'b) -> unit ptr
   (** Build an C function from a type specification and an OCaml function.
 
       The C function pointer returned is callable as long as the OCaml function
