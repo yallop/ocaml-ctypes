@@ -186,7 +186,7 @@ let attributes : type a b. (a -> b) fn -> attributes =
    fun fn -> { float = float fn; noalloc = not (may_allocate fn) }
 
 let managed_buffer = `Ident (path_of_string "Memory_stubs.managed_buffer")
-let voidp = `Ident (path_of_string "Ctypes_raw.voidp")
+let voidp = `Ident (path_of_string "Cstubs_internals.voidp")
 
 (* These functions determine the type that should appear in the extern
    signature *)
