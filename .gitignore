@@ -12,3 +12,4 @@ date_generated.ml
 date_stubs.c
 fts_generated.ml
 fts_stubs.c
+libffi_abi.ml

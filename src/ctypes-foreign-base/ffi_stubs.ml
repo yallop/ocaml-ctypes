@@ -49,7 +49,7 @@ external add_argument : callspec -> _ ffitype -> int
   = "ctypes_add_argument"
 
 (* Pass the return type and conclude the specification preparation *)
-external prep_callspec : callspec -> _ ffitype -> unit
+external prep_callspec : callspec -> int -> _ ffitype -> unit
   = "ctypes_prep_callspec"
 
 (* Call the function specified by `callspec' at the given address.

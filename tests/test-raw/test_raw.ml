@@ -23,7 +23,8 @@ let test_fabs () =
     let double_ffitype = primitive_ffitype Primitives.Double in
     let callspec = allocate_callspec () in
     let arg_1_offset = add_argument callspec double_ffitype in
-    let () = prep_callspec callspec double_ffitype in
+    let () = prep_callspec callspec Libffi_abi.(abi_code default_abi)
+      double_ffitype in
     
     let dlfabs = Dl.dlsym "fabs" in
     
@@ -49,7 +50,8 @@ let test_pow () =
     let callspec = allocate_callspec () in
     let arg_1_offset = add_argument callspec double_ffitype in
     let arg_2_offset = add_argument callspec double_ffitype in
-    let () = prep_callspec callspec double_ffitype in
+    let () = prep_callspec callspec Libffi_abi.(abi_code default_abi) 
+      double_ffitype in
     
     let dlpow = Dl.dlsym "pow" in
     

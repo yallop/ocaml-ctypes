@@ -6,7 +6,7 @@ OCAMLFIND=ocamlfind
 OCAMLMKLIB=ocamlmklib
 VPATH=src examples
 BUILDDIR=_build
-PROJECTS=configure configured ctypes cstubs ctypes-foreign-base ctypes-foreign-threaded ctypes-foreign-unthreaded ctypes-top
+PROJECTS=configure libffi-abigen configured ctypes cstubs ctypes-foreign-base ctypes-foreign-threaded ctypes-foreign-unthreaded ctypes-top
 GENERATED=src/ctypes_config.h src/ctypes_config.ml setup.data src/ctypes/ctypes_primitives.ml
 CFLAGS=-fPIC -Wall -O3 $(OCAML_FFI_INCOPTS)
 OCAML_FFI_INCOPTS=$(libffi_opt)
@@ -44,12 +44,13 @@ cstubs: PROJECT=cstubs
 cstubs: $(cstubs.dir)/$(cstubs.extra_mls) $$(LIB_TARGETS)
 
 # ctypes-foreign-base subproject
-ctypes-foreign-base.public = dl
+ctypes-foreign-base.public = dl libffi_abi
 ctypes-foreign-base.install = yes
 ctypes-foreign-base.install_native_objects = yes
 ctypes-foreign-base.threads = no
 ctypes-foreign-base.dir = src/ctypes-foreign-base
 ctypes-foreign-base.subproject_deps = ctypes
+ctypes-foreign-base.extra_mls = libffi_abi.ml
 ctypes-foreign-base.link_flags = $(as_needed_flags) $(libffi_lib)
 ctypes-foreign-base.cmo_opts = $(OCAML_FFI_INCOPTS:%=-ccopt %)
 ctypes-foreign-base.cmx_opts = $(OCAML_FFI_INCOPTS:%=-ccopt %)
@@ -102,10 +103,20 @@ configure.dir = src/configure
 configure: PROJECT=configure
 configure: $$(NATIVE_TARGET)
 
+# libffi-abigen subproject
+libffi-abigen.dir = src/libffi-abigen
+libffi-abigen.install = no
+libffi-abigen.deps = unix
+libffi-abigen: PROJECT=libffi-abigen
+libffi-abigen: $$(NATIVE_TARGET)
+
 # configuration
-configured: src/ctypes/ctypes_primitives.ml
+configured: src/ctypes/ctypes_primitives.ml src/ctypes-foreign-base/libffi_abi.ml
 
 src/ctypes/ctypes_primitives.ml: $(BUILDDIR)/configure.native
+	$< > $@
+
+src/ctypes-foreign-base/libffi_abi.ml: $(BUILDDIR)/libffi-abigen.native
 	$< > $@
 
 setup.data: src/discover/discover.ml

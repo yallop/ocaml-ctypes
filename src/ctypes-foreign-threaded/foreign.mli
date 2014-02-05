@@ -8,6 +8,7 @@
 (** High-level bindings for C functions and values *)
 
 val foreign :
+  ?abi:Libffi_abi.abi ->
   ?from:Dl.library ->
   ?stub:bool -> 
   ?check_errno:bool ->
@@ -36,6 +37,7 @@ val foreign_value : ?from:Dl.library -> string -> 'a Ctypes.typ -> 'a Ctypes.ptr
     returned by {!Dl.dlopen}.  *)
 
 val funptr :
+  ?abi:Libffi_abi.abi ->
   ?name:string ->
   ?check_errno:bool ->
   ('a -> 'b) Ctypes.fn ->
@@ -51,7 +53,10 @@ val funptr :
     The value [?check_errno], which defaults to [false], indicates whether
     {!Unix.Unix_error} should be raised if the C function modifies [errno]. *)
 
-val funptr_opt : ('a -> 'b) Ctypes.fn -> ('a -> 'b) option Ctypes.typ
+val funptr_opt :
+  ?abi:Libffi_abi.abi ->
+  ('a -> 'b) Ctypes.fn ->
+  ('a -> 'b) option Ctypes.typ
 (** Construct a function pointer type from a function type.
 
     This behaves like {!funptr}, except that null pointers appear in OCaml as

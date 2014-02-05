@@ -234,13 +234,14 @@ value ctypes_add_argument(value callspec_, value argument_)
 
 
 /* Pass the return type and conclude the specification preparation */
-/* prep_callspec : callspec -> 'a ffitype -> unit */
-value ctypes_prep_callspec(value callspec_, value rtype)
+/* prep_callspec : callspec -> 'a ffitype -> int -> unit */
+value ctypes_prep_callspec(value callspec_, value abi_, value rtype)
 {
-  CAMLparam2(callspec_, rtype);
+  CAMLparam3(callspec_, abi_, rtype);
 
   struct callspec *callspec = Data_custom_val(callspec_);
   ffi_type *rffitype = CTYPES_TO_PTR(rtype);
+  ffi_abi abi = Int_val(abi_);
 
   /* Allocate the cif structure */
   callspec->cif = caml_stat_alloc(sizeof *callspec->cif);
@@ -261,7 +262,7 @@ value ctypes_prep_callspec(value callspec_, value rtype)
   callspec->bytes += ffi_type_pointer.size;
 
   ffi_status status = ffi_prep_cif(callspec->cif,
-                                   FFI_DEFAULT_ABI,
+                                   abi,
                                    callspec->nelements,
                                    rffitype,
                                    callspec->args);
