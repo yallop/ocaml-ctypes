@@ -44,7 +44,7 @@ cstubs: PROJECT=cstubs
 cstubs: $(cstubs.dir)/$(cstubs.extra_mls) $$(LIB_TARGETS)
 
 # ctypes-foreign-base subproject
-ctypes-foreign-base.public = dl
+ctypes-foreign-base.public = dl libffi_abi
 ctypes-foreign-base.install = yes
 ctypes-foreign-base.install_native_objects = yes
 ctypes-foreign-base.threads = no
