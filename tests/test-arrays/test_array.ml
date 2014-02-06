@@ -153,6 +153,49 @@ let test_pointer_to_array_arithmetic () =
   assert_equal 12 a.(3).(2);
   assert_equal 1 a.(0).(0)
 
+(*
+  Test the copy function.
+*)
+let test_array_copy () =
+  assert false (* TODO *)
+
+(*
+  Test the iter function.
+*)
+let test_array_iter () =
+  assert false (* TODO *)
+
+(*
+  Test the iteri function.
+*)
+let test_array_iteri () =
+  assert false (* TODO *)
+
+(*
+  Test the map function.
+*)
+let test_array_map () =
+  assert false (* TODO *)
+
+(*
+  Test the mapi function.
+*)
+let test_array_mapi () =
+  assert false (* TODO *)
+
+(*
+  Test the fold_left function.
+*)
+let test_array_fold_left () =
+  assert false (* TODO *)
+
+(*
+  Test the fold_right function.
+*)
+let test_array_fold_right () =
+  assert false (* TODO *)
+
+
 module Common_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
 struct
   module M = Functions.Stubs(S)
@@ -211,6 +254,27 @@ let suite = "Array tests" >:::
 
    "ocaml_string cannot be used to build arrays"
     >:: test_ocaml_types_rejected_as_array_elements;
+
+   "copy"
+    >:: test_array_copy;
+
+   "iter"
+    >:: test_array_iter;
+
+   "iteri"
+    >:: test_array_iteri;
+
+   "map"
+    >:: test_array_map;
+
+   "mapi"
+    >:: test_array_mapi;
+
+   "fold_left"
+    >:: test_array_fold_left;
+
+   "fold_right"
+    >:: test_array_fold_right;
 
    "pointer to array arithmetic"
     >:: test_pointer_to_array_arithmetic;
