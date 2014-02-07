@@ -12,3 +12,5 @@ val write_dispatcher : prefix:string ->
   Format.formatter -> (string * int) list -> unit
 (* Write a definition of the dispatch function in C given a list of (name,
    arity) pairs. *)
+
+val write_frame_struct : string -> Format.formatter -> 'a Ctypes.fn -> unit

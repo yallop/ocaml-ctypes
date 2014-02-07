@@ -35,3 +35,25 @@ let write_dispatcher ~prefix fmt entries =
   pr "@[switch@ (call_buffer->fn_name)@]@\n{@[@\n";
   List.iter (write_entry ~prefix fmt) entries;
   pr "@]}@]@\n}@]@]\n}@."
+
+let make_frame_struct name fn =
+  let structure = Ctypes.structure name in
+  (* This shouldn't really be an int.  We need enum support, or at least
+     typedef support. *)
+  let _ = Ctypes.field structure "fn_name" Ctypes.int in
+  let rec loop : type a. int -> a Ctypes.fn -> unit =
+    fun i -> function
+    | Static.Function (typ, fn) ->
+      let _ = Ctypes.field structure (Printf.sprintf "x%d" i) typ in
+      loop (i + 1) fn
+    | Static.Returns typ ->
+      ignore (Ctypes.field structure "return_value" typ)
+  in
+  begin
+    loop 1 fn;
+    Ctypes.seal structure;
+    structure
+  end
+
+let write_frame_struct name fmt fn =
+  Ctypes.format_typ fmt (make_frame_struct name fn)
