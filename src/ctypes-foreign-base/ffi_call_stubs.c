@@ -281,6 +281,7 @@ value ctypes_call(value function, value callspec_, value argwriter,
                   value rvreader)
 {
   CAMLparam4(function, callspec_, argwriter, rvreader);
+  CAMLlocal2(callback_arg_buf, callback_rv_buf);
 
   struct callspec *callspec = Data_custom_val(callspec_);
   int roffset = callspec->roffset;
@@ -295,8 +296,9 @@ value ctypes_call(value function, value callspec_, value argwriter,
 
   populate_arg_array(callspec, (struct callbuffer *)callbuffer,
                      (void **)(callbuffer + arg_array_offset));
+  callback_arg_buf = CTYPES_FROM_PTR(callbuffer);
 
-  caml_callback(argwriter, CTYPES_FROM_PTR(callbuffer));
+  caml_callback(argwriter, callback_arg_buf);
 
   void (*cfunction)(void) = (void (*)(void)) CTYPES_TO_PTR(function);
 
@@ -305,7 +307,8 @@ value ctypes_call(value function, value callspec_, value argwriter,
            return_slot,
            (void **)(callbuffer + arg_array_offset));
 
-  CAMLreturn(caml_callback(rvreader, CTYPES_FROM_PTR(return_slot)));
+  callback_rv_buf = CTYPES_FROM_PTR(return_slot);
+  CAMLreturn(caml_callback(rvreader, callback_rv_buf));
 }
 
 
@@ -346,7 +349,7 @@ static void callback_handler(ffi_cif *cif,
 {
   CAMLparam0 ();
 
-  CAMLlocal1(boxedfn);
+  CAMLlocal2(boxedfn, argptr);
   boxedfn = retrieve_closure(*(int *)user_data);
 
   int i, arity = cif->nargs;
@@ -355,12 +358,14 @@ static void callback_handler(ffi_cif *cif,
     void *cvalue = args[i];
     assert (Tag_val(boxedfn) == Fn);
     /* unbox and call */
-    boxedfn = caml_callback(Field(boxedfn, 0), CTYPES_FROM_PTR(cvalue));
+    argptr = CTYPES_FROM_PTR(cvalue);
+    boxedfn = caml_callback(Field(boxedfn, 0), argptr);
   }
 
   /* now store the return value */
   assert (Tag_val(boxedfn) == Done);
-  caml_callback(Field(boxedfn, 0), CTYPES_FROM_PTR(ret));
+  argptr = CTYPES_FROM_PTR(ret);
+  caml_callback(Field(boxedfn, 0), argptr);
 
   CAMLreturn0;
 }
@@ -371,6 +376,7 @@ static void callback_handler(ffi_cif *cif,
 value ctypes_make_function_pointer(value callspec_, value fnid)
 {
   CAMLparam2(callspec_, fnid);
+  CAMLlocal1(codeptr);
   struct callspec *callspec = Data_custom_val(callspec_);
 
   assert(callspec->state == CALLSPEC);
@@ -397,6 +403,7 @@ value ctypes_make_function_pointer(value callspec_, value fnid)
 
     ctypes_check_ffi_status(status);
 
-    CAMLreturn (CTYPES_FROM_PTR((void *)code_address));
+    codeptr = CTYPES_FROM_PTR((void *)code_address);
+    CAMLreturn (codeptr);
   }
 }
