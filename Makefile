@@ -10,6 +10,7 @@ PROJECTS=configure libffi-abigen configured ctypes cstubs ctypes-foreign-base ct
 GENERATED=src/ctypes_config.h src/ctypes_config.ml setup.data src/ctypes/ctypes_primitives.ml
 CFLAGS=-fPIC -Wall -O3 $(OCAML_FFI_INCOPTS)
 OCAML_FFI_INCOPTS=$(libffi_opt)
+export CFLAGS
 
 # public targets
 all: setup.data build
