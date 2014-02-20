@@ -74,12 +74,16 @@ let test_type_info_hashing_and_equality () =
       assert_bool "Distinct array types do not compare equal"
         (array 3 (array 4 int) <> array 3 (array 5 int));
 
-      (* Structure equality is physical *)
+      (* Structure equality is structural *)
       assert_equal (hash s) (hash s);
 
       assert_bool
-        "equal-but-not-identical structure types do not compare equal"
-        (Obj.repr s <> Obj.repr t);
+        "equal-but-not-identical structure types have equal hashes"
+        (hash s = hash t);
+
+      assert_bool
+        "equal-but-not-identical structure types compare equal"
+        (Obj.repr s = Obj.repr t);
     end
   end in ()
 
