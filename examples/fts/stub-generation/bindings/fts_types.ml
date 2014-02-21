@@ -99,10 +99,6 @@ struct
   let fts_name    = char       -: "fts_name"
   let () = seal ftsent
 
-  let () = Cstubs.register_paths ftsent
-    ~value:"Fts_types.FTSENT.ftsent"
-    ~typ:"Fts_types.FTSENT.ftsent"
-
   type t = ftsent structure ptr
   let t = ptr ftsent
 
@@ -173,18 +169,6 @@ struct
   (* fts_options would work well as a view *)
   let fts_options = int              -: "fts_options"
   let () = seal fts
-
-  let () = Cstubs.register_paths fts
-    ~value:"Fts_types.FTS.fts"
-    ~typ:"Fts_types.FTS.fts"
-
-  let () = Cstubs.register_paths compar_typ
-    ~value:"Fts_types.FTS.compar_typ"
-    ~typ:"Fts_types.FTS.compar_typ"
-
-  let () = Cstubs.register_paths compar_typ_opt
-    ~value:"Fts_types.FTS.compar_typ_opt"
-    ~typ:"Fts_types.FTS.compar_typ_opt"
 
   type t = { ptr : fts structure ptr;
              (* The compar field ties the lifetime of the comparison function

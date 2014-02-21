@@ -11,7 +11,7 @@ open Fts_types
 open FTSENT
 open FTS
 
-module Bindings (F : sig val foreign : string -> ('a -> 'b) fn -> unit end) =
+module Bindings (F : Cstubs.FOREIGN) =
 struct
   (* FTS *fts_open(char * const *path_argv, int options,
      int ( *compar)(const FTSENT **, const FTSENT ** ));

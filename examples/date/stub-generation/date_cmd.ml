@@ -7,14 +7,12 @@
 
 open Ctypes
 open PosixTypes
-open Date_type
-open Date_generated
-
-(* TODO: remove this once we have typedef support *)
-let coerce_ptr = Coerce.coerce (ptr time_t) (ptr int64_t)
+open Date_stubs
+module D = Bindings(Date_generated)
+open D
 
 let () = begin
-  let timep = coerce_ptr (allocate_n ~count:1 time_t) in
+  let timep = allocate_n ~count:1 time_t in
   let time = time timep in
   assert (time = !@timep);
   let tm = localtime timep in

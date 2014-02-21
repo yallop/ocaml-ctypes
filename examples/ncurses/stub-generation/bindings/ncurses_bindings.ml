@@ -10,7 +10,7 @@ open Ctypes
 type window = unit ptr
 let window : window typ = ptr void
 
-module Bindings (F : sig val foreign : string -> ('a -> 'b) fn -> unit end) =
+module Bindings (F : Cstubs.FOREIGN) =
 struct
   open F
 
@@ -56,17 +56,13 @@ let c_headers = "
 let make_stubname cname = "ncurses_stub_" ^ cname
 
 let main () =
-  let ml_out = open_out "examples/ncurses/stub-generation/ncurses_generated.ml"
-  and c_out = open_out "examples/ncurses/stub-generation/ncurses_stubs.c" in
-  let ml_fmt = Format.formatter_of_out_channel ml_out
-  and c_fmt = Format.formatter_of_out_channel c_out in
+  let ml_out = open_out "examples/ncurses/stub-generation/ncurses_generated.ml" in
+  let c_out = open_out "examples/ncurses/stub-generation/ncurses_stubs.c" in
+  let c_fmt = Format.formatter_of_out_channel c_out in
+  let ml_fmt = Format.formatter_of_out_channel ml_out in
   Format.fprintf c_fmt "%s@\n" c_headers;
-  let module M = Bindings(struct
-    let foreign cname fn =
-      let stub_name = make_stubname cname in
-      Cstubs.write_c ~stub_name ~cname c_fmt fn;
-      Cstubs.write_ml ~stub_name ~external_name:cname ml_fmt fn
-  end) in
+  Cstubs.write_c c_fmt ~prefix:"ncurses_stub_" (module Bindings);
+  Cstubs.write_ml ml_fmt ~prefix:"ncurses_stub_" (module Bindings);
   Format.pp_print_flush ml_fmt ();
   Format.pp_print_flush c_fmt ();
   close_out ml_out;
