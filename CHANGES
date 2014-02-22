@@ -1,4 +1,12 @@
- == ctypes 0.2 ==
+== ctypes 0.2.3 ==
+
+39cacd: Fix GC-related bug that shows up on OS X.
+
+== ctypes 0.2.2 ==
+
+608714: Don't install the cmx files for ctypes-foreign.
+
+== ctypes 0.2 ==
 
 c8d54a: Basic coercion support
 2552d3: Build fix for Debian Squeeze
