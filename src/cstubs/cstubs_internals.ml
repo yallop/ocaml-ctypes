@@ -18,11 +18,8 @@ let make_structured reftype buf =
   let pbyte_offset = 0 in
   { structured = { reftype; pmanaged; pbyte_offset; raw_ptr } }
 
-type 'a ptr = 'a Static.ptr
-  = { reftype      : 'a Ctypes.typ;
-      raw_ptr      : voidp;
-      pmanaged     : Obj.t option;
-      pbyte_offset : int }
+include Static
+include Primitives
 
 let make_ptr reftype raw_ptr =
   { reftype; raw_ptr; pmanaged = None; pbyte_offset = 0 }
