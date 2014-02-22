@@ -9,15 +9,10 @@ open OUnit
 open Ctypes
 
 
-module type FOREIGN_SIGNATURES =
-sig
-  val check_name : Types.animal structure ptr -> string -> int 
-  val new_chorse : int -> Types.animal structure ptr 
-end
-
-module Common_tests(S : FOREIGN_SIGNATURES) =
+module Common_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
 struct
-  open S
+  module M = Functions.Stubs(S)
+  open M
 
   (* 
      Establish a hierarchy of "classes", create some "objects" and call some
@@ -25,7 +20,6 @@ struct
   *)
   let test_oo_hierarchy () =
     let module M = struct
-      open Types
 
       let camel_vtable_singleton = make camel_methods
       let () = begin
@@ -84,8 +78,7 @@ struct
     end in ()
 end
 
-module Foreign_tests =
-  Common_tests(Functions.Stubs(Tests_common.Foreign_binder))
+module Foreign_tests = Common_tests(Tests_common.Foreign_binder)
 module Stub_tests = Common_tests(Generated_bindings)
 
 

@@ -8,12 +8,17 @@
 (* Foreign function bindings for the struct tests. *)
 
 open Ctypes
-open Tests_common
-open Types
 
-module Stubs (F: FOREIGN) =
+module Stubs (F: Cstubs.FOREIGN) =
 struct
   open F
+
+  type simple
+  let simple : simple structure typ = structure "simple"
+  let i = field simple "i" int
+  let f = field simple "f" double
+  let self = field simple "self" (ptr simple)
+  let () = seal simple
 
   let accept_struct = foreign "accept_struct"
     (simple @-> returning int)

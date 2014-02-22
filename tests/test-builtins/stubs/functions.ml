@@ -8,9 +8,8 @@
 (* Foreign function bindings for the builtins tests. *)
 
 open Ctypes
-open Tests_common
 
-module Stubs (F: FOREIGN) =
+module Stubs (F: Cstubs.FOREIGN) =
 struct
   open F
 

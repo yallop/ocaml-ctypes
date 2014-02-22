@@ -8,22 +8,24 @@
 (* Foreign function bindings for the higher order tests. *)
 
 open Ctypes
-open Tests_common
+open Foreign
 
-open Types
-
-module Stubs (F: FOREIGN) =
+module Stubs (F: Cstubs.FOREIGN) =
 struct
   open F
   let higher_order_1 = foreign "higher_order_1"
-    (intfunptr @-> int @-> int @-> returning int)
+    (funptr (int @-> int @-> returning int) @-> int @-> int @-> returning int)
 
   let higher_order_3 = foreign "higher_order_3"
-    (funptr_acceptor @-> intfunptr @-> int @-> int @-> returning int)
+    (funptr (funptr (int @-> int @-> returning int) @->
+             int @-> int @-> returning int) @->
+     funptr (int @-> int @-> returning int) @->
+     int @-> int @-> returning int)
 
   let returning_funptr = foreign "returning_funptr"
-    (int @-> returning (intfunptr))
+    (int @-> returning (funptr (int @-> int @-> returning int)))
 
   let callback_returns_funptr = foreign "callback_returns_funptr"
-    (intfunhoptr @-> int @-> returning int)
+    (funptr (int @-> returning (funptr (int @-> returning int))) @->
+     int @-> returning int)
 end

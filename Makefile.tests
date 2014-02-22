@@ -73,7 +73,8 @@ test-builtins-stub-generator: $$(NATIVE_TARGET)
 test-builtins.dir = tests/test-builtins
 test-builtins.threads = yes
 test-builtins.deps = str bigarray oUnit
-test-builtins.subproject_deps = ctypes cstubs test-builtins-stubs
+test-builtins.subproject_deps = ctypes cstubs test-builtins-stubs \
+  ctypes-foreign-base ctypes-foreign-unthreaded tests-common
 test-builtins.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-builtins: PROJECT=test-builtins
 test-builtins: $$(NATIVE_TARGET)
@@ -105,7 +106,8 @@ test-macros-stub-generator: $$(NATIVE_TARGET)
 test-macros.dir = tests/test-macros
 test-macros.threads = yes
 test-macros.deps = str bigarray oUnit
-test-macros.subproject_deps = ctypes cstubs test-macros-stubs
+test-macros.subproject_deps = ctypes cstubs test-macros-stubs \
+  ctypes-foreign-base ctypes-foreign-unthreaded tests-common
 test-macros.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-macros: PROJECT=test-macros
 test-macros: $$(NATIVE_TARGET)

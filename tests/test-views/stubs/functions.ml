@@ -8,13 +8,14 @@
 (* Foreign function bindings for the views tests. *)
 
 open Ctypes
-open Tests_common
 
-open Types
-
-module Stubs (F: FOREIGN) =
+module Stubs (F: Cstubs.FOREIGN) =
 struct
   open F
+
+  let charish = view ~read:Char.chr ~write:Char.code int
+
+  let nullable_intptr = Foreign.funptr_opt (int @-> int @-> returning int)
 
   let concat_strings = foreign "concat_strings"
     (ptr string @-> int @-> ptr char @-> returning void)

@@ -8,12 +8,34 @@
 (* Foreign function bindings for the arrays tests. *)
 
 open Ctypes
-open Tests_common
-open Types
 
-module Stubs (F: FOREIGN) =
+module Stubs (F: Cstubs.FOREIGN) =
 struct
   open F
+
+  (* union u {
+        int i;
+        double d;
+     }
+  *)
+  type number
+  let u : number union typ = union "number"
+  let (-:) ty label = field u label ty
+  let i = int    -: "i"
+  let d = double -: "d"
+  let () = seal u
+
+  (* struct s {
+        char tag;
+        union u data;
+     }
+  *)
+  type tagged
+  let s : tagged structure typ = structure "tagged"
+  let (-:) ty label = field s label ty
+  let tag  = char -: "tag"
+  let data = u    -: "num"
+  let () = seal s
 
   let accepts_pointer_to_array_of_structs =
     foreign "accepts_pointer_to_array_of_structs"

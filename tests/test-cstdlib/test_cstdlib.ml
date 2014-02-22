@@ -11,37 +11,10 @@ open Unsigned
 open Foreign
 
 
-module type FOREIGN_SIGNATURES =
-sig
-  val isalnum : char -> bool 
-  val isalpha : char -> bool 
-  val iscntrl : char -> bool 
-  val isdigit : char -> bool 
-  val isgraph : char -> bool 
-  val islower : char -> bool 
-  val isprint : char -> bool 
-  val ispunct : char -> bool 
-  val isspace : char -> bool 
-
-  val isupper : char -> bool 
-  val isxdigit : char -> bool 
-  val strchr : string -> int -> string 
-  val strcmp : string -> string -> int 
-  val memcmp : unit ptr -> unit ptr -> Unsigned.size_t -> int 
-  val memset : unit ptr -> int -> Unsigned.size_t -> unit ptr 
-
-  val qsort : unit ptr -> Unsigned.size_t -> Unsigned.size_t ->
-    Types.funptr_comparator -> unit 
-
-  val bsearch : unit ptr -> unit ptr -> Unsigned.size_t ->
-    Unsigned.size_t -> Types.funptr_comparator -> unit ptr 
-
-  val strlen : char ptr -> Unsigned.size_t 
-end
-
-module Common_tests(S : FOREIGN_SIGNATURES) =
+module Common_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
 struct
-  open S
+  module M = Functions.Stubs(S)
+  open M
 
   (*
     Call the functions
@@ -334,8 +307,7 @@ let test_div () =
   end in ()
 
 
-module Foreign_tests =
-  Common_tests(Functions.Stubs(Tests_common.Foreign_binder))
+module Foreign_tests = Common_tests(Tests_common.Foreign_binder)
 module Stub_tests = Common_tests(Generated_bindings)
 
 

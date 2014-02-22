@@ -12,21 +12,10 @@ open Ctypes
 let testlib = Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW])
 
 
-module type FOREIGN_SIGNATURES =
-sig
-  val add_complexd :
-    Complex.t ptr -> Complex.t ptr -> Complex.t ptr -> unit 
-  val mul_complexd :
-    Complex.t ptr -> Complex.t ptr -> Complex.t ptr -> unit 
-  val add_complexf :
-    Complex.t ptr -> Complex.t ptr -> Complex.t ptr -> unit 
-  val mul_complexf :
-    Complex.t ptr -> Complex.t ptr -> Complex.t ptr -> unit 
-end
-
-module Common_tests(S : FOREIGN_SIGNATURES) =
+module Common_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
 struct
-  open S
+  module M = Functions.Stubs(S)
+  open M
 
   (*
     Test primitive operations on complex numbers.
@@ -69,8 +58,7 @@ struct
 end
 
 
-module Foreign_tests =
-  Common_tests(Functions.Stubs(Tests_common.Foreign_binder))
+module Foreign_tests = Common_tests(Tests_common.Foreign_binder)
 module Stub_tests = Common_tests(Generated_bindings)
 
 

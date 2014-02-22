@@ -134,14 +134,10 @@ let test_view_coercions () =
   end in ()
 
 
-module type FOREIGN_SIGNATURES =
-sig
-  val memchr : unit ptr -> int -> Unsigned.size_t -> unit ptr
-end
-
-module Common_tests(S : FOREIGN_SIGNATURES) =
+module Common_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
 struct
-  open S
+  module M = Functions.Stubs(S)
+  open M
 
   (* 
      Check coercions between functions.
@@ -254,8 +250,7 @@ let test_unsupported_coercions () =
   end in ()
 
 
-module Foreign_tests =
-  Common_tests(Functions.Stubs(Tests_common.Foreign_binder))
+module Foreign_tests = Common_tests(Tests_common.Foreign_binder)
 module Stub_tests = Common_tests(Generated_bindings)
 
 
