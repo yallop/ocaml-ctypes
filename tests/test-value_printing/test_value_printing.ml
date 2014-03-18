@@ -15,49 +15,10 @@ let equal_ignoring_whitespace l r =
   strip_whitespace l = strip_whitespace r
 
 
-module type FOREIGN_SIGNATURES =
-sig
-  val retrieve_CHAR_MIN : unit -> char 
-  val retrieve_CHAR_MAX : unit -> char 
-  val retrieve_SCHAR_MIN : unit -> int 
-  val retrieve_SCHAR_MAX : unit -> int 
-  val retrieve_SHRT_MIN : unit -> int 
-  val retrieve_SHRT_MAX : unit -> int 
-  val retrieve_INT_MIN : unit -> int 
-  val retrieve_INT_MAX : unit -> int 
-  val retrieve_LONG_MAX : unit -> Signed.long 
-  val retrieve_LONG_MIN : unit -> Signed.long 
-  val retrieve_nLONG_MAX : unit -> nativeint 
-  val retrieve_nLONG_MIN : unit -> nativeint 
-  val retrieve_LLONG_MAX : unit -> Signed.llong 
-  val retrieve_LLONG_MIN : unit -> Signed.llong 
-  val retrieve_UCHAR_MAX : unit -> Unsigned.uchar 
-  val retrieve_USHRT_MAX : unit -> Unsigned.ushort 
-  val retrieve_UINT_MAX : unit -> Unsigned.uint 
-  val retrieve_ULONG_MAX : unit -> Unsigned.ulong 
-  val retrieve_ULLONG_MAX : unit -> Unsigned.ullong 
-  val retrieve_INT8_MIN : unit -> int 
-  val retrieve_INT8_MAX : unit -> int 
-  val retrieve_INT16_MIN : unit -> int 
-  val retrieve_INT16_MAX : unit -> int 
-  val retrieve_INT32_MIN : unit -> int32 
-  val retrieve_INT32_MAX : unit -> int32 
-  val retrieve_INT64_MIN : unit -> int64 
-  val retrieve_INT64_MAX : unit -> int64 
-  val retrieve_UINT8_MAX : unit -> Unsigned.uint8 
-  val retrieve_UINT16_MAX : unit -> Unsigned.uint16 
-  val retrieve_UINT32_MAX : unit -> Unsigned.uint32 
-  val retrieve_UINT64_MAX : unit -> Unsigned.uint64 
-  val retrieve_SIZE_MAX : unit -> Unsigned.size_t 
-  val retrieve_FLT_MIN : unit -> float 
-  val retrieve_FLT_MAX : unit -> float 
-  val retrieve_DBL_MIN : unit -> float 
-  val retrieve_DBL_MAX : unit -> float 
-end
-
-module Common_tests(S : FOREIGN_SIGNATURES) =
+module Common_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
 struct
-  open S
+  module M = Functions.Stubs(S)
+  open M
 
   (*
     Test the printing of atomic values: arithmetic types and values of abstract
@@ -360,8 +321,7 @@ let test_array_printing () =
        (string_of (array 2 (array 3 int)) arrarr))
 
 
-module Foreign_tests =
-  Common_tests(Functions.Stubs(Tests_common.Foreign_binder))
+module Foreign_tests = Common_tests(Tests_common.Foreign_binder)
 module Stub_tests = Common_tests(Generated_bindings)
 
 

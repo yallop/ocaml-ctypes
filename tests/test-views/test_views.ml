@@ -9,18 +9,10 @@ open OUnit
 open Ctypes
 
 
-module type FOREIGN_SIGNATURES =
-sig
-  val concat_strings : string ptr -> int -> char ptr -> unit 
-  val toupper : char -> char 
-  val returning_funptr : int -> Types.nullable_intptr 
-  val accepting_possibly_null_funptr :
-    Types.nullable_intptr -> int ->  int -> int 
-end
-
-module Common_tests(S : FOREIGN_SIGNATURES) =
+module Common_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
 struct
-  open S
+  module M = Functions.Stubs(S)
+  open M
 
   (*
     Call a function of type
@@ -160,8 +152,7 @@ let test_polar_form_view () =
   end in ()
 
 
-module Foreign_tests =
-  Common_tests(Functions.Stubs(Tests_common.Foreign_binder))
+module Foreign_tests = Common_tests(Tests_common.Foreign_binder)
 module Stub_tests = Common_tests(Generated_bindings)
 
 

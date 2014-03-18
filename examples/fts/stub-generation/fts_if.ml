@@ -7,25 +7,27 @@
 
 open Ctypes
 open Fts_types
-open Fts_generated
 open FTS
 open FTSENT
+
+module N = Fts_bindings.Bindings(Fts_generated)
+open N
 
 let crush_options f : 'a list -> int = List.fold_left (fun i o -> i lor (f o)) 0
 
 let fts_read fts =
-  let p = fts_read fts.ptr in
+  let p = _fts_read fts.ptr in
   if to_voidp p = null then None
   else Some p
 
 let fts_close ftsp =
-  ignore (fts_close ftsp.ptr)
+  ignore (_fts_close ftsp.ptr)
       
 let fts_set ~ftsp ~f ~options =
-  ignore (fts_set ftsp.ptr f (crush_options fts_set_option_value options))
+  ignore (_fts_set ftsp.ptr f (crush_options fts_set_option_value options))
 
 let fts_children ~ftsp ~name_only =
-  fts_children ftsp.ptr (fts_children_option_of_bool name_only)
+  _fts_children ftsp.ptr (fts_children_option_of_bool name_only)
 
 let null_terminated_array_of_ptr_list typ list =
   let nitems = List.length list in
@@ -37,4 +39,4 @@ let null_terminated_array_of_ptr_list typ list =
 let fts_open ~path_argv ?compar ~options = 
   let paths = null_terminated_array_of_ptr_list string path_argv in
   let options = crush_options fts_open_option_value options in
-  { ptr = fts_open (CArray.start paths) options compar; compar }
+  { ptr = _fts_open (CArray.start paths) options compar; compar }

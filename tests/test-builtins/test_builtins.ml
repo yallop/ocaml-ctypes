@@ -8,13 +8,14 @@
 open OUnit
 open Ctypes
 
+module Bindings = Functions.Stubs(Generated_bindings)
 
 (*
   Test calling builtins.
 *)
 let test_calling_builtins () =
   let open Unsigned.UInt8 in
-  let open Generated_bindings in
+  let open Bindings in
   let u1 = of_int 0x77
   and u2 = of_int 0x8 in
   let expected = Infix.(u1 lor u2) in

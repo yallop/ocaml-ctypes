@@ -131,23 +131,15 @@ let test_pointer_to_array_arithmetic () =
   assert_equal 12 a.(3).(2);
   assert_equal 1 a.(0).(0)
 
-module type FOREIGN_SIGNATURES =
-sig
-  val accepts_pointer_to_array_of_structs :
-    Types.tagged structure carray ptr -> float 
-end
-
-
-module Common_tests(S : FOREIGN_SIGNATURES) =
+module Common_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
 struct
-  open S
+  module M = Functions.Stubs(S)
+  open M
 
   (*
     Test passing pointer to array of structs.
   *)
   let test_passing_pointer_to_array_of_structs () =
-    let open Types in
-
     let box_int x =
       let v = make s in
       setf v tag 'i';
@@ -182,8 +174,7 @@ struct
       sum
 end
 
-module Foreign_tests =
-  Common_tests(Functions.Stubs(Tests_common.Foreign_binder))
+module Foreign_tests = Common_tests(Tests_common.Foreign_binder)
 module Stub_tests = Common_tests(Generated_bindings)
 
 let suite = "Array tests" >:::

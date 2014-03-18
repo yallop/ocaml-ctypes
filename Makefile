@@ -24,7 +24,7 @@ distclean: clean
 	rm -f $(GENERATED)
 
 # ctypes subproject
-ctypes.public = unsigned signed structs ctypes posixTypes
+ctypes.public = static primitives unsigned signed structs ctypes posixTypes
 ctypes.dir = src/ctypes
 ctypes.extra_mls = ctypes_primitives.ml
 ctypes.deps = str bigarray

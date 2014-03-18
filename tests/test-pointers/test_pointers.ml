@@ -12,41 +12,10 @@ open Foreign
 
 let testlib = Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW])
 
-module type FOREIGN_SIGNATURES =
-sig
-  val accept_pointers :
-    float ptr -> float ptr -> int ptr -> int ptr -> Signed.long ptr ->
-    Signed.llong ptr -> nativeint ptr -> int ptr -> int ptr -> int32 ptr ->
-    int64 ptr -> Unsigned.uint8 ptr -> Unsigned.uint16 ptr ->
-    Unsigned.uint32 ptr -> Unsigned.uint64 ptr -> Unsigned.size_t ptr ->
-    Unsigned.ushort ptr -> Unsigned.uint ptr -> Unsigned.ulong ptr ->
-    Unsigned.ullong ptr -> int 
-
-  val accept_pointers_to_pointers :
-    int ptr -> int ptr ptr -> int ptr ptr ptr -> int ptr ptr ptr ptr -> int
-
-  val malloc : Unsigned.size_t -> unit ptr 
-
-  val realloc : unit ptr -> Unsigned.size_t -> unit ptr 
-    
-  val free : unit ptr -> unit 
-    
-  val return_global_address : unit -> int ptr 
-    
-  val pass_pointer_through : int ptr -> int ptr -> int -> int ptr 
-
-  val passing_pointers_to_callback : Types.pintfun1ptr -> int 
-    
-  val accepting_pointer_from_callback : Types.pintfun2ptr -> int 
-    
-  val accepting_pointer_to_function_pointer : Types.arg_type ptr -> int 
-    
-  val returning_pointer_to_function_pointer : unit -> Types.iiifunptr ptr 
-end
-
-module Common_tests(S : FOREIGN_SIGNATURES) =
+module Common_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
 struct
-  open S
+  module M = Functions.Stubs(S)
+  open M
 
   (*
     Test passing various types of pointers to a function.
@@ -124,7 +93,7 @@ struct
   let test_passing_pointer_to_function_pointer () =
     assert_equal ~printer:string_of_int
       5 (accepting_pointer_to_function_pointer 
-           (allocate Types.arg_type ( / )))
+           (allocate (funptr (int @-> int @-> returning int)) ( / )))
 
 
 
@@ -539,8 +508,7 @@ let test_pointer_differences () =
   assert_equal (-offsetof k) (ptr_diff (to_charp (canonicalize (p |-> k))) cp);
   assert_equal (-offsetof l) (ptr_diff (to_charp (canonicalize (p |-> l))) cp)
 
-module Foreign_tests =
-  Common_tests(Functions.Stubs(Tests_common.Foreign_binder))
+module Foreign_tests = Common_tests(Tests_common.Foreign_binder)
 module Stub_tests = Common_tests(Generated_bindings)
 
 let suite = "Pointer tests" >:::

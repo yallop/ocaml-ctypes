@@ -5,34 +5,10 @@
  * See the file LICENSE for details.
  *)
 
-(* Registry for views and structured types *)
+(* Publicly visible names for type values *)
 
 open Static
 open Ctypes_path
-
-type paths = { value: path; typ: path }
-
-exception Registration_error of string
-
-let paths = Hashtbl.create 10
-
-let id : type a. a typ -> int = function
-    View { id } -> id
-  | Struct { sid } -> sid
-  | Union { uid } -> uid
-  | Abstract { aid } -> aid
-  | _ -> raise (Registration_error "not a view or structured type")
-
-let register_paths : type a. a typ -> value:string -> typ:string -> unit =
-  fun ty ~value ~typ -> Hashtbl.add paths (id ty)
-    { value = path_of_string value; typ  = path_of_string typ }
-
-let retrieve_path : type a. a typ -> paths =
-  fun typ ->
-    try Hashtbl.find paths (id typ)
-    with Not_found -> raise (Registration_error (Ctypes.string_of_typ typ))
-
-let () = register_paths Ctypes.string ~value:"Ctypes.string" ~typ:"string"
 
 let ident_of_ml_prim : type a. a Primitives.ml_prim -> path =
   let open Primitives in function
@@ -85,34 +61,31 @@ let constructor_ident_of_prim : type a. a Primitives.prim -> path =
    | Complex32 -> path_of_string "Ctypes.complex32"
    | Complex64 -> path_of_string "Ctypes.complex64"
 
-module ML_type= struct
-
-  let ptr t = `Appl (path_of_string "Ctypes.ptr", [t])
-  let carray t = `Appl (path_of_string "Ctypes.carray", [t])
-  let structure t = `Appl (path_of_string "Ctypes.structure", [t])
-  let union t = `Appl (path_of_string "Ctypes.union", [t])
-  let abstract t = `Appl (path_of_string "Ctypes.abstract", [t])
-  let unit = `Ident (path_of_string "unit")
-
-  let user_type ty =
-    `Ident ((retrieve_path ty).typ)
-
-  (* This function determines the type that should appear in the
-     function signature *)
-  let rec typ : type a. a typ -> _ = function
-   | Void -> unit
-   | Primitive p -> `Ident (ident_of_ml_prim (Primitives.ml_prim p))
-   | Pointer t -> ptr (typ t)
-   | Array (t, _) -> carray (typ t)
-   | Struct _ as t -> structure (user_type t)
-   | Union _ as t -> union (user_type t)
-   | Abstract _ as t -> abstract (user_type t)
-   | View _ as t -> user_type t
-   | Bigarray ba -> Ctypes_bigarray.type_expression ba
-
-  let rec fn : type a. a fn -> _ = function
-    | Returns t -> typ t
-    | Function (f, t) -> `Fn (typ f, fn t)
-end
-
-let ident_of_fn = ML_type.fn
+let constructor_cident_of_prim : type a. a Primitives.prim -> path =
+  let open Primitives in function
+   | Char -> path_of_string "Cstubs_internals.Char"
+   | Schar -> path_of_string "Cstubs_internals.Schar"
+   | Uchar -> path_of_string "Cstubs_internals.Uchar"
+   | Short -> path_of_string "Cstubs_internals.Short"
+   | Int -> path_of_string "Cstubs_internals.Int"
+   | Long -> path_of_string "Cstubs_internals.Long"
+   | Llong -> path_of_string "Cstubs_internals.Llong"
+   | Ushort -> path_of_string "Cstubs_internals.Ushort"
+   | Uint -> path_of_string "Cstubs_internals.Uint"
+   | Ulong -> path_of_string "Cstubs_internals.Ulong"
+   | Ullong -> path_of_string "Cstubs_internals.Ullong"
+   | Size_t -> path_of_string "Cstubs_internals.Size_t"
+   | Int8_t -> path_of_string "Cstubs_internals.Int8_t"
+   | Int16_t -> path_of_string "Cstubs_internals.Int16_t"
+   | Int32_t -> path_of_string "Cstubs_internals.Int32_t"
+   | Int64_t -> path_of_string "Cstubs_internals.Int64_t"
+   | Uint8_t -> path_of_string "Cstubs_internals.Uint8_t"
+   | Uint16_t -> path_of_string "Cstubs_internals.Uint16_t"
+   | Uint32_t -> path_of_string "Cstubs_internals.Uint32_t"
+   | Uint64_t -> path_of_string "Cstubs_internals.Uint64_t"
+   | Camlint -> path_of_string "Cstubs_internals.Camlint"
+   | Nativeint -> path_of_string "Cstubs_internals.Nativeint"
+   | Float -> path_of_string "Cstubs_internals.Float"
+   | Double -> path_of_string "Cstubs_internals.Double"
+   | Complex32 -> path_of_string "Cstubs_internals.Complex32"
+   | Complex64 -> path_of_string "Cstubs_internals.Complex64"

@@ -9,17 +9,6 @@
 
 open Ctypes
 
-let mk_stubname cname =
-  "ctypes_test_stub" ^ cname
-
-let cstub ~cname fmt fn =
-  let stub_name = mk_stubname cname in
-  Cstubs.write_c ~stub_name ~cname fmt fn
-
-let mlstub ~cname fmt f =
-  let stub_name = mk_stubname cname in
-  Cstubs.write_ml ~stub_name ~external_name:cname fmt  f
-
 let filenames argv =
   let usage = "arguments: [--ml-file $filename] [--c-file $filename]"    in
   let ml_filename = ref ""
@@ -33,51 +22,38 @@ let filenames argv =
     (!ml_filename, !c_filename)
   end
 
-type generator = { stub: 'a 'b. cname:string -> Format.formatter -> ('a -> 'b) Static.fn -> unit }
-
-
-module type FOREIGN =
-sig
-  type 'a result
-  val foreign : string -> ('a -> 'b) fn -> ('a -> 'b) result
-end
-
-module Foreign_binder : FOREIGN with type 'a result = 'a =
+module Foreign_binder : Cstubs.FOREIGN with type 'a fn = 'a =
 struct
-  type 'a result = 'a
+  type 'a fn = 'a
   let foreign name fn = Foreign.foreign name fn
 end
 
-module type STUBS = functor  (F : FOREIGN) -> sig end
+module type STUBS = functor  (F : Cstubs.FOREIGN) -> sig end
 
-let generate ?header { stub } (module Specs : STUBS) filename =
+let with_open_formatter filename f =
   let out = open_out filename in
   let fmt = Format.formatter_of_out_channel out in
   let close_channel () = close_out out in
   try
-    begin match header with
-    | None -> ()
-    | Some h -> Format.pp_print_string fmt h
-    end;
-    let module M = Specs
-      (struct
-        type 'a result = unit
-        let foreign cname fn = stub ~cname fmt fn
-       end) in
-    close_channel ()
+    let rv = f fmt in
+    close_channel ();
+    rv
   with e ->
     close_channel ();
     raise e
 
-let add_cstubs_header ~cheader = "\
+let header = "\
 #include \"clib/test_functions.h\"
 #include \"cstubs/cstubs_internals.h\"
-" ^ cheader
+"
 
 let run ?(cheader="") argv specs =
   let ml_filename, c_filename = filenames argv in
   if ml_filename <> "" then
-    generate { stub = mlstub } specs ml_filename;
+    with_open_formatter ml_filename
+      (fun fmt -> Cstubs.write_ml fmt ~prefix:"cstubs_tests" specs);
   if c_filename <> "" then
-    generate ~header:(add_cstubs_header ~cheader)
-      { stub = cstub } specs c_filename
+    with_open_formatter c_filename
+      (fun fmt -> 
+        Format.fprintf fmt "%s\n%s\n" header cheader;
+        Cstubs.write_c fmt ~prefix:"cstubs_tests" specs)

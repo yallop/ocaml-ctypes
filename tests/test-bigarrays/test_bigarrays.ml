@@ -320,17 +320,10 @@ let test_ctypes_array_of_bigarray () =
   end
 
 
-module type FOREIGN_SIGNATURES =
-sig
-  val matrix_mul :
-    int -> int -> int -> float ptr -> float ptr -> float ptr -> unit 
-  val matrix_transpose :
-    int -> int -> float ptr -> float ptr 
-end
-
-module Common_tests(S : FOREIGN_SIGNATURES) =
+module Common_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
 struct
-  open S
+  module M = Functions.Stubs(S)
+  open M
 
   (*
     Test passing bigarrays to c functions.
@@ -470,8 +463,7 @@ let test_ctypes_memory_lifetime_with_bigarray_reference () =
   end
 
 
-module Foreign_tests =
-  Common_tests(Functions.Stubs(Tests_common.Foreign_binder))
+module Foreign_tests = Common_tests(Tests_common.Foreign_binder)
 module Stub_tests = Common_tests(Generated_bindings)
 
 

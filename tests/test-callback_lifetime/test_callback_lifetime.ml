@@ -10,16 +10,10 @@ open Ctypes
 open Foreign
 
 
-module type FOREIGN_SIGNATURES =
-sig
-  val store_callback : Types.callback_type_ptr -> unit
-  val invoke_stored_callback : int -> int
-  val return_callback : Types.callback_type_ptr -> Types.callback_type_ptr
-end
-
-module Common_tests(S : FOREIGN_SIGNATURES) =
+module Common_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
 struct
-  open S
+  module M = Functions.Stubs(S)
+  open M
 
   (*
     Check that we can store a reference to an OCaml function in a C global and
@@ -137,8 +131,7 @@ struct
     assert_equal 15 (ret 5)
 end
 
-module Foreign_tests =
-  Common_tests(Functions.Stubs(Tests_common.Foreign_binder))
+module Foreign_tests = Common_tests(Tests_common.Foreign_binder)
 module Stub_tests = Common_tests(Generated_bindings)
 
 let suite = "Callback lifetime tests" >:::

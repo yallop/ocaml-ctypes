@@ -9,6 +9,8 @@
    interface and subject to change. *)
 
 open Ctypes
+open Signed
+open Unsigned
 
 type voidp = Ctypes_raw.voidp
 type managed_buffer = Memory_stubs.managed_buffer
@@ -23,3 +25,52 @@ type 'a ptr = 'a Static.ptr
       pbyte_offset : int }
 
 val make_ptr : 'a typ -> voidp -> 'a ptr
+
+type 'a typ = 'a Static.typ =
+    Void            :                              unit typ
+  | Primitive       : 'a Primitives.prim        -> 'a typ 
+  | Pointer         : 'a typ                    -> 'a ptr typ
+  | Struct          : 'a Static.structure_type  -> 'a Static.structure typ
+  | Union           : 'a Static.union_type      -> 'a Static.union typ
+  | Abstract        : Static.abstract_type      -> 'a Static.abstract typ
+  | View            : ('a, 'b) view             -> 'a typ
+  | Array           : 'a typ * int              -> 'a Static.carray typ
+  | Bigarray        : (_, 'a) Ctypes_bigarray.t -> 'a typ
+and ('a, 'b) view = ('a, 'b) Static.view = {
+  read : 'b -> 'a;
+  write : 'a -> 'b;
+  format_typ: ((Format.formatter -> unit) -> Format.formatter -> unit) option;
+  ty: 'b typ;
+}
+
+type 'a fn = 'a Static.fn =
+  | Returns  : 'a typ   -> 'a fn
+  | Function : 'a typ * 'b fn  -> ('a -> 'b) fn
+
+type 'a prim = 'a Primitives.prim =
+  Char : char prim
+| Schar : int prim
+| Uchar : uchar prim
+| Short : int prim
+| Int : int prim
+| Long : long prim
+| Llong : llong prim
+| Ushort : ushort prim
+| Uint : uint prim
+| Ulong : ulong prim
+| Ullong : ullong prim
+| Size_t : size_t prim
+| Int8_t : int prim
+| Int16_t : int prim
+| Int32_t : int32 prim
+| Int64_t : int64 prim
+| Uint8_t : uint8 prim
+| Uint16_t : uint16 prim
+| Uint32_t : uint32 prim
+| Uint64_t : uint64 prim
+| Camlint : int prim
+| Nativeint : nativeint prim
+| Float : float prim
+| Double : float prim
+| Complex32 : Complex.t prim
+| Complex64 : Complex.t prim

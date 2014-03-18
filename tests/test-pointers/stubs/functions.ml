@@ -8,10 +8,8 @@
 (* Foreign function bindings for the pointer tests. *)
 
 open Ctypes
-open Tests_common
-open Types
 
-module Stubs (F: FOREIGN) =
+module Stubs (F: Cstubs.FOREIGN) =
 struct
   open F
 
@@ -61,17 +59,17 @@ struct
     (ptr int @-> ptr int @-> int @-> returning (ptr int))
 
   let passing_pointers_to_callback = foreign "passing_pointers_to_callback"
-      (pintfun1ptr @-> returning int)
+      (Foreign.funptr (ptr int @-> ptr int @-> returning int) @-> returning int)
 
   let accepting_pointer_from_callback =
     foreign "accepting_pointer_from_callback"
-      (pintfun2ptr @-> returning int)
+      (Foreign.funptr (int @-> int @-> returning (ptr int)) @-> returning int)
 
   let accepting_pointer_to_function_pointer =
     foreign "accepting_pointer_to_function_pointer"
-      (ptr arg_type @-> returning int)
+      (ptr (Foreign.funptr (int @-> int @-> returning int)) @-> returning int)
 
   let returning_pointer_to_function_pointer =
     foreign "returning_pointer_to_function_pointer"
-      (void @-> returning (ptr (iiifunptr)))
+      (void @-> returning (ptr (Foreign.funptr (int @-> int @-> returning int))))
 end

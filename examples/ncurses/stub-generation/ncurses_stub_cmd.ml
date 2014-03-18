@@ -5,7 +5,8 @@
  * See the file LICENSE for details.
  *)
 
-open Ncurses_generated
+module N = Ncurses_bindings.Bindings(Ncurses_generated)
+open N
 
 let () =
   let main_window = initscr () in

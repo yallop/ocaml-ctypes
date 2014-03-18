@@ -8,12 +8,13 @@
 (* Foreign function bindings for the callback lifetime tests. *)
 
 open Ctypes
-open Tests_common
-open Types
+open Foreign
 
-module Stubs (F: FOREIGN) =
+module Stubs (F: Cstubs.FOREIGN) =
 struct
   open F
+
+  let callback_type_ptr = funptr (int @-> returning int)
 
   let store_callback = foreign "store_callback"
     (callback_type_ptr @-> returning void)

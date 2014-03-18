@@ -84,28 +84,16 @@ let test_endian_detection () =
   end in ()
 
 
-
-external sum_union_components : Ctypes_raw.voidp -> Unsigned.size_t -> int64 
-  = "ctypes_test_stubsum_union_components" 
-let sum_union_components : Types.padded Ctypes.union Ctypes.ptr ->
-                           Unsigned.size_t -> int64 
-  = fun x1 x2 -> sum_union_components x1.Cstubs_internals.raw_ptr x2
-
-module type FOREIGN_SIGNATURES =
-sig
-  val sum_union_components :
-    Types.padded union ptr -> Unsigned.size_t -> int64 
-end
-
-module Common_tests(S : FOREIGN_SIGNATURES) =
+module Common_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
 struct
-  open S
+  open Functions
+  module M = Stubs(S)
+  open M
   (* Check that unions are tail-padded sufficiently to satisfy the alignment
      requirements of all their members.
   *)
   let test_union_padding () =
     let module M = struct
-      open Types
       let mkPadded : int64 -> padded union =
         fun x ->
           let u = make padded in
@@ -182,8 +170,7 @@ let test_sealing_empty_union () =
     (fun () -> seal empty)
 
 
-module Foreign_tests =
-  Common_tests(Functions.Stubs(Tests_common.Foreign_binder))
+module Foreign_tests = Common_tests(Tests_common.Foreign_binder)
 module Stub_tests = Common_tests(Generated_bindings)
 
 

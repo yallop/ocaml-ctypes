@@ -8,12 +8,14 @@
 (* Foreign function bindings for the C standard library tests. *)
 
 open Ctypes
-open Tests_common
-open Types
+open Foreign
 
-module Stubs (F: FOREIGN) =
+module Stubs (F: Cstubs.FOREIGN) =
 struct
   open F
+
+  let cchar = view ~read:Char.chr ~write:Char.code int
+  let bool = view ~read:((<>)0) ~write:(fun b -> if b then 1 else 0) int
 
   let t = (cchar @-> returning bool)
 
@@ -46,11 +48,13 @@ struct
   (* let div = foreign "div" (int @-> int @-> returning div_t) *)
 
   let qsort = foreign "qsort"
-    (ptr void @-> size_t @-> size_t @-> funptr_comparator @->
+    (ptr void @-> size_t @-> size_t @->
+     funptr (ptr void @-> ptr void @-> returning int) @->
      returning void)
 
   let bsearch = foreign "bsearch"
-    (ptr void @-> ptr void @-> size_t @-> size_t @-> funptr_comparator @->
+    (ptr void @-> ptr void @-> size_t @-> size_t @->
+     funptr (ptr void @-> ptr void @-> returning int) @->
      returning (ptr void))
 
   let strlen = foreign "strlen" (ptr char @-> returning size_t)

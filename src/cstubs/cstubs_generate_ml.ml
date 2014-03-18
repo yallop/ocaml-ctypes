@@ -19,14 +19,20 @@ type ml_type = [ `Ident of path
 type ml_external_type = [ `Prim of ml_type list * ml_type ]
 
 type ty = Ty : 'a typ -> ty
+type fnc = Fnc : 'a fn -> fnc
+
+type ml_pat = [ `Var of string
+              | `Record of (path * ml_pat) list
+              | `As of ml_pat * string
+              | `Underscore
+              | `Con of path * ml_pat list ]
 
 type ml_exp = [ `Ident of path 
               | `Project of ml_exp * path
-              | `MakePtr of ty * ml_exp
-              | `MakeStructured of ty * ml_exp
-              | `Coerce of ty * ty * ml_exp
-              | `Appl of ml_exp * ml_exp ]
-type ml_dec = [ `Function of lident * ml_type * lident list * ml_exp ]
+              | `MakePtr of ml_exp * ml_exp
+              | `MakeStructured of ml_exp * ml_exp
+              | `Appl of ml_exp * ml_exp 
+              | `Fun of lident list * ml_exp ]
 
 type attributes = { float: bool; noalloc: bool }
 
@@ -38,7 +44,12 @@ type extern = {
   attributes: attributes;
 }
 
-module Emit_ML =
+module Emit_ML : sig 
+  type appl_parens = ApplParens | NoApplParens
+  val ml_exp : appl_parens -> Format.formatter -> ml_exp -> unit
+  val ml_pat : appl_parens -> Format.formatter -> ml_pat -> unit
+  val extern : Format.formatter -> extern -> unit
+end =
 struct
   let fprintf, pp_print_string = Format.(fprintf, pp_print_string)
 
@@ -54,33 +65,6 @@ struct
         * as an argument in an application: e -
   *)
   type appl_parens = ApplParens | NoApplParens
-
-  let user_type fmt ty =
-    format_path fmt (Cstubs_public_name.((retrieve_path ty).value))
-
-  let rec typ : type a. appl_parens -> Format.formatter -> a Static.typ -> unit =
-    let open Format in
-    fun appl_parens fmt ty -> match appl_parens, ty with
-    | _, Void -> fprintf fmt "Ctypes.void"
-    | _, Primitive p ->
-      format_path fmt (Cstubs_public_name.constructor_ident_of_prim p)
-    | ApplParens, Pointer t -> fprintf fmt "@[(Ctypes.ptr@ @[%a@])@]" (typ ApplParens) t
-    | NoApplParens, Pointer t -> fprintf fmt "@[Ctypes.ptr@ @[%a@]@]" (typ ApplParens) t
-    | ApplParens, Array (t, n) -> fprintf fmt "@[(array@ %d@ @[%a@])@]" n (typ ApplParens) t
-    | NoApplParens, Array (t, n) -> fprintf fmt "@[array@ %d@ @[%a@]@]" n (typ ApplParens) t
-    | _, Bigarray _ -> failwith "Not yet implemented"
-    | _, Struct _ -> user_type fmt ty
-    | _, Union _ -> user_type fmt ty
-    | _, Abstract _ -> user_type fmt ty
-    | _, View _ -> user_type fmt ty
-
-  let rec fn : type a. appl_parens -> Format.formatter -> a Static.fn -> unit =
-    let open Format in
-    fun appl_parens fmt f -> match appl_parens, f with
-    | ApplParens, Function (a, b) -> fprintf fmt "@[(%a@ @@->@ %a)@]" (typ NoApplParens) a (fn NoApplParens) b
-    | NoApplParens, Function (a, b) -> fprintf fmt "@[%a@ @@->@ %a@]" (typ NoApplParens) a (fn NoApplParens) b
-    | ApplParens, Returns t -> fprintf fmt "@[(returning@ @[%a@])@}" (typ ApplParens) t
-    | NoApplParens, Returns t -> fprintf fmt "@[returning@ @[%a@]@]" (typ ApplParens) t
 
   let ident = format_path
 
@@ -127,45 +111,64 @@ struct
     (* if noalloc then pp_print_string fmt "\"noalloc\"" *)
     end
 
+  let args fmt xs =
+    List.iter (fprintf fmt "%s@ ") xs
+
   let rec ml_exp appl_parens fmt (e : ml_exp) =
     match appl_parens, e with
     | _, `Ident x -> ident fmt x
     | _, `Project (e, l) -> fprintf fmt "%a.%a" (ml_exp ApplParens) e ident l
     | ApplParens, `Appl (f, p) -> fprintf fmt "@[(%a@;<1 2>%a)@]" (ml_exp NoApplParens) f (ml_exp ApplParens) p
     | NoApplParens, `Appl (f, p) -> fprintf fmt "@[%a@ %a@]" (ml_exp NoApplParens) f (ml_exp ApplParens) p
-    | ApplParens, `MakePtr (Ty t, e) ->
+    | ApplParens, `MakePtr (t, e) ->
       fprintf fmt
-        "(@[<hov 2>Cstubs_internals.make_ptr@ %a@ %a)@]" (typ ApplParens) t (ml_exp ApplParens) e
-    | NoApplParens, `MakePtr (Ty t, e) ->
+        "(@[<hov 2>Cstubs_internals.make_ptr@ %a@ %a)@]" (ml_exp ApplParens) t (ml_exp ApplParens) e
+    | NoApplParens, `MakePtr (t, e) ->
       fprintf fmt
-        "@[<hov 2>Cstubs_internals.make_ptr@ %a@ %a@]" (typ ApplParens) t (ml_exp ApplParens) e
-    | ApplParens, `MakeStructured (Ty t, e) ->
+        "@[<hov 2>Cstubs_internals.make_ptr@ %a@ %a@]" (ml_exp ApplParens) t (ml_exp ApplParens) e
+    | ApplParens, `MakeStructured (t, e) ->
       fprintf fmt
-        "(@[<hov 2>Cstubs_internals.make_structured@ %a@ %a)@]" (typ ApplParens) t (ml_exp ApplParens) e
-    | NoApplParens, `MakeStructured (Ty t, e) ->
+        "(@[<hov 2>Cstubs_internals.make_structured@ %a@ %a)@]" (ml_exp ApplParens) t (ml_exp ApplParens) e
+    | NoApplParens, `MakeStructured (t, e) ->
       fprintf fmt
-        "@[<hov 2>Cstubs_internals.make_structured@ %a@ %a@]" (typ ApplParens) t (ml_exp ApplParens) e
-    | ApplParens, `Coerce (Ty t1, Ty t2, e) ->
-      fprintf fmt "@[(Ctypes.coerce@;<1 2>%a@ %a@ %a)@]"
-        (typ ApplParens) t1 (typ ApplParens) t2 (ml_exp ApplParens) e
-    | NoApplParens, `Coerce (Ty t1, Ty t2, e) ->
-      fprintf fmt "@[Ctypes.coerce@;<1 2>%a@ %a@ %a@]"
-        (typ ApplParens) t1 (typ ApplParens) t2 (ml_exp ApplParens) e
+        "@[<hov 2>Cstubs_internals.make_structured@ %a@ %a@]" (ml_exp ApplParens) t (ml_exp ApplParens) e
+    | _, `Fun (xs, e) ->
+      fprintf fmt "(@[<1>fun@ %a->@ %a)@]" args xs (ml_exp NoApplParens) e
 
-  let args fmt xs =
-    List.iter (fprintf fmt "%s@ ") xs
-
-  let ml_dec fmt (`Function (f, qt, xs, e) : ml_dec) =
-    fprintf fmt
-      "@[<v>@[let@ %s@ :@]@[<hov 1>@ %a@ @]@;<1 2>@[<hov 4>=@ fun@ %a->@ %a@]@\n@]@."
-      f (ml_type NoArrowParens) qt args xs (ml_exp NoApplParens) e
+  let rec ml_pat appl_parens fmt pat =
+    match appl_parens, pat with
+    | _, `Var x -> fprintf fmt "%s" x
+    | _, `Record fs -> fprintf fmt "{@[%a}@]" pat_fields fs
+    | _, `As (p, x) -> fprintf fmt "@[(%a@ as@ %s)@]" (ml_pat NoApplParens) p x
+    | _, `Underscore -> fprintf fmt "_"
+    | _, `Con (c, []) -> fprintf fmt "%a" format_path c
+    | NoApplParens, `Con (c, [p]) ->
+      fprintf fmt "@[<2>%a@ @[%a@]@]" format_path c (ml_pat ApplParens) p
+    | ApplParens, `Con (c, [p]) ->
+      fprintf fmt "(@[<2>%a@ @[%a@])@]" format_path c (ml_pat ApplParens) p
+    | ApplParens, `Con (c, ps) ->
+      fprintf fmt "(@[<2>%a@ (@[%a)@])@]" format_path c pat_args ps
+    | NoApplParens, `Con (c, ps) ->
+      fprintf fmt "@[<2>%a@ (@[%a)@]@]" format_path c pat_args ps
+  and pat_fields fmt : (path * ml_pat) list -> unit =
+    List.iter
+      (fun (l, p) ->
+        fprintf fmt "@[%a@ =@ %a;@]@ " format_path l (ml_pat NoApplParens) p)
+  and pat_args fmt : ml_pat list -> unit =
+    fun xs ->
+      let last = List.length xs - 1 in
+      List.iteri
+        (fun i ->
+          if i <> last then fprintf fmt "%a,@ " (ml_pat NoApplParens)
+          else fprintf fmt "%a" (ml_pat NoApplParens))
+        xs
 
   let extern fmt { ident; typ; primname; primname_byte; attributes } =
     fprintf fmt
       "@[<v>@[external@ %s@ :@]@[<hov 1>@ %a@ @]@;<1 2>"
       ident ml_external_type typ;
     fprintf fmt
-      "@[=@[@[%a@]@ @[%S@]@ %a@]@]@]@."
+      "@[=@ @[@[%a@]@ @[%S@]@ %a@]@]@]@."
       primname_opt primname_byte primname attrs attributes
 end
 
@@ -181,7 +184,7 @@ let byte_stub_name : string -> ml_external_type -> string option =
     then Some (Printf.sprintf "%s_byte%d" name arity)
     else None
 
-let attributes : type a b. (a -> b) fn -> attributes =
+let attributes : type a. a fn -> attributes =
    let open Cstubs_analysis in
    fun fn -> { float = float fn; noalloc = not (may_allocate fn) }
 
@@ -223,116 +226,129 @@ let rec ml_external_type_of_fn : type a. a fn -> ml_external_type = function
     let `Prim (l, t) = ml_external_type_of_fn t in
     `Prim (ml_typ_of_arg_typ f :: l, t)
 
-let rec underlying : type a. a typ -> ty = function
-  | View { ty } -> underlying ty
-  | t -> Ty t
-
-let rec unwrap_val : type a. a typ -> ml_exp -> ml_exp option =
-  fun ty e -> match ty with
-  | Void -> None
-  | Primitive p -> None
-  | Pointer _ -> Some (`Project (e, path_of_string "Cstubs_internals.raw_ptr"))
-  | Struct _ -> Some (`Project (`Appl (`Ident (path_of_string "Ctypes.addr"), e),
-                                path_of_string "Cstubs_internals.raw_ptr"))
-  | Union _ -> Some (`Project (`Appl (`Ident (path_of_string "Ctypes.addr"), e),
-                               path_of_string "Cstubs_internals.raw_ptr"))
-  | View _  ->
-    let Ty u = underlying ty in
-    let e = `Coerce (Ty ty, Ty u, e) in
-    begin match unwrap_val u e with
-    | Some e -> Some e
-    | None -> Some e
-    end
-  | Abstract _ -> internal_error
-    "Unexpected abstract type encountered during ML code generation: %s"
-    (Ctypes.string_of_typ ty)
-  | Array _ -> internal_error
-    "Unexpected array type encountered during ML code generation: %s"
-    (Ctypes.string_of_typ ty)
-  | Bigarray _ -> internal_error
-    "Unexpected bigarray type encountered during ML code generation: %s"
-    (Ctypes.string_of_typ ty)
-
-let rec wrap_val : type a. a typ -> ml_exp -> ml_exp option =
-  fun ty x -> match ty with
-  | Void -> None
-  | Primitive p -> None
-  | Pointer t -> Some (`MakePtr (Ty t, x))
-  | Struct _ -> Some (`MakeStructured (Ty ty, x))
-  | Union _ -> Some (`MakeStructured (Ty ty, x))
-  | View _ ->
-    let Ty u = underlying ty in
-    begin match wrap_val u x with
-    | Some x ->
-      Some (`Coerce (Ty u, Ty ty, x))
-    | None ->
-      Some (`Coerce (Ty u, Ty ty, x))
-    end
-  | Abstract _ -> internal_error
-    "Unexpected abstract type encountered during ML code generation: %s"
-    (Ctypes.string_of_typ ty)
-  | Array _ -> internal_error
-    "Unexpected array type encountered during ML code generation: %s"
-    (Ctypes.string_of_typ ty)
-  | Bigarray _ -> internal_error
-    "Unexpected bigarray type encountered during ML code generation: %s"
-    (Ctypes.string_of_typ ty)
-
 let var_counter = ref 0
 let fresh_var () =
   incr var_counter;
   Printf.sprintf "x%d" !var_counter
 
+let fn ~stub_name ~external_name fmt fn =
+  let ext =
+    let typ = ml_external_type_of_fn fn in
+    ({ ident = external_name;
+       typ = typ;
+       primname = stub_name;
+       primname_byte = byte_stub_name stub_name typ;
+       attributes = attributes fn; }) in
+  Format.fprintf fmt "%a@." Emit_ML.extern ext
+
+let static_con c args =
+  `Con (Ctypes_path.path_of_string ("Cstubs_internals." ^ c), args)
+
+let rec pattern_and_exp_of_typ :
+  type a. a typ -> ml_exp -> [`Arg | `Ret ] -> ml_pat * ml_exp option =
+  fun typ e pol -> match typ with
+  | Void ->
+    (static_con "Void" [], None)
+  | Primitive p ->
+    (static_con "Primitive"
+       [`Con (Cstubs_public_name.constructor_cident_of_prim p, [])],
+     None)
+  | Pointer _ ->
+    let x = fresh_var () in
+    let pat = static_con "Pointer" [`Var x] in
+    begin match pol with
+    | `Arg -> (pat, Some (`Project (e, path_of_string "Cstubs_internals.raw_ptr")))
+    | `Ret -> (pat, Some (`MakePtr (`Ident (path_of_string x), e)))
+    end
+  | Struct _ ->
+    let x = fresh_var () in
+    let pat = `As (static_con "Struct" [`Underscore], x) in
+    begin match pol with
+    | `Arg ->
+      (pat, Some (`Project (`Appl (`Ident (path_of_string "Ctypes.addr"), e),
+                            path_of_string "Cstubs_internals.raw_ptr")))
+    | `Ret -> (pat, Some (`MakeStructured (`Ident (path_of_string x), e)))
+    end
+  | Union _ ->
+    let x = fresh_var () in
+    let pat = `As (static_con "Union" [`Underscore], x) in
+    begin match pol with
+    | `Arg ->
+      (pat, Some (`Project (`Appl (`Ident (path_of_string "Ctypes.addr"), e),
+                            path_of_string "Cstubs_internals.raw_ptr")))
+    | `Ret -> (pat, Some (`MakeStructured (`Ident (path_of_string x), e)))
+    end
+  | View { ty } ->
+    begin match pol  with
+    | `Arg -> 
+      let x = fresh_var () in
+      let e = `Appl (`Ident (path_of_string x), e) in
+      let (p, None), e | (p, Some e), _ =
+        pattern_and_exp_of_typ ty e pol, e in
+      let pat = static_con "View"
+        [`Record [path_of_string "Cstubs_internals.ty", p;
+                  path_of_string "Cstubs_internals.write", `Var x]] in
+      (pat, Some e)
+    | `Ret -> 
+      let (p, None), e | (p, Some e), _ =
+        pattern_and_exp_of_typ ty e pol, e in
+      let x = fresh_var () in
+      let pat = static_con "View"
+        [`Record [path_of_string "Cstubs_internals.ty", p;
+                  path_of_string "Cstubs_internals.read", `Var x]] in
+      (pat, Some (`Appl (`Ident (path_of_string x), e)))
+    end
+  | Abstract _ as ty -> internal_error
+    "Unexpected abstract type encountered during ML code generation: %s"
+    (Ctypes.string_of_typ ty)
+  | Array _ as ty -> internal_error
+    "Unexpected array type encountered during ML code generation: %s"
+    (Ctypes.string_of_typ ty)
+  | Bigarray _ as ty -> internal_error
+    "Unexpected bigarray type encountered during ML code generation: %s"
+    (Ctypes.string_of_typ ty)
+
 type wrapper_state = {
+  pat: ml_pat;
   exp: ml_exp;
   args: lident list;
   trivial: bool;
 }
+
 let rec wrapper_body : type a. a fn -> ml_exp -> wrapper_state =
   fun fn exp -> match fn with
   | Returns t ->
-    begin match wrap_val t exp with
-      None -> { exp ; args = []; trivial = true }
-    | Some exp -> { exp; args = []; trivial = false }
+    begin match pattern_and_exp_of_typ t exp `Ret with
+      pat, None -> { exp ; args = []; trivial = true;
+                     pat = static_con "Returns" [pat] }
+    | pat, Some exp -> { exp; args = []; trivial = false;
+                         pat = static_con "Returns" [pat] }
     end
   | Function (f, t) ->
     let x = fresh_var () in
-    begin match unwrap_val f (`Ident (path_of_string x)) with
-    | None ->
-      let { exp; args; trivial } = wrapper_body t (`Appl (exp, `Ident (path_of_string x))) in
-      { exp; args = x :: args; trivial }
-    | Some exp' ->
-      let { exp; args = xs; trivial } = wrapper_body t (`Appl (exp, exp')) in
-      { exp; args = x :: xs; trivial = false }
+    begin match pattern_and_exp_of_typ f (`Ident (path_of_string x)) `Arg with
+    | fpat, None ->
+      let { exp; args; trivial; pat = tpat } =
+        wrapper_body t (`Appl (exp, `Ident (path_of_string x))) in
+      { exp; args = x :: args; trivial;
+        pat = static_con "Function" [fpat; tpat] }
+    | fpat, Some exp' ->
+      let { exp; args = xs; trivial; pat = tpat } =
+        wrapper_body t (`Appl (exp, exp')) in
+      { exp; args = x :: xs; trivial = false;
+        pat = static_con "Function" [fpat; tpat] }
     end
 
-let wrapper : type a. a fn -> string -> ml_dec option =
-  fun fn f ->
-    match wrapper_body fn (`Ident (path_of_string f)) with
-    | { trivial = true } ->
-      None
-    | { exp; args } ->
-      Some (`Function (f, Cstubs_public_name.ident_of_fn fn, args, exp))
+let wrapper : type a. a fn -> string -> ml_pat * ml_exp option =
+  fun fn f -> match wrapper_body fn (`Ident (path_of_string f)) with
+    { trivial = true; pat } -> (pat, None)
+  | { exp; args; pat } -> (pat, Some (`Fun (args, exp)))
 
-let fn : type a b. stub_name:string -> external_name:string -> (a -> b) fn -> extern * ml_dec option =
-   fun ~stub_name ~external_name fn -> 
-     let typ = ml_external_type_of_fn fn in
-     ({ ident = external_name;
-        typ = typ;
-        primname = stub_name;
-        primname_byte = byte_stub_name stub_name typ;
-        attributes = attributes fn; },
-      wrapper fn external_name)
-
-let fn ~stub_name ~external_name fmt f =
-  match fn ~stub_name ~external_name f with
-    (ext, Some dec) ->
-      Emit_ML.extern fmt ext;
-      Emit_ML.ml_dec fmt dec
-  | (ext, None) ->
-      Emit_ML.extern fmt ext;
-      Format.fprintf fmt "@."
-
-let signature s fmt f =
-  Format.fprintf fmt "val@ %s@ :@ %a@."
-    s Emit_ML.(ml_type NoArrowParens) (Cstubs_public_name.ident_of_fn f)
+let case ~stub_name ~external_name fmt fn =
+  let p, e = match wrapper fn external_name with
+      pat, None -> pat, `Ident (path_of_string external_name)
+    | pat, Some e -> pat, e
+  in
+  Format.fprintf fmt "@[<hov 2>@[<h 2>|@ @[%S,@ @[%a@]@]@ ->@]@ "
+    stub_name Emit_ML.(ml_pat NoApplParens) p;
+  Format.fprintf fmt "@[<hov 2>@[%a@]@]@]@." Emit_ML.(ml_exp ApplParens) e

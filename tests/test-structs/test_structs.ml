@@ -12,16 +12,10 @@ open Ctypes
 let testlib = Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW])
 
 
-module type FOREIGN_SIGNATURES =
-sig
-  val accept_struct : Types.simple structure -> int 
-  val return_struct : unit -> Types.simple structure 
-end
-
-
-module Common_tests(S : FOREIGN_SIGNATURES) =
+module Common_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
 struct
-  open S
+  module M = Functions.Stubs(S)
+  open M
 
   (*
     Call a function of type
@@ -38,7 +32,6 @@ struct
   *)
   let test_passing_struct () =
     let module M = struct
-      open Types
       let s = make simple
 
       let () = begin
@@ -70,7 +63,6 @@ struct
   *)
   let test_returning_struct () =
     let module M = struct
-      open Types
       let s = return_struct ()
 
       let () = assert_equal 20 (getf s i)
@@ -350,8 +342,7 @@ let test_struct_ffi_type_lifetime () =
   end in ()
 
 
-module Foreign_tests =
-  Common_tests(Functions.Stubs(Tests_common.Foreign_binder))
+module Foreign_tests = Common_tests(Tests_common.Foreign_binder)
 module Stub_tests = Common_tests(Generated_bindings)
 
 

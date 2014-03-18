@@ -10,4 +10,5 @@
 val fn : stub_name:string -> external_name:string -> Format.formatter ->
          ('a -> 'b) Ctypes.fn -> unit
 
-val signature : string -> Format.formatter -> ('a -> 'b) Ctypes.fn -> unit
+val case : stub_name:string -> external_name:string -> Format.formatter ->
+         ('a -> 'b) Ctypes.fn -> unit

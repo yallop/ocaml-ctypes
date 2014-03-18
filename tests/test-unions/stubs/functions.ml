@@ -8,10 +8,15 @@
 (* Foreign function bindings for the union tests. *)
 
 open Ctypes
-open Tests_common
-open Types
 
-module Stubs (F: FOREIGN) =
+type padded
+let padded : padded union typ = union "padded"
+let (-:) ty label = field padded label ty
+let i = int64_t                         -: "i"
+let a = array (sizeof int64_t + 1) char -: "a"
+let () = seal padded
+
+module Stubs (F: Cstubs.FOREIGN) =
 struct
   open F
 

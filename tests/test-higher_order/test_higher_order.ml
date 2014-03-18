@@ -10,22 +10,10 @@ open OUnit
 open Foreign
 
 
-module type FOREIGN_SIGNATURES =
-sig
-  val higher_order_1 : Types.intfunptr -> int -> int -> int 
-    
-  val higher_order_3 :
-    Types.funptr_acceptor -> Types.intfunptr -> int -> int -> int 
-
-  val returning_funptr : int -> Types.intfunptr 
-    
-  val callback_returns_funptr : Types.intfunhoptr -> int -> int 
-end
-
-
-module Common_tests(S : FOREIGN_SIGNATURES) =
+module Common_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
 struct
-  open S
+  module M = Functions.Stubs(S)
+  open M
 
   (*
      Call a C function of type
@@ -104,8 +92,7 @@ struct
 end
 
 
-module Foreign_tests =
-  Common_tests(Functions.Stubs(Tests_common.Foreign_binder))
+module Foreign_tests = Common_tests(Tests_common.Foreign_binder)
 module Stub_tests = Common_tests(Generated_bindings)
 
 

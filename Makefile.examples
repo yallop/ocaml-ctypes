@@ -78,11 +78,11 @@ ncurses-stubs.dir = examples/ncurses/stub-generation/bindings
 ncurses-stubs.subproject_deps = ctypes cstubs
 ncurses-stubs.deps = str bigarray
 ncurses-stubs: PROJECT=ncurses-stubs
-ncurses-stubs: $$(NATIVE_TARGET)
+ncurses-stubs: $$(NATIVE_TARGET) $$(LIB_TARGETS)
 
 ncurses-cmd.install = no
 ncurses-cmd.dir = examples/ncurses/stub-generation
-ncurses-cmd.subproject_deps = ctypes cstubs
+ncurses-cmd.subproject_deps = ctypes cstubs ncurses-stubs
 ncurses-cmd.deps = str bigarray
 ncurses-cmd.extra_mls = ncurses_generated.ml
 ncurses-cmd.link_flags = -lncurses
