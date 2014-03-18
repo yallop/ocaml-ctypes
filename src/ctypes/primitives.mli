@@ -5,6 +5,10 @@
  * See the file LICENSE for details.
  *)
 
+(* Representation of primitive C types.
+
+   Internal representation, not for public use. *)
+
 open Unsigned
 open Signed
 
@@ -57,30 +61,4 @@ type _ ml_prim =
   | ML_ulong :  ulong ml_prim
   | ML_ushort :  ushort ml_prim
 
-let ml_prim : type a. a prim -> a ml_prim = function
-  | Char -> ML_char
-  | Schar -> ML_int
-  | Uchar -> ML_uchar
-  | Short -> ML_int
-  | Int -> ML_int
-  | Long -> ML_long
-  | Llong -> ML_llong
-  | Ushort -> ML_ushort
-  | Uint -> ML_uint
-  | Ulong -> ML_ulong
-  | Ullong -> ML_ullong
-  | Size_t -> ML_size_t
-  | Int8_t -> ML_int
-  | Int16_t -> ML_int
-  | Int32_t -> ML_int32
-  | Int64_t -> ML_int64
-  | Uint8_t -> ML_uint8
-  | Uint16_t -> ML_uint16
-  | Uint32_t -> ML_uint32
-  | Uint64_t -> ML_uint64
-  | Camlint -> ML_int
-  | Nativeint -> ML_nativeint
-  | Float -> ML_float
-  | Double -> ML_float
-  | Complex32 -> ML_complex
-  | Complex64 -> ML_complex
+val ml_prim : 'a prim -> 'a ml_prim
