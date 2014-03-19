@@ -65,3 +65,41 @@ let write_ml fmt ~prefix (module B : BINDINGS) =
   let () = Format.fprintf fmt "module CI = Cstubs_internals@\n@\n" in
   let module M = B((val foreign)) in
   finally ()
+
+module type CONSTANT =
+sig
+  type 'a t
+  val constant : 'a Ctypes.typ -> string -> 'a t
+end
+
+module type CONSTANT' = CONSTANT with type 'a t = unit
+
+module type CONSTANT_BINDINGS = functor (C : CONSTANT') -> sig end
+
+let gen_constant_c fmt : (unit -> unit) * (module CONSTANT') * (unit -> unit) =
+  let initially () = 
+    Format.pp_print_string fmt "
+#include <stdio.h>
+int main() {
+"
+  and finally () =
+    Format.pp_print_string fmt "
+return 0;
+}
+"
+  and body : (module CONSTANT') =
+    (module
+     struct
+       type 'a t = unit
+       let constant typ name =
+       (* Cstubs_generate_c.const fmt name typ *)
+         assert false
+     end) in
+  initially, body, finally
+      
+
+let write_constant_c fmt (module B : CONSTANT_BINDINGS) =
+  let initially, body, finally = gen_constant_c fmt in
+  initially ();
+  let module M = B((val body)) in 
+  finally ()

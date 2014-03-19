@@ -32,3 +32,13 @@ val write_ml : Format.formatter -> prefix:string -> (module BINDINGS) -> unit
     The generated code uses definitions exposed in the module
     [Cstubs_internals]. *)
 
+module type CONSTANT =
+sig
+  type 'a t
+  val constant : 'a Ctypes.typ -> string -> 'a t
+end
+
+module type CONSTANT_BINDINGS =
+  functor (C : CONSTANT with type 'a t = unit) -> sig end
+
+val write_constant_c : Format.formatter -> (module CONSTANT_BINDINGS) -> unit
