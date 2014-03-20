@@ -13,5 +13,6 @@ val ident_of_ml_prim : 'a Primitives.ml_prim -> Ctypes_path.path
 val constructor_ident_of_prim : 'a Primitives.prim -> Ctypes_path.path
 (* The path to a value that represents the primitive type *)
 
-val constructor_cident_of_prim : 'a Primitives.prim -> Ctypes_path.path
+val constructor_cident_of_prim :
+  ?module_name:string -> 'a Primitives.prim -> Ctypes_path.path
 (* The path to a constructor that represents the primitive type *)
