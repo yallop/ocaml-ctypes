@@ -122,16 +122,16 @@ struct
     | NoApplParens, `Appl (f, p) -> fprintf fmt "@[%a@ %a@]" (ml_exp NoApplParens) f (ml_exp ApplParens) p
     | ApplParens, `MakePtr (t, e) ->
       fprintf fmt
-        "(@[<hov 2>Cstubs_internals.make_ptr@ %a@ %a)@]" (ml_exp ApplParens) t (ml_exp ApplParens) e
+        "(@[<hov 2>CI.make_ptr@ %a@ %a)@]" (ml_exp ApplParens) t (ml_exp ApplParens) e
     | NoApplParens, `MakePtr (t, e) ->
       fprintf fmt
-        "@[<hov 2>Cstubs_internals.make_ptr@ %a@ %a@]" (ml_exp ApplParens) t (ml_exp ApplParens) e
+        "@[<hov 2>CI.make_ptr@ %a@ %a@]" (ml_exp ApplParens) t (ml_exp ApplParens) e
     | ApplParens, `MakeStructured (t, e) ->
       fprintf fmt
-        "(@[<hov 2>Cstubs_internals.make_structured@ %a@ %a)@]" (ml_exp ApplParens) t (ml_exp ApplParens) e
+        "(@[<hov 2>CI.make_structured@ %a@ %a)@]" (ml_exp ApplParens) t (ml_exp ApplParens) e
     | NoApplParens, `MakeStructured (t, e) ->
       fprintf fmt
-        "@[<hov 2>Cstubs_internals.make_structured@ %a@ %a@]" (ml_exp ApplParens) t (ml_exp ApplParens) e
+        "@[<hov 2>CI.make_structured@ %a@ %a@]" (ml_exp ApplParens) t (ml_exp ApplParens) e
     | _, `Fun (xs, e) ->
       fprintf fmt "(@[<1>fun@ %a->@ %a)@]" args xs (ml_exp NoApplParens) e
 
@@ -189,7 +189,7 @@ let attributes : type a. a fn -> attributes =
    fun fn -> { float = float fn; noalloc = not (may_allocate fn) }
 
 let managed_buffer = `Ident (path_of_string "Memory_stubs.managed_buffer")
-let voidp = `Ident (path_of_string "Cstubs_internals.voidp")
+let voidp = `Ident (path_of_string "CI.voidp")
 
 (* These functions determine the type that should appear in the extern
    signature *)
@@ -242,7 +242,7 @@ let extern ~stub_name ~external_name fmt fn =
   Format.fprintf fmt "%a@." Emit_ML.extern ext
 
 let static_con c args =
-  `Con (Ctypes_path.path_of_string ("Cstubs_internals." ^ c), args)
+  `Con (Ctypes_path.path_of_string ("CI." ^ c), args)
 
 let rec pattern_and_exp_of_typ :
   type a. a typ -> ml_exp -> [`Arg | `Ret ] -> ml_pat * ml_exp option =
@@ -250,14 +250,13 @@ let rec pattern_and_exp_of_typ :
   | Void ->
     (static_con "Void" [], None)
   | Primitive p ->
-    (static_con "Primitive"
-       [`Con (Cstubs_public_name.constructor_cident_of_prim p, [])],
-     None)
+    let id = Cstubs_public_name.constructor_cident_of_prim ~module_name:"CI" p in
+    (static_con "Primitive" [`Con (id, [])], None)
   | Pointer _ ->
     let x = fresh_var () in
     let pat = static_con "Pointer" [`Var x] in
     begin match pol with
-    | `Arg -> (pat, Some (`Project (e, path_of_string "Cstubs_internals.raw_ptr")))
+    | `Arg -> (pat, Some (`Project (e, path_of_string "CI.raw_ptr")))
     | `Ret -> (pat, Some (`MakePtr (`Ident (path_of_string x), e)))
     end
   | Struct _ ->
@@ -266,7 +265,7 @@ let rec pattern_and_exp_of_typ :
     begin match pol with
     | `Arg ->
       (pat, Some (`Project (`Appl (`Ident (path_of_string "Ctypes.addr"), e),
-                            path_of_string "Cstubs_internals.raw_ptr")))
+                            path_of_string "CI.raw_ptr")))
     | `Ret -> (pat, Some (`MakeStructured (`Ident (path_of_string x), e)))
     end
   | Union _ ->
@@ -275,7 +274,7 @@ let rec pattern_and_exp_of_typ :
     begin match pol with
     | `Arg ->
       (pat, Some (`Project (`Appl (`Ident (path_of_string "Ctypes.addr"), e),
-                            path_of_string "Cstubs_internals.raw_ptr")))
+                            path_of_string "CI.raw_ptr")))
     | `Ret -> (pat, Some (`MakeStructured (`Ident (path_of_string x), e)))
     end
   | View { ty } ->
@@ -286,16 +285,16 @@ let rec pattern_and_exp_of_typ :
       let (p, None), e | (p, Some e), _ =
         pattern_and_exp_of_typ ty e pol, e in
       let pat = static_con "View"
-        [`Record [path_of_string "Cstubs_internals.ty", p;
-                  path_of_string "Cstubs_internals.write", `Var x]] in
+        [`Record [path_of_string "CI.ty", p;
+                  path_of_string "CI.write", `Var x]] in
       (pat, Some e)
     | `Ret -> 
       let (p, None), e | (p, Some e), _ =
         pattern_and_exp_of_typ ty e pol, e in
       let x = fresh_var () in
       let pat = static_con "View"
-        [`Record [path_of_string "Cstubs_internals.ty", p;
-                  path_of_string "Cstubs_internals.read", `Var x]] in
+        [`Record [path_of_string "CI.ty", p;
+                  path_of_string "CI.read", `Var x]] in
       (pat, Some (`Appl (`Ident (path_of_string x), e)))
     end
   | Abstract _ as ty -> internal_error

@@ -62,4 +62,6 @@ let write_c fmt ~prefix (module B : BINDINGS) =
 
 let write_ml fmt ~prefix (module B : BINDINGS) =
   let foreign, finally = gen_ml prefix fmt in
-  let module M = B((val foreign)) in finally ()
+  let () = Format.fprintf fmt "module CI = Cstubs_internals@\n@\n" in
+  let module M = B((val foreign)) in
+  finally ()
