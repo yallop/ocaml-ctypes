@@ -7,7 +7,7 @@
 
 (* ML stub generation *)
 
-val fn : stub_name:string -> external_name:string -> Format.formatter ->
+val extern : stub_name:string -> external_name:string -> Format.formatter ->
          ('a -> 'b) Ctypes.fn -> unit
 
 val case : stub_name:string -> external_name:string -> Format.formatter ->

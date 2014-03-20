@@ -53,7 +53,7 @@ let gen_ml prefix fmt : (module FOREIGN') * (unit -> unit) =
        let external_name = var prefix cname 
        and stub_name = prefix ^ cname in
        bindings := Bind (cname, external_name, fn) :: !bindings;
-       Cstubs_generate_ml.fn ~stub_name ~external_name fmt fn
+       Cstubs_generate_ml.extern ~stub_name ~external_name fmt fn
    end),
   fun () -> write_foreign fmt !bindings
 

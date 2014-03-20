@@ -231,7 +231,7 @@ let fresh_var () =
   incr var_counter;
   Printf.sprintf "x%d" !var_counter
 
-let fn ~stub_name ~external_name fmt fn =
+let extern ~stub_name ~external_name fmt fn =
   let ext =
     let typ = ml_external_type_of_fn fn in
     ({ ident = external_name;
