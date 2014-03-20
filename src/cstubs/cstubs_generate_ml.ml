@@ -286,7 +286,7 @@ let rec pattern_and_exp_of_typ :
         pattern_and_exp_of_typ ty e pol, e in
       let pat = static_con "View"
         [`Record [path_of_string "CI.ty", p;
-                  path_of_string "CI.write", `Var x]] in
+                  path_of_string "write", `Var x]] in
       (pat, Some e)
     | `Ret -> 
       let (p, None), e | (p, Some e), _ =
@@ -294,7 +294,7 @@ let rec pattern_and_exp_of_typ :
       let x = fresh_var () in
       let pat = static_con "View"
         [`Record [path_of_string "CI.ty", p;
-                  path_of_string "CI.read", `Var x]] in
+                  path_of_string "read", `Var x]] in
       (pat, Some (`Appl (`Ident (path_of_string x), e)))
     end
   | Abstract _ as ty -> internal_error
