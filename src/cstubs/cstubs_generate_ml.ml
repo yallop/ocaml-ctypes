@@ -94,7 +94,7 @@ struct
 
   let primname_opt fmt = function
     | None -> ()
-    | Some primname -> fprintf fmt "%S" primname
+    | Some primname -> fprintf fmt "%S@ " primname
 
   let attrs fmt { float; noalloc } =
     begin 
@@ -165,10 +165,10 @@ struct
 
   let extern fmt { ident; typ; primname; primname_byte; attributes } =
     fprintf fmt
-      "@[<v>@[external@ %s@ :@]@[<hov 1>@ %a@ @]@;<1 2>"
+      "@[<hov 2>@[external@ %s@]@ @[<h 1>:@ @[%a@]@]@ "
       ident ml_external_type typ;
     fprintf fmt
-      "@[=@ @[@[%a@]@ @[%S@]@ %a@]@]@]@."
+      "@[=@ @[@[%a@]@[%S@]@ %a@]@]@]@."
       primname_opt primname_byte primname attrs attributes
 end
 
