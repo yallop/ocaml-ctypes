@@ -462,6 +462,13 @@ val ptr_of_raw_address : int64 -> unit ptr
 val raw_address_of_ptr : unit ptr -> int64
 (** Return the numeric representation of an address *)
 
+val string_from_ptr : char ptr -> length:int -> string
+(** [string_from_ptr p ~length] creates a string initialized with the [length]
+    characters at address [p].
+
+    Raise [Invalid_argument "Ctypes.string_from_ptr"] if [length] is
+    negative. *)
+
 (** {3 Array values} *)
 
 (** {4 C array values} *)
