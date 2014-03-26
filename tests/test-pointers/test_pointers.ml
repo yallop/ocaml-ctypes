@@ -335,6 +335,21 @@ let test_reading_and_writing_global_value () =
 
 
 (*
+  Tests for reading a string from an address.
+*)
+let test_reading_strings () =
+  let p = allocate_n char 26 in begin
+    StringLabels.iteri "abcdefghijklmnoprwstuvwxyz"
+      ~f:(fun i c -> (p +@ i) <-@ c);
+    assert_equal (string_from_ptr p 5) "abcde";
+    assert_equal (string_from_ptr p 26) "abcdefghijklmnoprwstuvwxyz";
+    assert_equal (string_from_ptr p 0) "";
+    assert_raises (Invalid_argument "Ctypes.string_from_ptr")
+      (fun () -> string_from_ptr p (-1));
+  end
+
+
+(*
   Tests for various aspects of pointer arithmetic.
 *)
 let test_pointer_arithmetic () =
@@ -577,6 +592,9 @@ let suite = "Pointer tests" >:::
 
    "returned globals (stubs)"
     >:: Stub_tests.test_reading_returned_global;
+
+   "reading strings"
+    >:: test_reading_strings;
 
    "arithmetic"
     >:: test_pointer_arithmetic;

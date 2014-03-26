@@ -320,3 +320,7 @@ let array1 = Array1
 let array2 = Array2
 let array3 = Array3
 let typ_of_bigarray_kind k = Primitive (Ctypes_bigarray.prim_of_kind k)
+
+let string_from_ptr { raw_ptr; pbyte_offset = offset } ~length:len =
+  if len < 0 then invalid_arg "Ctypes.string_from_ptr"
+  else Stubs.string_of_array raw_ptr ~offset ~len

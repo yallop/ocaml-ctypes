@@ -42,3 +42,7 @@ external memcpy :
   src:Ctypes_raw.voidp -> src_offset:int ->
     size:int -> unit
   = "ctypes_memcpy"
+
+(* Read a fixed length OCaml string from memory *)
+external string_of_array : Ctypes_raw.voidp -> offset:int -> len:int -> string
+  = "ctypes_string_of_array"
