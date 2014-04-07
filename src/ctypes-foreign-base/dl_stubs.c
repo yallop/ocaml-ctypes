@@ -22,11 +22,15 @@ enum dl_flags_caml {
   _RTLD_LAZY,
   _RTLD_NOW,
   _RTLD_GLOBAL,
+#ifdef RTLD_NODELETE
   _RTLD_NODELETE,
+#endif /* RTLD_NODELETE */
+#ifdef RTLD_NOLOAD
   _RTLD_NOLOAD,
+#endif /* RTLD_NOLOAD */
 #ifdef RTLD_DEEPBIND
   _RTLD_DEEPBIND,
-#endif /* _RTLD_DEEPBIND */
+#endif /* RTLD_DEEPBIND */
 };
 
 static value Val_some(value v)
@@ -48,11 +52,15 @@ value ctypes_resolve_dl_flag(value flag)
     case _RTLD_LAZY:     rv = RTLD_LAZY;     break;
     case _RTLD_NOW:      rv = RTLD_NOW;      break;
     case _RTLD_GLOBAL:   rv = RTLD_GLOBAL;   break;
+#ifdef RTLD_NODELETE
     case _RTLD_NODELETE: rv = RTLD_NODELETE; break;
+#endif /* RTLD_NODELETE */
+#ifdef RTLD_NOLOAD
     case _RTLD_NOLOAD:   rv = RTLD_NOLOAD;   break;
+#endif /* RTLD_NOLOAD */
 #ifdef RTLD_DEEPBIND
     case _RTLD_DEEPBIND: rv = RTLD_DEEPBIND; break;
-#endif /* _RTLD_DEEPBIND */
+#endif /* RTLD_DEEPBIND */
     default: assert(0);
   }
 
