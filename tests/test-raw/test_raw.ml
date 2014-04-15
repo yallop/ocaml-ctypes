@@ -30,7 +30,7 @@ let test_fabs () =
     
     let fabs x =
       call dlfabs callspec
-        (write Primitives.Double ~offset:arg_1_offset x)
+        (fun p _values -> write Primitives.Double ~offset:arg_1_offset x p)
         (read Primitives.Double ~offset:0)
     in
 
@@ -57,7 +57,7 @@ let test_pow () =
     
     let pow x y =
       call dlpow callspec
-        (fun buffer ->
+        (fun buffer _values ->
           write Primitives.Double ~offset:arg_1_offset x buffer;
           write Primitives.Double ~offset:arg_2_offset y buffer)
         (read ~offset:0 Primitives.Double)
