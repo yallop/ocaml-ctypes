@@ -607,11 +607,12 @@ $(BUILDDIR)/clib/test_functions.o: tests/clib/test_functions.c
 	$(CC) -c $(CFLAGS) -I `ocamlc -where` -o $@ $^
 tests/clib/test_functions.c: tests/clib/test_functions.h
 
-.PHONY: $(TESTS) tests-common
-test: testlib tests-common $(TESTS) $(filter-out %-stubs,\
-				   $(filter-out %-stub-generator,\
-				   $(filter-out %-generated,\
-				     $(TESTS:%=run-%))))
+.PHONY: test testlib $(TESTS) tests-common
+test: build testlib tests-common $(TESTS) \
+         $(filter-out %-stubs,\
+         $(filter-out %-stub-generator,\
+         $(filter-out %-generated,\
+           $(TESTS:%=run-%))))
 
 run-%:	$*
 	@echo running $*
