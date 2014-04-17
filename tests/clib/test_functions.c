@@ -374,6 +374,26 @@ void mul_complexf(float complex *l, float complex *r, float complex *out)
   *out = *l * *r;
 }
 
+double complex add_complexd_val(double complex l, double complex r)
+{
+  return l + r;
+}
+
+double complex mul_complexd_val(double complex l, double complex r)
+{
+  return l * r;
+}
+
+float complex add_complexf_val(float complex l, float complex r)
+{
+  return l + r;
+}
+
+float complex mul_complexf_val(float complex l, float complex r)
+{
+  return l * r;
+}
+
 static int (*global_stored_callback)(int) = NULL;
 
 void store_callback(int (*callback)(int))

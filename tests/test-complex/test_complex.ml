@@ -14,7 +14,7 @@ let testlib = Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW]
 
 module Common_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
 struct
-  module M = Functions.Stubs(S)
+  module M = Functions.Common(S)
   open M
 
   (*
@@ -58,8 +58,41 @@ struct
 end
 
 
+module Build_stub_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
+struct
+  module N = Functions.Stubs(S)
+  open N
+
+  include Common_tests(S)
+
+  (*
+    Test primitive operations on complex numbers passed by value.
+  *)
+  let test_complex_primitive_value_operations () =
+    begin
+      let open Complex in
+
+      let eps64 = 1e-12 in
+      let complex64_eq { re = lre; im = lim } { re = rre; im = rim } =
+        abs_float (lre -. rre) < eps64 && abs_float (lim -. rim) < eps64 in
+
+      let eps32 = 1e-6 in
+      let complex32_eq { re = lre; im = lim } { re = rre; im = rim } =
+        abs_float (lre -. rre) < eps32 && abs_float (lim -. rim) < eps32 in
+
+      let l = { re = 3.5; im = -1.0 } and r = { re = 2.0; im = 2.7 } in
+
+      assert_equal ~cmp:complex64_eq (Complex.add l r) (add_complexd_val l r);
+      assert_equal ~cmp:complex64_eq (Complex.mul l r) (mul_complexd_val l r);
+
+      assert_equal ~cmp:complex32_eq (Complex.add l r) (add_complexf_val l r);
+      assert_equal ~cmp:complex32_eq (Complex.mul l r) (mul_complexf_val l r);
+    end
+end
+
+
 module Foreign_tests = Common_tests(Tests_common.Foreign_binder)
-module Stub_tests = Common_tests(Generated_bindings)
+module Stub_tests = Build_stub_tests(Generated_bindings)
 
 
 let suite = "Complex number tests" >:::
@@ -68,6 +101,9 @@ let suite = "Complex number tests" >:::
 
    "basic operations on complex numbers (stubs)"
    >:: Stub_tests.test_complex_primitive_operations;
+
+   "basic operations on complex numbers passed by value(stubs)"
+   >:: Stub_tests.test_complex_primitive_value_operations;
   ]
 
 
