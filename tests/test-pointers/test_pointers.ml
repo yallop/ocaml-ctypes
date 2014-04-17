@@ -523,6 +523,18 @@ let test_pointer_differences () =
   assert_equal (-offsetof k) (ptr_diff (to_charp (canonicalize (p |-> k))) cp);
   assert_equal (-offsetof l) (ptr_diff (to_charp (canonicalize (p |-> l))) cp)
 
+(*
+  Test raw pointers.
+*)
+let test_raw_pointers () =
+  (* Check that conversions to the raw form commute with arithmetic. *)
+  let p : float ptr = allocate double 1.0 in
+  let p' = p +@ 3 in
+  let praw = raw_address_of_ptr (to_voidp p) in
+  let praw' = raw_address_of_ptr (to_voidp p') in
+  assert_equal praw' Int64.(add praw (of_int (3 * sizeof double)))
+
+
 module Foreign_tests = Common_tests(Tests_common.Foreign_binder)
 module Stub_tests = Common_tests(Generated_bindings)
 
@@ -604,6 +616,9 @@ let suite = "Pointer tests" >:::
 
    "differences"
     >:: test_pointer_differences;
+
+   "raw"
+    >:: test_raw_pointers;
   ]
 
 

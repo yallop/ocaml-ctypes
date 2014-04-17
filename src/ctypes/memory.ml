@@ -150,7 +150,8 @@ let ptr_of_raw_address addr =
   { reftype = Void; raw_ptr = Raw.PtrType.of_int64 addr;
     pmanaged = None; pbyte_offset = 0 }
 
-let raw_address_of_ptr { raw_ptr } = Raw.PtrType.to_int64 raw_ptr
+let raw_address_of_ptr { raw_ptr; pbyte_offset } =
+  Int64.(add (Raw.PtrType.to_int64 raw_ptr) (of_int pbyte_offset))
 
 module CArray =
 struct
