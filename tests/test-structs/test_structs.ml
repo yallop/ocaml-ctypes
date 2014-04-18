@@ -12,9 +12,9 @@ open Ctypes
 let testlib = Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW])
 
 
-module Common_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
+module Build_foreign_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
 struct
-  module M = Functions.Stubs(S)
+  module M = Functions.Common(S)
   open M
 
   (*
@@ -342,8 +342,41 @@ let test_struct_ffi_type_lifetime () =
   end in ()
 
 
-module Foreign_tests = Common_tests(Tests_common.Foreign_binder)
-module Stub_tests = Common_tests(Generated_bindings)
+module Build_stub_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
+struct
+  open Functions
+  include Build_foreign_tests(S)
+  module N = Functions.Stubs(S)
+  open N
+
+  (*
+    Test passing structs with union members.
+  *)
+  let test_passing_structs_with_union_members () =
+    let mkInt v =
+      let t = make tagged in
+      t @. tag <-@ 'i';
+      (t @. num |-> i) <-@ v;
+      t
+    and mkDbl v =
+      let t = make tagged in
+      t @. tag <-@ 'd';
+      (t @. num |-> d) <-@ v;
+      t
+    and readDbl t =
+      assert_equal 'd' !@(t @. tag);
+      !@(t @. num |-> d)
+    in
+    begin
+      assert_equal 10.0 (readDbl (add_tagged_numbers (mkInt 3) (mkInt 7)));
+      assert_equal 10.0 (readDbl (add_tagged_numbers (mkInt 3) (mkDbl 7.0)));
+      assert_equal 10.0 (readDbl (add_tagged_numbers (mkDbl 3.0) (mkInt 7)));
+      assert_equal 10.0 (readDbl (add_tagged_numbers (mkDbl 3.0) (mkDbl 7.0)));
+    end
+end
+
+module Foreign_tests = Build_foreign_tests(Tests_common.Foreign_binder)
+module Stub_tests = Build_stub_tests(Generated_bindings)
 
 
 let suite = "Struct tests" >:::
@@ -367,6 +400,9 @@ let suite = "Struct tests" >:::
 
    "structs with union members"
    >:: test_structs_with_union_members;
+
+   "passing structs with union members (stubs)"
+   >:: Stub_tests.test_passing_structs_with_union_members;
 
    "structs with array members"
    >:: test_structs_with_array_members;

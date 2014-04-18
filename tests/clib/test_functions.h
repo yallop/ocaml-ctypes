@@ -57,6 +57,8 @@ struct tagged {
   union number num;
 };
 
+extern struct tagged add_tagged_numbers(struct tagged, struct tagged);
+
 extern double accepts_pointer_to_array_of_structs(struct tagged(*)[5]);
 #define GLOBAL_STRING "global string"
 struct global_struct {

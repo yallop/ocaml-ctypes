@@ -154,6 +154,37 @@ void concat_strings(const char **sv, int sc, char *buffer)
   *buffer = '\0';
 }
 
+
+struct tagged add_tagged_numbers(struct tagged l, struct tagged r)
+{
+  union number n;
+  struct tagged result = { 'd', n };
+  switch (l.tag) {
+  case 'i':
+    switch (r.tag) {
+    case 'i':
+      result.num.d = l.num.i + r.num.i;
+      return result;
+    case 'd':
+      result.num.d = l.num.i + r.num.d;
+      return result;
+    default: assert(0);
+    }
+  case 'd':
+    switch (r.tag) {
+    case 'i':
+      result.num.d = l.num.d + r.num.i;
+      return result;
+    case 'd':
+      result.num.d = l.num.d + r.num.d;
+      return result;
+    default: assert(0);
+    }
+  default: assert(0);
+  }
+}
+
+
 double accepts_pointer_to_array_of_structs(struct tagged(*arr)[5])
 {
   double sum = 0.0;
