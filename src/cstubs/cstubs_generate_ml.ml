@@ -347,10 +347,10 @@ type wrapper_state = {
   trivial: bool;
 }
 
-let rec wrapper_body : type a. a fn -> ml_exp -> wrapper_state =
-  fun fn exp -> match fn with
+let rec wrapper_body : type a. a fn -> ml_exp -> polarity -> wrapper_state =
+  fun fn exp pol -> match fn with
   | Returns t ->
-    begin match pattern_and_exp_of_typ t exp Out with
+    begin match pattern_and_exp_of_typ t exp (flip pol) with
       pat, None -> { exp ; args = []; trivial = true;
                      pat = static_con "Returns" [pat] }
     | pat, Some exp -> { exp; args = []; trivial = false;
@@ -358,29 +358,38 @@ let rec wrapper_body : type a. a fn -> ml_exp -> wrapper_state =
     end
   | Function (f, t) ->
     let x = fresh_var () in
-    begin match pattern_and_exp_of_typ f (`Ident (path_of_string x)) In with
+    begin match pattern_and_exp_of_typ f (`Ident (path_of_string x)) pol with
     | fpat, None ->
       let { exp; args; trivial; pat = tpat } =
-        wrapper_body t (`Appl (exp, `Ident (path_of_string x))) in
+        wrapper_body t (`Appl (exp, `Ident (path_of_string x))) pol in
       { exp; args = x :: args; trivial;
         pat = static_con "Function" [fpat; tpat] }
     | fpat, Some exp' ->
       let { exp; args = xs; trivial; pat = tpat } =
-        wrapper_body t (`Appl (exp, exp')) in
+        wrapper_body t (`Appl (exp, exp')) pol in
       { exp; args = x :: xs; trivial = false;
         pat = static_con "Function" [fpat; tpat] }
     end
 
-let wrapper : type a. a fn -> string -> ml_pat * ml_exp option =
-  fun fn f -> match wrapper_body fn (`Ident (path_of_string f)) with
+let wrapper : type a. a fn -> string -> polarity -> ml_pat * ml_exp option =
+  fun fn f pol -> match wrapper_body fn (`Ident (path_of_string f)) pol with
     { trivial = true; pat } -> (pat, None)
   | { exp; args; pat } -> (pat, Some (`Fun (args, exp)))
 
 let case ~stub_name ~external_name fmt fn =
-  let p, e = match wrapper fn external_name with
+  let p, e = match wrapper fn external_name In with
       pat, None -> pat, `Ident (path_of_string external_name)
     | pat, Some e -> pat, e
   in
   Format.fprintf fmt "@[<hov 2>@[<h 2>|@ @[%S,@ @[%a@]@]@ ->@]@ "
     stub_name Emit_ML.(ml_pat NoApplParens) p;
   Format.fprintf fmt "@[<hov 2>@[%a@]@]@]@." Emit_ML.(ml_exp ApplParens) e
+
+let inverse_case ~register_name i name fmt fn : unit =
+  let p, e = match wrapper fn "f" Out with
+      pat, None -> pat, `Ident (path_of_string "f")
+    | pat, Some e -> pat, e
+  in
+  Format.fprintf fmt "|@[ @[%S, %a@] -> %s %d (%a)@]@\n"
+    name Emit_ML.(ml_pat NoApplParens) p register_name i 
+    Emit_ML.(ml_exp ApplParens) e
