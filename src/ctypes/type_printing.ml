@@ -7,23 +7,10 @@
 
 open Static
 
-(* The format context affects the formatting of pointer, struct and union
-   types.  There are three printing contexts: *)
-type format_context = [
-(* In the top-level context struct and union types are printed in full, with
-   member lists.  Pointer types are unparenthesized; for example,
-   pointer-to-void is printed as "void *", not as "void ( * )". *)
-| `toplevel
-(* In the array context, struct and union types are printed in abbreviated
-   form, which consists of just a keyword and the tag name.  Pointer types are
-   parenthesized; for example, pointer-to-array-of-int is printed as
-   "int ( * )[]", not as "int *[]". *)
-| `array
-(* In the non-array context, struct and union types are printed in abbreviated
-   form and pointer types are unparenthesized. *)
-| `nonarray]
+(* See type_printing.mli for the documentation of [format context]. *)
+type format_context = [ `toplevel | `array | `nonarray ]
 
-let rec format_typ : type a. a typ ->
+let rec format_typ' : type a. a typ ->
   (format_context -> Format.formatter -> unit) ->
   (format_context -> Format.formatter -> unit) =
   let fprintf = Format.fprintf in
@@ -36,7 +23,7 @@ let rec format_typ : type a. a typ ->
     | View { format_typ = Some format } ->
       format (k `nonarray) fmt
     | View { ty } ->
-      format_typ ty k context fmt
+      format_typ' ty k context fmt
     | Abstract { aname } ->
       fprintf fmt "%s%t" aname (k `nonarray)
     | Struct { tag ; spec; fields } ->
@@ -60,14 +47,14 @@ let rec format_typ : type a. a typ ->
         | _ -> fprintf fmt "union %s%t" utag (k `nonarray)
       end
     | Pointer ty ->
-      format_typ ty
+      format_typ' ty
         (fun context fmt ->
           match context with
             | `array -> fprintf fmt "(*%t)" (k `nonarray)
             | _      -> fprintf fmt "*%t" (k `nonarray))
         `nonarray fmt
     | Array (ty, n) ->
-      format_typ ty (fun _ fmt -> fprintf fmt "%t[%d]" (k `array) n) `nonarray
+      format_typ' ty (fun _ fmt -> fprintf fmt "%t[%d]" (k `array) n) `nonarray
         fmt
     | Bigarray ba ->
       let elem = Ctypes_bigarray.element_type ba
@@ -75,8 +62,8 @@ let rec format_typ : type a. a typ ->
       let name = Ctypes_primitives.name elem in
       fprintf fmt "%s%t%t" name (k `array)
         (fun fmt -> (Array.iter (Format.fprintf fmt "[%d]") dims))
-    | OCaml String -> format_typ (ptr char) k context fmt
-    | OCaml FloatArray -> format_typ (ptr double) k context fmt
+    | OCaml String -> format_typ' (ptr char) k context fmt
+    | OCaml FloatArray -> format_typ' (ptr double) k context fmt
 
 and format_fields : type a. a boxed_field list -> Format.formatter -> unit =
   fun fields fmt ->
@@ -84,7 +71,7 @@ and format_fields : type a. a boxed_field list -> Format.formatter -> unit =
       List.iteri
         (fun i (BoxedField {ftype=t; fname}) ->
           fprintf fmt "@[";
-          format_typ t (fun _ fmt -> fprintf fmt " %s" fname) `nonarray fmt;
+          format_typ' t (fun _ fmt -> fprintf fmt " %s" fname) `nonarray fmt;
           fprintf fmt "@];@;")
         fields
 and format_parameter_list parameters k fmt =
@@ -93,7 +80,7 @@ and format_parameter_list parameters k fmt =
     List.iteri
       (fun i (BoxedType t) ->
         if i <> 0 then Format.fprintf fmt "@], @[";
-        format_typ t (fun _ _ -> ()) `nonarray fmt)
+        format_typ' t (fun _ _ -> ()) `nonarray fmt)
       parameters;
   Format.fprintf fmt "@]@])"
 and format_fn' : 'a. 'a fn ->
@@ -106,7 +93,7 @@ and format_fn' : 'a. 'a fn ->
       | Function (p, fn) -> let ps, r = gather fn in BoxedType p :: ps, r in
   fun fn k fmt ->
     let ps, BoxedType r = gather fn in
-    format_typ r (fun context fmt -> format_parameter_list ps k fmt)
+    format_typ' r (fun context fmt -> format_parameter_list ps k fmt)
       `nonarray fmt
 
 let format_name ?name fmt =
@@ -117,7 +104,7 @@ let format_name ?name fmt =
 let format_typ : ?name:string -> Format.formatter -> 'a typ -> unit
   = fun ?name fmt typ ->
     Format.fprintf fmt "@[";
-    format_typ typ (fun context -> format_name ?name) `toplevel fmt;
+    format_typ' typ (fun context -> format_name ?name) `toplevel fmt;
     Format.fprintf fmt "@]"
 
 let format_fn : ?name:string -> Format.formatter -> 'a fn -> unit
