@@ -38,8 +38,12 @@ struct simple {
 
 extern int accept_struct(struct simple);
 extern struct simple return_struct(void);
-union padded;
+union padded {
+  int64_t i;
+  char    a[sizeof(int64_t) + 1];
+};
 extern int64_t sum_union_components(union padded *, size_t);
+extern union padded add_unions(union padded, union padded);
 
 extern void concat_strings(const char **, int, char *);
 
@@ -53,6 +57,8 @@ struct tagged {
   union number num;
 };
 
+extern struct tagged add_tagged_numbers(struct tagged, struct tagged);
+
 extern double accepts_pointer_to_array_of_structs(struct tagged(*)[5]);
 #define GLOBAL_STRING "global string"
 struct global_struct {
@@ -61,7 +67,10 @@ struct global_struct {
 };
 
 extern struct global_struct global_struct;
-
+struct triple {
+  double elements[3];
+};
+extern struct triple add_triples(struct triple, struct triple);
 struct animal;
 struct chorse;
 extern int check_name(struct animal *, char *);
@@ -136,6 +145,10 @@ void add_complexd(double complex *, double complex *, double complex *);
 void mul_complexd(double complex *, double complex *, double complex *);
 void add_complexf(float complex *, float complex *, float complex *);
 void mul_complexf(float complex *, float complex *, float complex *);
+double complex add_complexd_val(double complex, double complex);
+double complex mul_complexd_val(double complex, double complex);
+float complex add_complexf_val(float complex, float complex);
+float complex mul_complexf_val(float complex, float complex);
 void store_callback(int (*callback)(int));
 int invoke_stored_callback(int);
 vintfun *return_callback(vintfun *);

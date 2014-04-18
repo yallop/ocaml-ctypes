@@ -9,7 +9,9 @@
 
 open Ctypes
 
-module Stubs (F: Cstubs.FOREIGN) =
+(* These functions can be bound either dynamically using Foreign or statically
+   using stub generation. *)
+module Common (F: Cstubs.FOREIGN) =
 struct
   open F
 
@@ -25,4 +27,40 @@ struct
 
   let return_struct = foreign "return_struct"
     (void @-> returning simple)
+end
+
+
+(* These functions can only be bound using stub generation, since Foreign
+   doesn't support passing structs with union or array members. *)
+module Stubs_only(F : Cstubs.FOREIGN) =
+struct
+  type number
+  let number : number union typ = union "number"
+  let i = field number "i" int
+  let d = field number "d" double
+  let () = seal number
+
+  type tagged
+  let tagged : tagged structure typ = structure "tagged"
+  let tag = field tagged "tag" char
+  let num = field tagged "num" number
+  let () = seal tagged
+
+  type triple
+  let triple : triple structure typ = structure "triple"
+  let elements = field triple "elements" (array 3 double)
+  let () = seal triple
+
+  let add_tagged_numbers = F.foreign "add_tagged_numbers"
+    (tagged @-> tagged @-> returning tagged)
+
+  let add_triples = F.foreign "add_triples"
+    (triple @-> triple @-> returning triple)
+end
+
+
+module Stubs (F: Cstubs.FOREIGN) =
+struct
+  include Common(F)
+  include Stubs_only(F)
 end

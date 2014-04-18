@@ -124,11 +124,6 @@ struct simple return_struct(void)
   return s;
 }
 
-union padded {
-  int64_t i;
-  char    a[sizeof(int64_t) + 1];
-};
-
 int64_t sum_union_components(union padded *padded, size_t len)
 {
   size_t i;
@@ -138,6 +133,14 @@ int64_t sum_union_components(union padded *padded, size_t len)
   }
   return acc;
 }
+
+union padded add_unions(union padded l, union padded r)
+{
+  union padded result, args[] = { l, r };
+  result.i = sum_union_components(args, sizeof args / sizeof *args);
+  return result;
+}
+
 
 void concat_strings(const char **sv, int sc, char *buffer)
 {
@@ -150,6 +153,37 @@ void concat_strings(const char **sv, int sc, char *buffer)
   }
   *buffer = '\0';
 }
+
+
+struct tagged add_tagged_numbers(struct tagged l, struct tagged r)
+{
+  union number n;
+  struct tagged result = { 'd', n };
+  switch (l.tag) {
+  case 'i':
+    switch (r.tag) {
+    case 'i':
+      result.num.d = l.num.i + r.num.i;
+      return result;
+    case 'd':
+      result.num.d = l.num.i + r.num.d;
+      return result;
+    default: assert(0);
+    }
+  case 'd':
+    switch (r.tag) {
+    case 'i':
+      result.num.d = l.num.d + r.num.i;
+      return result;
+    case 'd':
+      result.num.d = l.num.d + r.num.d;
+      return result;
+    default: assert(0);
+    }
+  default: assert(0);
+  }
+}
+
 
 double accepts_pointer_to_array_of_structs(struct tagged(*arr)[5])
 {
@@ -173,6 +207,18 @@ double accepts_pointer_to_array_of_structs(struct tagged(*arr)[5])
 }
 
 struct global_struct global_struct = { sizeof GLOBAL_STRING - 1, GLOBAL_STRING };
+
+
+struct triple add_triples(struct triple l, struct triple r)
+{
+  int i = 0;
+  struct triple result;
+  for (; i < 3; i++) {
+    result.elements[i] = l.elements[i] + r.elements[i];
+  }
+  return result;
+}
+
 
 /* OO-style example */
 struct animal_methods;
@@ -372,6 +418,26 @@ void add_complexf(float complex *l, float complex *r, float complex *out)
 void mul_complexf(float complex *l, float complex *r, float complex *out)
 {
   *out = *l * *r;
+}
+
+double complex add_complexd_val(double complex l, double complex r)
+{
+  return l + r;
+}
+
+double complex mul_complexd_val(double complex l, double complex r)
+{
+  return l * r;
+}
+
+float complex add_complexf_val(float complex l, float complex r)
+{
+  return l + r;
+}
+
+float complex mul_complexf_val(float complex l, float complex r)
+{
+  return l * r;
 }
 
 static int (*global_stored_callback)(int) = NULL;

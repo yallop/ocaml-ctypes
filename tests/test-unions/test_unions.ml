@@ -84,10 +84,10 @@ let test_endian_detection () =
   end in ()
 
 
-module Common_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
+module Build_foreign_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
 struct
   open Functions
-  module M = Stubs(S)
+  module M = Common(S)
   open M
   (* Check that unions are tail-padded sufficiently to satisfy the alignment
      requirements of all their members.
@@ -115,6 +115,32 @@ struct
       let () = assert_equal
         ~msg:"padded union members accessed correctly"
         15L sum
+        ~printer:Int64.to_string
+    end in ()
+end
+
+module Build_stub_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
+struct
+  open Functions
+  include Build_foreign_tests(S)
+  module N = Functions.Stubs(S)
+  open N
+
+  (* Check that unions can be passed and returned by value.
+  *)
+  let test_passing_unions_by_value () =
+    let module M = struct
+      let mkPadded : int64 -> padded union =
+        fun x ->
+          let u = make padded in
+          setf u i x;
+          u
+
+      let u = add_unions (mkPadded 20L) (mkPadded 30L)
+
+      let () = assert_equal
+        ~msg:"unions passed by value"
+        50L (getf u i)
         ~printer:Int64.to_string
     end in ()
 end
@@ -170,8 +196,8 @@ let test_sealing_empty_union () =
     (fun () -> seal empty)
 
 
-module Foreign_tests = Common_tests(Tests_common.Foreign_binder)
-module Stub_tests = Common_tests(Generated_bindings)
+module Foreign_tests = Build_foreign_tests(Tests_common.Foreign_binder)
+module Stub_tests = Build_stub_tests(Generated_bindings)
 
 
 let suite = "Union tests" >:::
@@ -186,6 +212,9 @@ let suite = "Union tests" >:::
 
    "union padding (stubs)"
     >:: Stub_tests.test_union_padding;
+
+   "passing unions by value (stubs)"
+    >:: Stub_tests.test_passing_unions_by_value;
 
    "union address"
     >:: test_union_address;

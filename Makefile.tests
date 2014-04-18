@@ -55,6 +55,39 @@ tests/test-pointers/generated_stubs.c: $(BUILDDIR)/test-pointers-stub-generator.
 tests/test-pointers/generated_bindings.ml: $(BUILDDIR)/test-pointers-stub-generator.native
 	$< --ml-file $@
 
+test-variadic-stubs.dir  = tests/test-variadic/stubs
+test-variadic-stubs.threads = yes
+test-variadic-stubs.subproject_deps = ctypes cstubs \
+   ctypes-foreign-base ctypes-foreign-unthreaded tests-common
+test-variadic-stubs: PROJECT=test-variadic-stubs
+test-variadic-stubs: $$(LIB_TARGETS)
+
+test-variadic-stub-generator.dir = tests/test-variadic/stub-generator
+test-variadic-stub-generator.threads = yes
+test-variadic-stub-generator.subproject_deps = ctypes cstubs \
+     ctypes-foreign-base ctypes-foreign-unthreaded test-variadic-stubs tests-common
+test-variadic-stub-generator.deps = str bigarray
+test-variadic-stub-generator: PROJECT=test-variadic-stub-generator
+test-variadic-stub-generator: $$(NATIVE_TARGET)
+
+test-variadic.dir = tests/test-variadic
+test-variadic.threads = yes
+test-variadic.deps = str bigarray oUnit
+test-variadic.subproject_deps = ctypes ctypes-foreign-base \
+  ctypes-foreign-unthreaded cstubs tests-common test-variadic-stubs
+test-variadic.link_flags = -L$(BUILDDIR)/clib -ltest_functions
+test-variadic: PROJECT=test-variadic
+test-variadic: $$(NATIVE_TARGET)
+
+test-variadic-generated: \
+  tests/test-variadic/generated_bindings.ml \
+  tests/test-variadic/generated_stubs.c
+
+tests/test-variadic/generated_stubs.c: $(BUILDDIR)/test-variadic-stub-generator.native
+	$< --c-file $@
+tests/test-variadic/generated_bindings.ml: $(BUILDDIR)/test-variadic-stub-generator.native
+	$< --ml-file $@
+
 
 test-builtins-stubs.dir  = tests/test-builtins/stubs
 test-builtins-stubs.threads = yes
@@ -576,6 +609,7 @@ tests/test-coercions/generated_bindings.ml: $(BUILDDIR)/test-coercions-stub-gene
 TESTS =
 TESTS += test-raw
 TESTS += test-pointers-stubs test-pointers-stub-generator test-pointers-generated test-pointers
+TESTS += test-variadic-stubs test-variadic-stub-generator test-variadic-generated test-variadic
 TESTS += test-builtins-stubs test-builtins-stub-generator test-builtins-generated test-builtins
 TESTS += test-macros-stubs test-macros-stub-generator test-macros-generated test-macros
 TESTS += test-higher_order-stubs test-higher_order-stub-generator test-higher_order-generated test-higher_order
