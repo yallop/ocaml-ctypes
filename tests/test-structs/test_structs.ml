@@ -373,6 +373,29 @@ struct
       assert_equal 10.0 (readDbl (add_tagged_numbers (mkDbl 3.0) (mkInt 7)));
       assert_equal 10.0 (readDbl (add_tagged_numbers (mkDbl 3.0) (mkDbl 7.0)));
     end
+
+
+  (*
+    Test passing structs with array members.
+  *)
+  let test_passing_structs_with_array_members () =
+    let mkTriple (x, y, z) =
+      let t = make triple in
+      t @. elements <-@ CArray.of_list double [x; y; z];
+      t
+    and readTriple t =
+      match CArray.to_list (getf t elements) with
+      | [x; y; z] -> (x, y, z)
+      | _ -> assert false
+    in
+    begin
+      assert_equal
+        (10.0, 20.0, 30.0)
+        (readTriple
+           (add_triples
+              (mkTriple (5.0, 12.0, 17.0))
+              (mkTriple (5.0,  8.0, 13.0))))
+    end
 end
 
 module Foreign_tests = Build_foreign_tests(Tests_common.Foreign_binder)
@@ -403,6 +426,9 @@ let suite = "Struct tests" >:::
 
    "passing structs with union members (stubs)"
    >:: Stub_tests.test_passing_structs_with_union_members;
+
+   "passing structs with array members (stubs)"
+   >:: Stub_tests.test_passing_structs_with_array_members;
 
    "structs with array members"
    >:: test_structs_with_array_members;

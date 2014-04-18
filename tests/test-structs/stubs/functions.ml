@@ -31,7 +31,7 @@ end
 
 
 (* These functions can only be bound using stub generation, since Foreign
-   doesn't support passing structs with union members. *)
+   doesn't support passing structs with union or array members. *)
 module Stubs_only(F : Cstubs.FOREIGN) =
 struct
   type number
@@ -46,8 +46,16 @@ struct
   let num = field tagged "num" number
   let () = seal tagged
 
+  type triple
+  let triple : triple structure typ = structure "triple"
+  let elements = field triple "elements" (array 3 double)
+  let () = seal triple
+
   let add_tagged_numbers = F.foreign "add_tagged_numbers"
     (tagged @-> tagged @-> returning tagged)
+
+  let add_triples = F.foreign "add_triples"
+    (triple @-> triple @-> returning triple)
 end
 
 

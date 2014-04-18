@@ -208,6 +208,18 @@ double accepts_pointer_to_array_of_structs(struct tagged(*arr)[5])
 
 struct global_struct global_struct = { sizeof GLOBAL_STRING - 1, GLOBAL_STRING };
 
+
+struct triple add_triples(struct triple l, struct triple r)
+{
+  int i = 0;
+  struct triple result;
+  for (; i < 3; i++) {
+    result.elements[i] = l.elements[i] + r.elements[i];
+  }
+  return result;
+}
+
+
 /* OO-style example */
 struct animal_methods;
 struct animal {

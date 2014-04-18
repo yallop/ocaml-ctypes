@@ -67,7 +67,10 @@ struct global_struct {
 };
 
 extern struct global_struct global_struct;
-
+struct triple {
+  double elements[3];
+};
+extern struct triple add_triples(struct triple, struct triple);
 struct animal;
 struct chorse;
 extern int check_name(struct animal *, char *);
