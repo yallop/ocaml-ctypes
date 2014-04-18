@@ -38,8 +38,12 @@ struct simple {
 
 extern int accept_struct(struct simple);
 extern struct simple return_struct(void);
-union padded;
+union padded {
+  int64_t i;
+  char    a[sizeof(int64_t) + 1];
+};
 extern int64_t sum_union_components(union padded *, size_t);
+extern union padded add_unions(union padded, union padded);
 
 extern void concat_strings(const char **, int, char *);
 

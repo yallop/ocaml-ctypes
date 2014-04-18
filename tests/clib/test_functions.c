@@ -124,11 +124,6 @@ struct simple return_struct(void)
   return s;
 }
 
-union padded {
-  int64_t i;
-  char    a[sizeof(int64_t) + 1];
-};
-
 int64_t sum_union_components(union padded *padded, size_t len)
 {
   size_t i;
@@ -138,6 +133,14 @@ int64_t sum_union_components(union padded *padded, size_t len)
   }
   return acc;
 }
+
+union padded add_unions(union padded l, union padded r)
+{
+  union padded result, args[] = { l, r };
+  result.i = sum_union_components(args, sizeof args / sizeof *args);
+  return result;
+}
+
 
 void concat_strings(const char **sv, int sc, char *buffer)
 {
