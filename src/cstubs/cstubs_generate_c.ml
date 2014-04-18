@@ -126,6 +126,8 @@ struct
   let rec ccomp env fmt : ccomp -> unit = function
     | #cexp as e -> fprintf fmt "@[<2>return@;@[%a@]@];" (cexp env) e
     | #ceff as e -> fprintf fmt "@[<2>return@;@[%a@]@];" (ceff env) e
+    | `Let (xe, `Cast (ty, (#cexp as e'))) when cast_unnecessary ty e' ->
+      ccomp env fmt (`Let (xe, e'))
     | `Let ((`Local (name, Ty Void), e), s) ->
       fprintf fmt "@[%a;@]@ %a" (ceff env) e (ccomp env) s
     | `Let ((`Local (name, Ty (Struct { tag })), e), s) ->
