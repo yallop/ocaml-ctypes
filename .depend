@@ -79,6 +79,7 @@ _build/src/cstubs/cstubs_internals.cmi : _build/src/ctypes/unsigned.cmi \
     _build/src/ctypes/static.cmi _build/src/ctypes/signed.cmi _build/src/ctypes/primitives.cmi \
     _build/src/ctypes/memory_stubs.cmo _build/src/ctypes/ctypes_raw.cmo \
     _build/src/ctypes/ctypes_bigarray.cmi _build/src/ctypes/ctypes.cmi
+_build/src/cstubs/cstubs_inverted.cmi : _build/src/ctypes/ctypes.cmi
 _build/src/cstubs/cstubs_generate_c.cmi : _build/src/ctypes/ctypes.cmi
 _build/src/cstubs/cstubs_generate_ml.cmo : _build/src/ctypes/static.cmi \
     _build/src/ctypes/primitives.cmi _build/src/ctypes/ctypes_path.cmi \
@@ -92,6 +93,10 @@ _build/src/cstubs/cstubs_generate_ml.cmx : _build/src/ctypes/static.cmx \
     _build/src/cstubs/cstubs_generate_ml.cmi
 _build/src/cstubs/cstubs_public_name.cmi : _build/src/ctypes/primitives.cmi \
     _build/src/ctypes/ctypes_path.cmi
+_build/src/cstubs/cstubs_inverted.cmo : _build/src/ctypes/ctypes.cmi \
+    _build/src/cstubs/cstubs_inverted.cmi
+_build/src/cstubs/cstubs_inverted.cmx : _build/src/ctypes/ctypes.cmx \
+    _build/src/cstubs/cstubs_inverted.cmi
 _build/src/cstubs/cstubs_internals.cmo : _build/src/ctypes/static.cmi \
     _build/src/ctypes/primitives.cmi _build/src/ctypes/memory_stubs.cmo \
     _build/src/ctypes/ctypes_raw.cmo _build/src/cstubs/cstubs_internals.cmi
