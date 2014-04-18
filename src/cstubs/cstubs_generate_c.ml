@@ -52,7 +52,15 @@ let max_byte_args = 5
 let rec return_type : type a. a fn -> ty = function
   | Function (_, f) -> return_type f
   | Returns t -> Ty t
-                        
+
+let args : type a. a fn -> (string * ty) list = fun fn ->
+  let var = Printf.sprintf "x%d" in
+  let rec loop : type a. int -> a Ctypes.fn -> (string * ty) list =
+                   fun n -> function
+                   | Static.Function (ty, fn) -> (var n, Ty ty) :: loop (n + 1) fn
+                   | Static.Returns _ -> []
+  in loop 0 fn
+
 module Type_C =
 struct
   let rec cexp : cexp -> ty = function
@@ -263,6 +271,8 @@ struct
        let Ty t = Type_C.ccomp c in
        `Let (ye, (c, t) >>= k)
 
+  let (>>) c1 c2 = (c1, Void) >>= fun _ -> c2
+
   let prim_prj : type a. a Primitives.prim -> _ =
     let open Primitives in function
     | Char -> reader "Int_val" (value @-> returning int)
@@ -344,6 +354,18 @@ struct
                                   reads_ocaml_heap = false;
                                   tfn = Typ value; }
 
+  let functions : cexp = `Global
+    { name = "functions";
+      allocates = false;
+      reads_ocaml_heap = true;
+      tfn = Typ (ptr value) }
+
+  let caml_callbackN : [ `Fn] cglobal = `Global
+    { name = "caml_callbackN";
+      allocates = true;
+      reads_ocaml_heap = true;
+      tfn = Fn (value @-> int @-> ptr value @-> returning value) }
+
   let copy_bytes : [`Fn] cglobal =
     `Global { name = "ctypes_copy_bytes";
               allocates = true;
@@ -401,6 +423,9 @@ struct
     | Returns t -> []
     | Function (x, _, t) -> (x, Ty value) :: value_params t
 
+  let fundec : type a. string -> a Ctypes.fn -> cfundec =
+    fun name fn -> `Fundec (name, args fn, return_type fn)
+
   let fn : type a. cname:string -> stub_name:string -> a Static.fn -> cfundef =
     fun ~cname ~stub_name f ->
       let fvar = `Global { name = cname;
@@ -441,6 +466,55 @@ struct
       let bytename = Printf.sprintf "%s_byte%d" name nargs in
       `Function (`Fundec (bytename, [argv; argc], Ty value),
                  build_call nargs)
+
+  let inverse_fn ~stub_name f =
+    let `Fundec (_, args, Ty rtyp) as dec = fundec stub_name f in
+    let idx = local (Printf.sprintf "fn_%s" stub_name) int in
+    let project typ e =
+      match prj typ e with
+        None -> (e :> ccomp)
+      | Some e -> e
+    in
+    let call =
+      (* f := functions[fn_name];
+         x := caml_callbackN(f, nargs, locals);
+         y := T_val(x);
+         CAMLreturnT(T, y);    *)
+      (`Index (functions, idx), value) >>= fun f ->
+      (`App (caml_callbackN, [f;
+                              local "nargs" int;
+                              local "locals" (ptr value)]),
+       value) >>= fun x ->
+      (project rtyp x, rtyp) >>= fun y -> 
+      `CAMLreturnT (Ty rtyp, y)
+    in
+    let body =
+      (* locals[0] = Val_T0(x0);
+         locals[1] = Val_T1(x1);
+         ...
+         locals[n] = Val_Tn(xn);
+         call;       *)
+      snd
+        (ListLabels.fold_right  args
+           ~init:(List.length args - 1, call)
+           ~f:(fun (x, Ty t) (i, c) ->
+             i - 1,
+             `Assign (`Index (local "locals" (ptr value), `Int i),
+                      (inj t (local x t))) >> c))
+    in
+      (* T f(T0 x0, T1 x1, ..., Tn xn) {
+            enum { nargs = n };
+            CAMLparam0();
+            CAMLlocalN(locals, nargs);
+            body
+         }      *)
+    `Function
+      (dec,
+       `LetConst (local "nargs" int, `Int (List.length args),
+                  `CAMLparam0 >>
+                  `CAMLlocalN (local "locals" (array (List.length args) value),
+                               local "nargs" int) >>
+                    body))
 end
 
 let fn ~cname  ~stub_name fmt fn =
@@ -454,3 +528,10 @@ let fn ~cname  ~stub_name fmt fn =
   end
   else
     Emit_C.cfundef fmt dec
+
+let inverse_fn ~stub_name fmt fn : unit =
+  Emit_C.cfundef fmt (Generate_C.inverse_fn ~stub_name fn)
+
+let inverse_fn_decl ~stub_name fmt fn =
+  Format.fprintf fmt "@[%a@];@\n"
+    Emit_C.cfundec (Generate_C.fundec stub_name fn)
