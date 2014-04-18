@@ -8,6 +8,7 @@
 #include <string.h>
 
 #include <caml/memory.h>
+#include <caml/fail.h>
 
 #include "managed_buffer_stubs.h"
 #include "type_info_stubs.h"
