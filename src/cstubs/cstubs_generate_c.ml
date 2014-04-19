@@ -156,6 +156,11 @@ struct
   let conser name fn = { name; allocates = true; reads_ocaml_heap = false; tfn = Fn fn }
   let immediater name fn = { name; allocates = false; reads_ocaml_heap = false; tfn = Fn fn }
 
+  let (>>=) : type a. ccomp * a typ -> ([> cvar] -> ccomp) -> ccomp =
+   fun (e, ty) k ->
+     let x = fresh_var () in
+     `Let ((x, Ty ty), e, k (`Local (x, Ty ty)))
+
   let prim_prj : type a. a Primitives.prim -> _ =
     let open Primitives in function
     | Char -> reader "Int_val" (value @-> returning int)
@@ -233,9 +238,9 @@ struct
                                     tfn = Fn (ptr void @-> size_t @-> returning value) }
 
   let cast : type a b. from:ty -> into:ty -> ccomp -> ccomp =
-    fun ~from ~into e ->
-      let x = (fresh_var (), from) in
-      `Let (x, e, `Cast (into, `Local x))
+    fun ~from:(Ty from) ~into e ->
+      (e, from) >>= fun x ->
+      `Cast (into, x)
 
   let rec prj : type a. a typ -> cexp -> ccomp option =
     fun ty x -> match ty with
@@ -250,13 +255,11 @@ struct
       end
     | Pointer _ -> Some (to_ptr x)
     | Struct s ->
-      let y = (fresh_var (), Ty (ptr void)) in
-      Some (`Let (y, to_ptr x,
-                  `Deref (`Cast (Ty (ptr ty), `Local y))))
+      Some ((to_ptr x, ptr void) >>= fun y ->
+            `Deref (`Cast (Ty (ptr ty), y)))
     | Union u -> 
-      let y = (fresh_var (), Ty (ptr void)) in
-      Some (`Let (y, to_ptr x,
-                  `Deref (`Cast (Ty (ptr ty), `Local y))))
+      Some ((to_ptr x, ptr void) >>= fun y ->
+            `Deref (`Cast (Ty (ptr ty), y)))
     | Abstract _ -> report_unpassable "values of abstract type"
     | View { ty } -> prj ty x
     | Array _ -> report_unpassable "arrays"
@@ -274,49 +277,40 @@ struct
     | Array _ -> report_unpassable "arrays"
     | Bigarray _ -> report_unpassable "bigarrays"
       
-  type ('state, 'result) folder = {
-    arg: 'a. 'a typ -> 'state -> 'state;
-    returns: 'a. 'a typ -> 'state -> 'result;
-  }
+  type _ fn =
+  | Returns  : 'a typ   -> 'a fn
+  | Function : string * 'a typ * 'b fn  -> ('a -> 'b) fn
 
-  let rec foldl_fn : type a s r. (s, r) folder -> s -> a fn -> r =
-    fun ({ arg; returns } as folder) init -> function 
-    | Returns t -> returns t init
-    | Function (f, t) -> foldl_fn folder (arg f init) t
+  let rec name_params : type a. a Static.fn -> a fn = function
+    | Returns t -> Returns t
+    | Function (f, t) -> Function (fresh_var (), f, name_params t)
 
-  type fold_state = {
-    env: cvar list;
-    body: ccomp -> ccomp;
-    vars: string list;
-  }
+  let rec params : type a. a fn -> string list = function
+    | Returns t -> []
+    | Function (x, _, t) -> x :: params t
 
-  let fn : type a. cname:string -> stub_name:string -> a fn -> cfundec =
+  let fn : type a. cname:string -> stub_name:string -> a Static.fn -> cfundec =
     fun ~cname ~stub_name f ->
-      foldl_fn {
-        arg = (fun ty state ->
-          let x = fresh_var () in
-          let x' = fresh_var () in 
-          match prj ty (`Local (x, Ty value)) with
-          | None ->
-            { state with vars = x :: state.vars }
-          | Some projected ->
-            { vars = x :: state.vars;
-              body = (fun e -> state.body (`Let ((x', Ty ty), projected, e)));
-              env = `Local (x', Ty ty) :: state.env });
-        returns = (fun t state ->
-          let x = fresh_var () in
-          `Function (stub_name, List.rev state.vars,
-                     state.body (`Let ((x, Ty t),
-                                       (`App
-                                           (`Global { name = cname;
-                                                      allocates = false;
-                                                      reads_ocaml_heap = false;
-                                                      tfn = Fn f; },
-                                            (List.rev state.env :> cexp list))),
-                                       let y = (fresh_var (), Ty value) in
-                                       `Let (y, inj t (`Local (x, Ty t)),
-                                             `Return (`Local y))))))}
-          { env = []; body = (fun e -> e); vars = [] } f
+      let fvar = `Global { name = cname;
+                           allocates = false;
+                           reads_ocaml_heap = false;
+                           tfn = Fn f; } in
+      let rec body : type a. _ -> a fn -> _ =
+         fun vars -> function 
+         | Returns t ->
+           (`App (fvar, (List.rev vars :> cexp list)), t) >>= fun x ->
+           (inj t x, value) >>= fun y ->
+           `Return y
+         | Function (x, f, t) ->
+           begin match prj f (`Local (x, Ty value)) with
+             None -> body vars t
+           | Some projected -> 
+             (projected, f) >>= fun x' ->
+             body (x' :: vars) t
+           end
+      in
+      let f' = name_params f in
+      `Function (stub_name, params f', body [] f')
 end
 
 let fn ~cname  ~stub_name fmt fn =
