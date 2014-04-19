@@ -103,12 +103,6 @@ struct
       fprintf fmt ")@]@]";
     | `Deref e -> fprintf fmt "@[*@[%a@]@]" (cexp env) e
     | `Return e -> fprintf fmt "@[<2>return@;@[%a@]@];" (cexp env) e
-    | `Let ((x, _), (#cexp as v), e) ->
-      (* substitute values during printing for now *)
-      ccomp ((x, v) :: env) fmt e
-    | `Let (x1, `Let (x2, c2, c3), c1) ->
-      (* Normalise during printing for now *)
-      ccomp env fmt (`Let (x2, c2, `Let (x1, c3, c1)))
     | `Let ((name, Ty Void), e, s) ->
       fprintf fmt "@[%a;@]@ %a" (ccomp env) e (ccomp env) s
     | `Let ((name, Ty (Struct { tag })), e, s) ->
@@ -156,10 +150,18 @@ struct
   let conser name fn = { name; allocates = true; reads_ocaml_heap = false; tfn = Fn fn }
   let immediater name fn = { name; allocates = false; reads_ocaml_heap = false; tfn = Fn fn }
 
-  let (>>=) : type a. ccomp * a typ -> ([> cvar] -> ccomp) -> ccomp =
+  let (>>=) : type a. ccomp * a typ -> (cexp -> ccomp) -> ccomp =
    fun (e, ty) k ->
      let x = fresh_var () in
-     `Let ((x, Ty ty), e, k (`Local (x, Ty ty)))
+     match e with
+       (* let x = v in e ~> e[x:=v] *) 
+       #cexp as v -> k v
+     | `Let (y, e1, e2) ->
+       (* let x = let y = e1 in e2 in e3
+          ~>
+          let y = e1 in let x = e2 in e3 *)
+       `Let (y, e1, `Let ((x, Ty ty), e2, k (`Local (x, Ty ty))))
+     | e -> `Let ((x, Ty ty), e, k (`Local (x, Ty ty)))
 
   let prim_prj : type a. a Primitives.prim -> _ =
     let open Primitives in function
