@@ -20,17 +20,18 @@ type id_properties = {
   tfn: tfn;
 }
 
-type cvar = [ `Local of string * ty | `Global of id_properties ]
+type cglobal = [ `Global of id_properties ]
+type cvar = [ `Local of string * ty | cglobal ]
 type cconst = [ `Int of int ]
 type cexp = [ cconst
             | cvar
             | `Cast of ty * cexp
             | `Addr of cexp ]
+type ceff = [ `App of cglobal * cexp list
+            | `Deref of cexp ]
 type ccomp = [ cexp
-             | `App of cvar * cexp list
-             | `Return of cexp
-             | `Let of (string * ty) * ccomp * ccomp
-             | `Deref of cexp ]
+             | ceff
+             | `Let of (string * ty) * ceff * ccomp ]
 type cfundec = [ `Function of string * string list * ccomp ]
 
 let max_byte_args = 5
@@ -39,14 +40,35 @@ let rec return_type : type a. a fn -> ty = function
   | Function (_, f) -> return_type f
   | Returns t -> Ty t
                         
-let rec typ_val : cexp -> ty = function
-  | `Int _ -> Ty int
-  | `Local (_, ty) -> ty
-  | `Global { tfn = Typ t } -> Ty t
-  | `Global { tfn = Fn f } -> internal_error
-    "unexpected function type for expression: %s" (Ctypes.string_of_fn f)
-  | `Cast (Ty ty, _) -> Ty ty
-  | `Addr e -> let Ty ty = typ_val e in Ty (Pointer ty)
+module Type_C =
+struct
+  let rec cexp : cexp -> ty = function
+    | `Int _ -> Ty int
+    | `Local (_, ty) -> ty
+    | `Global { tfn = Typ t } -> Ty t
+    | `Global { tfn = Fn f } -> internal_error
+      "unexpected function type for expression: %s" (Ctypes.string_of_fn f)
+    | `Cast (Ty ty, _) -> Ty ty
+    | `Addr e -> let Ty ty = cexp e in Ty (Pointer ty)
+
+  let ceff : ceff -> ty = function
+    | `App (`Global  { tfn = Typ t; name }, _) -> internal_error
+      "unexpected non-function type %s for variable %s in function position"
+      (Ctypes.string_of_typ t) name
+    | `App (`Global  { tfn = Fn f; name }, _) -> return_type f
+    | `Deref e ->
+      begin match cexp e with
+      | Ty (Pointer ty) -> Ty ty
+      | Ty t -> internal_error
+        "dereferencing expression of non-pointer type %s"
+        (Ctypes.string_of_typ t)
+      end
+
+  let rec ccomp : ccomp -> ty = function
+    | #cexp as e -> cexp e
+    | #ceff as e -> ceff e
+    | `Let (_, _, c) -> ccomp c
+end
 
 (* We're using an abstract type ([value]) as an argument and return type, so
    we'll use the [Function] and [Return] constructors directly.  The smart
@@ -76,7 +98,7 @@ struct
     | (Ty (Primitive _) as l), (Ty (Primitive _) as r) -> l = r
     | _ -> false
     in
-    fun ty e -> harmless ty (typ_val e)
+    fun ty e -> harmless ty (Type_C.cexp e)
 
   let rec cexp env fmt : cexp -> unit = function
     | #cconst as c -> cconst fmt c
@@ -90,8 +112,7 @@ struct
     | `Cast (ty, e) -> fprintf fmt "@[@[(%a)@]%a@]" format_ty ty (cexp env) e
     | `Addr e -> fprintf fmt "@[&@[%a@]@]" (cexp env) e
 
-  let rec ccomp env fmt : ccomp -> unit = function
-    | #cexp as v -> cexp env fmt v
+  let ceff env fmt : ceff -> unit = function
     | `App (v, es) ->
       fprintf fmt "@[%s(@[" (cvar_name v);
       let last_exp = List.length es - 1 in
@@ -102,15 +123,21 @@ struct
         es;
       fprintf fmt ")@]@]";
     | `Deref e -> fprintf fmt "@[*@[%a@]@]" (cexp env) e
-    | `Return e -> fprintf fmt "@[<2>return@;@[%a@]@];" (cexp env) e
+
+  let rec ccomp env fmt : ccomp -> unit = function
+    | #cexp as e -> fprintf fmt "@[<2>return@;@[%a@]@];" (cexp env) e
+    | #ceff as e -> fprintf fmt "@[<2>return@;@[%a@]@];" (ceff env) e
     | `Let ((name, Ty Void), e, s) ->
-      fprintf fmt "@[%a;@]@ %a" (ccomp env) e (ccomp env) s
+      fprintf fmt "@[%a;@]@ %a" (ceff env) e (ccomp env) s
     | `Let ((name, Ty (Struct { tag })), e, s) ->
-      fprintf fmt "@[struct@;%s@;%s@;=@;@[%a;@]@]@ %a" tag name (ccomp env) e (ccomp env) s
+      fprintf fmt "@[struct@;%s@;%s@;=@;@[%a;@]@]@ %a"
+        tag name (ceff env) e (ccomp env) s
     | `Let ((name, Ty (Union { utag })), e, s) ->
-      fprintf fmt "@[union@;%s@;%s@;=@;@[%a;@]@]@ %a" utag name (ccomp env) e (ccomp env) s
-    | `Let ((name, Ty ty), e, s) -> fprintf fmt "@[@[%a@]@;=@;@[%a;@]@]@ %a"
-      (Ctypes.format_typ ~name) ty (ccomp env) e (ccomp env) s
+      fprintf fmt "@[union@;%s@;%s@;=@;@[%a;@]@]@ %a"
+        utag name (ceff env) e (ccomp env) s
+    | `Let ((name, Ty ty), e, s) ->
+      fprintf fmt "@[@[%a@]@;=@;@[%a;@]@]@ %a"
+        (Ctypes.format_typ ~name) ty (ceff env) e (ccomp env) s
 
   let cfundec fmt (`Function (f, xs, body) : cfundec) =
     fprintf fmt "@[value@;%s(@[" f;
@@ -150,18 +177,21 @@ struct
   let conser name fn = { name; allocates = true; reads_ocaml_heap = false; tfn = Fn fn }
   let immediater name fn = { name; allocates = false; reads_ocaml_heap = false; tfn = Fn fn }
 
-  let (>>=) : type a. ccomp * a typ -> (cexp -> ccomp) -> ccomp =
+  let rec (>>=) : type a. ccomp * a typ -> (cexp -> ccomp) -> ccomp =
    fun (e, ty) k ->
      let x = fresh_var () in
      match e with
        (* let x = v in e ~> e[x:=v] *) 
-       #cexp as v -> k v
-     | `Let (y, e1, e2) ->
-       (* let x = let y = e1 in e2 in e3
+     | #cexp as v ->
+       k v
+     | #ceff as e ->
+       `Let ((x, Ty ty), e, k (`Local (x, Ty ty)))
+     | `Let (y, e, c) ->
+       (* let x = (let y = e1 in e2) in e3
           ~>
-          let y = e1 in let x = e2 in e3 *)
-       `Let (y, e1, `Let ((x, Ty ty), e2, k (`Local (x, Ty ty))))
-     | e -> `Let ((x, Ty ty), e, k (`Local (x, Ty ty)))
+          let y = e1 in (let x = e2 in e3) *)
+       let Ty t = Type_C.ccomp c in
+       `Let (y, e, (c, t) >>= k)
 
   let prim_prj : type a. a Primitives.prim -> _ =
     let open Primitives in function
@@ -234,10 +264,10 @@ struct
                                    reads_ocaml_heap = false;
                                    tfn = Typ value; }
 
-  let copy_bytes : cvar = `Global { name = "ctypes_copy_bytes";
-                                    allocates = true;
-                                    reads_ocaml_heap = true;
-                                    tfn = Fn (ptr void @-> size_t @-> returning value) }
+  let copy_bytes : cglobal = `Global { name = "ctypes_copy_bytes";
+                                       allocates = true;
+                                       reads_ocaml_heap = true;
+                                       tfn = Fn (ptr void @-> size_t @-> returning value) }
 
   let cast : type a b. from:ty -> into:ty -> ccomp -> ccomp =
     fun ~from:(Ty from) ~into e ->
@@ -301,8 +331,7 @@ struct
          fun vars -> function 
          | Returns t ->
            (`App (fvar, (List.rev vars :> cexp list)), t) >>= fun x ->
-           (inj t x, value) >>= fun y ->
-           `Return y
+           inj t x
          | Function (x, f, t) ->
            begin match prj f (`Local (x, Ty value)) with
              None -> body vars t
