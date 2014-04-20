@@ -11,23 +11,25 @@ open Static
 open Cstubs_errors
 
 type ty = Ty : _ typ -> ty
-type tfn = Typ : _ typ -> tfn | Fn : _ fn -> tfn
+type _ tfn =
+  Typ : _ typ -> [`Typ] tfn
+| Fn : _ fn -> [`Fn] tfn
 
-type id_properties = {
+type 'a id_properties = {
   name: string;
   allocates: bool;
   reads_ocaml_heap: bool;
-  tfn: tfn;
+  tfn: 'a tfn;
 }
 
-type cglobal = [ `Global of id_properties ]
-type cvar = [ `Local of string * ty | cglobal ]
+type 'a cglobal = [ `Global of 'a id_properties ]
+type cvar = [ `Local of string * ty | [`Typ] cglobal ]
 type cconst = [ `Int of int ]
 type cexp = [ cconst
             | cvar
             | `Cast of ty * cexp
             | `Addr of cexp ]
-type ceff = [ `App of cglobal * cexp list
+type ceff = [ `App of [`Fn] cglobal * cexp list
             | `Deref of cexp ]
 type ccomp = [ cexp
              | ceff
@@ -46,15 +48,10 @@ struct
     | `Int _ -> Ty int
     | `Local (_, ty) -> ty
     | `Global { tfn = Typ t } -> Ty t
-    | `Global { tfn = Fn f } -> internal_error
-      "unexpected function type for expression: %s" (Ctypes.string_of_fn f)
     | `Cast (Ty ty, _) -> Ty ty
     | `Addr e -> let Ty ty = cexp e in Ty (Pointer ty)
 
   let ceff : ceff -> ty = function
-    | `App (`Global  { tfn = Typ t; name }, _) -> internal_error
-      "unexpected non-function type %s for variable %s in function position"
-      (Ctypes.string_of_typ t) name
     | `App (`Global  { tfn = Fn f; name }, _) -> return_type f
     | `Deref e ->
       begin match cexp e with
@@ -264,10 +261,11 @@ struct
                                    reads_ocaml_heap = false;
                                    tfn = Typ value; }
 
-  let copy_bytes : cglobal = `Global { name = "ctypes_copy_bytes";
-                                       allocates = true;
-                                       reads_ocaml_heap = true;
-                                       tfn = Fn (ptr void @-> size_t @-> returning value) }
+  let copy_bytes : [`Fn] cglobal =
+    `Global { name = "ctypes_copy_bytes";
+              allocates = true;
+              reads_ocaml_heap = true;
+              tfn = Fn (ptr void @-> size_t @-> returning value) }
 
   let cast : type a b. from:ty -> into:ty -> ccomp -> ccomp =
     fun ~from:(Ty from) ~into e ->
@@ -278,13 +276,9 @@ struct
     fun ty x -> match ty with
     | Void -> None
     | Primitive p ->
-      begin match prim_prj p with
-      | { tfn = Fn fn } as prj ->
-        let rt = return_type fn in
-        Some (cast ~from:rt ~into:(Ty (Primitive p)) (`App (`Global prj, [x])))
-      | { tfn = Typ t } -> internal_error
-        "Unexpected non-function type for function: %s" (Ctypes.string_of_typ t)
-      end
+      let { tfn = Fn fn } as prj = prim_prj p in
+      let rt = return_type fn in
+      Some (cast ~from:rt ~into:(Ty (Primitive p)) (`App (`Global prj, [x])))
     | Pointer _ -> Some (to_ptr x)
     | Struct s ->
       Some ((to_ptr x, ptr void) >>= fun y ->
