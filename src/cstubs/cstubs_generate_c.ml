@@ -23,7 +23,8 @@ type 'a id_properties = {
 }
 
 type 'a cglobal = [ `Global of 'a id_properties ]
-type cvar = [ `Local of string * ty | [`Typ] cglobal ]
+type clocal = [ `Local of string * ty ]
+type cvar = [ clocal | [`Typ] cglobal ]
 type cconst = [ `Int of int ]
 type cexp = [ cconst
             | cvar
