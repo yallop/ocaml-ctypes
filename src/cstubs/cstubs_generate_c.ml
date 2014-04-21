@@ -32,9 +32,10 @@ type cexp = [ cconst
             | `Addr of cexp ]
 type ceff = [ `App of [`Fn] cglobal * cexp list
             | `Deref of cexp ]
+type cbind = clocal * ceff
 type ccomp = [ cexp
              | ceff
-             | `Let of (string * ty) * ceff * ccomp ]
+             | `Let of cbind * ccomp ]
 type cfundec = [ `Function of string * string list * ccomp ]
 
 let max_byte_args = 5
@@ -65,7 +66,7 @@ struct
   let rec ccomp : ccomp -> ty = function
     | #cexp as e -> cexp e
     | #ceff as e -> ceff e
-    | `Let (_, _, c) -> ccomp c
+    | `Let (_, c) -> ccomp c
 end
 
 (* We're using an abstract type ([value]) as an argument and return type, so
@@ -125,15 +126,15 @@ struct
   let rec ccomp env fmt : ccomp -> unit = function
     | #cexp as e -> fprintf fmt "@[<2>return@;@[%a@]@];" (cexp env) e
     | #ceff as e -> fprintf fmt "@[<2>return@;@[%a@]@];" (ceff env) e
-    | `Let ((name, Ty Void), e, s) ->
+    | `Let ((`Local (name, Ty Void), e), s) ->
       fprintf fmt "@[%a;@]@ %a" (ceff env) e (ccomp env) s
-    | `Let ((name, Ty (Struct { tag })), e, s) ->
+    | `Let ((`Local (name, Ty (Struct { tag })), e), s) ->
       fprintf fmt "@[struct@;%s@;%s@;=@;@[%a;@]@]@ %a"
         tag name (ceff env) e (ccomp env) s
-    | `Let ((name, Ty (Union { utag })), e, s) ->
+    | `Let ((`Local (name, Ty (Union { utag })), e), s) ->
       fprintf fmt "@[union@;%s@;%s@;=@;@[%a;@]@]@ %a"
         utag name (ceff env) e (ccomp env) s
-    | `Let ((name, Ty ty), e, s) ->
+    | `Let ((`Local (name, Ty ty), e), s) ->
       fprintf fmt "@[@[%a@]@;=@;@[%a;@]@]@ %a"
         (Ctypes.format_typ ~name) ty (ceff env) e (ccomp env) s
 
@@ -183,13 +184,13 @@ struct
      | #cexp as v ->
        k v
      | #ceff as e ->
-       `Let ((x, Ty ty), e, k (`Local (x, Ty ty)))
-     | `Let (y, e, c) ->
+       `Let ((`Local (x, Ty ty), e), k (`Local (x, Ty ty)))
+     | `Let (ye, c) ->
        (* let x = (let y = e1 in e2) in e3
           ~>
           let y = e1 in (let x = e2 in e3) *)
        let Ty t = Type_C.ccomp c in
-       `Let (y, e, (c, t) >>= k)
+       `Let (ye, (c, t) >>= k)
 
   let prim_prj : type a. a Primitives.prim -> _ =
     let open Primitives in function
