@@ -14,10 +14,10 @@ open Ctypes
    is raised.
 *)
 let test_errno_exception_raised () =
-  let fdopendir = Foreign.foreign "fdopendir" ~check_errno:true
-    (int @-> returning (ptr void)) in
-  assert_raises (Unix.Unix_error(Unix.EBADF, "fdopendir", ""))
-    (fun () -> fdopendir (-300))
+  let close = Foreign.foreign "close" ~check_errno:true
+    (int @-> returning int) in
+  assert_raises (Unix.Unix_error(Unix.EBADF, "close", ""))
+    (fun () -> close (-300))
     
 
 (*
