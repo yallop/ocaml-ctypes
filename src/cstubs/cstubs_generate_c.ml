@@ -11,26 +11,31 @@ open Static
 open Cstubs_errors
 
 type ty = Ty : _ typ -> ty
-type tfn = Typ : _ typ -> tfn | Fn : _ fn -> tfn
+type _ tfn =
+  Typ : _ typ -> [`Typ] tfn
+| Fn : _ fn -> [`Fn] tfn
 
-type id_properties = {
+type 'a id_properties = {
   name: string;
   allocates: bool;
   reads_ocaml_heap: bool;
-  tfn: tfn;
+  tfn: 'a tfn;
 }
 
-type cvar = [ `Local of string * ty | `Global of id_properties ]
+type 'a cglobal = [ `Global of 'a id_properties ]
+type clocal = [ `Local of string * ty ]
+type cvar = [ clocal | [`Typ] cglobal ]
 type cconst = [ `Int of int ]
 type cexp = [ cconst
             | cvar
             | `Cast of ty * cexp
             | `Addr of cexp ]
+type ceff = [ `App of [`Fn] cglobal * cexp list
+            | `Deref of cexp ]
+type cbind = clocal * ceff
 type ccomp = [ cexp
-             | `App of cvar * cexp list
-             | `Return of cexp
-             | `Let of (string * ty) * ccomp * ccomp
-             | `Deref of cexp ]
+             | ceff
+             | `Let of cbind * ccomp ]
 type cfundec = [ `Function of string * string list * ccomp ]
 
 let max_byte_args = 5
@@ -39,14 +44,30 @@ let rec return_type : type a. a fn -> ty = function
   | Function (_, f) -> return_type f
   | Returns t -> Ty t
                         
-let rec typ_val : cexp -> ty = function
-  | `Int _ -> Ty int
-  | `Local (_, ty) -> ty
-  | `Global { tfn = Typ t } -> Ty t
-  | `Global { tfn = Fn f } -> internal_error
-    "unexpected function type for expression: %s" (Ctypes.string_of_fn f)
-  | `Cast (Ty ty, _) -> Ty ty
-  | `Addr e -> let Ty ty = typ_val e in Ty (Pointer ty)
+module Type_C =
+struct
+  let rec cexp : cexp -> ty = function
+    | `Int _ -> Ty int
+    | `Local (_, ty) -> ty
+    | `Global { tfn = Typ t } -> Ty t
+    | `Cast (Ty ty, _) -> Ty ty
+    | `Addr e -> let Ty ty = cexp e in Ty (Pointer ty)
+
+  let ceff : ceff -> ty = function
+    | `App (`Global  { tfn = Fn f; name }, _) -> return_type f
+    | `Deref e ->
+      begin match cexp e with
+      | Ty (Pointer ty) -> Ty ty
+      | Ty t -> internal_error
+        "dereferencing expression of non-pointer type %s"
+        (Ctypes.string_of_typ t)
+      end
+
+  let rec ccomp : ccomp -> ty = function
+    | #cexp as e -> cexp e
+    | #ceff as e -> ceff e
+    | `Let (_, c) -> ccomp c
+end
 
 (* We're using an abstract type ([value]) as an argument and return type, so
    we'll use the [Function] and [Return] constructors directly.  The smart
@@ -76,7 +97,7 @@ struct
     | (Ty (Primitive _) as l), (Ty (Primitive _) as r) -> l = r
     | _ -> false
     in
-    fun ty e -> harmless ty (typ_val e)
+    fun ty e -> harmless ty (Type_C.cexp e)
 
   let rec cexp env fmt : cexp -> unit = function
     | #cconst as c -> cconst fmt c
@@ -90,8 +111,7 @@ struct
     | `Cast (ty, e) -> fprintf fmt "@[@[(%a)@]%a@]" format_ty ty (cexp env) e
     | `Addr e -> fprintf fmt "@[&@[%a@]@]" (cexp env) e
 
-  let rec ccomp env fmt : ccomp -> unit = function
-    | #cexp as v -> cexp env fmt v
+  let ceff env fmt : ceff -> unit = function
     | `App (v, es) ->
       fprintf fmt "@[%s(@[" (cvar_name v);
       let last_exp = List.length es - 1 in
@@ -102,21 +122,21 @@ struct
         es;
       fprintf fmt ")@]@]";
     | `Deref e -> fprintf fmt "@[*@[%a@]@]" (cexp env) e
-    | `Return e -> fprintf fmt "@[<2>return@;@[%a@]@];" (cexp env) e
-    | `Let ((x, _), (#cexp as v), e) ->
-      (* substitute values during printing for now *)
-      ccomp ((x, v) :: env) fmt e
-    | `Let (x1, `Let (x2, c2, c3), c1) ->
-      (* Normalise during printing for now *)
-      ccomp env fmt (`Let (x2, c2, `Let (x1, c3, c1)))
-    | `Let ((name, Ty Void), e, s) ->
-      fprintf fmt "@[%a;@]@ %a" (ccomp env) e (ccomp env) s
-    | `Let ((name, Ty (Struct { tag })), e, s) ->
-      fprintf fmt "@[struct@;%s@;%s@;=@;@[%a;@]@]@ %a" tag name (ccomp env) e (ccomp env) s
-    | `Let ((name, Ty (Union { utag })), e, s) ->
-      fprintf fmt "@[union@;%s@;%s@;=@;@[%a;@]@]@ %a" utag name (ccomp env) e (ccomp env) s
-    | `Let ((name, Ty ty), e, s) -> fprintf fmt "@[@[%a@]@;=@;@[%a;@]@]@ %a"
-      (Ctypes.format_typ ~name) ty (ccomp env) e (ccomp env) s
+
+  let rec ccomp env fmt : ccomp -> unit = function
+    | #cexp as e -> fprintf fmt "@[<2>return@;@[%a@]@];" (cexp env) e
+    | #ceff as e -> fprintf fmt "@[<2>return@;@[%a@]@];" (ceff env) e
+    | `Let ((`Local (name, Ty Void), e), s) ->
+      fprintf fmt "@[%a;@]@ %a" (ceff env) e (ccomp env) s
+    | `Let ((`Local (name, Ty (Struct { tag })), e), s) ->
+      fprintf fmt "@[struct@;%s@;%s@;=@;@[%a;@]@]@ %a"
+        tag name (ceff env) e (ccomp env) s
+    | `Let ((`Local (name, Ty (Union { utag })), e), s) ->
+      fprintf fmt "@[union@;%s@;%s@;=@;@[%a;@]@]@ %a"
+        utag name (ceff env) e (ccomp env) s
+    | `Let ((`Local (name, Ty ty), e), s) ->
+      fprintf fmt "@[@[%a@]@;=@;@[%a;@]@]@ %a"
+        (Ctypes.format_typ ~name) ty (ceff env) e (ccomp env) s
 
   let cfundec fmt (`Function (f, xs, body) : cfundec) =
     fprintf fmt "@[value@;%s(@[" f;
@@ -155,6 +175,22 @@ struct
   let reader name fn = { name; allocates = false; reads_ocaml_heap = true; tfn = Fn fn }
   let conser name fn = { name; allocates = true; reads_ocaml_heap = false; tfn = Fn fn }
   let immediater name fn = { name; allocates = false; reads_ocaml_heap = false; tfn = Fn fn }
+
+  let rec (>>=) : type a. ccomp * a typ -> (cexp -> ccomp) -> ccomp =
+   fun (e, ty) k ->
+     let x = fresh_var () in
+     match e with
+       (* let x = v in e ~> e[x:=v] *) 
+     | #cexp as v ->
+       k v
+     | #ceff as e ->
+       `Let ((`Local (x, Ty ty), e), k (`Local (x, Ty ty)))
+     | `Let (ye, c) ->
+       (* let x = (let y = e1 in e2) in e3
+          ~>
+          let y = e1 in (let x = e2 in e3) *)
+       let Ty t = Type_C.ccomp c in
+       `Let (ye, (c, t) >>= k)
 
   let prim_prj : type a. a Primitives.prim -> _ =
     let open Primitives in function
@@ -227,36 +263,31 @@ struct
                                    reads_ocaml_heap = false;
                                    tfn = Typ value; }
 
-  let copy_bytes : cvar = `Global { name = "ctypes_copy_bytes";
-                                    allocates = true;
-                                    reads_ocaml_heap = true;
-                                    tfn = Fn (ptr void @-> size_t @-> returning value) }
+  let copy_bytes : [`Fn] cglobal =
+    `Global { name = "ctypes_copy_bytes";
+              allocates = true;
+              reads_ocaml_heap = true;
+              tfn = Fn (ptr void @-> size_t @-> returning value) }
 
   let cast : type a b. from:ty -> into:ty -> ccomp -> ccomp =
-    fun ~from ~into e ->
-      let x = (fresh_var (), from) in
-      `Let (x, e, `Cast (into, `Local x))
+    fun ~from:(Ty from) ~into e ->
+      (e, from) >>= fun x ->
+      `Cast (into, x)
 
   let rec prj : type a. a typ -> cexp -> ccomp option =
     fun ty x -> match ty with
     | Void -> None
     | Primitive p ->
-      begin match prim_prj p with
-      | { tfn = Fn fn } as prj ->
-        let rt = return_type fn in
-        Some (cast ~from:rt ~into:(Ty (Primitive p)) (`App (`Global prj, [x])))
-      | { tfn = Typ t } -> internal_error
-        "Unexpected non-function type for function: %s" (Ctypes.string_of_typ t)
-      end
+      let { tfn = Fn fn } as prj = prim_prj p in
+      let rt = return_type fn in
+      Some (cast ~from:rt ~into:(Ty (Primitive p)) (`App (`Global prj, [x])))
     | Pointer _ -> Some (to_ptr x)
     | Struct s ->
-      let y = (fresh_var (), Ty (ptr void)) in
-      Some (`Let (y, to_ptr x,
-                  `Deref (`Cast (Ty (ptr ty), `Local y))))
+      Some ((to_ptr x, ptr void) >>= fun y ->
+            `Deref (`Cast (Ty (ptr ty), y)))
     | Union u -> 
-      let y = (fresh_var (), Ty (ptr void)) in
-      Some (`Let (y, to_ptr x,
-                  `Deref (`Cast (Ty (ptr ty), `Local y))))
+      Some ((to_ptr x, ptr void) >>= fun y ->
+            `Deref (`Cast (Ty (ptr ty), y)))
     | Abstract _ -> report_unpassable "values of abstract type"
     | View { ty } -> prj ty x
     | Array _ -> report_unpassable "arrays"
@@ -274,49 +305,39 @@ struct
     | Array _ -> report_unpassable "arrays"
     | Bigarray _ -> report_unpassable "bigarrays"
       
-  type ('state, 'result) folder = {
-    arg: 'a. 'a typ -> 'state -> 'state;
-    returns: 'a. 'a typ -> 'state -> 'result;
-  }
+  type _ fn =
+  | Returns  : 'a typ   -> 'a fn
+  | Function : string * 'a typ * 'b fn  -> ('a -> 'b) fn
 
-  let rec foldl_fn : type a s r. (s, r) folder -> s -> a fn -> r =
-    fun ({ arg; returns } as folder) init -> function 
-    | Returns t -> returns t init
-    | Function (f, t) -> foldl_fn folder (arg f init) t
+  let rec name_params : type a. a Static.fn -> a fn = function
+    | Returns t -> Returns t
+    | Function (f, t) -> Function (fresh_var (), f, name_params t)
 
-  type fold_state = {
-    env: cvar list;
-    body: ccomp -> ccomp;
-    vars: string list;
-  }
+  let rec params : type a. a fn -> string list = function
+    | Returns t -> []
+    | Function (x, _, t) -> x :: params t
 
-  let fn : type a. cname:string -> stub_name:string -> a fn -> cfundec =
+  let fn : type a. cname:string -> stub_name:string -> a Static.fn -> cfundec =
     fun ~cname ~stub_name f ->
-      foldl_fn {
-        arg = (fun ty state ->
-          let x = fresh_var () in
-          let x' = fresh_var () in 
-          match prj ty (`Local (x, Ty value)) with
-          | None ->
-            { state with vars = x :: state.vars }
-          | Some projected ->
-            { vars = x :: state.vars;
-              body = (fun e -> state.body (`Let ((x', Ty ty), projected, e)));
-              env = `Local (x', Ty ty) :: state.env });
-        returns = (fun t state ->
-          let x = fresh_var () in
-          `Function (stub_name, List.rev state.vars,
-                     state.body (`Let ((x, Ty t),
-                                       (`App
-                                           (`Global { name = cname;
-                                                      allocates = false;
-                                                      reads_ocaml_heap = false;
-                                                      tfn = Fn f; },
-                                            (List.rev state.env :> cexp list))),
-                                       let y = (fresh_var (), Ty value) in
-                                       `Let (y, inj t (`Local (x, Ty t)),
-                                             `Return (`Local y))))))}
-          { env = []; body = (fun e -> e); vars = [] } f
+      let fvar = `Global { name = cname;
+                           allocates = false;
+                           reads_ocaml_heap = false;
+                           tfn = Fn f; } in
+      let rec body : type a. _ -> a fn -> _ =
+         fun vars -> function 
+         | Returns t ->
+           (`App (fvar, (List.rev vars :> cexp list)), t) >>= fun x ->
+           inj t x
+         | Function (x, f, t) ->
+           begin match prj f (`Local (x, Ty value)) with
+             None -> body vars t
+           | Some projected -> 
+             (projected, f) >>= fun x' ->
+             body (x' :: vars) t
+           end
+      in
+      let f' = name_params f in
+      `Function (stub_name, params f', body [] f')
 end
 
 let fn ~cname  ~stub_name fmt fn =
