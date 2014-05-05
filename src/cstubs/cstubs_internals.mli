@@ -20,6 +20,8 @@ val make_structured :
 
 val make_ptr : 'a typ -> voidp -> 'a ptr
 
+val raw_ptr : 'a ptr -> voidp
+
 type 'a ocaml_type = 'a Static.ocaml_type =
   String     : string ocaml_type
 | FloatArray : float array ocaml_type

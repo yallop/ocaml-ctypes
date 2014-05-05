@@ -256,7 +256,7 @@ let rec pattern_and_exp_of_typ :
     let x = fresh_var () in
     let pat = static_con "Pointer" [`Var x] in
     begin match pol with
-    | `Arg -> (pat, Some (`Project (e, path_of_string "CI.raw_ptr")))
+    | `Arg -> (pat, Some (`Appl (`Ident (path_of_string "CI.raw_ptr"), e)))
     | `Ret -> (pat, Some (`MakePtr (`Ident (path_of_string x), e)))
     end
   | Struct _ ->
@@ -264,8 +264,8 @@ let rec pattern_and_exp_of_typ :
     let pat = `As (static_con "Struct" [`Underscore], x) in
     begin match pol with
     | `Arg ->
-      (pat, Some (`Project (`Appl (`Ident (path_of_string "Ctypes.addr"), e),
-                            path_of_string "CI.raw_ptr")))
+      (pat, Some (`Appl (`Ident (path_of_string "CI.raw_ptr"),
+                         `Appl (`Ident (path_of_string "Ctypes.addr"), e))))
     | `Ret -> (pat, Some (`MakeStructured (`Ident (path_of_string x), e)))
     end
   | Union _ ->
@@ -273,8 +273,8 @@ let rec pattern_and_exp_of_typ :
     let pat = `As (static_con "Union" [`Underscore], x) in
     begin match pol with
     | `Arg ->
-      (pat, Some (`Project (`Appl (`Ident (path_of_string "Ctypes.addr"), e),
-                            path_of_string "CI.raw_ptr")))
+      (pat, Some (`Appl (`Ident (path_of_string "CI.raw_ptr"),
+                         `Appl (`Ident (path_of_string "Ctypes.addr"), e))))
     | `Ret -> (pat, Some (`MakeStructured (`Ident (path_of_string x), e)))
     end
   | View { ty } ->

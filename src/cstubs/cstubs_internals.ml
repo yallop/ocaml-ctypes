@@ -23,3 +23,5 @@ include Primitives
 
 let make_ptr reftype raw_ptr =
   CPointer { reftype; raw_ptr; pmanaged = None; pbyte_offset = 0; }
+
+let raw_ptr (CPointer { raw_ptr }) = raw_ptr
