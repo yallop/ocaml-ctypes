@@ -606,6 +606,39 @@ tests/test-coercions/generated_stubs.c: $(BUILDDIR)/test-coercions-stub-generato
 tests/test-coercions/generated_bindings.ml: $(BUILDDIR)/test-coercions-stub-generator.native
 	$< --ml-file $@
 
+test-passing-ocaml-values-stubs.dir  = tests/test-passing-ocaml-values/stubs
+test-passing-ocaml-values-stubs.threads = yes
+test-passing-ocaml-values-stubs.subproject_deps = ctypes cstubs \
+   ctypes-foreign-base ctypes-foreign-unthreaded tests-common
+test-passing-ocaml-values-stubs: PROJECT=test-passing-ocaml-values-stubs
+test-passing-ocaml-values-stubs: $$(LIB_TARGETS)
+
+test-passing-ocaml-values-stub-generator.dir = tests/test-passing-ocaml-values/stub-generator
+test-passing-ocaml-values-stub-generator.threads = yes
+test-passing-ocaml-values-stub-generator.subproject_deps = ctypes cstubs \
+     ctypes-foreign-base ctypes-foreign-unthreaded test-passing-ocaml-values-stubs tests-common
+test-passing-ocaml-values-stub-generator.deps = str bigarray
+test-passing-ocaml-values-stub-generator: PROJECT=test-passing-ocaml-values-stub-generator
+test-passing-ocaml-values-stub-generator: $$(NATIVE_TARGET)
+
+test-passing-ocaml-values.dir = tests/test-passing-ocaml-values
+test-passing-ocaml-values.threads = yes
+test-passing-ocaml-values.deps = str bigarray oUnit
+test-passing-ocaml-values.subproject_deps = ctypes ctypes-foreign-base \
+   ctypes-foreign-unthreaded cstubs tests-common test-passing-ocaml-values-stubs
+test-passing-ocaml-values.link_flags = -L$(BUILDDIR)/clib -ltest_functions
+test-passing-ocaml-values: PROJECT=test-passing-ocaml-values
+test-passing-ocaml-values: $$(NATIVE_TARGET)
+
+test-passing-ocaml-values-generated: \
+  tests/test-passing-ocaml-values/generated_bindings.ml \
+  tests/test-passing-ocaml-values/generated_stubs.c
+
+tests/test-passing-ocaml-values/generated_stubs.c: $(BUILDDIR)/test-passing-ocaml-values-stub-generator.native
+	$< --c-file $@
+tests/test-passing-ocaml-values/generated_bindings.ml: $(BUILDDIR)/test-passing-ocaml-values-stub-generator.native
+	$< --ml-file $@
+
 TESTS =
 TESTS += test-raw
 TESTS += test-pointers-stubs test-pointers-stub-generator test-pointers-generated test-pointers
@@ -632,6 +665,7 @@ TESTS += test-callback_lifetime-stubs test-callback_lifetime-stub-generator test
 TESTS += test-stubs
 TESTS += test-bigarrays-stubs test-bigarrays-stub-generator test-bigarrays-generated test-bigarrays
 TESTS += test-coercions-stubs test-coercions-stub-generator test-coercions-generated test-coercions
+TESTS += test-passing-ocaml-values-stubs test-passing-ocaml-values-stub-generator test-passing-ocaml-values-generated test-passing-ocaml-values
 
 testlib: $(BUILDDIR)/clib/libtest_functions.so
 $(BUILDDIR)/clib/libtest_functions.so: $(BUILDDIR)/clib/test_functions.o
