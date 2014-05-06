@@ -254,6 +254,16 @@ struct
     fun x -> `App (`Global (reader "CTYPES_TO_PTR" (value @-> returning (ptr void))),
                    [x])
 
+  let string_to_ptr : cexp -> ccomp =
+    fun x -> `App (`Global (reader "CTYPES_PTR_OF_OCAML_STRING"
+                              (value @-> returning (ptr void))),
+                   [x])
+
+  let float_array_to_ptr : cexp -> ccomp =
+    fun x -> `App (`Global (reader "CTYPES_PTR_OF_FLOAT_ARRAY"
+                              (value @-> returning (ptr void))),
+                   [x])
+
   let from_ptr : cexp -> ccomp =
     fun x -> `App (`Global (conser "CTYPES_FROM_PTR" (ptr void @-> returning value)),
                    [x])
@@ -292,6 +302,8 @@ struct
     | View { ty } -> prj ty x
     | Array _ -> report_unpassable "arrays"
     | Bigarray _ -> report_unpassable "bigarrays"
+    | OCaml String -> Some (string_to_ptr x)
+    | OCaml FloatArray -> Some (float_array_to_ptr x)
 
   let rec inj : type a. a typ -> cexp -> ccomp =
     fun ty x -> match ty with
@@ -304,7 +316,8 @@ struct
     | View { ty } -> inj ty x
     | Array _ -> report_unpassable "arrays"
     | Bigarray _ -> report_unpassable "bigarrays"
-      
+    | OCaml _ -> report_unpassable "ocaml references as return values"
+
   type _ fn =
   | Returns  : 'a typ   -> 'a fn
   | Function : string * 'a typ * 'b fn  -> ('a -> 'b) fn
