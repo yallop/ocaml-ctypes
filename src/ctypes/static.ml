@@ -29,6 +29,7 @@ type abstract_type = {
 
 type _ ocaml_type =
   String     : string ocaml_type
+| Bytes      : Bytes.t ocaml_type
 | FloatArray : float array ocaml_type
 
 type _ typ =
@@ -188,6 +189,7 @@ let ulong = Primitive Primitives.Ulong
 let ullong = Primitive Primitives.Ullong
 let array i t = Array (t, i)
 let ocaml_string = OCaml String
+let ocaml_bytes = OCaml Bytes
 let ocaml_float_array = OCaml FloatArray
 let ptr t = Pointer t
 let ( @->) f t =
