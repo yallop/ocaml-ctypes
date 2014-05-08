@@ -148,6 +148,7 @@ struct
         mov.(idx) <- (Obj.repr obj, disp * elt_size)
     in function
     | OCaml String     -> ocaml_arg 1
+    | OCaml Bytes      -> ocaml_arg 1
     | OCaml FloatArray -> ocaml_arg (Ctypes_primitives.sizeof Primitives.Double)
     | ty -> (fun ~offset ~idx v dst mov -> Memory.write ty ~offset v dst)
 

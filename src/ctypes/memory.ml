@@ -346,5 +346,8 @@ let string_from_ptr (CPointer { raw_ptr; pbyte_offset = offset }) ~length:len =
 let ocaml_string_start str =
   OCamlRef (0, str, String)
 
+let ocaml_bytes_start str =
+  OCamlRef (0, str, Bytes)
+
 let ocaml_float_array_start arr =
   OCamlRef (0, arr, FloatArray)

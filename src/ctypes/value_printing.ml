@@ -64,6 +64,7 @@ and format_ocaml : type a. Format.formatter -> a ocaml -> unit =
   in
   fun fmt (OCamlRef (off, obj, ty)) -> match ty with
   | String -> Format.fprintf fmt "%S%a" obj offset off
+  | Bytes -> Format.fprintf fmt "%S%a" (Bytes.to_string obj) offset off
   | FloatArray -> Format.fprintf fmt "%a%a" float_array obj offset off
 and format_fields : type a b. string -> (a, b) structured boxed_field list ->
                               Format.formatter -> (a, b) structured -> unit

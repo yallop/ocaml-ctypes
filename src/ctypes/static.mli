@@ -15,6 +15,7 @@ type abstract_type = {
 
 type _ ocaml_type =
   String     : string ocaml_type
+| Bytes      : Bytes.t ocaml_type
 | FloatArray : float array ocaml_type
 
 type incomplete_size = { mutable isize: int }
@@ -139,6 +140,7 @@ val ulong : Unsigned.ulong typ
 val ullong : Unsigned.ullong typ
 val array : int -> 'a typ -> 'a carray typ
 val ocaml_string : string ocaml typ
+val ocaml_bytes : Bytes.t ocaml typ
 val ocaml_float_array : float array ocaml typ
 val ptr : 'a typ -> 'a ptr typ
 val ( @-> ) : 'a typ -> 'b fn -> ('a -> 'b) fn

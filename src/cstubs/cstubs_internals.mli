@@ -24,6 +24,7 @@ val raw_ptr : 'a ptr -> voidp
 
 type 'a ocaml_type = 'a Static.ocaml_type =
   String     : string ocaml_type
+| Bytes      : Bytes.t ocaml_type
 | FloatArray : float array ocaml_type
 
 type 'a typ = 'a Static.typ =
