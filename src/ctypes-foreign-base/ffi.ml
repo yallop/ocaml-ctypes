@@ -76,12 +76,42 @@ struct
        Ffi_stubs.complete_struct_type bufspec;
        ArgType (Ffi_stubs.ffi_type_of_struct_type bufspec)
 
-
   let pick_call_stub check_errno name =
     match check_errno, name with
     | true, Some name -> Ffi_stubs.call_errno name
     | true, None      -> Ffi_stubs.call_errno ""
     | false, _        -> Ffi_stubs.call
+
+  (*
+    call addr callspec
+     (fun buffer ->
+          write arg_1 buffer v_1
+          write arg buffer v
+          ...
+          write arg_n buffer v_n)
+     read_return_value
+  *)
+  let invoke_ name check_errno read_return_value =
+    let call = pick_call_stub check_errno name in
+    fun write callspec addr -> call addr callspec write read_return_value
+
+  let invoke0' f =
+    f (fun buf _ -> ())
+
+  let invoke1' f write callspec addr v =
+    f (write v) callspec addr
+
+  let invoke2' f write0 write callspec addr v1 v2 =
+    f (fun buf -> write v2 buf; write0 v1 buf) callspec addr
+
+  let invoke0 name check_errno read_return_value =
+    invoke0' (invoke_ name check_errno read_return_value)
+
+  let invoke1 name write check_errno read_return_value =
+    invoke1' (invoke_ name check_errno read_return_value) write
+
+  let invoke2 name write0 write check_errno read_return_value =
+    invoke2' (invoke_ name check_errno read_return_value) write0 write
 
   (*
     call addr callspec
