@@ -28,12 +28,12 @@ struct
 
   type _ ccallspec =
       Call : bool * (Ctypes_raw.voidp -> 'a) -> 'a ccallspec
-    | WriteArg : ('a -> Ctypes_raw.voidp -> unit) * 'b ccallspec ->
+    | WriteArg : ('a -> Ctypes_raw.voidp -> (Obj.t * int) array -> unit) * 'b ccallspec ->
                  ('a -> 'b) ccallspec
 
   type arg_type = ArgType : 'a Ffi_stubs.ffitype -> arg_type
 
-  (* keep_alive ties the lifetimes of objects together.  
+  (* keep_alive ties the lifetimes of objects together.
 
      [keep_alive w ~while_live:v] ensures that [w] is not collected while [v] is
      still live.
@@ -52,6 +52,7 @@ struct
                                                (Type_printing.string_of_typ prim)
                                              else ArgType ffitype
     | Pointer _                           -> ArgType (Ffi_stubs.pointer_ffitype ())
+    | OCaml _                             -> ArgType (Ffi_stubs.pointer_ffitype ())
     | Union _                             -> report_unpassable "unions"
     | Struct ({ spec = Complete _ } as s) -> struct_arg_type s
     | View { ty }                         -> arg_type ty
@@ -86,7 +87,7 @@ struct
   *)
   let rec invoke : type a. string option ->
                            a ccallspec ->
-                           (Ctypes_raw.voidp -> unit) list ->
+                           (Ctypes_raw.voidp -> (Obj.t * int) array -> unit) list ->
                            Ffi_stubs.callspec ->
                            Ctypes_raw.voidp ->
                         a
@@ -99,7 +100,7 @@ struct
         in
         fun writers callspec addr ->
           call addr callspec
-            (fun buf -> List.iter (fun w -> w buf) writers)
+            (fun buf arr -> List.iter (fun w -> w buf arr) writers)
             read_return_value
       | WriteArg (write, ccallspec) ->
         let next = invoke name ccallspec in
@@ -128,14 +129,30 @@ struct
         let box = box_function abi f callspec in
         let read = Memory.build p ~offset:0 in
         fun f -> Ffi_stubs.Fn (fun buf ->
-          let f' = 
-            try WeakRef.get f (read buf) 
+          let f' =
+            try WeakRef.get f (read buf)
             with WeakRef.EmptyWeakReference ->
               raise Ffi_stubs.CallToExpiredClosure
           in
           let v = box (WeakRef.make f') in
-          let () = Gc.finalise (fun _ -> f'; ()) v in
+          let () = Gc.finalise (fun _ -> ignore (f'); ()) v in
           v)
+
+  let write_arg : type a. a typ -> offset:int -> idx:int -> a ->
+                  Ctypes_raw.voidp -> (Obj.t * int) array -> unit =
+    let ocaml_arg elt_size =
+      fun ~offset ~idx (OCamlRef (disp, obj)) dst mov ->
+        mov.(idx) <- (Obj.repr obj, disp * elt_size)
+    in
+    function
+    | Pointer _ ->
+      (fun ~offset ~idx (CPointer { raw_ptr; pbyte_offset; pmanaged }) dst mov ->
+        Memory_stubs.Pointer.write ~offset
+              (Ctypes_raw.PtrType.(add raw_ptr (of_int pbyte_offset))) dst)
+    | OCaml String     -> ocaml_arg 1
+    | OCaml Bytes      -> ocaml_arg 1
+    | OCaml FloatArray -> ocaml_arg (Ctypes_primitives.sizeof Primitives.Double)
+    | ty -> (fun ~offset ~idx v dst mov -> Memory.write ty ~offset v dst)
 
   (*
     callspec = allocate_callspec ()
@@ -145,16 +162,16 @@ struct
     add_argument callspec argn
     prep_callspec callspec rettype
   *)
-  let rec build_ccallspec : type a. abi:abi -> check_errno:bool -> a fn ->
+  let rec build_ccallspec : type a. abi:abi -> check_errno:bool -> ?idx:int -> a fn ->
     Ffi_stubs.callspec -> a ccallspec
-    = fun ~abi ~check_errno fn callspec -> match fn with
+    = fun ~abi ~check_errno ?(idx=0) fn callspec -> match fn with
       | Returns t ->
         let () = prep_callspec callspec abi t in
         Call (check_errno, Memory.build t ~offset:0)
       | Function (p, f) ->
         let offset = add_argument callspec p in
-        let rest = build_ccallspec ~abi ~check_errno f callspec in
-        WriteArg (Memory.write p ~offset, rest)
+        let rest = build_ccallspec ~abi ~check_errno ~idx:(idx+1) f callspec in
+        WriteArg (write_arg p ~offset ~idx, rest)
 
   let build_function ?name ~abi ~check_errno fn =
     let c = Ffi_stubs.allocate_callspec () in
@@ -162,11 +179,11 @@ struct
     invoke name e [] c
 
   let ptr_of_rawptr raw_ptr =
-    { raw_ptr ; pbyte_offset = 0; reftype = void; pmanaged = None }
+    CPointer { raw_ptr ; pbyte_offset = 0; reftype = void; pmanaged = None; }
 
   let function_of_pointer ?name ~abi ~check_errno fn =
     let f = build_function ?name ~abi ~check_errno fn in
-    fun {raw_ptr} -> f raw_ptr
+    fun (CPointer {raw_ptr}) -> f raw_ptr
 
   let pointer_of_function ~abi fn =
     let cs' = Ffi_stubs.allocate_callspec () in

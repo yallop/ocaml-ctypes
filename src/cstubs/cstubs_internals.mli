@@ -18,17 +18,16 @@ type managed_buffer = Memory_stubs.managed_buffer
 val make_structured :
   ('a, 's) structured typ -> managed_buffer -> ('a, 's) structured
 
-type 'a ptr = 'a Static.ptr
-  = { reftype      : 'a typ;
-      raw_ptr      : voidp;
-      pmanaged     : Obj.t option;
-      pbyte_offset : int }
-
 val make_ptr : 'a typ -> voidp -> 'a ptr
+
+type 'a ocaml_type = 'a Static.ocaml_type =
+  String     : string ocaml_type
+| Bytes      : Bytes.t ocaml_type
+| FloatArray : float array ocaml_type
 
 type 'a typ = 'a Static.typ =
     Void            :                              unit typ
-  | Primitive       : 'a Primitives.prim        -> 'a typ 
+  | Primitive       : 'a Primitives.prim        -> 'a typ
   | Pointer         : 'a typ                    -> 'a ptr typ
   | Struct          : 'a Static.structure_type  -> 'a Static.structure typ
   | Union           : 'a Static.union_type      -> 'a Static.union typ
@@ -36,6 +35,17 @@ type 'a typ = 'a Static.typ =
   | View            : ('a, 'b) view             -> 'a typ
   | Array           : 'a typ * int              -> 'a Static.carray typ
   | Bigarray        : (_, 'a) Ctypes_bigarray.t -> 'a typ
+  | OCaml           : 'a ocaml_type             -> 'a ocaml typ
+and 'a cptr = 'a Static.cptr
+  = { reftype      : 'a typ;
+      raw_ptr      : voidp;
+      pmanaged     : Obj.t option;
+      pbyte_offset : int; }
+and ('a, 'b) pointer = ('a, 'b) Static.pointer =
+  CPointer : 'a cptr -> ('a, [`C]) pointer
+| OCamlRef : int * 'a -> ('a, [`OCaml]) pointer
+and 'a ptr = ('a, [`C]) pointer
+and 'a ocaml = ('a, [`OCaml]) pointer
 and ('a, 'b) view = ('a, 'b) Static.view = {
   read : 'b -> 'a;
   write : 'a -> 'b;

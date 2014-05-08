@@ -152,9 +152,16 @@ val complex64 : Complex.t typ
 
 (** {4:pointer_types Pointer types} *)
 
-type 'a ptr = 'a Static.ptr
-(** The type of pointer values.  A value of type [t ptr] can be used to read
-    and write values of type [t] at particular addresses. *)
+type ('a, 'b) pointer = ('a, 'b) Static.pointer
+(** The type of pointer values. A value of type [('a, [`C]) pointer] contains
+    a C-compatible pointer, and a value of type [('a, [`OCaml]) pointer]
+    contains a pointer to a value that can be moved by OCaml runtime. *)
+
+(** {4 C-compatible pointers} *)
+
+type 'a ptr = ('a, [`C]) pointer
+(** The type of C-compatible pointer values.  A value of type [t ptr] can be
+    used to read and write values of type [t] at particular addresses. *)
 
 val ptr : 'a typ -> 'a ptr typ
 (** Construct a pointer type from an existing type (called the {i reference
@@ -181,9 +188,26 @@ val string_opt : string option typ
 	except that null pointers appear in OCaml as [None].
 *)
 
+(** {4 OCaml pointers} *)
+
+type 'a ocaml = 'a Static.ocaml
+(** The type of pointer values pointing directly into OCaml values.
+    {b Pointers of this type should never be captured by external code}.
+    In particular, functions accepting ['a ocaml] pointers must not invoke
+    any OCaml code. *)
+
+val ocaml_string : string ocaml typ
+(** Value representing the directly mapped storage of an OCaml string. *)
+
+val ocaml_bytes : Bytes.t ocaml typ
+(** Value representing the directly mapped storage of an OCaml byte array. *)
+
+val ocaml_float_array : float array ocaml typ
+(** Value representing the directly mapped storage of an OCaml float array. *)
+
 (** {3 Array types} *)
 
-(** {4 C array types} *) 
+(** {4 C array types} *)
 
 type 'a carray
 (** The type of C array values.  A value of type [t carray] can be used to read
@@ -418,15 +442,15 @@ val (!@) : 'a ptr -> 'a
 val (<-@) : 'a ptr -> 'a -> unit
 (** [p <-@ v] writes the value [v] to the address [p]. *)
 
-val (+@) : 'a ptr -> int -> 'a ptr
+val (+@) : ('a, 'b) pointer -> int -> ('a, 'b) pointer
 (** If [p] is a pointer to an array element then [p +@ n] computes the
     address of the [n]th next element. *)
 
-val (-@) : 'a ptr -> int -> 'a ptr
+val (-@) : ('a, 'b) pointer -> int -> ('a, 'b) pointer
 (** If [p] is a pointer to an array element then [p -@ n] computes the address
     of the nth previous element. *)
 
-val ptr_diff : 'a ptr -> 'a ptr -> int
+val ptr_diff : ('a, 'b) pointer -> ('a, 'b) pointer -> int
 (** [ptr_diff p q] computes [q - p].  As in C, both [p] and [q] must point
     into the same array, and the result value is the difference of the
     subscripts of the two array elements. *)
@@ -468,6 +492,18 @@ val string_from_ptr : char ptr -> length:int -> string
 
     Raise [Invalid_argument "Ctypes.string_from_ptr"] if [length] is
     negative. *)
+
+val ocaml_string_start : string -> string ocaml
+(** [ocaml_string_start s] allows to pass a pointer to the contents of an OCaml
+    string directly to a C function. *)
+
+val ocaml_bytes_start : Bytes.t -> Bytes.t ocaml
+(** [ocaml_bytes_start s] allows to pass a pointer to the contents of an OCaml
+    byte array directly to a C function. *)
+
+val ocaml_float_array_start : float array -> float array ocaml
+(** [ocaml_float_array_start fa] allows to pass a pointer to the contents of
+    an OCaml float array directly to a C function. *)
 
 (** {3 Array values} *)
 
@@ -606,7 +642,7 @@ val addr : ((_, _) structured as 's) -> 's ptr
 
 val coerce : 'a typ -> 'b typ -> 'a -> 'b
 (** [coerce t1 t2] returns a coercion function between the types represented
-    by [t1] and [t2].  If [t1] cannot be coerced to [t2], [coerce] raises 
+    by [t1] and [t2].  If [t1] cannot be coerced to [t2], [coerce] raises
     {!Uncoercible}.
 
     The following coercions are currently supported:

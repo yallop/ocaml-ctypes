@@ -26,7 +26,7 @@ type format_context = [
 let rec format_typ : type a. a typ ->
   (format_context -> Format.formatter -> unit) ->
   (format_context -> Format.formatter -> unit) =
-  let fprintf = Format.fprintf in 
+  let fprintf = Format.fprintf in
   fun t k context fmt -> match t with
     | Void ->
       fprintf fmt "void%t" (k `nonarray)
@@ -75,6 +75,7 @@ let rec format_typ : type a. a typ ->
       let name = Ctypes_primitives.name elem in
       fprintf fmt "%s%t%t" name (k `array)
         (fun fmt -> (Array.iter (Format.fprintf fmt "[%d]") dims))
+    | OCaml ty -> assert false (* TODO *)
 
 and format_fields : type a. a boxed_field list -> Format.formatter -> unit =
   fun fields fmt ->
