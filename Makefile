@@ -1,5 +1,6 @@
 .SECONDEXPANSION:
 
+DEBUG=false
 OCAML=ocaml
 OCAMLDEP=ocamldep
 OCAMLFIND=ocamlfind
@@ -8,9 +9,8 @@ VPATH=src examples
 BUILDDIR=_build
 PROJECTS=configure libffi-abigen configured ctypes cstubs ctypes-foreign-base ctypes-foreign-threaded ctypes-foreign-unthreaded ctypes-top
 GENERATED=src/ctypes_config.h src/ctypes_config.ml setup.data src/ctypes/ctypes_primitives.ml
-CFLAGS=-fPIC -Wall -O3 $(OCAML_FFI_INCOPTS)
 OCAML_FFI_INCOPTS=$(libffi_opt)
-export CFLAGS
+export CFLAGS DEBUG
 
 # public targets
 all: setup.data build
