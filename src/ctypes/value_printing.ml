@@ -20,10 +20,12 @@ let rec format : type a. a typ -> Format.formatter -> a -> unit
   | Bigarray ba -> Format.fprintf fmt "<bigarray %a>"
     (fun fmt -> Type_printing.format_typ fmt) typ
   | Abstract _ -> format_structured fmt v
+  | OCaml String -> Format.pp_print_string fmt "<string>"
+  | OCaml FloatArray -> Format.pp_print_string fmt "<float array>"
     (* For now, just print the underlying value in a view *)
   | View {write; ty} -> format ty fmt (write v)
 and format_structured : type a b. Format.formatter -> (a, b) structured -> unit
-  = fun fmt ({structured = {reftype}} as s) ->
+  = fun fmt ({structured = CPointer {reftype}} as s) ->
     let open Format in
     match reftype with
     | Struct {fields} ->
@@ -38,7 +40,7 @@ and format_structured : type a b. Format.formatter -> (a, b) structured -> unit
       pp_print_string fmt "<abstract>"
     | _ -> raise (Unsupported "unknown structured type")
 and format_array : type a. Format.formatter -> a carray -> unit
-  = fun fmt ({astart = {reftype}; alength} as arr) ->
+  = fun fmt ({astart = CPointer {reftype}; alength} as arr) ->
     let open Format in
     fprintf fmt "{@;<1 2>@[";
     for i = 0 to alength - 1 do
@@ -58,7 +60,7 @@ and format_fields : type a b. string -> (a, b) structured boxed_field list ->
           (if i <> last_field then sep else ""))
       fields
 and format_ptr : type a. Format.formatter -> a ptr -> unit
-  = fun fmt {raw_ptr; reftype; pbyte_offset} ->
+  = fun fmt (CPointer {raw_ptr; reftype; pbyte_offset}) ->
     Format.fprintf fmt "%s"
       (Value_printing_stubs.string_of_pointer
          (Raw.PtrType.(add raw_ptr (of_int pbyte_offset))))
