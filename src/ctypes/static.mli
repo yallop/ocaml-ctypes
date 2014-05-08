@@ -13,6 +13,11 @@ type abstract_type = {
   aalignment : int;
 }
 
+type _ ocaml_type =
+  String     : string ocaml_type
+| Bytes      : Bytes.t ocaml_type
+| FloatArray : float array ocaml_type
+
 type incomplete_size = { mutable isize: int }
 
 type structured_spec = { size: int; align: int; }
@@ -23,7 +28,7 @@ type 'a structspec =
 
 type _ typ =
     Void            :                       unit typ
-  | Primitive       : 'a Primitives.prim -> 'a typ 
+  | Primitive       : 'a Primitives.prim -> 'a typ
   | Pointer         : 'a typ             -> 'a ptr typ
   | Struct          : 'a structure_type  -> 'a structure typ
   | Union           : 'a union_type      -> 'a union typ
@@ -32,15 +37,21 @@ type _ typ =
   | Array           : 'a typ * int       -> 'a carray typ
   | Bigarray        : (_, 'a) Ctypes_bigarray.t
                                          -> 'a typ
-and 'a ptr = { reftype      : 'a typ;
-               raw_ptr      : Ctypes_raw.voidp;
-               pmanaged     : Obj.t option;
-               pbyte_offset : int }
+  | OCaml           : 'a ocaml_type      -> 'a ocaml typ
+and 'a cptr = { reftype      : 'a typ;
+                raw_ptr      : Ctypes_raw.voidp;
+                pmanaged     : Obj.t option;
+                pbyte_offset : int; }
 and 'a carray = { astart : 'a ptr; alength : int }
 and ('a, 'kind) structured = { structured : ('a, 'kind) structured ptr }
 and 'a union = ('a, [`Union]) structured
 and 'a structure = ('a, [`Struct]) structured
 and 'a abstract = ('a, [`Abstract]) structured
+and (_, _) pointer =
+  CPointer : 'a cptr -> ('a, [`C]) pointer
+| OCamlRef : int * 'a -> ('a, [`OCaml]) pointer
+and 'a ptr = ('a, [`C]) pointer
+and 'a ocaml = ('a, [`OCaml]) pointer
 and ('a, 'b) view = {
   read : 'b -> 'a;
   write : 'a -> 'b;
@@ -101,7 +112,7 @@ val alignment : 'a typ -> int
 val passable : 'a typ -> bool
 
 val void : unit typ
-val char : char typ 
+val char : char typ
 val schar : int typ
 val float : float typ
 val double : float typ
@@ -128,6 +139,9 @@ val uint : Unsigned.uint typ
 val ulong : Unsigned.ulong typ
 val ullong : Unsigned.ullong typ
 val array : int -> 'a typ -> 'a carray typ
+val ocaml_string : string ocaml typ
+val ocaml_bytes : Bytes.t ocaml typ
+val ocaml_float_array : float array ocaml typ
 val ptr : 'a typ -> 'a ptr typ
 val ( @-> ) : 'a typ -> 'b fn -> ('a -> 'b) fn
 val abstract : name:string -> size:int -> alignment:int -> 'a abstract typ

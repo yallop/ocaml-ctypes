@@ -25,9 +25,14 @@ type abstract_type = {
   aalignment : int;
 }
 
+type _ ocaml_type =
+  String     : string ocaml_type
+| Bytes      : Bytes.t ocaml_type
+| FloatArray : float array ocaml_type
+
 type _ typ =
     Void            :                       unit typ
-  | Primitive       : 'a Primitives.prim -> 'a typ 
+  | Primitive       : 'a Primitives.prim -> 'a typ
   | Pointer         : 'a typ             -> 'a ptr typ
   | Struct          : 'a structure_type  -> 'a structure typ
   | Union           : 'a union_type      -> 'a union typ
@@ -36,15 +41,21 @@ type _ typ =
   | Array           : 'a typ * int       -> 'a carray typ
   | Bigarray        : (_, 'a) Ctypes_bigarray.t
                                          -> 'a typ
-and 'a ptr = { reftype      : 'a typ;
-               raw_ptr      : Ctypes_raw.voidp;
-               pmanaged     : Obj.t option;
-               pbyte_offset : int }
+  | OCaml           : 'a ocaml_type      -> 'a ocaml typ
+and 'a cptr = { reftype      : 'a typ;
+                raw_ptr      : Ctypes_raw.voidp;
+                pmanaged     : Obj.t option;
+                pbyte_offset : int; }
 and 'a carray = { astart : 'a ptr; alength : int }
 and ('a, 'kind) structured = { structured : ('a, 'kind) structured ptr }
 and 'a union = ('a, [`Union]) structured
 and 'a structure = ('a, [`Struct]) structured
 and 'a abstract = ('a, [`Abstract]) structured
+and (_, _) pointer =
+  CPointer : 'a cptr -> ('a, [`C]) pointer
+| OCamlRef : int * 'a -> ('a, [`OCaml]) pointer
+and 'a ptr = ('a, [`C]) pointer
+and 'a ocaml = ('a, [`OCaml]) pointer
 and ('a, 'b) view = {
   read : 'b -> 'a;
   write : 'a -> 'b;
@@ -115,6 +126,7 @@ let rec sizeof : type a. a typ -> int = function
   | Bigarray ba                    -> Ctypes_bigarray.sizeof ba
   | Abstract { asize }             -> asize
   | Pointer _                      -> Ctypes_primitives.pointer_size
+  | OCaml _                        -> raise IncompleteType
   | View { ty }                    -> sizeof ty
 
 let rec alignment : type a. a typ -> int = function
@@ -128,12 +140,13 @@ let rec alignment : type a. a typ -> int = function
   | Array (t, _)                     -> alignment t
   | Bigarray ba                      -> Ctypes_bigarray.alignment ba
   | Abstract { aalignment }          -> aalignment
-  | Pointer _                        -> Ctypes_primitives.pointer_alignment 
+  | Pointer _                        -> Ctypes_primitives.pointer_alignment
+  | OCaml _                          -> raise IncompleteType
   | View { ty }                      -> alignment ty
 
 let rec passable : type a. a typ -> bool = function
     Void                           -> true
-  | Primitive _                    -> true 
+  | Primitive _                    -> true
   | Struct { spec = Incomplete _ } -> raise IncompleteType
   | Struct { spec = Complete _ }   -> true
   | Union  { uspec = None }        -> raise IncompleteType
@@ -142,6 +155,7 @@ let rec passable : type a. a typ -> bool = function
   | Bigarray _                     -> false
   | Pointer _                      -> true
   | Abstract _                     -> false
+  | OCaml _                        -> true
   | View { ty }                    -> passable ty
 
 let void = Void
@@ -172,6 +186,9 @@ let uint = Primitive Primitives.Uint
 let ulong = Primitive Primitives.Ulong
 let ullong = Primitive Primitives.Ullong
 let array i t = Array (t, i)
+let ocaml_string = OCaml String
+let ocaml_bytes = OCaml Bytes
+let ocaml_float_array = OCaml FloatArray
 let ptr t = Pointer t
 let ( @->) f t =
   if not (passable f) then
