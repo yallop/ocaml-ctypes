@@ -76,6 +76,13 @@ struct
        Ffi_stubs.complete_struct_type bufspec;
        ArgType (Ffi_stubs.ffi_type_of_struct_type bufspec)
 
+
+  let pick_call_stub check_errno name =
+    match check_errno, name with
+    | true, Some name -> Ffi_stubs.call_errno name
+    | true, None      -> Ffi_stubs.call_errno ""
+    | false, _        -> Ffi_stubs.call
+
   (*
     call addr callspec
      (fun buffer ->
@@ -93,11 +100,7 @@ struct
                         a
     = fun name -> function
       | Call (check_errno, read_return_value) ->
-        let call = match check_errno, name with
-          | true, Some name -> Ffi_stubs.call_errno name
-          | true, None      -> Ffi_stubs.call_errno ""
-          | false, _        -> Ffi_stubs.call
-        in
+        let call = pick_call_stub check_errno name in
         fun writers callspec addr ->
           call addr callspec
             (fun buf arr -> List.iter (fun w -> w buf arr) writers)
