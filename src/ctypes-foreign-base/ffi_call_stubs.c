@@ -46,7 +46,7 @@ static value retrieve_closure(int key)
   CAMLreturn (result);
 }
 
-/* Register the function used to resolve closure identifiers */ 
+/* Register the function used to resolve closure identifiers */
 /* set_closure_callback : (int -> boxedfn) -> unit */
 value ctypes_set_closure_callback(value retrieve)
 {
@@ -55,7 +55,7 @@ value ctypes_set_closure_callback(value retrieve)
   caml_register_global_root(&retrieve_closure_);
   retrieve_closure_ = retrieve;
 
-  CAMLreturn(Val_unit);  
+  CAMLreturn(Val_unit);
 }
 
 
@@ -93,7 +93,7 @@ static struct callspec {
 
   /* The ffi_cif structure holds some of the information that we're
      maintaining here, but it isn't part of the public interface. */
-  
+
   /* The space needed to store properly-aligned arguments and return value. */
   size_t bytes;
 
@@ -114,14 +114,14 @@ static struct callspec {
 
   /* return value offset */
   size_t roffset;
-  
+
   /* The libffi call interface structure.  It would be nice for this member to
      be a value rather than a pointer (to save a layer of indirection) but the
      ffi_closure structure keeps the address of the structure, and the GC can
      move callspec values around.
   */
   ffi_cif *cif;
-  
+
 } callspec_prototype = {
   0, 0, 0, 0, BUILDING, NULL, -1, NULL
 };
@@ -162,18 +162,18 @@ static size_t compute_arg_buffer_size(struct callspec *callspec,
                                       size_t *arg_array_offset)
 {
   assert(callspec->state == CALLSPEC);
-     
+
   size_t bytes = callspec->bytes;
-     
+
   *arg_array_offset = aligned_offset(bytes, ffi_type_pointer.alignment);
   bytes = *arg_array_offset + callspec->nelements * sizeof(void *);
-     
+
   return bytes;
 }
 
 /* Set the pointers in `arg_array' to the addresses of the argument slots in
    `callbuffer' as indicated by the elements of the ffitype array in the
-   callspec.  */ 
+   callspec.  */
 static void populate_arg_array(struct callspec *callspec,
                                callbuffer *callbuffer, void **arg_array)
 {
@@ -275,13 +275,12 @@ value ctypes_prep_callspec(value callspec_, value abi_, value rtype)
 
 /* Call the function specified by `callspec', passing arguments and return
    values in `buffer' */
-/* call : raw_pointer -> callspec -> (raw_pointer -> unit) ->
+/* call : raw_pointer -> callspec -> (raw_pointer -> Obj.t array -> unit) ->
           (raw_pointer -> 'a) -> 'a */
-value ctypes_call(value function, value callspec_, value argwriter,
-                  value rvreader)
+value ctypes_call(value function, value callspec_, value argwriter, value rvreader)
 {
   CAMLparam4(function, callspec_, argwriter, rvreader);
-  CAMLlocal2(callback_arg_buf, callback_rv_buf);
+  CAMLlocal3(callback_arg_buf, callback_val_arr, callback_rv_buf);
 
   struct callspec *callspec = Data_custom_val(callspec_);
   int roffset = callspec->roffset;
@@ -298,7 +297,26 @@ value ctypes_call(value function, value callspec_, value argwriter,
                      (void **)(callbuffer + arg_array_offset));
   callback_arg_buf = CTYPES_FROM_PTR(callbuffer);
 
-  caml_callback(argwriter, callback_arg_buf);
+  callback_val_arr = caml_alloc_tuple(callspec->nelements);
+  caml_callback2(argwriter, callback_arg_buf, callback_val_arr);
+
+  void **val_refs = alloca(sizeof(void*) * callspec->nelements);
+
+  int arg_idx;
+  for(arg_idx = 0; arg_idx < Wosize_val(callback_val_arr); arg_idx++) {
+    value arg_tuple = Field(callback_val_arr, arg_idx);
+    /* <4.02 initialize to 0; >=4.02 initialize to unit. */
+    if(arg_tuple == NULL || arg_tuple == Val_unit) continue;
+
+    value arg_ptr    = Field(arg_tuple, 0);
+    value arg_offset = Field(arg_tuple, 1);
+
+    /* Only strings have defined semantics for now. */
+    assert(Is_block(arg_ptr) && Tag_val(arg_ptr) == String_tag);
+    val_refs[arg_idx] = String_val(arg_ptr) + Int_val(arg_offset);
+
+    ((void**)(callbuffer + arg_array_offset))[arg_idx] = &val_refs[arg_idx];
+  }
 
   void (*cfunction)(void) = (void (*)(void)) CTYPES_TO_PTR(function);
 
@@ -312,14 +330,14 @@ value ctypes_call(value function, value callspec_, value argwriter,
 }
 
 
-/* call_errno : string -> raw_pointer -> callspec -> 
+/* call_errno : string -> raw_pointer -> callspec ->
                (raw_pointer -> unit) ->
                (raw_pointer -> 'a) -> 'a */
 value ctypes_call_errno(value fnname, value function, value callspec_,
                         value argwriter, value rvreader)
 {
   CAMLparam5(fnname, function, callspec_, argwriter, rvreader);
-  
+
   errno = 0;
   CAMLlocal1(rv);
   rv = ctypes_call(function, callspec_, argwriter, rvreader);
@@ -331,7 +349,6 @@ value ctypes_call_errno(value fnname, value function, value callspec_,
   }
   CAMLreturn(rv);
 }
-
 
 typedef struct closure closure;
 struct closure

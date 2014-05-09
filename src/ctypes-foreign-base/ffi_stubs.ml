@@ -55,13 +55,13 @@ external prep_callspec : callspec -> int -> _ ffitype -> unit
 (* Call the function specified by `callspec' at the given address.
    The callback functions write the arguments to the buffer and read
    the return value. *)
-external call : voidp -> callspec -> (voidp -> unit) ->
-  (voidp -> 'a) -> 'a
+external call : voidp -> callspec ->
+  (voidp -> (Obj.t * int) array -> unit) -> (voidp -> 'a) -> 'a
   = "ctypes_call"
 
 (* As ctypes_call, but check errno and raise Unix_error if the call failed. *)
 external call_errno : string -> voidp -> callspec ->
-  (voidp -> unit) -> (voidp -> 'a) -> 'a
+  (voidp -> (Obj.t * int) array -> unit) -> (voidp -> 'a) -> 'a
   = "ctypes_call_errno"
 
 
