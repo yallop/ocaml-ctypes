@@ -143,12 +143,7 @@ struct
     let ocaml_arg elt_size =
       fun ~offset ~idx (OCamlRef (disp, obj)) dst mov ->
         mov.(idx) <- (Obj.repr obj, disp * elt_size)
-    in
-    function
-    | Pointer _ ->
-      (fun ~offset ~idx (CPointer { raw_ptr; pbyte_offset; pmanaged }) dst mov ->
-        Memory_stubs.Pointer.write ~offset
-              (Ctypes_raw.PtrType.(add raw_ptr (of_int pbyte_offset))) dst)
+    in function
     | OCaml String     -> ocaml_arg 1
     | OCaml FloatArray -> ocaml_arg (Ctypes_primitives.sizeof Primitives.Double)
     | ty -> (fun ~offset ~idx v dst mov -> Memory.write ty ~offset v dst)
