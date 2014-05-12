@@ -9,8 +9,6 @@
 
 let cheader = "
 #include <tgmath.h>
-#define exp_float exp
-#define exp_double exp
 "
 
 let () = Tests_common.run ~cheader Sys.argv (module Functions.Stubs)

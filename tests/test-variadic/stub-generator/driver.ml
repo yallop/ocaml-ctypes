@@ -9,10 +9,6 @@
 
 let cheader = "
 #include <stdio.h>
-#define snprintf1 snprintf
-#define snprintf2 snprintf
-#define snprintf3 snprintf
-#define snprintf4 snprintf
 "
 
 let () = Tests_common.run ~cheader Sys.argv (module Functions.Stubs)

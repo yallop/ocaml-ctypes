@@ -13,7 +13,7 @@ module Stubs (F: Cstubs.FOREIGN) =
 struct
   open F
 
-  let exp_double = foreign "exp_double" (double @-> returning double)
+  let exp_double = foreign "exp" (double @-> returning double)
 
-  let exp_float = foreign "exp_float" (float @-> returning float)
+  let exp_float = foreign "exp" (float @-> returning float)
 end
