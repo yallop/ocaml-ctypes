@@ -18,6 +18,7 @@ let printers = [ "Ctypes_printers.format_typ";
                  "Ctypes_printers.format_struct";
                  "Ctypes_printers.format_union";
                  "Ctypes_printers.format_array";
+                 "Ctypes_printers.format_ocaml";
                  "Ctypes_printers.format_blkcnt_t";
                  "Ctypes_printers.format_blksize_t";
                  "Ctypes_printers.format_clock_t";

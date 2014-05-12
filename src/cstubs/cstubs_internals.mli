@@ -44,7 +44,7 @@ and 'a cptr = 'a Static.cptr
       pbyte_offset : int; }
 and ('a, 'b) pointer = ('a, 'b) Static.pointer =
   CPointer : 'a cptr -> ('a, [`C]) pointer
-| OCamlRef : int * 'a -> ('a, [`OCaml]) pointer
+| OCamlRef : int * 'a * 'a ocaml_type -> ('a, [`OCaml]) pointer
 and 'a ptr = ('a, [`C]) pointer
 and 'a ocaml = ('a, [`OCaml]) pointer
 and ('a, 'b) view = ('a, 'b) Static.view = {

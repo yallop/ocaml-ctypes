@@ -24,6 +24,7 @@ val format_pointer : formatter -> 'a Ctypes.ptr -> unit
 val format_struct : formatter -> ('a, 'b) Ctypes.structured -> unit
 val format_union : formatter -> ('a, 'b) Ctypes.structured -> unit
 val format_array : formatter -> 'a Ctypes.CArray.t -> unit
+val format_ocaml : formatter -> 'a Ctypes.ocaml -> unit
 val format_blkcnt_t : formatter -> PosixTypes.blkcnt_t -> unit
 val format_blksize_t : formatter -> PosixTypes.blksize_t -> unit
 val format_clock_t : formatter -> PosixTypes.clock_t -> unit

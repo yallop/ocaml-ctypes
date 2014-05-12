@@ -110,7 +110,7 @@ let ptr_diff : type a b. (a, b) pointer -> (a, b) pointer -> int
         let l = add lp (of_int loff)
         and r = add rp (of_int roff) in
         to_int (sub r l) / sizeof reftype
-    | OCamlRef (lo, l), OCamlRef (ro, r) ->
+    | OCamlRef (lo, l, _), OCamlRef (ro, r, _) ->
       if l != r then invalid_arg "Ctypes.ptr_diff";
       ro - lo
 
@@ -119,8 +119,8 @@ let (+@) : type a b. (a, b) pointer -> int -> (a, b) pointer
     match p with
     | CPointer ({ pbyte_offset; reftype } as p) ->
       CPointer { p with pbyte_offset = pbyte_offset + (x * sizeof reftype) }
-    | OCamlRef (offset, obj) ->
-      OCamlRef (offset + x, obj)
+    | OCamlRef (offset, obj, ty) ->
+      OCamlRef (offset + x, obj, ty)
 
 let (-@) p x = p +@ (-x)
 
@@ -344,10 +344,7 @@ let string_from_ptr (CPointer { raw_ptr; pbyte_offset = offset }) ~length:len =
   else Stubs.string_of_array raw_ptr ~offset ~len
 
 let ocaml_string_start str =
-  OCamlRef (0, str)
-
-let ocaml_bytes_start bytes =
-  OCamlRef (0, bytes)
+  OCamlRef (0, str, String)
 
 let ocaml_float_array_start arr =
-  OCamlRef (0, arr)
+  OCamlRef (0, arr, FloatArray)

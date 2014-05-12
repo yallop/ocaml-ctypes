@@ -144,7 +144,7 @@ struct
   let write_arg : type a. a typ -> offset:int -> idx:int -> a ->
                   Ctypes_raw.voidp -> (Obj.t * int) array -> unit =
     let ocaml_arg elt_size =
-      fun ~offset ~idx (OCamlRef (disp, obj)) dst mov ->
+      fun ~offset ~idx (OCamlRef (disp, obj, _)) dst mov ->
         mov.(idx) <- (Obj.repr obj, disp * elt_size)
     in function
     | OCaml String     -> ocaml_arg 1

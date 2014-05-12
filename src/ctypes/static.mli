@@ -48,7 +48,7 @@ and 'a structure = ('a, [`Struct]) structured
 and 'a abstract = ('a, [`Abstract]) structured
 and (_, _) pointer =
   CPointer : 'a cptr -> ('a, [`C]) pointer
-| OCamlRef : int * 'a -> ('a, [`OCaml]) pointer
+| OCamlRef : int * 'a * 'a ocaml_type -> ('a, [`OCaml]) pointer
 and 'a ptr = ('a, [`C]) pointer
 and 'a ocaml = ('a, [`OCaml]) pointer
 and ('a, 'b) view = {
