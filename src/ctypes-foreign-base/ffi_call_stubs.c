@@ -306,7 +306,7 @@ value ctypes_call(value function, value callspec_, value argwriter, value rvread
   for(arg_idx = 0; arg_idx < Wosize_val(callback_val_arr); arg_idx++) {
     value arg_tuple = Field(callback_val_arr, arg_idx);
     /* <4.02 initialize to 0; >=4.02 initialize to unit. */
-    if(arg_tuple == NULL || arg_tuple == Val_unit) continue;
+    if(arg_tuple == 0 || arg_tuple == Val_unit) continue;
 
     value arg_ptr    = Field(arg_tuple, 0);
     value arg_offset = Field(arg_tuple, 1);
