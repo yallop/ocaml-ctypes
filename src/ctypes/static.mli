@@ -161,3 +161,5 @@ val field_type : ('a, 'b) field -> 'a typ
 exception IncompleteType
 exception ModifyingSealedType of string
 exception Unsupported of string
+
+val unsupported : ('a, unit, string, _) format4 -> 'a

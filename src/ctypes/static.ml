@@ -11,6 +11,8 @@ exception IncompleteType
 exception ModifyingSealedType of string
 exception Unsupported of string
 
+let unsupported fmt = Printf.ksprintf (fun s -> raise (Unsupported s)) fmt
+
 type incomplete_size = { mutable isize: int }
 
 type structured_spec = { size: int; align: int; }
