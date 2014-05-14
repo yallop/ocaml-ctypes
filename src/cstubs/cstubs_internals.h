@@ -14,5 +14,7 @@
 #include "ctypes/complex_stubs.h"
 #include "ctypes/raw_pointer.h"
 #include "ctypes/managed_buffer_stubs.h"
+#define CTYPES_PTR_OF_OCAML_STRING(s) \
+  (String_val(Field(s, 1)) + Int_val(Field(s, 0)))
 
 #endif /* CSTUBS_INTERNALS_H */

@@ -240,6 +240,12 @@ let test_unsupported_coercions () =
        T (bigarray array1 10 Bigarray.int32); T (array 5 int32_t);
        T (structure "s"); T (union "u");
        T (abstract ~name:"a" ~size:12 ~alignment:4)];
+
+      T ocaml_string,
+      [T int8_t; T uint16_t; T int; T float; T short; T complex64;
+       T (bigarray array1 10 Bigarray.int32); T (array 5 int32_t);
+       T (structure "s"); T (union "u");
+       T (abstract ~name:"a" ~size:12 ~alignment:4)];
     ]
 
     (* None of the types in the list are currently intercoercible. *)

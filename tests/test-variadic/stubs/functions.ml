@@ -17,15 +17,8 @@ struct
     ~read:Unsigned.Size_t.to_int
     ~write:Unsigned.Size_t.of_int
 
-  let counter = ref 0
-  let name () =
-    begin
-      incr counter;
-      Printf.sprintf "snprintf%d" !counter
-    end
-
   let bind_snprintf tail =
-    foreign (name ()) (ptr char @-> size_t_as_int @-> string @-> tail)
+    foreign "snprintf" (ptr char @-> size_t_as_int @-> string @-> tail)
 
   let snprintf_int =
     bind_snprintf (int @-> returning int)

@@ -48,7 +48,7 @@ type _ alloc =
 | Alloc_nativeint : nativeint alloc
 | Alloc_float : float alloc
 | Alloc_complex : Complex.t alloc
-| Alloc_pointer : _ ptr alloc
+| Alloc_pointer : (_, _) pointer alloc
 | Alloc_structured : (_, _) structured alloc
 | Alloc_array : _ carray alloc
 | Alloc_bigarray : (_, 'a) Ctypes_bigarray.t -> 'a alloc
@@ -99,6 +99,7 @@ let rec allocation : type a. a typ -> a allocation = function
    end
  | Array _ -> `Alloc Alloc_array
  | Bigarray ba -> `Alloc (Alloc_bigarray ba)
+ | OCaml _ -> `Alloc Alloc_pointer
 
 let rec may_allocate : type a. a fn -> bool = function
   | Returns t ->

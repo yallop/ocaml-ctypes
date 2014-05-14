@@ -384,6 +384,19 @@ let test_array_printing () =
 
 
 (*
+  Test the printing of OCaml string types.
+*)
+let test_ocaml_string_printing () =
+  begin
+    assert_typ_printed_as ~name:"p" "char *p"
+      ocaml_string;
+
+    assert_typ_printed_as "char *"
+      ocaml_string;
+  end
+
+
+(*
   Test the printing of bigarray types.
 *)
 let test_bigarray_printing () =
@@ -499,6 +512,9 @@ let suite = "Type printing tests" >:::
 
    "printing arrays"
     >:: test_array_printing;
+
+   "printing OCaml string types"
+    >:: test_ocaml_string_printing;
 
    "printing bigarrays"
     >:: test_bigarray_printing;

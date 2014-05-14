@@ -20,9 +20,12 @@ module type BINDINGS = functor (F : FOREIGN') -> sig end
 let gen_c prefix fmt : (module FOREIGN') =
   (module
    struct
+     let counter = ref 0
+     let var prefix name = incr counter;
+       Printf.sprintf "%s_%d_%s" prefix !counter name
      type 'a fn = unit
      let foreign cname fn =
-       Cstubs_generate_c.fn ~cname ~stub_name:(prefix ^ cname) fmt fn
+       Cstubs_generate_c.fn ~cname ~stub_name:(var prefix cname) fmt fn
    end)
 
 type bind = Bind : string * string * ('a -> 'b) Ctypes.fn -> bind
@@ -50,10 +53,9 @@ let gen_ml prefix fmt : (module FOREIGN') * (unit -> unit) =
    struct
      type 'a fn = unit
      let foreign cname fn =
-       let external_name = var prefix cname 
-       and stub_name = prefix ^ cname in
-       bindings := Bind (cname, external_name, fn) :: !bindings;
-       Cstubs_generate_ml.extern ~stub_name ~external_name fmt fn
+       let name = var prefix cname in
+       bindings := Bind (cname, name, fn) :: !bindings;
+       Cstubs_generate_ml.extern ~stub_name:name ~external_name:name fmt fn
    end),
   fun () -> write_foreign fmt !bindings
 

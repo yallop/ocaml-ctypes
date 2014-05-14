@@ -91,6 +91,14 @@ let test_incomplete_alignment () =
   ()
 
 
+(*
+  Test that [alignment] treats OCaml types as incomplete.
+*)
+let test_alignment_ocaml_string () =
+  assert_raises IncompleteType
+    (fun () -> alignment ocaml_string)
+
+
 (* 
    Test that the alignment of a struct is equal to the maximum
    alignment of its members.
@@ -289,6 +297,9 @@ let suite = "Alignment tests" >:::
 
    "alignment of incomplete types"
    >:: test_incomplete_alignment;
+
+   "alignment considers ocaml_string incomplete"
+    >:: test_alignment_ocaml_string;
 
    "alignment of bigarray types"
    >:: test_bigarray_alignment;

@@ -98,6 +98,24 @@ let test_incomplete_struct_members () =
 
 
 (*
+  Test that OCaml types cannot be used as struct or union fields.
+*)
+let test_ocaml_types_rejected_as_fields () =
+  let module M = struct
+    let s = structure "s"
+    let () = assert_raises IncompleteType
+      (fun () -> field s "o" ocaml_string)
+
+    let u = union "u"
+    let () = assert_raises IncompleteType
+      (fun () ->
+        field u "o" ocaml_string;
+        (* The error is currently only caught on sealing the union *)
+        seal u)
+  end in ()
+
+
+(*
   Test reading and writing pointers to struct members.
 *)
 let test_pointers_to_struct_members () =
@@ -417,6 +435,9 @@ let suite = "Struct tests" >:::
 
    "incomplete struct members rejected"
    >:: test_incomplete_struct_members;
+
+   "ocaml_string cannot be used as a structure field"
+   >:: test_ocaml_types_rejected_as_fields;
 
    "pointers to struct members"
    >:: test_pointers_to_struct_members;

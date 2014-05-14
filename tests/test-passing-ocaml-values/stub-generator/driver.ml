@@ -5,10 +5,8 @@
  * See the file LICENSE for details.
  *)
 
-(* Stub generation driver for the macro tests. *)
+(* Stub generation driver for the OCaml-value-passing tests. *)
 
-let cheader = "
-#include <tgmath.h>
-"
+let cheader = "#include <string.h>"
 
 let () = Tests_common.run ~cheader Sys.argv (module Functions.Stubs)
