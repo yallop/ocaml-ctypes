@@ -63,6 +63,14 @@ struct
 end
 
 
+(*
+  Test that OCaml values do not reside in addressable memory.
+*)
+let test_ocaml_types_rejected_as_pointer_reference_types () =
+  assert_raises IncompleteType
+    (fun () -> allocate ocaml_string (ocaml_string_start ""))
+
+
 module Foreign_tests = Common_tests(Tests_common.Foreign_binder)
 module Stub_tests = Common_tests(Generated_bindings)
 
@@ -79,6 +87,9 @@ let suite = "Tests passing OCaml values" >:::
 
    "pointer arithmetic on OCaml values (stubs)"
     >:: Stub_tests.test_pointer_arithmetic;
+
+   "ocaml_string values aren't addressable"
+    >:: test_ocaml_types_rejected_as_pointer_reference_types;
   ]
 
 
