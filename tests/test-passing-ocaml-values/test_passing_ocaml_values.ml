@@ -79,6 +79,22 @@ let test_ocaml_types_rejected_as_return_types () =
     (fun () -> Foreign.foreign "strdup" (string @-> returning ocaml_string))
 
 
+(*
+  Test that pointers to OCaml values cannot be dereferenced.
+*)
+let test_pointers_to_ocaml_types_cannot_be_dereferenced () =
+  let p = allocate_n char 10 in
+  let po = coerce (ptr char) (ptr ocaml_string) p in
+
+  begin
+    assert_raises IncompleteType
+      (fun () -> !@po);
+
+    assert_raises IncompleteType
+      (fun () -> po <-@ ocaml_string_start "");
+  end
+
+
 module Foreign_tests = Common_tests(Tests_common.Foreign_binder)
 module Stub_tests = Common_tests(Generated_bindings)
 
@@ -100,7 +116,10 @@ let suite = "Tests passing OCaml values" >:::
     >:: test_ocaml_types_rejected_as_pointer_reference_types;
 
    "ocaml_string can't be used as a return type"
-    >:: test_ocaml_types_rejected_as_return_types
+    >:: test_ocaml_types_rejected_as_return_types;
+
+   "pointers to ocaml_string values cannot be dereferenced"
+    >:: test_pointers_to_ocaml_types_cannot_be_dereferenced;
   ]
 
 
