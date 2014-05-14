@@ -71,6 +71,14 @@ let test_ocaml_types_rejected_as_pointer_reference_types () =
     (fun () -> allocate ocaml_string (ocaml_string_start ""))
 
 
+(*
+  Test that OCaml values cannot be used as return types.
+*)
+let test_ocaml_types_rejected_as_return_types () =
+  assert_raises IncompleteType
+    (fun () -> Foreign.foreign "strdup" (string @-> returning ocaml_string))
+
+
 module Foreign_tests = Common_tests(Tests_common.Foreign_binder)
 module Stub_tests = Common_tests(Generated_bindings)
 
@@ -90,6 +98,9 @@ let suite = "Tests passing OCaml values" >:::
 
    "ocaml_string values aren't addressable"
     >:: test_ocaml_types_rejected_as_pointer_reference_types;
+
+   "ocaml_string can't be used as a return type"
+    >:: test_ocaml_types_rejected_as_return_types
   ]
 
 
