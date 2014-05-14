@@ -274,22 +274,26 @@ let rec pattern_and_exp_of_typ :
     | `Ret -> (pat, Some (`MakePtr (`Ident (path_of_string x), e)))
     end
   | Struct _ ->
-    let x = fresh_var () in
-    let pat = `As (static_con "Struct" [`Underscore], x) in
     begin match pol with
     | `Arg ->
+      let pat = static_con "Struct" [`Underscore] in
       (pat, Some (`Appl (`Ident (path_of_string "CI.raw_ptr"),
                          `Appl (`Ident (path_of_string "Ctypes.addr"), e))))
-    | `Ret -> (pat, Some (`MakeStructured (`Ident (path_of_string x), e)))
+    | `Ret ->
+      let x = fresh_var () in
+      let pat = `As (static_con "Struct" [`Underscore], x) in
+      (pat, Some (`MakeStructured (`Ident (path_of_string x), e)))
     end
   | Union _ ->
-    let x = fresh_var () in
-    let pat = `As (static_con "Union" [`Underscore], x) in
     begin match pol with
     | `Arg ->
+      let pat = static_con "Union" [`Underscore] in
       (pat, Some (`Appl (`Ident (path_of_string "CI.raw_ptr"),
                          `Appl (`Ident (path_of_string "Ctypes.addr"), e))))
-    | `Ret -> (pat, Some (`MakeStructured (`Ident (path_of_string x), e)))
+    | `Ret ->
+      let x = fresh_var () in
+      let pat = `As (static_con "Union" [`Underscore], x) in
+      (pat, Some (`MakeStructured (`Ident (path_of_string x), e)))
     end
   | View { ty } ->
     begin match pol  with
