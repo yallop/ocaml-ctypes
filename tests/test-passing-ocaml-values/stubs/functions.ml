@@ -18,4 +18,7 @@ struct
 
   let memcpy_string_ptr = foreign "memcpy"
     (ocaml_string @-> ptr void @-> size_t @-> returning (ptr void))
+
+  let strdup = foreign "strdup"
+    (ocaml_string @-> returning string)
 end

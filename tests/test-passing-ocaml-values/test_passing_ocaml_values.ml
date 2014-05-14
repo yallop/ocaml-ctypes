@@ -42,6 +42,24 @@ struct
     in begin
       assert_equal buf input
     end
+
+
+    (*
+      Test pointer arithmetic on OCaml values.
+    *)
+    let test_pointer_arithmetic () =
+      let s = ocaml_string_start "abcdefghijklmnopqrstuvwxyz" in
+      begin
+        assert_equal s (s +@ 0);
+
+        assert_equal (ptr_diff s (s +@ 10)) 10;
+
+        assert_equal s ((s +@ 10) -@ 10);
+
+        assert_equal
+          (strdup (ocaml_string_start "klmnopqrstuvwxyz"))
+          (strdup (s +@ 10))
+      end
 end
 
 
@@ -55,6 +73,12 @@ let suite = "Tests passing OCaml values" >:::
 
    "passing strings (stubs)"
     >:: Stub_tests.test_passing_strings;
+
+   "pointer arithmetic on OCaml values (foreign)"
+    >:: Foreign_tests.test_pointer_arithmetic;
+
+   "pointer arithmetic on OCaml values (stubs)"
+    >:: Stub_tests.test_pointer_arithmetic;
   ]
 
 
