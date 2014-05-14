@@ -95,6 +95,16 @@ let test_pointers_to_ocaml_types_cannot_be_dereferenced () =
   end
 
 
+(*
+  Test that [funptr] does not support ocaml_string return values.
+*)
+let test_no_higher_order_ocaml_string_support () =
+  begin
+    assert_raises IncompleteType
+      (fun () -> funptr (void @-> returning ocaml_string))
+  end
+
+
 module Foreign_tests = Common_tests(Tests_common.Foreign_binder)
 module Stub_tests = Common_tests(Generated_bindings)
 
@@ -120,6 +130,9 @@ let suite = "Tests passing OCaml values" >:::
 
    "pointers to ocaml_string values cannot be dereferenced"
     >:: test_pointers_to_ocaml_types_cannot_be_dereferenced;
+
+   "no higher-order ocaml_string support"
+    >:: test_no_higher_order_ocaml_string_support;
   ]
 
 
