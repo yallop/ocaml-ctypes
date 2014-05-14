@@ -112,6 +112,20 @@ let test_array_initialiation () =
 
 
 (*
+  Test that creating arrays of elements of incomplete type fails.
+*)
+let test_arrays_of_incomplete_type () =
+  let module M = struct
+    let () = assert_raises IncompleteType
+      (fun () -> CArray.make void 10)
+
+    let s = structure "s"
+    let () = assert_raises IncompleteType
+      (fun () -> CArray.make s 10)
+  end in ()
+
+
+(*
   Test that creating an array initializes all elements appropriately.
 *)
 let test_pointer_to_array_arithmetic () =
@@ -183,6 +197,9 @@ let suite = "Array tests" >:::
 
    "array initialization"
     >:: test_array_initialiation;
+
+   "arrays of incomplete type"
+    >:: test_arrays_of_incomplete_type;
 
    "pointer to array arithmetic"
     >:: test_pointer_to_array_arithmetic;
