@@ -258,8 +258,14 @@ let extern ~stub_name ~external_name fmt fn =
 let static_con c args =
   `Con (Ctypes_path.path_of_string ("CI." ^ c), args)
 
+type polarity = In | Out
+
+let flip = function
+  | In -> Out
+  | Out -> In
+
 let rec pattern_and_exp_of_typ :
-  type a. a typ -> ml_exp -> [`Arg | `Ret ] -> ml_pat * ml_exp option =
+  type a. a typ -> ml_exp -> polarity -> ml_pat * ml_exp option =
   fun typ e pol -> match typ with
   | Void ->
     (static_con "Void" [], None)
@@ -270,34 +276,34 @@ let rec pattern_and_exp_of_typ :
     let x = fresh_var () in
     let pat = static_con "Pointer" [`Var x] in
     begin match pol with
-    | `Arg -> (pat, Some (`Appl (`Ident (path_of_string "CI.raw_ptr"), e)))
-    | `Ret -> (pat, Some (`MakePtr (`Ident (path_of_string x), e)))
+    | In -> (pat, Some (`Appl (`Ident (path_of_string "CI.raw_ptr"), e)))
+    | Out -> (pat, Some (`MakePtr (`Ident (path_of_string x), e)))
     end
   | Struct _ ->
     begin match pol with
-    | `Arg ->
+    | In ->
       let pat = static_con "Struct" [`Underscore] in
       (pat, Some (`Appl (`Ident (path_of_string "CI.raw_ptr"),
                          `Appl (`Ident (path_of_string "Ctypes.addr"), e))))
-    | `Ret ->
+    | Out ->
       let x = fresh_var () in
       let pat = `As (static_con "Struct" [`Underscore], x) in
       (pat, Some (`MakeStructured (`Ident (path_of_string x), e)))
     end
   | Union _ ->
     begin match pol with
-    | `Arg ->
+    | In ->
       let pat = static_con "Union" [`Underscore] in
       (pat, Some (`Appl (`Ident (path_of_string "CI.raw_ptr"),
                          `Appl (`Ident (path_of_string "Ctypes.addr"), e))))
-    | `Ret ->
+    | Out ->
       let x = fresh_var () in
       let pat = `As (static_con "Union" [`Underscore], x) in
       (pat, Some (`MakeStructured (`Ident (path_of_string x), e)))
     end
   | View { ty } ->
     begin match pol  with
-    | `Arg -> 
+    | In ->
       let x = fresh_var () in
       let e = `Appl (`Ident (path_of_string x), e) in
       let (p, None), e | (p, Some e), _ =
@@ -306,7 +312,7 @@ let rec pattern_and_exp_of_typ :
         [`Record [path_of_string "CI.ty", p;
                   path_of_string "write", `Var x]] in
       (pat, Some e)
-    | `Ret -> 
+    | Out ->
       let (p, None), e | (p, Some e), _ =
         pattern_and_exp_of_typ ty e pol, e in
       let x = fresh_var () in
@@ -317,11 +323,11 @@ let rec pattern_and_exp_of_typ :
     end
   | OCaml ty ->
     begin match pol, ty with
-    | `Arg, String -> (static_con "OCaml" [static_con "String" []], None)
-    | `Arg, FloatArray -> (static_con "OCaml" [static_con "FloatArray" []], None)
-    | `Ret, String -> Static.unsupported
+    | In, String -> (static_con "OCaml" [static_con "String" []], None)
+    | In, FloatArray -> (static_con "OCaml" [static_con "FloatArray" []], None)
+    | Out, String -> Static.unsupported
       "cstubs does not support OCaml strings as return values"
-    | `Ret, FloatArray -> Static.unsupported
+    | Out, FloatArray -> Static.unsupported
       "cstubs does not support OCaml float arrays as return values"
     end
   | Abstract _ as ty -> internal_error
@@ -344,7 +350,7 @@ type wrapper_state = {
 let rec wrapper_body : type a. a fn -> ml_exp -> wrapper_state =
   fun fn exp -> match fn with
   | Returns t ->
-    begin match pattern_and_exp_of_typ t exp `Ret with
+    begin match pattern_and_exp_of_typ t exp Out with
       pat, None -> { exp ; args = []; trivial = true;
                      pat = static_con "Returns" [pat] }
     | pat, Some exp -> { exp; args = []; trivial = false;
@@ -352,7 +358,7 @@ let rec wrapper_body : type a. a fn -> ml_exp -> wrapper_state =
     end
   | Function (f, t) ->
     let x = fresh_var () in
-    begin match pattern_and_exp_of_typ f (`Ident (path_of_string x)) `Arg with
+    begin match pattern_and_exp_of_typ f (`Ident (path_of_string x)) In with
     | fpat, None ->
       let { exp; args; trivial; pat = tpat } =
         wrapper_body t (`Appl (exp, `Ident (path_of_string x))) in
