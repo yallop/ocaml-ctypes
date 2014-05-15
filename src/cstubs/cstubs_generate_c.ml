@@ -36,7 +36,8 @@ type cbind = clocal * ceff
 type ccomp = [ cexp
              | ceff
              | `Let of cbind * ccomp ]
-type cfundec = [ `Function of string * string list * ccomp ]
+type cfundef = [ `Function of string * (string * ty) list * ccomp ]
+type cfundec = [ `Function of string * (string * ty) list * ty ]
 
 let max_byte_args = 5
 
@@ -78,6 +79,14 @@ let returning t = Returns t
 module Emit_C =
 struct
   open Format
+
+  let format_seq lbr fmt_item sep rbr fmt items =
+    let open Format in
+    fprintf fmt "%s@[@[" lbr;
+      ListLabels.iteri items ~f:(fun i item ->
+        if i <> 0 then fprintf fmt "@]%s@ @[" sep;
+        fmt_item fmt item);
+    fprintf fmt "@]%s@]" rbr
 
   let format_ty fmt (Ty ty) = Ctypes.format_typ fmt ty
 
@@ -142,11 +151,11 @@ struct
       fprintf fmt "@[@[%a@]@;=@;@[%a;@]@]@ %a"
         (Ctypes.format_typ ~name) ty (ceff env) e (ccomp env) s
 
-  let cfundec fmt (`Function (f, xs, body) : cfundec) =
+  let cfundef fmt (`Function (f, xs, body) : cfundef) =
     fprintf fmt "@[value@;%s(@[" f;
     let xs_len = List.length xs - 1 in
     List.iteri
-      (fun i x ->
+      (fun i (x, _) ->
         fprintf fmt "value %s%(%)" x
           (if i <> xs_len then ",@ " else ""))
       xs;
@@ -330,11 +339,11 @@ struct
     | Returns t -> Returns t
     | Function (f, t) -> Function (fresh_var (), f, name_params t)
 
-  let rec params : type a. a fn -> string list = function
+  let rec params : type a. a fn -> (string * ty) list = function
     | Returns t -> []
-    | Function (x, _, t) -> x :: params t
+    | Function (x, f, t) -> (x, Ty f) :: params t
 
-  let fn : type a. cname:string -> stub_name:string -> a Static.fn -> cfundec =
+  let fn : type a. cname:string -> stub_name:string -> a Static.fn -> cfundef =
     fun ~cname ~stub_name f ->
       let fvar = `Global { name = cname;
                            allocates = false;
@@ -358,4 +367,4 @@ struct
 end
 
 let fn ~cname  ~stub_name fmt fn =
-  Emit_C.cfundec fmt (Generate_C.fn ~stub_name ~cname fn)
+  Emit_C.cfundef fmt (Generate_C.fn ~stub_name ~cname fn)
