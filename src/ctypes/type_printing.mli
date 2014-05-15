@@ -23,6 +23,8 @@ type format_context = [
    form and pointer types are unparenthesized. *)
 | `nonarray]
 
+val format_name : ?name:string -> Format.formatter -> unit
+
 val format_typ' : 'a Static.typ -> (format_context -> Format.formatter -> unit) ->
   format_context -> Format.formatter -> unit
 
