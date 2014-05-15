@@ -31,6 +31,7 @@ type cexp = [ cconst
             | `Cast of ty * cexp
             | `Addr of cexp ]
 type ceff = [ `App of [`Fn] cglobal * cexp list
+            | `Index of cexp * cexp
             | `Deref of cexp ]
 type cbind = clocal * ceff
 type ccomp = [ cexp
@@ -56,9 +57,11 @@ struct
 
   let ceff : ceff -> ty = function
     | `App (`Global  { tfn = Fn f; name }, _) -> return_type f
+    | `Index (e, _)
     | `Deref e ->
       begin match cexp e with
       | Ty (Pointer ty) -> Ty ty
+      | Ty (Array (ty, _)) -> Ty ty
       | Ty t -> internal_error
         "dereferencing expression of non-pointer type %s"
         (Ctypes.string_of_typ t)
@@ -130,6 +133,9 @@ struct
             (if i <> last_exp then ",@ " else ""))
         es;
       fprintf fmt ")@]@]";
+    | `Index (e, i) ->
+      fprintf fmt "@[@[%a@]@[[%a]@]@]"
+        (cexp env) e (cexp env) i
     | `Deref e -> fprintf fmt "@[*@[%a@]@]" (cexp env) e
 
   let rec ccomp env fmt : ccomp -> unit = function
