@@ -236,6 +236,8 @@ struct
   let conser name fn = { name; allocates = true; reads_ocaml_heap = false; tfn = Fn fn }
   let immediater name fn = { name; allocates = false; reads_ocaml_heap = false; tfn = Fn fn }
 
+  let local name ty = `Local (name, Ty ty)
+
   let rec (>>=) : type a. ccomp * a typ -> (cexp -> ccomp) -> ccomp =
    fun (e, ty) k ->
      let x = fresh_var () in
@@ -244,7 +246,7 @@ struct
      | #cexp as v ->
        k v
      | #ceff as e ->
-       `Let ((`Local (x, Ty ty), e), k (`Local (x, Ty ty)))
+       `Let ((local x ty, e), k (local x ty))
      | `LetConst (y, i, c) ->
        (* let x = (let const y = i in c) in e
           ~>
@@ -411,7 +413,7 @@ struct
            (`App (fvar, (List.rev vars :> cexp list)), t) >>= fun x ->
            (inj t x :> ccomp)
          | Function (x, f, t) ->
-           begin match prj f (`Local (x, Ty value)) with
+           begin match prj f (local x value) with
              None -> body vars t
            | Some projected -> 
              (projected, f) >>= fun x' ->
