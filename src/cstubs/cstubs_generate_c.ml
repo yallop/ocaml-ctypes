@@ -39,8 +39,8 @@ type ceff = [ cexp
 type cbind = clocal * ceff
 type ccomp = [ ceff
              | `Let of cbind * ccomp ]
-type cfundef = [ `Function of string * (string * ty) list * ccomp ]
-type cfundec = [ `Function of string * (string * ty) list * ty ]
+type cfundec = [ `Fundec of string * (string * ty) list * ty ]
+type cfundef = [ `Function of cfundec * ccomp ]
 
 let max_byte_args = 5
 
@@ -170,7 +170,7 @@ struct
       fprintf fmt "@[@[%a@]@;=@;@[%a;@]@]@ %a"
         (Ctypes.format_typ ~name) ty (ceff env) e (ccomp env) s
 
-  let cfundef fmt (`Function (f, xs, body) : cfundef) =
+  let cfundef fmt (`Function (`Fundec (f, xs, _), body) : cfundef) =
     fprintf fmt "@[value@;%s(@[" f;
     let xs_len = List.length xs - 1 in
     List.iteri
@@ -373,7 +373,8 @@ struct
            end
       in
       let f' = name_params f in
-      `Function (stub_name, value_params f', body [] f')
+      `Function (`Fundec (stub_name, value_params f', Ty value),
+                 body [] f')
 
   let byte_fn : type a. string -> a Static.fn -> int -> cfundef =
     fun name fn nargs ->
@@ -390,11 +391,14 @@ struct
                build_call ~args:(x :: args) (n - 1)
       in
       let bytename = Printf.sprintf "%s_byte%d" name nargs in
-      `Function (bytename, [argv; argc], build_call nargs)
+      `Function (`Fundec (bytename, [argv; argc], Ty value),
+                 build_call nargs)
 end
 
 let fn ~cname  ~stub_name fmt fn =
-  let `Function (f, xs, body) as dec = Generate_C.fn ~stub_name ~cname fn in
+  let `Function (`Fundec (f, xs, _), _) as dec
+      = Generate_C.fn ~stub_name ~cname fn
+  in
   let nargs = List.length xs in
   if nargs > max_byte_args then begin
     Emit_C.cfundef fmt dec;
