@@ -174,21 +174,12 @@ struct
     fprintf fmt "@[value@;%s(@[" f;
     let xs_len = List.length xs - 1 in
     List.iteri
-      (fun i (x, _) ->
-        fprintf fmt "value %s%(%)" x
+      (fun i (name, Ty ty) ->
+        fprintf fmt "%a%(%)"
+          (Type_printing.format_typ ~name) ty
           (if i <> xs_len then ",@ " else ""))
       xs;
-    fprintf fmt ")@]@]@\n{@[<v 2>@\n%a@]@\n}@\n" (ccomp []) body;
-    let nargs = List.length xs in
-    if nargs > max_byte_args then
-      begin
-        fprintf fmt "@[value@;%s_byte%d(value *argv, int argn)@]@\n{" f nargs;
-        fprintf fmt "@[<v 2>@\nreturn@[@;%s(@[" f;
-        for i = 0 to nargs - 1 do
-          if i <> nargs - 1 then fprintf fmt "argv[%d],@ " i
-          else fprintf fmt "argv[%d])@]@]@];@\n}@." i
-        done
-      end
+    fprintf fmt ")@]@]@\n{@[<v 2>@\n%a@]@\n}@\n" (ccomp []) body
 end
 
 let value = abstract ~name:"value" ~size:0 ~alignment:0
@@ -358,9 +349,9 @@ struct
     | Returns t -> Returns t
     | Function (f, t) -> Function (fresh_var (), f, name_params t)
 
-  let rec params : type a. a fn -> (string * ty) list = function
+  let rec value_params : type a. a fn -> (string * ty) list = function
     | Returns t -> []
-    | Function (x, f, t) -> (x, Ty f) :: params t
+    | Function (x, _, t) -> (x, Ty value) :: value_params t
 
   let fn : type a. cname:string -> stub_name:string -> a Static.fn -> cfundef =
     fun ~cname ~stub_name f ->
@@ -382,8 +373,32 @@ struct
            end
       in
       let f' = name_params f in
-      `Function (stub_name, params f', body [] f')
+      `Function (stub_name, value_params f', body [] f')
+
+  let byte_fn : type a. string -> a Static.fn -> int -> cfundef =
+    fun name fn nargs ->
+      let argv = ("argv", Ty (ptr value)) in
+      let argc = ("argc", Ty int) in
+      let f = `Global { name ;
+                        allocates = true;
+                        reads_ocaml_heap = true;
+                        tfn = Fn fn }
+      in
+      let rec build_call ?(args=[]) = function
+        | 0 -> `App (f, args)
+        | n -> (`Index (`Local argv, `Int (n - 1)), value) >>= fun x ->
+               build_call ~args:(x :: args) (n - 1)
+      in
+      let bytename = Printf.sprintf "%s_byte%d" name nargs in
+      `Function (bytename, [argv; argc], build_call nargs)
 end
 
 let fn ~cname  ~stub_name fmt fn =
-  Emit_C.cfundef fmt (Generate_C.fn ~stub_name ~cname fn)
+  let `Function (f, xs, body) as dec = Generate_C.fn ~stub_name ~cname fn in
+  let nargs = List.length xs in
+  if nargs > max_byte_args then begin
+    Emit_C.cfundef fmt dec;
+    Emit_C.cfundef fmt (Generate_C.byte_fn f fn nargs)
+  end
+  else
+    Emit_C.cfundef fmt dec
