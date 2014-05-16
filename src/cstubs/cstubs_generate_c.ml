@@ -30,12 +30,14 @@ type cexp = [ cconst
             | cvar
             | `Cast of ty * cexp
             | `Addr of cexp ]
-type ceff = [ `App of [`Fn] cglobal * cexp list
+type clvalue = [ clocal | `Index of clvalue * cexp ]
+type ceff = [ cexp
+            | `App of [`Fn] cglobal * cexp list
             | `Index of cexp * cexp
-            | `Deref of cexp ]
+            | `Deref of cexp
+            | `Assign of clvalue * ceff ]
 type cbind = clocal * ceff
-type ccomp = [ cexp
-             | ceff
+type ccomp = [ ceff
              | `Let of cbind * ccomp ]
 type cfundef = [ `Function of string * (string * ty) list * ccomp ]
 type cfundec = [ `Function of string * (string * ty) list * ty ]
@@ -55,7 +57,8 @@ struct
     | `Cast (Ty ty, _) -> Ty ty
     | `Addr e -> let Ty ty = cexp e in Ty (Pointer ty)
 
-  let ceff : ceff -> ty = function
+  let rec ceff : ceff -> ty = function
+    | #cexp as e -> cexp e
     | `App (`Global  { tfn = Fn f; name }, _) -> return_type f
     | `Index (e, _)
     | `Deref e ->
@@ -66,6 +69,7 @@ struct
         "dereferencing expression of non-pointer type %s"
         (Ctypes.string_of_typ t)
       end
+    | `Assign (_, rv) -> ceff rv
 
   let rec ccomp : ccomp -> ty = function
     | #cexp as e -> cexp e
@@ -123,7 +127,13 @@ struct
     | `Cast (ty, e) -> fprintf fmt "@[@[(%a)@]%a@]" format_ty ty (cexp env) e
     | `Addr e -> fprintf fmt "@[&@[%a@]@]" (cexp env) e
 
-  let ceff env fmt : ceff -> unit = function
+  let rec clvalue env fmt : clvalue -> unit = function
+    | `Local _ as x -> cvar fmt x
+    | `Index (lv, i) ->
+      fprintf fmt "@[@[%a@]@[[%a]@]@]" (clvalue env) lv (cexp env) i
+
+  let rec ceff env fmt : ceff -> unit = function
+    | #cexp as e -> cexp env fmt e
     | `App (v, es) ->
       fprintf fmt "@[%s(@[" (cvar_name v);
       let last_exp = List.length es - 1 in
@@ -137,6 +147,9 @@ struct
       fprintf fmt "@[@[%a@]@[[%a]@]@]"
         (cexp env) e (cexp env) i
     | `Deref e -> fprintf fmt "@[*@[%a@]@]" (cexp env) e
+    | `Assign (lv, e) ->
+      fprintf fmt "@[@[%a@]@;=@;@[%a@]@]"
+        (clvalue env) lv (ceff env) e
 
   let rec ccomp env fmt : ccomp -> unit = function
     | #cexp as e -> fprintf fmt "@[<2>return@;@[%a@]@];" (cexp env) e
@@ -283,14 +296,14 @@ struct
                               (value @-> returning (ptr void))),
                    [x])
 
-  let from_ptr : cexp -> ccomp =
+  let from_ptr : cexp -> ceff =
     fun x -> `App (`Global (conser "CTYPES_FROM_PTR" (ptr void @-> returning value)),
                    [x])
 
-  let val_unit : ccomp = `Global { name = "Val_unit";
-                                   allocates = false;
-                                   reads_ocaml_heap = false;
-                                   tfn = Typ value; }
+  let val_unit : ceff = `Global { name = "Val_unit";
+                                  allocates = false;
+                                  reads_ocaml_heap = false;
+                                  tfn = Typ value; }
 
   let copy_bytes : [`Fn] cglobal =
     `Global { name = "ctypes_copy_bytes";
@@ -324,7 +337,7 @@ struct
     | OCaml String -> Some (string_to_ptr x)
     | OCaml FloatArray -> Some (float_array_to_ptr x)
 
-  let rec inj : type a. a typ -> cexp -> ccomp =
+  let rec inj : type a. a typ -> cexp -> ceff =
     fun ty x -> match ty with
     | Void -> val_unit
     | Primitive p -> `App (`Global (prim_inj p), [`Cast (Ty (Primitive p), x)])
@@ -359,7 +372,7 @@ struct
          fun vars -> function 
          | Returns t ->
            (`App (fvar, (List.rev vars :> cexp list)), t) >>= fun x ->
-           inj t x
+           (inj t x :> ccomp)
          | Function (x, f, t) ->
            begin match prj f (`Local (x, Ty value)) with
              None -> body vars t
