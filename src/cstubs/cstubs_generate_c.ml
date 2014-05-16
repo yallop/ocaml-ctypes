@@ -170,16 +170,28 @@ struct
       fprintf fmt "@[@[%a@]@;=@;@[%a;@]@]@ %a"
         (Ctypes.format_typ ~name) ty (ceff env) e (ccomp env) s
 
-  let cfundef fmt (`Function (`Fundec (f, xs, _), body) : cfundef) =
-    fprintf fmt "@[value@;%s(@[" f;
-    let xs_len = List.length xs - 1 in
-    List.iteri
-      (fun i (name, Ty ty) ->
-        fprintf fmt "%a%(%)"
-          (Type_printing.format_typ ~name) ty
-          (if i <> xs_len then ",@ " else ""))
-      xs;
-    fprintf fmt ")@]@]@\n{@[<v 2>@\n%a@]@\n}@\n" (ccomp []) body
+  let format_parameter_list parameters k fmt =
+    let format_arg fmt (name, Ty t) =
+      Type_printing.format_typ ~name fmt t
+    in
+    match parameters with
+    | [] ->
+      Format.fprintf fmt "%t(void)" k
+    | _ ->
+      Format.fprintf fmt "@[%t@[%a@]@]" k
+        (format_seq "(" format_arg "," ")")
+        parameters
+
+  let cfundec : Format.formatter -> cfundec -> unit =
+    fun fmt (`Fundec (name, args, Ty return)) ->
+      Type_printing.format_typ' return
+        (fun context fmt ->
+          format_parameter_list args (Type_printing.format_name ~name) fmt)
+        `nonarray fmt
+
+  let cfundef fmt (`Function (dec, body) : cfundef) =
+    fprintf fmt "%a@\n{@[<v 2>@\n%a@]@\n}@\n" 
+      cfundec dec (ccomp []) body
 end
 
 let value = abstract ~name:"value" ~size:0 ~alignment:0
