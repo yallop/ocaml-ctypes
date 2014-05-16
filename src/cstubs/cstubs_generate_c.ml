@@ -39,6 +39,7 @@ type ceff = [ cexp
 type cbind = clocal * ceff
 type ccomp = [ ceff
              | `LetConst of clocal * cconst * ccomp
+             | `CAMLreturnT of ty * cexp
              | `Let of cbind * ccomp ]
 type cfundec = [ `Fundec of string * (string * ty) list * ty ]
 type cfundef = [ `Function of cfundec * ccomp ]
@@ -77,6 +78,7 @@ struct
     | #ceff as e -> ceff e
     | `Let (_, c)
     | `LetConst (_, _, c) -> ccomp c
+    | `CAMLreturnT (ty, _) -> ty
 end
 
 (* We're using an abstract type ([value]) as an argument and return type, so
@@ -156,6 +158,10 @@ struct
   let rec ccomp env fmt : ccomp -> unit = function
     | #cexp as e -> fprintf fmt "@[<2>return@;@[%a@]@];" (cexp env) e
     | #ceff as e -> fprintf fmt "@[<2>return@;@[%a@]@];" (ceff env) e
+    | `CAMLreturnT (Ty ty, e) ->
+      fprintf fmt "@[<2>CAMLreturnT(@[%a@],@;@[%a@])@];"
+        (fun t -> Ctypes.format_typ t) ty
+        (cexp env) e
     | `Let (xe, `Cast (ty, (#cexp as e'))) when cast_unnecessary ty e' ->
       ccomp env fmt (`Let (xe, e'))
     | `Let ((`Local (x, _), e), `Local (y, _)) when x = y ->
@@ -231,6 +237,9 @@ struct
           let const y = i in (let x = c in e) *)
        let Ty t = Type_C.ccomp c in
        `LetConst (y, i, (c, t) >>= k)
+     | `CAMLreturnT (Ty ty, v) ->
+       (k v, ty) >>= fun e ->
+       `CAMLreturnT (Type_C.cexp e, e)
      | `Let (ye, c) ->
        (* let x = (let y = e1 in e2) in e3
           ~>
