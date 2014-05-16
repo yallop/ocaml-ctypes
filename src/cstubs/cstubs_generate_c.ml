@@ -31,7 +31,10 @@ type cexp = [ cconst
             | `Cast of ty * cexp
             | `Addr of cexp ]
 type clvalue = [ clocal | `Index of clvalue * cexp ]
+type camlop = [ `CAMLparam0
+              | `CAMLlocalN of cexp * cexp ]
 type ceff = [ cexp
+            | camlop
             | `App of [`Fn] cglobal * cexp list
             | `Index of cexp * cexp
             | `Deref of cexp
@@ -59,8 +62,13 @@ struct
     | `Cast (Ty ty, _) -> Ty ty
     | `Addr e -> let Ty ty = cexp e in Ty (Pointer ty)
 
+  let camlop : camlop -> ty = function
+    | `CAMLparam0
+    | `CAMLlocalN _ -> Ty Void
+
   let rec ceff : ceff -> ty = function
     | #cexp as e -> cexp e
+    | #camlop as o -> camlop o
     | `App (`Global  { tfn = Fn f; name }, _) -> return_type f
     | `Index (e, _)
     | `Deref e ->
@@ -136,8 +144,14 @@ struct
     | `Index (lv, i) ->
       fprintf fmt "@[@[%a@]@[[%a]@]@]" (clvalue env) lv (cexp env) i
 
+  let camlop env fmt : camlop -> unit = function
+    | `CAMLparam0 -> Format.fprintf fmt "CAMLparam0()"
+    | `CAMLlocalN (e, c) -> Format.fprintf fmt "CAMLlocalN(@[%a@],@ @[%a@])"
+      (cexp env) e (cexp env) c
+
   let rec ceff env fmt : ceff -> unit = function
     | #cexp as e -> cexp env fmt e
+    | #camlop as o -> camlop env fmt o
     | `App (v, es) ->
       fprintf fmt "@[%s(@[" (cvar_name v);
       let last_exp = List.length es - 1 in
