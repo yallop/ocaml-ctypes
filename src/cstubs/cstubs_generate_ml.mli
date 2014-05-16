@@ -13,5 +13,7 @@ val extern : stub_name:string -> external_name:string -> Format.formatter ->
 val case : stub_name:string -> external_name:string -> Format.formatter ->
          ('a -> 'b) Ctypes.fn -> unit
 
-val inverse_case : register_name:string -> int -> string -> Format.formatter ->
-         ('a -> 'b) Ctypes.fn -> unit
+val constructor_decl : string -> 'a Ctypes.fn -> Format.formatter -> unit
+
+val inverse_case : register_name:string -> constructor:string -> string ->
+         Format.formatter -> ('a -> 'b) Ctypes.fn -> unit

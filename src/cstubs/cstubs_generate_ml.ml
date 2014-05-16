@@ -48,6 +48,7 @@ module Emit_ML : sig
   type appl_parens = ApplParens | NoApplParens
   val ml_exp : appl_parens -> Format.formatter -> ml_exp -> unit
   val ml_pat : appl_parens -> Format.formatter -> ml_pat -> unit
+  val ml_external_type : Format.formatter -> ml_external_type -> unit
   val extern : Format.formatter -> extern -> unit
 end =
 struct
@@ -385,11 +386,17 @@ let case ~stub_name ~external_name fmt fn =
     stub_name Emit_ML.(ml_pat NoApplParens) p;
   Format.fprintf fmt "@[<hov 2>@[%a@]@]@]@." Emit_ML.(ml_exp ApplParens) e
 
-let inverse_case ~register_name i name fmt fn : unit =
+let constructor_decl : type a. string -> a fn -> Format.formatter -> unit =
+  fun name fn fmt ->
+    Format.fprintf fmt "@[|@ %s@ : (@[%a@])@ name@]@\n" name
+      Emit_ML.ml_external_type (ml_external_type_of_fn fn)
+
+let inverse_case ~register_name ~constructor name fmt fn : unit =
   let p, e = match wrapper fn "f" Out with
       pat, None -> pat, `Ident (path_of_string "f")
     | pat, Some e -> pat, e
   in
-  Format.fprintf fmt "|@[ @[%S, %a@] -> %s %d (%a)@]@\n"
-    name Emit_ML.(ml_pat NoApplParens) p register_name i 
-    Emit_ML.(ml_exp ApplParens) e
+  Format.fprintf fmt "|@[ @[%S, %a@] -> %s %s (%a)@]@\n"
+    name Emit_ML.(ml_pat NoApplParens) p register_name constructor
+    Emit_ML.(ml_exp ApplParens) 
+e
