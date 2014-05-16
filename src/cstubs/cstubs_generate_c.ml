@@ -38,6 +38,7 @@ type ceff = [ cexp
             | `Assign of clvalue * ceff ]
 type cbind = clocal * ceff
 type ccomp = [ ceff
+             | `LetConst of clocal * cconst * ccomp
              | `Let of cbind * ccomp ]
 type cfundec = [ `Fundec of string * (string * ty) list * ty ]
 type cfundef = [ `Function of cfundec * ccomp ]
@@ -74,7 +75,8 @@ struct
   let rec ccomp : ccomp -> ty = function
     | #cexp as e -> cexp e
     | #ceff as e -> ceff e
-    | `Let (_, c) -> ccomp c
+    | `Let (_, c)
+    | `LetConst (_, _, c) -> ccomp c
 end
 
 (* We're using an abstract type ([value]) as an argument and return type, so
@@ -169,6 +171,9 @@ struct
     | `Let ((`Local (name, Ty ty), e), s) ->
       fprintf fmt "@[@[%a@]@;=@;@[%a;@]@]@ %a"
         (Ctypes.format_typ ~name) ty (ceff env) e (ccomp env) s
+    | `LetConst (`Local (x, _), `Int c, s) ->
+      fprintf fmt "@[enum@ {@[@ %s@ =@ %d@ };@]@]@ %a"
+        x c (ccomp env) s
 
   let format_parameter_list parameters k fmt =
     let format_arg fmt (name, Ty t) =
@@ -220,6 +225,12 @@ struct
        k v
      | #ceff as e ->
        `Let ((`Local (x, Ty ty), e), k (`Local (x, Ty ty)))
+     | `LetConst (y, i, c) ->
+       (* let x = (let const y = i in c) in e
+          ~>
+          let const y = i in (let x = c in e) *)
+       let Ty t = Type_C.ccomp c in
+       `LetConst (y, i, (c, t) >>= k)
      | `Let (ye, c) ->
        (* let x = (let y = e1 in e2) in e3
           ~>
