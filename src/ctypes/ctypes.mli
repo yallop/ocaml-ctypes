@@ -644,6 +644,8 @@ val coerce : 'a typ -> 'b typ -> 'a -> 'b
      - There is a coercion between a {!view} and another type [t] (in either
        direction) if there is a coercion between the representation type
        underlying the view and [t].
+     - Coercion is transitive: if [t1] is coercible to [t2] and [t2] is
+       coercible to [t3], then [t1] is directly coercible to [t3].
 
     The set of supported coercions is subject to change.  Future versions of
     ctypes may both add new types of coercion and restrict the existing
