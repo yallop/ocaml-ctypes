@@ -572,13 +572,19 @@ val bigarray_of_ptr : < element: 'a;
                         carray: _;
                         dims: 'i > bigarray_class ->
     'i -> ('a, 'f) Bigarray.kind -> 'a ptr -> 'b
-(** Convert a C pointer to a bigarray value. *)
+(** [bigarray_of_ptr c dims k p] converts the C pointer [p] to a bigarray
+    value.  No copy is made; the bigarray references the memory pointed to by
+    [p]. *)
 
 val array_of_bigarray : < element: _;
                           ba_repr: _;
                           bigarray: 'b;
                           carray: 'c;
                           dims: _ > bigarray_class -> 'b -> 'c
+(** [array_of_bigarray c b] converts the bigarray value [b] to a value of type
+    {!CArray.t}.  No copy is made; the result occupies the same memory as
+    [b]. *)
+
 (** Convert a Bigarray value to a C array. *)
 
 val bigarray_of_array : < element: 'a;
@@ -587,8 +593,8 @@ val bigarray_of_array : < element: 'a;
                           carray: 'c carray;
                           dims: 'i > bigarray_class ->
     ('a, 'f) Bigarray.kind -> 'c carray -> 'b
-(** Convert a C array to a Bigarray value. *)
-
+(** [bigarray_of_array c k a] converts the {!CArray.t} value [c] to a bigarray
+    value.  No copy is made; the result occupies the same memory as [c]. *)
 
 (** {3 Struct and union values} *)
 
@@ -638,6 +644,8 @@ val coerce : 'a typ -> 'b typ -> 'a -> 'b
      - There is a coercion between a {!view} and another type [t] (in either
        direction) if there is a coercion between the representation type
        underlying the view and [t].
+     - Coercion is transitive: if [t1] is coercible to [t2] and [t2] is
+       coercible to [t3], then [t1] is directly coercible to [t3].
 
     The set of supported coercions is subject to change.  Future versions of
     ctypes may both add new types of coercion and restrict the existing
