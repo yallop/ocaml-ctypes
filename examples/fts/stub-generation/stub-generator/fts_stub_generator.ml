@@ -9,7 +9,6 @@ let c_headers = "
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fts.h>
-#include \"cstubs/cstubs_internals.h\"
 "
 
 let main () =

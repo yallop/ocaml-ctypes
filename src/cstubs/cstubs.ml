@@ -60,6 +60,8 @@ let gen_ml prefix fmt : (module FOREIGN') * (unit -> unit) =
   fun () -> write_foreign fmt !bindings
 
 let write_c fmt ~prefix (module B : BINDINGS) =
+  Format.fprintf fmt
+    "#include \"ctypes/cstubs_internals.h\"@\n@\n";
   let module M = B((val gen_c prefix fmt)) in ()
 
 let write_ml fmt ~prefix (module B : BINDINGS) =

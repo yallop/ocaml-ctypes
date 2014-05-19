@@ -48,10 +48,7 @@ struct
     foreign "cbreak" (void @-> (returning void))
 end
 
-let c_headers = "
-#include <ncurses.h>
-#include \"cstubs/cstubs_internals.h\"
-"
+let c_headers = "#include <ncurses.h>"
 
 let make_stubname cname = "ncurses_stub_" ^ cname
 

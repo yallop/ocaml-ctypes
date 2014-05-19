@@ -5,10 +5,7 @@
  * See the file LICENSE for details.
  *)
 
-let c_headers = "
-#include <time.h>
-#include \"cstubs/cstubs_internals.h\"
-"
+let c_headers = "#include <time.h>"
 
 let main () =
   let ml_out = open_out "examples/date/stub-generation/date_generated.ml"

@@ -42,10 +42,7 @@ let with_open_formatter filename f =
     close_channel ();
     raise e
 
-let header = "\
-#include \"clib/test_functions.h\"
-#include \"cstubs/cstubs_internals.h\"
-"
+let header = "#include \"clib/test_functions.h\""
 
 let run ?(cheader="") argv specs =
   let ml_filename, c_filename = filenames argv in
@@ -55,5 +52,5 @@ let run ?(cheader="") argv specs =
   if c_filename <> "" then
     with_open_formatter c_filename
       (fun fmt -> 
-        Format.fprintf fmt "%s\n%s\n" header cheader;
+        Format.fprintf fmt "%s@\n%s@\n" header cheader;
         Cstubs.write_c fmt ~prefix:"cstubs_tests" specs)
