@@ -9,3 +9,9 @@
 
 val fn : cname:string -> stub_name:string -> Format.formatter ->
          'a Ctypes.fn -> unit
+
+val inverse_fn : stub_name:string -> Format.formatter ->
+         'a Ctypes.fn -> unit
+
+val inverse_fn_decl : stub_name:string -> Format.formatter ->
+         'a Ctypes.fn -> unit
