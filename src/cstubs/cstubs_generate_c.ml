@@ -183,6 +183,8 @@ struct
   let rec ccomp env fmt : ccomp -> unit = function
     | #cexp as e -> fprintf fmt "@[<2>return@;@[%a@]@];" (cexp env) e
     | #ceff as e -> fprintf fmt "@[<2>return@;@[%a@]@];" (ceff env) e
+    | `CAMLreturnT (Ty Void, e) ->
+      fprintf fmt "@[CAMLreturn0@];"
     | `CAMLreturnT (Ty ty, e) ->
       fprintf fmt "@[<2>CAMLreturnT(@[%a@],@;@[%a@])@];"
         (fun t -> Ctypes.format_typ t) ty
