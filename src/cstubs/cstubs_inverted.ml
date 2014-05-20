@@ -66,12 +66,14 @@ let write_c fmt ~prefix (module B : BINDINGS) : unit =
   let register = prefix ^ "_register" in
   let m, infos = collector () in
   let module M = B((val m)) in
-  gen_c fmt register (infos ())
+  gen_c fmt register (infos ());
+  Format.fprintf fmt "@."
 
 let write_c_header fmt ~prefix (module B : BINDINGS) : unit =
   let m, infos = collector () in
   let module M = B((val m)) in
-  List.iter (c_declaration fmt) (infos ())
+  List.iter (c_declaration fmt) (infos ());
+  Format.fprintf fmt "@."
 
 let gen_ml fmt register (infos : fn_info list) : unit =
   Format.fprintf fmt 
