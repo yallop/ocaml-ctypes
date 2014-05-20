@@ -49,17 +49,20 @@ type cfundef = [ `Function of cfundec * ccomp ]
 
 let max_byte_args = 5
 
+let var_counter = ref 0
+let fresh_var () =
+  incr var_counter;
+  Printf.sprintf "x%d" !var_counter
+
 let rec return_type : type a. a fn -> ty = function
   | Function (_, f) -> return_type f
   | Returns t -> Ty t
 
 let args : type a. a fn -> (string * ty) list = fun fn ->
-  let var = Printf.sprintf "x%d" in
-  let rec loop : type a. int -> a Ctypes.fn -> (string * ty) list =
-                   fun n -> function
-                   | Static.Function (ty, fn) -> (var n, Ty ty) :: loop (n + 1) fn
-                   | Static.Returns _ -> []
-  in loop 0 fn
+  let rec loop : type a. a Ctypes.fn -> (string * ty) list = function
+    | Static.Function (ty, fn) -> (fresh_var (), Ty ty) :: loop fn
+    | Static.Returns _ -> []
+  in loop fn
 
 module Type_C =
 struct
@@ -231,11 +234,6 @@ let value = abstract ~name:"value" ~size:0 ~alignment:0
 
 module Generate_C =
 struct
-  let var_counter = ref 0
-  let fresh_var () =
-    incr var_counter;
-    Printf.sprintf "x%d" !var_counter
-
   let report_unpassable what =
     let msg = Printf.sprintf "cstubs does not support passing %s" what in
     raise (Unsupported msg)
