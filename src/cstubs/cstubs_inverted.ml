@@ -32,9 +32,9 @@ let format_enum_values fmt infos =
   List.iter (fun (Fn (n, _)) -> Format.fprintf fmt "@[fn_%s,@]@ " n) infos
 
 let c_prologue fmt register infos =
-  Format.fprintf fmt "#include <caml/mlvalues.h>@\n";
   Format.fprintf fmt "#include <caml/memory.h>@\n";
-  Format.fprintf fmt "#include <caml/callback.h>@\n@\n";
+  Format.fprintf fmt "#include <caml/callback.h>@\n";
+  Format.fprintf fmt "#include \"ctypes/cstubs_internals.h\"@\n@\n";
   Format.fprintf fmt "enum functions@\n{@[<v 2>@ %afn_count@]@\n};"
     format_enum_values infos;
   Format.fprintf fmt "@\n
