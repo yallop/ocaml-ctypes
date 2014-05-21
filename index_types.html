@@ -8,12 +8,15 @@
 <link title="Index of values" rel=Appendix href="index_values.html">
 <link title="Index of modules" rel=Appendix href="index_modules.html">
 <link title="Index of module types" rel=Appendix href="index_module_types.html">
-<link title="Unsigned" rel="Chapter" href="Unsigned.html">
-<link title="Signed" rel="Chapter" href="Signed.html">
-<link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
+<link title="Libffi_abi" rel="Chapter" href="Libffi_abi.html">
 <link title="Dl" rel="Chapter" href="Dl.html">
-<link title="Foreign" rel="Chapter" href="Foreign.html">
-<link title="Ctypes" rel="Chapter" href="Ctypes.html"><title>Index of types</title>
+<link title="Cstubs" rel="Chapter" href="Cstubs.html">
+<link title="Cstubs_inverted" rel="Chapter" href="Cstubs_inverted.html">
+<link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
+<link title="Signed" rel="Chapter" href="Signed.html">
+<link title="Unsigned" rel="Chapter" href="Unsigned.html">
+<link title="Ctypes" rel="Chapter" href="Ctypes.html">
+<link title="Foreign" rel="Chapter" href="Foreign.html"><title>Index of types</title>
 </head>
 <body>
 <div class="navbar">&nbsp;<a class="up" href="index.html" title="Index">Up</a>
@@ -21,14 +24,11 @@
 <h1>Index of types</h1>
 <table>
 <tr><td align="left"><br>A</td></tr>
+<tr><td><a href="Libffi_abi.html#TYPEabi">abi</a> [<a href="Libffi_abi.html">Libffi_abi</a>]</td>
+<td></td></tr>
 <tr><td><a href="Ctypes.html#TYPEabstract">abstract</a> [<a href="Ctypes.html">Ctypes</a>]</td>
 <td><div class="info">
 The type of abstract values.
-</div>
-</td></tr>
-<tr><td><a href="Ctypes.html#TYPEarray">array</a> [<a href="Ctypes.html">Ctypes</a>]</td>
-<td><div class="info">
-The type of C array values.
 </div>
 </td></tr>
 <tr><td align="left"><br>B</td></tr>
@@ -42,6 +42,11 @@ The type of Bigarray classes.
 <tr><td><a href="PosixTypes.html#TYPEblksize_t">blksize_t</a> [<a href="PosixTypes.html">PosixTypes</a>]</td>
 <td></td></tr>
 <tr><td align="left"><br>C</td></tr>
+<tr><td><a href="Ctypes.html#TYPEcarray">carray</a> [<a href="Ctypes.html">Ctypes</a>]</td>
+<td><div class="info">
+The type of C array values.
+</div>
+</td></tr>
 <tr><td><a href="PosixTypes.html#TYPEclock_t">clock_t</a> [<a href="PosixTypes.html">PosixTypes</a>]</td>
 <td></td></tr>
 <tr><td align="left"><br>D</td></tr>
@@ -64,6 +69,8 @@ Flags for <a href="Dl.html#VALdlopen"><code class="code">Dl.dlopen</code></a>
 The type of values representing C function types.
 </div>
 </td></tr>
+<tr><td><a href="Cstubs.FOREIGN.html#TYPEfn">fn</a> [<a href="Cstubs.FOREIGN.html">Cstubs.FOREIGN</a>]</td>
+<td></td></tr>
 <tr><td><a href="PosixTypes.html#TYPEfsblkcnt_t">fsblkcnt_t</a> [<a href="PosixTypes.html">PosixTypes</a>]</td>
 <td></td></tr>
 <tr><td><a href="PosixTypes.html#TYPEfsfilcnt_t">fsfilcnt_t</a> [<a href="PosixTypes.html">PosixTypes</a>]</td>
@@ -102,11 +109,21 @@ The signed long integer type.
 <tr><td><a href="PosixTypes.html#TYPEnlink_t">nlink_t</a> [<a href="PosixTypes.html">PosixTypes</a>]</td>
 <td></td></tr>
 <tr><td align="left"><br>O</td></tr>
+<tr><td><a href="Ctypes.html#TYPEocaml">ocaml</a> [<a href="Ctypes.html">Ctypes</a>]</td>
+<td><div class="info">
+The type of pointer values pointing directly into OCaml values.
+</div>
+</td></tr>
 <tr><td><a href="PosixTypes.html#TYPEoff_t">off_t</a> [<a href="PosixTypes.html">PosixTypes</a>]</td>
 <td></td></tr>
 <tr><td align="left"><br>P</td></tr>
 <tr><td><a href="PosixTypes.html#TYPEpid_t">pid_t</a> [<a href="PosixTypes.html">PosixTypes</a>]</td>
 <td></td></tr>
+<tr><td><a href="Ctypes.html#TYPEpointer">pointer</a> [<a href="Ctypes.html">Ctypes</a>]</td>
+<td><div class="info">
+The type of pointer values.
+</div>
+</td></tr>
 <tr><td><a href="PosixTypes.html#TYPEpthread_attr_t">pthread_attr_t</a> [<a href="PosixTypes.html">PosixTypes</a>]</td>
 <td></td></tr>
 <tr><td><a href="PosixTypes.html#TYPEpthread_cond_t">pthread_cond_t</a> [<a href="PosixTypes.html">PosixTypes</a>]</td>
@@ -129,19 +146,19 @@ The signed long integer type.
 <td></td></tr>
 <tr><td><a href="Ctypes.html#TYPEptr">ptr</a> [<a href="Ctypes.html">Ctypes</a>]</td>
 <td><div class="info">
-The type of pointer values.
+The type of C-compatible pointer values.
 </div>
 </td></tr>
 <tr><td align="left"><br>S</td></tr>
 <tr><td><a href="PosixTypes.html#TYPEsigset_t">sigset_t</a> [<a href="PosixTypes.html">PosixTypes</a>]</td>
-<td></td></tr>
-<tr><td><a href="PosixTypes.html#TYPEsize_t">size_t</a> [<a href="PosixTypes.html">PosixTypes</a>]</td>
 <td></td></tr>
 <tr><td><a href="Unsigned.html#TYPEsize_t">size_t</a> [<a href="Unsigned.html">Unsigned</a>]</td>
 <td><div class="info">
 The size_t unsigned integer type.
 </div>
 </td></tr>
+<tr><td><a href="PosixTypes.html#TYPEsize_t">size_t</a> [<a href="PosixTypes.html">PosixTypes</a>]</td>
+<td></td></tr>
 <tr><td><a href="PosixTypes.html#TYPEssize_t">ssize_t</a> [<a href="PosixTypes.html">PosixTypes</a>]</td>
 <td></td></tr>
 <tr><td><a href="Ctypes.html#TYPEstructure">structure</a> [<a href="Ctypes.html">Ctypes</a>]</td>
@@ -157,7 +174,7 @@ The base type of values representing C struct and union types.
 <tr><td><a href="PosixTypes.html#TYPEsuseconds_t">suseconds_t</a> [<a href="PosixTypes.html">PosixTypes</a>]</td>
 <td></td></tr>
 <tr><td align="left"><br>T</td></tr>
-<tr><td><a href="Ctypes.Array.html#TYPEt">t</a> [<a href="Ctypes.Array.html">Ctypes.Array</a>]</td>
+<tr><td><a href="Ctypes.CArray.html#TYPEt">t</a> [<a href="Ctypes.CArray.html">Ctypes.CArray</a>]</td>
 <td></td></tr>
 <tr><td><a href="Unsigned.S.html#TYPEt">t</a> [<a href="Unsigned.S.html">Unsigned.S</a>]</td>
 <td></td></tr>

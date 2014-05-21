@@ -4,19 +4,23 @@
 <link rel="stylesheet" href="style.css" type="text/css">
 <meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
 <link rel="Start" href="index.html">
-<link rel="previous" href="Foreign.html">
+<link rel="previous" href="Unsigned.html">
+<link rel="next" href="Foreign.html">
 <link rel="Up" href="index.html">
 <link title="Index of types" rel=Appendix href="index_types.html">
 <link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
 <link title="Index of values" rel=Appendix href="index_values.html">
 <link title="Index of modules" rel=Appendix href="index_modules.html">
 <link title="Index of module types" rel=Appendix href="index_module_types.html">
-<link title="Unsigned" rel="Chapter" href="Unsigned.html">
-<link title="Signed" rel="Chapter" href="Signed.html">
-<link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
+<link title="Libffi_abi" rel="Chapter" href="Libffi_abi.html">
 <link title="Dl" rel="Chapter" href="Dl.html">
-<link title="Foreign" rel="Chapter" href="Foreign.html">
-<link title="Ctypes" rel="Chapter" href="Ctypes.html"><link title="Values representing C types" rel="Section" href="#types">
+<link title="Cstubs" rel="Chapter" href="Cstubs.html">
+<link title="Cstubs_inverted" rel="Chapter" href="Cstubs_inverted.html">
+<link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
+<link title="Signed" rel="Chapter" href="Signed.html">
+<link title="Unsigned" rel="Chapter" href="Unsigned.html">
+<link title="Ctypes" rel="Chapter" href="Ctypes.html">
+<link title="Foreign" rel="Chapter" href="Foreign.html"><link title="Values representing C types" rel="Section" href="#types">
 <link title="Values representing C values" rel="Section" href="#values">
 <link title="Exceptions" rel="Section" href="#2_Exceptions">
 <link title="The void type" rel="Subsection" href="#3_Thevoidtype">
@@ -34,9 +38,10 @@
 <title>Ctypes</title>
 </head>
 <body>
-<div class="navbar"><a class="pre" href="Foreign.html" title="Foreign">Previous</a>
+<div class="navbar"><a class="pre" href="Unsigned.html" title="Unsigned">Previous</a>
 &nbsp;<a class="up" href="index.html" title="Index">Up</a>
-&nbsp;</div>
+&nbsp;<a class="post" href="Foreign.html" title="Foreign">Next</a>
+</div>
 <h1>Module <a href="type_Ctypes.html">Ctypes</a></h1>
 
 <pre><span class="keyword">module</span> Ctypes: <code class="code">sig</code> <a href="Ctypes.html">..</a> <code class="code">end</code></pre><div class="info module top">
@@ -219,10 +224,20 @@ Value representing the C99 double-precision <code class="code">double complex</c
 <br>
 <h4 id="pointer_types">Pointer types</h4><br>
 
-<pre><span id="TYPEptr"><span class="keyword">type</span> <code class="type">'a</code> ptr</span> </pre>
+<pre><span id="TYPEpointer"><span class="keyword">type</span> <code class="type">('a, 'b)</code> pointer</span> = <code class="type">('a, 'b) Static.pointer</code> </pre>
 <div class="info ">
-The type of pointer values.  A value of type <code class="code">t ptr</code> can be used to read
-    and write values of type <code class="code">t</code> at particular addresses.<br>
+The type of pointer values. A value of type <code class="code">('a, [`C]) pointer</code> contains
+    a C-compatible pointer, and a value of type <code class="code">('a, [`OCaml]) pointer</code>
+    contains a pointer to a value that can be moved by OCaml runtime.<br>
+</div>
+
+<br>
+<h4 id="4_Ccompatiblepointers">C-compatible pointers</h4><br>
+
+<pre><span id="TYPEptr"><span class="keyword">type</span> <code class="type">'a</code> ptr</span> = <code class="type">('a, [ `C ]) <a href="Ctypes.html#TYPEpointer">pointer</a></code> </pre>
+<div class="info ">
+The type of C-compatible pointer values.  A value of type <code class="code">t ptr</code> can be
+    used to read and write values of type <code class="code">t</code> at particular addresses.<br>
 </div>
 
 
@@ -255,18 +270,33 @@ A high-level representation of the string type.  This behaves like <a href="Ctyp
 	except that null pointers appear in OCaml as <code class="code">None</code>.<br>
 </div>
 <br>
+<h4 id="4_OCamlpointers">OCaml pointers</h4><br>
+
+<pre><span id="TYPEocaml"><span class="keyword">type</span> <code class="type">'a</code> ocaml</span> = <code class="type">'a Static.ocaml</code> </pre>
+<div class="info ">
+The type of pointer values pointing directly into OCaml values.
+    <b>Pointers of this type should never be captured by external code</b>.
+    In particular, functions accepting <code class="code">'a ocaml</code> pointers must not invoke
+    any OCaml code.<br>
+</div>
+
+
+<pre><span id="VALocaml_string"><span class="keyword">val</span> ocaml_string</span> : <code class="type">string <a href="Ctypes.html#TYPEocaml">ocaml</a> <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info ">
+Value representing the directly mapped storage of an OCaml string.<br>
+</div>
+<br>
 <h3 id="3_Arraytypes">Array types</h3><br>
 <br>
 <h4 id="4_Carraytypes">C array types</h4><br>
 
-<pre><span id="TYPEarray"><span class="keyword">type</span> <code class="type">'a</code> array</span> </pre>
+<pre><span id="TYPEcarray"><span class="keyword">type</span> <code class="type">'a</code> carray</span> </pre>
 <div class="info ">
-The type of C array values.  A value of type <code class="code">t array</code> can be used to read
+The type of C array values.  A value of type <code class="code">t carray</code> can be used to read
     and write array objects in C-managed storage.<br>
 </div>
 
 
-<pre><span id="VALarray"><span class="keyword">val</span> array</span> : <code class="type">int -> 'a <a href="Ctypes.html#TYPEtyp">typ</a> -> 'a <a href="Ctypes.html#TYPEarray">array</a> <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info ">
+<pre><span id="VALarray"><span class="keyword">val</span> array</span> : <code class="type">int -> 'a <a href="Ctypes.html#TYPEtyp">typ</a> -> 'a <a href="Ctypes.html#TYPEcarray">carray</a> <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info ">
 Construct a sized array type from a length and an existing type (called
     the <i>element type</i>).<br>
 </div>
@@ -280,25 +310,30 @@ The type of Bigarray classes.  There are four instances, one for each of
 </div>
 
 
-<pre><span id="VALgenarray"><span class="keyword">val</span> genarray</span> : <code class="type">< ba_repr : 'b; bigarray : ('a, 'b, Bigarray.c_layout) Bigarray.Genarray.t;<br>         carray : 'a <a href="Ctypes.html#TYPEarray">array</a>; dims : int std_array; element : 'a ><br>       <a href="Ctypes.html#TYPEbigarray_class">bigarray_class</a></code></pre><div class="info ">
+<pre><span id="VALgenarray"><span class="keyword">val</span> genarray</span> : <code class="type">< ba_repr : 'b; bigarray : ('a, 'b, Bigarray.c_layout) Bigarray.Genarray.t;<br>         carray : 'a <a href="Ctypes.html#TYPEcarray">carray</a>; dims : int array; element : 'a ><br>       <a href="Ctypes.html#TYPEbigarray_class">bigarray_class</a></code></pre><div class="info ">
 The class of <code class="code">Bigarray.Genarray.t</code> values<br>
 </div>
 
-<pre><span id="VALarray1"><span class="keyword">val</span> array1</span> : <code class="type">< ba_repr : 'b; bigarray : ('a, 'b, Bigarray.c_layout) Bigarray.Array1.t;<br>         carray : 'a <a href="Ctypes.html#TYPEarray">array</a>; dims : int; element : 'a ><br>       <a href="Ctypes.html#TYPEbigarray_class">bigarray_class</a></code></pre><div class="info ">
+<pre><span id="VALarray1"><span class="keyword">val</span> array1</span> : <code class="type">< ba_repr : 'b; bigarray : ('a, 'b, Bigarray.c_layout) Bigarray.Array1.t;<br>         carray : 'a <a href="Ctypes.html#TYPEcarray">carray</a>; dims : int; element : 'a ><br>       <a href="Ctypes.html#TYPEbigarray_class">bigarray_class</a></code></pre><div class="info ">
 The class of <code class="code">Bigarray.Array1.t</code> values<br>
 </div>
 
-<pre><span id="VALarray2"><span class="keyword">val</span> array2</span> : <code class="type">< ba_repr : 'b; bigarray : ('a, 'b, Bigarray.c_layout) Bigarray.Array2.t;<br>         carray : 'a <a href="Ctypes.html#TYPEarray">array</a> <a href="Ctypes.html#TYPEarray">array</a>; dims : int * int; element : 'a ><br>       <a href="Ctypes.html#TYPEbigarray_class">bigarray_class</a></code></pre><div class="info ">
+<pre><span id="VALarray2"><span class="keyword">val</span> array2</span> : <code class="type">< ba_repr : 'b; bigarray : ('a, 'b, Bigarray.c_layout) Bigarray.Array2.t;<br>         carray : 'a <a href="Ctypes.html#TYPEcarray">carray</a> <a href="Ctypes.html#TYPEcarray">carray</a>; dims : int * int; element : 'a ><br>       <a href="Ctypes.html#TYPEbigarray_class">bigarray_class</a></code></pre><div class="info ">
 The class of <code class="code">Bigarray.Array2.t</code> values<br>
 </div>
 
-<pre><span id="VALarray3"><span class="keyword">val</span> array3</span> : <code class="type">< ba_repr : 'b; bigarray : ('a, 'b, Bigarray.c_layout) Bigarray.Array3.t;<br>         carray : 'a <a href="Ctypes.html#TYPEarray">array</a> <a href="Ctypes.html#TYPEarray">array</a> <a href="Ctypes.html#TYPEarray">array</a>; dims : int * int * int;<br>         element : 'a ><br>       <a href="Ctypes.html#TYPEbigarray_class">bigarray_class</a></code></pre><div class="info ">
+<pre><span id="VALarray3"><span class="keyword">val</span> array3</span> : <code class="type">< ba_repr : 'b; bigarray : ('a, 'b, Bigarray.c_layout) Bigarray.Array3.t;<br>         carray : 'a <a href="Ctypes.html#TYPEcarray">carray</a> <a href="Ctypes.html#TYPEcarray">carray</a> <a href="Ctypes.html#TYPEcarray">carray</a>;<br>         dims : int * int * int; element : 'a ><br>       <a href="Ctypes.html#TYPEbigarray_class">bigarray_class</a></code></pre><div class="info ">
 The class of <code class="code">Bigarray.Array3.t</code> values<br>
 </div>
 
 <pre><span id="VALbigarray"><span class="keyword">val</span> bigarray</span> : <code class="type">< ba_repr : 'b; bigarray : 'bigarray; carray : 'c; dims : 'dims;<br>         element : 'a ><br>       <a href="Ctypes.html#TYPEbigarray_class">bigarray_class</a> -><br>       'dims -> ('a, 'b) Bigarray.kind -> 'bigarray <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info ">
 Construct a sized bigarray type representation from a bigarray class, the
     dimensions, and the <code class="code">Bigarray.kind</code>.<br>
+</div>
+
+<pre><span id="VALtyp_of_bigarray_kind"><span class="keyword">val</span> typ_of_bigarray_kind</span> : <code class="type">('a, 'b) Bigarray.kind -> 'a <a href="Ctypes.html#TYPEtyp">typ</a></code></pre><div class="info ">
+<code class="code">typ_of_bigarray_kind k</code> is the type corresponding to the Bigarray kind
+    <code class="code">k</code>.<br>
 </div>
 <br>
 <h3 id="3_Functiontypes">Function types</h3><br>
@@ -520,17 +555,17 @@ A null pointer.<br>
 <code class="code">p &lt;-@ v</code> writes the value <code class="code">v</code> to the address <code class="code">p</code>.<br>
 </div>
 
-<pre><span id="VAL(+@)"><span class="keyword">val</span> (+@)</span> : <code class="type">'a <a href="Ctypes.html#TYPEptr">ptr</a> -> int -> 'a <a href="Ctypes.html#TYPEptr">ptr</a></code></pre><div class="info ">
+<pre><span id="VAL(+@)"><span class="keyword">val</span> (+@)</span> : <code class="type">('a, 'b) <a href="Ctypes.html#TYPEpointer">pointer</a> -> int -> ('a, 'b) <a href="Ctypes.html#TYPEpointer">pointer</a></code></pre><div class="info ">
 If <code class="code">p</code> is a pointer to an array element then <code class="code">p +@ n</code> computes the
     address of the <code class="code">n</code>th next element.<br>
 </div>
 
-<pre><span id="VAL(-@)"><span class="keyword">val</span> (-@)</span> : <code class="type">'a <a href="Ctypes.html#TYPEptr">ptr</a> -> int -> 'a <a href="Ctypes.html#TYPEptr">ptr</a></code></pre><div class="info ">
+<pre><span id="VAL(-@)"><span class="keyword">val</span> (-@)</span> : <code class="type">('a, 'b) <a href="Ctypes.html#TYPEpointer">pointer</a> -> int -> ('a, 'b) <a href="Ctypes.html#TYPEpointer">pointer</a></code></pre><div class="info ">
 If <code class="code">p</code> is a pointer to an array element then <code class="code">p -@ n</code> computes the address
     of the nth previous element.<br>
 </div>
 
-<pre><span id="VALptr_diff"><span class="keyword">val</span> ptr_diff</span> : <code class="type">'a <a href="Ctypes.html#TYPEptr">ptr</a> -> 'a <a href="Ctypes.html#TYPEptr">ptr</a> -> int</code></pre><div class="info ">
+<pre><span id="VALptr_diff"><span class="keyword">val</span> ptr_diff</span> : <code class="type">('a, 'b) <a href="Ctypes.html#TYPEpointer">pointer</a> -> ('a, 'b) <a href="Ctypes.html#TYPEpointer">pointer</a> -> int</code></pre><div class="info ">
 <code class="code">ptr_diff p q</code> computes <code class="code">q - p</code>.  As in C, both <code class="code">p</code> and <code class="code">q</code> must point
     into the same array, and the result value is the difference of the
     subscripts of the two array elements.<br>
@@ -570,12 +605,30 @@ Retrieve the reference type of a pointer.<br>
 <pre><span id="VALptr_of_raw_address"><span class="keyword">val</span> ptr_of_raw_address</span> : <code class="type">int64 -> unit <a href="Ctypes.html#TYPEptr">ptr</a></code></pre><div class="info ">
 Convert the numeric representation of an address to a pointer<br>
 </div>
+
+<pre><span id="VALraw_address_of_ptr"><span class="keyword">val</span> raw_address_of_ptr</span> : <code class="type">unit <a href="Ctypes.html#TYPEptr">ptr</a> -> int64</code></pre><div class="info ">
+Return the numeric representation of an address<br>
+</div>
+
+<pre><span id="VALstring_from_ptr"><span class="keyword">val</span> string_from_ptr</span> : <code class="type">char <a href="Ctypes.html#TYPEptr">ptr</a> -> length:int -> string</code></pre><div class="info ">
+<code class="code">string_from_ptr p ~length</code> creates a string initialized with the <code class="code">length</code>
+    characters at address <code class="code">p</code>.
+<p>
+
+    Raise <code class="code">Invalid_argument "Ctypes.string_from_ptr"</code> if <code class="code">length</code> is
+    negative.<br>
+</div>
+
+<pre><span id="VALocaml_string_start"><span class="keyword">val</span> ocaml_string_start</span> : <code class="type">string -> string <a href="Ctypes.html#TYPEocaml">ocaml</a></code></pre><div class="info ">
+<code class="code">ocaml_string_start s</code> allows to pass a pointer to the contents of an OCaml
+    string directly to a C function.<br>
+</div>
 <br>
 <h3 id="3_Arrayvalues">Array values</h3><br>
 <br>
 <h4 id="4_Carrayvalues">C array values</h4><br>
 
-<pre><span class="keyword">module</span> <a href="Ctypes.Array.html">Array</a>: <code class="code">sig</code> <a href="Ctypes.Array.html">..</a> <code class="code">end</code></pre><div class="info">
+<pre><span class="keyword">module</span> <a href="Ctypes.CArray.html">CArray</a>: <code class="code">sig</code> <a href="Ctypes.CArray.html">..</a> <code class="code">end</code></pre><div class="info">
 Operations on C arrays.
 </div>
 <br>
@@ -586,15 +639,22 @@ Return the address of the first element of the given Bigarray value.<br>
 </div>
 
 <pre><span id="VALbigarray_of_ptr"><span class="keyword">val</span> bigarray_of_ptr</span> : <code class="type">< ba_repr : 'f; bigarray : 'b; carray : 'c; dims : 'i; element : 'a ><br>       <a href="Ctypes.html#TYPEbigarray_class">bigarray_class</a> -> 'i -> ('a, 'f) Bigarray.kind -> 'a <a href="Ctypes.html#TYPEptr">ptr</a> -> 'b</code></pre><div class="info ">
-Convert a C pointer to a bigarray value.<br>
+<code class="code">bigarray_of_ptr c dims k p</code> converts the C pointer <code class="code">p</code> to a bigarray
+    value.  No copy is made; the bigarray references the memory pointed to by
+    <code class="code">p</code>.<br>
 </div>
 
 <pre><span id="VALarray_of_bigarray"><span class="keyword">val</span> array_of_bigarray</span> : <code class="type">< ba_repr : 'a; bigarray : 'b; carray : 'c; dims : 'd; element : 'e ><br>       <a href="Ctypes.html#TYPEbigarray_class">bigarray_class</a> -> 'b -> 'c</code></pre><div class="info ">
-Convert a Bigarray value to a C array.<br>
+<code class="code">array_of_bigarray c b</code> converts the bigarray value <code class="code">b</code> to a value of type
+    <a href="Ctypes.CArray.html#TYPEt"><code class="code">Ctypes.CArray.t</code></a>.  No copy is made; the result occupies the same memory as
+    <code class="code">b</code>.<br>
 </div>
+<br>
+Convert a Bigarray value to a C array.<br>
 
-<pre><span id="VALbigarray_of_array"><span class="keyword">val</span> bigarray_of_array</span> : <code class="type">< ba_repr : 'f; bigarray : 'b; carray : 'c <a href="Ctypes.html#TYPEarray">array</a>; dims : 'i;<br>         element : 'a ><br>       <a href="Ctypes.html#TYPEbigarray_class">bigarray_class</a> -> ('a, 'f) Bigarray.kind -> 'c <a href="Ctypes.html#TYPEarray">array</a> -> 'b</code></pre><div class="info ">
-Convert a C array to a Bigarray value.<br>
+<pre><span id="VALbigarray_of_array"><span class="keyword">val</span> bigarray_of_array</span> : <code class="type">< ba_repr : 'f; bigarray : 'b; carray : 'c <a href="Ctypes.html#TYPEcarray">carray</a>; dims : 'i;<br>         element : 'a ><br>       <a href="Ctypes.html#TYPEbigarray_class">bigarray_class</a> -> ('a, 'f) Bigarray.kind -> 'c <a href="Ctypes.html#TYPEcarray">carray</a> -> 'b</code></pre><div class="info ">
+<code class="code">bigarray_of_array c k a</code> converts the <a href="Ctypes.CArray.html#TYPEt"><code class="code">Ctypes.CArray.t</code></a> value <code class="code">c</code> to a bigarray
+    value.  No copy is made; the result occupies the same memory as <code class="code">c</code>.<br>
 </div>
 <br>
 <h3 id="3_Structandunionvalues">Struct and union values</h3><br>
@@ -643,7 +703,7 @@ Allocate a fresh, uninitialised structure or union value.  The argument
 
 <pre><span id="VALcoerce"><span class="keyword">val</span> coerce</span> : <code class="type">'a <a href="Ctypes.html#TYPEtyp">typ</a> -> 'b <a href="Ctypes.html#TYPEtyp">typ</a> -> 'a -> 'b</code></pre><div class="info ">
 <code class="code">coerce t1 t2</code> returns a coercion function between the types represented
-    by <code class="code">t1</code> and <code class="code">t2</code>.  If <code class="code">t1</code> cannot be coerced to <code class="code">t2</code>, <code class="code">coerce</code> raises 
+    by <code class="code">t1</code> and <code class="code">t2</code>.  If <code class="code">t1</code> cannot be coerced to <code class="code">t2</code>, <code class="code">coerce</code> raises
     <a href="Ctypes.html#EXCEPTIONUncoercible"><code class="code">Ctypes.Uncoercible</code></a>.
 <p>
 
@@ -655,6 +715,33 @@ Allocate a fresh, uninitialised structure or union value.  The argument
 <li>There is a coercion between a <a href="Ctypes.html#VALview"><code class="code">Ctypes.view</code></a> and another type <code class="code">t</code> (in either
        direction) if there is a coercion between the representation type
        underlying the view and <code class="code">t</code>.</li>
+<li>Coercion is transitive: if <code class="code">t1</code> is coercible to <code class="code">t2</code> and <code class="code">t2</code> is
+       coercible to <code class="code">t3</code>, then <code class="code">t1</code> is directly coercible to <code class="code">t3</code>.</li>
+</ul>
+
+    The set of supported coercions is subject to change.  Future versions of
+    ctypes may both add new types of coercion and restrict the existing
+    coercions.<br>
+</div>
+
+<pre><span id="VALcoerce_fn"><span class="keyword">val</span> coerce_fn</span> : <code class="type">'a <a href="Ctypes.html#TYPEfn">fn</a> -> 'b <a href="Ctypes.html#TYPEfn">fn</a> -> 'a -> 'b</code></pre><div class="info ">
+<code class="code">coerce_fn f1 f2</code> returns a coercion function between the function
+    types represented by <code class="code">f1</code> and <code class="code">f2</code>.  If <code class="code">f1</code> cannot be coerced to
+    <code class="code">f2</code>, <code class="code">coerce_fn</code> raises <a href="Ctypes.html#EXCEPTIONUncoercible"><code class="code">Ctypes.Uncoercible</code></a>.
+<p>
+
+    A function type <code class="code">f1</code> may be coerced to another function type <code class="code">f2</code>
+    if all of the following hold:
+<p>
+<ul>
+<li>the C types described by <code class="code">f1</code> and <code class="code">f2</code> have the same arity</li>
+</ul>
+<ul>
+<li>each argument of <code class="code">f2</code> may be coerced to the corresponding
+        argument of <code class="code">f1</code></li>
+</ul>
+<ul>
+<li>the return type of <code class="code">f1</code> may be coerced to the return type of <code class="code">f2</code></li>
 </ul>
 
     The set of supported coercions is subject to change.  Future versions of
