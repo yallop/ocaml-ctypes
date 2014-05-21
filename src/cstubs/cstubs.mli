@@ -5,7 +5,7 @@
  * See the file LICENSE for details.
  *)
 
-(* Cstubs public interface. *)
+(** Operations for generating C bindings stubs. *)
 
 module type FOREIGN =
 sig

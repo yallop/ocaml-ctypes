@@ -5,7 +5,7 @@
  * See the file LICENSE for details.
  *)
 
-(* Support for various ABIs *)
+(** Support for various ABIs. *)
 
 type abi
 

@@ -5,7 +5,7 @@
  * See the file LICENSE for details.
  *)
 
-(* Cstubs_inverted public interface. *)
+(** Operations for exposing OCaml code as C libraries. *)
 
 module type INTERNAL =
 sig
