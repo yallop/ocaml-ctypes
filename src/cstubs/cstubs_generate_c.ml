@@ -416,8 +416,8 @@ struct
   | Function : string * 'a typ * 'b fn  -> ('a -> 'b) fn
 
   let rec name_params : type a. a Static.fn -> a fn = function
-    | Returns t -> Returns t
-    | Function (f, t) -> Function (fresh_var (), f, name_params t)
+    | Static.Returns t -> Returns t
+    | Static.Function (f, t) -> Function (fresh_var (), f, name_params t)
 
   let rec value_params : type a. a fn -> (string * ty) list = function
     | Returns t -> []
