@@ -95,7 +95,7 @@ let determine_code symbol =
   let result = read_output_int input_file output_file in
   begin
     Sys.remove input_file;
-    Sys.remove output_file;
+    if Sys.file_exists output_file then Sys.remove output_file;
     result
   end
 
