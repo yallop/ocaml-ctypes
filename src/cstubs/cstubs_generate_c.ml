@@ -97,75 +97,68 @@ struct
     in
     fun ty e -> harmless ty (Type_C.cexp e)
 
-  let rec cexp env fmt : cexp -> unit = function
+  let rec cexp fmt : cexp -> unit = function
     | #cconst as c -> cconst fmt c
-    | `Local (y, _) as x ->
-      begin
-        try cexp env fmt (List.assoc y env)
-        with Not_found -> cvar fmt x
-      end
     | #cvar as x -> cvar fmt x
-    | `Cast (ty, e) when cast_unnecessary ty e -> cexp env fmt e
-    | `Cast (ty, e) -> fprintf fmt "@[@[(%a)@]%a@]" format_ty ty (cexp env) e
-    | `Addr e -> fprintf fmt "@[&@[%a@]@]" (cexp env) e
+    | `Cast (ty, e) when cast_unnecessary ty e -> cexp fmt e
+    | `Cast (ty, e) -> fprintf fmt "@[@[(%a)@]%a@]" format_ty ty cexp e
+    | `Addr e -> fprintf fmt "@[&@[%a@]@]" cexp e
 
-  let rec clvalue env fmt : clvalue -> unit = function
+  let rec clvalue fmt : clvalue -> unit = function
     | `Local _ as x -> cvar fmt x
     | `Index (lv, i) ->
-      fprintf fmt "@[@[%a@]@[[%a]@]@]" (clvalue env) lv (cexp env) i
+      fprintf fmt "@[@[%a@]@[[%a]@]@]" clvalue lv cexp i
 
-  let camlop env fmt : camlop -> unit = function
+  let camlop fmt : camlop -> unit = function
     | `CAMLparam0 -> Format.fprintf fmt "CAMLparam0()"
     | `CAMLlocalN (e, c) -> Format.fprintf fmt "CAMLlocalN(@[%a@],@ @[%a@])"
-      (cexp env) e (cexp env) c
+      cexp e cexp c
 
-  let rec ceff env fmt : ceff -> unit = function
-    | #cexp as e -> cexp env fmt e
-    | #camlop as o -> camlop env fmt o
+  let rec ceff fmt : ceff -> unit = function
+    | #cexp as e -> cexp fmt e
+    | #camlop as o -> camlop fmt o
     | `App (v, es) ->
       fprintf fmt "@[%s(@[" (cvar_name v);
       let last_exp = List.length es - 1 in
       List.iteri
         (fun i e ->
-          fprintf fmt "@[%a@]%(%)" (cexp env) e
+          fprintf fmt "@[%a@]%(%)" cexp e
             (if i <> last_exp then ",@ " else ""))
         es;
       fprintf fmt ")@]@]";
     | `Index (e, i) ->
-      fprintf fmt "@[@[%a@]@[[%a]@]@]"
-        (cexp env) e (cexp env) i
-    | `Deref e -> fprintf fmt "@[*@[%a@]@]" (cexp env) e
+      fprintf fmt "@[@[%a@]@[[%a]@]@]" cexp e cexp i
+    | `Deref e -> fprintf fmt "@[*@[%a@]@]" cexp e
     | `Assign (lv, e) ->
-      fprintf fmt "@[@[%a@]@;=@;@[%a@]@]"
-        (clvalue env) lv (ceff env) e
+      fprintf fmt "@[@[%a@]@;=@;@[%a@]@]" clvalue lv ceff e
 
-  let rec ccomp env fmt : ccomp -> unit = function
-    | #cexp as e -> fprintf fmt "@[<2>return@;@[%a@]@];" (cexp env) e
-    | #ceff as e -> fprintf fmt "@[<2>return@;@[%a@]@];" (ceff env) e
+  let rec ccomp fmt : ccomp -> unit = function
+    | #cexp as e -> fprintf fmt "@[<2>return@;@[%a@]@];" cexp e
+    | #ceff as e -> fprintf fmt "@[<2>return@;@[%a@]@];" ceff e
     | `CAMLreturnT (Ty Void, e) ->
       fprintf fmt "@[CAMLreturn0@];"
     | `CAMLreturnT (Ty ty, e) ->
       fprintf fmt "@[<2>CAMLreturnT(@[%a@],@;@[%a@])@];"
         (fun t -> Ctypes.format_typ t) ty
-        (cexp env) e
+        cexp e
     | `Let (xe, `Cast (ty, (#cexp as e'))) when cast_unnecessary ty e' ->
-      ccomp env fmt (`Let (xe, e'))
+      ccomp fmt (`Let (xe, e'))
     | `Let ((`Local (x, _), e), `Local (y, _)) when x = y ->
-      ccomp env fmt (e :> ccomp)
+      ccomp fmt (e :> ccomp)
     | `Let ((`Local (name, Ty Void), e), s) ->
-      fprintf fmt "@[%a;@]@ %a" (ceff env) e (ccomp env) s
+      fprintf fmt "@[%a;@]@ %a" ceff e ccomp s
     | `Let ((`Local (name, Ty (Struct { tag })), e), s) ->
       fprintf fmt "@[struct@;%s@;%s@;=@;@[%a;@]@]@ %a"
-        tag name (ceff env) e (ccomp env) s
+        tag name ceff e ccomp s
     | `Let ((`Local (name, Ty (Union { utag })), e), s) ->
       fprintf fmt "@[union@;%s@;%s@;=@;@[%a;@]@]@ %a"
-        utag name (ceff env) e (ccomp env) s
+        utag name ceff e ccomp s
     | `Let ((`Local (name, Ty ty), e), s) ->
       fprintf fmt "@[@[%a@]@;=@;@[%a;@]@]@ %a"
-        (Ctypes.format_typ ~name) ty (ceff env) e (ccomp env) s
+        (Ctypes.format_typ ~name) ty ceff e ccomp s
     | `LetConst (`Local (x, _), `Int c, s) ->
       fprintf fmt "@[enum@ {@[@ %s@ =@ %d@ };@]@]@ %a"
-        x c (ccomp env) s
+        x c ccomp s
 
   let format_parameter_list parameters k fmt =
     let format_arg fmt (name, Ty t) =
@@ -188,7 +181,7 @@ struct
 
   let cfundef fmt (`Function (dec, body) : cfundef) =
     fprintf fmt "%a@\n{@[<v 2>@\n%a@]@\n}@\n" 
-      cfundec dec (ccomp []) body
+      cfundec dec ccomp body
 end
 
 let value = abstract ~name:"value" ~size:0 ~alignment:0
