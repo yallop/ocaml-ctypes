@@ -51,3 +51,49 @@ type ccomp = [ ceff
              | `Let of cbind * ccomp ]
 type cfundec = [ `Fundec of string * (string * ty) list * ty ]
 type cfundef = [ `Function of cfundec * ccomp ]
+
+let rec return_type : type a. a fn -> ty = function
+  | Function (_, f) -> return_type f
+  | Returns t -> Ty t
+
+let args : type a. a fn -> (string * ty) list = fun fn ->
+  let rec loop : type a. a Ctypes.fn -> (string * ty) list = function
+    | Static.Function (ty, fn) -> (fresh_var (), Ty ty) :: loop fn
+    | Static.Returns _ -> []
+  in loop fn
+
+module Type_C =
+struct
+  let rec cexp : cexp -> ty = function
+    | `Int _ -> Ty int
+    | `Local (_, ty) -> ty
+    | `Global { tfn = Typ t } -> Ty t
+    | `Cast (Ty ty, _) -> Ty ty
+    | `Addr e -> let Ty ty = cexp e in Ty (Pointer ty)
+
+  let camlop : camlop -> ty = function
+    | `CAMLparam0
+    | `CAMLlocalN _ -> Ty Void
+
+  let rec ceff : ceff -> ty = function
+    | #cexp as e -> cexp e
+    | #camlop as o -> camlop o
+    | `App (`Global  { tfn = Fn f; name }, _) -> return_type f
+    | `Index (e, _)
+    | `Deref e ->
+      begin match cexp e with
+      | Ty (Pointer ty) -> Ty ty
+      | Ty (Array (ty, _)) -> Ty ty
+      | Ty t -> Cstubs_errors.internal_error
+        "dereferencing expression of non-pointer type %s"
+        (Ctypes.string_of_typ t)
+      end
+    | `Assign (_, rv) -> ceff rv
+
+  let rec ccomp : ccomp -> ty = function
+    | #cexp as e -> cexp e
+    | #ceff as e -> ceff e
+    | `Let (_, c)
+    | `LetConst (_, _, c) -> ccomp c
+    | `CAMLreturnT (ty, _) -> ty
+end

@@ -8,181 +8,15 @@
 (* C stub generation *)
 
 open Static
-open Cstubs_errors
 open Cstubs_c_language
 
 let max_byte_args = 5
-
-let rec return_type : type a. a fn -> ty = function
-  | Function (_, f) -> return_type f
-  | Returns t -> Ty t
-
-let args : type a. a fn -> (string * ty) list = fun fn ->
-  let rec loop : type a. a Ctypes.fn -> (string * ty) list = function
-    | Static.Function (ty, fn) -> (fresh_var (), Ty ty) :: loop fn
-    | Static.Returns _ -> []
-  in loop fn
-
-module Type_C =
-struct
-  let rec cexp : cexp -> ty = function
-    | `Int _ -> Ty int
-    | `Local (_, ty) -> ty
-    | `Global { tfn = Typ t } -> Ty t
-    | `Cast (Ty ty, _) -> Ty ty
-    | `Addr e -> let Ty ty = cexp e in Ty (Pointer ty)
-
-  let camlop : camlop -> ty = function
-    | `CAMLparam0
-    | `CAMLlocalN _ -> Ty Void
-
-  let rec ceff : ceff -> ty = function
-    | #cexp as e -> cexp e
-    | #camlop as o -> camlop o
-    | `App (`Global  { tfn = Fn f; name }, _) -> return_type f
-    | `Index (e, _)
-    | `Deref e ->
-      begin match cexp e with
-      | Ty (Pointer ty) -> Ty ty
-      | Ty (Array (ty, _)) -> Ty ty
-      | Ty t -> internal_error
-        "dereferencing expression of non-pointer type %s"
-        (Ctypes.string_of_typ t)
-      end
-    | `Assign (_, rv) -> ceff rv
-
-  let rec ccomp : ccomp -> ty = function
-    | #cexp as e -> cexp e
-    | #ceff as e -> ceff e
-    | `Let (_, c)
-    | `LetConst (_, _, c) -> ccomp c
-    | `CAMLreturnT (ty, _) -> ty
-end
 
 (* We're using an abstract type ([value]) as an argument and return type, so
    we'll use the [Function] and [Return] constructors directly.  The smart
    constructors [@->] and [returning] would reject the abstract type. *)
 let (@->) f t = Function (f, t)
 let returning t = Returns t
-
-module Emit_C =
-struct
-  open Format
-
-  let format_seq lbr fmt_item sep rbr fmt items =
-    let open Format in
-    fprintf fmt "%s@[@[" lbr;
-      ListLabels.iteri items ~f:(fun i item ->
-        if i <> 0 then fprintf fmt "@]%s@ @[" sep;
-        fmt_item fmt item);
-    fprintf fmt "@]%s@]" rbr
-
-  let format_ty fmt (Ty ty) = Ctypes.format_typ fmt ty
-
-  let cvar_name = function
-    | `Local (name, _) | `Global { name } -> name
-
-  let cvar fmt v = fprintf fmt "%s" (cvar_name v)
-
-  let cconst fmt (`Int i) = fprintf fmt "%d" i
-
-  (* Determine whether the C expression [(ty)e] is equivalent to [e] *)
-  let cast_unnecessary : ty -> cexp -> bool =
-    let rec harmless l r = match l, r with
-    | Ty (Pointer Void), Ty (Pointer _) -> true
-    | Ty (View { ty }), t -> harmless (Ty ty) t
-    | t, Ty (View { ty }) -> harmless t (Ty ty)
-    | (Ty (Primitive _) as l), (Ty (Primitive _) as r) -> l = r
-    | _ -> false
-    in
-    fun ty e -> harmless ty (Type_C.cexp e)
-
-  let rec cexp fmt : cexp -> unit = function
-    | #cconst as c -> cconst fmt c
-    | #cvar as x -> cvar fmt x
-    | `Cast (ty, e) when cast_unnecessary ty e -> cexp fmt e
-    | `Cast (ty, e) -> fprintf fmt "@[@[(%a)@]%a@]" format_ty ty cexp e
-    | `Addr e -> fprintf fmt "@[&@[%a@]@]" cexp e
-
-  let rec clvalue fmt : clvalue -> unit = function
-    | `Local _ as x -> cvar fmt x
-    | `Index (lv, i) ->
-      fprintf fmt "@[@[%a@]@[[%a]@]@]" clvalue lv cexp i
-
-  let camlop fmt : camlop -> unit = function
-    | `CAMLparam0 -> Format.fprintf fmt "CAMLparam0()"
-    | `CAMLlocalN (e, c) -> Format.fprintf fmt "CAMLlocalN(@[%a@],@ @[%a@])"
-      cexp e cexp c
-
-  let rec ceff fmt : ceff -> unit = function
-    | #cexp as e -> cexp fmt e
-    | #camlop as o -> camlop fmt o
-    | `App (v, es) ->
-      fprintf fmt "@[%s(@[" (cvar_name v);
-      let last_exp = List.length es - 1 in
-      List.iteri
-        (fun i e ->
-          fprintf fmt "@[%a@]%(%)" cexp e
-            (if i <> last_exp then ",@ " else ""))
-        es;
-      fprintf fmt ")@]@]";
-    | `Index (e, i) ->
-      fprintf fmt "@[@[%a@]@[[%a]@]@]" cexp e cexp i
-    | `Deref e -> fprintf fmt "@[*@[%a@]@]" cexp e
-    | `Assign (lv, e) ->
-      fprintf fmt "@[@[%a@]@;=@;@[%a@]@]" clvalue lv ceff e
-
-  let rec ccomp fmt : ccomp -> unit = function
-    | #cexp as e -> fprintf fmt "@[<2>return@;@[%a@]@];" cexp e
-    | #ceff as e -> fprintf fmt "@[<2>return@;@[%a@]@];" ceff e
-    | `CAMLreturnT (Ty Void, e) ->
-      fprintf fmt "@[CAMLreturn0@];"
-    | `CAMLreturnT (Ty ty, e) ->
-      fprintf fmt "@[<2>CAMLreturnT(@[%a@],@;@[%a@])@];"
-        (fun t -> Ctypes.format_typ t) ty
-        cexp e
-    | `Let (xe, `Cast (ty, (#cexp as e'))) when cast_unnecessary ty e' ->
-      ccomp fmt (`Let (xe, e'))
-    | `Let ((`Local (x, _), e), `Local (y, _)) when x = y ->
-      ccomp fmt (e :> ccomp)
-    | `Let ((`Local (name, Ty Void), e), s) ->
-      fprintf fmt "@[%a;@]@ %a" ceff e ccomp s
-    | `Let ((`Local (name, Ty (Struct { tag })), e), s) ->
-      fprintf fmt "@[struct@;%s@;%s@;=@;@[%a;@]@]@ %a"
-        tag name ceff e ccomp s
-    | `Let ((`Local (name, Ty (Union { utag })), e), s) ->
-      fprintf fmt "@[union@;%s@;%s@;=@;@[%a;@]@]@ %a"
-        utag name ceff e ccomp s
-    | `Let ((`Local (name, Ty ty), e), s) ->
-      fprintf fmt "@[@[%a@]@;=@;@[%a;@]@]@ %a"
-        (Ctypes.format_typ ~name) ty ceff e ccomp s
-    | `LetConst (`Local (x, _), `Int c, s) ->
-      fprintf fmt "@[enum@ {@[@ %s@ =@ %d@ };@]@]@ %a"
-        x c ccomp s
-
-  let format_parameter_list parameters k fmt =
-    let format_arg fmt (name, Ty t) =
-      Type_printing.format_typ ~name fmt t
-    in
-    match parameters with
-    | [] ->
-      Format.fprintf fmt "%t(void)" k
-    | _ ->
-      Format.fprintf fmt "@[%t@[%a@]@]" k
-        (format_seq "(" format_arg "," ")")
-        parameters
-
-  let cfundec : Format.formatter -> cfundec -> unit =
-    fun fmt (`Fundec (name, args, Ty return)) ->
-      Type_printing.format_typ' return
-        (fun context fmt ->
-          format_parameter_list args (Type_printing.format_name ~name) fmt)
-        `nonarray fmt
-
-  let cfundef fmt (`Function (dec, body) : cfundef) =
-    fprintf fmt "%a@\n{@[<v 2>@\n%a@]@\n}@\n" 
-      cfundec dec ccomp body
-end
 
 let value = abstract ~name:"value" ~size:0 ~alignment:0
 
@@ -475,15 +309,15 @@ let fn ~cname  ~stub_name fmt fn =
   in
   let nargs = List.length xs in
   if nargs > max_byte_args then begin
-    Emit_C.cfundef fmt dec;
-    Emit_C.cfundef fmt (Generate_C.byte_fn f fn nargs)
+    Cstubs_emit_c.cfundef fmt dec;
+    Cstubs_emit_c.cfundef fmt (Generate_C.byte_fn f fn nargs)
   end
   else
-    Emit_C.cfundef fmt dec
+    Cstubs_emit_c.cfundef fmt dec
 
 let inverse_fn ~stub_name fmt fn : unit =
-  Emit_C.cfundef fmt (Generate_C.inverse_fn ~stub_name fn)
+  Cstubs_emit_c.cfundef fmt (Generate_C.inverse_fn ~stub_name fn)
 
 let inverse_fn_decl ~stub_name fmt fn =
   Format.fprintf fmt "@[%a@];@\n"
-    Emit_C.cfundec (Generate_C.fundec stub_name fn)
+    Cstubs_emit_c.cfundec (Generate_C.fundec stub_name fn)

@@ -1,3 +1,9 @@
+_build/src/cstubs/cstubs_emit_c.cmo : _build/src/ctypes/type_printing.cmi \
+    _build/src/ctypes/static.cmi _build/src/ctypes/ctypes.cmi \
+    _build/src/cstubs/cstubs_c_language.cmo
+_build/src/cstubs/cstubs_emit_c.cmx : _build/src/ctypes/type_printing.cmx \
+    _build/src/ctypes/static.cmx _build/src/ctypes/ctypes.cmx \
+    _build/src/cstubs/cstubs_c_language.cmx
 _build/src/cstubs/cstubs.cmi : _build/src/ctypes/ctypes.cmi
 _build/src/cstubs/cstubs_analysis.cmo : _build/src/ctypes/unsigned.cmi \
     _build/src/ctypes/static.cmi _build/src/ctypes/signed.cmi _build/src/ctypes/primitives.cmi \
@@ -15,19 +21,21 @@ _build/src/cstubs/cstubs_internals.cmi : _build/src/ctypes/unsigned.cmi \
     _build/src/ctypes/static.cmi _build/src/ctypes/signed.cmi _build/src/ctypes/primitives.cmi \
     _build/src/ctypes/memory_stubs.cmo _build/src/ctypes/ctypes_raw.cmo \
     _build/src/ctypes/ctypes_bigarray.cmi _build/src/ctypes/ctypes.cmi
-_build/src/cstubs/cstubs_generate_c.cmo : _build/src/ctypes/type_printing.cmi \
-    _build/src/ctypes/static.cmi _build/src/ctypes/primitives.cmi _build/src/ctypes/ctypes.cmi \
+_build/src/cstubs/cstubs_generate_c.cmo : _build/src/ctypes/static.cmi \
+    _build/src/ctypes/primitives.cmi _build/src/ctypes/ctypes.cmi \
     _build/src/cstubs/cstubs_errors.cmi _build/src/cstubs/cstubs_c_language.cmo \
     _build/src/cstubs/cstubs_generate_c.cmi
-_build/src/cstubs/cstubs_generate_c.cmx : _build/src/ctypes/type_printing.cmx \
-    _build/src/ctypes/static.cmx _build/src/ctypes/primitives.cmx _build/src/ctypes/ctypes.cmx \
+_build/src/cstubs/cstubs_generate_c.cmx : _build/src/ctypes/static.cmx \
+    _build/src/ctypes/primitives.cmx _build/src/ctypes/ctypes.cmx \
     _build/src/cstubs/cstubs_errors.cmx _build/src/cstubs/cstubs_c_language.cmx \
     _build/src/cstubs/cstubs_generate_c.cmi
 _build/src/cstubs/cstubs_generate_c.cmi : _build/src/ctypes/ctypes.cmi
 _build/src/cstubs/cstubs_generate_ml.cmi : _build/src/ctypes/ctypes.cmi
 _build/src/cstubs/cstubs_errors.cmi :
-_build/src/cstubs/cstubs_c_language.cmo :
-_build/src/cstubs/cstubs_c_language.cmx :
+_build/src/cstubs/cstubs_c_language.cmo : _build/src/ctypes/static.cmi \
+    _build/src/ctypes/ctypes.cmi
+_build/src/cstubs/cstubs_c_language.cmx : _build/src/ctypes/static.cmx \
+    _build/src/ctypes/ctypes.cmx
 _build/src/cstubs/cstubs_inverted.cmi : _build/src/ctypes/ctypes.cmi
 _build/src/cstubs/cstubs.cmo : _build/src/ctypes/ctypes.cmi \
     _build/src/cstubs/cstubs_generate_ml.cmi _build/src/cstubs/cstubs_generate_c.cmi \
