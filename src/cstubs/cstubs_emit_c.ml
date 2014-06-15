@@ -70,7 +70,7 @@ let rec ceff fmt : ceff -> unit = function
       es;
     fprintf fmt ")@]@]";
   | `Index (e, i) ->
-    fprintf fmt "@[@[%a@]@[[%a]@]@]" cexp e cexp i
+    fprintf fmt "@[@[%a@]@[[%a]@]@]" ceff e cexp i
   | `Deref e -> fprintf fmt "@[*@[%a@]@]" cexp e
   | `Assign (lv, e) ->
     fprintf fmt "@[@[%a@]@;=@;@[%a@]@]" clvalue lv ceff e

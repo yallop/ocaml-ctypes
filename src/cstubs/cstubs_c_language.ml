@@ -32,7 +32,7 @@ type clocal = [ `Local of string * ty ]
 type cvar = [ clocal | [`Typ] cglobal ]
 type cconst = [ `Int of int ]
 type cexp = [ cconst
-            | cvar
+            | clocal
             | `Cast of ty * cexp
             | `Addr of cexp ]
 type clvalue = [ clocal | `Index of clvalue * cexp ]
@@ -40,8 +40,9 @@ type camlop = [ `CAMLparam0
               | `CAMLlocalN of cexp * cexp ]
 type ceff = [ cexp
             | camlop
+            | [`Typ] cglobal
             | `App of [`Fn] cglobal * cexp list
-            | `Index of cexp * cexp
+            | `Index of ceff * cexp
             | `Deref of cexp
             | `Assign of clvalue * ceff ]
 type cbind = clocal * ceff
@@ -67,7 +68,6 @@ struct
   let rec cexp : cexp -> ty = function
     | `Int _ -> Ty int
     | `Local (_, ty) -> ty
-    | `Global { tfn = Typ t } -> Ty t
     | `Cast (Ty ty, _) -> Ty ty
     | `Addr e -> let Ty ty = cexp e in Ty (Pointer ty)
 
@@ -78,17 +78,20 @@ struct
   let rec ceff : ceff -> ty = function
     | #cexp as e -> cexp e
     | #camlop as o -> camlop o
+    | `Global { tfn = Typ t } -> Ty t
     | `App (`Global  { tfn = Fn f; name }, _) -> return_type f
-    | `Index (e, _)
-    | `Deref e ->
-      begin match cexp e with
+    | `Index (e, _) -> reference_ceff e
+    | `Deref e -> reference_ceff (e :> ceff)
+    | `Assign (_, rv) -> ceff rv
+  and reference_ceff : ceff -> ty =
+    fun e ->
+      begin match ceff e with
       | Ty (Pointer ty) -> Ty ty
       | Ty (Array (ty, _)) -> Ty ty
       | Ty t -> Cstubs_errors.internal_error
         "dereferencing expression of non-pointer type %s"
         (Ctypes.string_of_typ t)
       end
-    | `Assign (_, rv) -> ceff rv
 
   let rec ccomp : ccomp -> ty = function
     | #cexp as e -> cexp e

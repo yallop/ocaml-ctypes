@@ -140,7 +140,7 @@ struct
                                   reads_ocaml_heap = false;
                                   tfn = Typ value; }
 
-  let functions : cexp = `Global
+  let functions : ceff = `Global
     { name = "functions";
       allocates = false;
       reads_ocaml_heap = true;
