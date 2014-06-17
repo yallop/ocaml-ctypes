@@ -45,6 +45,7 @@ type ceff = [ cexp
             | camlop
             | `Global of cglobal
             | `App of cfunction * cexp list
+            | `If of cexp * ceff * ceff
             | `Index of ceff * cexp
             | `Deref of cexp
             | `Assign of clvalue * ceff ]
@@ -83,6 +84,7 @@ struct
     | #camlop as o -> camlop o
     | `Global { typ } -> typ
     | `App ({ fn = Fn f }, _) -> return_type f
+    | `If (_, e, _) -> ceff e
     | `Index (e, _) -> reference_ceff e
     | `Deref e -> reference_ceff (e :> ceff)
     | `Assign (_, rv) -> ceff rv

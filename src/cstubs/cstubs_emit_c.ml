@@ -69,6 +69,8 @@ let rec ceff fmt : ceff -> unit = function
           (if i <> last_exp then ",@ " else ""))
       es;
     fprintf fmt ")@]@]";
+  | `If (e, s, t) ->
+    fprintf fmt "@[(%a)@]@ ?@ @[(%a)@]@ :@ @[(%a)@]" cexp e ceff s ceff t
   | `Index (e, i) ->
     fprintf fmt "@[@[%a@]@[[%a]@]@]" ceff e cexp i
   | `Deref e -> fprintf fmt "@[*@[%a@]@]" cexp e
@@ -88,7 +90,10 @@ let rec ccomp fmt : ccomp -> unit = function
     ccomp fmt (`Let (xe, e'))
   | `Let ((`Local (x, _), e), `Local (y, _)) when x = y ->
     ccomp fmt (e :> ccomp)
-  | `Let ((`Local (name, Ty Void), e), s) ->
+  | `Let ((`Local (_, Ty Void), `If (e, a, b)), s) ->
+    fprintf fmt "@[if@ (@[%a)@]@ {@[%a}@]@\nelse@ {@[%a}@]@]@ %a"
+      cexp e ceff a ceff b ccomp s
+  | `Let ((`Local (_, Ty Void), e), s) ->
     fprintf fmt "@[%a;@]@ %a" ceff e ccomp s
   | `Let ((`Local (name, Ty (Struct { tag })), e), s) ->
     fprintf fmt "@[struct@;%s@;%s@;=@;@[%a;@]@]@ %a"
