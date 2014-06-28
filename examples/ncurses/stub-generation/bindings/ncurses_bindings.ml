@@ -50,8 +50,6 @@ end
 
 let c_headers = "#include <ncurses.h>"
 
-let make_stubname cname = "ncurses_stub_" ^ cname
-
 let main () =
   let ml_out = open_out "examples/ncurses/stub-generation/ncurses_generated.ml" in
   let c_out = open_out "examples/ncurses/stub-generation/ncurses_stubs.c" in
