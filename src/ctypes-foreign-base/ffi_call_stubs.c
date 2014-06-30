@@ -284,6 +284,7 @@ value ctypes_call(value function, value callspec_, value argwriter, value rvread
 
   struct callspec *callspec = Data_custom_val(callspec_);
   int roffset = callspec->roffset;
+  size_t nelements = callspec->nelements;
 
   assert(callspec->state == CALLSPEC);
 
@@ -297,10 +298,10 @@ value ctypes_call(value function, value callspec_, value argwriter, value rvread
                      (void **)(callbuffer + arg_array_offset));
   callback_arg_buf = CTYPES_FROM_PTR(callbuffer);
 
-  callback_val_arr = caml_alloc_tuple(callspec->nelements);
+  callback_val_arr = caml_alloc_tuple(nelements);
   caml_callback2(argwriter, callback_arg_buf, callback_val_arr);
 
-  void **val_refs = alloca(sizeof(void*) * callspec->nelements);
+  void **val_refs = alloca(sizeof(void*) * nelements);
 
   int arg_idx;
   for(arg_idx = 0; arg_idx < Wosize_val(callback_val_arr); arg_idx++) {
