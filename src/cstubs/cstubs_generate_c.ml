@@ -182,6 +182,7 @@ struct
     | Array _ -> report_unpassable "arrays"
     | Bigarray _ -> report_unpassable "bigarrays"
     | OCaml String -> Some (string_to_ptr x)
+    | OCaml Bytes -> Some (string_to_ptr x)
     | OCaml FloatArray -> Some (float_array_to_ptr x)
 
   let rec inj : type a. a typ -> cexp -> ceff =

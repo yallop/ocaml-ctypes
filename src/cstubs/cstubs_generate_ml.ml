@@ -212,6 +212,8 @@ let rec ml_typ_of_return_typ : type a. a typ -> ml_type =
     "Unexpected bigarray type in the return type: %s" (Ctypes.string_of_typ a)
   | OCaml String -> Static.unsupported
     "cstubs does not support OCaml strings as return values"
+  | OCaml Bytes -> Static.unsupported
+    "cstubs does not support OCaml bytes values as return values"
   | OCaml FloatArray -> Static.unsupported
     "cstubs does not support OCaml float arrays as return values"
 
@@ -230,6 +232,9 @@ let rec ml_typ_of_arg_typ : type a. a typ -> ml_type = function
   | OCaml String ->
     `Appl (path_of_string "CI.ocaml",
            [`Ident (path_of_string "string")])
+  | OCaml Bytes ->
+    `Appl (path_of_string "CI.ocaml",
+           [`Ident (path_of_string "Bytes.t")])
   | OCaml FloatArray ->
     `Appl (path_of_string "CI.ocaml",
            [`Appl (path_of_string "array",
@@ -325,9 +330,12 @@ let rec pattern_and_exp_of_typ :
   | OCaml ty ->
     begin match pol, ty with
     | In, String -> (static_con "OCaml" [static_con "String" []], None)
+    | In, Bytes -> (static_con "OCaml" [static_con "Bytes" []], None)
     | In, FloatArray -> (static_con "OCaml" [static_con "FloatArray" []], None)
     | Out, String -> Static.unsupported
       "cstubs does not support OCaml strings as return values"
+    | Out, Bytes -> Static.unsupported
+      "cstubs does not support OCaml bytes values as return values"
     | Out, FloatArray -> Static.unsupported
       "cstubs does not support OCaml float arrays as return values"
     end

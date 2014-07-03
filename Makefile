@@ -38,7 +38,7 @@ ctypes: $(ctypes.dir)/$(ctypes.extra_mls) $$(LIB_TARGETS)
 cstubs.public = cstubs_internals cstubs cstubs_inverted
 cstubs.dir = src/cstubs
 cstubs.subproject_deps = ctypes
-cstubs.deps = str
+cstubs.deps = str bytes
 cstubs.install = yes
 
 cstubs: PROJECT=cstubs
