@@ -31,6 +31,16 @@ struct
     in begin
       assert_equal buf input
     end;
+
+    let bbuf = Bytes.create len in
+    let binput = Bytes.unsafe_of_string (String.copy input) in
+    let _ = memcpy_bytes_bytes
+      (ocaml_bytes_start bbuf)
+      (ocaml_bytes_start binput)
+      (Unsigned.Size_t.of_int len)
+    in begin
+      assert_equal bbuf binput
+    end;
     
     let arr = CArray.make char len in
     let () = String.iteri (CArray.set arr) input in

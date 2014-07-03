@@ -16,6 +16,9 @@ struct
   let memcpy_string_string = foreign "memcpy"
     (ocaml_string @-> ocaml_string @-> size_t @-> returning (ptr void))
 
+  let memcpy_bytes_bytes = foreign "memcpy"
+    (ocaml_bytes @-> ocaml_bytes @-> size_t @-> returning (ptr void))
+
   let memcpy_string_ptr = foreign "memcpy"
     (ocaml_string @-> ptr void @-> size_t @-> returning (ptr void))
 
