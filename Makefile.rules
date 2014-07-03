@@ -45,7 +45,7 @@ THREAD_FLAG = $(if $(filter yes,$($(PROJECT).threads)),-thread)
 LINK_FLAGS = $($(PROJECT).link_flags)
 OCAML_LINK_FLAGS=$(LINK_FLAGS:%=-cclib %)
 OCAMLFIND_PACKAGE_FLAGS=$(patsubst %,-package %,$($(PROJECT).deps)) \
-                        $(patsubst %,-package threads,$(THREAD_FLAG))
+                        $(patsubst %,-thread -package threads,$(THREAD_FLAG))
 
 $(BUILDDIR)/%.cmxa: $$(NATIVE_OBJECTS)
 	$(OCAMLFIND) opt -a -linkall $(OCAMLFLAGS) $(THREAD_FLAG) $(OCAMLFIND_PACKAGE_FLAGS) $(CMXA_OPTS) -o $@ $(NATIVE_OBJECTS) $(OCAML_LINK_FLAGS)
