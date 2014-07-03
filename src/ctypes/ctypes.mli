@@ -199,6 +199,9 @@ type 'a ocaml = 'a Static.ocaml
 val ocaml_string : string ocaml typ
 (** Value representing the directly mapped storage of an OCaml string. *)
 
+val ocaml_bytes : Bytes.t ocaml typ
+(** Value representing the directly mapped storage of an OCaml byte array. *)
+
 (** {3 Array types} *)
 
 (** {4 C array types} *)
@@ -490,6 +493,10 @@ val string_from_ptr : char ptr -> length:int -> string
 val ocaml_string_start : string -> string ocaml
 (** [ocaml_string_start s] allows to pass a pointer to the contents of an OCaml
     string directly to a C function. *)
+
+val ocaml_bytes_start : Bytes.t -> Bytes.t ocaml
+(** [ocaml_bytes_start s] allows to pass a pointer to the contents of an OCaml
+    byte array directly to a C function. *)
 
 (** {3 Array values} *)
 

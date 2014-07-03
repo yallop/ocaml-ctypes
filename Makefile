@@ -27,7 +27,7 @@ distclean: clean
 ctypes.public = static primitives unsigned signed structs ctypes posixTypes
 ctypes.dir = src/ctypes
 ctypes.extra_mls = ctypes_primitives.ml
-ctypes.deps = str bigarray
+ctypes.deps = str bigarray bytes
 ctypes.install = yes
 ctypes.install_native_objects = yes
 
@@ -38,7 +38,7 @@ ctypes: $(ctypes.dir)/$(ctypes.extra_mls) $$(LIB_TARGETS)
 cstubs.public = cstubs_internals cstubs cstubs_inverted
 cstubs.dir = src/cstubs
 cstubs.subproject_deps = ctypes
-cstubs.deps = str
+cstubs.deps = str bytes
 cstubs.install = yes
 
 cstubs: PROJECT=cstubs
