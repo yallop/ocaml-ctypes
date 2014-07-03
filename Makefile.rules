@@ -65,7 +65,7 @@ $(BUILDDIR)/%.cmo : %.ml
 
 $(BUILDDIR)/%.cmx : %.ml
 	@mkdir -p $(@D)
-	$(OCAMLFIND) opt -c -o $@ $(OCAMLFLAGS) $(THREAD_FLAG) $(OCAMLFIND_PACKAGE_FLAGS) $(CMX_OPTS) $(OCAMLINCLUDES) $(filter %.ml,$<)
+	$(OCAMLFIND) opt -c -o $@ $(OCAMLFIND_PACKAGE_FLAGS) $(OCAMLFLAGS) $(THREAD_FLAG) $(OCAMLFIND_PACKAGE_FLAGS) $(CMX_OPTS) $(OCAMLINCLUDES) $(filter %.ml,$<)
 
 $(BUILDDIR)/%.o : %.c
 	@mkdir -p $(@D)
@@ -73,7 +73,7 @@ $(BUILDDIR)/%.o : %.c
 
 $(BUILDDIR)/%.cmi : %.mli
 	@mkdir -p $(@D)
-	$(OCAMLFIND) ocamlc -c -o $@ $(OCAMLFLAGS) $(OCAMLINCLUDES) $<
+	$(OCAMLFIND) ocamlc -c -o $@ $(OCAMLFIND_PACKAGE_FLAGS) $(OCAMLFLAGS) $(OCAMLINCLUDES) $<
 
 $(BUILDDIR)/%.native : $$(NATIVE_OBJECTS) $$(C_OBJECTS)
 	$(OCAMLFIND) opt -I $(BUILDDIR) -linkpkg $(OCAMLFLAGS) $(THREAD_FLAG) $(OCAMLFIND_PACKAGE_FLAGS) $(LOCAL_CMXAS) -o $@ $^ $(OCAML_LINK_FLAGS) 
