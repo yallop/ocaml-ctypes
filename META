@@ -1,6 +1,6 @@
 version = "0.3"
 description = "Combinators for binding to C libraries without writing any C."
-requires = "unix bigarray str"
+requires = "unix bigarray str bytes"
 archive(byte) = "ctypes.cma"
 archive(byte, plugin) = "ctypes.cma"
 archive(native) = "ctypes.cmxa"
