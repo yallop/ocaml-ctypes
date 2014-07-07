@@ -89,6 +89,24 @@ struct
     in
 
     assert_equal 280 (callback_returns_funptr callback 0)
+
+  (*
+    Call an OCaml function through a C function pointer of type
+
+         void ( * )(void)
+  *)
+  let test_zero_argument_callbacks () =
+    let counter = ref 0 in
+    let callback () = let c = !counter in incr counter; c in
+    let () = register_callback callback in
+
+    begin
+      assert_equal !counter 0;
+      call_registered_callback 5 !counter;
+      assert_equal !counter 5;
+      call_registered_callback 3 !counter;
+      assert_equal !counter 8;
+    end
 end
 
 
@@ -120,6 +138,12 @@ let suite = "Higher-order tests" >:::
 
    "test_callback_returns_pointer_to_function (stubs)"
    >:: Stub_tests.test_callback_returns_pointer_to_function;
+
+   "test_zero_argument_callbacks (foreign)"
+   >:: Foreign_tests.test_zero_argument_callbacks;
+
+   "test_zero_argument_callbacks (stubs)"
+   >:: Stub_tests.test_zero_argument_callbacks;
   ]
 
 
