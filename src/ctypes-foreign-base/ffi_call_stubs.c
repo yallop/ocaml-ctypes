@@ -371,13 +371,27 @@ static void callback_handler(ffi_cif *cif,
   boxedfn = retrieve_closure(*(int *)user_data);
 
   int i, arity = cif->nargs;
-  for (i = 0; i < arity; i++)
+
+  switch (arity)
   {
-    void *cvalue = args[i];
-    assert (Tag_val(boxedfn) == Fn);
-    /* unbox and call */
-    argptr = CTYPES_FROM_PTR(cvalue);
-    boxedfn = caml_callback(Field(boxedfn, 0), argptr);
+    case 0:
+    {
+      assert (Tag_val(boxedfn) == Fn);
+      boxedfn = caml_callback(Field(boxedfn, 0), Val_unit);
+      break;
+    }
+    default:
+    {
+      for (i = 0; i < arity; i++)
+      {
+        void *cvalue = args[i];
+        assert (Tag_val(boxedfn) == Fn);
+        /* unbox and call */
+        argptr = CTYPES_FROM_PTR(cvalue);
+        boxedfn = caml_callback(Field(boxedfn, 0), argptr);
+      }
+      break;
+    }
   }
 
   /* now store the return value */

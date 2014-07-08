@@ -28,4 +28,10 @@ struct
   let callback_returns_funptr = foreign "callback_returns_funptr"
     (funptr (int @-> returning (funptr (int @-> returning int))) @->
      int @-> returning int)
+
+  let register_callback = foreign "register_callback"
+      (funptr (void @-> returning int) @-> returning void)
+
+  let call_registered_callback = foreign "call_registered_callback"
+      (int @-> int @-> returning void)
 end

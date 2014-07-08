@@ -158,5 +158,8 @@ void matrix_mul(int, int, int, double *, double *, double *);
 double *matrix_transpose(int, int, double *);
 int (*plus_callback)(int);
 int sum_range_with_plus_callback(int, int);
+typedef int callback_t(void);
+void register_callback(callback_t *);
+void call_registered_callback(int, int);
 
 #endif /* TEST_FUNCTIONS_H */

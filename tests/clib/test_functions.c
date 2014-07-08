@@ -501,3 +501,19 @@ int sum_range_with_plus_callback(int a, int b)
   }
   return sum;
 }
+
+static callback_t *registered_callback = NULL;
+
+void register_callback(callback_t *callback)
+{
+  registered_callback = callback;
+}
+
+void call_registered_callback(int times, int starting_value)
+{
+  int i;
+  for (i = 0; i < times; i++) {
+    int result = registered_callback();
+    assert (result == starting_value++);
+  }
+}
