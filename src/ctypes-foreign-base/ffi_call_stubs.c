@@ -106,7 +106,7 @@ static struct callspec {
   /* The maximum element alignment */
   size_t max_align;
 
-  /* The state of the bufferspec value. */
+  /* The state of the callspec value. */
   enum { BUILDING, CALLSPEC } state;
 
   /* A null-terminated array of size `nelements' types */
@@ -127,7 +127,7 @@ static struct callspec {
 };
 
 
-static void finalize_bufferspec(value v)
+static void finalize_callspec(value v)
 {
   struct callspec *callspec = Data_custom_val(v);
   free(callspec->args);
@@ -136,8 +136,8 @@ static void finalize_bufferspec(value v)
 
 
 static struct custom_operations callspec_custom_ops = {
-  "ocaml-ctypes:bufferspec",
-  finalize_bufferspec,
+  "ocaml-ctypes:callspec",
+  finalize_callspec,
   custom_compare_default,
   custom_hash_default,
   custom_serialize_default,
