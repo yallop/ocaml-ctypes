@@ -115,6 +115,12 @@ static struct callspec {
   /* return value offset */
   size_t roffset;
 
+  /* The context in which the call should run: whether errno is
+     checked, whether the runtime lock is released, and so on. */
+  struct call_context {
+    int check_errno;
+  } context;
+
   /* The libffi call interface structure.  It would be nice for this member to
      be a value rather than a pointer (to save a layer of indirection) but the
      ffi_closure structure keeps the address of the structure, and the GC can
@@ -123,7 +129,7 @@ static struct callspec {
   ffi_cif *cif;
 
 } callspec_prototype = {
-  0, 0, 0, 0, BUILDING, NULL, -1, NULL
+  0, 0, 0, 0, BUILDING, NULL, -1, { 0 }, NULL
 };
 
 
@@ -187,13 +193,19 @@ static void populate_arg_array(struct callspec *callspec,
 
 
 /* Allocate a new C call specification */
-/* allocate_callspec : unit -> callspec */
-value ctypes_allocate_callspec(value unit)
+/* allocate_callspec :
+      check_errno:bool -> callspec */
+value ctypes_allocate_callspec(value check_errno)
 {
+  struct call_context context = {
+    Int_val(check_errno),
+  };
+
   value block = caml_alloc_custom(&callspec_custom_ops,
                                   sizeof(struct callspec), 0, 1);
-  memcpy(Data_custom_val(block), &callspec_prototype,
-         sizeof(struct callspec));
+  struct callspec *spec = Data_custom_val(block);
+  memcpy(spec, &callspec_prototype, sizeof(struct callspec));
+  spec->context = context;
   return block;
 }
 
@@ -275,15 +287,17 @@ value ctypes_prep_callspec(value callspec_, value abi_, value rtype)
 
 /* Call the function specified by `callspec', passing arguments and return
    values in `buffer' */
-/* call : raw_pointer -> callspec -> (raw_pointer -> Obj.t array -> unit) ->
-          (raw_pointer -> 'a) -> 'a */
-value ctypes_call(value function, value callspec_, value argwriter, value rvreader)
+/* call : string -> raw_pointer -> callspec ->
+          (raw_pointer -> Obj.t array -> unit) -> (raw_pointer -> 'a) -> 'a */
+value ctypes_call(value fnname, value function, value callspec_,
+                  value argwriter, value rvreader)
 {
-  CAMLparam4(function, callspec_, argwriter, rvreader);
+  CAMLparam5(fnname, function, callspec_, argwriter, rvreader);
   CAMLlocal3(callback_arg_buf, callback_val_arr, callback_rv_buf);
 
   struct callspec *callspec = Data_custom_val(callspec_);
   int roffset = callspec->roffset;
+  struct call_context context = callspec->context;
   size_t nelements = callspec->nelements;
 
   assert(callspec->state == CALLSPEC);
@@ -321,34 +335,25 @@ value ctypes_call(value function, value callspec_, value argwriter, value rvread
 
   void (*cfunction)(void) = (void (*)(void)) CTYPES_TO_PTR(function);
 
+  if (context.check_errno)
+  {
+    errno = 0;
+  }
+
   ffi_call(((struct callspec *)Data_custom_val(callspec_))->cif,
            cfunction,
            return_slot,
            (void **)(callbuffer + arg_array_offset));
 
-  callback_rv_buf = CTYPES_FROM_PTR(return_slot);
-  CAMLreturn(caml_callback(rvreader, callback_rv_buf));
-}
-
-
-/* call_errno : string -> raw_pointer -> callspec ->
-               (raw_pointer -> unit) ->
-               (raw_pointer -> 'a) -> 'a */
-value ctypes_call_errno(value fnname, value function, value callspec_,
-                        value argwriter, value rvreader)
-{
-  CAMLparam5(fnname, function, callspec_, argwriter, rvreader);
-
-  errno = 0;
-  CAMLlocal1(rv);
-  rv = ctypes_call(function, callspec_, argwriter, rvreader);
-  if (errno != 0)
+  if (context.check_errno && errno != 0)
   {
     char *buffer = alloca(caml_string_length(fnname) + 1);
     strcpy(buffer, String_val(fnname));
     unix_error(errno, buffer, Nothing);
   }
-  CAMLreturn(rv);
+
+  callback_rv_buf = CTYPES_FROM_PTR(return_slot);
+  CAMLreturn(caml_callback(rvreader, callback_rv_buf));
 }
 
 typedef struct closure closure;

@@ -76,13 +76,6 @@ struct
        Ffi_stubs.complete_struct_type bufspec;
        ArgType (Ffi_stubs.ffi_type_of_struct_type bufspec)
 
-
-  let pick_call_stub check_errno name =
-    match check_errno, name with
-    | true, Some name -> Ffi_stubs.call_errno name
-    | true, None      -> Ffi_stubs.call_errno ""
-    | false, _        -> Ffi_stubs.call
-
   (*
     call addr callspec
      (fun buffer ->
@@ -100,9 +93,9 @@ struct
                         a
     = fun name -> function
       | Call (check_errno, read_return_value) ->
-        let call = pick_call_stub check_errno name in
+        let name = match name with Some name -> name | None -> "" in
         fun writers callspec addr ->
-          call addr callspec
+          Ffi_stubs.call name addr callspec
             (fun buf arr -> List.iter (fun w -> w buf arr) writers)
             read_return_value
       | WriteArg (write, ccallspec) ->
@@ -172,7 +165,7 @@ struct
         WriteArg (write_arg p ~offset ~idx, rest)
 
   let build_function ?name ~abi ~check_errno fn =
-    let c = Ffi_stubs.allocate_callspec () in
+    let c = Ffi_stubs.allocate_callspec ~check_errno in
     let e = build_ccallspec ~abi ~check_errno fn c in
     invoke name e [] c
 
@@ -184,7 +177,7 @@ struct
     fun (CPointer {raw_ptr}) -> f raw_ptr
 
   let pointer_of_function ~abi fn =
-    let cs' = Ffi_stubs.allocate_callspec () in
+    let cs' = Ffi_stubs.allocate_callspec ~check_errno:false in
     let cs = box_function abi fn cs' in
     fun f ->
       let boxed = cs (WeakRef.make f) in
