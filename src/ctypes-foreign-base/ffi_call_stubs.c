@@ -17,6 +17,8 @@
 #include <caml/fail.h>
 #include <caml/hash.h>
 #include <caml/unixsupport.h>
+#include <caml/unixsupport.h>
+#include <caml/threads.h>
 
 #include <ffi.h>
 
@@ -119,6 +121,7 @@ static struct callspec {
      checked, whether the runtime lock is released, and so on. */
   struct call_context {
     int check_errno;
+    int release_runtime_lock;
   } context;
 
   /* The libffi call interface structure.  It would be nice for this member to
@@ -129,7 +132,7 @@ static struct callspec {
   ffi_cif *cif;
 
 } callspec_prototype = {
-  0, 0, 0, 0, BUILDING, NULL, -1, { 0 }, NULL
+  0, 0, 0, 0, BUILDING, NULL, -1, { 0, 0 }, NULL
 };
 
 
@@ -194,11 +197,13 @@ static void populate_arg_array(struct callspec *callspec,
 
 /* Allocate a new C call specification */
 /* allocate_callspec :
-      check_errno:bool -> callspec */
-value ctypes_allocate_callspec(value check_errno)
+     check_errno:bool -> release_runtime_lock:bool -> callspec */
+value ctypes_allocate_callspec(value check_errno,
+                               value release_runtime_lock)
 {
   struct call_context context = {
     Int_val(check_errno),
+    Int_val(release_runtime_lock),
   };
 
   value block = caml_alloc_custom(&callspec_custom_ops,
@@ -299,6 +304,7 @@ value ctypes_call(value fnname, value function, value callspec_,
   int roffset = callspec->roffset;
   struct call_context context = callspec->context;
   size_t nelements = callspec->nelements;
+  ffi_cif *cif = callspec->cif;
 
   assert(callspec->state == CALLSPEC);
 
@@ -339,11 +345,20 @@ value ctypes_call(value fnname, value function, value callspec_,
   {
     errno = 0;
   }
+  if (context.release_runtime_lock)
+  {
+    caml_release_runtime_system();
+  }
 
-  ffi_call(((struct callspec *)Data_custom_val(callspec_))->cif,
+  ffi_call(cif,
            cfunction,
            return_slot,
            (void **)(callbuffer + arg_array_offset));
+
+  if (context.release_runtime_lock)
+  {
+    caml_acquire_runtime_system();
+  }
 
   if (context.check_errno && errno != 0)
   {

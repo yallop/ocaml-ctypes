@@ -164,20 +164,23 @@ struct
         let rest = build_ccallspec ~abi ~check_errno ~idx:(idx+1) f callspec in
         WriteArg (write_arg p ~offset ~idx, rest)
 
-  let build_function ?name ~abi ~check_errno fn =
-    let c = Ffi_stubs.allocate_callspec ~check_errno in
+  let build_function ?name ~abi ~release_runtime_lock ~check_errno fn =
+    let c = Ffi_stubs.allocate_callspec ~check_errno ~release_runtime_lock in
     let e = build_ccallspec ~abi ~check_errno fn c in
     invoke name e [] c
 
   let ptr_of_rawptr raw_ptr =
     CPointer { raw_ptr ; pbyte_offset = 0; reftype = void; pmanaged = None; }
 
-  let function_of_pointer ?name ~abi ~check_errno fn =
-    let f = build_function ?name ~abi ~check_errno fn in
+  let function_of_pointer ?name ~abi ~check_errno ~release_runtime_lock fn =
+    let f = build_function ?name ~abi ~check_errno ~release_runtime_lock fn in
     fun (CPointer {raw_ptr}) -> f raw_ptr
 
   let pointer_of_function ~abi fn =
-    let cs' = Ffi_stubs.allocate_callspec ~check_errno:false in
+    let cs' = Ffi_stubs.allocate_callspec
+      ~check_errno:false
+      ~release_runtime_lock:false
+    in
     let cs = box_function abi fn cs' in
     fun f ->
       let boxed = cs (WeakRef.make f) in

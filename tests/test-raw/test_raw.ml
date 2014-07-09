@@ -21,7 +21,10 @@ open Std_view_stubs
 let test_fabs () =
   Ffi_stubs.(
     let double_ffitype = primitive_ffitype Primitives.Double in
-    let callspec = allocate_callspec ~check_errno:false in
+    let callspec = allocate_callspec
+      ~check_errno:false
+      ~release_runtime_lock:false
+    in
     let arg_1_offset = add_argument callspec double_ffitype in
     let () = prep_callspec callspec Libffi_abi.(abi_code default_abi)
       double_ffitype in
@@ -47,7 +50,10 @@ let test_fabs () =
 let test_pow () =
   Ffi_stubs.(
     let double_ffitype = primitive_ffitype Primitives.Double in
-    let callspec = allocate_callspec ~check_errno:false in
+    let callspec = allocate_callspec
+      ~check_errno:false
+      ~release_runtime_lock:false
+    in
     let arg_1_offset = add_argument callspec double_ffitype in
     let arg_2_offset = add_argument callspec double_ffitype in
     let () = prep_callspec callspec Libffi_abi.(abi_code default_abi) 

@@ -12,6 +12,7 @@ val foreign :
   ?from:Dl.library ->
   ?stub:bool -> 
   ?check_errno:bool ->
+  ?release_runtime_lock:bool ->
   string ->
   ('a -> 'b) Ctypes.fn ->
   ('a -> 'b)
@@ -28,6 +29,13 @@ val foreign :
     The value [?check_errno], which defaults to [false], indicates whether
     {!Unix.Unix_error} should be raised if the C function modifies [errno].
 
+    The value [?release_runtime_lock], which defaults to [false], indicates
+    whether the OCaml runtime lock should be released during the call to the C
+    function, allowing other threads to run.  If the runtime lock is released
+    then the C function must not access OCaml heap objects, such as arguments
+    passed using {!Ctypes.ocaml_string} and {!Ctypes.ocaml_bytes}, and must not
+    call back into OCaml.
+
     @raise Dl.DL_error if [name] is not found in [?from] and [?stub] is
     [false]. *)
 
@@ -40,6 +48,7 @@ val funptr :
   ?abi:Libffi_abi.abi ->
   ?name:string ->
   ?check_errno:bool ->
+  ?release_runtime_lock:bool ->
   ('a -> 'b) Ctypes.fn ->
   ('a -> 'b) Ctypes.typ
 (** Construct a function pointer type from a function type.
@@ -51,7 +60,15 @@ val funptr :
     restrictions.
 
     The value [?check_errno], which defaults to [false], indicates whether
-    {!Unix.Unix_error} should be raised if the C function modifies [errno]. *)
+    {!Unix.Unix_error} should be raised if the C function modifies [errno].
+
+    The value [?release_runtime_lock], which defaults to [false], indicates
+    whether the OCaml runtime lock should be released during the call to the C
+    function, allowing other threads to run.  If the runtime lock is released
+    then the C function must not access OCaml heap objects, such as arguments
+    passed using {!Ctypes.ocaml_string} and {!Ctypes.ocaml_bytes}, and must not
+    call back into OCaml.
+ *)
 
 val funptr_opt :
   ?abi:Libffi_abi.abi ->
