@@ -639,6 +639,22 @@ tests/test-passing-ocaml-values/generated_stubs.c: $(BUILDDIR)/test-passing-ocam
 tests/test-passing-ocaml-values/generated_bindings.ml: $(BUILDDIR)/test-passing-ocaml-values-stub-generator.native
 	$< --ml-file $@
 
+test-threads-stubs.dir  = tests/test-threads/stubs
+test-threads-stubs.threads = yes
+test-threads-stubs.subproject_deps = ctypes cstubs \
+   ctypes-foreign-base ctypes-foreign-unthreaded tests-common
+test-threads-stubs: PROJECT=test-threads-stubs
+test-threads-stubs: $$(LIB_TARGETS)
+
+test-threads.dir = tests/test-threads
+test-threads.threads = yes
+test-threads.deps = str bigarray oUnit bytes
+test-threads.subproject_deps = ctypes ctypes-foreign-base \
+   ctypes-foreign-unthreaded cstubs tests-common test-threads-stubs
+test-threads.link_flags = -L$(BUILDDIR)/clib -ltest_functions
+test-threads: PROJECT=test-threads
+test-threads: $$(NATIVE_TARGET)
+
 TESTS =
 TESTS += test-raw
 TESTS += test-pointers-stubs test-pointers-stub-generator test-pointers-generated test-pointers
@@ -666,6 +682,7 @@ TESTS += test-stubs
 TESTS += test-bigarrays-stubs test-bigarrays-stub-generator test-bigarrays-generated test-bigarrays
 TESTS += test-coercions-stubs test-coercions-stub-generator test-coercions-generated test-coercions
 TESTS += test-passing-ocaml-values-stubs test-passing-ocaml-values-stub-generator test-passing-ocaml-values-generated test-passing-ocaml-values
+TESTS += test-threads-stubs test-threads
 
 testlib: $(BUILDDIR)/clib/libtest_functions.so
 $(BUILDDIR)/clib/libtest_functions.so: $(BUILDDIR)/clib/test_functions.o
