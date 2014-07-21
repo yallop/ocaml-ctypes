@@ -38,7 +38,18 @@ The documentation and source distribution contain more complex examples, involvi
 
 ## Links
 
-* [Tutorial](https://github.com/ocamllabs/ocaml-ctypes/wiki/ctypes-tutorial)
-* [API documentation](http://ocamllabs.github.io/ocaml-ctypes)
-* [Mailing list](http://lists.ocaml.org/listinfo/ctypes)
-* [FAQ](https://github.com/ocamllabs/ocaml-ctypes/wiki/FAQ)
+* [Chapter 19: Foreign Function Interface][rwo-19] of [Real World OCaml][rwo] describes ctypes
+* [Modular Foreign Function Bindings][mirage-blogpost] introduces ctypes in the context of the [Mirage][mirage] library operating system
+* [Tutorial][tutorial]
+* [API documentation][apidoc]
+* [Mailing list][mailing-list]
+* [FAQ][faq]
+
+[rwo-19]: https://realworldocaml.org/v1/en/html/foreign-function-interface.html
+[rwo]: http://realworldocaml.org/
+[mirage-blogpost]: http://openmirage.org/blog/modular-foreign-function-bindings
+[tutorial]: https://github.com/ocamllabs/ocaml-ctypes/wiki/ctypes-tutorial
+[apidoc]: http://ocamllabs.github.io/ocaml-ctypes
+[mailing-list]: http://lists.ocaml.org/listinfo/ctypes
+[faq]: https://github.com/ocamllabs/ocaml-ctypes/wiki/FAQ
+[mirage]: http://openmirage.org
