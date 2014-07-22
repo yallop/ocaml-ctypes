@@ -21,7 +21,10 @@ open Std_view_stubs
 let test_fabs () =
   Ffi_stubs.(
     let double_ffitype = primitive_ffitype Primitives.Double in
-    let callspec = allocate_callspec () in
+    let callspec = allocate_callspec
+      ~check_errno:false
+      ~release_runtime_lock:false
+    in
     let arg_1_offset = add_argument callspec double_ffitype in
     let () = prep_callspec callspec Libffi_abi.(abi_code default_abi)
       double_ffitype in
@@ -29,7 +32,7 @@ let test_fabs () =
     let dlfabs = Dl.dlsym "fabs" in
     
     let fabs x =
-      call dlfabs callspec
+      call "fabs" dlfabs callspec
         (fun p _values -> write Primitives.Double ~offset:arg_1_offset x p)
         (read Primitives.Double ~offset:0)
     in
@@ -47,7 +50,10 @@ let test_fabs () =
 let test_pow () =
   Ffi_stubs.(
     let double_ffitype = primitive_ffitype Primitives.Double in
-    let callspec = allocate_callspec () in
+    let callspec = allocate_callspec
+      ~check_errno:false
+      ~release_runtime_lock:false
+    in
     let arg_1_offset = add_argument callspec double_ffitype in
     let arg_2_offset = add_argument callspec double_ffitype in
     let () = prep_callspec callspec Libffi_abi.(abi_code default_abi) 
@@ -56,7 +62,7 @@ let test_pow () =
     let dlpow = Dl.dlsym "pow" in
     
     let pow x y =
-      call dlpow callspec
+      call "pow" dlpow callspec
         (fun buffer _values ->
           write Primitives.Double ~offset:arg_1_offset x buffer;
           write Primitives.Double ~offset:arg_2_offset y buffer)

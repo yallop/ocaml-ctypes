@@ -18,9 +18,11 @@ struct
     Type_printing.format_fn' fn
       (fun fmt -> Format.fprintf fmt "(*%t)" k) fmt
 
-  let funptr ?(abi=Libffi_abi.default_abi) ?name ?(check_errno=false) fn =
+  let funptr ?(abi=Libffi_abi.default_abi) ?name ?(check_errno=false)
+      ?(release_runtime_lock=false) fn =
     let open Ffi in
-    let read = function_of_pointer ~abi ~check_errno ?name fn
+    let read = function_of_pointer
+      ~abi ~check_errno ~release_runtime_lock ?name fn
     and write = pointer_of_function ~abi fn
     and format_typ = format_function_pointer fn in
     Static.(view ~format_typ ~read ~write (ptr void))
@@ -36,10 +38,10 @@ struct
     from_voidp t (ptr_of_raw_ptr (dlsym ?handle:from ~symbol))
 
   let foreign ?(abi=Libffi_abi.default_abi) ?from ?(stub=false)
-      ?(check_errno=false) symbol typ =
+      ?(check_errno=false) ?(release_runtime_lock=false) symbol typ =
     try
       let coerce = Coerce.coerce (ptr void)
-        (funptr ~abi ~name:symbol ~check_errno typ) in
+        (funptr ~abi ~name:symbol ~check_errno ~release_runtime_lock typ) in
       coerce (ptr_of_raw_ptr (dlsym ?handle:from ~symbol))
     with 
     | exn -> if stub then fun _ -> raise exn else raise exn

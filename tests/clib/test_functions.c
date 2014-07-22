@@ -16,6 +16,8 @@
 #include <string.h>
 #include <complex.h>
 
+#include <semaphore.h>
+
 #include "test_functions.h"
 
 static int add(int x, int y) { return x + y; }
@@ -516,4 +518,25 @@ void call_registered_callback(int times, int starting_value)
     int result = registered_callback();
     assert (result == starting_value++);
   }
+}
+
+static sem_t semaphore1;
+static sem_t semaphore2;
+
+void initialize_waiters(void)
+{
+  sem_init(&semaphore1, 0, -1);
+  sem_init(&semaphore2, 0, -1);
+}
+
+void post1_wait2(void)
+{
+  sem_post(&semaphore1);
+  sem_wait(&semaphore2);
+}
+
+void post2_wait1(void)
+{
+  sem_post(&semaphore2);
+  sem_wait(&semaphore1);
 }

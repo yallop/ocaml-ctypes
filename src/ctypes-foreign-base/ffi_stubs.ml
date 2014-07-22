@@ -41,7 +41,8 @@ external ffi_type_of_struct_type : struct_ffitype -> _ ffitype
 type callspec
 
 (* Allocate a new C call specification *)
-external allocate_callspec : unit -> callspec
+external allocate_callspec :
+  check_errno:bool -> release_runtime_lock:bool -> callspec
   = "ctypes_allocate_callspec"
 
 (* Add an argument to the C buffer specification *)
@@ -55,14 +56,9 @@ external prep_callspec : callspec -> int -> _ ffitype -> unit
 (* Call the function specified by `callspec' at the given address.
    The callback functions write the arguments to the buffer and read
    the return value. *)
-external call : voidp -> callspec ->
+external call : string -> voidp -> callspec ->
   (voidp -> (Obj.t * int) array -> unit) -> (voidp -> 'a) -> 'a
   = "ctypes_call"
-
-(* As ctypes_call, but check errno and raise Unix_error if the call failed. *)
-external call_errno : string -> voidp -> callspec ->
-  (voidp -> (Obj.t * int) array -> unit) -> (voidp -> 'a) -> 'a
-  = "ctypes_call_errno"
 
 
 (* nary callbacks *)
