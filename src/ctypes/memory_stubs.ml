@@ -29,10 +29,10 @@ external write :  'a Primitives.prim -> offset:int -> 'a -> Ctypes_raw.voidp -> 
 
 module Pointer =
 struct
-  external read : offset:int -> Ctypes_raw.voidp -> Ctypes_raw.voidp
+  external read : Ctypes_raw.voidp -> Ctypes_raw.voidp
     = "ctypes_read_pointer"
 
-  external write : offset:int -> Ctypes_raw.voidp -> Ctypes_raw.voidp -> unit
+  external write : Ctypes_raw.voidp -> Ctypes_raw.voidp -> unit
   = "ctypes_write_pointer"
 end
 

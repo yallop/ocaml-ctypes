@@ -156,19 +156,19 @@ value ctypes_string_of_prim(value prim_, value v)
   CAMLreturn (s);
 }
 
-/* read_pointer : offset:int -> raw_pointer -> raw_pointer */
-value ctypes_read_pointer(value offset_, value src_)
+/* read_pointer : raw_pointer -> raw_pointer */
+value ctypes_read_pointer(value src_)
 {
-  CAMLparam2(offset_, src_);
-  void *src = (char *)CTYPES_TO_PTR(src_) + Int_val(offset_);
+  CAMLparam1(src_);
+  void *src = CTYPES_TO_PTR(src_);
   CAMLreturn(CTYPES_FROM_PTR(*(void **)src));
 }
 
-/* write_pointer : offset:int -> raw_pointer -> dst:raw_pointer -> unit */
-value ctypes_write_pointer(value offset_, value p_, value dst_)
+/* write_pointer : raw_pointer -> dst:raw_pointer -> unit */
+value ctypes_write_pointer(value p_, value dst_)
 {
-  CAMLparam3(offset_, p_, dst_);
-  void *dst = (char *)CTYPES_TO_PTR(dst_) + Int_val(offset_);
+  CAMLparam2(p_, dst_);
+  void *dst = CTYPES_TO_PTR(dst_);
   *(void **)dst = CTYPES_TO_PTR(p_);
   CAMLreturn(Val_unit);
 }

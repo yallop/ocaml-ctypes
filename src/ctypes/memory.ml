@@ -28,7 +28,7 @@ let rec build : type a. a typ -> Raw.voidp -> a
     | Pointer reftype ->
       (fun buf ->
         CPointer {
-          raw_ptr = Stubs.Pointer.read ~offset:0 buf;
+          raw_ptr = Stubs.Pointer.read buf;
           reftype;
           pmanaged = None; })
     | View { read; ty } ->
@@ -51,7 +51,7 @@ let rec write : type a. a typ -> a -> Raw.voidp -> unit
     | Primitive p -> Stubs.write p ~offset:0
     | Pointer _ ->
       (fun (CPointer { raw_ptr }) dst ->
-        Stubs.Pointer.write ~offset:0 raw_ptr dst)
+        Stubs.Pointer.write raw_ptr dst)
     | Struct { spec = Incomplete _ } -> raise IncompleteType
     | Struct { spec = Complete _ } as s -> write_aggregate (sizeof s)
     | Union { uspec = None } -> raise IncompleteType
