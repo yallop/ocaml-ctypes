@@ -14,19 +14,19 @@
 #include <caml/memory.h>
 #include <caml/alloc.h>
 
+#include "type_info_stubs.h"
 #include "unsigned_stubs.h"
 #include "complex_stubs.h"
 #include "raw_pointer.h"
 #include "primitives.h"
 
 /* Read a C value from a block of memory */
-/* read : 'a prim -> offset:int -> raw_pointer -> 'a */
-value ctypes_read(value prim_, value offset_, value buffer_)
+/* read : 'a prim -> raw_pointer -> 'a */
+value ctypes_read(value prim_, value buffer_)
 {
-  CAMLparam3(prim_, offset_, buffer_);
+  CAMLparam2(prim_, buffer_);
   CAMLlocal1(b);
-  int offset = Int_val(offset_);
-  void *buf = (char *)CTYPES_TO_PTR(buffer_) + offset;
+  void *buf = CTYPES_TO_PTR(buffer_);
   switch (Int_val(prim_))
   {
    case Char: b = Val_int(*(char *)buf); break;

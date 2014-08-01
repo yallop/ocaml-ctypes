@@ -15,7 +15,7 @@ let rec build : type a. a typ -> Raw.voidp -> a
  = function
     | Void ->
       fun _ -> ()
-    | Primitive p -> Stubs.read p ~offset:0
+    | Primitive p -> Stubs.read p
     | Struct { spec = Incomplete _ } ->
       raise IncompleteType
     | Struct { spec = Complete { size } } as reftype ->

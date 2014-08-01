@@ -34,7 +34,7 @@ let test_fabs () =
     let fabs x =
       call "fabs" dlfabs callspec
         (fun p _values -> write Primitives.Double ~offset:arg_1_offset x p)
-        (read Primitives.Double ~offset:0)
+        (read Primitives.Double)
     in
 
     assert_equal 2.0 (fabs (-2.0)) ~printer:string_of_float;
@@ -66,7 +66,7 @@ let test_pow () =
         (fun buffer _values ->
           write Primitives.Double ~offset:arg_1_offset x buffer;
           write Primitives.Double ~offset:arg_2_offset y buffer)
-        (read ~offset:0 Primitives.Double)
+        (read Primitives.Double)
     in
 
     assert_equal 8.0 (pow 2.0 3.0);

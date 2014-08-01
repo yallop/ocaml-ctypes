@@ -11,8 +11,8 @@
 #include <caml/mlvalues.h>
 
 /* Read a C value from a block of memory */
-/* read : 'a prim -> offset:int -> raw_pointer -> 'a */
-extern value ctypes_read(value ctype, value offset, value buffer);
+/* read : 'a prim -> raw_pointer -> 'a */
+extern value ctypes_read(value ctype, value buffer);
 
 /* Write a C value to a block of memory */
 /* write : 'a prim -> offset:int -> 'a -> raw_pointer -> unit */

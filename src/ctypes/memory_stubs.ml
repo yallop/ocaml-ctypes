@@ -20,7 +20,7 @@ external block_address : managed_buffer -> Ctypes_raw.voidp
   = "ctypes_block_address"
 
 (* Read a C value from a block of memory *)
-external read : 'a Primitives.prim -> offset:int -> Ctypes_raw.voidp -> 'a
+external read : 'a Primitives.prim -> Ctypes_raw.voidp -> 'a
   = "ctypes_read"
 
 (* Write a C value to a block of memory *)
