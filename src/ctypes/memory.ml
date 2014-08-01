@@ -11,32 +11,32 @@ module Stubs = Memory_stubs
 module Raw = Ctypes_raw
 
 (* Describes how to read a value, e.g. from a return buffer *)
-let rec build : type a. a typ -> offset:int -> Raw.voidp -> a
+let rec build : type a. a typ -> Raw.voidp -> a
  = function
     | Void ->
-      fun ~offset _ -> ()
-    | Primitive p -> Stubs.read p
+      fun _ -> ()
+    | Primitive p -> Stubs.read p ~offset:0
     | Struct { spec = Incomplete _ } ->
       raise IncompleteType
     | Struct { spec = Complete { size } } as reftype ->
-      (fun ~offset buf ->
+      (fun buf ->
         let m = Stubs.allocate size in
         let raw_ptr = Stubs.block_address m in
         let () = Stubs.memcpy ~size
           ~dst:raw_ptr ~dst_offset:0
-          ~src:buf ~src_offset:offset in
+          ~src:buf ~src_offset:0 in
         { structured =
             CPointer { pmanaged = Some (Obj.repr m); reftype; raw_ptr; } })
     | Pointer reftype ->
-      (fun ~offset buf ->
+      (fun buf ->
         CPointer {
-          raw_ptr = Stubs.Pointer.read ~offset buf;
+          raw_ptr = Stubs.Pointer.read ~offset:0 buf;
           reftype;
           pmanaged = None; })
     | View { read; ty } ->
       let buildty = build ty in
-      (fun ~offset buf -> read (buildty ~offset buf))
-    | OCaml _ -> (fun ~offset buf -> assert false)
+      (fun buf -> read (buildty buf))
+    | OCaml _ -> (fun buf -> assert false)
     (* The following cases should never happen; non-struct aggregate
        types are excluded during type construction. *)
     | Union _ -> assert false
@@ -44,16 +44,16 @@ let rec build : type a. a typ -> offset:int -> Raw.voidp -> a
     | Bigarray _ -> assert false
     | Abstract _ -> assert false
 
-let rec write : type a. a typ -> offset:int -> a -> Raw.voidp -> unit
+let rec write : type a. a typ -> a -> Raw.voidp -> unit
   = let write_aggregate size =
-      (fun ~offset { structured = CPointer { raw_ptr } } dst ->
-        Stubs.memcpy ~size ~dst ~dst_offset:offset ~src:raw_ptr ~src_offset:0) in
+      (fun { structured = CPointer { raw_ptr } } dst ->
+        Stubs.memcpy ~size ~dst ~dst_offset:0 ~src:raw_ptr ~src_offset:0) in
     function
-    | Void -> (fun ~offset _ _ -> ())
-    | Primitive p -> Stubs.write p
+    | Void -> (fun _ _ -> ())
+    | Primitive p -> Stubs.write p ~offset:0
     | Pointer _ ->
-      (fun ~offset (CPointer { raw_ptr }) dst ->
-        Stubs.Pointer.write ~offset raw_ptr dst)
+      (fun (CPointer { raw_ptr }) dst ->
+        Stubs.Pointer.write ~offset:0 raw_ptr dst)
     | Struct { spec = Incomplete _ } -> raise IncompleteType
     | Struct { spec = Complete _ } as s -> write_aggregate (sizeof s)
     | Union { uspec = None } -> raise IncompleteType
@@ -61,16 +61,16 @@ let rec write : type a. a typ -> offset:int -> a -> Raw.voidp -> unit
     | Abstract { asize } -> write_aggregate asize
     | Array _ as a ->
       let size = sizeof a in
-      (fun ~offset { astart = CPointer { raw_ptr } } dst ->
-        Stubs.memcpy ~size ~dst ~dst_offset:offset ~src:raw_ptr ~src_offset:0)
+      (fun { astart = CPointer { raw_ptr } } dst ->
+        Stubs.memcpy ~size ~dst ~dst_offset:0 ~src:raw_ptr ~src_offset:0)
     | Bigarray b as t ->
       let size = sizeof t in
-      (fun ~offset ba dst ->
+      (fun ba dst ->
         let src = Ctypes_bigarray.address b ba in
-        Stubs.memcpy ~size ~dst ~dst_offset:offset ~src ~src_offset:0)
+        Stubs.memcpy ~size ~dst ~dst_offset:0 ~src ~src_offset:0)
     | View { write = w; ty } ->
       let writety = write ty in
-      (fun ~offset v -> writety ~offset (w v))
+      (fun v -> writety (w v))
     | OCaml _ -> raise IncompleteType
 
 let null : unit ptr = CPointer {
@@ -94,7 +94,7 @@ let rec (!@) : type a. a ptr -> a
       | Abstract _ -> { structured = ptr }
       | OCaml _ -> raise IncompleteType
       (* If it's a value type then we cons a new value. *)
-      | _ -> build reftype ~offset:0 raw_ptr
+      | _ -> build reftype raw_ptr
 
 let ptr_diff : type a b. (a, b) pointer -> (a, b) pointer -> int
   = fun l r ->
@@ -121,7 +121,7 @@ let (-@) p x = p +@ (-x)
 
 let (<-@) : type a. a ptr -> a -> unit
   = fun (CPointer { reftype; raw_ptr }) ->
-    fun v -> write reftype ~offset:0 v raw_ptr
+    fun v -> write reftype v raw_ptr
 
 let from_voidp : type a. a typ -> unit ptr -> a ptr
   = fun reftype (CPointer p) -> CPointer { p with reftype }

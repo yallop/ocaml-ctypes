@@ -119,11 +119,11 @@ struct
       | Returns ty ->
         let () = prep_callspec callspec abi ty in
         let write_rv = Memory.write ty in
-        fun f -> Ffi_stubs.Done (write_rv ~offset:0 (WeakRef.get f), callspec)
+        fun f -> Ffi_stubs.Done (write_rv (WeakRef.get f), callspec)
       | Function (p, f) ->
         let _ = add_argument callspec p in
         let box = box_function abi f callspec in
-        let read = Memory.build p ~offset:0 in
+        let read = Memory.build p in
         fun f -> Ffi_stubs.Fn (fun buf ->
           let f' =
             try WeakRef.get f (read buf)
@@ -143,7 +143,8 @@ struct
     | OCaml String     -> ocaml_arg 1
     | OCaml Bytes      -> ocaml_arg 1
     | OCaml FloatArray -> ocaml_arg (Ctypes_primitives.sizeof Primitives.Double)
-    | ty -> (fun ~offset ~idx v dst mov -> Memory.write ty ~offset v dst)
+    | ty -> (fun ~offset ~idx v dst mov -> Memory.write ty v
+      Ctypes_raw.PtrType.(add dst (of_int offset)))
 
   (*
     callspec = allocate_callspec ()
@@ -158,7 +159,7 @@ struct
     = fun ~abi ~check_errno ?(idx=0) fn callspec -> match fn with
       | Returns t ->
         let () = prep_callspec callspec abi t in
-        Call (check_errno, Memory.build t ~offset:0)
+        Call (check_errno, Memory.build t)
       | Function (p, f) ->
         let offset = add_argument callspec p in
         let rest = build_ccallspec ~abi ~check_errno ~idx:(idx+1) f callspec in
