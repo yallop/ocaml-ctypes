@@ -24,4 +24,5 @@ include Primitives
 let make_ptr reftype raw_ptr =
   CPointer { reftype; raw_ptr; pmanaged = None; pbyte_offset = 0; }
 
-let raw_ptr (CPointer { raw_ptr }) = raw_ptr
+let raw_ptr (CPointer { raw_ptr; pbyte_offset }) =
+  Ctypes_raw.PtrType.(add raw_ptr (of_int pbyte_offset))
