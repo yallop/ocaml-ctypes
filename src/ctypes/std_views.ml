@@ -5,16 +5,15 @@
  * See the file LICENSE for details.
  *)
 
-let string_of_char_ptr (Static.CPointer {Static.raw_ptr; pbyte_offset}) =
-  Std_view_stubs.string_of_cstring raw_ptr pbyte_offset
+let string_of_char_ptr (Static.CPointer {Static.raw_ptr}) =
+  Std_view_stubs.string_of_cstring raw_ptr 0
 
 let char_ptr_of_string s =
   let buf = Std_view_stubs.cstring_of_string s in
   Static.CPointer {
     Static.reftype = Static.char;
     pmanaged = Some (Obj.repr buf);
-    raw_ptr = Memory_stubs.block_address buf;
-    pbyte_offset = 0; }
+    raw_ptr = Memory_stubs.block_address buf }
 
 let string = Static.(view (ptr char))
   ~read:string_of_char_ptr ~write:char_ptr_of_string

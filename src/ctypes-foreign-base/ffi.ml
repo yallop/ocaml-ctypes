@@ -170,7 +170,7 @@ struct
     invoke name e [] c
 
   let ptr_of_rawptr raw_ptr =
-    CPointer { raw_ptr ; pbyte_offset = 0; reftype = void; pmanaged = None; }
+    CPointer { raw_ptr; reftype = void; pmanaged = None; }
 
   let function_of_pointer ?name ~abi ~check_errno ~release_runtime_lock fn =
     let f = build_function ?name ~abi ~check_errno ~release_runtime_lock fn in

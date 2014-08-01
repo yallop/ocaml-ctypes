@@ -41,8 +41,7 @@ type 'a typ = 'a Static.typ =
 and 'a cptr = 'a Static.cptr
   = { reftype      : 'a typ;
       raw_ptr      : voidp;
-      pmanaged     : Obj.t option;
-      pbyte_offset : int; }
+      pmanaged     : Obj.t option; }
 and ('a, 'b) pointer = ('a, 'b) Static.pointer =
   CPointer : 'a cptr -> ('a, [`C]) pointer
 | OCamlRef : int * 'a * 'a ocaml_type -> ('a, [`OCaml]) pointer
