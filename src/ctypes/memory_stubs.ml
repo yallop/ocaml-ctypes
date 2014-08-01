@@ -24,7 +24,7 @@ external read : 'a Primitives.prim -> Ctypes_raw.voidp -> 'a
   = "ctypes_read"
 
 (* Write a C value to a block of memory *)
-external write :  'a Primitives.prim -> offset:int -> 'a -> Ctypes_raw.voidp -> unit
+external write :  'a Primitives.prim -> 'a -> Ctypes_raw.voidp -> unit
   = "ctypes_write"
 
 module Pointer =

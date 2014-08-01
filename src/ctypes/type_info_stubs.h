@@ -15,7 +15,7 @@
 extern value ctypes_read(value ctype, value buffer);
 
 /* Write a C value to a block of memory */
-/* write : 'a prim -> offset:int -> 'a -> raw_pointer -> unit */
-extern value ctypes_write(value ctype, value offset, value v, value buffer);
+/* write : 'a prim -> 'a -> raw_pointer -> unit */
+extern value ctypes_write(value ctype, value v, value buffer);
 
 #endif /* TYPE_INFO_STUBS_H */

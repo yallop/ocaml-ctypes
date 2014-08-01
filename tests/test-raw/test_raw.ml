@@ -33,7 +33,9 @@ let test_fabs () =
     
     let fabs x =
       call "fabs" dlfabs callspec
-        (fun p _values -> write Primitives.Double ~offset:arg_1_offset x p)
+        (fun p _values ->
+          write Primitives.Double x
+            Ctypes_raw.PtrType.(add p (of_int arg_1_offset)))
         (read Primitives.Double)
     in
 
@@ -64,8 +66,10 @@ let test_pow () =
     let pow x y =
       call "pow" dlpow callspec
         (fun buffer _values ->
-          write Primitives.Double ~offset:arg_1_offset x buffer;
-          write Primitives.Double ~offset:arg_2_offset y buffer)
+          write Primitives.Double x
+            Ctypes_raw.PtrType.(add buffer (of_int arg_1_offset));
+          write Primitives.Double y
+            Ctypes_raw.PtrType.(add buffer (of_int arg_2_offset)))
         (read Primitives.Double)
     in
 

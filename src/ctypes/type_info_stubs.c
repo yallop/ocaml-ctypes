@@ -62,12 +62,11 @@ value ctypes_read(value prim_, value buffer_)
 }
 
 /* Read a C value from a block of memory */
-/* write : 'a prim -> offset:int -> 'a -> raw_pointer -> unit */
-value ctypes_write(value prim_, value offset_, value v, value buffer_)
+/* write : 'a prim -> 'a -> raw_pointer -> unit */
+value ctypes_write(value prim_, value v, value buffer_)
 {
-  CAMLparam4(prim_, offset_, v, buffer_);
-  int offset = Int_val(offset_);
-  void *buf = (char *)CTYPES_TO_PTR(buffer_) + offset;
+  CAMLparam3(prim_, v, buffer_);
+  void *buf = CTYPES_TO_PTR(buffer_);
   switch (Int_val(prim_))
   {
    case Char: *(char *)buf = Int_val(v); break;

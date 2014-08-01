@@ -48,7 +48,7 @@ let rec write : type a. a typ -> a -> Raw.voidp -> unit
         Stubs.memcpy ~size ~dst ~src:raw_ptr) in
     function
     | Void -> (fun _ _ -> ())
-    | Primitive p -> Stubs.write p ~offset:0
+    | Primitive p -> Stubs.write p
     | Pointer _ ->
       (fun (CPointer { raw_ptr }) dst ->
         Stubs.Pointer.write raw_ptr dst)
