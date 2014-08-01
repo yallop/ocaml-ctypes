@@ -55,7 +55,7 @@ val type_expression : ('a, 'b) t -> ([> `Appl of Ctypes_path.path * 'c list
 val address : (_, 'a) t -> 'a -> Ctypes_raw.voidp
 (** Return the address of a bigarray value. *)
 
-val view : (_, 'a) t -> ?ref:Obj.t -> Ctypes_raw.voidp -> offset:int -> 'a
+val view : (_, 'a) t -> ?ref:Obj.t -> Ctypes_raw.voidp -> 'a
 (** Create a bigarray view onto existing memory.
 
     The optional [ref] argument is an OCaml object that controls the lifetime

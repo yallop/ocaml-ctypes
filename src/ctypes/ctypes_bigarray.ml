@@ -136,13 +136,13 @@ let prim_of_kind k = prim_of_kind (kind k)
 
 let address _ b = Bigarray_stubs.address b
 
-let view : type a b. (a, b) t -> ?ref:Obj.t -> Ctypes_raw.voidp -> offset:int -> b =
+let view : type a b. (a, b) t -> ?ref:Obj.t -> Ctypes_raw.voidp -> b =
   let open Bigarray_stubs in
-  fun (dims, kind) ?ref ptr ~offset -> let ba : b = match dims with
-  | DimsGen ds -> view kind ds ptr offset
-  | Dims1 d -> view1 kind [| d |] ptr offset
-  | Dims2 (d1, d2) -> view2 kind [| d1; d2 |] ptr offset
-  | Dims3 (d1, d2, d3) -> view3 kind [| d1; d2; d3 |] ptr offset in
+  fun (dims, kind) ?ref ptr -> let ba : b = match dims with
+  | DimsGen ds -> view kind ds ptr
+  | Dims1 d -> view1 kind [| d |] ptr
+  | Dims2 (d1, d2) -> view2 kind [| d1; d2 |] ptr
+  | Dims3 (d1, d2, d3) -> view3 kind [| d1; d2; d3 |] ptr in
   match ref with
   | None -> ba
   | Some src -> Gc.finalise (fun _ -> ignore src; ()) ba; ba

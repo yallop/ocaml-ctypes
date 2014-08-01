@@ -88,7 +88,7 @@ let rec (!@) : type a. a ptr -> a
       | Struct _ -> { structured = ptr }
       | Array (elemtype, alength) ->
         { astart = CPointer { cptr with reftype = elemtype }; alength }
-      | Bigarray b -> Ctypes_bigarray.view b ?ref ~offset:0 raw_ptr
+      | Bigarray b -> Ctypes_bigarray.view b ?ref raw_ptr
       | Abstract _ -> { structured = ptr }
       | OCaml _ -> raise IncompleteType
       (* If it's a value type then we cons a new value. *)
