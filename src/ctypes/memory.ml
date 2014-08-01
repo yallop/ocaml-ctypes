@@ -22,9 +22,7 @@ let rec build : type a. a typ -> Raw.voidp -> a
       (fun buf ->
         let m = Stubs.allocate size in
         let raw_ptr = Stubs.block_address m in
-        let () = Stubs.memcpy ~size
-          ~dst:raw_ptr ~dst_offset:0
-          ~src:buf ~src_offset:0 in
+        let () = Stubs.memcpy ~size ~dst:raw_ptr ~src:buf in
         { structured =
             CPointer { pmanaged = Some (Obj.repr m); reftype; raw_ptr; } })
     | Pointer reftype ->
@@ -47,7 +45,7 @@ let rec build : type a. a typ -> Raw.voidp -> a
 let rec write : type a. a typ -> a -> Raw.voidp -> unit
   = let write_aggregate size =
       (fun { structured = CPointer { raw_ptr } } dst ->
-        Stubs.memcpy ~size ~dst ~dst_offset:0 ~src:raw_ptr ~src_offset:0) in
+        Stubs.memcpy ~size ~dst ~src:raw_ptr) in
     function
     | Void -> (fun _ _ -> ())
     | Primitive p -> Stubs.write p ~offset:0
@@ -62,12 +60,12 @@ let rec write : type a. a typ -> a -> Raw.voidp -> unit
     | Array _ as a ->
       let size = sizeof a in
       (fun { astart = CPointer { raw_ptr } } dst ->
-        Stubs.memcpy ~size ~dst ~dst_offset:0 ~src:raw_ptr ~src_offset:0)
+        Stubs.memcpy ~size ~dst ~src:raw_ptr)
     | Bigarray b as t ->
       let size = sizeof t in
       (fun ba dst ->
         let src = Ctypes_bigarray.address b ba in
-        Stubs.memcpy ~size ~dst ~dst_offset:0 ~src ~src_offset:0)
+        Stubs.memcpy ~size ~dst ~src)
     | View { write = w; ty } ->
       let writety = write ty in
       (fun v -> writety (w v))

@@ -36,11 +36,8 @@ struct
   = "ctypes_write_pointer"
 end
 
-(* Copy [size] bytes from [src + src_offset] to [dst + dst_offset]. *)
-external memcpy :
-  dst:Ctypes_raw.voidp -> dst_offset:int ->
-  src:Ctypes_raw.voidp -> src_offset:int ->
-    size:int -> unit
+(* Copy [size] bytes from [src] to [dst]. *)
+external memcpy : dst:Ctypes_raw.voidp -> src:Ctypes_raw.voidp -> size:int -> unit
   = "ctypes_memcpy"
 
 (* Read a fixed length OCaml string from memory *)

@@ -14,16 +14,11 @@
 #include "type_info_stubs.h"
 #include "raw_pointer.h"
 
-/* memcpy : dest:raw_pointer -> dest_offset:int ->
-            src:raw_pointer -> src_offset:int ->
-            size:int -> unit */
-value ctypes_memcpy(value dst, value dst_offset,
-                    value src, value src_offset, value size)
+/* memcpy : dst:raw_pointer -> src:raw_pointer -> size:int -> unit */
+value ctypes_memcpy(value dst, value src, value size)
 {
-  CAMLparam5(dst, dst_offset, src, src_offset, size);
-  memcpy((char *)CTYPES_TO_PTR(dst) + Int_val(dst_offset),
-         (char *)CTYPES_TO_PTR(src) + Int_val(src_offset),
-         Int_val(size));
+  CAMLparam3(dst, src, size);
+  memcpy(CTYPES_TO_PTR(dst), CTYPES_TO_PTR(src), Int_val(size));
   CAMLreturn(Val_unit);
 }
 
