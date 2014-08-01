@@ -8,7 +8,7 @@
 (* Stubs for standard views. *)
 
 (* Convert a C string to an OCaml string *)
-external string_of_cstring : Ctypes_raw.voidp -> int -> string
+external string_of_cstring : Ctypes_raw.voidp -> string
   = "ctypes_string_of_cstring"
 
 (* Convert an OCaml string to a C string *)

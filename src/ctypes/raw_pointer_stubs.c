@@ -24,10 +24,9 @@ value ctypes_memcpy(value dst, value src, value size)
 
 
 /* string_of_cstring : raw_ptr -> int -> string */
-value ctypes_string_of_cstring(value p, value offset)
+value ctypes_string_of_cstring(value p)
 {
-  return caml_copy_string(((char *)CTYPES_TO_PTR(p))
-                          + Int_val(offset));
+  return caml_copy_string(CTYPES_TO_PTR(p));
 }
 
 

@@ -6,7 +6,7 @@
  *)
 
 let string_of_char_ptr (Static.CPointer {Static.raw_ptr}) =
-  Std_view_stubs.string_of_cstring raw_ptr 0
+  Std_view_stubs.string_of_cstring raw_ptr
 
 let char_ptr_of_string s =
   let buf = Std_view_stubs.cstring_of_string s in
