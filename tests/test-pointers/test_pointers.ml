@@ -154,7 +154,42 @@ struct
     assert_equal 25 !@rv;
     let rv = pass_pointer_through p1 p2 (-10) in
     assert_equal !@rv !@p2;
-    assert_equal 32 !@rv
+    assert_equal 32 !@rv;
+    let p3 = p1 +@ 1 in
+    let rv = pass_pointer_through p3 p1 1 in
+    assert_bool
+      "pointer with (positive) offset successfully passed through"
+      (ptr_compare rv p3 = 0);
+    assert_bool
+      "pointer with positive computed offset compares greater than original"
+      (ptr_compare p1 p3 < 0);
+    assert_bool
+      "pointer with positive computed offset compares greater than original"
+      (ptr_compare p3 p1 > 0);
+    assert_bool
+      "returned pointer with positive computed offset compares greater than original"
+      (ptr_compare p1 rv < 0);
+    assert_bool
+      "returned pointer with positive computed offset compares greater than original"
+      (ptr_compare rv p1 > 0);
+    assert_equal !@rv !@p3;
+    let p4 = p1 -@ 1 in
+    let rv = pass_pointer_through p1 p4 (-1) in
+    assert_bool
+      "pointer with (negative) offset successfully passed through"
+      (ptr_compare rv p4 = 0);
+    assert_bool
+      "pointer with negative computed offset compares less than original"
+      (ptr_compare p1 p4 > 0);
+    assert_bool
+      "pointer with negative computed offset compares less than original"
+      (ptr_compare p4 p1 < 0);
+    assert_bool
+      "returned pointer with negative computed offset compares greater than original"
+      (ptr_compare p1 rv > 0);
+    assert_bool
+      "returned pointer with negative computed offset compares greater than original"
+      (ptr_compare rv p1 < 0)
 end
 
 
