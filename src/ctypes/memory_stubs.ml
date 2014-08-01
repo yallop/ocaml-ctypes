@@ -41,5 +41,5 @@ external memcpy : dst:Ctypes_raw.voidp -> src:Ctypes_raw.voidp -> size:int -> un
   = "ctypes_memcpy"
 
 (* Read a fixed length OCaml string from memory *)
-external string_of_array : Ctypes_raw.voidp -> offset:int -> len:int -> string
+external string_of_array : Ctypes_raw.voidp -> len:int -> string
   = "ctypes_string_of_array"

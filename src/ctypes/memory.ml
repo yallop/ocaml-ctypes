@@ -333,7 +333,7 @@ let typ_of_bigarray_kind k = Primitive (Ctypes_bigarray.prim_of_kind k)
 
 let string_from_ptr (CPointer { raw_ptr }) ~length:len =
   if len < 0 then invalid_arg "Ctypes.string_from_ptr"
-  else Stubs.string_of_array raw_ptr ~offset:0 ~len
+  else Stubs.string_of_array raw_ptr ~len
 
 let ocaml_string_start str =
   OCamlRef (0, str, String)

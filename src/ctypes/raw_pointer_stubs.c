@@ -31,18 +31,16 @@ value ctypes_string_of_cstring(value p, value offset)
 }
 
 
-/* string_of_array : raw_ptr -> off:int -> len:int -> string */
-value ctypes_string_of_array(value p, value offset, value vlen)
+/* string_of_array : raw_ptr -> len:int -> string */
+value ctypes_string_of_array(value p, value vlen)
 {
-  CAMLparam3(p, offset, vlen);
+  CAMLparam2(p, vlen);
   CAMLlocal1(dst);
   int len = Int_val(vlen);
   if (len < 0)
     caml_invalid_argument("ctypes_string_of_array");
   dst = caml_alloc_string(len);
-  memcpy(String_val(dst),
-         (char *)CTYPES_TO_PTR(p) + Int_val(offset),
-         len);
+  memcpy(String_val(dst), CTYPES_TO_PTR(p), len);
   CAMLreturn(dst);
 }
 
