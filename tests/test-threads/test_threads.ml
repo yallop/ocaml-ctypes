@@ -24,9 +24,25 @@ let test_release_runtime_lock () =
   end
 
 
+(*
+  Ensure that passing ~runtime_lock to funptr causes a callbacks to acquire
+  the runtime lock.
+*)
+let test_acquire_runtime_lock () =
+  begin
+    let f x y = let _ = Gc.major () in !@x + !@y in
+    let t1 = Thread.create Gc.major () in
+    assert (callback_with_pointers f = 7);
+    Thread.join t1
+  end
+
+
 let suite = "Thread tests" >:::
   ["test_release_runtime_lock (foreign)"
    >:: test_release_runtime_lock;
+
+   "test_acquire_runtime_lock (foreign)"
+   >:: test_acquire_runtime_lock;
   ]
 
 
