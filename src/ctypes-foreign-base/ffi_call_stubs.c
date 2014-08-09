@@ -370,8 +370,9 @@ value ctypes_call(value fnname, value function, value callspec_,
 typedef struct closure closure;
 struct closure
 {
-  ffi_closure closure;
-  int         fnkey;
+  ffi_closure         closure;
+  int                 fnkey;
+  struct call_context context;
 };
 
 enum boxedfn_tags { Done, Fn };
@@ -384,7 +385,14 @@ static void callback_handler(ffi_cif *cif,
   CAMLparam0 ();
 
   CAMLlocal2(boxedfn, argptr);
-  boxedfn = retrieve_closure(*(int *)user_data);
+  closure *closure = user_data;
+
+  if (closure->context.runtime_lock)
+  {
+    caml_acquire_runtime_system();
+  }
+
+  boxedfn = retrieve_closure(closure->fnkey);
 
   int i, arity = cif->nargs;
 
@@ -415,6 +423,11 @@ static void callback_handler(ffi_cif *cif,
   argptr = CTYPES_FROM_PTR(ret);
   caml_callback(Field(boxedfn, 0), argptr);
 
+  if (closure->context.runtime_lock)
+  {
+    caml_release_runtime_system();
+  }
+
   CAMLreturn0;
 }
 
@@ -441,12 +454,13 @@ value ctypes_make_function_pointer(value callspec_, value fnid)
     caml_raise_out_of_memory();
   } else {
     closure->fnkey = Int_val(fnid);
+    closure->context = callspec->context;
 
     ffi_status status =  ffi_prep_closure_loc
       ((ffi_closure *)closure,
        callspec->cif,
        callback_handler,
-       &closure->fnkey,
+       closure,
        (void *)code_address);
 
     ctypes_check_ffi_status(status);
