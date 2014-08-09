@@ -29,8 +29,6 @@
 /* TODO: support callbacks that raise exceptions?  e.g. using
    caml_callback_exn etc.  */
 
-/* TODO: thread support */
-
 /* An OCaml function that converts resolves identifiers to OCaml functions */
 static value retrieve_closure_;
 
@@ -121,7 +119,7 @@ static struct callspec {
      checked, whether the runtime lock is released, and so on. */
   struct call_context {
     int check_errno;
-    int release_runtime_lock;
+    int runtime_lock;
   } context;
 
   /* The libffi call interface structure.  It would be nice for this member to
@@ -196,14 +194,12 @@ static void populate_arg_array(struct callspec *callspec,
 
 
 /* Allocate a new C call specification */
-/* allocate_callspec :
-     check_errno:bool -> release_runtime_lock:bool -> callspec */
-value ctypes_allocate_callspec(value check_errno,
-                               value release_runtime_lock)
+/* allocate_callspec : check_errno:bool -> runtime_lock:bool -> callspec */
+value ctypes_allocate_callspec(value check_errno, value runtime_lock)
 {
   struct call_context context = {
     Int_val(check_errno),
-    Int_val(release_runtime_lock),
+    Int_val(runtime_lock),
   };
 
   value block = caml_alloc_custom(&callspec_custom_ops,
@@ -345,7 +341,7 @@ value ctypes_call(value fnname, value function, value callspec_,
   {
     errno = 0;
   }
-  if (context.release_runtime_lock)
+  if (context.runtime_lock)
   {
     caml_release_runtime_system();
   }
@@ -355,7 +351,7 @@ value ctypes_call(value fnname, value function, value callspec_,
            return_slot,
            (void **)(callbuffer + arg_array_offset));
 
-  if (context.release_runtime_lock)
+  if (context.runtime_lock)
   {
     caml_acquire_runtime_system();
   }

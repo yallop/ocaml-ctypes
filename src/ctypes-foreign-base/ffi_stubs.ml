@@ -41,8 +41,7 @@ external ffi_type_of_struct_type : struct_ffitype -> _ ffitype
 type callspec
 
 (* Allocate a new C call specification *)
-external allocate_callspec :
-  check_errno:bool -> release_runtime_lock:bool -> callspec
+external allocate_callspec : check_errno:bool -> runtime_lock:bool -> callspec
   = "ctypes_allocate_callspec"
 
 (* Add an argument to the C buffer specification *)

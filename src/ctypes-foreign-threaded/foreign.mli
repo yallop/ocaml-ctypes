@@ -48,7 +48,7 @@ val funptr :
   ?abi:Libffi_abi.abi ->
   ?name:string ->
   ?check_errno:bool ->
-  ?release_runtime_lock:bool ->
+  ?runtime_lock:bool ->
   ('a -> 'b) Ctypes.fn ->
   ('a -> 'b) Ctypes.typ
 (** Construct a function pointer type from a function type.
@@ -62,13 +62,17 @@ val funptr :
     The value [?check_errno], which defaults to [false], indicates whether
     {!Unix.Unix_error} should be raised if the C function modifies [errno].
 
-    The value [?release_runtime_lock], which defaults to [false], indicates
-    whether the OCaml runtime lock should be released during the call to the C
+    The value [?runtime_lock], which defaults to [false], indicates whether
+    the OCaml runtime lock should be released during the call to the C
     function, allowing other threads to run.  If the runtime lock is released
     then the C function must not access OCaml heap objects, such as arguments
-    passed using {!Ctypes.ocaml_string} and {!Ctypes.ocaml_bytes}, and must not
-    call back into OCaml.
- *)
+    passed using {!Ctypes.ocaml_string} and {!Ctypes.ocaml_bytes}, and must
+    not call back into OCaml.  If the function pointer is used to call into
+    OCaml from C then the [?runtime_lock] argument indicates whether the lock
+    should be acquired and held during the call.
+
+    @raise Dl.DL_error if [name] is not found in [?from] and [?stub] is
+    [false]. *)
 
 val funptr_opt :
   ?abi:Libffi_abi.abi ->
