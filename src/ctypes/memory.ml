@@ -11,33 +11,30 @@ module Stubs = Memory_stubs
 module Raw = Ctypes_raw
 
 (* Describes how to read a value, e.g. from a return buffer *)
-let rec build : type a. a typ -> offset:int -> Raw.voidp -> a
+let rec build : type a. a typ -> Raw.voidp -> a
  = function
     | Void ->
-      fun ~offset _ -> ()
+      fun _ -> ()
     | Primitive p -> Stubs.read p
     | Struct { spec = Incomplete _ } ->
       raise IncompleteType
     | Struct { spec = Complete { size } } as reftype ->
-      (fun ~offset buf ->
+      (fun buf ->
         let m = Stubs.allocate size in
         let raw_ptr = Stubs.block_address m in
-        let () = Stubs.memcpy ~size
-          ~dst:raw_ptr ~dst_offset:0
-          ~src:buf ~src_offset:offset in
+        let () = Stubs.memcpy ~size ~dst:raw_ptr ~src:buf in
         { structured =
-            CPointer { pmanaged = Some (Obj.repr m); reftype; raw_ptr; pbyte_offset = 0; } })
+            CPointer { pmanaged = Some (Obj.repr m); reftype; raw_ptr; } })
     | Pointer reftype ->
-      (fun ~offset buf ->
+      (fun buf ->
         CPointer {
-          raw_ptr = Stubs.Pointer.read ~offset buf;
-          pbyte_offset = 0;
+          raw_ptr = Stubs.Pointer.read buf;
           reftype;
           pmanaged = None; })
     | View { read; ty } ->
       let buildty = build ty in
-      (fun ~offset buf -> read (buildty ~offset buf))
-    | OCaml _ -> (fun ~offset buf -> assert false)
+      (fun buf -> read (buildty buf))
+    | OCaml _ -> (fun buf -> assert false)
     (* The following cases should never happen; non-struct aggregate
        types are excluded during type construction. *)
     | Union _ -> assert false
@@ -45,17 +42,16 @@ let rec build : type a. a typ -> offset:int -> Raw.voidp -> a
     | Bigarray _ -> assert false
     | Abstract _ -> assert false
 
-let rec write : type a. a typ -> offset:int -> a -> Raw.voidp -> unit
+let rec write : type a. a typ -> a -> Raw.voidp -> unit
   = let write_aggregate size =
-      (fun ~offset { structured = CPointer { raw_ptr; pbyte_offset = src_offset } } dst ->
-        Stubs.memcpy ~size ~dst ~dst_offset:offset ~src:raw_ptr ~src_offset) in
+      (fun { structured = CPointer { raw_ptr } } dst ->
+        Stubs.memcpy ~size ~dst ~src:raw_ptr) in
     function
-    | Void -> (fun ~offset _ _ -> ())
+    | Void -> (fun _ _ -> ())
     | Primitive p -> Stubs.write p
     | Pointer _ ->
-      (fun ~offset (CPointer { raw_ptr; pbyte_offset }) dst ->
-        Stubs.Pointer.write ~offset
-          (Raw.PtrType.(add raw_ptr (of_int pbyte_offset))) dst)
+      (fun (CPointer { raw_ptr }) dst ->
+        Stubs.Pointer.write raw_ptr dst)
     | Struct { spec = Incomplete _ } -> raise IncompleteType
     | Struct { spec = Complete _ } as s -> write_aggregate (sizeof s)
     | Union { uspec = None } -> raise IncompleteType
@@ -63,26 +59,25 @@ let rec write : type a. a typ -> offset:int -> a -> Raw.voidp -> unit
     | Abstract { asize } -> write_aggregate asize
     | Array _ as a ->
       let size = sizeof a in
-      (fun ~offset { astart = CPointer { raw_ptr; pbyte_offset = src_offset } } dst ->
-        Stubs.memcpy ~size ~dst ~dst_offset:offset ~src:raw_ptr ~src_offset)
+      (fun { astart = CPointer { raw_ptr } } dst ->
+        Stubs.memcpy ~size ~dst ~src:raw_ptr)
     | Bigarray b as t ->
       let size = sizeof t in
-      (fun ~offset ba dst ->
+      (fun ba dst ->
         let src = Ctypes_bigarray.address b ba in
-        Stubs.memcpy ~size ~dst ~dst_offset:offset ~src ~src_offset:0)
+        Stubs.memcpy ~size ~dst ~src)
     | View { write = w; ty } ->
       let writety = write ty in
-      (fun ~offset v -> writety ~offset (w v))
+      (fun v -> writety (w v))
     | OCaml _ -> raise IncompleteType
 
 let null : unit ptr = CPointer {
                         raw_ptr = Raw.null;
                         reftype = Void;
-                        pbyte_offset = 0;
                         pmanaged = None; }
 
 let rec (!@) : type a. a ptr -> a
-  = fun (CPointer ({ raw_ptr; reftype; pbyte_offset = offset; pmanaged = ref } as cptr) as ptr) ->
+  = fun (CPointer ({ raw_ptr; reftype; pmanaged = ref } as cptr) as ptr) ->
     match reftype with
       | Void -> raise IncompleteType
       | Union { uspec = None } -> raise IncompleteType
@@ -93,23 +88,20 @@ let rec (!@) : type a. a ptr -> a
       | Struct _ -> { structured = ptr }
       | Array (elemtype, alength) ->
         { astart = CPointer { cptr with reftype = elemtype }; alength }
-      | Bigarray b -> Ctypes_bigarray.view b ?ref ~offset raw_ptr
+      | Bigarray b -> Ctypes_bigarray.view b ?ref raw_ptr
       | Abstract _ -> { structured = ptr }
       | OCaml _ -> raise IncompleteType
       (* If it's a value type then we cons a new value. *)
-      | _ -> build reftype ~offset raw_ptr
+      | _ -> build reftype raw_ptr
 
 let ptr_diff : type a b. (a, b) pointer -> (a, b) pointer -> int
   = fun l r ->
     match l, r with
-    | CPointer { raw_ptr = lp; pbyte_offset = loff; reftype },
-      CPointer { raw_ptr = rp; pbyte_offset = roff } ->
+    | CPointer { raw_ptr = lp; reftype },
+      CPointer { raw_ptr = rp; } ->
       (* We assume the pointers are properly aligned, or at least that
          the difference is a multiple of sizeof reftype. *)
-      let open Raw.PtrType in
-        let l = add lp (of_int loff)
-        and r = add rp (of_int roff) in
-        to_int (sub r l) / sizeof reftype
+      Raw.PtrType.(to_int (sub rp lp)) / sizeof reftype
     | OCamlRef (lo, l, _), OCamlRef (ro, r, _) ->
       if l != r then invalid_arg "Ctypes.ptr_diff";
       ro - lo
@@ -117,16 +109,17 @@ let ptr_diff : type a b. (a, b) pointer -> (a, b) pointer -> int
 let (+@) : type a b. (a, b) pointer -> int -> (a, b) pointer
   = fun p x ->
     match p with
-    | CPointer ({ pbyte_offset; reftype } as p) ->
-      CPointer { p with pbyte_offset = pbyte_offset + (x * sizeof reftype) }
+    | CPointer ({ raw_ptr; reftype } as p) ->
+      CPointer { p with raw_ptr = Raw.PtrType.(add raw_ptr
+                                                 (of_int (x * sizeof reftype))) }
     | OCamlRef (offset, obj, ty) ->
       OCamlRef (offset + x, obj, ty)
 
 let (-@) p x = p +@ (-x)
 
 let (<-@) : type a. a ptr -> a -> unit
-  = fun (CPointer { reftype; raw_ptr; pbyte_offset = offset }) ->
-    fun v -> write reftype ~offset v raw_ptr
+  = fun (CPointer { reftype; raw_ptr }) ->
+    fun v -> write reftype v raw_ptr
 
 let from_voidp : type a. a typ -> unit ptr -> a ptr
   = fun reftype (CPointer p) -> CPointer { p with reftype }
@@ -137,7 +130,7 @@ let to_voidp : type a. a ptr -> unit ptr
 let allocate_n : type a. ?finalise:(a ptr -> unit) -> a typ -> count:int -> a ptr
   = fun ?finalise reftype ~count ->
     let package p =
-      CPointer { reftype; pbyte_offset = 0; raw_ptr = Stubs.block_address p;
+      CPointer { reftype; raw_ptr = Stubs.block_address p;
                  pmanaged = Some (Obj.repr p); } in
     let finalise = match finalise with
       | Some f -> Gc.finalise (fun p -> f (package p))
@@ -155,19 +148,18 @@ let allocate : type a. ?finalise:(a ptr -> unit) -> a typ -> a -> a ptr
       p
     end
 
-let ptr_compare (CPointer {raw_ptr = lp; pbyte_offset = loff})
-                (CPointer {raw_ptr = rp; pbyte_offset = roff})
-    = Raw.PtrType.(compare (add lp (of_int loff)) (add rp (of_int roff)))
+let ptr_compare (CPointer {raw_ptr = lp}) (CPointer {raw_ptr = rp})
+    = Raw.PtrType.(compare lp rp)
 
 let reference_type (CPointer { reftype }) = reftype
 
 let ptr_of_raw_address addr =
   CPointer {
-    reftype = Void; raw_ptr = Raw.PtrType.of_int64 addr;
-    pmanaged = None; pbyte_offset = 0; }
+    reftype = Void;
+    raw_ptr = Raw.PtrType.of_int64 addr;
+    pmanaged = None }
 
-let raw_address_of_ptr (CPointer { raw_ptr; pbyte_offset }) =
-  Int64.(add (Raw.PtrType.to_int64 raw_ptr) (of_int pbyte_offset))
+let raw_address_of_ptr (CPointer { raw_ptr }) = Raw.PtrType.to_int64 raw_ptr
 
 module CArray =
 struct
@@ -228,7 +220,8 @@ let make ?finalise s =
     | None -> None in
   { structured = allocate_n ?finalise s ~count:1 }
 let (|->) (CPointer p) { ftype = reftype; foffset } =
-  CPointer { p with reftype; pbyte_offset = p.pbyte_offset + foffset }
+  CPointer { p with reftype;
+                    raw_ptr = Raw.PtrType.(add p.raw_ptr (of_int foffset)) }
 let (@.) { structured = p } f = p |-> f
 let setf s field v = (s @. field) <-@ v
 let getf s field = !@(s @. field)
@@ -243,8 +236,7 @@ let _bigarray_start kind typ ba =
   CPointer {
     reftype      = reftype ;
     raw_ptr      = raw_address ;
-    pmanaged     = Some (Obj.repr ba) ;
-    pbyte_offset = 0; }
+    pmanaged     = Some (Obj.repr ba) }
 
 let bigarray_start : type a b c d f.
   < element: a;
@@ -339,9 +331,9 @@ let array2 = Array2
 let array3 = Array3
 let typ_of_bigarray_kind k = Primitive (Ctypes_bigarray.prim_of_kind k)
 
-let string_from_ptr (CPointer { raw_ptr; pbyte_offset = offset }) ~length:len =
+let string_from_ptr (CPointer { raw_ptr }) ~length:len =
   if len < 0 then invalid_arg "Ctypes.string_from_ptr"
-  else Stubs.string_of_array raw_ptr ~offset ~len
+  else Stubs.string_of_array raw_ptr ~len
 
 let ocaml_string_start str =
   OCamlRef (0, str, String)

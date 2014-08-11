@@ -15,14 +15,12 @@ let make_structured reftype buf =
   let open Static in
   let pmanaged = Some (Obj.repr buf) in
   let raw_ptr = Memory_stubs.block_address buf in
-  let pbyte_offset = 0 in
-  { structured = CPointer { reftype; pmanaged; pbyte_offset; raw_ptr; } }
+  { structured = CPointer { reftype; pmanaged; raw_ptr; } }
 
 include Static
 include Primitives
 
 let make_ptr reftype raw_ptr =
-  CPointer { reftype; raw_ptr; pmanaged = None; pbyte_offset = 0; }
+  CPointer { reftype; raw_ptr; pmanaged = None; }
 
-let raw_ptr (CPointer { raw_ptr; pbyte_offset }) =
-  Ctypes_raw.PtrType.(add raw_ptr (of_int pbyte_offset))
+let raw_ptr (CPointer { raw_ptr }) = raw_ptr

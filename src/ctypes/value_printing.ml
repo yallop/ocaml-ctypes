@@ -77,9 +77,7 @@ and format_fields : type a b. string -> (a, b) structured boxed_field list ->
           (if i <> last_field then sep else ""))
       fields
 and format_ptr : type a. Format.formatter -> a ptr -> unit
-  = fun fmt (CPointer {raw_ptr; reftype; pbyte_offset}) ->
-    Format.fprintf fmt "%s"
-      (Value_printing_stubs.string_of_pointer
-         (Raw.PtrType.(add raw_ptr (of_int pbyte_offset))))
+  = fun fmt (CPointer {raw_ptr; reftype}) ->
+    Format.fprintf fmt "%s" (Value_printing_stubs.string_of_pointer raw_ptr)
 
 let string_of typ v = Common.string_of (format typ) v

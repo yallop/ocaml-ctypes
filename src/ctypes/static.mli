@@ -40,8 +40,7 @@ type _ typ =
   | OCaml           : 'a ocaml_type      -> 'a ocaml typ
 and 'a cptr = { reftype      : 'a typ;
                 raw_ptr      : Ctypes_raw.voidp;
-                pmanaged     : Obj.t option;
-                pbyte_offset : int; }
+                pmanaged     : Obj.t option; }
 and 'a carray = { astart : 'a ptr; alength : int }
 and ('a, 'kind) structured = { structured : ('a, 'kind) structured ptr }
 and 'a union = ('a, [`Union]) structured

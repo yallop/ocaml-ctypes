@@ -14,19 +14,19 @@
 #include <caml/memory.h>
 #include <caml/alloc.h>
 
+#include "type_info_stubs.h"
 #include "unsigned_stubs.h"
 #include "complex_stubs.h"
 #include "raw_pointer.h"
 #include "primitives.h"
 
 /* Read a C value from a block of memory */
-/* read : 'a prim -> offset:int -> raw_pointer -> 'a */
-value ctypes_read(value prim_, value offset_, value buffer_)
+/* read : 'a prim -> raw_pointer -> 'a */
+value ctypes_read(value prim_, value buffer_)
 {
-  CAMLparam3(prim_, offset_, buffer_);
+  CAMLparam2(prim_, buffer_);
   CAMLlocal1(b);
-  int offset = Int_val(offset_);
-  void *buf = (char *)CTYPES_TO_PTR(buffer_) + offset;
+  void *buf = CTYPES_TO_PTR(buffer_);
   switch (Int_val(prim_))
   {
    case Char: b = Val_int(*(char *)buf); break;
@@ -62,12 +62,11 @@ value ctypes_read(value prim_, value offset_, value buffer_)
 }
 
 /* Read a C value from a block of memory */
-/* write : 'a prim -> offset:int -> 'a -> raw_pointer -> unit */
-value ctypes_write(value prim_, value offset_, value v, value buffer_)
+/* write : 'a prim -> 'a -> raw_pointer -> unit */
+value ctypes_write(value prim_, value v, value buffer_)
 {
-  CAMLparam4(prim_, offset_, v, buffer_);
-  int offset = Int_val(offset_);
-  void *buf = (char *)CTYPES_TO_PTR(buffer_) + offset;
+  CAMLparam3(prim_, v, buffer_);
+  void *buf = CTYPES_TO_PTR(buffer_);
   switch (Int_val(prim_))
   {
    case Char: *(char *)buf = Int_val(v); break;
@@ -156,19 +155,19 @@ value ctypes_string_of_prim(value prim_, value v)
   CAMLreturn (s);
 }
 
-/* read_pointer : offset:int -> raw_pointer -> raw_pointer */
-value ctypes_read_pointer(value offset_, value src_)
+/* read_pointer : raw_pointer -> raw_pointer */
+value ctypes_read_pointer(value src_)
 {
-  CAMLparam2(offset_, src_);
-  void *src = (char *)CTYPES_TO_PTR(src_) + Int_val(offset_);
+  CAMLparam1(src_);
+  void *src = CTYPES_TO_PTR(src_);
   CAMLreturn(CTYPES_FROM_PTR(*(void **)src));
 }
 
-/* write_pointer : offset:int -> raw_pointer -> dst:raw_pointer -> unit */
-value ctypes_write_pointer(value offset_, value p_, value dst_)
+/* write_pointer : raw_pointer -> dst:raw_pointer -> unit */
+value ctypes_write_pointer(value p_, value dst_)
 {
-  CAMLparam3(offset_, p_, dst_);
-  void *dst = (char *)CTYPES_TO_PTR(dst_) + Int_val(offset_);
+  CAMLparam2(p_, dst_);
+  void *dst = CTYPES_TO_PTR(dst_);
   *(void **)dst = CTYPES_TO_PTR(p_);
   CAMLreturn(Val_unit);
 }
