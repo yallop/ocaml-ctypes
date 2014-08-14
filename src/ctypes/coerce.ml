@@ -62,10 +62,12 @@ let rec coercion : type a b. a typ -> b typ -> (a, b) coercion =
       try
         begin match coercion a b with
         | Id -> Id
-        | Coercion _ -> Coercion (fun (CPointer p) -> CPointer { p with reftype = b })
+        | Coercion _ -> Coercion (fun (CPointer p) ->
+          CPointer { p with Ctypes_raw.reftype = b })
         end
       with Uncoercible ->
-        Coercion (fun (CPointer p) -> CPointer { p with reftype = b })
+        Coercion (fun (CPointer p) ->
+          CPointer { p with Ctypes_raw.reftype = b })
     end
   | _ -> raise Uncoercible
 

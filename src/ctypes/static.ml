@@ -44,16 +44,13 @@ type _ typ =
   | Bigarray        : (_, 'a) Ctypes_bigarray.t
                                          -> 'a typ
   | OCaml           : 'a ocaml_type      -> 'a ocaml typ
-and 'a cptr = { reftype      : 'a typ;
-                raw_ptr      : Ctypes_raw.voidp;
-                pmanaged     : Obj.t option; }
 and 'a carray = { astart : 'a ptr; alength : int }
 and ('a, 'kind) structured = { structured : ('a, 'kind) structured ptr }
 and 'a union = ('a, [`Union]) structured
 and 'a structure = ('a, [`Struct]) structured
 and 'a abstract = ('a, [`Abstract]) structured
 and (_, _) pointer =
-  CPointer : 'a cptr -> ('a, [`C]) pointer
+  CPointer : 'a typ Ctypes_raw.cptr -> ('a, [`C]) pointer
 | OCamlRef : int * 'a * 'a ocaml_type -> ('a, [`OCaml]) pointer
 and 'a ptr = ('a, [`C]) pointer
 and 'a ocaml = ('a, [`OCaml]) pointer

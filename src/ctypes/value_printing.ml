@@ -24,7 +24,7 @@ let rec format : type a. a typ -> Format.formatter -> a -> unit
     (* For now, just print the underlying value in a view *)
   | View {write; ty} -> format ty fmt (write v)
 and format_structured : type a b. Format.formatter -> (a, b) structured -> unit
-  = fun fmt ({structured = CPointer {reftype}} as s) ->
+  = fun fmt ({structured = CPointer {Ctypes_raw.reftype}} as s) ->
     let open Format in
     match reftype with
     | Struct {fields} ->
@@ -39,7 +39,7 @@ and format_structured : type a b. Format.formatter -> (a, b) structured -> unit
       pp_print_string fmt "<abstract>"
     | _ -> raise (Unsupported "unknown structured type")
 and format_array : type a. Format.formatter -> a carray -> unit
-  = fun fmt ({astart = CPointer {reftype}; alength} as arr) ->
+  = fun fmt ({astart = CPointer {Ctypes_raw.reftype}; alength} as arr) ->
     let open Format in
     fprintf fmt "{@;<1 2>@[";
     for i = 0 to alength - 1 do
@@ -77,7 +77,7 @@ and format_fields : type a b. string -> (a, b) structured boxed_field list ->
           (if i <> last_field then sep else ""))
       fields
 and format_ptr : type a. Format.formatter -> a ptr -> unit
-  = fun fmt (CPointer {raw_ptr; reftype}) ->
+  = fun fmt (CPointer {Ctypes_raw.raw_ptr; reftype}) ->
     Format.fprintf fmt "%s" (Value_printing_stubs.string_of_pointer raw_ptr)
 
 let string_of typ v = Common.string_of (format typ) v
