@@ -16,30 +16,30 @@ external allocate : int -> managed_buffer
   = "ctypes_allocate"
 
 (* Obtain the address of the managed block. *)
-external block_address : managed_buffer -> Ctypes_raw.voidp
+external block_address : managed_buffer -> Ctypes_ptr.voidp
   = "ctypes_block_address"
 
 (* Read a C value from a block of memory *)
-external read : 'a Primitives.prim -> Ctypes_raw.voidp -> 'a
+external read : 'a Primitives.prim -> Ctypes_ptr.voidp -> 'a
   = "ctypes_read"
 
 (* Write a C value to a block of memory *)
-external write :  'a Primitives.prim -> 'a -> Ctypes_raw.voidp -> unit
+external write :  'a Primitives.prim -> 'a -> Ctypes_ptr.voidp -> unit
   = "ctypes_write"
 
 module Pointer =
 struct
-  external read : Ctypes_raw.voidp -> Ctypes_raw.voidp
+  external read : Ctypes_ptr.voidp -> Ctypes_ptr.voidp
     = "ctypes_read_pointer"
 
-  external write : Ctypes_raw.voidp -> Ctypes_raw.voidp -> unit
+  external write : Ctypes_ptr.voidp -> Ctypes_ptr.voidp -> unit
   = "ctypes_write_pointer"
 end
 
 (* Copy [size] bytes from [src] to [dst]. *)
-external memcpy : dst:Ctypes_raw.voidp -> src:Ctypes_raw.voidp -> size:int -> unit
+external memcpy : dst:Ctypes_ptr.voidp -> src:Ctypes_ptr.voidp -> size:int -> unit
   = "ctypes_memcpy"
 
 (* Read a fixed length OCaml string from memory *)
-external string_of_array : Ctypes_raw.voidp -> len:int -> string
+external string_of_array : Ctypes_ptr.voidp -> len:int -> string
   = "ctypes_string_of_array"

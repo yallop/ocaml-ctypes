@@ -136,7 +136,7 @@ let prim_of_kind k = prim_of_kind (kind k)
 
 let address _ b = Bigarray_stubs.address b
 
-let view : type a b. (a, b) t -> ?ref:Obj.t -> Ctypes_raw.voidp -> b =
+let view : type a b. (a, b) t -> ?ref:Obj.t -> Ctypes_ptr.voidp -> b =
   let open Bigarray_stubs in
   fun (dims, kind) ?ref ptr -> let ba : b = match dims with
   | DimsGen ds -> view kind ds ptr

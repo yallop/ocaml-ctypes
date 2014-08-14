@@ -30,7 +30,7 @@ val bigarray3 : int -> int -> int -> ('a, 'b) Bigarray.kind ->
 (** Create a {!t} value for the {!Bigarray.Array3.t} type. *)
 
 val prim_of_kind : ('a, _) Bigarray.kind -> 'a Primitives.prim
-(** Create a {!Ctypes_raw.Types.ctype} for a {!Bigarray.kind}. *)
+(** Create a {!Ctypes_ptr.Types.ctype} for a {!Bigarray.kind}. *)
 
 (** {3 Type eliminators *)
 
@@ -52,10 +52,10 @@ val type_expression : ('a, 'b) t -> ([> `Appl of Ctypes_path.path * 'c list
 
 (** {2 Values *)
 
-val address : (_, 'a) t -> 'a -> Ctypes_raw.voidp
+val address : (_, 'a) t -> 'a -> Ctypes_ptr.voidp
 (** Return the address of a bigarray value. *)
 
-val view : (_, 'a) t -> ?ref:Obj.t -> Ctypes_raw.voidp -> 'a
+val view : (_, 'a) t -> ?ref:Obj.t -> Ctypes_ptr.voidp -> 'a
 (** Create a bigarray view onto existing memory.
 
     The optional [ref] argument is an OCaml object that controls the lifetime

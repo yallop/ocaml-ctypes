@@ -7,7 +7,7 @@
 
 (* Stubs for binding to libffi. *)
 
-open Ctypes_raw
+open Ctypes_ptr
 
 (* The type of structure types *)
 type 'a ffitype = voidp

@@ -11,5 +11,5 @@
 external string_of_prim : 'a Primitives.prim -> 'a -> string
   = "ctypes_string_of_prim"
 
-external string_of_pointer : Ctypes_raw.voidp -> string
+external string_of_pointer : Ctypes_ptr.voidp -> string
   = "ctypes_string_of_pointer"
