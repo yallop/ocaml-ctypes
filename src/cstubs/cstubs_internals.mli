@@ -39,7 +39,7 @@ type 'a typ = 'a Static.typ =
   | Bigarray        : (_, 'a) Ctypes_bigarray.t -> 'a typ
   | OCaml           : 'a ocaml_type             -> 'a ocaml typ
 and ('a, 'b) pointer = ('a, 'b) Static.pointer =
-  CPointer : 'a typ Ctypes_ptr.cptr -> ('a, [`C]) pointer
+  CPointer : 'a typ Ctypes_ptr.Fat.t -> ('a, [`C]) pointer
 | OCamlRef : int * 'a * 'a ocaml_type -> ('a, [`OCaml]) pointer
 and 'a ptr = ('a, [`C]) pointer
 and 'a ocaml = ('a, [`OCaml]) pointer

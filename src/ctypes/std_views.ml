@@ -5,15 +5,13 @@
  * See the file LICENSE for details.
  *)
 
-let string_of_char_ptr (Static.CPointer {Ctypes_ptr.raw_ptr}) =
-  Std_view_stubs.string_of_cstring raw_ptr
+let string_of_char_ptr (Static.CPointer p) =
+  Std_view_stubs.string_of_cstring (Ctypes_ptr.Fat.unsafe_raw_addr p)
 
 let char_ptr_of_string s =
-  let buf = Std_view_stubs.cstring_of_string s in
-  Static.CPointer {
-    Ctypes_ptr.reftype = Static.char;
-    pmanaged = Some (Obj.repr buf);
-    raw_ptr = Memory_stubs.block_address buf }
+  let managed = Std_view_stubs.cstring_of_string s in
+  Static.CPointer (Ctypes_ptr.Fat.make ~managed ~reftyp:Static.char
+                     (Memory_stubs.block_address managed))
 
 let string = Static.(view (ptr char))
   ~read:string_of_char_ptr ~write:char_ptr_of_string

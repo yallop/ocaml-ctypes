@@ -173,11 +173,11 @@ struct
     invoke name e [] c
 
   let ptr_of_rawptr raw_ptr =
-    CPointer { Ctypes_ptr.raw_ptr; reftype = void; pmanaged = None; }
+    CPointer (Ctypes_ptr.Fat.make ~reftyp:void raw_ptr)
 
   let function_of_pointer ?name ~abi ~check_errno ~release_runtime_lock fn =
     let f = build_function ?name ~abi ~check_errno ~release_runtime_lock fn in
-    fun (CPointer {Ctypes_ptr.raw_ptr}) -> f raw_ptr
+    fun (CPointer p) -> f (Ctypes_ptr.Fat.unsafe_raw_addr p)
 
   let pointer_of_function ~abi ~acquire_runtime_lock fn =
     let cs' = Ffi_stubs.allocate_callspec
