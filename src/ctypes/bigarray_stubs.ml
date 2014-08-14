@@ -25,10 +25,9 @@ external kind : ('a, 'b) Bigarray.kind -> 'a kind
      starting from zero, so we can directly transform its values to a variant
      with appropriately-ordered constructors.
 
-     Unfortunately, Bigarray.char and Bigarray.int8_unsigned are currently
+     In OCaml <= 4.01.0, Bigarray.char and Bigarray.int8_unsigned are
      indistinguishable, so the 'kind' function will never return Kind_char.
-     Mantis bug 6064 has a patch that gives char and int8_unsigned distinct
-     representations. *)
+     OCaml 4.02.0 gives the types distinct representations. *)
   = "%identity"
 
 external address : 'b -> Ctypes_raw.voidp
