@@ -7,14 +7,21 @@
 
 (* Boxed pointers to C memory locations . *)
 
-module PtrType = (val match Ctypes_primitives.pointer_size with
-  4 -> (module Signed.Int32 : Signed.S)
-| 8 -> (module Signed.Int64 : Signed.S)
-| _ -> failwith "No suitable type available to represent pointers.")
+module Raw :
+sig
+  include Signed.S
+  val null : t
+end =
+struct
+  include (val match Ctypes_primitives.pointer_size with
+    4 -> (module Signed.Int32 : Signed.S)
+  | 8 -> (module Signed.Int64 : Signed.S)
+  | _ -> failwith "No suitable type available to represent pointers.")
 
-type voidp = PtrType.t
+  let null = zero
+end
 
-let null = PtrType.zero
+type voidp = Raw.t
 
 module Fat :
 sig
@@ -63,7 +70,7 @@ struct
     
   let unsafe_raw_addr { raw } = raw
 
-  let add_bytes p bytes = { p with raw = PtrType.(add p.raw (of_int bytes)) }
+  let add_bytes p bytes = { p with raw = Raw.(add p.raw (of_int bytes)) }
 
-  let compare l r = PtrType.compare l.raw r.raw
+  let compare l r = Raw.compare l.raw r.raw
 end

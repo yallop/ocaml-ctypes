@@ -8,10 +8,11 @@
 open Static
 
 module Stubs = Memory_stubs
-module Ptr = Ctypes_ptr
+module Raw = Ctypes_ptr.Raw
+module Fat = Ctypes_ptr.Fat
 
 (* Describes how to read a value, e.g. from a return buffer *)
-let rec build : type a. a typ -> Ptr.voidp -> a
+let rec build : type a. a typ -> Ctypes_ptr.voidp -> a
  = function
     | Void ->
       fun _ -> ()
@@ -23,9 +24,9 @@ let rec build : type a. a typ -> Ptr.voidp -> a
         let managed = Stubs.allocate size in
         let raw = Stubs.block_address managed in
         let () = Stubs.memcpy ~size ~dst:raw ~src:buf in
-        { structured = CPointer (Ptr.Fat.make ~managed ~reftyp raw)})
+        { structured = CPointer (Fat.make ~managed ~reftyp raw)})
     | Pointer reftyp ->
-      (fun buf -> CPointer (Ptr.Fat.make ~reftyp (Stubs.Pointer.read buf)))
+      (fun buf -> CPointer (Fat.make ~reftyp (Stubs.Pointer.read buf)))
     | View { read; ty } ->
       let buildty = build ty in
       (fun buf -> read (buildty buf))
@@ -37,16 +38,16 @@ let rec build : type a. a typ -> Ptr.voidp -> a
     | Bigarray _ -> assert false
     | Abstract _ -> assert false
 
-let rec write : type a. a typ -> a -> Ptr.voidp -> unit
+let rec write : type a. a typ -> a -> Ctypes_ptr.voidp -> unit
   = let write_aggregate size { structured = CPointer p } dst =
-      Stubs.memcpy ~size ~dst ~src:(Ptr.Fat.unsafe_raw_addr p)
+      Stubs.memcpy ~size ~dst ~src:(Fat.unsafe_raw_addr p)
     in
     function
     | Void -> (fun _ _ -> ())
     | Primitive p -> Stubs.write p
     | Pointer _ ->
       (fun (CPointer p) dst ->
-        Stubs.Pointer.write (Ptr.Fat.unsafe_raw_addr p) dst)
+        Stubs.Pointer.write (Fat.unsafe_raw_addr p) dst)
     | Struct { spec = Incomplete _ } -> raise IncompleteType
     | Struct { spec = Complete _ } as s -> write_aggregate (sizeof s)
     | Union { uspec = None } -> raise IncompleteType
@@ -55,7 +56,7 @@ let rec write : type a. a typ -> a -> Ptr.voidp -> unit
     | Array _ as a ->
       let size = sizeof a in
       (fun { astart = CPointer p } dst ->
-        Stubs.memcpy ~size ~dst ~src:(Ptr.Fat.unsafe_raw_addr p))
+        Stubs.memcpy ~size ~dst ~src:(Fat.unsafe_raw_addr p))
     | Bigarray b as t ->
       let size = sizeof t in
       (fun ba dst ->
@@ -66,26 +67,26 @@ let rec write : type a. a typ -> a -> Ptr.voidp -> unit
       (fun v -> writety (w v))
     | OCaml _ -> raise IncompleteType
 
-let null : unit ptr = CPointer Ptr.(Fat.make Void null)
+let null : unit ptr = CPointer (Fat.make Void Raw.null)
 
 let rec (!@) : type a. a ptr -> a
   = fun (CPointer cptr as ptr) ->
-    match Ptr.Fat.reftype cptr with
+    match Fat.reftype cptr with
       | Void -> raise IncompleteType
       | Union { uspec = None } -> raise IncompleteType
       | Struct { spec = Incomplete _ } -> raise IncompleteType
-      | View { read; ty } -> read (!@ (CPointer (Ptr.Fat.coerce cptr ty)))
+      | View { read; ty } -> read (!@ (CPointer (Fat.coerce cptr ty)))
       (* If it's a reference type then we take a reference *)
       | Union _ -> { structured = ptr }
       | Struct _ -> { structured = ptr }
       | Array (elemtype, alength) ->
-        { astart = CPointer (Ptr.Fat.coerce cptr elemtype); alength }
-      | Bigarray b -> Ctypes_bigarray.view b ?ref:(Ptr.Fat.managed cptr)
-        (Ptr.Fat.unsafe_raw_addr cptr)
+        { astart = CPointer (Fat.coerce cptr elemtype); alength }
+      | Bigarray b -> Ctypes_bigarray.view b ?ref:(Fat.managed cptr)
+        (Fat.unsafe_raw_addr cptr)
       | Abstract _ -> { structured = ptr }
       | OCaml _ -> raise IncompleteType
       (* If it's a value type then we cons a new value. *)
-      | _ -> build (Ptr.Fat.reftype cptr) (Ptr.Fat.unsafe_raw_addr cptr)
+      | _ -> build (Fat.reftype cptr) (Fat.unsafe_raw_addr cptr)
 
 let ptr_diff : type a b. (a, b) pointer -> (a, b) pointer -> int
   = fun l r ->
@@ -94,9 +95,9 @@ let ptr_diff : type a b. (a, b) pointer -> (a, b) pointer -> int
       CPointer rp ->
       (* We assume the pointers are properly aligned, or at least that
          the difference is a multiple of sizeof reftype. *)
-      let laddr = Ptr.Fat.unsafe_raw_addr rp
-      and raddr = Ptr.Fat.unsafe_raw_addr lp in
-      Ptr.PtrType.(to_int (sub laddr raddr)) / sizeof (Ptr.Fat.reftype lp)
+      let laddr = Fat.unsafe_raw_addr rp
+      and raddr = Fat.unsafe_raw_addr lp in
+      Raw.(to_int (sub laddr raddr)) / sizeof (Fat.reftype lp)
     | OCamlRef (lo, l, _), OCamlRef (ro, r, _) ->
       if l != r then invalid_arg "Ctypes.ptr_diff";
       ro - lo
@@ -105,7 +106,7 @@ let (+@) : type a b. (a, b) pointer -> int -> (a, b) pointer
   = fun p x ->
     match p with
     | CPointer p ->
-      CPointer (Ptr.Fat.add_bytes p (x * sizeof (Ptr.Fat.reftype p)))
+      CPointer (Fat.add_bytes p (x * sizeof (Fat.reftype p)))
     | OCamlRef (offset, obj, ty) ->
       OCamlRef (offset + x, obj, ty)
 
@@ -113,18 +114,18 @@ let (-@) p x = p +@ (-x)
 
 let (<-@) : type a. a ptr -> a -> unit
   = fun (CPointer p) ->
-    fun v -> write (Ptr.Fat.reftype p) v (Ptr.Fat.unsafe_raw_addr p)
+    fun v -> write (Fat.reftype p) v (Fat.unsafe_raw_addr p)
 
 let from_voidp : type a. a typ -> unit ptr -> a ptr
-  = fun reftype (CPointer p) -> CPointer (Ptr.Fat.coerce p reftype)
+  = fun reftype (CPointer p) -> CPointer (Fat.coerce p reftype)
 
 let to_voidp : type a. a ptr -> unit ptr
-  = fun (CPointer p) -> CPointer (Ptr.Fat.coerce p Void)
+  = fun (CPointer p) -> CPointer (Fat.coerce p Void)
 
 let allocate_n : type a. ?finalise:(a ptr -> unit) -> a typ -> count:int -> a ptr
   = fun ?finalise reftyp ~count ->
     let package p =
-      CPointer (Ptr.Fat.make ~managed:p ~reftyp (Stubs.block_address p))
+      CPointer (Fat.make ~managed:p ~reftyp (Stubs.block_address p))
     in
     let finalise = match finalise with
       | Some f -> Gc.finalise (fun p -> f (package p))
@@ -142,15 +143,15 @@ let allocate : type a. ?finalise:(a ptr -> unit) -> a typ -> a -> a ptr
       p
     end
 
-let ptr_compare (CPointer l) (CPointer r) = Ptr.Fat.(compare l r)
+let ptr_compare (CPointer l) (CPointer r) = Fat.(compare l r)
 
-let reference_type (CPointer p) = Ptr.Fat.reftype p
+let reference_type (CPointer p) = Fat.reftype p
 
 let ptr_of_raw_address addr =
-  CPointer Ptr.(Fat.make ~reftyp:Void (PtrType.of_int64 addr))
+  CPointer (Fat.make ~reftyp:Void (Raw.of_int64 addr))
 
 let raw_address_of_ptr (CPointer p) =
-  Ptr.(PtrType.to_int64 (Fat.unsafe_raw_addr p))
+  Raw.to_int64 (Fat.unsafe_raw_addr p)
 
 module CArray =
 struct
@@ -211,7 +212,7 @@ let make ?finalise s =
     | None -> None in
   { structured = allocate_n ?finalise s ~count:1 }
 let (|->) (CPointer p) { ftype; foffset } =
-  CPointer (Ptr.Fat.(add_bytes (coerce p ftype) foffset))
+  CPointer (Fat.(add_bytes (coerce p ftype) foffset))
 
 let (@.) { structured = p } f = p |-> f
 let setf s field v = (s @. field) <-@ v
@@ -224,7 +225,7 @@ open Bigarray
 let _bigarray_start kind typ ba =
   let raw_address = Ctypes_bigarray.address typ ba in
   let reftyp = Primitive (Ctypes_bigarray.prim_of_kind kind) in
-  CPointer (Ptr.Fat.make ~managed:ba ~reftyp raw_address)
+  CPointer (Fat.make ~managed:ba ~reftyp raw_address)
 
 let bigarray_start : type a b c d f.
   < element: a;
@@ -250,7 +251,7 @@ let bigarray_start : type a b c d f.
     let d1 = Array3.dim1 ba and d2 = Array3.dim2 ba and d3 = Array3.dim3 ba in
     _bigarray_start kind (Ctypes_bigarray.bigarray3 d1 d2 d3 kind) ba
 
-let castp reftype (CPointer p) = CPointer (Ptr.Fat.coerce p reftype)
+let castp reftype (CPointer p) = CPointer (Fat.coerce p reftype)
 
 let array_of_bigarray : type a b c d e.
   < element: a;
@@ -270,10 +271,10 @@ let array_of_bigarray : type a b c d e.
     CArray.from_ptr element_ptr d
   | Array2 ->
     let d1 = Array2.dim1 ba and d2 = Array2.dim2 ba in
-    CArray.from_ptr (castp (array d2 (Ptr.Fat.reftype p)) element_ptr) d1
+    CArray.from_ptr (castp (array d2 (Fat.reftype p)) element_ptr) d1
   | Array3 ->
     let d1 = Array3.dim1 ba and d2 = Array3.dim2 ba and d3 = Array3.dim3 ba in
-    CArray.from_ptr (castp (array d2 (array d3 (Ptr.Fat.reftype p))) element_ptr) d1
+    CArray.from_ptr (castp (array d2 (array d3 (Fat.reftype p))) element_ptr) d1
 
 let bigarray_elements : type a b c d f.
    < element: a;
@@ -303,7 +304,7 @@ let array_dims : type a b c d f.
    | Array2 ->
      begin match a.astart with
      | CPointer p ->
-       begin match Ptr.Fat.reftype p with
+       begin match Fat.reftype p with
        | Array (_, n) -> (a.alength, n)
        | _ -> unsupported ()
        end
@@ -312,7 +313,7 @@ let array_dims : type a b c d f.
    | Array3 ->
      begin match a.astart with
      | CPointer p ->
-       begin match Ptr.Fat.reftype p with
+       begin match Fat.reftype p with
        |  Array (Array (_, m), n) -> (a.alength, n, m)
        | _ -> unsupported ()
        end
@@ -331,7 +332,7 @@ let typ_of_bigarray_kind k = Primitive (Ctypes_bigarray.prim_of_kind k)
 
 let string_from_ptr (CPointer p) ~length:len =
   if len < 0 then invalid_arg "Ctypes.string_from_ptr"
-  else Stubs.string_of_array (Ptr.Fat.unsafe_raw_addr p) ~len
+  else Stubs.string_of_array (Fat.unsafe_raw_addr p) ~len
 
 let ocaml_string_start str =
   OCamlRef (0, str, String)

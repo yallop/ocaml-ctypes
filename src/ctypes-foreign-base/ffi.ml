@@ -47,7 +47,7 @@ struct
   let rec arg_type : type a. a typ -> arg_type = function
     | Void                                -> ArgType (Ffi_stubs.void_ffitype ())
     | Primitive p as prim                 -> let ffitype = Ffi_stubs.primitive_ffitype p in
-                                             if ffitype = Ctypes_ptr.null
+                                             if ffitype = Ctypes_ptr.Raw.null
                                              then report_unpassable
                                                (Type_printing.string_of_typ prim)
                                              else ArgType ffitype
@@ -144,7 +144,7 @@ struct
     | OCaml Bytes      -> ocaml_arg 1
     | OCaml FloatArray -> ocaml_arg (Ctypes_primitives.sizeof Primitives.Double)
     | ty -> (fun ~offset ~idx v dst mov -> Memory.write ty v
-      Ctypes_ptr.PtrType.(add dst (of_int offset)))
+      Ctypes_ptr.Raw.(add dst (of_int offset)))
 
   (*
     callspec = allocate_callspec ()

@@ -55,5 +55,5 @@ let dlclose ~handle =
 
 let dlsym ?handle ~symbol =
   match _dlsym ?handle ~symbol with
-    | Some symbol -> Ctypes_ptr.PtrType.of_int64 symbol
+    | Some symbol -> Ctypes_ptr.Raw.of_int64 symbol
     | None        -> _report_dl_error ()
