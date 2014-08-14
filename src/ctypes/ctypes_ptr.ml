@@ -51,6 +51,8 @@ sig
   val add_bytes : 'typ t -> int -> 'typ t
 
   val compare : 'typ t -> 'typ t -> int
+
+  val diff_bytes : 'typ t -> 'typ t -> int
 end =
 struct
   type 'typ t =
@@ -73,4 +75,6 @@ struct
   let add_bytes p bytes = { p with raw = Raw.(add p.raw (of_int bytes)) }
 
   let compare l r = Raw.compare l.raw r.raw
+
+  let diff_bytes l r = Raw.(to_int (sub r.raw l.raw))
 end

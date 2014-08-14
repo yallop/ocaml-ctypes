@@ -16,7 +16,7 @@ value ctypes_bigarray_address(value ba)
   return CTYPES_FROM_PTR(Caml_ba_data_val(ba));
 }
 
-/* _view : ('a, 'b) kind -> dims:int array -> ptr ->
+/* _view : ('a, 'b) kind -> dims:int array -> fatptr ->
            ('a, 'b, Bigarray.c_layout) Bigarray.Genarray.t */
 value ctypes_bigarray_view(value kind_, value dims_, value ptr_)
 {
@@ -28,6 +28,6 @@ value ctypes_bigarray_view(value kind_, value dims_, value ptr_)
     dims[i] = Int_val(Field(dims_, i));
   }
   int flags = kind | CAML_BA_C_LAYOUT | CAML_BA_EXTERNAL;
-  void *data = CTYPES_TO_PTR(ptr_);
+  void *data = CTYPES_ADDR_OF_FATPTR(ptr_);
   return caml_ba_alloc(flags, ndims, data, dims);
 }

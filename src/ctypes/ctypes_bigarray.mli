@@ -59,9 +59,9 @@ val unsafe_address : 'a -> Ctypes_ptr.voidp
     reference to the OCaml object then the array might be freed, invalidating
     the address. *)
 
-val view : (_, 'a) t -> ?ref:Obj.t -> Ctypes_ptr.voidp -> 'a
-(** Create a bigarray view onto existing memory.
+val view : (_, 'a) t -> _ Ctypes_ptr.Fat.t -> 'a
+(** [view b ptr] creates a bigarray view onto existing memory.
 
-    The optional [ref] argument is an OCaml object that controls the lifetime
-    of the memory; if [ref] is present, [view] will ensure that it is not
-    collected before the bigarray returned by [view]. *)
+    If [ptr] references an OCaml object then [view] will ensure that
+    that object is not collected before the bigarray returned by
+    [view]. *)

@@ -12,7 +12,7 @@ module Raw = Ctypes_ptr.Raw
 module Fat = Ctypes_ptr.Fat
 
 (* Describes how to read a value, e.g. from a return buffer *)
-let rec build : type a. a typ -> Ctypes_ptr.voidp -> a
+let rec build : type a b. a typ -> b typ Fat.t -> a
  = function
     | Void ->
       fun _ -> ()
@@ -22,9 +22,9 @@ let rec build : type a. a typ -> Ctypes_ptr.voidp -> a
     | Struct { spec = Complete { size } } as reftyp ->
       (fun buf ->
         let managed = Stubs.allocate size in
-        let raw = Stubs.block_address managed in
-        let () = Stubs.memcpy ~size ~dst:raw ~src:buf in
-        { structured = CPointer (Fat.make ~managed ~reftyp raw)})
+        let dst = Fat.make ~managed ~reftyp (Stubs.block_address managed) in
+        let () = Stubs.memcpy ~size ~dst ~src:buf in
+        { structured = CPointer dst})
     | Pointer reftyp ->
       (fun buf -> CPointer (Fat.make ~reftyp (Stubs.Pointer.read buf)))
     | View { read; ty } ->
@@ -38,16 +38,15 @@ let rec build : type a. a typ -> Ctypes_ptr.voidp -> a
     | Bigarray _ -> assert false
     | Abstract _ -> assert false
 
-let rec write : type a. a typ -> a -> Ctypes_ptr.voidp -> unit
-  = let write_aggregate size { structured = CPointer p } dst =
-      Stubs.memcpy ~size ~dst ~src:(Fat.unsafe_raw_addr p)
+let rec write : type a b. a typ -> a -> b Fat.t -> unit
+  = let write_aggregate size { structured = CPointer src } dst =
+      Stubs.memcpy ~size ~dst ~src
     in
     function
     | Void -> (fun _ _ -> ())
     | Primitive p -> Stubs.write p
     | Pointer _ ->
-      (fun (CPointer p) dst ->
-        Stubs.Pointer.write (Fat.unsafe_raw_addr p) dst)
+      (fun (CPointer p) dst -> Stubs.Pointer.write p dst)
     | Struct { spec = Incomplete _ } -> raise IncompleteType
     | Struct { spec = Complete _ } as s -> write_aggregate (sizeof s)
     | Union { uspec = None } -> raise IncompleteType
@@ -55,12 +54,14 @@ let rec write : type a. a typ -> a -> Ctypes_ptr.voidp -> unit
     | Abstract { asize } -> write_aggregate asize
     | Array _ as a ->
       let size = sizeof a in
-      (fun { astart = CPointer p } dst ->
-        Stubs.memcpy ~size ~dst ~src:(Fat.unsafe_raw_addr p))
+      (fun { astart = CPointer src } dst ->
+        Stubs.memcpy ~size ~dst ~src)
     | Bigarray b as t ->
       let size = sizeof t in
       (fun ba dst ->
-        let src = Ctypes_bigarray.unsafe_address ba in
+        let src = Fat.make ~managed:ba ~reftyp:Void
+          (Ctypes_bigarray.unsafe_address ba)
+        in
         Stubs.memcpy ~size ~dst ~src)
     | View { write = w; ty } ->
       let writety = write ty in
@@ -81,23 +82,19 @@ let rec (!@) : type a. a ptr -> a
       | Struct _ -> { structured = ptr }
       | Array (elemtype, alength) ->
         { astart = CPointer (Fat.coerce cptr elemtype); alength }
-      | Bigarray b -> Ctypes_bigarray.view b ?ref:(Fat.managed cptr)
-        (Fat.unsafe_raw_addr cptr)
+      | Bigarray b -> Ctypes_bigarray.view b cptr
       | Abstract _ -> { structured = ptr }
       | OCaml _ -> raise IncompleteType
       (* If it's a value type then we cons a new value. *)
-      | _ -> build (Fat.reftype cptr) (Fat.unsafe_raw_addr cptr)
+      | _ -> build (Fat.reftype cptr) cptr
 
 let ptr_diff : type a b. (a, b) pointer -> (a, b) pointer -> int
   = fun l r ->
     match l, r with
-    | CPointer lp,
-      CPointer rp ->
+    | CPointer lp, CPointer rp ->
       (* We assume the pointers are properly aligned, or at least that
          the difference is a multiple of sizeof reftype. *)
-      let laddr = Fat.unsafe_raw_addr rp
-      and raddr = Fat.unsafe_raw_addr lp in
-      Raw.(to_int (sub laddr raddr)) / sizeof (Fat.reftype lp)
+      Fat.diff_bytes lp rp / sizeof (Fat.reftype lp)
     | OCamlRef (lo, l, _), OCamlRef (ro, r, _) ->
       if l != r then invalid_arg "Ctypes.ptr_diff";
       ro - lo
@@ -114,7 +111,7 @@ let (-@) p x = p +@ (-x)
 
 let (<-@) : type a. a ptr -> a -> unit
   = fun (CPointer p) ->
-    fun v -> write (Fat.reftype p) v (Fat.unsafe_raw_addr p)
+    fun v -> write (Fat.reftype p) v p
 
 let from_voidp : type a. a typ -> unit ptr -> a ptr
   = fun reftype (CPointer p) -> CPointer (Fat.coerce p reftype)
@@ -322,7 +319,7 @@ let typ_of_bigarray_kind k = Primitive (Ctypes_bigarray.prim_of_kind k)
 
 let string_from_ptr (CPointer p) ~length:len =
   if len < 0 then invalid_arg "Ctypes.string_from_ptr"
-  else Stubs.string_of_array (Fat.unsafe_raw_addr p) ~len
+  else Stubs.string_of_array p ~len
 
 let ocaml_string_start str =
   OCamlRef (0, str, String)

@@ -335,7 +335,7 @@ value ctypes_call(value fnname, value function, value callspec_,
     ((void**)(callbuffer + arg_array_offset))[arg_idx] = &val_refs[arg_idx];
   }
 
-  void (*cfunction)(void) = (void (*)(void)) CTYPES_TO_PTR(function);
+  void (*cfunction)(void) = (void (*)(void)) CTYPES_ADDR_OF_FATPTR(function);
 
   if (context.check_errno)
   {

@@ -6,7 +6,7 @@
  *)
 
 let string_of_char_ptr (Static.CPointer p) =
-  Std_view_stubs.string_of_cstring (Ctypes_ptr.Fat.unsafe_raw_addr p)
+  Std_view_stubs.string_of_cstring p
 
 let char_ptr_of_string s =
   let managed = Std_view_stubs.cstring_of_string s in

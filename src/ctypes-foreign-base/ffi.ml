@@ -89,7 +89,7 @@ struct
                            a ccallspec ->
                            (Ctypes_ptr.voidp -> (Obj.t * int) array -> unit) list ->
                            Ffi_stubs.callspec ->
-                           Ctypes_ptr.voidp ->
+                           unit typ Ctypes_ptr.Fat.t ->
                         a
     = fun name -> function
       | Call (check_errno, read_return_value) ->
@@ -119,14 +119,17 @@ struct
       | Returns ty ->
         let () = prep_callspec callspec abi ty in
         let write_rv = Memory.write ty in
-        fun f -> Ffi_stubs.Done (write_rv (WeakRef.get f), callspec)
+        fun f ->
+          let w = write_rv (WeakRef.get f) in
+          Ffi_stubs.Done ((fun p -> w (Ctypes_ptr.Fat.make ~reftyp:Void p)),
+                          callspec)
       | Function (p, f) ->
         let _ = add_argument callspec p in
         let box = box_function abi f callspec in
         let read = Memory.build p in
         fun f -> Ffi_stubs.Fn (fun buf ->
           let f' =
-            try WeakRef.get f (read buf)
+            try WeakRef.get f (read (Ctypes_ptr.Fat.make ~reftyp:Void buf))
             with WeakRef.EmptyWeakReference ->
               raise Ffi_stubs.CallToExpiredClosure
           in
@@ -144,7 +147,7 @@ struct
     | OCaml Bytes      -> ocaml_arg 1
     | OCaml FloatArray -> ocaml_arg (Ctypes_primitives.sizeof Primitives.Double)
     | ty -> (fun ~offset ~idx v dst mov -> Memory.write ty v
-      Ctypes_ptr.Raw.(add dst (of_int offset)))
+      (Ctypes_ptr.Fat.(add_bytes (make ~reftyp:Void dst) offset)))
 
   (*
     callspec = allocate_callspec ()
@@ -159,7 +162,8 @@ struct
     = fun ~abi ~check_errno ?(idx=0) fn callspec -> match fn with
       | Returns t ->
         let () = prep_callspec callspec abi t in
-        Call (check_errno, Memory.build t)
+        let b = Memory.build t in
+        Call (check_errno, (fun p -> b (Ctypes_ptr.Fat.make ~reftyp:Void p)))
       | Function (p, f) ->
         let offset = add_argument callspec p in
         let rest = build_ccallspec ~abi ~check_errno ~idx:(idx+1) f callspec in
@@ -177,7 +181,7 @@ struct
 
   let function_of_pointer ?name ~abi ~check_errno ~release_runtime_lock fn =
     let f = build_function ?name ~abi ~check_errno ~release_runtime_lock fn in
-    fun (CPointer p) -> f (Ctypes_ptr.Fat.unsafe_raw_addr p)
+    fun (CPointer p) -> f p
 
   let pointer_of_function ~abi ~acquire_runtime_lock fn =
     let cs' = Ffi_stubs.allocate_callspec

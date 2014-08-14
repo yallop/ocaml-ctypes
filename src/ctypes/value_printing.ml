@@ -78,7 +78,6 @@ and format_fields : type a b. string -> (a, b) structured boxed_field list ->
       fields
 and format_ptr : type a. Format.formatter -> a ptr -> unit
   = fun fmt (CPointer p) ->
-    Format.fprintf fmt "%s" (Value_printing_stubs.string_of_pointer
-                               (Ctypes_ptr.Fat.unsafe_raw_addr p))
+    Format.fprintf fmt "%s" (Value_printing_stubs.string_of_pointer p)
 
 let string_of typ v = Common.string_of (format typ) v

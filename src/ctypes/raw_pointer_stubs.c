@@ -14,11 +14,11 @@
 #include "type_info_stubs.h"
 #include "raw_pointer.h"
 
-/* memcpy : dst:raw_pointer -> src:raw_pointer -> size:int -> unit */
+/* memcpy : dst:fat_pointer -> src:fat_pointer -> size:int -> unit */
 value ctypes_memcpy(value dst, value src, value size)
 {
   CAMLparam3(dst, src, size);
-  memcpy(CTYPES_TO_PTR(dst), CTYPES_TO_PTR(src), Int_val(size));
+  memcpy(CTYPES_ADDR_OF_FATPTR(dst), CTYPES_ADDR_OF_FATPTR(src), Int_val(size));
   CAMLreturn(Val_unit);
 }
 
@@ -26,11 +26,11 @@ value ctypes_memcpy(value dst, value src, value size)
 /* string_of_cstring : raw_ptr -> int -> string */
 value ctypes_string_of_cstring(value p)
 {
-  return caml_copy_string(CTYPES_TO_PTR(p));
+  return caml_copy_string(CTYPES_ADDR_OF_FATPTR(p));
 }
 
 
-/* string_of_array : raw_ptr -> len:int -> string */
+/* string_of_array : fat_ptr -> len:int -> string */
 value ctypes_string_of_array(value p, value vlen)
 {
   CAMLparam2(p, vlen);
@@ -39,7 +39,7 @@ value ctypes_string_of_array(value p, value vlen)
   if (len < 0)
     caml_invalid_argument("ctypes_string_of_array");
   dst = caml_alloc_string(len);
-  memcpy(String_val(dst), CTYPES_TO_PTR(p), len);
+  memcpy(String_val(dst), CTYPES_ADDR_OF_FATPTR(p), len);
   CAMLreturn(dst);
 }
 

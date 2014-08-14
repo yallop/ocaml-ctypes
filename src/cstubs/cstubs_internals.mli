@@ -14,13 +14,14 @@ open Unsigned
 
 type voidp = Ctypes_ptr.voidp
 type managed_buffer = Memory_stubs.managed_buffer
+type 'a fatptr = 'a typ Ctypes_ptr.Fat.t
 
 val make_structured :
   ('a, 's) structured typ -> managed_buffer -> ('a, 's) structured
 
 val make_ptr : 'a typ -> voidp -> 'a ptr
 
-val raw_ptr : 'a ptr -> voidp
+val cptr : 'a ptr -> 'a typ Ctypes_ptr.Fat.t
 
 type 'a ocaml_type = 'a Static.ocaml_type =
   String     : string ocaml_type

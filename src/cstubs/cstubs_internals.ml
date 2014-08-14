@@ -10,6 +10,7 @@
 
 type voidp = Ctypes_ptr.voidp
 type managed_buffer = Memory_stubs.managed_buffer
+type 'a fatptr = 'a Ctypes.typ Ctypes_ptr.Fat.t
 
 let make_structured reftyp buf =
   let open Static in
@@ -22,4 +23,4 @@ include Primitives
 
 let make_ptr reftyp raw_ptr = CPointer (Ctypes_ptr.Fat.make ~reftyp raw_ptr)
 
-let raw_ptr (CPointer p) = Ctypes_ptr.Fat.unsafe_raw_addr p
+let cptr (CPointer p) = p

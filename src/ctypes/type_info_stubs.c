@@ -21,12 +21,12 @@
 #include "primitives.h"
 
 /* Read a C value from a block of memory */
-/* read : 'a prim -> raw_pointer -> 'a */
+/* read : 'a prim -> fat_pointer -> 'a */
 value ctypes_read(value prim_, value buffer_)
 {
   CAMLparam2(prim_, buffer_);
   CAMLlocal1(b);
-  void *buf = CTYPES_TO_PTR(buffer_);
+  void *buf = CTYPES_ADDR_OF_FATPTR(buffer_);
   switch (Int_val(prim_))
   {
    case Char: b = Val_int(*(char *)buf); break;
@@ -62,11 +62,11 @@ value ctypes_read(value prim_, value buffer_)
 }
 
 /* Read a C value from a block of memory */
-/* write : 'a prim -> 'a -> raw_pointer -> unit */
+/* write : 'a prim -> 'a -> fat_pointer -> unit */
 value ctypes_write(value prim_, value v, value buffer_)
 {
   CAMLparam3(prim_, v, buffer_);
-  void *buf = CTYPES_TO_PTR(buffer_);
+  void *buf = CTYPES_ADDR_OF_FATPTR(buffer_);
   switch (Int_val(prim_))
   {
    case Char: *(char *)buf = Int_val(v); break;
@@ -155,28 +155,28 @@ value ctypes_string_of_prim(value prim_, value v)
   CAMLreturn (s);
 }
 
-/* read_pointer : raw_pointer -> raw_pointer */
+/* read_pointer : fat_pointer -> raw_pointer */
 value ctypes_read_pointer(value src_)
 {
   CAMLparam1(src_);
-  void *src = CTYPES_TO_PTR(src_);
+  void *src = CTYPES_ADDR_OF_FATPTR(src_);
   CAMLreturn(CTYPES_FROM_PTR(*(void **)src));
 }
 
-/* write_pointer : raw_pointer -> dst:raw_pointer -> unit */
+/* write_pointer : fat_pointer -> dst:fat_pointer -> unit */
 value ctypes_write_pointer(value p_, value dst_)
 {
   CAMLparam2(p_, dst_);
-  void *dst = CTYPES_TO_PTR(dst_);
-  *(void **)dst = CTYPES_TO_PTR(p_);
+  void *dst = CTYPES_ADDR_OF_FATPTR(dst_);
+  *(void **)dst = CTYPES_ADDR_OF_FATPTR(p_);
   CAMLreturn(Val_unit);
 }
 
-/* string_of_pointer : raw_pointer -> string */
+/* string_of_pointer : fat_pointer -> string */
 value ctypes_string_of_pointer(value p_)
 {
   char buf[32];
   CAMLparam1(p_);
-  snprintf(buf, sizeof buf, "%p", CTYPES_TO_PTR(p_));
+  snprintf(buf, sizeof buf, "%p", CTYPES_ADDR_OF_FATPTR(p_));
   CAMLreturn (caml_copy_string(buf));
 }

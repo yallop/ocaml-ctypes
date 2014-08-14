@@ -24,4 +24,7 @@
 #error "No suitable type available to represent pointers."
 #endif
 
+/* CTYPES_ADDR_OF_FATPTR : _ Ctypes_ptr.Fat.t -> void * */
+#define CTYPES_ADDR_OF_FATPTR(P) CTYPES_TO_PTR(Field(P, 1))
+
 #endif /* RAW_POINTER_STUBS_H */
