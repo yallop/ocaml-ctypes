@@ -16,8 +16,6 @@ let char_ptr_of_string s =
 let string = Static.(view (ptr char))
   ~read:string_of_char_ptr ~write:char_ptr_of_string
 
-let castp typ p = Memory.(from_voidp typ (to_voidp p))
-
 let read_nullable t =
   let coerce = Coerce.coerce Static.(ptr void) t in
   fun p -> Memory.(if p = null then None else Some (coerce p))

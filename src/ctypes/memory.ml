@@ -11,6 +11,8 @@ module Stubs = Memory_stubs
 module Raw = Ctypes_ptr.Raw
 module Fat = Ctypes_ptr.Fat
 
+let castp reftype (CPointer p) = CPointer (Fat.coerce p reftype)
+
 (* Describes how to read a value, e.g. from a return buffer *)
 let rec build : type a b. a typ -> b typ Fat.t -> a
  = function
@@ -113,11 +115,8 @@ let (<-@) : type a. a ptr -> a -> unit
   = fun (CPointer p) ->
     fun v -> write (Fat.reftype p) v p
 
-let from_voidp : type a. a typ -> unit ptr -> a ptr
-  = fun reftype (CPointer p) -> CPointer (Fat.coerce p reftype)
-
-let to_voidp : type a. a ptr -> unit ptr
-  = fun (CPointer p) -> CPointer (Fat.coerce p Void)
+let from_voidp = castp
+let to_voidp p = castp Void p
 
 let allocate_n : type a. ?finalise:(a ptr -> unit) -> a typ -> count:int -> a ptr
   = fun ?finalise reftyp ~count ->
@@ -209,7 +208,7 @@ let make ?finalise s =
     | None -> None in
   { structured = allocate_n ?finalise s ~count:1 }
 let (|->) (CPointer p) { ftype; foffset } =
-  CPointer (Fat.(add_bytes (coerce p ftype) foffset))
+  CPointer (Fat.(add_bytes (Fat.coerce p ftype) foffset))
 
 let (@.) { structured = p } f = p |-> f
 let setf s field v = (s @. field) <-@ v
@@ -237,8 +236,6 @@ let bigarray_kind : type a b c d f.
   | Array3 -> Array3.kind
 
 let bigarray_start spec ba = _bigarray_start (bigarray_kind spec ba) ba
-
-let castp reftype (CPointer p) = CPointer (Fat.coerce p reftype)
 
 let array_of_bigarray : type a b c d e.
   < element: a;
