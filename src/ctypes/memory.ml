@@ -60,7 +60,7 @@ let rec write : type a. a typ -> a -> Ctypes_ptr.voidp -> unit
     | Bigarray b as t ->
       let size = sizeof t in
       (fun ba dst ->
-        let src = Ctypes_bigarray.address b ba in
+        let src = Ctypes_bigarray.unsafe_address ba in
         Stubs.memcpy ~size ~dst ~src)
     | View { write = w; ty } ->
       let writety = write ty in
@@ -222,34 +222,24 @@ let addr { structured } = structured
 
 open Bigarray
 
-let _bigarray_start kind typ ba =
-  let raw_address = Ctypes_bigarray.address typ ba in
+let _bigarray_start kind ba =
+  let raw_address = Ctypes_bigarray.unsafe_address ba in
   let reftyp = Primitive (Ctypes_bigarray.prim_of_kind kind) in
   CPointer (Fat.make ~managed:ba ~reftyp raw_address)
 
-let bigarray_start : type a b c d f.
+let bigarray_kind : type a b c d f.
   < element: a;
     ba_repr: f;
     bigarray: b;
     carray: c;
-    dims: d > bigarray_class -> b -> a ptr
-  = fun spec ba -> match spec with
-  | Genarray ->
-    let kind = Genarray.kind ba in
-    let dims = Genarray.dims ba in
-    _bigarray_start kind (Ctypes_bigarray.bigarray dims kind) ba
-  | Array1 ->
-    let kind = Array1.kind ba in
-    let d = Array1.dim ba in
-    _bigarray_start kind (Ctypes_bigarray.bigarray1 d kind) ba
-  | Array2 ->
-    let kind = Array2.kind ba in
-    let d1 = Array2.dim1 ba and d2 = Array2.dim2 ba in
-    _bigarray_start kind (Ctypes_bigarray.bigarray2 d1 d2 kind) ba
-  | Array3 ->
-    let kind = Array3.kind ba in
-    let d1 = Array3.dim1 ba and d2 = Array3.dim2 ba and d3 = Array3.dim3 ba in
-    _bigarray_start kind (Ctypes_bigarray.bigarray3 d1 d2 d3 kind) ba
+    dims: d > bigarray_class -> b -> (a, f) Bigarray.kind =
+  function
+  | Genarray -> Genarray.kind
+  | Array1 -> Array1.kind
+  | Array2 -> Array2.kind
+  | Array3 -> Array3.kind
+
+let bigarray_start spec ba = _bigarray_start (bigarray_kind spec ba) ba
 
 let castp reftype (CPointer p) = CPointer (Fat.coerce p reftype)
 

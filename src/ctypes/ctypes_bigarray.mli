@@ -52,8 +52,12 @@ val type_expression : ('a, 'b) t -> ([> `Appl of Ctypes_path.path * 'c list
 
 (** {2 Values *)
 
-val address : (_, 'a) t -> 'a -> Ctypes_ptr.voidp
-(** Return the address of a bigarray value. *)
+val unsafe_address : 'a -> Ctypes_ptr.voidp
+(** Return the address of a bigarray value.  This function is unsafe because
+    it dissociates the raw address of the C array from the OCaml object that
+    manages the lifetime of the array.  If the caller does not hold a
+    reference to the OCaml object then the array might be freed, invalidating
+    the address. *)
 
 val view : (_, 'a) t -> ?ref:Obj.t -> Ctypes_ptr.voidp -> 'a
 (** Create a bigarray view onto existing memory.

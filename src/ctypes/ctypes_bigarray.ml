@@ -134,7 +134,7 @@ let type_expression : type a b. (a, b) t -> _ =
 
 let prim_of_kind k = prim_of_kind (kind k)
 
-let address _ b = Bigarray_stubs.address b
+let unsafe_address b = Bigarray_stubs.address b
 
 let view : type a b. (a, b) t -> ?ref:Obj.t -> Ctypes_ptr.voidp -> b =
   let open Bigarray_stubs in
