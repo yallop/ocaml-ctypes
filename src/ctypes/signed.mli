@@ -26,11 +26,11 @@ module type S = sig
   (** {!shift_right_logical} [x] [y] shifts [x] to the right by [y] bits.  See
       {!Int32.shift_right_logical}. *)
 
-  val of_int64 : int64 -> t
-  (** Convert the given int64 value to a signed integer. *)
+  val of_nativeint : nativeint -> t
+  (** Convert the given nativeint value to a signed integer. *)
 
-  val to_int64 : t -> int64
-  (** Convert the given signed integer to an int64 value. *)
+  val to_nativeint : t -> nativeint
+  (** Convert the given signed integer to a nativeint value. *)
 end
 (** Signed integer operations *)
 

@@ -92,7 +92,7 @@ value ctypes_dlsym(value handle_option, value symbol)
   void *result = dlsym(handle, s);
   CAMLreturn(result == NULL
              ? Val_none
-             : Val_some(caml_copy_int64((intptr_t)result)));
+             : Val_some(caml_copy_nativeint((intptr_t)result)));
 }
 
 
