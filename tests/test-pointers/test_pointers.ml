@@ -172,7 +172,7 @@ struct
     assert_bool
       "returned pointer with positive computed offset compares greater than original"
       (ptr_compare rv p1 > 0);
-    assert_equal !@rv !@p3;
+    assert_equal !@(rv -@ 1) !@(p3 -@ 1);
     let p4 = p1 -@ 1 in
     let rv = pass_pointer_through p1 p4 (-1) in
     assert_bool
