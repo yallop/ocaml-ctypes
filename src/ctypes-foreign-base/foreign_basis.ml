@@ -19,11 +19,12 @@ struct
       (fun fmt -> Format.fprintf fmt "(*%t)" k) fmt
 
   let funptr ?(abi=Libffi_abi.default_abi) ?name ?(check_errno=false)
-      ?(release_runtime_lock=false) fn =
+      ?(runtime_lock=false) fn =
     let open Ffi in
     let read = function_of_pointer
-      ~abi ~check_errno ~release_runtime_lock ?name fn
-    and write = pointer_of_function ~abi fn
+      ~abi ~check_errno ~release_runtime_lock:runtime_lock ?name fn
+    and write = pointer_of_function
+      ~abi ~acquire_runtime_lock:runtime_lock fn
     and format_typ = format_function_pointer fn in
     Static.(view ~format_typ ~read ~write (ptr void))
 
@@ -41,7 +42,7 @@ struct
       ?(check_errno=false) ?(release_runtime_lock=false) symbol typ =
     try
       let coerce = Coerce.coerce (ptr void)
-        (funptr ~abi ~name:symbol ~check_errno ~release_runtime_lock typ) in
+        (funptr ~abi ~name:symbol ~check_errno ~runtime_lock:release_runtime_lock typ) in
       coerce (ptr_of_raw_ptr (dlsym ?handle:from ~symbol))
     with 
     | exn -> if stub then fun _ -> raise exn else raise exn

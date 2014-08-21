@@ -166,7 +166,9 @@ struct
         WriteArg (write_arg p ~offset ~idx, rest)
 
   let build_function ?name ~abi ~release_runtime_lock ~check_errno fn =
-    let c = Ffi_stubs.allocate_callspec ~check_errno ~release_runtime_lock in
+    let c = Ffi_stubs.allocate_callspec ~check_errno
+      ~runtime_lock:release_runtime_lock
+    in
     let e = build_ccallspec ~abi ~check_errno fn c in
     invoke name e [] c
 
@@ -177,10 +179,10 @@ struct
     let f = build_function ?name ~abi ~check_errno ~release_runtime_lock fn in
     fun (CPointer {raw_ptr}) -> f raw_ptr
 
-  let pointer_of_function ~abi fn =
+  let pointer_of_function ~abi ~acquire_runtime_lock fn =
     let cs' = Ffi_stubs.allocate_callspec
       ~check_errno:false
-      ~release_runtime_lock:false
+      ~runtime_lock:acquire_runtime_lock
     in
     let cs = box_function abi fn cs' in
     fun f ->

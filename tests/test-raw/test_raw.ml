@@ -23,7 +23,7 @@ let test_fabs () =
     let double_ffitype = primitive_ffitype Primitives.Double in
     let callspec = allocate_callspec
       ~check_errno:false
-      ~release_runtime_lock:false
+      ~runtime_lock:false
     in
     let arg_1_offset = add_argument callspec double_ffitype in
     let () = prep_callspec callspec Libffi_abi.(abi_code default_abi)
@@ -54,7 +54,7 @@ let test_pow () =
     let double_ffitype = primitive_ffitype Primitives.Double in
     let callspec = allocate_callspec
       ~check_errno:false
-      ~release_runtime_lock:false
+      ~runtime_lock:false
     in
     let arg_1_offset = add_argument callspec double_ffitype in
     let arg_2_offset = add_argument callspec double_ffitype in

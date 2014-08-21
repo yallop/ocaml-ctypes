@@ -20,3 +20,8 @@ let post1_wait2 = foreign "post1_wait2"
 let post2_wait1 = foreign "post2_wait1"
   ~release_runtime_lock:true
   (void @-> returning void)
+
+let callback_with_pointers = foreign "passing_pointers_to_callback"
+  ~release_runtime_lock:true
+  (funptr ~runtime_lock:true
+     (ptr int @-> ptr int @-> returning int) @-> returning int)
