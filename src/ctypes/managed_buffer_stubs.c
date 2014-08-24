@@ -28,10 +28,10 @@ static int compare_pointers(value l_, value r_)
   return (l > r) - (l < r);
 }
 
-static long hash_address(value l)
+static intnat hash_address(value l)
 {
   /* address hashing */
-  return (long)*(void **)Data_custom_val(l);
+  return (intnat)*(void **)Data_custom_val(l);
 }
 
 static struct custom_operations managed_buffer_custom_ops = {
