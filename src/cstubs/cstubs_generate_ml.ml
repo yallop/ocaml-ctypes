@@ -191,6 +191,7 @@ let attributes : type a. a fn -> attributes =
 
 let managed_buffer = `Ident (path_of_string "Memory_stubs.managed_buffer")
 let voidp = `Ident (path_of_string "CI.voidp")
+let fatptr = `Appl (path_of_string "CI.fatptr", [`Ident (path_of_string "_")])
 let string = `Ident (path_of_string "string")
 let float_array = `Appl (path_of_string "array",
                          [`Ident (path_of_string "float")])
@@ -220,10 +221,10 @@ let rec ml_typ_of_return_typ : type a. a typ -> ml_type =
 let rec ml_typ_of_arg_typ : type a. a typ -> ml_type = function
   | Void -> `Ident (path_of_string "unit")
   | Primitive p -> `Ident (Cstubs_public_name.ident_of_ml_prim (Primitives.ml_prim p))
-  | Pointer _   -> voidp
-  | Struct _    -> voidp
-  | Union _     -> voidp
-  | Abstract _  -> voidp
+  | Pointer _   -> fatptr
+  | Struct _    -> fatptr
+  | Union _     -> fatptr
+  | Abstract _  -> fatptr
   | View { ty } -> ml_typ_of_arg_typ ty
   | Array _    as a -> internal_error
     "Unexpected array in an argument type: %s" (Ctypes.string_of_typ a)
@@ -282,14 +283,14 @@ let rec pattern_and_exp_of_typ :
     let x = fresh_var () in
     let pat = static_con "Pointer" [`Var x] in
     begin match pol with
-    | In -> (pat, Some (`Appl (`Ident (path_of_string "CI.raw_ptr"), e)))
+    | In -> (pat, Some (`Appl (`Ident (path_of_string "CI.cptr"), e)))
     | Out -> (pat, Some (`MakePtr (`Ident (path_of_string x), e)))
     end
   | Struct _ ->
     begin match pol with
     | In ->
       let pat = static_con "Struct" [`Underscore] in
-      (pat, Some (`Appl (`Ident (path_of_string "CI.raw_ptr"),
+      (pat, Some (`Appl (`Ident (path_of_string "CI.cptr"),
                          `Appl (`Ident (path_of_string "Ctypes.addr"), e))))
     | Out ->
       let x = fresh_var () in
@@ -300,7 +301,7 @@ let rec pattern_and_exp_of_typ :
     begin match pol with
     | In ->
       let pat = static_con "Union" [`Underscore] in
-      (pat, Some (`Appl (`Ident (path_of_string "CI.raw_ptr"),
+      (pat, Some (`Appl (`Ident (path_of_string "CI.cptr"),
                          `Appl (`Ident (path_of_string "Ctypes.addr"), e))))
     | Out ->
       let x = fresh_var () in

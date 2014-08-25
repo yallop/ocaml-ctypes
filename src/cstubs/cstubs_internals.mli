@@ -12,15 +12,16 @@ open Ctypes
 open Signed
 open Unsigned
 
-type voidp = Ctypes_raw.voidp
+type voidp = Ctypes_ptr.voidp
 type managed_buffer = Memory_stubs.managed_buffer
+type 'a fatptr = 'a typ Ctypes_ptr.Fat.t
 
 val make_structured :
   ('a, 's) structured typ -> managed_buffer -> ('a, 's) structured
 
 val make_ptr : 'a typ -> voidp -> 'a ptr
 
-val raw_ptr : 'a ptr -> voidp
+val cptr : 'a ptr -> 'a typ Ctypes_ptr.Fat.t
 
 type 'a ocaml_type = 'a Static.ocaml_type =
   String     : string ocaml_type
@@ -38,12 +39,8 @@ type 'a typ = 'a Static.typ =
   | Array           : 'a typ * int              -> 'a Static.carray typ
   | Bigarray        : (_, 'a) Ctypes_bigarray.t -> 'a typ
   | OCaml           : 'a ocaml_type             -> 'a ocaml typ
-and 'a cptr = 'a Static.cptr
-  = { reftype      : 'a typ;
-      raw_ptr      : voidp;
-      pmanaged     : Obj.t option; }
 and ('a, 'b) pointer = ('a, 'b) Static.pointer =
-  CPointer : 'a cptr -> ('a, [`C]) pointer
+  CPointer : 'a typ Ctypes_ptr.Fat.t -> ('a, [`C]) pointer
 | OCamlRef : int * 'a * 'a ocaml_type -> ('a, [`OCaml]) pointer
 and 'a ptr = ('a, [`C]) pointer
 and 'a ocaml = ('a, [`OCaml]) pointer

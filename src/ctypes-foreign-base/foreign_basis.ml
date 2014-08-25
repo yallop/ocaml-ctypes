@@ -33,7 +33,7 @@ struct
   let funptr_opt ?abi fn = Std_views.nullable_view (funptr ?abi fn)
 
   let ptr_of_raw_ptr p = 
-    Ctypes.ptr_of_raw_address (Ctypes_raw.PtrType.to_int64 p)
+    Ctypes.ptr_of_raw_address (Ctypes_ptr.Raw.to_int64 p)
 
   let foreign_value ?from symbol t =
     from_voidp t (ptr_of_raw_ptr (dlsym ?handle:from ~symbol))

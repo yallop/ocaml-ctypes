@@ -7,7 +7,7 @@
 
 (* Stubs for binding to libffi. *)
 
-open Ctypes_raw
+open Ctypes_ptr
 
 (* The type of structure types *)
 type 'a ffitype = voidp
@@ -55,7 +55,7 @@ external prep_callspec : callspec -> int -> _ ffitype -> unit
 (* Call the function specified by `callspec' at the given address.
    The callback functions write the arguments to the buffer and read
    the return value. *)
-external call : string -> voidp -> callspec ->
+external call : string -> unit Static.typ Fat.t -> callspec ->
   (voidp -> (Obj.t * int) array -> unit) -> (voidp -> 'a) -> 'a
   = "ctypes_call"
 

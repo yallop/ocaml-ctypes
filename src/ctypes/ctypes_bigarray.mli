@@ -30,7 +30,7 @@ val bigarray3 : int -> int -> int -> ('a, 'b) Bigarray.kind ->
 (** Create a {!t} value for the {!Bigarray.Array3.t} type. *)
 
 val prim_of_kind : ('a, _) Bigarray.kind -> 'a Primitives.prim
-(** Create a {!Ctypes_raw.Types.ctype} for a {!Bigarray.kind}. *)
+(** Create a {!Ctypes_ptr.Types.ctype} for a {!Bigarray.kind}. *)
 
 (** {3 Type eliminators *)
 
@@ -52,12 +52,16 @@ val type_expression : ('a, 'b) t -> ([> `Appl of Ctypes_path.path * 'c list
 
 (** {2 Values *)
 
-val address : (_, 'a) t -> 'a -> Ctypes_raw.voidp
-(** Return the address of a bigarray value. *)
+val unsafe_address : 'a -> Ctypes_ptr.voidp
+(** Return the address of a bigarray value.  This function is unsafe because
+    it dissociates the raw address of the C array from the OCaml object that
+    manages the lifetime of the array.  If the caller does not hold a
+    reference to the OCaml object then the array might be freed, invalidating
+    the address. *)
 
-val view : (_, 'a) t -> ?ref:Obj.t -> Ctypes_raw.voidp -> 'a
-(** Create a bigarray view onto existing memory.
+val view : (_, 'a) t -> _ Ctypes_ptr.Fat.t -> 'a
+(** [view b ptr] creates a bigarray view onto existing memory.
 
-    The optional [ref] argument is an OCaml object that controls the lifetime
-    of the memory; if [ref] is present, [view] will ensure that it is not
-    collected before the bigarray returned by [view]. *)
+    If [ptr] references an OCaml object then [view] will ensure that
+    that object is not collected before the bigarray returned by
+    [view]. *)

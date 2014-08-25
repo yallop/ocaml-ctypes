@@ -117,8 +117,9 @@ struct
     | Complex32 -> conser "ctypes_copy_float_complex" (complex32 @-> returning value)
     | Complex64 -> conser "ctypes_copy_double_complex" (complex64 @-> returning value)
 
-  let to_ptr : cexp -> ccomp =
-    fun x -> `App (`Global (reader "CTYPES_TO_PTR" (value @-> returning (ptr void))),
+  let of_fatptr : cexp -> ccomp =
+    fun x -> `App (`Global (reader "CTYPES_ADDR_OF_FATPTR"
+                              (value @-> returning (ptr void))),
                    [x])
 
   let string_to_ptr : cexp -> ccomp =
@@ -132,7 +133,8 @@ struct
                    [x])
 
   let from_ptr : cexp -> ceff =
-    fun x -> `App (`Global (conser "CTYPES_FROM_PTR" (ptr void @-> returning value)),
+    fun x -> `App (`Global (conser "CTYPES_FROM_PTR"
+                              (ptr void @-> returning value)),
                    [x])
 
   let val_unit : ceff = `Global { name = "Val_unit";
@@ -170,12 +172,12 @@ struct
       let { tfn = Fn fn } as prj = prim_prj p in
       let rt = return_type fn in
       Some (cast ~from:rt ~into:(Ty (Primitive p)) (`App (`Global prj, [x])))
-    | Pointer _ -> Some (to_ptr x)
+    | Pointer _ -> Some (of_fatptr x)
     | Struct s ->
-      Some ((to_ptr x, ptr void) >>= fun y ->
+      Some ((of_fatptr x, ptr void) >>= fun y ->
             `Deref (`Cast (Ty (ptr ty), y)))
     | Union u -> 
-      Some ((to_ptr x, ptr void) >>= fun y ->
+      Some ((of_fatptr x, ptr void) >>= fun y ->
             `Deref (`Cast (Ty (ptr ty), y)))
     | Abstract _ -> report_unpassable "values of abstract type"
     | View { ty } -> prj ty x

@@ -481,7 +481,12 @@ val ptr_of_raw_address : int64 -> unit ptr
 (** Convert the numeric representation of an address to a pointer *)
 
 val raw_address_of_ptr : unit ptr -> int64
-(** Return the numeric representation of an address *)
+(** [raw_address_of_ptr p] returns the numeric representation of p.
+
+    Note that the return value remains valid only as long as the pointed-to
+    object is alive.  If [p] is a managed object (e.g. a value returned by
+    {!make}) then unless the caller retains a reference to [p], the object may
+    be collected, invalidating the returned address. *)
 
 val string_from_ptr : char ptr -> length:int -> string
 (** [string_from_ptr p ~length] creates a string initialized with the [length]

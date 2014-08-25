@@ -30,13 +30,14 @@ let test_fabs () =
       double_ffitype in
     
     let dlfabs = Dl.dlsym "fabs" in
+    let dlfabs_fat = Ctypes_ptr.Fat.make ~reftyp:Static.Void dlfabs in
     
     let fabs x =
-      call "fabs" dlfabs callspec
+      call "fabs" dlfabs_fat callspec
         (fun p _values ->
           write Primitives.Double x
-            Ctypes_raw.PtrType.(add p (of_int arg_1_offset)))
-        (read Primitives.Double)
+            Ctypes_ptr.(Fat.make ~reftyp:Static.Void (Raw.(add p (of_int arg_1_offset)))))
+        (fun p -> read Primitives.Double (Ctypes_ptr.Fat.make ~reftyp:Static.Void p))
     in
 
     assert_equal 2.0 (fabs (-2.0)) ~printer:string_of_float;
@@ -62,15 +63,16 @@ let test_pow () =
       double_ffitype in
     
     let dlpow = Dl.dlsym "pow" in
+    let dlpow_fat = Ctypes_ptr.Fat.make ~reftyp:Static.Void dlpow in
     
     let pow x y =
-      call "pow" dlpow callspec
+      call "pow" dlpow_fat callspec
         (fun buffer _values ->
           write Primitives.Double x
-            Ctypes_raw.PtrType.(add buffer (of_int arg_1_offset));
+            Ctypes_ptr.(Fat.make ~reftyp:Static.Void (Raw.(add buffer (of_int arg_1_offset))));
           write Primitives.Double y
-            Ctypes_raw.PtrType.(add buffer (of_int arg_2_offset)))
-        (read Primitives.Double)
+            Ctypes_ptr.(Fat.make ~reftyp:Static.Void (Raw.(add buffer (of_int arg_2_offset)))))
+        (fun p -> read Primitives.Double (Ctypes_ptr.Fat.make ~reftyp:Static.Void p))
     in
 
     assert_equal 8.0 (pow 2.0 3.0);

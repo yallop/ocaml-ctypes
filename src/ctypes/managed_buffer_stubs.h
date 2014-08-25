@@ -19,4 +19,7 @@ extern value ctypes_allocate(value size);
 /* block_address : managed_buffer -> immediate_pointer */
 extern value ctypes_block_address(value managed_buffer);
 
+/* CTYPES_FROM_FAT_PTR : _ Ctypes_ptr.Fat.t -> void * */
+
+
 #endif /* MANAGED_BUFFER_STUBS_H */

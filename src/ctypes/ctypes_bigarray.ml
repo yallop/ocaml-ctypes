@@ -134,15 +134,15 @@ let type_expression : type a b. (a, b) t -> _ =
 
 let prim_of_kind k = prim_of_kind (kind k)
 
-let address _ b = Bigarray_stubs.address b
+let unsafe_address b = Bigarray_stubs.address b
 
-let view : type a b. (a, b) t -> ?ref:Obj.t -> Ctypes_raw.voidp -> b =
+let view : type a b. (a, b) t -> _ Ctypes_ptr.Fat.t -> b =
   let open Bigarray_stubs in
-  fun (dims, kind) ?ref ptr -> let ba : b = match dims with
+  fun (dims, kind) ptr -> let ba : b = match dims with
   | DimsGen ds -> view kind ds ptr
   | Dims1 d -> view1 kind [| d |] ptr
   | Dims2 (d1, d2) -> view2 kind [| d1; d2 |] ptr
   | Dims3 (d1, d2, d3) -> view3 kind [| d1; d2; d3 |] ptr in
-  match ref with
+  match Ctypes_ptr.Fat.managed ptr with
   | None -> ba
   | Some src -> Gc.finalise (fun _ -> ignore src; ()) ba; ba
