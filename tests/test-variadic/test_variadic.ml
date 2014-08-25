@@ -40,7 +40,7 @@ struct
       assert_equal "a long long 9223372036854775807 and an int -4."
         (write snprintf_longlong_int
            (fun k -> k "a long long %lld and an int %d."
-             (LLong.of_int64 Int64.max_int) (-4)));
+             (LLong.of_nativeint Nativeint.max_int) (-4)));
 
       assert_equal "a string abcde and an unsigned short ffd."
         (write snprintf_string_ushort

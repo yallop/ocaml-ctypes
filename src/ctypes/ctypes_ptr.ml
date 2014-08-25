@@ -13,10 +13,24 @@ sig
   val null : t
 end =
 struct
-  include (val match Ctypes_primitives.pointer_size with
-    4 -> (module Signed.Int32 : Signed.S)
-  | 8 -> (module Signed.Int64 : Signed.S)
-  | _ -> failwith "No suitable type available to represent pointers.")
+  include Nativeint
+
+  module Infix =
+  struct
+    let (+) = add
+    let (-) = sub
+    let ( * ) = mul
+    let (/) = div
+    let (mod) = rem
+    let (land) = logand
+    let (lor) = logor
+    let (lxor) = logxor
+    let (lsl) = shift_left
+    let (lsr) = shift_right_logical
+  end
+
+  let of_nativeint x = x
+  let to_nativeint x = x
 
   let null = zero
 end

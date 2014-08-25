@@ -144,14 +144,14 @@ let ptr_compare (CPointer l) (CPointer r) = Fat.(compare l r)
 let reference_type (CPointer p) = Fat.reftype p
 
 let ptr_of_raw_address addr =
-  CPointer (Fat.make ~reftyp:Void (Raw.of_int64 addr))
+  CPointer (Fat.make ~reftyp:Void (Raw.of_nativeint addr))
 
 let raw_address_of_ptr (CPointer p) =
   (* This is unsafe by definition: if the object to which [p] refers
      is collected at this point then the returned address is invalid.
      If there is an OCaml object associated with [p] then it is vital
      that the caller retains a reference to it. *)
-  Raw.to_int64 (Fat.unsafe_raw_addr p)
+  Raw.to_nativeint (Fat.unsafe_raw_addr p)
 
 module CArray =
 struct

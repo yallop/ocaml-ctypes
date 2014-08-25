@@ -13,8 +13,8 @@ module type S = sig
   val minus_one : t
   val min_int : t
   val shift_right_logical : t -> int -> t
-  val of_int64 : int64 -> t
-  val to_int64 : t -> int64
+  val of_nativeint : nativeint -> t
+  val to_nativeint : t -> nativeint
 end
 
 module type Basics = sig
@@ -53,8 +53,8 @@ module Int32 =
 struct
   include Int32
   module Infix = MakeInfix(Int32)
-  let of_int64 = Int64.to_int32
-  let to_int64 = Int64.of_int32
+  let of_nativeint = Nativeint.to_int32
+  let to_nativeint = Nativeint.of_int32
 end
 
 module Int64 = 

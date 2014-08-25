@@ -22,7 +22,7 @@ external _dlopen : ?filename:string -> flags:int -> library option
   = "ctypes_dlopen"
     
 (* void *dlsym(void *handle, const char *symbol); *)
-external _dlsym : ?handle:library -> symbol:string -> int64 option
+external _dlsym : ?handle:library -> symbol:string -> nativeint option
   = "ctypes_dlsym"
 
 (* int dlclose(void *handle); *)
@@ -55,5 +55,5 @@ let dlclose ~handle =
 
 let dlsym ?handle ~symbol =
   match _dlsym ?handle ~symbol with
-    | Some symbol -> Ctypes_ptr.Raw.of_int64 symbol
+    | Some symbol -> Ctypes_ptr.Raw.of_nativeint symbol
     | None        -> _report_dl_error ()

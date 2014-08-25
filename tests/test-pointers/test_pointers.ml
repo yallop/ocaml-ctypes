@@ -567,7 +567,7 @@ let test_raw_pointers () =
   let p' = p +@ 3 in
   let praw = raw_address_of_ptr (to_voidp p) in
   let praw' = raw_address_of_ptr (to_voidp p') in
-  assert_equal praw' Int64.(add praw (of_int (3 * sizeof double)))
+  assert_equal praw' Nativeint.(add praw (of_int (3 * sizeof double)))
 
 
 module Foreign_tests = Common_tests(Tests_common.Foreign_binder)

@@ -477,10 +477,10 @@ val ptr_compare : 'a ptr -> 'a ptr -> int
 val reference_type : 'a ptr -> 'a typ
 (** Retrieve the reference type of a pointer. *)
 
-val ptr_of_raw_address : int64 -> unit ptr
+val ptr_of_raw_address : nativeint -> unit ptr
 (** Convert the numeric representation of an address to a pointer *)
 
-val raw_address_of_ptr : unit ptr -> int64
+val raw_address_of_ptr : unit ptr -> nativeint
 (** [raw_address_of_ptr p] returns the numeric representation of p.
 
     Note that the return value remains valid only as long as the pointed-to
