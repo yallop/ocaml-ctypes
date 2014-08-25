@@ -36,20 +36,20 @@
     return (u1 > u2) - (u1 < u2);                                            \
   }                                                                          \
                                                                              \
-  static long uint ## BITS ## _hash(value v)                                 \
+  static intnat uint ## BITS ## _hash(value v)                               \
   {                                                                          \
     return Uint_custom_val(TYPE(BITS), v);                                   \
   }                                                                          \
                                                                              \
   static void uint ## BITS ## _serialize(value v,                            \
-                                         unsigned long *wsize_32,            \
-                                         unsigned long *wsize_64)            \
+                                         uintnat *wsize_32,                  \
+                                         uintnat *wsize_64)                  \
   {                                                                          \
     caml_serialize_int_ ## BYTES(Uint_custom_val(TYPE(BITS), v));            \
     *wsize_32 = *wsize_64 = BYTES;                                           \
   }                                                                          \
                                                                              \
-  static unsigned long uint ## BITS ## _deserialize(void *dst)               \
+  static uintnat uint ## BITS ## _deserialize(void *dst)                     \
   {                                                                          \
     *(TYPE(BITS) *)dst = caml_deserialize_uint_ ## BYTES();                  \
     return BYTES;                                                            \
