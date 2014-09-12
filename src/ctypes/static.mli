@@ -155,6 +155,7 @@ val structure : string -> 'a structure typ
 val union : string -> 'a union typ
 val offsetof : ('a, 'b) field -> int
 val field_type : ('a, 'b) field -> 'a typ
+val field_name : ('a, 'b) field -> string
 
 exception IncompleteType
 exception ModifyingSealedType of string

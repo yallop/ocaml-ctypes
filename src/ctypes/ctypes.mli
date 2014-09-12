@@ -639,6 +639,9 @@ val offsetof : (_, _ structure) field -> int
 val field_type : ('a, _) field -> 'a typ
 (** [field_type f] returns the type of the field [f]. *)
 
+val field_name : (_, _) field -> string
+(** [field_name f] returns the name of the field [f]. *)
+
 val addr : ((_, _) structured as 's) -> 's ptr
 (** [addr s] returns the address of the structure or union [s]. *)
 
@@ -709,4 +712,3 @@ exception IncompleteType
 
 exception Uncoercible
 (** An attempt was made to coerce between uncoercible types.  *)
-

@@ -223,3 +223,4 @@ let union utag = Union { utag; uspec = None; ufields = [] }
 
 let offsetof { foffset } = foffset
 let field_type { ftype } = ftype
+let field_name { fname } = fname
