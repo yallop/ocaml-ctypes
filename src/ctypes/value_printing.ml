@@ -21,8 +21,8 @@ let rec format : type a. a typ -> Format.formatter -> a -> unit
     (fun fmt -> Type_printing.format_typ fmt) typ
   | Abstract _ -> format_structured fmt v
   | OCaml _ -> format_ocaml fmt v
-  | View {write; ty; format_val} ->
-    begin match format_val with
+  | View {write; ty; format=f} ->
+    begin match f with
       | None -> format ty fmt (write v)
       | Some f -> f fmt v
     end

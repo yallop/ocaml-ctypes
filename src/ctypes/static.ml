@@ -58,7 +58,7 @@ and ('a, 'b) view = {
   read : 'b -> 'a;
   write : 'a -> 'b;
   format_typ: ((Format.formatter -> unit) -> Format.formatter -> unit) option;
-  format_val: (Format.formatter -> 'a -> unit) option;
+  format: (Format.formatter -> 'a -> unit) option;
   ty: 'b typ;
 }
 and ('a, 's) field = {
@@ -196,8 +196,8 @@ let ( @->) f t =
     Function (f, t)
 let abstract ~name ~size ~alignment =
   Abstract { aname = name; asize = size; aalignment = alignment }
-let view ?format_typ ?format_val ~read ~write ty =
-  View { read; write; format_typ; format_val; ty }
+let view ?format_typ ?format ~read ~write ty =
+  View { read; write; format_typ; format; ty }
 let bigarray : type a b c d e.
   < element: a;
     dims: b;

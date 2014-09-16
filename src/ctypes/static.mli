@@ -52,7 +52,7 @@ and ('a, 'b) view = {
   read : 'b -> 'a;
   write : 'a -> 'b;
   format_typ: ((Format.formatter -> unit) -> Format.formatter -> unit) option;
-  format_val: (Format.formatter -> 'a -> unit) option;
+  format: (Format.formatter -> 'a -> unit) option;
   ty: 'b typ;
 }
 and ('a, 's) field = {
@@ -144,7 +144,7 @@ val ( @-> ) : 'a typ -> 'b fn -> ('a -> 'b) fn
 val abstract : name:string -> size:int -> alignment:int -> 'a abstract typ
 val view : ?format_typ:((Format.formatter -> unit) ->
                         Format.formatter -> unit) ->
-           ?format_val: (Format.formatter -> 'b -> unit) ->
+           ?format: (Format.formatter -> 'b -> unit) ->
            read:('a -> 'b) -> write:('b -> 'a) -> 'a typ -> 'b typ
 val bigarray : < ba_repr : 'c;
                  bigarray : 'd;
