@@ -48,6 +48,7 @@ and ('a, 'b) view = ('a, 'b) Static.view = {
   read : 'b -> 'a;
   write : 'a -> 'b;
   format_typ: ((Format.formatter -> unit) -> Format.formatter -> unit) option;
+  format: (Format.formatter -> 'a -> unit) option;
   ty: 'b typ;
 }
 

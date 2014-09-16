@@ -351,6 +351,7 @@ val seal : (_, [< `Struct | `Union]) structured typ -> unit
 (** {3 View types} *)
 
 val view : ?format_typ:((Format.formatter -> unit) -> Format.formatter -> unit) ->
+           ?format:(Format.formatter -> 'b -> unit) ->
            read:('a -> 'b) -> write:('b -> 'a) -> 'a typ -> 'b typ
 (** [view ~read:r ~write:w t] creates a C type representation [t'] which
     behaves like [t] except that values read using [t'] are subsequently
@@ -370,6 +371,11 @@ val view : ?format_typ:((Format.formatter -> unit) -> Format.formatter -> unit) 
     {!string_of_typ} functions to print the type at the top level and
     elsewhere.  If [format_typ] is not supplied the printer for [t] is used
     instead.
+
+    The optional argument [format] is used by the {!Ctypes.format}
+    and {!string_of} functions to print the values. If [format_val]
+    is not supplied the printer for [t] is used instead.
+
 *)
 
 (** {3 Abstract types} *)
