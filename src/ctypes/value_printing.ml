@@ -22,7 +22,11 @@ let rec format : type a. a typ -> Format.formatter -> a -> unit
   | Abstract _ -> format_structured fmt v
   | OCaml _ -> format_ocaml fmt v
     (* For now, just print the underlying value in a view *)
-  | View {write; ty} -> format ty fmt (write v)
+  | View {write; ty; format_val} ->
+    begin match format_val with
+      | None -> format ty fmt (write v)
+      | Some f -> f fmt v
+    end
 and format_structured : type a b. Format.formatter -> (a, b) structured -> unit
   = fun fmt ({structured = CPointer p} as s) ->
     let open Format in
