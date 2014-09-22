@@ -35,8 +35,6 @@ type _ typ =
   | Abstract        : abstract_type      -> 'a abstract typ
   | View            : ('a, 'b) view      -> 'a typ
   | Array           : 'a typ * int       -> 'a carray typ
-  | Bigarray        : (_, 'a) Ctypes_bigarray.t
-                                         -> 'a typ
   | OCaml           : 'a ocaml_type      -> 'a ocaml typ
 and 'a carray = { astart : 'a ptr; alength : int }
 and ('a, 'kind) structured = { structured : ('a, 'kind) structured ptr }
@@ -71,32 +69,6 @@ and 'a union_type = {
   mutable ufields : 'a union boxed_field list;
 }
 and 's boxed_field = BoxedField : ('a, 's) field -> 's boxed_field
-
-type _ bigarray_class =
-  Genarray :
-  < element: 'a;
-    dims: int array;
-    ba_repr: 'b;
-    bigarray: ('a, 'b, Bigarray.c_layout) Bigarray.Genarray.t;
-    carray: 'a carray > bigarray_class
-| Array1 :
-  < element: 'a;
-    dims: int;
-    ba_repr: 'b;
-    bigarray: ('a, 'b, Bigarray.c_layout) Bigarray.Array1.t;
-    carray: 'a carray > bigarray_class
-| Array2 :
-  < element: 'a;
-    dims: int * int;
-    ba_repr: 'b;
-    bigarray: ('a, 'b, Bigarray.c_layout) Bigarray.Array2.t;
-    carray: 'a carray carray > bigarray_class
-| Array3 :
-  < element: 'a;
-    dims: int * int * int;
-    ba_repr: 'b;
-    bigarray: ('a, 'b, Bigarray.c_layout) Bigarray.Array3.t;
-    carray: 'a carray carray carray > bigarray_class
 
 type _ fn =
   | Returns  : 'a typ   -> 'a fn
@@ -146,12 +118,6 @@ val view : ?format_typ:((Format.formatter -> unit) ->
                         Format.formatter -> unit) ->
            ?format: (Format.formatter -> 'b -> unit) ->
            read:('a -> 'b) -> write:('b -> 'a) -> 'a typ -> 'b typ
-val bigarray : < ba_repr : 'c;
-                 bigarray : 'd;
-                 carray : 'e;
-                 dims : 'b;
-                 element : 'a > bigarray_class ->
-               'b -> ('a, 'c) Bigarray.kind -> 'd typ
 val returning : 'a typ -> 'a fn
 val structure : string -> 'a structure typ
 val union : string -> 'a union typ

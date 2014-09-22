@@ -209,8 +209,6 @@ let rec ml_typ_of_return_typ : type a. a typ -> ml_type =
   | View { ty } -> ml_typ_of_return_typ ty
   | Array _    as a -> internal_error
     "Unexpected array type in the return type: %s" (Ctypes.string_of_typ a)
-  | Bigarray _ as a -> internal_error
-    "Unexpected bigarray type in the return type: %s" (Ctypes.string_of_typ a)
   | OCaml String -> Static.unsupported
     "cstubs does not support OCaml strings as return values"
   | OCaml Bytes -> Static.unsupported
@@ -228,8 +226,6 @@ let rec ml_typ_of_arg_typ : type a. a typ -> ml_type = function
   | View { ty } -> ml_typ_of_arg_typ ty
   | Array _    as a -> internal_error
     "Unexpected array in an argument type: %s" (Ctypes.string_of_typ a)
-  | Bigarray _ as a -> internal_error
-    "Unexpected bigarray in an argument type: %s" (Ctypes.string_of_typ a)
   | OCaml String ->
     `Appl (path_of_string "CI.ocaml",
            [`Ident (path_of_string "string")])
@@ -345,9 +341,6 @@ let rec pattern_and_exp_of_typ :
     (Ctypes.string_of_typ ty)
   | Array _ as ty -> internal_error
     "Unexpected array type encountered during ML code generation: %s"
-    (Ctypes.string_of_typ ty)
-  | Bigarray _ as ty -> internal_error
-    "Unexpected bigarray type encountered during ML code generation: %s"
     (Ctypes.string_of_typ ty)
 
 type wrapper_state = {

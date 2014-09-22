@@ -17,8 +17,6 @@ let rec format : type a. a typ -> Format.formatter -> a -> unit
   | Struct _ -> format_structured fmt v
   | Union _ -> format_structured fmt v
   | Array (a, n) -> format_array fmt v
-  | Bigarray ba -> Format.fprintf fmt "<bigarray %a>"
-    (fun fmt -> Type_printing.format_typ fmt) typ
   | Abstract _ -> format_structured fmt v
   | OCaml _ -> format_ocaml fmt v
   | View {write; ty; format=f} ->

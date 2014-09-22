@@ -56,12 +56,6 @@ let rec format_typ' : type a. a typ ->
     | Array (ty, n) ->
       format_typ' ty (fun _ fmt -> fprintf fmt "%t[%d]" (k `array) n) `nonarray
         fmt
-    | Bigarray ba ->
-      let elem = Ctypes_bigarray.element_type ba
-      and dims = Ctypes_bigarray.dimensions ba in
-      let name = Ctypes_primitives.name elem in
-      fprintf fmt "%s%t%t" name (k `array)
-        (fun fmt -> (Array.iter (Format.fprintf fmt "[%d]") dims))
     | OCaml String -> format_typ' (ptr char) k context fmt
     | OCaml Bytes -> format_typ' (ptr char) k context fmt
     | OCaml FloatArray -> format_typ' (ptr double) k context fmt

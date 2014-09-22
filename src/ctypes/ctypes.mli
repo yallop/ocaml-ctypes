@@ -214,58 +214,6 @@ val array : int -> 'a typ -> 'a carray typ
 (** Construct a sized array type from a length and an existing type (called
     the {i element type}). *)
 
-(** {4 Bigarray types} *)
-
-type _ bigarray_class
-(** The type of Bigarray classes.  There are four instances, one for each of
-    the Bigarray submodules. *)
-
-val genarray :
-  < element: 'a;
-    ba_repr: 'b;
-    bigarray: ('a, 'b, Bigarray.c_layout) Bigarray.Genarray.t;
-    carray: 'a carray;
-    dims: int array > bigarray_class
-(** The class of {!Bigarray.Genarray.t} values *)
-
-val array1 :
-  < element: 'a;
-    ba_repr: 'b;
-    bigarray: ('a, 'b, Bigarray.c_layout) Bigarray.Array1.t;
-    carray: 'a carray;
-    dims: int > bigarray_class
-(** The class of {!Bigarray.Array1.t} values *)
-
-val array2 :
-  < element: 'a;
-    ba_repr: 'b;
-    bigarray: ('a, 'b, Bigarray.c_layout) Bigarray.Array2.t;
-    carray: 'a carray carray;
-    dims: int * int > bigarray_class
-(** The class of {!Bigarray.Array2.t} values *)
-
-val array3 :
-  < element: 'a;
-    ba_repr: 'b;
-    bigarray: ('a, 'b, Bigarray.c_layout) Bigarray.Array3.t;
-    carray: 'a carray carray carray;
-    dims: int * int * int > bigarray_class
-(** The class of {!Bigarray.Array3.t} values *)
-
-val bigarray :
-  < element: 'a;
-    ba_repr: 'b;
-    dims: 'dims;
-    bigarray: 'bigarray;
-    carray: _ > bigarray_class ->
-   'dims -> ('a, 'b) Bigarray.kind -> 'bigarray typ
-(** Construct a sized bigarray type representation from a bigarray class, the
-    dimensions, and the {!Bigarray.kind}. *)
-
-val typ_of_bigarray_kind : ('a, 'b) Bigarray.kind -> 'a typ
-(** [typ_of_bigarray_kind k] is the type corresponding to the Bigarray kind
-    [k]. *)
-
 (** {3 Function types} *)
 
 type 'a fn = 'a Static.fn
@@ -574,45 +522,6 @@ sig
 (** Retrieve the element type of an array. *)
 end
 (** Operations on C arrays. *)
-
-(** {4 Bigarray values} *)
-
-val bigarray_start : < element: 'a;
-                       ba_repr: _;
-                       bigarray: 'b;
-                       carray: _;
-                       dims: _ > bigarray_class -> 'b -> 'a ptr
-(** Return the address of the first element of the given Bigarray value. *)
-
-val bigarray_of_ptr : < element: 'a;
-                        ba_repr: 'f;
-                        bigarray: 'b;
-                        carray: _;
-                        dims: 'i > bigarray_class ->
-    'i -> ('a, 'f) Bigarray.kind -> 'a ptr -> 'b
-(** [bigarray_of_ptr c dims k p] converts the C pointer [p] to a bigarray
-    value.  No copy is made; the bigarray references the memory pointed to by
-    [p]. *)
-
-val array_of_bigarray : < element: _;
-                          ba_repr: _;
-                          bigarray: 'b;
-                          carray: 'c;
-                          dims: _ > bigarray_class -> 'b -> 'c
-(** [array_of_bigarray c b] converts the bigarray value [b] to a value of type
-    {!CArray.t}.  No copy is made; the result occupies the same memory as
-    [b]. *)
-
-(** Convert a Bigarray value to a C array. *)
-
-val bigarray_of_array : < element: 'a;
-                          ba_repr: 'f;
-                          bigarray: 'b;
-                          carray: 'c carray;
-                          dims: 'i > bigarray_class ->
-    ('a, 'f) Bigarray.kind -> 'c carray -> 'b
-(** [bigarray_of_array c k a] converts the {!CArray.t} value [c] to a bigarray
-    value.  No copy is made; the result occupies the same memory as [c]. *)
 
 (** {3 Struct and union values} *)
 

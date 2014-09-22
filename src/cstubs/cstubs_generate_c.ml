@@ -182,7 +182,6 @@ struct
     | Abstract _ -> report_unpassable "values of abstract type"
     | View { ty } -> prj ty x
     | Array _ -> report_unpassable "arrays"
-    | Bigarray _ -> report_unpassable "bigarrays"
     | OCaml String -> Some (string_to_ptr x)
     | OCaml Bytes -> Some (string_to_ptr x)
     | OCaml FloatArray -> Some (float_array_to_ptr x)
@@ -197,7 +196,6 @@ struct
     | Abstract _ -> report_unpassable "values of abstract type"
     | View { ty } -> inj ty x
     | Array _ -> report_unpassable "arrays"
-    | Bigarray _ -> report_unpassable "bigarrays"
     | OCaml _ -> report_unpassable "ocaml references as return values"
 
   type _ fn =

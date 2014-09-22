@@ -37,7 +37,6 @@ let rec build : type a b. a typ -> b typ Fat.t -> a
        types are excluded during type construction. *)
     | Union _ -> assert false
     | Array _ -> assert false
-    | Bigarray _ -> assert false
     | Abstract _ -> assert false
 
 let rec write : type a b. a typ -> a -> b Fat.t -> unit
@@ -58,13 +57,6 @@ let rec write : type a b. a typ -> a -> b Fat.t -> unit
       let size = sizeof a in
       (fun { astart = CPointer src } dst ->
         Stubs.memcpy ~size ~dst ~src)
-    | Bigarray b as t ->
-      let size = sizeof t in
-      (fun ba dst ->
-        let src = Fat.make ~managed:ba ~reftyp:Void
-          (Ctypes_bigarray.unsafe_address ba)
-        in
-        Stubs.memcpy ~size ~dst ~src)
     | View { write = w; ty } ->
       let writety = write ty in
       (fun v -> writety (w v))
@@ -84,7 +76,6 @@ let rec (!@) : type a. a ptr -> a
       | Struct _ -> { structured = ptr }
       | Array (elemtype, alength) ->
         { astart = CPointer (Fat.coerce cptr elemtype); alength }
-      | Bigarray b -> Ctypes_bigarray.view b cptr
       | Abstract _ -> { structured = ptr }
       | OCaml _ -> raise IncompleteType
       (* If it's a value type then we cons a new value. *)
@@ -219,104 +210,6 @@ let setf s field v = (s @. field) <-@ v
 let getf s field = !@(s @. field)
 
 let addr { structured } = structured
-
-open Bigarray
-
-let _bigarray_start kind ba =
-  let raw_address = Ctypes_bigarray.unsafe_address ba in
-  let reftyp = Primitive (Ctypes_bigarray.prim_of_kind kind) in
-  CPointer (Fat.make ~managed:ba ~reftyp raw_address)
-
-let bigarray_kind : type a b c d f.
-  < element: a;
-    ba_repr: f;
-    bigarray: b;
-    carray: c;
-    dims: d > bigarray_class -> b -> (a, f) Bigarray.kind =
-  function
-  | Genarray -> Genarray.kind
-  | Array1 -> Array1.kind
-  | Array2 -> Array2.kind
-  | Array3 -> Array3.kind
-
-let bigarray_start spec ba = _bigarray_start (bigarray_kind spec ba) ba
-
-let array_of_bigarray : type a b c d e.
-  < element: a;
-    ba_repr: e;
-    bigarray: b;
-    carray: c;
-    dims: d > bigarray_class -> b -> c
-  = fun spec ba ->
-    let CPointer p as element_ptr =
-      bigarray_start spec ba in
-    match spec with
-  | Genarray ->
-    let ds = Genarray.dims ba in
-    CArray.from_ptr element_ptr (Array.fold_left ( * ) 1 ds)
-  | Array1 ->
-    let d = Array1.dim ba in
-    CArray.from_ptr element_ptr d
-  | Array2 ->
-    let d1 = Array2.dim1 ba and d2 = Array2.dim2 ba in
-    CArray.from_ptr (castp (array d2 (Fat.reftype p)) element_ptr) d1
-  | Array3 ->
-    let d1 = Array3.dim1 ba and d2 = Array3.dim2 ba and d3 = Array3.dim3 ba in
-    CArray.from_ptr (castp (array d2 (array d3 (Fat.reftype p))) element_ptr) d1
-
-let bigarray_elements : type a b c d f.
-   < element: a;
-     ba_repr: f;
-     bigarray: b;
-     carray: c;
-     dims: d > bigarray_class -> d -> int
-  = fun spec dims -> match spec, dims with
-   | Genarray, ds -> Array.fold_left ( * ) 1 ds
-   | Array1, d -> d
-   | Array2, (d1, d2) -> d1 * d2
-   | Array3, (d1, d2, d3) -> d1 * d2 * d3
-
-let bigarray_of_ptr spec dims kind ptr =
-  !@ (castp (bigarray spec dims kind) ptr)
-
-let array_dims : type a b c d f.
-   < element: a;
-     ba_repr: f;
-     bigarray: b;
-     carray: c carray;
-     dims: d > bigarray_class -> c carray -> d =
-   let unsupported () = raise (Unsupported "taking dimensions of non-array type") in
-   fun spec a -> match spec with
-   | Genarray -> [| a.alength |]
-   | Array1 -> a.alength
-   | Array2 ->
-     begin match a.astart with
-     | CPointer p ->
-       begin match Fat.reftype p with
-       | Array (_, n) -> (a.alength, n)
-       | _ -> unsupported ()
-       end
-     | _ -> unsupported ()
-    end
-   | Array3 ->
-     begin match a.astart with
-     | CPointer p ->
-       begin match Fat.reftype p with
-       |  Array (Array (_, m), n) -> (a.alength, n, m)
-       | _ -> unsupported ()
-       end
-     | _ -> unsupported ()
-     end
-
-let bigarray_of_array spec kind a =
-  let dims = array_dims spec a in
-  !@ (castp (bigarray spec dims kind) (CArray.start a))
-
-let genarray = Genarray
-let array1 = Array1
-let array2 = Array2
-let array3 = Array3
-let typ_of_bigarray_kind k = Primitive (Ctypes_bigarray.prim_of_kind k)
 
 let string_from_ptr (CPointer p) ~length:len =
   if len < 0 then invalid_arg "Ctypes.string_from_ptr"

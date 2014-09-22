@@ -37,7 +37,6 @@ type 'a typ = 'a Static.typ =
   | Abstract        : Static.abstract_type      -> 'a Static.abstract typ
   | View            : ('a, 'b) view             -> 'a typ
   | Array           : 'a typ * int              -> 'a Static.carray typ
-  | Bigarray        : (_, 'a) Ctypes_bigarray.t -> 'a typ
   | OCaml           : 'a ocaml_type             -> 'a ocaml typ
 and ('a, 'b) pointer = ('a, 'b) Static.pointer =
   CPointer : 'a typ Ctypes_ptr.Fat.t -> ('a, [`C]) pointer
