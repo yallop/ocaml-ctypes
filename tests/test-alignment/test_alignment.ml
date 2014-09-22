@@ -55,16 +55,6 @@ end
 
 
 (*
-  Test the alignment of abstract types
-*)
-let test_abstract_alignment _ =
-  for i = 1 to 10 do
-    assert_equal
-      i (alignment (abstract ~name:"abstract" ~size:(11 - i) ~alignment:i))
-  done
-
-
-(*
   Test that requesting the alignment of an incomplete type raises an exception.
 *)
 let test_incomplete_alignment _ =
@@ -114,21 +104,18 @@ let test_struct_alignment _ =
                 alignment double])
       (alignment struct_a)
 
-    let abs = abstract ~name:"abs" ~size:33 ~alignment:33
     let charish = view ~read:(fun _ -> ()) ~write:(fun () -> 'c') char
 
     let struct_b = structure "A"
     let (-:) ty label = field struct_b label ty
     let _ = charish                        -: "_"
     let _ = Foreign.funptr (int @-> returning int) -: "_"
-    let _ = abs                            -: "_"
     let _ = double                         -: "_"
     let () = seal struct_b
 
     let () = assert_equal
       (maximum [alignment charish;
                 alignment (Foreign.funptr (int @-> returning int));
-                alignment abs;
                 alignment double])
       (alignment struct_b)
   end in ()
@@ -234,9 +221,6 @@ let suite = "Alignment tests" >:::
 
    "struct alignment"
    >:: test_struct_alignment;
-
-   "alignment of abstract types"
-   >:: test_abstract_alignment;
 
    "alignment of incomplete types"
    >:: test_incomplete_alignment;

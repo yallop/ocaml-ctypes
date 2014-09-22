@@ -204,7 +204,6 @@ let rec ml_typ_of_return_typ : type a. a typ -> ml_type =
   | Primitive p -> `Ident (Cstubs_public_name.ident_of_ml_prim (Primitives.ml_prim p))
   | Struct _    -> managed_buffer
   | Union _     -> managed_buffer
-  | Abstract _  -> managed_buffer
   | Pointer _   -> voidp
   | View { ty } -> ml_typ_of_return_typ ty
   | Array _    as a -> internal_error
@@ -216,7 +215,6 @@ let rec ml_typ_of_arg_typ : type a. a typ -> ml_type = function
   | Pointer _   -> fatptr
   | Struct _    -> fatptr
   | Union _     -> fatptr
-  | Abstract _  -> fatptr
   | View { ty } -> ml_typ_of_arg_typ ty
   | Array _    as a -> internal_error
     "Unexpected array in an argument type: %s" (Ctypes.string_of_typ a)
@@ -308,9 +306,6 @@ let rec pattern_and_exp_of_typ :
                   path_of_string "read", `Var x]] in
       (pat, Some (`Appl (`Ident (path_of_string x), e)))
     end
-  | Abstract _ as ty -> internal_error
-    "Unexpected abstract type encountered during ML code generation: %s"
-    (Ctypes.string_of_typ ty)
   | Array _ as ty -> internal_error
     "Unexpected array type encountered during ML code generation: %s"
     (Ctypes.string_of_typ ty)

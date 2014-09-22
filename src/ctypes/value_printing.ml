@@ -17,7 +17,6 @@ let rec format : type a. a typ -> Format.formatter -> a -> unit
   | Struct _ -> format_structured fmt v
   | Union _ -> format_structured fmt v
   | Array (a, n) -> format_array fmt v
-  | Abstract _ -> format_structured fmt v
   | View {write; ty; format=f} ->
     begin match f with
       | None -> format ty fmt (write v)
@@ -35,8 +34,6 @@ and format_structured : type a b. Format.formatter -> (a, b) structured -> unit
       fprintf fmt "{@;<1 2>@[";
       format_fields " |" ufields fmt s;
       fprintf fmt "@]@;<1 0>}"
-    | Abstract abs ->
-      pp_print_string fmt "<abstract>"
     | _ -> raise (Unsupported "unknown structured type")
 and format_array : type a. Format.formatter -> a carray -> unit
   = fun fmt ({astart = CPointer p; alength} as arr) ->

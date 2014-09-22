@@ -18,7 +18,16 @@ let max_byte_args = 5
 let (@->) f t = Function (f, t)
 let returning t = Returns t
 
-let value = abstract ~name:"value" ~size:0 ~alignment:0
+module Value :
+sig
+  type t
+  val t : t typ
+end =
+struct
+  type t = nativeint
+  let t = nativeint
+end
+let value = Value.t
 
 module Generate_C =
 struct
@@ -179,7 +188,6 @@ struct
     | Union u -> 
       Some ((of_fatptr x, ptr void) >>= fun y ->
             `Deref (`Cast (Ty (ptr ty), y)))
-    | Abstract _ -> report_unpassable "values of abstract type"
     | View { ty } -> prj ty x
     | Array _ -> report_unpassable "arrays"
 
@@ -190,7 +198,6 @@ struct
     | Pointer _ -> from_ptr x
     | Struct s -> `App (copy_bytes, [`Addr x; `Int (sizeof ty)])
     | Union u -> `App (copy_bytes, [`Addr x; `Int (sizeof ty)])
-    | Abstract _ -> report_unpassable "values of abstract type"
     | View { ty } -> inj ty x
     | Array _ -> report_unpassable "arrays"
 

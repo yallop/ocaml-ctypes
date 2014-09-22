@@ -25,8 +25,7 @@ let assert_fn_printed_as ?name e f = assert_printed_as ?name string_of_fn e f
 
 
 (*
-  Test the printing of atomic types: void, arithmetic types and abstract
-  types.
+  Test the printing of atomic types: void and arithmetic types.
 *)
 let test_atomic_printing _ =
   begin
@@ -101,11 +100,6 @@ let test_atomic_printing _ =
 
     assert_typ_printed_as ~name:"l" "double l"
       double;
-
-    let abs_t = abstract ~name:"abs_t" ~size:1 ~alignment:1 in
-
-    assert_typ_printed_as "abs_t"
-      abs_t;
   end
 
 
@@ -123,11 +117,6 @@ let test_pointer_printing _ =
 
     assert_typ_printed_as ~name:"b" "char *****b"
       (ptr (ptr (ptr (ptr (ptr char)))));
-
-    let abs_t = abstract ~name:"abs_t" ~size:1 ~alignment:1 in
-
-    assert_typ_printed_as "abs_t *"
-      (ptr abs_t);
 
     (* Pointers to incomplete structs and unions *)
     let s_incomplete = structure "s_incomplete" in 

@@ -28,7 +28,6 @@ let test_pointer_coercions _ =
       T (array 5 int32_t);
       T (structure "s");
       T (union "u");
-      T (abstract ~name:"a" ~size:12 ~alignment:4);
     ]
 
     (* Check that we can construct a coercion between any two pointer types *)
@@ -179,53 +178,39 @@ let test_unsupported_coercions _ =
     let types = [
       T int8_t,
       [T uint16_t; T float; T complex64;
-       T (array 5 int32_t); T (structure "s"); T (union "u");
-       T (abstract ~name:"a" ~size:12 ~alignment:4)];
+       T (array 5 int32_t); T (structure "s"); T (union "u")];
 
       T uint16_t,
       [T int8_t; T int; T float; T short; T complex64;
-       T (array 5 int32_t); T (structure "s"); T (union "u");
-       T (abstract ~name:"a" ~size:12 ~alignment:4)];
+       T (array 5 int32_t); T (structure "s"); T (union "u")];
 
       T int,
       [T uint16_t; T float; T complex64;
-       T (array 5 int32_t); T (structure "s"); T (union "u");
-       T (abstract ~name:"a" ~size:12 ~alignment:4)];
+       T (array 5 int32_t); T (structure "s"); T (union "u")];
 
       T float,
       [T int8_t; T uint16_t; T int; T short; T complex64;
-       T (array 5 int32_t); T (structure "s"); T (union "u");
-       T (abstract ~name:"a" ~size:12 ~alignment:4)];
+       T (array 5 int32_t); T (structure "s"); T (union "u")];
 
       T short,
       [T uint16_t; T float; T complex64;
-       T (array 5 int32_t); T (structure "s"); T (union "u");
-       T (abstract ~name:"a" ~size:12 ~alignment:4)];
+       T (array 5 int32_t); T (structure "s"); T (union "u")];
 
       T complex64,
       [T int8_t; T uint16_t; T int; T float; T short;
-       T (array 5 int32_t); T (structure "s"); T (union "u");
-       T (abstract ~name:"a" ~size:12 ~alignment:4)];
+       T (array 5 int32_t); T (structure "s"); T (union "u")];
 
       T (array 5 int32_t),
       [T int8_t; T uint16_t; T int; T float; T short; T complex64;
-       T (array 5 int32_t); T (structure "s"); T (union "u");
-       T (abstract ~name:"a" ~size:12 ~alignment:4)];
+       T (array 5 int32_t); T (structure "s"); T (union "u")];
 
       T (structure "s"),
       [T int8_t; T uint16_t; T int; T float; T short; T complex64;
-       T (array 5 int32_t); T (structure "s"); T (union "u");
-       T (abstract ~name:"a" ~size:12 ~alignment:4)];
+       T (array 5 int32_t); T (structure "s"); T (union "u")];
 
       T (union "u"),
       [T int8_t; T uint16_t; T int; T float; T short; T complex64;
-       T (array 5 int32_t); T (structure "s"); T (union "u");
-       T (abstract ~name:"a" ~size:12 ~alignment:4)];
-
-      T (abstract ~name:"a" ~size:12 ~alignment:4),
-      [T int8_t; T uint16_t; T int; T float; T short; T complex64;
-       T (array 5 int32_t); T (structure "s"); T (union "u");
-       T (abstract ~name:"a" ~size:12 ~alignment:4)];
+       T (array 5 int32_t); T (structure "s"); T (union "u")];
     ]
 
     (* None of the types in the list are currently intercoercible. *)

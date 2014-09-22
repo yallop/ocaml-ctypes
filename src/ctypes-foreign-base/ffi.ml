@@ -56,8 +56,6 @@ struct
     | Struct ({ spec = Complete _ } as s) -> struct_arg_type s
     | View { ty }                         -> arg_type ty
     | Array _                             -> report_unpassable "arrays"
-    | Abstract _                          -> (report_unpassable
-                                                "values of abstract type")
     (* The following case should never happen; incomplete types are excluded
        during type construction. *)
     | Struct { spec = Incomplete _ }      -> report_unpassable "incomplete types"

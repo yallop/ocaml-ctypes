@@ -24,8 +24,6 @@ let rec format_typ' : type a. a typ ->
       format (k `nonarray) fmt
     | View { ty } ->
       format_typ' ty k context fmt
-    | Abstract { aname } ->
-      fprintf fmt "%s%t" aname (k `nonarray)
     | Struct { tag ; spec; fields } ->
       begin match spec, context with
         | Complete _, `toplevel ->

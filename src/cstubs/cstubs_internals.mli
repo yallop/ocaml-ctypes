@@ -29,7 +29,6 @@ type 'a typ = 'a Static.typ =
   | Pointer         : 'a typ                    -> 'a ptr typ
   | Struct          : 'a Static.structure_type  -> 'a Static.structure typ
   | Union           : 'a Static.union_type      -> 'a Static.union typ
-  | Abstract        : Static.abstract_type      -> 'a Static.abstract typ
   | View            : ('a, 'b) view             -> 'a typ
   | Array           : 'a typ * int              -> 'a Static.carray typ
 and ('a, 'b) pointer = ('a, 'b) Static.pointer =

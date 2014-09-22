@@ -111,16 +111,6 @@ let test_sizeof_structs _ =
 
 
 (*
-  Test the size of abstract types.
-*)
-let test_sizeof_abstract _ =
-  for i = 1 to 10 do
-    assert_equal
-      i (sizeof (abstract ~name:"abstract" ~size:i ~alignment:(11 - i)))
-  done
-
-
-(*
   Test that taking the size of an incomplete type is treated as an error.
 *)
 let test_sizeof_incomplete _ = begin
@@ -196,9 +186,6 @@ let suite = "sizeof tests" >:::
    
    "sizeof unions"
    >:: test_sizeof_unions;
-
-   "sizeof abstract"
-   >:: test_sizeof_abstract;
 
    "sizeof incomplete"
    >:: test_sizeof_incomplete;

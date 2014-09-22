@@ -36,7 +36,6 @@ let rec build : type a b. a typ -> b typ Fat.t -> a
        types are excluded during type construction. *)
     | Union _ -> assert false
     | Array _ -> assert false
-    | Abstract _ -> assert false
 
 let rec write : type a b. a typ -> a -> b Fat.t -> unit
   = let write_aggregate size { structured = CPointer src } dst =
@@ -51,7 +50,6 @@ let rec write : type a b. a typ -> a -> b Fat.t -> unit
     | Struct { spec = Complete _ } as s -> write_aggregate (sizeof s)
     | Union { uspec = None } -> raise IncompleteType
     | Union { uspec = Some { size } } -> write_aggregate size
-    | Abstract { asize } -> write_aggregate asize
     | Array _ as a ->
       let size = sizeof a in
       (fun { astart = CPointer src } dst ->
@@ -74,7 +72,6 @@ let rec (!@) : type a. a ptr -> a
       | Struct _ -> { structured = ptr }
       | Array (elemtype, alength) ->
         { astart = CPointer (Fat.coerce cptr elemtype); alength }
-      | Abstract _ -> { structured = ptr }
       (* If it's a value type then we cons a new value. *)
       | _ -> build (Fat.reftype cptr) cptr
 

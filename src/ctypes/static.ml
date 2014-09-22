@@ -21,26 +21,18 @@ type 'a structspec =
     Incomplete of incomplete_size
   | Complete of structured_spec
 
-type abstract_type = {
-  aname : string;
-  asize : int;
-  aalignment : int;
-}
-
 type _ typ =
     Void            :                       unit typ
   | Primitive       : 'a Primitives.prim -> 'a typ
   | Pointer         : 'a typ             -> 'a ptr typ
   | Struct          : 'a structure_type  -> 'a structure typ
   | Union           : 'a union_type      -> 'a union typ
-  | Abstract        : abstract_type      -> 'a abstract typ
   | View            : ('a, 'b) view      -> 'a typ
   | Array           : 'a typ * int       -> 'a carray typ
 and 'a carray = { astart : 'a ptr; alength : int }
 and ('a, 'kind) structured = { structured : ('a, 'kind) structured ptr }
 and 'a union = ('a, [`Union]) structured
 and 'a structure = ('a, [`Struct]) structured
-and 'a abstract = ('a, [`Abstract]) structured
 and (_, _) pointer =
   CPointer : 'a typ Ctypes_ptr.Fat.t -> ('a, [`C]) pointer
 and 'a ptr = ('a, [`C]) pointer
@@ -86,7 +78,6 @@ let rec sizeof : type a. a typ -> int = function
   | Union { uspec = Some { size } }
                                    -> size
   | Array (t, i)                   -> i * sizeof t
-  | Abstract { asize }             -> asize
   | Pointer _                      -> Ctypes_primitives.pointer_size
   | View { ty }                    -> sizeof ty
 
@@ -99,7 +90,6 @@ let rec alignment : type a. a typ -> int = function
   | Union { uspec = None }           -> raise IncompleteType
   | Union { uspec = Some { align } } -> align
   | Array (t, _)                     -> alignment t
-  | Abstract { aalignment }          -> aalignment
   | Pointer _                        -> Ctypes_primitives.pointer_alignment
   | View { ty }                      -> alignment ty
 
@@ -112,7 +102,6 @@ let rec passable : type a. a typ -> bool = function
   | Union  { uspec = Some _ }      -> true
   | Array _                        -> false
   | Pointer _                      -> true
-  | Abstract _                     -> false
   | View { ty }                    -> passable ty
 
 let void = Void
@@ -149,8 +138,6 @@ let ( @->) f t =
     raise (Unsupported "Unsupported argument type")
   else
     Function (f, t)
-let abstract ~name ~size ~alignment =
-  Abstract { aname = name; asize = size; aalignment = alignment }
 let view ?format_typ ?format ~read ~write ty =
   View { read; write; format_typ; format; ty }
 let returning v =

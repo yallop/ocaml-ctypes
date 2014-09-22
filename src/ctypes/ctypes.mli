@@ -312,28 +312,6 @@ val view : ?format_typ:((Format.formatter -> unit) -> Format.formatter -> unit) 
 
 *)
 
-(** {3 Abstract types} *)
-
-type 'a abstract
-(** The type of abstract values.  The purpose of the [abstract] type is to
-    represent values whose type varies from platform to platform.
-
-    For example, the type [pthread_t] is a pointer on some platforms, an
-    integer on other platforms, and a struct on a third set of platforms.  One
-    way to deal with this kind of situation is to have
-    possibly-platform-specific code which interrogates the C type in some way
-    to help determine an appropriate representation.  Another way is to use
-    [abstract], leaving the representation opaque.
-
-    (Note, however, that although [pthread_t] is a convenient example, since
-    the type used to implement it varies significantly across platforms, it's
-    not actually a good match for [abstract], since values of type [pthread_t]
-    are passed and returned by value.) *)
-
-val abstract : name:string -> size:int -> alignment:int -> 'a abstract typ
-(** Create an abstract type specification from the size and alignment
-    requirements for the type. *)
-
 (** {3 Operations on types} *)
 
 val sizeof : 'a typ -> int
@@ -582,7 +560,7 @@ val coerce_fn : 'a fn -> 'b fn -> 'a -> 'b
 
 exception Unsupported of string
 (** An attempt was made to use a feature not currently supported by ctypes.
-    In practice this refers to attempts to use an union, array or abstract
+    In practice this refers to attempts to use an union or array
     type as an argument or return type of a function. *)
 
 exception ModifyingSealedType of string

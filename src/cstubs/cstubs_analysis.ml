@@ -90,7 +90,6 @@ let rec allocation : type a. a typ -> a allocation = function
  | Pointer _ -> `Alloc Alloc_pointer
  | Struct _ -> `Alloc Alloc_structured
  | Union _ -> `Alloc Alloc_structured
- | Abstract _ -> `Alloc Alloc_structured
  | View v ->
    begin match allocation v.ty with
    | `Alloc a -> `Alloc (Alloc_view (v, a))

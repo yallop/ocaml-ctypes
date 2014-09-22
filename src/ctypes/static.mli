@@ -7,12 +7,6 @@
 
 (* C type construction.  Internal representation, not for public use. *)
 
-type abstract_type = {
-  aname : string;
-  asize : int;
-  aalignment : int;
-}
-
 type incomplete_size = { mutable isize: int }
 
 type structured_spec = { size: int; align: int; }
@@ -27,14 +21,12 @@ type _ typ =
   | Pointer         : 'a typ             -> 'a ptr typ
   | Struct          : 'a structure_type  -> 'a structure typ
   | Union           : 'a union_type      -> 'a union typ
-  | Abstract        : abstract_type      -> 'a abstract typ
   | View            : ('a, 'b) view      -> 'a typ
   | Array           : 'a typ * int       -> 'a carray typ
 and 'a carray = { astart : 'a ptr; alength : int }
 and ('a, 'kind) structured = { structured : ('a, 'kind) structured ptr }
 and 'a union = ('a, [`Union]) structured
 and 'a structure = ('a, [`Struct]) structured
-and 'a abstract = ('a, [`Abstract]) structured
 and (_, _) pointer =
   CPointer : 'a typ Ctypes_ptr.Fat.t -> ('a, [`C]) pointer
 and 'a ptr = ('a, [`C]) pointer
@@ -102,7 +94,6 @@ val ullong : Unsigned.ullong typ
 val array : int -> 'a typ -> 'a carray typ
 val ptr : 'a typ -> 'a ptr typ
 val ( @-> ) : 'a typ -> 'b fn -> ('a -> 'b) fn
-val abstract : name:string -> size:int -> alignment:int -> 'a abstract typ
 val view : ?format_typ:((Format.formatter -> unit) ->
                         Format.formatter -> unit) ->
            ?format: (Format.formatter -> 'b -> unit) ->

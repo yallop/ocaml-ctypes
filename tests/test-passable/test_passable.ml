@@ -156,24 +156,8 @@ let test_function_pointers_are_passable _ =
 
 
 (*
-  Test that values of abstract types are not passable
-*)
-let test_abstract_values_are_not_passable _ = begin
-  assert_raises ~msg:"Abstract type rejected as argument"
-    (Unsupported "Unsupported argument type")
-    (fun () ->
-      (abstract ~name:"abstract" ~size:1 ~alignment:1) @-> returning void);
-
-  assert_raises ~msg:"Abstract type rejected as return type"
-    (Unsupported "Unsupported return type")
-    (fun () ->
-      void @-> returning (abstract ~name:"abstract" ~size:1 ~alignment:1));
-end
-
-
-(*
   Test struct passability.  Structs are passable unless they contain
-  unpassable members (unions, arrays, abstract types, or unpassable structs).
+  unpassable members (unions, arrays, or unpassable structs).
 *)
 let test_struct_passability _ =
   let module M = struct
@@ -213,11 +197,6 @@ let test_struct_passability _ =
     let (-:) ty label = field s5 label ty
     let _ = u -: "_"
     let () = seal s5
-
-    let s6 : s6 structure typ = structure "s6"
-    let (-:) ty label = field s6 label ty
-    let _ = abstract ~name:"abstract" ~size:1 ~alignment:1 -: "_"
-    let () = seal s6
 
     let _ = begin
       (* Struct types can be argument types *)
@@ -270,21 +249,6 @@ let test_struct_passability _ =
         ~msg:"Foreign rejects structs with union members as return types"
         (Unsupported "libffi does not support passing unions")
         (fun () -> Foreign.funptr (void @-> returning s5));
-
-      (* Structs with abstract members can be arguments *)
-      ignore (s6 @-> returning void);
-
-      assert_raises
-        ~msg:"Foreign rejects structs with abstract members as arguments"
-        (Unsupported "libffi does not support passing values of abstract type")
-        (fun () -> Foreign.funptr (s6 @-> returning void));
- 
-      ignore (void @-> returning s6);
-
-      assert_raises
-        ~msg:"Foreign rejects structs with abstract members as return types"
-        (Unsupported "libffi does not support passing values of abstract type")
-        (fun () -> Foreign.funptr (void @-> returning s6));
     end
   end in ()
 
@@ -329,9 +293,6 @@ let suite = "Passability tests" >:::
 
    "function pointers are passable"
     >:: test_function_pointers_are_passable;
-
-   "abstract values are not passable"
-    >:: test_abstract_values_are_not_passable;
 
    "struct passability"
     >:: test_struct_passability;
