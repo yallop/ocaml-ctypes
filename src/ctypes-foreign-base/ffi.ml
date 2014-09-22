@@ -52,7 +52,6 @@ struct
                                                (Type_printing.string_of_typ prim)
                                              else ArgType ffitype
     | Pointer _                           -> ArgType (Ffi_stubs.pointer_ffitype ())
-    | OCaml _                             -> ArgType (Ffi_stubs.pointer_ffitype ())
     | Union _                             -> report_unpassable "unions"
     | Struct ({ spec = Complete _ } as s) -> struct_arg_type s
     | View { ty }                         -> arg_type ty
@@ -138,15 +137,8 @@ struct
 
   let write_arg : type a. a typ -> offset:int -> idx:int -> a ->
                   Ctypes_ptr.voidp -> (Obj.t * int) array -> unit =
-    let ocaml_arg elt_size =
-      fun ~offset ~idx (OCamlRef (disp, obj, _)) dst mov ->
-        mov.(idx) <- (Obj.repr obj, disp * elt_size)
-    in function
-    | OCaml String     -> ocaml_arg 1
-    | OCaml Bytes      -> ocaml_arg 1
-    | OCaml FloatArray -> ocaml_arg (Ctypes_primitives.sizeof Primitives.Double)
-    | ty -> (fun ~offset ~idx v dst mov -> Memory.write ty v
-      (Ctypes_ptr.Fat.(add_bytes (make ~reftyp:Void dst) offset)))
+    fun ty ~offset ~idx v dst mov -> Memory.write ty v
+      (Ctypes_ptr.Fat.(add_bytes (make ~reftyp:Void dst) offset))
 
   (*
     callspec = allocate_callspec ()

@@ -32,7 +32,6 @@ let rec build : type a b. a typ -> b typ Fat.t -> a
     | View { read; ty } ->
       let buildty = build ty in
       (fun buf -> read (buildty buf))
-    | OCaml _ -> (fun buf -> assert false)
     (* The following cases should never happen; non-struct aggregate
        types are excluded during type construction. *)
     | Union _ -> assert false
@@ -60,7 +59,6 @@ let rec write : type a b. a typ -> a -> b Fat.t -> unit
     | View { write = w; ty } ->
       let writety = write ty in
       (fun v -> writety (w v))
-    | OCaml _ -> raise IncompleteType
 
 let null : unit ptr = CPointer (Fat.make Void Raw.null)
 
@@ -77,7 +75,6 @@ let rec (!@) : type a. a ptr -> a
       | Array (elemtype, alength) ->
         { astart = CPointer (Fat.coerce cptr elemtype); alength }
       | Abstract _ -> { structured = ptr }
-      | OCaml _ -> raise IncompleteType
       (* If it's a value type then we cons a new value. *)
       | _ -> build (Fat.reftype cptr) cptr
 
@@ -88,17 +85,12 @@ let ptr_diff : type a b. (a, b) pointer -> (a, b) pointer -> int
       (* We assume the pointers are properly aligned, or at least that
          the difference is a multiple of sizeof reftype. *)
       Fat.diff_bytes lp rp / sizeof (Fat.reftype lp)
-    | OCamlRef (lo, l, _), OCamlRef (ro, r, _) ->
-      if l != r then invalid_arg "Ctypes.ptr_diff";
-      ro - lo
 
 let (+@) : type a b. (a, b) pointer -> int -> (a, b) pointer
   = fun p x ->
     match p with
     | CPointer p ->
       CPointer (Fat.add_bytes p (x * sizeof (Fat.reftype p)))
-    | OCamlRef (offset, obj, ty) ->
-      OCamlRef (offset + x, obj, ty)
 
 let (-@) p x = p +@ (-x)
 
@@ -214,12 +206,3 @@ let addr { structured } = structured
 let string_from_ptr (CPointer p) ~length:len =
   if len < 0 then invalid_arg "Ctypes.string_from_ptr"
   else Stubs.string_of_array p ~len
-
-let ocaml_string_start str =
-  OCamlRef (0, str, String)
-
-let ocaml_bytes_start str =
-  OCamlRef (0, str, Bytes)
-
-let ocaml_float_array_start arr =
-  OCamlRef (0, arr, FloatArray)

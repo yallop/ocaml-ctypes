@@ -13,11 +13,6 @@ type abstract_type = {
   aalignment : int;
 }
 
-type _ ocaml_type =
-  String     : string ocaml_type
-| Bytes      : Bytes.t ocaml_type
-| FloatArray : float array ocaml_type
-
 type incomplete_size = { mutable isize: int }
 
 type structured_spec = { size: int; align: int; }
@@ -35,7 +30,6 @@ type _ typ =
   | Abstract        : abstract_type      -> 'a abstract typ
   | View            : ('a, 'b) view      -> 'a typ
   | Array           : 'a typ * int       -> 'a carray typ
-  | OCaml           : 'a ocaml_type      -> 'a ocaml typ
 and 'a carray = { astart : 'a ptr; alength : int }
 and ('a, 'kind) structured = { structured : ('a, 'kind) structured ptr }
 and 'a union = ('a, [`Union]) structured
@@ -43,9 +37,7 @@ and 'a structure = ('a, [`Struct]) structured
 and 'a abstract = ('a, [`Abstract]) structured
 and (_, _) pointer =
   CPointer : 'a typ Ctypes_ptr.Fat.t -> ('a, [`C]) pointer
-| OCamlRef : int * 'a * 'a ocaml_type -> ('a, [`OCaml]) pointer
 and 'a ptr = ('a, [`C]) pointer
-and 'a ocaml = ('a, [`OCaml]) pointer
 and ('a, 'b) view = {
   read : 'b -> 'a;
   write : 'a -> 'b;
@@ -108,9 +100,6 @@ val uint : Unsigned.uint typ
 val ulong : Unsigned.ulong typ
 val ullong : Unsigned.ullong typ
 val array : int -> 'a typ -> 'a carray typ
-val ocaml_string : string ocaml typ
-val ocaml_bytes : Bytes.t ocaml typ
-val ocaml_float_array : float array ocaml typ
 val ptr : 'a typ -> 'a ptr typ
 val ( @-> ) : 'a typ -> 'b fn -> ('a -> 'b) fn
 val abstract : name:string -> size:int -> alignment:int -> 'a abstract typ

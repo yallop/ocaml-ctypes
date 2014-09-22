@@ -18,7 +18,6 @@ let rec format : type a. a typ -> Format.formatter -> a -> unit
   | Union _ -> format_structured fmt v
   | Array (a, n) -> format_array fmt v
   | Abstract _ -> format_structured fmt v
-  | OCaml _ -> format_ocaml fmt v
   | View {write; ty; format=f} ->
     begin match f with
       | None -> format ty fmt (write v)
@@ -49,24 +48,6 @@ and format_array : type a. Format.formatter -> a carray -> unit
         fprintf fmt ",@;"
     done;
     fprintf fmt "@]@;<1 0>}"
-and format_ocaml : type a. Format.formatter -> a ocaml -> unit =
-  let offset fmt = function
-    | 0 -> ()
-    | n -> Format.fprintf fmt "@ @[[offset:%d]@]" n
-  and float_array fmt arr =
-    Format.fprintf fmt "[|@;<1 2>@[";
-    let len = Array.length arr in
-    for i = 0 to len - 1 do
-      Format.pp_print_float fmt arr.(i);
-      if i <> len - 1 then
-        Format.fprintf fmt ",@;"
-    done;
-    Format.fprintf fmt "@]@;<1 0>|]"
-  in
-  fun fmt (OCamlRef (off, obj, ty)) -> match ty with
-  | String -> Format.fprintf fmt "%S%a" obj offset off
-  | Bytes -> Format.fprintf fmt "%S%a" (Bytes.to_string obj) offset off
-  | FloatArray -> Format.fprintf fmt "%a%a" float_array obj offset off
 and format_fields : type a b. string -> (a, b) structured boxed_field list ->
                               Format.formatter -> (a, b) structured -> unit
   = fun sep fields fmt s ->

@@ -141,14 +141,6 @@ let test_sizeof_void _ =
  
 
 (*
-  Test that [sizeof] treats OCaml types as incomplete.
-*)
-let test_sizeof_ocaml_string _ =
-  assert_raises IncompleteType
-    (fun () -> sizeof ocaml_string)
-
-
-(*
   Test the behaviour of sizeof on array types.
 *)
 let test_sizeof_arrays _ = begin
@@ -213,9 +205,6 @@ let suite = "sizeof tests" >:::
 
    "sizeof void"
    >:: test_sizeof_void;
-
-   "sizeof considers ocaml_string incomplete"
-    >:: test_sizeof_ocaml_string;
 
    "sizeof arrays"
    >:: test_sizeof_arrays;

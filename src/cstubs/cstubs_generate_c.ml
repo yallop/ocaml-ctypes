@@ -182,9 +182,6 @@ struct
     | Abstract _ -> report_unpassable "values of abstract type"
     | View { ty } -> prj ty x
     | Array _ -> report_unpassable "arrays"
-    | OCaml String -> Some (string_to_ptr x)
-    | OCaml Bytes -> Some (string_to_ptr x)
-    | OCaml FloatArray -> Some (float_array_to_ptr x)
 
   let rec inj : type a. a typ -> cexp -> ceff =
     fun ty x -> match ty with
@@ -196,7 +193,6 @@ struct
     | Abstract _ -> report_unpassable "values of abstract type"
     | View { ty } -> inj ty x
     | Array _ -> report_unpassable "arrays"
-    | OCaml _ -> report_unpassable "ocaml references as return values"
 
   type _ fn =
   | Returns  : 'a typ   -> 'a fn

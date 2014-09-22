@@ -209,12 +209,6 @@ let rec ml_typ_of_return_typ : type a. a typ -> ml_type =
   | View { ty } -> ml_typ_of_return_typ ty
   | Array _    as a -> internal_error
     "Unexpected array type in the return type: %s" (Ctypes.string_of_typ a)
-  | OCaml String -> Static.unsupported
-    "cstubs does not support OCaml strings as return values"
-  | OCaml Bytes -> Static.unsupported
-    "cstubs does not support OCaml bytes values as return values"
-  | OCaml FloatArray -> Static.unsupported
-    "cstubs does not support OCaml float arrays as return values"
 
 let rec ml_typ_of_arg_typ : type a. a typ -> ml_type = function
   | Void -> `Ident (path_of_string "unit")
@@ -226,16 +220,6 @@ let rec ml_typ_of_arg_typ : type a. a typ -> ml_type = function
   | View { ty } -> ml_typ_of_arg_typ ty
   | Array _    as a -> internal_error
     "Unexpected array in an argument type: %s" (Ctypes.string_of_typ a)
-  | OCaml String ->
-    `Appl (path_of_string "CI.ocaml",
-           [`Ident (path_of_string "string")])
-  | OCaml Bytes ->
-    `Appl (path_of_string "CI.ocaml",
-           [`Ident (path_of_string "Bytes.t")])
-  | OCaml FloatArray ->
-    `Appl (path_of_string "CI.ocaml",
-           [`Appl (path_of_string "array",
-                   [`Ident (path_of_string "float")])])
 
 let rec ml_external_type_of_fn : type a. a fn -> ml_external_type = function
   | Returns t -> `Prim ([], ml_typ_of_return_typ t)
@@ -323,18 +307,6 @@ let rec pattern_and_exp_of_typ :
         [`Record [path_of_string "CI.ty", p;
                   path_of_string "read", `Var x]] in
       (pat, Some (`Appl (`Ident (path_of_string x), e)))
-    end
-  | OCaml ty ->
-    begin match pol, ty with
-    | In, String -> (static_con "OCaml" [static_con "String" []], None)
-    | In, Bytes -> (static_con "OCaml" [static_con "Bytes" []], None)
-    | In, FloatArray -> (static_con "OCaml" [static_con "FloatArray" []], None)
-    | Out, String -> Static.unsupported
-      "cstubs does not support OCaml strings as return values"
-    | Out, Bytes -> Static.unsupported
-      "cstubs does not support OCaml bytes values as return values"
-    | Out, FloatArray -> Static.unsupported
-      "cstubs does not support OCaml float arrays as return values"
     end
   | Abstract _ as ty -> internal_error
     "Unexpected abstract type encountered during ML code generation: %s"

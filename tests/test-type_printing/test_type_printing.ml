@@ -384,19 +384,6 @@ let test_array_printing _ =
 
 
 (*
-  Test the printing of OCaml string types.
-*)
-let test_ocaml_string_printing _ =
-  begin
-    assert_typ_printed_as ~name:"p" "char *p"
-      ocaml_string;
-
-    assert_typ_printed_as "char *"
-      ocaml_string;
-  end
-
-
-(*
   Test the printing of function types.
 *)
 let test_function_printing _ =
@@ -464,9 +451,6 @@ let suite = "Type printing tests" >:::
 
    "printing arrays"
     >:: test_array_printing;
-
-   "printing OCaml string types"
-    >:: test_ocaml_string_printing;
 
    "printing functions"
     >:: test_function_printing;

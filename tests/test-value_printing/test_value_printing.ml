@@ -311,22 +311,6 @@ let test_array_printing _ =
        (string_of (array 2 (array 3 int)) arrarr))
 
 
-(*
-  Test the printing of ocaml_string values.
-*)
-let test_ocaml_string_printing _ =
-  let s = "abc@%^&*[\"" in
-  begin
-    assert_equal
-      (string_of ocaml_string (ocaml_string_start s))
-      (Printf.sprintf "%S" s);
-
-    assert_bool "ocaml_string printing with offsets"
-      (equal_ignoring_whitespace
-         (string_of ocaml_string ((ocaml_string_start s) +@ 3))
-         (Printf.sprintf "%S [offset:3]" s));
-  end
-
 module Foreign_tests = Common_tests(Tests_common.Foreign_binder)
 module Stub_tests = Common_tests(Generated_bindings)
 
@@ -349,9 +333,6 @@ let suite = "Value printing tests" >:::
 
    "printing arrays"
     >:: test_array_printing;
-
-   "printing ocaml strings"
-    >:: test_ocaml_string_printing;
   ]
 
 

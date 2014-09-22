@@ -27,11 +27,6 @@ type abstract_type = {
   aalignment : int;
 }
 
-type _ ocaml_type =
-  String     : string ocaml_type
-| Bytes      : Bytes.t ocaml_type
-| FloatArray : float array ocaml_type
-
 type _ typ =
     Void            :                       unit typ
   | Primitive       : 'a Primitives.prim -> 'a typ
@@ -41,7 +36,6 @@ type _ typ =
   | Abstract        : abstract_type      -> 'a abstract typ
   | View            : ('a, 'b) view      -> 'a typ
   | Array           : 'a typ * int       -> 'a carray typ
-  | OCaml           : 'a ocaml_type      -> 'a ocaml typ
 and 'a carray = { astart : 'a ptr; alength : int }
 and ('a, 'kind) structured = { structured : ('a, 'kind) structured ptr }
 and 'a union = ('a, [`Union]) structured
@@ -49,9 +43,7 @@ and 'a structure = ('a, [`Struct]) structured
 and 'a abstract = ('a, [`Abstract]) structured
 and (_, _) pointer =
   CPointer : 'a typ Ctypes_ptr.Fat.t -> ('a, [`C]) pointer
-| OCamlRef : int * 'a * 'a ocaml_type -> ('a, [`OCaml]) pointer
 and 'a ptr = ('a, [`C]) pointer
-and 'a ocaml = ('a, [`OCaml]) pointer
 and ('a, 'b) view = {
   read : 'b -> 'a;
   write : 'a -> 'b;
@@ -96,7 +88,6 @@ let rec sizeof : type a. a typ -> int = function
   | Array (t, i)                   -> i * sizeof t
   | Abstract { asize }             -> asize
   | Pointer _                      -> Ctypes_primitives.pointer_size
-  | OCaml _                        -> raise IncompleteType
   | View { ty }                    -> sizeof ty
 
 let rec alignment : type a. a typ -> int = function
@@ -110,7 +101,6 @@ let rec alignment : type a. a typ -> int = function
   | Array (t, _)                     -> alignment t
   | Abstract { aalignment }          -> aalignment
   | Pointer _                        -> Ctypes_primitives.pointer_alignment
-  | OCaml _                          -> raise IncompleteType
   | View { ty }                      -> alignment ty
 
 let rec passable : type a. a typ -> bool = function
@@ -123,7 +113,6 @@ let rec passable : type a. a typ -> bool = function
   | Array _                        -> false
   | Pointer _                      -> true
   | Abstract _                     -> false
-  | OCaml _                        -> true
   | View { ty }                    -> passable ty
 
 let void = Void
@@ -154,9 +143,6 @@ let uint = Primitive Primitives.Uint
 let ulong = Primitive Primitives.Ulong
 let ullong = Primitive Primitives.Ullong
 let array i t = Array (t, i)
-let ocaml_string = OCaml String
-let ocaml_bytes = OCaml Bytes
-let ocaml_float_array = OCaml FloatArray
 let ptr t = Pointer t
 let ( @->) f t =
   if not (passable f) then

@@ -126,14 +126,6 @@ let test_arrays_of_incomplete_type _ =
 
 
 (*
-  Test that OCaml types cannot be used to build arrays.
-*)
-let test_ocaml_types_rejected_as_array_elements _ =
-  assert_raises IncompleteType
-    (fun () -> CArray.make ocaml_string 10)
-
-
-(*
   Test that creating an array initializes all elements appropriately.
 *)
 let test_pointer_to_array_arithmetic _ =
@@ -208,9 +200,6 @@ let suite = "Array tests" >:::
 
    "arrays of incomplete type"
     >:: test_arrays_of_incomplete_type;
-
-   "ocaml_string cannot be used to build arrays"
-    >:: test_ocaml_types_rejected_as_array_elements;
 
    "pointer to array arithmetic"
     >:: test_pointer_to_array_arithmetic;

@@ -97,7 +97,6 @@ let rec allocation : type a. a typ -> a allocation = function
    | `Noalloc na -> `Noalloc (Noalloc_view (v, na))
    end
  | Array _ -> `Alloc Alloc_array
- | OCaml _ -> `Alloc Alloc_pointer
 
 let rec may_allocate : type a. a fn -> bool = function
   | Returns t ->
