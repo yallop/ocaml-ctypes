@@ -1,77 +1,5 @@
 # -*- Makefile -*-
 
-# subproject: fts with stub generation
-fts-stubs.install = no
-fts-stubs.dir = examples/fts/stub-generation/bindings
-fts-stubs.subproject_deps = ctypes cstubs \
-  ctypes-foreign-base ctypes-foreign-unthreaded
-fts-stubs: PROJECT=fts-stubs
-fts-stubs: $$(LIB_TARGETS)
-
-fts-stub-generator.install = no
-fts-stub-generator.dir = examples/fts/stub-generation/stub-generator
-fts-stub-generator.subproject_deps = ctypes cstubs \
-  ctypes-foreign-base ctypes-foreign-unthreaded fts-stubs
-fts-stub-generator.deps = str unix
-fts-stub-generator: PROJECT=fts-stub-generator
-fts-stub-generator: $$(NATIVE_TARGET)
-
-fts-cmd.install = no
-fts-cmd.dir = examples/fts/stub-generation
-fts-cmd.subproject_deps = ctypes cstubs \
-  ctypes-foreign-base ctypes-foreign-unthreaded fts-stubs
-fts-cmd.deps = str unix
-fts-cmd.extra_mls = fts_generated.ml
-fts-cmd: CFLAGS+=-D_FILE_OFFSET_BITS=32
-fts-cmd: PROJECT=fts-cmd
-fts-cmd: $$(NATIVE_TARGET)
-
-fts-cmd-build: examples/fts/stub-generation/fts_generated.ml
-examples/fts/stub-generation/fts_generated.ml:
-	_build/fts-stub-generator.native
-
-# subproject: fts using dynamic linking (foreign)
-fts.install = no
-fts.dir = examples/fts/foreign
-fts.deps = str unix
-fts.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
-fts: PROJECT=fts
-fts: $$(NATIVE_TARGET)
-
-# subproject: date with stub generation
-date-stubs.install = no
-date-stubs.dir = examples/date/stub-generation/bindings
-date-stubs.subproject_deps = ctypes cstubs
-date-stubs: PROJECT=date-stubs
-date-stubs: $$(LIB_TARGETS)
-
-date-stub-generator.install = no
-date-stub-generator.dir = examples/date/stub-generation/stub-generator
-date-stub-generator.subproject_deps = ctypes cstubs date-stubs
-date-stub-generator.deps = str unix
-date-stub-generator: PROJECT=date-stub-generator
-date-stub-generator: $$(NATIVE_TARGET)
-
-date-cmd.install = no
-date-cmd.dir = examples/date/stub-generation
-date-cmd.subproject_deps = ctypes cstubs date-stubs
-date-cmd.deps = str unix
-date-cmd.extra_mls = date_generated.ml
-date-cmd: PROJECT=date-cmd
-date-cmd: $$(NATIVE_TARGET)
-
-date-cmd-build: examples/date/stub-generation/date_generated.ml
-examples/date/stub-generation/date_generated.ml:
-	_build/date-stub-generator.native
-
-# subproject: date using dynamic linking (foreign)
-date.install = no
-date.dir = examples/date/foreign
-date.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
-date.deps = str unix
-date: PROJECT=date
-date: $$(NATIVE_TARGET)
-
 # subproject: ncurses with stub generation
 ncurses-stubs.install = no
 ncurses-stubs.dir = examples/ncurses/stub-generation/bindings
@@ -102,4 +30,4 @@ ncurses.link_flags = -Wl,-no-as-needed -lncurses
 ncurses: PROJECT=ncurses
 ncurses: $$(NATIVE_TARGET)
 
-examples: build ncurses ncurses-stubs ncurses-cmd-build ncurses-cmd fts fts-stubs fts-stub-generator fts-cmd-build fts-cmd date date-stubs date-stub-generator date-cmd-build date-cmd
+examples: build ncurses ncurses-stubs ncurses-cmd-build ncurses-cmd
