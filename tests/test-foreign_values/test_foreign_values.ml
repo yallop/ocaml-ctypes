@@ -22,7 +22,7 @@ let test_retrieving_struct () =
   let str = array 1 char -: "str" in
   let () = seal s in
   let global_struct = Foreign.foreign_value "global_struct" s ~from:testlib in
-  let p = Array.start (getf !@global_struct str) in
+  let p = CArray.start (getf !@global_struct str) in
   let stringp = from_voidp string (to_voidp (allocate (ptr char) p)) in
   begin
     let expected = "global string" in

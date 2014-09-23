@@ -268,6 +268,13 @@ test-sizeof.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthread
 test-sizeof: PROJECT=test-sizeof
 test-sizeof: $$(NATIVE_TARGET)
 
+test-foreign_values.dir = tests/test-foreign_values
+test-foreign_values.threads = yes
+test-foreign_values.deps = str bigarray oUnit bytes
+test-foreign_values.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
+test-foreign_values: PROJECT=test-foreign_values
+test-foreign_values: $$(NATIVE_TARGET)
+
 test-unions-stubs.dir  = tests/test-unions/stubs
 test-unions-stubs.threads = yes
 test-unions-stubs.subproject_deps = ctypes cstubs \
@@ -666,6 +673,7 @@ TESTS += test-structs-stubs test-structs-stub-generator test-structs-generated t
 TESTS += test-finalisers
 TESTS += test-cstdlib-stubs test-cstdlib-stub-generator test-cstdlib-generated test-cstdlib
 TESTS += test-sizeof
+TESTS += test-foreign_values
 TESTS += test-unions-stubs test-unions-stub-generator test-unions-generated test-unions
 TESTS += test-custom_ops
 TESTS += test-arrays-stubs test-arrays-stub-generator test-arrays-generated test-arrays
