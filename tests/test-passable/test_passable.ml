@@ -5,14 +5,14 @@
  * See the file LICENSE for details.
  *)
 
-open OUnit
+open OUnit2
 open Ctypes
 
 
 (*
   Test that primitives are passable.
 *)
-let test_primitives_are_passable () =
+let test_primitives_are_passable _ =
   let _ = void @-> returning void 
   and _ = char @-> returning char
   and _ = schar @-> returning schar
@@ -41,7 +41,7 @@ let test_primitives_are_passable () =
 (*
   Test that unions are not passable
 *)
-let test_unions_are_not_passable () =
+let test_unions_are_not_passable _ =
   let module M = struct
     type u
 
@@ -73,7 +73,7 @@ let test_unions_are_not_passable () =
 (*
   Test the passability of complex values
 *)
-let test_complex_value_passability () =
+let test_complex_value_passability _ =
   (* complex32 can be used as an argument type *)
   ignore (complex32 @-> returning void);
 
@@ -106,7 +106,7 @@ let test_complex_value_passability () =
 (*
   Test that arrays are not passable
 *)
-let test_arrays_are_not_passable () =
+let test_arrays_are_not_passable _ =
   assert_raises ~msg:"Array type rejected as argument"
     (Unsupported "Unsupported argument type")
     (fun () -> array 1 int @-> returning void);
@@ -119,7 +119,7 @@ let test_arrays_are_not_passable () =
 (*
   Test that bigarrays are not passable
 *)
-let test_bigarrays_are_not_passable () =
+let test_bigarrays_are_not_passable _ =
   assert_raises ~msg:"bigarray type rejected as argument"
     (Unsupported "Unsupported argument type")
     (fun () -> bigarray genarray [|1|] Bigarray.int @-> returning void);
@@ -156,7 +156,7 @@ let test_bigarrays_are_not_passable () =
 (*
   Test that pointers are passable
 *)
-let test_pointers_are_passable () =
+let test_pointers_are_passable _ =
   (* Pointers to primitives are passable *)
   let _ = ptr void @-> returning (ptr void)
   and _ = ptr int @-> returning (ptr int)
@@ -186,7 +186,7 @@ let test_pointers_are_passable () =
 (*
   Test that function pointers are passable
 *)
-let test_function_pointers_are_passable () =
+let test_function_pointers_are_passable _ =
   (* Pointers to primitives are passable *)
   ignore (Foreign.funptr (int @-> returning int)
           @-> returning (Foreign.funptr (int @-> returning int)))
@@ -195,7 +195,7 @@ let test_function_pointers_are_passable () =
 (*
   Test that values of abstract types are not passable
 *)
-let test_abstract_values_are_not_passable () = begin
+let test_abstract_values_are_not_passable _ = begin
   assert_raises ~msg:"Abstract type rejected as argument"
     (Unsupported "Unsupported argument type")
     (fun () ->
@@ -212,7 +212,7 @@ end
   Test struct passability.  Structs are passable unless they contain
   unpassable members (unions, arrays, abstract types, or unpassable structs).
 *)
-let test_struct_passability () =
+let test_struct_passability _ =
   let module M = struct
     type s1 and s2 and s3 and s4 and s5 and s6 and u
 
@@ -330,7 +330,7 @@ let test_struct_passability () =
   Test passability of incomplete types.  Trying to use an incomplete type
   in a function specification should give rise to an error.
 *)
-let test_incomplete_passability () =
+let test_incomplete_passability _ =
   let s = structure "incomplete"
   and u = union "incomplete"
   in begin

@@ -5,7 +5,7 @@
  * See the file LICENSE for details.
  *)
 
-open OUnit
+open OUnit2
 open Ctypes
 
 
@@ -22,7 +22,7 @@ struct
     using strings for input parameters and a char array for an output
     parameter.  Examine the output buffer using a cast to a string view.
   *)
-  let test_passing_string_array () =
+  let test_passing_string_array _ =
     let l = ["the "; "quick "; "brown "; "fox "; "etc. "; "etc. "; ] in
     let arr = CArray.of_list string l in
 
@@ -44,7 +44,7 @@ struct
 
     using a custom view that treats chars as ints.
   *)
-  let test_passing_chars_as_ints () =
+  let test_passing_chars_as_ints _ =
     assert_equal ~msg:"toupper('x') = 'X'"
       'X' (toupper 'x');
 
@@ -58,7 +58,7 @@ struct
   (*
     Use views to create a nullable function pointer.
   *)
-  let test_nullable_function_pointer_view () =
+  let test_nullable_function_pointer_view _ =
     begin
       let fromSome = function None -> assert false | Some x -> x in
 
@@ -88,7 +88,7 @@ end
 (*
   Use the nullable pointer view to view nulls as Nones.
 *)
-let test_nullable_pointer_view () =
+let test_nullable_pointer_view _ =
   let p = allocate int 10 in
   let pp = allocate (ptr int) p in
   let npp = from_voidp (ptr_opt int) (to_voidp pp) in
@@ -110,7 +110,7 @@ let test_nullable_pointer_view () =
 (*
   Use a polar form view of complex numbers.
 *)
-let test_polar_form_view () =
+let test_polar_form_view _ =
   let module M =
   struct
     open Complex

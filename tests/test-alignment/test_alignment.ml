@@ -5,14 +5,14 @@
  * See the file LICENSE for details.
  *)
 
-open OUnit
+open OUnit2
 open Ctypes
 
 
 (*
   Test some relationships between the alignment requirements of primitive types.
 *)
-let test_primitive_alignment () = begin
+let test_primitive_alignment _ = begin
   assert_equal ~msg:"alignmentof(char) == 1"
     (alignment char) 1;
 
@@ -57,7 +57,7 @@ end
 (*
   Test the alignment of abstract types
 *)
-let test_abstract_alignment () =
+let test_abstract_alignment _ =
   for i = 1 to 10 do
     assert_equal
       i (alignment (abstract ~name:"abstract" ~size:(11 - i) ~alignment:i))
@@ -67,7 +67,7 @@ let test_abstract_alignment () =
 (*
   Test that requesting the alignment of an incomplete type raises an exception.
 *)
-let test_incomplete_alignment () =
+let test_incomplete_alignment _ =
   assert_raises IncompleteType
     (fun () -> alignment void);
 
@@ -94,7 +94,7 @@ let test_incomplete_alignment () =
 (*
   Test that [alignment] treats OCaml types as incomplete.
 *)
-let test_alignment_ocaml_string () =
+let test_alignment_ocaml_string _ =
   assert_raises IncompleteType
     (fun () -> alignment ocaml_string)
 
@@ -103,7 +103,7 @@ let test_alignment_ocaml_string () =
    Test that the alignment of a struct is equal to the maximum
    alignment of its members.
 *)
-let test_struct_alignment () = 
+let test_struct_alignment _ = 
   let module M = struct
     type a and b and u
 
@@ -160,7 +160,7 @@ let test_struct_alignment () =
      sizeof (struct A) == 12
      sizeof (struct B) == 16
 *)
-let test_struct_tail_padding () = 
+let test_struct_tail_padding _ = 
   let module M = struct
     type a and b and u
 
@@ -237,7 +237,7 @@ let test_struct_tail_padding () =
    Test that the alignment of a bigarray is the same as the alignment
    of its element type.
 *)
-let test_bigarray_alignment () =
+let test_bigarray_alignment _ =
   let module M = struct
     module B = Bigarray
     type k = K : ('a, 'b) Bigarray.kind * int -> k

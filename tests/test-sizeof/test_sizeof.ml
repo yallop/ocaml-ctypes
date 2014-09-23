@@ -5,14 +5,14 @@
  * See the file LICENSE for details.
  *)
 
-open OUnit
+open OUnit2
 open Ctypes
 
 
 (*
   Test some relationships between the sizes of primitive types.
 *)
-let test_sizeof_primitives () = begin
+let test_sizeof_primitives _ = begin
   assert_equal ~msg:"sizeof (char) == 1"
     (sizeof char) 1;
 
@@ -73,7 +73,7 @@ end
 (*
   Test some properties of the sizes of unions.
 *)
-let test_sizeof_unions () =
+let test_sizeof_unions _ =
   let int_char = union "int_char" in
   let _ = field int_char "_" int in
   let _ = field int_char "_" char in
@@ -92,7 +92,7 @@ let test_sizeof_unions () =
 (*
   Test some properties of the sizes of structs.
 *)
-let test_sizeof_structs () =
+let test_sizeof_structs _ =
   let module M = struct
     (* We don't expect homogeneous structs consisting of words to have
        any padding. *)
@@ -113,7 +113,7 @@ let test_sizeof_structs () =
 (*
   Test the size of abstract types.
 *)
-let test_sizeof_abstract () =
+let test_sizeof_abstract _ =
   for i = 1 to 10 do
     assert_equal
       i (sizeof (abstract ~name:"abstract" ~size:i ~alignment:(11 - i)))
@@ -123,7 +123,7 @@ let test_sizeof_abstract () =
 (*
   Test that taking the size of an incomplete type is treated as an error.
 *)
-let test_sizeof_incomplete () = begin
+let test_sizeof_incomplete _ = begin
   assert_raises IncompleteType
     (fun () -> sizeof (structure "incomplete"));
 
@@ -135,7 +135,7 @@ end
 (*
   Test that taking the size of void is treated as an error.
 *)
-let test_sizeof_void () =
+let test_sizeof_void _ =
   assert_raises IncompleteType
     (fun () -> sizeof void)
  
@@ -143,7 +143,7 @@ let test_sizeof_void () =
 (*
   Test that [sizeof] treats OCaml types as incomplete.
 *)
-let test_sizeof_ocaml_string () =
+let test_sizeof_ocaml_string _ =
   assert_raises IncompleteType
     (fun () -> sizeof ocaml_string)
 
@@ -151,7 +151,7 @@ let test_sizeof_ocaml_string () =
 (*
   Test the behaviour of sizeof on array types.
 *)
-let test_sizeof_arrays () = begin
+let test_sizeof_arrays _ = begin
   assert_equal ~msg:"The size of an array is the sum of the size of its members"
     (12 * (sizeof int8_t)) (sizeof (array 12 int8_t));
 
@@ -163,7 +163,7 @@ end
 (*
   Test the behaviour of sizeof on bigarray types.
 *)
-let test_sizeof_bigarrays () =
+let test_sizeof_bigarrays _ =
   let module M = struct
     module B = Bigarray
     type k = K : ('a, 'b) Bigarray.kind * int -> k
@@ -211,7 +211,7 @@ let test_sizeof_bigarrays () =
 (*
   Test that all pointers have equal size.
 *)
-let test_sizeof_pointers () = begin
+let test_sizeof_pointers _ = begin
   let pointer_size = sizeof (ptr void) in
   assert_equal pointer_size (sizeof (ptr void));
   assert_equal pointer_size (sizeof (ptr int));
@@ -231,7 +231,7 @@ end
 (*
   Test that the size of a view type is the same as the underlying type.
 *)
-let test_sizeof_views () = begin
+let test_sizeof_views _ = begin
   let const c x = c in
   let vint = view ~read:(const [1]) ~write:(const 0) int
   and vchar = view ~read:(const ["1"]) ~write:(const 'a') char

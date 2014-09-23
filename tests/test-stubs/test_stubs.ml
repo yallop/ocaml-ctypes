@@ -5,13 +5,13 @@
  * See the file LICENSE for details.
  *)
 
-open OUnit
+open OUnit2
 open Ctypes
 open Foreign
 
 let missing = "_60d2dd04_1b66_4b79_a2ea_8375157da563"
 
-let test_missing () = 
+let test_missing _ = 
   let miss = foreign missing ~stub:true (int @-> int @-> (returning int)) in
   begin try ignore (miss 2 3); assert_failure "should raise" with exn -> () end;
   try

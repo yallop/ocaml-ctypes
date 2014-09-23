@@ -7,7 +7,7 @@
 
 (* Tests for binding variadic functions. *)
 
-open OUnit
+open OUnit2
 open Ctypes
 
 
@@ -21,7 +21,7 @@ struct
   (*
     Test calling snprintf.
   *)
-  let test_snprintf () =
+  let test_snprintf _ =
     let bufsz = 128 in
     let write snprintf apply =
       let buf = allocate_n char bufsz in

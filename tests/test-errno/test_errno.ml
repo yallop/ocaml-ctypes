@@ -5,7 +5,7 @@
  * See the file LICENSE for details.
  *)
 
-open OUnit
+open OUnit2
 open Ctypes
 
 
@@ -13,7 +13,7 @@ open Ctypes
    Call fdopendir() with a bogus file descriptor and check that an exception
    is raised.
 *)
-let test_errno_exception_raised () =
+let test_errno_exception_raised _ =
   let close = Foreign.foreign "close" ~check_errno:true
     (int @-> returning int) in
   assert_raises (Unix.Unix_error(Unix.EBADF, "close", ""))
@@ -23,7 +23,7 @@ let test_errno_exception_raised () =
 (*
   Call chdir() with a valid directory path and check that zero is returned. 
 *)
-let test_int_return_errno_exception_raised () =
+let test_int_return_errno_exception_raised _ =
   let chdir = Foreign.foreign "chdir" ~check_errno:true
     (string @-> returning int) in
   assert_raises (Unix.Unix_error(Unix.ENOENT, "chdir", ""))
@@ -33,7 +33,7 @@ let test_int_return_errno_exception_raised () =
 (*
   Call chdir() with a valid directory path and check that zero is returned. 
 *)
-let test_errno_no_exception_raised () =
+let test_errno_no_exception_raised _ =
   let chdir = Foreign.foreign "chdir" ~check_errno:true
     (string @-> returning int) in
   assert_equal 0 (chdir (Sys.getcwd ()))

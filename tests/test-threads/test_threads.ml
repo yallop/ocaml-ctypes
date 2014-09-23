@@ -6,7 +6,7 @@
  *)
 
 open Ctypes
-open OUnit
+open OUnit2
 open Foreign
 open Functions
 
@@ -14,7 +14,7 @@ open Functions
 (*
   Ensure that passing ~release_runtime_lock releases the runtime lock.
 *)
-let test_release_runtime_lock () =
+let test_release_runtime_lock _ =
   begin
     initialize_waiters ();
     let t1 = Thread.create post1_wait2 () in
@@ -28,7 +28,7 @@ let test_release_runtime_lock () =
   Ensure that passing ~runtime_lock to funptr causes a callbacks to acquire
   the runtime lock.
 *)
-let test_acquire_runtime_lock () =
+let test_acquire_runtime_lock _ =
   begin
     let f x y = let _ = Gc.major () in !@x + !@y in
     let t1 = Thread.create Gc.major () in

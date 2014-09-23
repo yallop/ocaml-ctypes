@@ -5,7 +5,7 @@
  * See the file LICENSE for details.
  *)
 
-open OUnit
+open OUnit2
 open Ctypes
 
 
@@ -30,7 +30,7 @@ struct
          struct simple *self;
        };
   *)
-  let test_passing_struct () =
+  let test_passing_struct _ =
     let module M = struct
       let s = make simple
 
@@ -61,7 +61,7 @@ struct
          struct simple *self;
        };
   *)
-  let test_returning_struct () =
+  let test_returning_struct _ =
     let module M = struct
       let s = return_struct ()
 
@@ -83,7 +83,7 @@ end
 (*
   Check that attempts to use incomplete types for struct members are rejected.
 *)
-let test_incomplete_struct_members () =
+let test_incomplete_struct_members _ =
   let s = structure "s" in begin
 
     assert_raises IncompleteType
@@ -100,7 +100,7 @@ let test_incomplete_struct_members () =
 (*
   Test that OCaml types cannot be used as struct or union fields.
 *)
-let test_ocaml_types_rejected_as_fields () =
+let test_ocaml_types_rejected_as_fields _ =
   let module M = struct
     let s = structure "s"
     let () = assert_raises IncompleteType
@@ -118,7 +118,7 @@ let test_ocaml_types_rejected_as_fields () =
 (*
   Test reading and writing pointers to struct members.
 *)
-let test_pointers_to_struct_members () =
+let test_pointers_to_struct_members _ =
   let module M = struct
     type s
 
@@ -159,7 +159,7 @@ let test_pointers_to_struct_members () =
 (*
   Test structs with union members.
 *)
-let test_structs_with_union_members () =
+let test_structs_with_union_members _ =
   let module M = struct
     type u and s
 
@@ -221,7 +221,7 @@ let test_structs_with_union_members () =
 (*
   Test structs with array members.
 *)
-let test_structs_with_array_members () =
+let test_structs_with_array_members _ =
   let module M = struct
     type u and s
 
@@ -285,7 +285,7 @@ let test_structs_with_array_members () =
 (*
   Test that attempting to update a sealed struct is treated as an error.
 *)
-let test_updating_sealed_struct () =
+let test_updating_sealed_struct _ =
   let styp = structure "sealed" in
   let _ = field styp "_" int in
   let () = seal styp in
@@ -297,7 +297,7 @@ let test_updating_sealed_struct () =
 (*
   Test that attempting to seal an empty struct is treated as an error.
 *)
-let test_sealing_empty_struct () =
+let test_sealing_empty_struct _ =
   let empty = structure "empty" in
 
   assert_raises (Unsupported "struct with no fields")
@@ -308,7 +308,7 @@ let test_sealing_empty_struct () =
    Check that references to fields aren't garbage collected while they're
    still needed.
 *)
-let test_field_references_not_invalidated () =
+let test_field_references_not_invalidated _ =
   let module M = struct
     type s1 and s2
 
@@ -340,7 +340,7 @@ let test_field_references_not_invalidated () =
    Check that references to ffi_type values for structs aren't collected while
    they're still needed
 *)
-let test_struct_ffi_type_lifetime () =
+let test_struct_ffi_type_lifetime _ =
   let module M = struct
     let f =
       let t = 
@@ -370,7 +370,7 @@ struct
   (*
     Test passing structs with union members.
   *)
-  let test_passing_structs_with_union_members () =
+  let test_passing_structs_with_union_members _ =
     let mkInt v =
       let t = make tagged in
       t @. tag <-@ 'i';
@@ -396,7 +396,7 @@ struct
   (*
     Test passing structs with array members.
   *)
-  let test_passing_structs_with_array_members () =
+  let test_passing_structs_with_array_members _ =
     let mkTriple (x, y, z) =
       let t = make triple in
       t @. elements <-@ CArray.of_list double [x; y; z];

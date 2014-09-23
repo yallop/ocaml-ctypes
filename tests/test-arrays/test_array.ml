@@ -5,7 +5,7 @@
  * See the file LICENSE for details.
  *)
 
-open OUnit
+open OUnit2
 open Ctypes
 
 
@@ -15,7 +15,7 @@ let testlib = Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW]
 (*
   Creating multidimensional arrays, and reading and writing elements.
 *)
-let test_multidimensional_arrays () =
+let test_multidimensional_arrays _ =
   let module Array = CArray in
   (* one dimension *)
   let one = Array.make int 10 in
@@ -96,7 +96,7 @@ let test_multidimensional_arrays () =
 (*
   Test that creating an array initializes all elements appropriately.
 *)
-let test_array_initialiation () =
+let test_array_initialiation _ =
   let module Array = CArray in
   let int_array = Array.make int ~initial:33 10 in
   for i = 0 to Array.length int_array - 1 do
@@ -114,7 +114,7 @@ let test_array_initialiation () =
 (*
   Test that creating arrays of elements of incomplete type fails.
 *)
-let test_arrays_of_incomplete_type () =
+let test_arrays_of_incomplete_type _ =
   let module M = struct
     let () = assert_raises IncompleteType
       (fun () -> CArray.make void 10)
@@ -128,7 +128,7 @@ let test_arrays_of_incomplete_type () =
 (*
   Test that OCaml types cannot be used to build arrays.
 *)
-let test_ocaml_types_rejected_as_array_elements () =
+let test_ocaml_types_rejected_as_array_elements _ =
   assert_raises IncompleteType
     (fun () -> CArray.make ocaml_string 10)
 
@@ -136,7 +136,7 @@ let test_ocaml_types_rejected_as_array_elements () =
 (*
   Test that creating an array initializes all elements appropriately.
 *)
-let test_pointer_to_array_arithmetic () =
+let test_pointer_to_array_arithmetic _ =
   let module Array = CArray in
   (* int ( * )[3] *)
   let p = allocate_n (array 3 int) ~count:4 in
@@ -161,7 +161,7 @@ struct
   (*
     Test passing pointer to array of structs.
   *)
-  let test_passing_pointer_to_array_of_structs () =
+  let test_passing_pointer_to_array_of_structs _ =
     let box_int x =
       let v = make s in
       setf v tag 'i';

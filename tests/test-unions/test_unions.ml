@@ -5,7 +5,7 @@
  * See the file LICENSE for details.
  *)
 
-open OUnit
+open OUnit2
 open Ctypes
 open Unsigned
 
@@ -19,7 +19,7 @@ open Unsigned
        int64_t i;
      };
 *)
-let test_inspecting_float () =
+let test_inspecting_float _ =
   let module M = struct
     type u
     let utyp : u union typ = union "u"
@@ -53,7 +53,7 @@ let test_inspecting_float () =
        unsigned char c[sizeof int64_t];
      };
 *)
-let test_endian_detection () =
+let test_endian_detection _ =
   let module M = struct
     type e
     let etyp : e union typ = union "e"
@@ -92,7 +92,7 @@ struct
   (* Check that unions are tail-padded sufficiently to satisfy the alignment
      requirements of all their members.
   *)
-  let test_union_padding () =
+  let test_union_padding _ =
     let module M = struct
       let mkPadded : int64 -> padded union =
         fun x ->
@@ -128,7 +128,7 @@ struct
 
   (* Check that unions can be passed and returned by value.
   *)
-  let test_passing_unions_by_value () =
+  let test_passing_unions_by_value _ =
     let module M = struct
       let mkPadded : int64 -> padded union =
         fun x ->
@@ -148,7 +148,7 @@ end
 (* Check that the address of a union is equal to the addresses of each
    of its members.
 *)
-let test_union_address () =
+let test_union_address _ =
   let module M = struct
     type u
     let u : u union typ = union "u"
@@ -177,7 +177,7 @@ let test_union_address () =
 (*
   Test that attempting to update a sealed union is treated as an error.
 *)
-let test_updating_sealed_union () =
+let test_updating_sealed_union _ =
   let utyp = union "sealed" in
   let _ = field utyp "_" int in
   let () = seal utyp in
@@ -189,7 +189,7 @@ let test_updating_sealed_union () =
 (*
   Test that attempting to seal an empty union is treated as an error.
 *)
-let test_sealing_empty_union () =
+let test_sealing_empty_union _ =
   let empty = union "empty" in
 
   assert_raises (Unsupported "union with no fields")

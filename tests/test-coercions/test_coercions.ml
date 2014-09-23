@@ -5,14 +5,14 @@
  * See the file LICENSE for details.
  *)
 
-open OUnit
+open OUnit2
 open Ctypes
 
 
 (* 
    Check coercions between pointers.
 *)
-let test_pointer_coercions () =
+let test_pointer_coercions _ =
   let module M = struct
     type boxed_type = T : 'a typ -> boxed_type
     let types = [
@@ -53,7 +53,7 @@ let test_pointer_coercions () =
   Check that coercions between a pointer to a struct and a pointer to
   its first member succeed.
 *)
-let test_struct_first_member_coercions () =
+let test_struct_first_member_coercions _ =
   let module M = struct
     let s = structure "s"
     let f = field s "f" double
@@ -77,7 +77,7 @@ let test_struct_first_member_coercions () =
    Check that coercions between a pointer to a union and a pointer to
    a member succeed.
 *)
-let test_union_coercions () =
+let test_union_coercions _ =
   let module M = struct
     let u = union "u"
     let f = field u "f" double
@@ -108,7 +108,7 @@ let test_union_coercions () =
 (* 
    Check coercions between views.
 *)
-let test_view_coercions () =
+let test_view_coercions _ =
   let module M = struct
     type 'a variant = V of 'a
     let unV (V v) = v and inV v = V v
@@ -142,7 +142,7 @@ struct
   (* 
      Check coercions between functions.
   *)
-  let test_function_coercions () =
+  let test_function_coercions _ =
     let isize_t = view size_t
       ~read:Unsigned.Size_t.to_int ~write:Unsigned.Size_t.of_int in
     let memchr' = coerce_fn
@@ -164,7 +164,7 @@ end
 (* 
    Check that identity coercions are cost-free.
 *)
-let test_identity_coercions () =
+let test_identity_coercions _ =
   let f = fun x y -> x in
   let fn = int @-> float @-> returning int in
   let f' = coerce_fn fn fn f in
@@ -174,7 +174,7 @@ let test_identity_coercions () =
 (* 
    Check that coercions between unsupported types raise an exception
 *)
-let test_unsupported_coercions () =
+let test_unsupported_coercions _ =
   let module M = struct
     type boxed_type = T : 'a typ -> boxed_type
     let types = [

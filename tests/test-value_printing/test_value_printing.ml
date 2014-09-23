@@ -5,7 +5,7 @@
  * See the file LICENSE for details.
  *)
 
-open OUnit
+open OUnit2
 open Ctypes
 
 
@@ -24,7 +24,7 @@ struct
     Test the printing of atomic values: arithmetic types and values of abstract
     types.
   *)
-  let test_atomic_printing () =
+  let test_atomic_printing _ =
     let open Signed in
     let open Unsigned in
 
@@ -231,7 +231,7 @@ end
 (*
   Test the printing of pointers.
 *)
-let test_pointer_printing () =
+let test_pointer_printing _ =
   (* There's not much we can test here, since pointer formatting is
      implementation-dependent.  We can at least run the pointer-formatting
      code, and test that pointers of different types are printed
@@ -247,7 +247,7 @@ let test_pointer_printing () =
 (*
   Test the printing of structs.
 *)
-let test_struct_printing () =
+let test_struct_printing _ =
   let s = structure "s" in
   let (-:) ty label = field s label ty in
   let a = array 3 int -: "arr" in
@@ -282,7 +282,7 @@ let test_struct_printing () =
 (*
   Test the printing of unions.
 *)
-let test_union_printing () =
+let test_union_printing _ =
   let s = structure "s" in
   let (-:) ty label = field s label ty in
   let i = uint16_t -: "i" in
@@ -303,7 +303,7 @@ let test_union_printing () =
 (*
   Test the printing of array types.
 *)
-let test_array_printing () =
+let test_array_printing _ =
   let arr = CArray.of_list int [-1; 0; 1] in
   let arrarr = CArray.of_list (array 3 int) [arr; arr] in
   assert_bool "array printing"
@@ -314,7 +314,7 @@ let test_array_printing () =
 (*
   Test the printing of ocaml_string values.
 *)
-let test_ocaml_string_printing () =
+let test_ocaml_string_printing _ =
   let s = "abc@%^&*[\"" in
   begin
     assert_equal

@@ -6,7 +6,7 @@
  *)
 
 open Ctypes
-open OUnit
+open OUnit2
 open Foreign
 
 
@@ -26,7 +26,7 @@ struct
 
      as the first argument.
   *)
-  let test_higher_order_basic () =
+  let test_higher_order_basic _ =
     (* higher_order_1 f x y returns true iff f x y == x + y *)
     assert_equal 1 (higher_order_1 ( + ) 2 3);
     assert_equal 0 (higher_order_1 ( * ) 2 3);
@@ -48,7 +48,7 @@ struct
 
     as the first and second arguments.
   *)
-  let test_higher_higher_order () =
+  let test_higher_higher_order _ =
     let acceptor op x y = op x (op x y) in
     assert_equal 10 (higher_order_3 acceptor ( + ) 3 4);
     assert_equal 36 (higher_order_3 acceptor ( * ) 3 4)
@@ -62,7 +62,7 @@ struct
     (i.e. a function that returns a pointer-to-function) and ensure that we can
     call the returned function from OCaml.
   *)
-  let test_returning_pointer_to_function () =
+  let test_returning_pointer_to_function _ =
     let add = returning_funptr 0 in
 
     let times = returning_funptr 1 in
@@ -81,7 +81,7 @@ struct
     (i.e. a function whose first argument is a pointer-to-function
     returning a pointer-to-function.)
   *)
-  let test_callback_returns_pointer_to_function () =
+  let test_callback_returns_pointer_to_function _ =
     let callback = function
       | 0 -> ( + ) 10
       | 1 -> ( * ) 13
@@ -95,7 +95,7 @@ struct
 
          void ( * )(void)
   *)
-  let test_zero_argument_callbacks () =
+  let test_zero_argument_callbacks _ =
     let counter = ref 0 in
     let callback () = let c = !counter in incr counter; c in
     let () = register_callback callback in

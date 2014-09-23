@@ -5,7 +5,7 @@
  * See the file LICENSE for details.
  *)
 
-open OUnit
+open OUnit2
 open Ctypes
 open Foreign
 
@@ -19,7 +19,7 @@ struct
     Check that we can store a reference to an OCaml function in a C global and
     invoke it later.
   *)
-  let test_storing_function_reference () =
+  let test_storing_function_reference _ =
     (* This shouldn't be collected in the code that follows. *)
     let double x = x * 2 in
 
@@ -38,7 +38,7 @@ struct
     have defined behaviour, since the structures needed to make the call may
     have been garbage collected.
   *)
-  let test_calling_collected_closure_raises_exception () =
+  let test_calling_collected_closure_raises_exception _ =
     let closure x y = x * y in
 
     begin
@@ -57,7 +57,7 @@ struct
     Check that we have fairly fine-grained control over the lifetime of closures
     passed to C.
   *)
-  let test_controlling_closure_lifetime () =
+  let test_controlling_closure_lifetime _ =
     (* The return_callback function simply returns its argument.  However, since
        that involves converting an OCaml function ("arg") to a C function
        pointer and back to an OCaml function ("ret"), there are potential

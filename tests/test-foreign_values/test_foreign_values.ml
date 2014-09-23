@@ -5,7 +5,7 @@
  * See the file LICENSE for details.
  *)
 
-open OUnit
+open OUnit2
 open Ctypes
 
 
@@ -15,7 +15,7 @@ let testlib = Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW]
 (*
   Retrieve a struct exposed as a global value. 
 *)
-let test_retrieving_struct () =
+let test_retrieving_struct _ =
   let s = structure "global_struct" in
   let (-:) ty label = field s label ty in
   let len = size_t       -: "len" in
@@ -36,7 +36,7 @@ let test_retrieving_struct () =
 (*
   Store a reference to an OCaml function as a global function pointer.
 *)
-let test_global_callback () =
+let test_global_callback _ =
   let open Foreign in
 
   let plus =

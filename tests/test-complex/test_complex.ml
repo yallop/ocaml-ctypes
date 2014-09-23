@@ -5,7 +5,7 @@
  * See the file LICENSE for details.
  *)
 
-open OUnit
+open OUnit2
 open Ctypes
 
 
@@ -23,7 +23,7 @@ struct
     Arguments and return values are currently mediated through pointers,
     since libffi doesn't support passing complex numbers.
   *)
-  let test_complex_primitive_operations () =
+  let test_complex_primitive_operations _ =
     let wrap typ f l r =
       let rv = allocate_n ~count:1 typ in
       f (allocate typ l) (allocate typ r) rv;
@@ -68,7 +68,7 @@ struct
   (*
     Test primitive operations on complex numbers passed by value.
   *)
-  let test_complex_primitive_value_operations () =
+  let test_complex_primitive_value_operations _ =
     begin
       let open Complex in
 

@@ -5,7 +5,7 @@
  * See the file LICENSE for details.
  *)
 
-open OUnit
+open OUnit2
 open Ctypes
 open Foreign
 
@@ -20,7 +20,7 @@ struct
   (*
     Test passing OCaml strings directly to C.
   *)
-  let test_passing_strings () =
+  let test_passing_strings _ =
     let input = "abcdefghijklmnopqrstuvwxyz" in
     let len = String.length input in
     let buf = String.create len in
@@ -54,29 +54,29 @@ struct
     end
 
 
-    (*
-      Test pointer arithmetic on OCaml values.
-    *)
-    let test_pointer_arithmetic () =
-      let s = ocaml_string_start "abcdefghijklmnopqrstuvwxyz" in
-      begin
-        assert_equal s (s +@ 0);
+  (*
+    Test pointer arithmetic on OCaml values.
+   *)
+  let test_pointer_arithmetic _ =
+    let s = ocaml_string_start "abcdefghijklmnopqrstuvwxyz" in
+    begin
+      assert_equal s (s +@ 0);
 
-        assert_equal (ptr_diff s (s +@ 10)) 10;
+      assert_equal (ptr_diff s (s +@ 10)) 10;
 
-        assert_equal s ((s +@ 10) -@ 10);
+      assert_equal s ((s +@ 10) -@ 10);
 
-        assert_equal
-          (strdup (ocaml_string_start "klmnopqrstuvwxyz"))
-          (strdup (s +@ 10))
-      end
+      assert_equal
+        (strdup (ocaml_string_start "klmnopqrstuvwxyz"))
+        (strdup (s +@ 10))
+    end
 end
 
 
 (*
   Test that OCaml values do not reside in addressable memory.
 *)
-let test_ocaml_types_rejected_as_pointer_reference_types () =
+let test_ocaml_types_rejected_as_pointer_reference_types _ =
   assert_raises IncompleteType
     (fun () -> allocate ocaml_string (ocaml_string_start ""))
 
@@ -84,7 +84,7 @@ let test_ocaml_types_rejected_as_pointer_reference_types () =
 (*
   Test that OCaml values cannot be used as return types.
 *)
-let test_ocaml_types_rejected_as_return_types () =
+let test_ocaml_types_rejected_as_return_types _ =
   assert_raises IncompleteType
     (fun () -> Foreign.foreign "strdup" (string @-> returning ocaml_string))
 
@@ -92,7 +92,7 @@ let test_ocaml_types_rejected_as_return_types () =
 (*
   Test that pointers to OCaml values cannot be dereferenced.
 *)
-let test_pointers_to_ocaml_types_cannot_be_dereferenced () =
+let test_pointers_to_ocaml_types_cannot_be_dereferenced _ =
   let p = allocate_n char 10 in
   let po = coerce (ptr char) (ptr ocaml_string) p in
 
@@ -108,7 +108,7 @@ let test_pointers_to_ocaml_types_cannot_be_dereferenced () =
 (*
   Test that [funptr] does not support ocaml_string return values.
 *)
-let test_no_higher_order_ocaml_string_support () =
+let test_no_higher_order_ocaml_string_support _ =
   begin
     assert_raises IncompleteType
       (fun () -> funptr (void @-> returning ocaml_string))

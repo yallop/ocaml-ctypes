@@ -5,7 +5,7 @@
  * See the file LICENSE for details.
  *)
 
-open OUnit
+open OUnit2
 open Ctypes
 
 module Bindings = Functions.Stubs(Generated_bindings)
@@ -13,7 +13,7 @@ module Bindings = Functions.Stubs(Generated_bindings)
 (*
   Test calling type-generic macros.
 *)
-let test_tg_macros () =
+let test_tg_macros _ =
   let open Bindings in
   assert_bool "calling double version of type-generic exp"
     (exp_double 1.0 = exp 1.0);

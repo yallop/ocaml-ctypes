@@ -5,7 +5,7 @@
  * See the file LICENSE for details.
  *)
 
-open OUnit
+open OUnit2
 open Memory_stubs
 open Std_view_stubs
 
@@ -18,7 +18,7 @@ open Std_view_stubs
 
         double fabs(double)
 *)
-let test_fabs () =
+let test_fabs _ =
   Ffi_stubs.(
     let double_ffitype = primitive_ffitype Primitives.Double in
     let callspec = allocate_callspec
@@ -50,7 +50,7 @@ let test_fabs () =
 
         double pow(double, double)
 *)
-let test_pow () =
+let test_pow _ =
   Ffi_stubs.(
     let double_ffitype = primitive_ffitype Primitives.Double in
     let callspec = allocate_callspec

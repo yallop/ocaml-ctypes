@@ -710,4 +710,4 @@ test: build testlib tests-common $(TESTS) \
 run-%:	$*
 	@echo running $*
 	@cd $(BUILDDIR) && LD_LIBRARY_PATH=clib DYLD_LIBRARY_PATH=clib ./$*.native
-	@echo
+

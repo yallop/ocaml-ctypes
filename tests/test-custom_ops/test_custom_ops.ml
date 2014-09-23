@@ -5,7 +5,7 @@
  * See the file LICENSE for details.
  *)
 
-open OUnit
+open OUnit2
 open Ctypes
 
 let hash = Hashtbl.hash
@@ -18,7 +18,7 @@ let hash = Hashtbl.hash
   objects, so even structurally-equal values should have different
   hashes and compare unequal.
 *)
-let test_managed_buffer_hashing_and_equality () =
+let test_managed_buffer_hashing_and_equality _ =
   let i1 = allocate int 20 in
   let i2 = allocate int 20 in
   assert_equal !@i1 !@i2;
@@ -38,7 +38,7 @@ let test_managed_buffer_hashing_and_equality () =
   should have equal hashes and compare equal.
 *)
 
-let test_type_info_hashing_and_equality () =
+let test_type_info_hashing_and_equality _ =
   let module M = struct
     type s
     let s : s structure typ = structure "s"

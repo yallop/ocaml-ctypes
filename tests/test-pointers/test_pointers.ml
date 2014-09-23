@@ -5,7 +5,7 @@
  * See the file LICENSE for details.
  *)
 
-open OUnit
+open OUnit2
 open Ctypes
 open Foreign
 
@@ -20,7 +20,7 @@ struct
   (*
     Test passing various types of pointers to a function.
   *)
-  let test_passing_pointers () =
+  let test_passing_pointers _ =
     assert_equal ~msg:"Passing pointers to various numeric types"
       ~printer:string_of_int
       (1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 +
@@ -52,7 +52,7 @@ struct
   (*
     Test passing pointers to pointers.
   *)
-  let test_passing_pointers_to_pointers () =
+  let test_passing_pointers_to_pointers _ =
     let p = allocate int 1
     and pp = allocate (ptr int) (allocate int 2)
     and ppp = allocate (ptr (ptr int)) (allocate (ptr int) (allocate int 3))
@@ -67,7 +67,7 @@ struct
   (*
     Passing a callback that accepts pointers as arguments.
   *)
-  let test_callback_receiving_pointers () =
+  let test_callback_receiving_pointers _ =
     assert_equal 7
       (passing_pointers_to_callback (fun lp rp -> !@lp + !@rp))
 
@@ -75,7 +75,7 @@ struct
   (*
     Passing a callback that returns a pointer.
   *)
-  let test_callback_returning_pointers () =
+  let test_callback_returning_pointers _ =
     let p = allocate int 17 in
     begin
       assert_equal 17 !@p;
@@ -90,7 +90,7 @@ struct
   (*
     Test passing a pointer-to-a-function-pointer as an argument.
   *)
-  let test_passing_pointer_to_function_pointer () =
+  let test_passing_pointer_to_function_pointer _ =
     assert_equal ~printer:string_of_int
       5 (accepting_pointer_to_function_pointer 
            (allocate (funptr (int @-> int @-> returning int)) ( / )))
@@ -100,7 +100,7 @@ struct
   (*
     Test returning a pointer to a function pointer
   *)
-  let test_callback_returning_pointer_to_function_pointer () =
+  let test_callback_returning_pointer_to_function_pointer _ =
     assert_equal
       10 (!@(returning_pointer_to_function_pointer ()) 2 5)
 
@@ -108,7 +108,7 @@ struct
   (*
     Test bindings for malloc, realloc and free.
   *)
-  let test_allocation () =
+  let test_allocation _ =
     let open Unsigned in
 
     let pointer = malloc (Size_t.of_int (sizeof int)) in
@@ -139,14 +139,14 @@ struct
   (*
     Test a function that returns the address of a global variable.
   *)
-  let test_reading_returned_global () =
+  let test_reading_returned_global _ =
     assert_equal (!@(return_global_address ())) 100
 
 
   (*
     Test a function that returns a pointer passed as argument.
   *)
-  let test_passing_pointer_through () =
+  let test_passing_pointer_through _ =
     let p1 = allocate int 25 in
     let p2 = allocate int 32 in
     let rv = pass_pointer_through p1 p2 10 in
@@ -196,7 +196,7 @@ end
 (*
   Tests for reading and writing primitive values through pointers.
 *)
-let test_pointer_assignment_with_primitives () =
+let test_pointer_assignment_with_primitives _ =
   let open Signed in
   let open Unsigned in
   let p_char = allocate char '1'
@@ -300,7 +300,7 @@ let test_pointer_assignment_with_primitives () =
 (*
   Dereferencing pointers to incomplete types
 *)
-let test_dereferencing_pointers_to_incomplete_types () =
+let test_dereferencing_pointers_to_incomplete_types _ =
   begin
     assert_raises IncompleteType
       (fun () -> !@null);
@@ -316,7 +316,7 @@ let test_dereferencing_pointers_to_incomplete_types () =
 (*
   Writing through a pointer to an abstract type
 *)
-let test_writing_through_pointer_to_abstract_type () =
+let test_writing_through_pointer_to_abstract_type _ =
   let module Array = CArray in
   let arra = Array.make int 2 in
   let arrb = Array.make int 2 in
@@ -357,7 +357,7 @@ let test_writing_through_pointer_to_abstract_type () =
    Test for reading and writing global values using the "foreign_value"
    function.
 *)
-let test_reading_and_writing_global_value () =
+let test_reading_and_writing_global_value _ =
   let ptr = foreign_value "global" int ~from:testlib in
   let ptr' = foreign_value "global" int ~from:testlib in
   assert_equal (!@ptr) 100;
@@ -372,7 +372,7 @@ let test_reading_and_writing_global_value () =
 (*
   Tests for reading a string from an address.
 *)
-let test_reading_strings () =
+let test_reading_strings _ =
   let p = allocate_n char 26 in begin
     StringLabels.iteri "abcdefghijklmnoprwstuvwxyz"
       ~f:(fun i c -> (p +@ i) <-@ c);
@@ -387,7 +387,7 @@ let test_reading_strings () =
 (*
   Tests for various aspects of pointer arithmetic.
 *)
-let test_pointer_arithmetic () =
+let test_pointer_arithmetic _ =
   let module Array = CArray in
   let arr = Array.of_list int [1;2;3;4;5;6;7;8] in
 
@@ -428,7 +428,7 @@ let test_pointer_arithmetic () =
 (*
   Test pointer comparisons.
 *)
-let test_pointer_comparison () =
+let test_pointer_comparison _ =
   let canonicalize p =
     (* Ensure that the 'pbyte_offset' component of the pointer is zero by
        writing the pointer to memory and then reading it back. *)
@@ -515,7 +515,7 @@ let test_pointer_comparison () =
 (*
   Test pointer differences.
 *)
-let test_pointer_differences () =
+let test_pointer_differences _ =
   let canonicalize p =
     (* Ensure that the 'pbyte_offset' component of the pointer is zero by
        writing the pointer to memory and then reading it back. *)
@@ -561,7 +561,7 @@ let test_pointer_differences () =
 (*
   Test raw pointers.
 *)
-let test_raw_pointers () =
+let test_raw_pointers _ =
   (* Check that conversions to the raw form commute with arithmetic. *)
   let p : float ptr = allocate double 1.0 in
   let p' = p +@ 3 in

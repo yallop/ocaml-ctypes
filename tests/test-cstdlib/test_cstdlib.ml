@@ -5,7 +5,7 @@
  * See the file LICENSE for details.
  *)
 
-open OUnit
+open OUnit2
 open Ctypes
 open Unsigned
 open Foreign
@@ -31,7 +31,7 @@ struct
        int isisupper(int)
        int isisxdigit(int)
   *)
-  let test_isX_functions () =
+  let test_isX_functions _ =
     begin
       assert_bool "" (isalnum 'a');
       assert_bool "" (not (isalnum ' '));
@@ -74,7 +74,7 @@ struct
       char *strchr(const char *str, int c);
       int strcmp(const char *str1, const char *str2);
   *)
-  let test_string_functions () =
+  let test_string_functions _ =
     assert_equal "efg" (strchr "abcdefg" (Char.code 'e'))
       ~printer:(fun x -> x);
 
@@ -110,7 +110,7 @@ struct
        void qsort(void *base, size_t nmemb, size_t size,
                   int(*compar)(const void *, const void *));
   *)
-  let test_qsort () =
+  let test_qsort _ =
     let sortby (type a) (typ : a typ) (f : a -> a -> int) (l : a list) =
       let open CArray in
       let open Size_t in
@@ -143,7 +143,7 @@ struct
                      size_t nmemb, size_t size,
                      int (*compar)(const void *, const void *));
   *)
-  let test_bsearch () =
+  let test_bsearch _ =
     let module M = struct
       (*
         struct mi {
@@ -284,7 +284,7 @@ end
         int rem;			/* Remainder.  */
       } div_t;
 *)
-let test_div () =
+let test_div _ =
   let module M = struct
     type div_t
     let div_t : div_t structure typ = structure "div_t"

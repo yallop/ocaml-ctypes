@@ -5,7 +5,7 @@
  * See the file LICENSE for details.
  *)
 
-open OUnit
+open OUnit2
 open Ctypes
 
 
@@ -28,7 +28,7 @@ let assert_fn_printed_as ?name e f = assert_printed_as ?name string_of_fn e f
   Test the printing of atomic types: void, arithmetic types and abstract
   types.
 *)
-let test_atomic_printing () =
+let test_atomic_printing _ =
   begin
     assert_typ_printed_as "void"
       void;
@@ -112,7 +112,7 @@ let test_atomic_printing () =
 (*
   Test the printing of pointers to object and function types.
 *)
-let test_pointer_printing () =
+let test_pointer_printing _ =
   begin
     (* Pointers to atomic types *)
     assert_typ_printed_as ~name:"a" "void *a"
@@ -208,7 +208,7 @@ let test_pointer_printing () =
 (*
   Test the printing of pointers to object and function types.
 *)
-let test_struct_and_union_printing () =
+let test_struct_and_union_printing _ =
   begin
     (* Incomplete structs and unions *) 
     let s_incomplete = structure "s_incomplete" in 
@@ -362,7 +362,7 @@ let test_struct_and_union_printing () =
 (*
   Test the printing of array types.
 *)
-let test_array_printing () =
+let test_array_printing _ =
   begin
     assert_typ_printed_as ~name:"a" "int a[10]"
       (array 10 int);
@@ -386,7 +386,7 @@ let test_array_printing () =
 (*
   Test the printing of OCaml string types.
 *)
-let test_ocaml_string_printing () =
+let test_ocaml_string_printing _ =
   begin
     assert_typ_printed_as ~name:"p" "char *p"
       ocaml_string;
@@ -399,7 +399,7 @@ let test_ocaml_string_printing () =
 (*
   Test the printing of bigarray types.
 *)
-let test_bigarray_printing () =
+let test_bigarray_printing _ =
   begin
     assert_typ_printed_as "float[10][100]"
       (bigarray genarray [|10; 100|] Bigarray.float32);
@@ -447,7 +447,7 @@ let test_bigarray_printing () =
 (*
   Test the printing of function types.
 *)
-let test_function_printing () =
+let test_function_printing _ =
   begin
     assert_fn_printed_as ~name:"a" "void a(void)"
       (void @-> returning void);
@@ -471,7 +471,7 @@ let test_function_printing () =
 (*
   Test the printing of view types.
 *)
-let test_view_printing () =
+let test_view_printing _ =
   begin
     (* By default, views are printed as the underlying type *)
 

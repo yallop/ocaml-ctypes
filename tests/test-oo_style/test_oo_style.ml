@@ -5,7 +5,7 @@
  * See the file LICENSE for details.
  *)
 
-open OUnit
+open OUnit2
 open Ctypes
 
 
@@ -18,7 +18,7 @@ struct
      Establish a hierarchy of "classes", create some "objects" and call some
      "methods".
   *)
-  let test_oo_hierarchy () =
+  let test_oo_hierarchy _ =
     let module M = struct
 
       let camel_vtable_singleton = make camel_methods

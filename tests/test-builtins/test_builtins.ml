@@ -5,7 +5,7 @@
  * See the file LICENSE for details.
  *)
 
-open OUnit
+open OUnit2
 open Ctypes
 
 module Bindings = Functions.Stubs(Generated_bindings)
@@ -13,7 +13,7 @@ module Bindings = Functions.Stubs(Generated_bindings)
 (*
   Test calling builtins.
 *)
-let test_calling_builtins () =
+let test_calling_builtins _ =
   let open Unsigned.UInt8 in
   let open Bindings in
   let u1 = of_int 0x77

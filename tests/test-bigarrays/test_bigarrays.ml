@@ -8,7 +8,7 @@
 module Std_array = Array
 type 'a std_array = 'a array
 
-open OUnit
+open OUnit2
 open Ctypes
 module BA = Bigarray
 
@@ -37,7 +37,7 @@ let castp typ p = from_voidp typ (to_voidp p)
 (*
   View ctypes-managed memory through a bigarray lens.
 *)
-let test_bigarray_of_ctypes_array () =
+let test_bigarray_of_ctypes_array _ =
   (* One-dimensional Genarrays *)
   let module Array = CArray in
   let a1 = Array.of_list int8_t [10; 20; 30; 40] in
@@ -157,7 +157,7 @@ let test_bigarray_of_ctypes_array () =
 (*
   View bigarray-managed memory through a ctypes lens
 *)
-let test_ctypes_array_of_bigarray () =
+let test_ctypes_array_of_bigarray _ =
   let module Array = CArray in
 
   (* One-dimensional Genarrays *)
@@ -328,7 +328,7 @@ struct
   (*
     Test passing bigarrays to c functions.
   *)
-  let test_passing_bigarrays () =
+  let test_passing_bigarrays _ =
     let mul l r =
       let m = BA.Array2.dim1 l and n = BA.Array2.dim2 l in
       let o = BA.Array2.dim1 r and p = BA.Array2.dim2 r in
@@ -360,7 +360,7 @@ struct
   (*
     Test returning bigarrays from c functions.
   *)
-  let test_returning_bigarrays () =
+  let test_returning_bigarrays _ =
     let transpose m =
       (* For the purposes of the test we'll just leak the allocated memory. *)
       let rows = BA.Array2.dim1 m and cols = BA.Array2.dim2 m in
@@ -382,7 +382,7 @@ end
   Test that bigarrays are not collected while there's a ctypes pointer pointing
   into them.
 *)
-let test_bigarray_lifetime_with_ctypes_reference () =
+let test_bigarray_lifetime_with_ctypes_reference _ =
   let state = ref `Not_safe_to_collect in
   let finalise ba =
     begin
@@ -424,7 +424,7 @@ let test_bigarray_lifetime_with_ctypes_reference () =
   Test that ctypes-allocated memory is not collected while there's a bigarray
   associated with it.
 *)
-let test_ctypes_memory_lifetime_with_bigarray_reference () =
+let test_ctypes_memory_lifetime_with_bigarray_reference _ =
   let module Array = CArray in
   let state = ref `Not_safe_to_collect in
   let finalise a =

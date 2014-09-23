@@ -5,14 +5,14 @@
  * See the file LICENSE for details.
  *)
 
-open OUnit
+open OUnit2
 open Ctypes
 
 
 (*
   Simple finalisation test for arrays.
 *)
-let test_array_finaliser () =
+let test_array_finaliser _ =
   let module Array = CArray in
   let finaliser_completed = ref false in
   let finalise a =
@@ -44,7 +44,7 @@ let test_array_finaliser () =
 (*
   Simple finalisation test for structs.
 *)
-let test_struct_finaliser () =
+let test_struct_finaliser _ =
   let module M = struct
     type s
     let s : s structure typ = structure "s"
