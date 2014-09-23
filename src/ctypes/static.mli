@@ -73,24 +73,12 @@ val complex32 : Complex.t typ
 val complex64 : Complex.t typ
 val short : int typ
 val int : int typ
-val long : Signed.long typ
-val llong : Signed.llong typ
 val nativeint : nativeint typ
 val int8_t : int typ
 val int16_t : int typ
-val int32_t : Signed.Int32.t typ
-val int64_t : Signed.Int64.t typ
+val int32_t : int32 typ
+val int64_t : int64 typ
 val camlint : int typ
-val uchar : Unsigned.uchar typ
-val uint8_t : Unsigned.UInt8.t typ
-val uint16_t : Unsigned.UInt16.t typ
-val uint32_t : Unsigned.UInt32.t typ
-val uint64_t : Unsigned.UInt64.t typ
-val size_t : Unsigned.size_t typ
-val ushort : Unsigned.ushort typ
-val uint : Unsigned.uint typ
-val ulong : Unsigned.ulong typ
-val ullong : Unsigned.ullong typ
 val array : int -> 'a typ -> 'a carray typ
 val ptr : 'a typ -> 'a ptr typ
 val ( @-> ) : 'a typ -> 'b fn -> ('a -> 'b) fn

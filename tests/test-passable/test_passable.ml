@@ -25,16 +25,6 @@ let test_primitives_are_passable _ =
   and _ = int16_t @-> returning int16_t
   and _ = int32_t @-> returning int32_t
   and _ = int64_t @-> returning int64_t
-  and _ = uchar @-> returning uchar
-  and _ = uint8_t @-> returning uint8_t
-  and _ = uint16_t @-> returning uint16_t
-  and _ = uint32_t @-> returning uint32_t
-  and _ = uint64_t @-> returning uint64_t
-  and _ = size_t @-> returning size_t
-  and _ = ushort @-> returning ushort
-  and _ = uint @-> returning uint
-  and _ = ulong @-> returning ulong
-  and _ = ullong @-> returning ullong
   in ()
 
 

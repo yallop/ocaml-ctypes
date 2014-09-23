@@ -30,46 +30,16 @@
 #error "No suitable pointer-sized integer type available"
 #endif
 
-/* long long is at least 64 bits. */
-#if LLONG_MAX == 9223372036854775807LL
-#define ctypes_ffi_type_sllong ffi_type_sint64
-#define ctypes_ffi_type_ullong ffi_type_uint64
-#else
-# error "No suitable OCaml type available for representing longs"
-#endif
-
-#if SIZE_MAX == 65535U
-#define ctypes_ffi_type_size_t ffi_type_uint16
-#elif SIZE_MAX == 4294967295UL
-#define ctypes_ffi_type_size_t ffi_type_uint32
-#elif SIZE_MAX == 18446744073709551615ULL
-#define ctypes_ffi_type_size_t ffi_type_uint64
-#else
-# error "No suitable OCaml type available for representing size_t values"
-#endif
-
 /* The order here must correspond to the constructor order in primitives.ml */
 static ffi_type *primitive_ffi_types[] = {
   &ctypes_ffi_type_char,    /* Char */
   &ffi_type_schar,          /* Schar */
-  &ffi_type_uchar,          /* Uchar */
   &ffi_type_sshort,         /* Short */
   &ffi_type_sint,           /* Int */
-  &ffi_type_slong,          /* Long */
-  &ctypes_ffi_type_sllong,  /* Llong */
-  &ffi_type_ushort,         /* Ushort */
-  &ffi_type_ulong,          /* Uint */
-  &ffi_type_ulong,          /* Ulong */
-  &ctypes_ffi_type_ullong,  /* Ullong */
-  &ctypes_ffi_type_size_t,  /* Size */
   &ffi_type_sint8,          /* Int8 */
   &ffi_type_sint16,         /* Int16 */
   &ffi_type_sint32,         /* Int32 */
   &ffi_type_sint64,         /* Int64 */
-  &ffi_type_uint8,          /* Uint8 */
-  &ffi_type_uint16,         /* Uint16 */
-  &ffi_type_uint32,         /* Uint32 */
-  &ffi_type_uint64,         /* Uint64 */
   &ctypes_ffi_type_camlint, /* Camlint */
   &ctypes_ffi_type_camlint, /* Nativeint */
   &ffi_type_float,          /* Float */

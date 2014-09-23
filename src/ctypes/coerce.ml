@@ -27,19 +27,7 @@ let ml_prim_coercion :
   | ML_int, ML_int -> Id
   | ML_int32, ML_int32 -> Id
   | ML_int64, ML_int64 -> Id
-  | ML_llong, ML_llong -> Id
-  | ML_long, ML_long -> Id
   | ML_nativeint, ML_nativeint -> Id
-  | ML_size_t, ML_size_t -> Id
-  | ML_uchar, ML_uchar -> Id
-  | ML_uint, ML_uint -> Id
-  | ML_uint16, ML_uint16 -> Id
-  | ML_uint32, ML_uint32 -> Id
-  | ML_uint64, ML_uint64 -> Id
-  | ML_uint8, ML_uint8 -> Id
-  | ML_ullong, ML_ullong -> Id
-  | ML_ulong, ML_ulong -> Id
-  | ML_ushort, ML_ushort -> Id
   | _ -> raise Uncoercible
 
 let rec coercion : type a b. a typ -> b typ -> (a, b) coercion =

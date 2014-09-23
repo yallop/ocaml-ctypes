@@ -19,33 +19,6 @@ let test_primitive_alignment _ = begin
   assert_equal ~msg:"alignmentof(signed char) == 1"
     (alignment schar) 1;
 
-  assert_equal ~msg:"alignmentof(unsigned char) == 1"
-    (alignment uchar) 1;
-
-  assert_equal ~msg:"alignmentof(short) == alignmentof(unsigned short)"
-    (alignment short) (alignment ushort);
-
-  assert_equal ~msg:"alignmentof(int) == alignmentof(unsigned int)"
-    (alignment int) (alignment uint);
-
-  assert_equal ~msg:"alignmentof(long) == alignmentof(unsigned long)"
-    (alignment long) (alignment ulong);
-
-  assert_equal ~msg:"alignmentof(long long) == alignmentof(unsigned long long)"
-    (alignment llong) (alignment ullong);
-
-  assert_equal ~msg:"alignmentof(int8_t) == alignmentof(uint8_t)"
-    (alignment int8_t) (alignment uint8_t);
-
-  assert_equal ~msg:"alignmentof(int16_t) == alignmentof(uint16_t)"
-    (alignment int16_t) (alignment uint16_t);
-
-  assert_equal ~msg:"alignmentof(int32_t) == alignmentof(uint32_t)"
-    (alignment int32_t) (alignment uint32_t);
-
-  assert_equal ~msg:"alignmentof(int64_t) == alignmentof(uint64_t)"
-    (alignment int64_t) (alignment uint64_t);
-
   assert_equal ~msg:"alignmentof(complex32) == alignmentof(float)"
     (alignment complex32) (alignment float);
 

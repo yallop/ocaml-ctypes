@@ -18,22 +18,11 @@ struct
      ptr double @->
      ptr short @->
      ptr int @->
-     ptr long @->
-     ptr llong @->
      ptr nativeint @->
      ptr int8_t @->
      ptr int16_t @->
      ptr int32_t @->
      ptr int64_t @->
-     ptr uint8_t @->
-     ptr uint16_t @->
-     ptr uint32_t @->
-     ptr uint64_t @->
-     ptr size_t @->
-     ptr ushort @->
-     ptr uint @->
-     ptr ulong @->
-     ptr ullong @->
      returning int)
 
   let accept_pointers_to_pointers = foreign "accept_pointers_to_pointers"
@@ -42,15 +31,6 @@ struct
      ptr (ptr (ptr int)) @->
      ptr (ptr (ptr (ptr int))) @->
      returning int)
-
-  let malloc = foreign "malloc"
-    (size_t @-> returning (ptr void))
-
-  let realloc = foreign "realloc"
-    (ptr void @-> size_t @-> returning (ptr void))
-
-  let free = foreign "free"
-    (ptr void @-> returning void)
 
   let return_global_address = foreign "return_global_address"
     (void @-> returning (ptr int))

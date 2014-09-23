@@ -18,7 +18,7 @@ let testlib = Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW]
 let test_retrieving_struct _ =
   let s = structure "global_struct" in
   let (-:) ty label = field s label ty in
-  let len = size_t       -: "len" in
+  let len = int          -: "len" in
   let str = array 1 char -: "str" in
   let () = seal s in
   let global_struct = Foreign.foreign_value "global_struct" s ~from:testlib in
@@ -28,7 +28,7 @@ let test_retrieving_struct _ =
     let expected = "global string" in
     assert_equal expected !@stringp;
     assert_equal
-      (Unsigned.Size_t.of_int (String.length expected))
+      (String.length expected)
       (getf !@global_struct len)
   end
 

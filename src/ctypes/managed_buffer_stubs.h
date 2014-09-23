@@ -10,8 +10,8 @@
 
 #include <caml/mlvalues.h>
 
-/* copy_bytes : void * -> size_t -> managed_buffer */
-extern value ctypes_copy_bytes(void *, size_t);
+/* copy_bytes : void * -> int -> managed_buffer */
+extern value ctypes_copy_bytes(void *, int);
 
 /* allocate : int -> managed_buffer */
 extern value ctypes_allocate(value size);

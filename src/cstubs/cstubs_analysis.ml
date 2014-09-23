@@ -31,20 +31,8 @@ type _ noalloc =
 (* A value of type 'a alloc says that reading a value of type 'a
    may cause an OCaml allocation in C code. *)
 type _ alloc =
-| Alloc_long : Signed.long alloc
-| Alloc_llong : Signed.llong alloc
-| Alloc_uint : Unsigned.uint alloc
-| Alloc_uchar : Unsigned.uchar alloc
-| Alloc_ushort : Unsigned.ushort alloc
-| Alloc_ulong : Unsigned.ulong alloc
-| Alloc_ullong : Unsigned.ullong alloc
-| Alloc_size_t : Unsigned.size_t alloc
 | Alloc_int32_t : int32 alloc
 | Alloc_int64_t : int64 alloc
-| Alloc_uint8_t : Unsigned.uint8 alloc
-| Alloc_uint16_t : Unsigned.uint16 alloc
-| Alloc_uint32_t : Unsigned.uint32 alloc
-| Alloc_uint64_t : Unsigned.uint64 alloc
 | Alloc_nativeint : nativeint alloc
 | Alloc_float : float alloc
 | Alloc_complex : Complex.t alloc
@@ -64,20 +52,8 @@ let primitive_allocation : type a. a Primitives.prim -> a allocation =
  | Int8_t -> `Noalloc Noalloc_int
  | Int16_t -> `Noalloc Noalloc_int
  | Camlint -> `Noalloc Noalloc_int
- | Long -> `Alloc Alloc_long
- | Llong -> `Alloc Alloc_llong
- | Ushort -> `Alloc Alloc_ushort
- | Uchar -> `Alloc Alloc_uchar
- | Uint -> `Alloc Alloc_uint
- | Ulong -> `Alloc Alloc_ulong
- | Ullong -> `Alloc Alloc_ullong
- | Size_t -> `Alloc Alloc_size_t
  | Int32_t -> `Alloc Alloc_int32_t
  | Int64_t -> `Alloc Alloc_int64_t
- | Uint8_t -> `Alloc Alloc_uint8_t
- | Uint16_t -> `Alloc Alloc_uint16_t
- | Uint32_t -> `Alloc Alloc_uint32_t
- | Uint64_t -> `Alloc Alloc_uint64_t
  | Nativeint -> `Alloc Alloc_nativeint
  | Float -> `Alloc Alloc_float
  | Double -> `Alloc Alloc_float

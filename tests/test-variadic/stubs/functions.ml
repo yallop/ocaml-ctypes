@@ -13,22 +13,15 @@ module Stubs (F: Cstubs.FOREIGN) =
 struct
   open F
 
-  let size_t_as_int : int typ = view size_t
-    ~read:Unsigned.Size_t.to_int
-    ~write:Unsigned.Size_t.of_int
-
   let bind_snprintf tail =
-    foreign "snprintf" (ptr char @-> size_t_as_int @-> string @-> tail)
+    foreign "snprintf_wrapper" (ptr char @-> int @-> string @-> tail)
 
   let snprintf_int =
     bind_snprintf (int @-> returning int)
 
-  let snprintf_char_unsigned =
-    bind_snprintf (char @-> uint @-> returning int)
+  let snprintf_char_float =
+    bind_snprintf (char @-> float @-> returning int)
 
-  let snprintf_longlong_int =
-    bind_snprintf (llong @-> int @-> returning int)
-
-  let snprintf_string_ushort =
-    bind_snprintf (string @-> ushort @-> returning int)
+  let snprintf_string_short =
+    bind_snprintf (string @-> short @-> returning int)
 end

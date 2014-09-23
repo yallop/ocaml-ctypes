@@ -44,12 +44,6 @@ let test_atomic_printing _ =
     assert_typ_printed_as "int"
       int;
 
-    assert_typ_printed_as ~name:"c" "long c"
-      long;
-
-    assert_typ_printed_as "long long"
-      llong;
-
     assert_typ_printed_as ~name:"d" "intnat d"
       nativeint;
 
@@ -64,36 +58,6 @@ let test_atomic_printing _ =
 
     assert_typ_printed_as ~name:"f" "int64_t f"
       int64_t;
-
-    assert_typ_printed_as "unsigned char"
-      uchar;
-
-    assert_typ_printed_as ~name:"g" "uint8_t g"
-      uint8_t;
-
-    assert_typ_printed_as "uint16_t"
-      uint16_t;
-
-    assert_typ_printed_as ~name:"h" "uint32_t h"
-      uint32_t;
-
-    assert_typ_printed_as "uint64_t"
-      uint64_t;
-
-    assert_typ_printed_as ~name:"i" "size_t i"
-      size_t;
-
-    assert_typ_printed_as "unsigned short"
-      ushort;
-
-    assert_typ_printed_as ~name:"j" "unsigned int j"
-      uint;
-
-    assert_typ_printed_as "unsigned long"
-      ulong;
-
-    assert_typ_printed_as ~name:"k" "unsigned long long k"
-      ullong;
 
     assert_typ_printed_as "float"
       float;
@@ -111,9 +75,6 @@ let test_pointer_printing _ =
     (* Pointers to atomic types *)
     assert_typ_printed_as ~name:"a" "void *a"
       (ptr void);
-
-    assert_typ_printed_as "unsigned long long **"
-      (ptr (ptr ullong));
 
     assert_typ_printed_as ~name:"b" "char *****b"
       (ptr (ptr (ptr (ptr (ptr char)))));
@@ -157,8 +118,8 @@ let test_pointer_printing _ =
     assert_typ_printed_as "void (*)(void)"
       (Foreign.funptr (void @-> returning void));
 
-    assert_typ_printed_as ~name:"g" "float (*g)(int, long)"
-      (Foreign.funptr (int @-> long @-> returning float));
+    assert_typ_printed_as ~name:"g" "float (*g)(int, char)"
+      (Foreign.funptr (int @-> char @-> returning float));
 
     assert_typ_printed_as "void (*)(int (*)[4])"
       (Foreign.funptr (ptr (array 4 int) @-> returning void));
@@ -167,10 +128,10 @@ let test_pointer_printing _ =
       (Foreign.funptr (void @-> returning (Foreign.funptr (int @-> returning int32_t))));
 
     assert_typ_printed_as
-      "unsigned long (*(*)(int, void (*)(float, float)))(long)"
+      "double (*(*)(int, void (*)(float, float)))(char)"
       (Foreign.funptr (int @->
                Foreign.funptr (float @-> float @-> returning void) @->
-               returning (Foreign.funptr (long @-> returning ulong))));
+               returning (Foreign.funptr (char @-> returning double))));
 
     (* Pointers to pointers to functions *)
     assert_typ_printed_as ~name:"i" "double (**i)(int)"
@@ -179,7 +140,7 @@ let test_pointer_printing _ =
     assert_typ_printed_as "double (**)(int)"
       (ptr (Foreign.funptr (int @-> returning double)));
 
-    assert_typ_printed_as ~name:"j" "void (*(*(*(**j)(int))(void))[8])(long, long)"
+    assert_typ_printed_as ~name:"j" "void (*(*(*(**j)(int))(void))[8])(float, float)"
       (ptr
          (Foreign.funptr
             (int @->
@@ -188,8 +149,8 @@ let test_pointer_printing _ =
                            returning (ptr
                                         (array 8
                                            (Foreign.funptr
-                                              (long @->
-                                               long @->
+                                              (float @->
+                                               float @->
                                                returning void)))))))));
   end
 
@@ -213,14 +174,14 @@ let test_struct_and_union_printing _ =
     let s_prims = structure "s_prims" in
     let (-:) ty label = field s_prims label ty in
     let _ = int   -: "i" in
-    let _ = ulong -: "l" in
+    let _ = char  -: "c" in
     let _ = float -: "z" in
     seal s_prims;
 
     assert_typ_printed_as ~name:"b"
                           "struct s_prims {
                               int i;
-                              unsigned long l;
+                              char c;
                               float z;
                            } b"
       s_prims;
@@ -356,8 +317,8 @@ let test_array_printing _ =
     assert_typ_printed_as ~name:"a" "int a[10]"
       (array 10 int);
 
-    assert_typ_printed_as "long [1][2][3]"
-      (array 1 (array 2 (array 3 long)));
+    assert_typ_printed_as "char [1][2][3]"
+      (array 1 (array 2 (array 3 char)));
 
     assert_typ_printed_as ~name:"b" "int (*b[10])(float)"
       (array 10 (Foreign.funptr (float @-> returning int)));

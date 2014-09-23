@@ -16,9 +16,6 @@ let test_sizeof_primitives _ = begin
   assert_equal ~msg:"sizeof (char) == 1"
     (sizeof char) 1;
 
-  assert_equal ~msg:"sizeof (unsigned char) == 1"
-    (sizeof uchar) 1;
-
   assert_equal ~msg:"sizeof (signed char) == 1"
     (sizeof schar) 1;
 
@@ -31,12 +28,6 @@ let test_sizeof_primitives _ = begin
   assert_bool "sizeof (short) <= sizeof (int)"
     (sizeof char <= sizeof int);
 
-  assert_bool "sizeof (int) <= sizeof (long)"
-    (sizeof int <= sizeof long);
-
-  assert_bool "sizeof (long) <= sizeof (long long)"
-    (sizeof long <= sizeof llong);
-
   assert_equal ~msg:"2 * sizeof (int32_t) == sizeof (int64_t)"
     (2 * sizeof int32_t) (sizeof int64_t);
 
@@ -48,24 +39,6 @@ let test_sizeof_primitives _ = begin
 
   assert_bool "sizeof (int16_t) <= sizeof (int)"
     (sizeof int16_t <= sizeof int);
-
-  assert_bool "sizeof (int32_t) <= sizeof (long)"
-    (sizeof int32_t <= sizeof long);
-
-  assert_bool "sizeof (int64_t) <= sizeof (long long)"
-    (sizeof int64_t <= sizeof llong);
-
-  assert_equal ~msg:"sizeof (short) == sizeof (unsigned short)"
-    (sizeof short) (sizeof ushort);
-
-  assert_equal ~msg:"sizeof (int) == sizeof (unsigned int)"
-    (sizeof int) (sizeof uint);
-
-  assert_equal ~msg:"sizeof (long) == sizeof (unsigned long)"
-    (sizeof long) (sizeof ulong);
-
-  assert_equal ~msg:"sizeof (long long) == sizeof (unsigned long long)"
-    (sizeof llong) (sizeof ullong);
 end
 
 

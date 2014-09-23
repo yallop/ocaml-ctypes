@@ -15,6 +15,7 @@
 #include <assert.h>
 #include <string.h>
 #include <complex.h>
+#include <stdarg.h>
 
 #include <semaphore.h>
 
@@ -126,9 +127,9 @@ struct simple return_struct(void)
   return s;
 }
 
-int64_t sum_union_components(union padded *padded, size_t len)
+int64_t sum_union_components(union padded *padded, int len)
 {
-  size_t i;
+  int i;
   int64_t acc = 0;
   for (i = 0; i < len; i++) {
     acc += padded[i].i;
@@ -295,43 +296,21 @@ int accept_pointers(float *float_p,
                     double *double_p,
                     short *short_p,
                     int *int_p,
-                    long *long_p,
-                    long long *llong_p,
                     intnat *nativeint_p,
                     int8_t *int8_t_p,
                     int16_t *int16_t_p,
                     int32_t *int32_t_p,
-                    int64_t *int64_t_p,
-                    uint8_t *uint8_t_p,
-                    uint16_t *uint16_t_p,
-                    uint32_t *uint32_t_p,
-                    uint64_t *uint64_t_p,
-                    size_t *size_t_p,
-                    unsigned short *ushort_p,
-                    unsigned *uint_p,
-                    unsigned long *ulong_p,
-                    unsigned long long *ullong_p)
+                    int64_t *int64_t_p)
 {
   return (*float_p
           + *double_p
           + *short_p
           + *int_p
-          + *long_p
-          + *llong_p
           + *nativeint_p
           + *int8_t_p
           + *int16_t_p
           + *int32_t_p
-          + *int64_t_p
-          + *uint8_t_p
-          + *uint16_t_p
-          + *uint32_t_p
-          + *uint64_t_p
-          + *size_t_p
-          + *ushort_p
-          + *uint_p
-          + *ulong_p
-          + *ullong_p);
+          + *int64_t_p);
 }
 
 int accept_pointers_to_pointers(int *p, int **pp, int ***ppp, int ****pppp)
@@ -537,4 +516,21 @@ void post2_wait1(void)
 {
   sem_post(&semaphore2);
   sem_wait(&semaphore1);
+}
+
+int snprintf_wrapper(char *s, int size, const char *format, ...)
+{
+  int rv;
+  va_list args;
+  va_start(args, format);
+  
+  rv = vsnprintf(s, size, format, args);
+
+  va_end(args);
+  return rv;
+}
+
+void *memchr_wrapper(const void *s, int c, int n)
+{
+  return memchr(s, c, n);
 }

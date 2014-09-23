@@ -44,8 +44,8 @@ static struct custom_operations managed_buffer_custom_ops = {
   custom_deserialize_default
 };
 
-/* copy_bytes : void * -> size_t -> managed_buffer */
-value ctypes_copy_bytes(void *src, size_t size)
+/* copy_bytes : void * -> int -> managed_buffer */
+value ctypes_copy_bytes(void *src, int size)
 {
   value block = caml_alloc_custom(&managed_buffer_custom_ops, sizeof(void*), 0, 1);
   *(void **)Data_custom_val(block) = memcpy(caml_stat_alloc(size), src, size);

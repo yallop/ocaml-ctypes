@@ -7,7 +7,6 @@
 
 open OUnit2
 open Ctypes
-open Unsigned
 open Foreign
 
 
@@ -88,187 +87,7 @@ struct
       (strcmp "def" "abc" > 0);
 
     assert_bool "strcmp('abc', 'abc') == 0"
-      (strcmp "abc" "abc" = 0);
-
-    let p1 = allocate int 10 and p2 = allocate int 20 in
-    assert_bool "memcmp(&10, &20) < 0"
-      (memcmp (to_voidp p1) (to_voidp p2) (Size_t.of_int (sizeof int)) < 0);
-
-    let p = allocate_n uchar 12 in
-    let i = 44 in
-    let u = UChar.of_int i in begin
-      ignore (memset (to_voidp p) i (Size_t.of_int 12));
-      for i = 0 to 11 do
-        assert_equal u !@(p +@ i)
-      done
-    end
-
-
-  (*
-    Call the function
-
-       void qsort(void *base, size_t nmemb, size_t size,
-                  int(*compar)(const void *, const void *));
-  *)
-  let test_qsort _ =
-    let sortby (type a) (typ : a typ) (f : a -> a -> int) (l : a list) =
-      let open CArray in
-      let open Size_t in
-      let open Infix in
-      let arr = of_list typ l in
-      let len = of_int (length arr) in
-      let size = of_int (sizeof typ) in
-      let cmp xp yp =
-        let x = !@(from_voidp typ xp)
-        and y = !@(from_voidp typ yp) in
-        f x y
-      in
-      let () = qsort (to_voidp (start arr)) len size cmp in
-      to_list arr
-      in
-
-      assert_equal
-        [5; 4; 3; 2; 1]
-        (sortby int (fun x y -> - (compare x y)) [3; 4; 1; 2; 5]);
-
-      assert_equal
-        ['o'; 'q'; 'r'; 's'; 't']
-        (sortby char compare ['q'; 's'; 'o'; 'r'; 't'])
-
-
-  (*
-    Call the function
-
-       void *bsearch(const void *key, const void *base,
-                     size_t nmemb, size_t size,
-                     int (*compar)(const void *, const void *));
-  *)
-  let test_bsearch _ =
-    let module M = struct
-      (*
-        struct mi {
-           int nr;
-           char *name;
-        } months[] = {
-           { 1, "jan" }, { 2, "feb" }, { 3, "mar" }, { 4, "apr" },
-           { 5, "may" }, { 6, "jun" }, { 7, "jul" }, { 8, "aug" },
-           { 9, "sep" }, {10, "oct" }, {11, "nov" }, {12, "dec" }
-        };
-      *)
-      type mi
-      let mi = structure "mi"
-      let (-:) ty label = field mi label ty
-      let mr   = int      -: "mr"
-      let name = ptr char -: "name"
-      let () = seal (mi : mi structure typ)
-
-    let of_string : string -> char carray =
-      fun s ->
-        let module Array = CArray in
-        let len = String.length s in
-        let arr = Array.make char (len + 1) in
-        for i = 0 to len - 1 do
-          arr.(i) <- s.[i];
-        done;
-        arr.(len) <- '\000';
-        arr
-
-    let as_string : char ptr -> string =
-      fun p ->
-        let len = Size_t.to_int (strlen p) in
-        let s = String.create len in
-        for i = 0 to len - 1 do
-          s.[i] <- !@(p +@ i);
-        done;
-        s
-
-    let mkmi n s =
-      let m = make mi in
-      setf m mr n;
-      setf m name (CArray.start s);
-      m
-
-    let cmpi m1 m2 =
-      let mi1 = from_voidp mi m1 in
-      let mi2 = from_voidp mi m2 in
-      Pervasives.compare
-        (as_string (!@(mi1 |-> name)))
-        (as_string (!@(mi2 |-> name)))
-
-    let jan = of_string "jan"
-    let feb = of_string "feb"
-    let mar = of_string "mar"
-    let apr = of_string "apr"
-    let may = of_string "may"
-    let jun = of_string "jun"
-    let jul = of_string "jul"
-    let aug = of_string "aug"
-    let sep = of_string "sep"
-    let oct = of_string "oct"
-    let nov = of_string "nov"
-    let dec = of_string "dec"
-
-    let months = CArray.of_list mi [
-      mkmi 1 jan;
-      mkmi 2 feb;
-      mkmi 3 mar;
-      mkmi 4 apr;
-      mkmi 5 may;
-      mkmi 6 jun;
-      mkmi 7 jul;
-      mkmi 8 aug;
-      mkmi 9 sep;
-      mkmi 10 oct;
-      mkmi 11 nov;
-      mkmi 12 dec;
-    ]
-
-    let () = qsort
-      (to_voidp (CArray.start months))
-      (Size_t.of_int (CArray.length months))
-      (Size_t.of_int (sizeof mi))
-      cmpi
-
-    let search : mi structure -> mi structure carray -> mi structure option
-      = fun key array ->
-        let len = Size_t.of_int (CArray.length array) in
-        let size = Size_t.of_int (sizeof mi) in
-        let r : unit ptr =
-          bsearch
-            (to_voidp (addr key))
-            (to_voidp (CArray.start array))
-            len size cmpi in
-        if r = null then None
-        else Some (!@(from_voidp mi r))
-
-    let find_month_by_name : char carray -> mi structure option =
-      fun s -> search (mkmi 0 s) months
-
-    let () = match find_month_by_name dec with
-        Some m -> assert_equal 12 (getf m mr)
-      | _ -> assert false
-
-    let () = match find_month_by_name feb with
-        Some m -> assert_equal 2 (getf m mr)
-      | _ -> assert false
-
-    let () = match find_month_by_name jan with
-        Some m -> assert_equal 1 (getf m mr)
-      | _ -> assert false
-
-    let () = match find_month_by_name may with
-        Some m -> assert_equal 5 (getf m mr)
-      | _ -> assert false
-
-    let missing = of_string "missing"
-    let () =
-      assert_equal None (find_month_by_name missing)
-
-    let empty = of_string ""
-    let () =
-      assert_equal None (find_month_by_name empty)
-
-    end in ()
+      (strcmp "abc" "abc" = 0)
 end
 
 (*
@@ -326,18 +145,6 @@ let suite = "C standard library tests" >:::
 
    "test div function"
     >:: test_div;
-
-   "test qsort function (foreign)"
-    >:: Foreign_tests.test_qsort;
-
-   "test qsort function (stubs)"
-    >:: Stub_tests.test_qsort;
-
-   "test bsearch function (foreign)"
-    >:: Foreign_tests.test_bsearch;
-
-   "test bsearch function (stubs)"
-    >:: Stub_tests.test_bsearch;
   ]
 
 

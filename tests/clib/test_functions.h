@@ -42,7 +42,7 @@ union padded {
   int64_t i;
   char    a[sizeof(int64_t) + 1];
 };
-extern int64_t sum_union_components(union padded *, size_t);
+extern int64_t sum_union_components(union padded *, int);
 extern union padded add_unions(union padded, union padded);
 
 extern void concat_strings(const char **, int, char *);
@@ -62,7 +62,7 @@ extern struct tagged add_tagged_numbers(struct tagged, struct tagged);
 extern double accepts_pointer_to_array_of_structs(struct tagged(*)[5]);
 #define GLOBAL_STRING "global string"
 struct global_struct {
-  size_t len;
+  int len;
   const char str[sizeof GLOBAL_STRING];
 };
 
@@ -82,22 +82,11 @@ extern int accept_pointers(float *,
                            double *,
                            short *,
                            int *,
-                           long *,
-                           long long *,
                            intnat *,
                            int8_t *,
                            int16_t *,
                            int32_t *,
-                           int64_t *,
-                           uint8_t *,
-                           uint16_t *,
-                           uint32_t *,
-                           uint64_t *,
-                           size_t *,
-                           unsigned short *,
-                           unsigned *,
-                           unsigned long *,
-                           unsigned long long *);
+                           int64_t *);
 int accept_pointers_to_pointers(int *, int **, int ***, int ****);
 intfun **returning_pointer_to_function_pointer(void);
 int accepting_pointer_to_function_pointer(intfun **);
@@ -116,12 +105,6 @@ unsigned short retrieve_USHRT_MAX(void);
 int retrieve_INT_MIN(void);
 int retrieve_INT_MAX(void);
 unsigned int retrieve_UINT_MAX(void);
-long retrieve_LONG_MAX(void);
-long retrieve_LONG_MIN(void);
-unsigned long retrieve_ULONG_MAX(void);
-long long retrieve_LLONG_MAX(void);
-long long retrieve_LLONG_MIN(void);
-unsigned long long retrieve_ULLONG_MAX(void);
 int8_t retrieve_INT8_MIN(void);
 int16_t retrieve_INT16_MIN(void);
 int32_t retrieve_INT32_MIN(void);
@@ -130,11 +113,6 @@ int8_t retrieve_INT8_MAX(void);
 int16_t retrieve_INT16_MAX(void);
 int32_t retrieve_INT32_MAX(void);
 int64_t retrieve_INT64_MAX(void);
-uint8_t retrieve_UINT8_MAX(void);
-uint16_t retrieve_UINT16_MAX(void);
-uint32_t retrieve_UINT32_MAX(void);
-uint64_t retrieve_UINT64_MAX(void);
-size_t retrieve_SIZE_MAX(void);
 float retrieve_FLT_MIN(void);
 float retrieve_FLT_MAX(void);
 double retrieve_DBL_MIN(void);
@@ -162,5 +140,6 @@ void call_registered_callback(int, int);
 void initialize_waiters(void);
 void post1_wait2(void);
 void post2_wait1(void);
-
+int snprintf_wrapper(char *s, int size, const char *format, ...);
+void *memchr_wrapper(const void *s, int c, int n);
 #endif /* TEST_FUNCTIONS_H */

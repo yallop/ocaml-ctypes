@@ -36,26 +36,4 @@ struct
 
   (* int strcmp(const char *str1, const char *str2);  *)
   let strcmp = foreign "strcmp" (string @-> string @-> returning int)
-
-  (* int memcmp(const void *ptr1, const void *ptr2, size_t num) *)
-  let memcmp = foreign "memcmp"
-    (ptr void @-> ptr void @-> size_t @-> returning int)
-
-  (* void  *memset(void *ptr, int value, size_t num) *)
-  let memset = foreign "memset"
-    (ptr void @-> int @-> size_t @-> returning (ptr void))
-
-  (* let div = foreign "div" (int @-> int @-> returning div_t) *)
-
-  let qsort = foreign "qsort"
-    (ptr void @-> size_t @-> size_t @->
-     funptr (ptr void @-> ptr void @-> returning int) @->
-     returning void)
-
-  let bsearch = foreign "bsearch"
-    (ptr void @-> ptr void @-> size_t @-> size_t @->
-     funptr (ptr void @-> ptr void @-> returning int) @->
-     returning (ptr void))
-
-  let strlen = foreign "strlen" (ptr char @-> returning size_t)
 end

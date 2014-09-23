@@ -13,9 +13,6 @@
     to bind external C values.
 *)
 
-open Signed
-open Unsigned
-
 (** {2:types Values representing C types} *)
 
 type 'a typ = 'a Static.typ
@@ -53,11 +50,10 @@ val void  : unit typ
 
 (** {4:arithmetic_types Arithmetic types}
 
-    The arithmetic types consist of the signed and unsigned integer types
+    The arithmetic types consist of the signed integer types
     (including character types) and the floating types.  There are values
     representing both exact-width integer types (of 8, 16, 32 and 64 bits) and
-    types whose size depend on the platform (signed and unsigned short, int, long,
-    long long).
+    types whose size depend on the platform (short, int).
 
 *)
 
@@ -74,12 +70,6 @@ val short : int typ
 
 val int   : int typ
 (** Value representing the C type ([signed]) [int]. *)
-
-val long  : long typ
-(** Value representing the C type ([signed]) [long]. *)
-
-val llong  : llong typ
-(** Value representing the C type ([signed]) [long long]. *)
 
 val nativeint : nativeint typ
 (** Value representing the C type ([signed]) [int]. *)
@@ -99,40 +89,6 @@ val int64_t : int64 typ
 val camlint : int typ
 (** Value representing an integer type with the same storage requirements as
     an OCaml [int]. *)
-
-(** {5 Unsigned integer types} *)
-
-val uchar : uchar typ
-(** Value representing the C type [unsigned char]. *)
-
-val uint8_t : uint8 typ
-(** Value representing an 8-bit unsigned integer C type. *)
-
-val uint16_t : uint16 typ
-(** Value representing a 16-bit unsigned integer C type. *)
-
-val uint32_t : uint32 typ
-(** Value representing a 32-bit unsigned integer C type. *)
-
-val uint64_t : uint64 typ
-(** Value representing a 64-bit unsigned integer C type. *)
-
-val size_t : size_t typ
-(** Value representing the C type [size_t], an alias for one of the unsigned
-    integer types.  The actual size and alignment requirements for [size_t]
-    vary between platforms. *)
-
-val ushort : ushort typ
-(** Value representing the C type [unsigned short]. *)
-
-val uint : uint typ
-(** Value representing the C type [unsigned int]. *)
-
-val ulong : ulong typ
-(** Value representing the C type [unsigned long]. *)
-
-val ullong : ullong typ
-(** Value representing the C type [unsigned long long]. *)
 
 (** {5 Floating types} *)
 

@@ -18,7 +18,6 @@ let test_pointer_coercions _ =
     let types = [
       T void;
       T int8_t;
-      T uint16_t;
       T int;
       T float;
       T short;
@@ -141,19 +140,19 @@ struct
      Check coercions between functions.
   *)
   let test_function_coercions _ =
-    let isize_t = view size_t
-      ~read:Unsigned.Size_t.to_int ~write:Unsigned.Size_t.of_int in
+    let i64int = view int
+      ~read:Int64.of_int ~write:Int64.to_int in
     let memchr' = coerce_fn
-      (ptr void @-> int @-> size_t @-> returning (ptr void))
-      (string @-> int8_t @-> isize_t @-> returning string_opt)
+      (ptr void @-> int @-> int @-> returning (ptr void))
+      (string @-> int8_t @-> i64int @-> returning string_opt)
       memchr in
     begin
       assert_equal
-        (memchr' "foobar" (Char.code 'b') 4)
+        (memchr' "foobar" (Char.code 'b') 4L)
         (Some "bar")
       ;
       assert_equal
-        (memchr' "foobar" (Char.code 'b') 2)
+        (memchr' "foobar" (Char.code 'b') 2L)
         None
       ;
     end
@@ -177,39 +176,35 @@ let test_unsupported_coercions _ =
     type boxed_type = T : 'a typ -> boxed_type
     let types = [
       T int8_t,
-      [T uint16_t; T float; T complex64;
-       T (array 5 int32_t); T (structure "s"); T (union "u")];
-
-      T uint16_t,
-      [T int8_t; T int; T float; T short; T complex64;
+      [T float; T complex64;
        T (array 5 int32_t); T (structure "s"); T (union "u")];
 
       T int,
-      [T uint16_t; T float; T complex64;
+      [T float; T complex64;
        T (array 5 int32_t); T (structure "s"); T (union "u")];
 
       T float,
-      [T int8_t; T uint16_t; T int; T short; T complex64;
+      [T int8_t; T int; T short; T complex64;
        T (array 5 int32_t); T (structure "s"); T (union "u")];
 
       T short,
-      [T uint16_t; T float; T complex64;
+      [T float; T complex64;
        T (array 5 int32_t); T (structure "s"); T (union "u")];
 
       T complex64,
-      [T int8_t; T uint16_t; T int; T float; T short;
+      [T int8_t; T int; T float; T short;
        T (array 5 int32_t); T (structure "s"); T (union "u")];
 
       T (array 5 int32_t),
-      [T int8_t; T uint16_t; T int; T float; T short; T complex64;
+      [T int8_t; T int; T float; T short; T complex64;
        T (array 5 int32_t); T (structure "s"); T (union "u")];
 
       T (structure "s"),
-      [T int8_t; T uint16_t; T int; T float; T short; T complex64;
+      [T int8_t; T int; T float; T short; T complex64;
        T (array 5 int32_t); T (structure "s"); T (union "u")];
 
       T (union "u"),
-      [T int8_t; T uint16_t; T int; T float; T short; T complex64;
+      [T int8_t; T int; T float; T short; T complex64;
        T (array 5 int32_t); T (structure "s"); T (union "u")];
     ]
 

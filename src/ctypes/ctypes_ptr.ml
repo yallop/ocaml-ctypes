@@ -9,7 +9,14 @@
 
 module Raw :
 sig
-  include Signed.S
+  type t
+  val add : t -> t -> t
+  val sub : t -> t -> t
+  val of_int : int -> t
+  val to_int : t -> int
+  val of_nativeint : nativeint -> t
+  val to_nativeint : t -> nativeint
+  val compare : t -> t -> int
   val null : t
 end =
 struct

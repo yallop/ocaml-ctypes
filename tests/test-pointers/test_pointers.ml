@@ -23,31 +23,17 @@ struct
   let test_passing_pointers _ =
     assert_equal ~msg:"Passing pointers to various numeric types"
       ~printer:string_of_int
-      (1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 +
-       11 + 12 + 13 + 14 + 15 + 16 + 17 + 18 + 19 + 20)
-      (let open Signed in
-       let open Unsigned in
-       accept_pointers
+      (1 + 2 + 3 + 4 + 7 + 8 + 9 + 10 + 11)
+      (accept_pointers
          (allocate float 1.0)
          (allocate double 2.0)
          (allocate short 3)
          (allocate int 4)
-         (allocate long (Long.of_int 5))
-         (allocate llong (LLong.of_int 6))
          (allocate nativeint 7n)
          (allocate int8_t 8)
          (allocate int16_t 9)
          (allocate int32_t 10l)
-         (allocate int64_t 11L)
-         (allocate uint8_t (UInt8.of_int 12))
-         (allocate uint16_t (UInt16.of_int 13))
-         (allocate uint32_t (UInt32.of_int 14))
-         (allocate uint64_t (UInt64.of_int 15))
-         (allocate size_t (Size_t.of_int 16))
-         (allocate ushort (UShort.of_int 17))
-         (allocate uint (UInt.of_int 18))
-         (allocate ulong (ULong.of_int 19))
-         (allocate ullong (ULLong.of_int 20)))
+         (allocate int64_t 11L))
 
   (*
     Test passing pointers to pointers.
@@ -103,37 +89,6 @@ struct
   let test_callback_returning_pointer_to_function_pointer _ =
     assert_equal
       10 (!@(returning_pointer_to_function_pointer ()) 2 5)
-
-
-  (*
-    Test bindings for malloc, realloc and free.
-  *)
-  let test_allocation _ =
-    let open Unsigned in
-
-    let pointer = malloc (Size_t.of_int (sizeof int)) in
-      let int_pointer = from_voidp int pointer in
-      int_pointer <-@ 17;
-      assert_equal !@int_pointer 17;
-      int_pointer <-@ -3;
-      assert_equal !@int_pointer (-3);
-
-      let pointer' = realloc pointer (Size_t.of_int (20 * sizeof int)) in
-      assert_bool "realloc succeeded" (pointer' <> null);
-      let int_pointer = from_voidp int pointer' in
-
-      assert_equal ~msg:"realloc copied the existing data over"
-        !@int_pointer (-3);
-
-      for i = 0 to 19 do
-        (int_pointer +@ i) <-@ i
-      done;
-
-      for i = 0 to 19 do
-        assert_equal i !@(int_pointer +@ i)
-      done;
-
-      free pointer'
 
 
   (*
@@ -197,103 +152,53 @@ end
   Tests for reading and writing primitive values through pointers.
 *)
 let test_pointer_assignment_with_primitives _ =
-  let open Signed in
-  let open Unsigned in
   let p_char = allocate char '1'
-  and p_uchar = allocate uchar (UChar.of_int 2)
   and p_schar = allocate schar 3
   and p_float = allocate float 4.0
   and p_double = allocate double 5.0
   and p_short = allocate short 6
   and p_int = allocate int 7
-  and p_long = allocate long (Long.of_int 8)
-  and p_llong = allocate llong (LLong.of_int 9)
   and p_nativeint = allocate nativeint 10n
   and p_int8_t = allocate int8_t 11
   and p_int16_t = allocate int16_t 12
   and p_int32_t = allocate int32_t 13l
   and p_int64_t = allocate int64_t 14L
-  and p_uint8_t = allocate uint8_t (UInt8.of_int 15)
-  and p_uint16_t = allocate uint16_t (UInt16.of_int 16)
-  and p_uint32_t = allocate uint32_t (UInt32.of_int 17)
-  and p_uint64_t = allocate uint64_t (UInt64.of_int 18)
-  and p_size_t = allocate size_t (Size_t.of_int 19)
-  and p_ushort = allocate ushort (UShort.of_int 20)
-  and p_uint = allocate uint (UInt.of_int 21)
-  and p_ulong = allocate ulong (ULong.of_int 22)
-  and p_ullong = allocate ullong (ULLong.of_int 23)
   in begin
     assert_equal '1' (!@p_char);
-    assert_equal (UChar.of_int 2) (!@p_uchar);
     assert_equal 3 (!@p_schar);
     assert_equal 4.0 (!@p_float);
     assert_equal 5.0 (!@p_double);
     assert_equal 6 (!@p_short);
     assert_equal 7 (!@p_int);
-    assert_equal (Long.of_int 8) (!@p_long);
-    assert_equal (LLong.of_int 9) (!@p_llong);
     assert_equal 10n (!@p_nativeint);
     assert_equal 11 (!@p_int8_t);
     assert_equal 12 (!@p_int16_t);
     assert_equal 13l (!@p_int32_t);
     assert_equal 14L (!@p_int64_t);
-    assert_equal (UInt8.of_int 15) (!@p_uint8_t);
-    assert_equal (UInt16.of_int 16) (!@p_uint16_t);
-    assert_equal (UInt32.of_int 17) (!@p_uint32_t);
-    assert_equal (UInt64.of_int 18) (!@p_uint64_t);
-    assert_equal (Size_t.of_int 19) (!@p_size_t);
-    assert_equal (UShort.of_int 20) (!@p_ushort);
-    assert_equal (UInt.of_int 21) (!@p_uint);
-    assert_equal (ULong.of_int 22) (!@p_ulong);
-    assert_equal (ULLong.of_int 23) (!@p_ullong);
 
     p_char <-@ '2';
-    p_uchar <-@ (UChar.of_int 102);
     p_schar <-@ 103;
     p_float <-@ 104.0;
     p_double <-@ 105.0;
     p_short <-@ 106;
     p_int <-@ 107;
-    p_long <-@ (Long.of_int 108);
-    p_llong <-@ (LLong.of_int 109);
     p_nativeint <-@ 110n;
     p_int8_t <-@ 111;
     p_int16_t <-@ 112;
     p_int32_t <-@ 113l;
     p_int64_t <-@ 114L;
-    p_uint8_t <-@ (UInt8.of_int 115);
-    p_uint16_t <-@ (UInt16.of_int 116);
-    p_uint32_t <-@ (UInt32.of_int 117);
-    p_uint64_t <-@ (UInt64.of_int 118);
-    p_size_t <-@ (Size_t.of_int 119);
-    p_ushort <-@ (UShort.of_int 120);
-    p_uint <-@ (UInt.of_int 121);
-    p_ulong <-@ (ULong.of_int 122);
-    p_ullong <-@ (ULLong.of_int 123);
 
     assert_equal '2' (!@p_char);
-    assert_equal (UChar.of_int 102) (!@p_uchar);
     assert_equal 103 (!@p_schar);
     assert_equal 104.0 (!@p_float);
     assert_equal 105.0 (!@p_double);
     assert_equal 106 (!@p_short);
     assert_equal 107 (!@p_int);
-    assert_equal (Long.of_int 108) (!@p_long);
-    assert_equal (LLong.of_int 109) (!@p_llong);
     assert_equal 110n (!@p_nativeint);
     assert_equal 111 (!@p_int8_t);
     assert_equal 112 (!@p_int16_t);
     assert_equal 113l (!@p_int32_t);
     assert_equal 114L (!@p_int64_t);
-    assert_equal (UInt8.of_int 115) (!@p_uint8_t);
-    assert_equal (UInt16.of_int 116) (!@p_uint16_t);
-    assert_equal (UInt32.of_int 117) (!@p_uint32_t);
-    assert_equal (UInt64.of_int 118) (!@p_uint64_t);
-    assert_equal (Size_t.of_int 119) (!@p_size_t);
-    assert_equal (UShort.of_int 120) (!@p_ushort);
-    assert_equal (UInt.of_int 121) (!@p_uint);
-    assert_equal (ULong.of_int 122) (!@p_ulong);
-    assert_equal (ULLong.of_int 123) (!@p_ullong);
   end
 
 
@@ -578,12 +483,6 @@ let suite = "Pointer tests" >:::
 
    "global value"
     >:: test_reading_and_writing_global_value;
-
-   "allocation (foreign)"
-    >:: Foreign_tests.test_allocation;
-
-   "allocation (stubs)"
-    >:: Stub_tests.test_allocation;
 
    "passing pointers through functions (foreign)"
     >:: Foreign_tests.test_passing_pointer_through;

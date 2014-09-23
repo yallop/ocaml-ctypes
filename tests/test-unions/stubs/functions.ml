@@ -21,7 +21,7 @@ let () = seal padded
 module Common (F: Cstubs.FOREIGN) =
 struct
   let sum_union_components = F.foreign "sum_union_components"
-    (ptr padded @-> size_t @-> returning int64_t)
+    (ptr padded @-> int @-> returning int64_t)
 end
 
 (* These functions can only be bound using stub generation, since Foreign

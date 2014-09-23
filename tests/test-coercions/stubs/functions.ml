@@ -13,6 +13,6 @@ module Stubs (F: Cstubs.FOREIGN) =
 struct
   open F
 
-  let memchr = foreign "memchr"
-    (ptr void @-> int @-> size_t @-> returning (ptr void))
+  let memchr = foreign "memchr_wrapper"
+    (ptr void @-> int @-> int @-> returning (ptr void))
 end

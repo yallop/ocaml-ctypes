@@ -14,8 +14,6 @@ open Ctypes
 module Common_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
 struct
   module M = Functions.Stubs(S)
-  open Signed
-  open Unsigned
   open M
 
   (*
@@ -33,19 +31,14 @@ struct
         (write snprintf_int
            (fun k -> k "an int: %d." 100));
       
-      assert_equal "a char A and a uint 33."
-        (write snprintf_char_unsigned
-           (fun k -> k "a char %c and a uint %u." 'A' (UInt.of_int 33)));
+      assert_equal "a char A and a float 0.0."
+        (write snprintf_char_float
+           (fun k -> k "a char %c and a float %.1f." 'A' 0.0));
 
-      assert_equal "a long long 9223372036854775807 and an int -4."
-        (write snprintf_longlong_int
-           (fun k -> k "a long long %lld and an int %d."
-             (LLong.of_nativeint Nativeint.max_int) (-4)));
-
-      assert_equal "a string abcde and an unsigned short ffd."
-        (write snprintf_string_ushort
-           (fun k -> k "a string %s and an unsigned short %hx."
-             "abcde" (UShort.of_int 0xffd)));
+      assert_equal "a string abcde and a short ffd."
+        (write snprintf_string_short
+           (fun k -> k "a string %s and a short %hx."
+             "abcde" 0xffd));
     end
 end
 
