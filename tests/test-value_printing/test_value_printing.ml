@@ -201,16 +201,6 @@ struct
     Size_t.(assert_equal (string_of size_t (of_int 5)) (to_string (of_int 5)));
     Size_t.(assert_equal (string_of size_t _SIZE_MAX) (to_string _SIZE_MAX));
 
-    (* nativeint *)
-    let _nINT_MIN = retrieve_nLONG_MIN () in
-    let _nINT_MAX = retrieve_nLONG_MAX () in
-
-    assert_equal (string_of nativeint _nINT_MIN) (Nativeint.to_string _nINT_MIN);
-    assert_equal (string_of nativeint 0n) (Nativeint.to_string 0n);
-    assert_equal (string_of nativeint (-5n)) (Nativeint.to_string (-5n));
-    assert_equal (string_of nativeint 14n) (Nativeint.to_string 14n);
-    assert_equal (string_of nativeint _nINT_MAX) (Nativeint.to_string _nINT_MAX);
-
     (* float *)
     let _FLT_MIN = retrieve_FLT_MIN () in
     let _FLT_MAX = retrieve_FLT_MAX () in

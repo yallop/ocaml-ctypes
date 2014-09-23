@@ -41,12 +41,6 @@ struct
   let retrieve_LONG_MIN = foreign "retrieve_LONG_MIN"
     (void @-> returning long)
 
-  let retrieve_nLONG_MAX = foreign "retrieve_nLONG_MAX"
-    (void @-> returning nativeint)
-
-  let retrieve_nLONG_MIN = foreign "retrieve_nLONG_MIN"
-    (void @-> returning nativeint)
-
   let retrieve_LLONG_MAX = foreign "retrieve_LLONG_MAX"
     (void @-> returning llong)
 
