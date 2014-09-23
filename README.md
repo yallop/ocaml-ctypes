@@ -45,6 +45,8 @@ The documentation and source distribution contain more complex examples, involvi
 * [Mailing list][mailing-list]
 * [FAQ][faq]
 
+[![Build Status](https://travis-ci.org/ocamllabs/ocaml-ctypes.svg?branch=master)](https://travis-ci.org/ocamllabs/ocaml-ctypes)
+
 [rwo-19]: https://realworldocaml.org/v1/en/html/foreign-function-interface.html
 [rwo]: http://realworldocaml.org/
 [mirage-blogpost]: http://openmirage.org/blog/modular-foreign-function-bindings
