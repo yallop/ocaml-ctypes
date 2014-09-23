@@ -397,27 +397,15 @@ let test_ocaml_string_printing _ =
 
 
 (*
-  Test the printing of bigarray types.
+  Test the printing of bigarray types with signed elements.
 *)
-let test_bigarray_printing _ =
+let test_bigarray_signed_printing _ =
   begin
-    assert_typ_printed_as "float[10][100]"
-      (bigarray genarray [|10; 100|] Bigarray.float32);
-
-    assert_typ_printed_as "double[20][30][40]"
-      (bigarray genarray [|20; 30; 40|] Bigarray.float64);
-
     assert_typ_printed_as "int8_t[1][3]"
       (bigarray genarray [|1; 3|] Bigarray.int8_signed);
 
-    assert_typ_printed_as "uint8_t[2]"
-      (bigarray array1 2 Bigarray.int8_unsigned);
-
     assert_typ_printed_as "int16_t[3]"
       (bigarray array1 3 Bigarray.int16_signed);
-
-    assert_typ_printed_as "uint16_t[4]"
-      (bigarray array1 4 Bigarray.int16_unsigned);
 
     assert_typ_printed_as "int32_t[5][6]"
       (bigarray array2 (5, 6) Bigarray.int32);
@@ -430,17 +418,38 @@ let test_bigarray_printing _ =
 
     assert_typ_printed_as "intnat[13][14][15]"
       (bigarray array3 (13, 14, 15) Bigarray.nativeint);
+  end
+
+
+(*
+  Test the printing of bigarray types with unsigned elements.
+*)
+let test_bigarray_unsigned_printing _ =
+  begin
+    assert_typ_printed_as "uint8_t[2]"
+      (bigarray array1 2 Bigarray.int8_unsigned);
+
+    assert_typ_printed_as "uint16_t[4]"
+      (bigarray array1 4 Bigarray.int16_unsigned);
+  end
+
+
+(*
+  Test the printing of bigarray types with floating elements.
+*)
+let test_bigarray_float_printing _ =
+  begin
+    assert_typ_printed_as "float[10][100]"
+      (bigarray genarray [|10; 100|] Bigarray.float32);
+
+    assert_typ_printed_as "double[20][30][40]"
+      (bigarray genarray [|20; 30; 40|] Bigarray.float64);
 
     assert_typ_printed_as "float _Complex[16][17][18]"
       (bigarray array3 (16, 17, 18) Bigarray.complex32);
 
     assert_typ_printed_as "double _Complex[19][20][21]"
       (bigarray array3 (19, 20, 21) Bigarray.complex64);
-
-    assert_typ_printed_as ~name:"b" "int (*b[10])(camlint(*)[5])"
-      (array 10
-         (Foreign.funptr (ptr (bigarray genarray [|5|] Bigarray.int) @->
-                          returning int)));
   end
 
 
@@ -516,8 +525,14 @@ let suite = "Type printing tests" >:::
    "printing OCaml string types"
     >:: test_ocaml_string_printing;
 
-   "printing bigarrays"
-    >:: test_bigarray_printing;
+   "printing bigarrays with signed elements"
+    >:: test_bigarray_signed_printing;
+
+   "printing bigarrays with unsigned elements"
+    >:: test_bigarray_unsigned_printing;
+
+   "printing bigarrays with floating elements"
+    >:: test_bigarray_float_printing;
 
    "printing functions"
     >:: test_function_printing;
