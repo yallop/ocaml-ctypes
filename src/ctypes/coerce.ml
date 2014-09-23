@@ -22,7 +22,6 @@ let ml_prim_coercion :
   let open Primitives in
   fun l r -> match l, r with
   | ML_char, ML_char -> Id
-  | ML_complex, ML_complex -> Id
   | ML_float, ML_float -> Id
   | ML_int, ML_int -> Id
   | ML_int32, ML_int32 -> Id

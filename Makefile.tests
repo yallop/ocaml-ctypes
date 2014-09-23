@@ -441,39 +441,6 @@ tests/test-value_printing/generated_stubs.c: $(BUILDDIR)/test-value_printing-stu
 tests/test-value_printing/generated_bindings.ml: $(BUILDDIR)/test-value_printing-stub-generator.native
 	$< --ml-file $@
 
-test-complex-stubs.dir  = tests/test-complex/stubs
-test-complex-stubs.threads = yes
-test-complex-stubs.subproject_deps = ctypes cstubs \
-   ctypes-foreign-base ctypes-foreign-unthreaded tests-common
-test-complex-stubs: PROJECT=test-complex-stubs
-test-complex-stubs: $$(LIB_TARGETS)
-
-test-complex-stub-generator.dir = tests/test-complex/stub-generator
-test-complex-stub-generator.threads = yes
-test-complex-stub-generator.subproject_deps = ctypes cstubs \
-     ctypes-foreign-base ctypes-foreign-unthreaded test-complex-stubs tests-common
-test-complex-stub-generator.deps = str bytes
-test-complex-stub-generator: PROJECT=test-complex-stub-generator
-test-complex-stub-generator: $$(NATIVE_TARGET)
-
-test-complex.dir = tests/test-complex
-test-complex.threads = yes
-test-complex.deps = str oUnit bytes
-test-complex.subproject_deps = ctypes ctypes-foreign-base \
-  ctypes-foreign-unthreaded cstubs tests-common test-complex-stubs
-test-complex.link_flags = -L$(BUILDDIR)/clib -ltest_functions
-test-complex: PROJECT=test-complex
-test-complex: $$(NATIVE_TARGET)
-
-test-complex-generated: \
-  tests/test-complex/generated_bindings.ml \
-  tests/test-complex/generated_stubs.c
-
-tests/test-complex/generated_stubs.c: $(BUILDDIR)/test-complex-stub-generator.native
-	$< --c-file $@
-tests/test-complex/generated_bindings.ml: $(BUILDDIR)/test-complex-stub-generator.native
-	$< --ml-file $@
-
 test-callback_lifetime-stubs.dir  = tests/test-callback_lifetime/stubs
 test-callback_lifetime-stubs.threads = yes
 test-callback_lifetime-stubs.subproject_deps = ctypes cstubs \
@@ -584,7 +551,6 @@ TESTS += test-views-stubs test-views-stub-generator test-views-generated test-vi
 TESTS += test-oo_style-stubs test-oo_style-stub-generator test-oo_style-generated test-oo_style
 TESTS += test-type_printing
 TESTS += test-value_printing-stubs test-value_printing-stub-generator test-value_printing-generated test-value_printing
-TESTS += test-complex-stubs test-complex-stub-generator test-complex-generated test-complex
 TESTS += test-callback_lifetime-stubs test-callback_lifetime-stub-generator test-callback_lifetime-generated test-callback_lifetime
 TESTS += test-stubs
 TESTS += test-coercions-stubs test-coercions-stub-generator test-coercions-generated test-coercions

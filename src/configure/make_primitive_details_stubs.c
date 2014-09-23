@@ -10,7 +10,6 @@
 #include <stddef.h>
 #include <errno.h>
 #include <stdint.h>
-#include <complex.h>
 
 #include <caml/mlvalues.h>
 
@@ -35,8 +34,6 @@ static struct details {
   ENTRY(Nativeint, intnat),
   ENTRY(Float, float),
   ENTRY(Double, double),
-  ENTRY(Complex32, float complex),
-  ENTRY(Complex64, double complex),
 };
 
 void generate_function(char *name, char *type,

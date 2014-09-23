@@ -18,12 +18,6 @@ let test_primitive_alignment _ = begin
 
   assert_equal ~msg:"alignmentof(signed char) == 1"
     (alignment schar) 1;
-
-  assert_equal ~msg:"alignmentof(complex32) == alignmentof(float)"
-    (alignment complex32) (alignment float);
-
-  assert_equal ~msg:"alignmentof(complex64) == alignmentof(double)"
-    (alignment complex64) (alignment double);
 end
 
 

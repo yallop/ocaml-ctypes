@@ -11,7 +11,6 @@
 /* Types and functions used by generated C code. */
 
 #include "ctypes/primitives.h"
-#include "ctypes/complex_stubs.h"
 #include "ctypes/raw_pointer.h"
 #include "ctypes/managed_buffer_stubs.h"
 #define CTYPES_PTR_OF_OCAML_STRING(s) \

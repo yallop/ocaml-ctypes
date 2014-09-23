@@ -21,7 +21,6 @@ let test_pointer_coercions _ =
       T int;
       T float;
       T short;
-      T complex64;
       T (ptr double);
       T string;
       T (array 5 int32_t);
@@ -176,35 +175,31 @@ let test_unsupported_coercions _ =
     type boxed_type = T : 'a typ -> boxed_type
     let types = [
       T int8_t,
-      [T float; T complex64;
+      [T float;
        T (array 5 int32_t); T (structure "s"); T (union "u")];
 
       T int,
-      [T float; T complex64;
+      [T float;
        T (array 5 int32_t); T (structure "s"); T (union "u")];
 
       T float,
-      [T int8_t; T int; T short; T complex64;
+      [T int8_t; T int; T short;
        T (array 5 int32_t); T (structure "s"); T (union "u")];
 
       T short,
-      [T float; T complex64;
-       T (array 5 int32_t); T (structure "s"); T (union "u")];
-
-      T complex64,
-      [T int8_t; T int; T float; T short;
+      [T float;
        T (array 5 int32_t); T (structure "s"); T (union "u")];
 
       T (array 5 int32_t),
-      [T int8_t; T int; T float; T short; T complex64;
+      [T int8_t; T int; T float; T short;
        T (array 5 int32_t); T (structure "s"); T (union "u")];
 
       T (structure "s"),
-      [T int8_t; T int; T float; T short; T complex64;
+      [T int8_t; T int; T float; T short;
        T (array 5 int32_t); T (structure "s"); T (union "u")];
 
       T (union "u"),
-      [T int8_t; T int; T float; T short; T complex64;
+      [T int8_t; T int; T float; T short;
        T (array 5 int32_t); T (structure "s"); T (union "u")];
     ]
 

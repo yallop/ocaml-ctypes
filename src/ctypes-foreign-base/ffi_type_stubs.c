@@ -44,8 +44,6 @@ static ffi_type *primitive_ffi_types[] = {
   &ctypes_ffi_type_camlint, /* Nativeint */
   &ffi_type_float,          /* Float */
   &ffi_type_double,         /* Double */
-  NULL,                     /* Complex32 */
-  NULL,                     /* Complex64 */
 };
 
 

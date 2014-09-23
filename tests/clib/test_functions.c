@@ -14,7 +14,6 @@
 #include <float.h>
 #include <assert.h>
 #include <string.h>
-#include <complex.h>
 #include <stdarg.h>
 
 #include <semaphore.h>
@@ -378,46 +377,6 @@ float retrieve_FLT_MIN(void) { return FLT_MIN; }
 float retrieve_FLT_MAX(void) { return FLT_MAX; }
 double retrieve_DBL_MIN(void) { return DBL_MIN; }
 double retrieve_DBL_MAX(void) { return DBL_MAX; }
-
-void add_complexd(double complex *l, double complex *r, double complex *out)
-{
-  *out = *l + *r;
-}
-
-void mul_complexd(double complex *l, double complex *r, double complex *out)
-{
-  *out = *l * *r;
-}
-
-void add_complexf(float complex *l, float complex *r, float complex *out)
-{
-  *out = *l + *r;
-}
-
-void mul_complexf(float complex *l, float complex *r, float complex *out)
-{
-  *out = *l * *r;
-}
-
-double complex add_complexd_val(double complex l, double complex r)
-{
-  return l + r;
-}
-
-double complex mul_complexd_val(double complex l, double complex r)
-{
-  return l * r;
-}
-
-float complex add_complexf_val(float complex l, float complex r)
-{
-  return l + r;
-}
-
-float complex mul_complexf_val(float complex l, float complex r)
-{
-  return l * r;
-}
 
 static int (*global_stored_callback)(int) = NULL;
 

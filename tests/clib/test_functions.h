@@ -10,7 +10,6 @@
 
 #include <inttypes.h>
 #include <stdlib.h>
-#include <complex.h>
 
 #include <caml/mlvalues.h>
 
@@ -117,14 +116,6 @@ float retrieve_FLT_MIN(void);
 float retrieve_FLT_MAX(void);
 double retrieve_DBL_MIN(void);
 double retrieve_DBL_MAX(void);
-void add_complexd(double complex *, double complex *, double complex *);
-void mul_complexd(double complex *, double complex *, double complex *);
-void add_complexf(float complex *, float complex *, float complex *);
-void mul_complexf(float complex *, float complex *, float complex *);
-double complex add_complexd_val(double complex, double complex);
-double complex mul_complexd_val(double complex, double complex);
-float complex add_complexf_val(float complex, float complex);
-float complex mul_complexf_val(float complex, float complex);
 void store_callback(int (*callback)(int));
 int invoke_stored_callback(int);
 vintfun *return_callback(vintfun *);

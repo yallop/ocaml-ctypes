@@ -25,8 +25,6 @@ enum ctypes_primitive {
   Nativeint,
   Float,
   Double,
-  Complex32,
-  Complex64,
 };
 
 #endif /* CTYPES_PRIMITIVES_H */

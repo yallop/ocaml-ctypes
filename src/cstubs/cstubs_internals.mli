@@ -57,5 +57,3 @@ type 'a prim = 'a Primitives.prim =
 | Nativeint : nativeint prim
 | Float : float prim
 | Double : float prim
-| Complex32 : Complex.t prim
-| Complex64 : Complex.t prim

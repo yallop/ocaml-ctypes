@@ -35,7 +35,6 @@ type _ alloc =
 | Alloc_int64_t : int64 alloc
 | Alloc_nativeint : nativeint alloc
 | Alloc_float : float alloc
-| Alloc_complex : Complex.t alloc
 | Alloc_pointer : (_, _) pointer alloc
 | Alloc_structured : (_, _) structured alloc
 | Alloc_array : _ carray alloc
@@ -57,8 +56,6 @@ let primitive_allocation : type a. a Primitives.prim -> a allocation =
  | Nativeint -> `Alloc Alloc_nativeint
  | Float -> `Alloc Alloc_float
  | Double -> `Alloc Alloc_float
- | Complex32 -> `Alloc Alloc_complex
- | Complex64 -> `Alloc Alloc_complex
 
 let rec allocation : type a. a typ -> a allocation = function
  | Void -> `Noalloc Noalloc_unit

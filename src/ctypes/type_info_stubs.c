@@ -8,14 +8,12 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include <assert.h>
-#include <complex.h>
 #include <string.h>
 
 #include <caml/memory.h>
 #include <caml/alloc.h>
 
 #include "type_info_stubs.h"
-#include "complex_stubs.h"
 #include "raw_pointer.h"
 #include "primitives.h"
 
@@ -40,8 +38,6 @@ value ctypes_read(value prim_, value buffer_)
    case Nativeint: b = caml_copy_nativeint(*(intnat *)buf); break;
    case Float: b = caml_copy_double(*(float *)buf); break;
    case Double: b = caml_copy_double(*(double *)buf); break;
-   case Complex32: b = ctypes_copy_float_complex(*(float complex *)buf); break;
-   case Complex64: b = ctypes_copy_double_complex(*(double complex *)buf); break;
    default:
     assert(0);
   }
@@ -68,8 +64,6 @@ value ctypes_write(value prim_, value v, value buffer_)
    case Nativeint: *(intnat *)buf = Nativeint_val(v); break;
    case Float: *(float *)buf = Double_val(v); break;
    case Double: *(double *)buf = Double_val(v); break;
-   case Complex32: *(float complex *)buf = ctypes_float_complex_val(v); break;
-   case Complex64: *(double complex *)buf = ctypes_double_complex_val(v); break;
    default:
     assert(0);
   }
@@ -100,16 +94,6 @@ value ctypes_string_of_prim(value prim_, value v)
                            (intnat)Nativeint_val(v)); break;
   case Float: len = snprintf(buf, sizeof buf, "%.12g", Double_val(v)); break;
   case Double: len = snprintf(buf, sizeof buf, "%.12g", Double_val(v)); break;
-  case Complex32: {
-    float complex c = ctypes_float_complex_val(v);
-    len = snprintf(buf, sizeof buf, "%.12g+%.12gi", crealf(c), cimagf(c));
-    break;
-  }
-  case Complex64: {
-    double complex c = ctypes_double_complex_val(v);
-    len = snprintf(buf, sizeof buf, "%.12g+%.12gi", creal(c), cimag(c));
-    break;
-  }
   default:
     assert(0);
   }

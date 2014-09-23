@@ -82,8 +82,6 @@ struct
     | Nativeint -> reader "Nativeint_val" (value @-> returning nativeint)
     | Float -> reader "Double_val" (value @-> returning double)
     | Double -> reader "Double_val" (value @-> returning double)
-    | Complex32 -> reader "ctypes_float_complex_val" (value @-> returning complex32)
-    | Complex64 -> reader "ctypes_double_complex_val" (value @-> returning complex64)
 
   let prim_inj : type a. a Primitives.prim -> _ =
     let open Primitives in function
@@ -99,8 +97,6 @@ struct
     | Nativeint -> conser "caml_copy_nativeint" (nativeint @-> returning value)
     | Float -> conser "caml_copy_double" (double @-> returning value)
     | Double -> conser "caml_copy_double" (double @-> returning value)
-    | Complex32 -> conser "ctypes_copy_float_complex" (complex32 @-> returning value)
-    | Complex64 -> conser "ctypes_copy_double_complex" (complex64 @-> returning value)
 
   let of_fatptr : cexp -> ccomp =
     fun x -> `App (`Global (reader "CTYPES_ADDR_OF_FATPTR"

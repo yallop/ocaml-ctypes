@@ -18,12 +18,9 @@ type _ prim =
  | Nativeint : nativeint prim
  | Float : float prim
  | Double : float prim
- | Complex32 : Complex.t prim
- | Complex64 : Complex.t prim
 
 type _ ml_prim = 
   | ML_char :  char ml_prim
-  | ML_complex :  Complex.t ml_prim
   | ML_float :  float ml_prim
   | ML_int :  int ml_prim
   | ML_int32 :  int32 ml_prim
@@ -43,5 +40,3 @@ let ml_prim : type a. a prim -> a ml_prim = function
   | Nativeint -> ML_nativeint
   | Float -> ML_float
   | Double -> ML_float
-  | Complex32 -> ML_complex
-  | Complex64 -> ML_complex
