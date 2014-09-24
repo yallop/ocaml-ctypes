@@ -69,35 +69,39 @@ let fts_set_option_value = function
   | FTS_FOLLOW -> 2
   | FTS_SKIP   -> 4
 
+let id x = x
+
 module FTSENT =
 struct
   open PosixTypes
   open Unsigned
 
   type ftsent
-  let ftsent : ftsent structure typ = structure "FTSENT"
-  let ( -: ) ty label = field ftsent label ty
-  let fts_cycle   = ptr ftsent -: "fts_cycle"
-  let fts_parent  = ptr ftsent -: "fts_parent"
-  let fts_link    = ptr ftsent -: "fts_link"
-  let fts_number  = int        -: "fts_number"
-  let fts_pointer = ptr void   -: "fts_pointer"
-  let fts_accpath = string     -: "fts_accpath"
-  let fts_path    = string     -: "fts_path"
-  let fts_errno   = int        -: "fts_errno"
-  let fts_symfd   = int        -: "fts_symfd"
-  let fts_pathlen = ushort     -: "fts_pathlen"
-  let fts_namelen = ushort     -: "fts_namelen"
-  let fts_ino     = ino_t      -: "fts_ino"
-  let fts_dev     = dev_t      -: "fts_dev"
-  let fts_nlink   = nlink_t    -: "fts_nlink"
-  let fts_level   = short      -: "fts_level"
-  let fts_info    = ushort     -: "fts_info"
-  let fts_flags   = ushort     -: "fts_flags"
-  let fts_instr   = ushort     -: "fts_instr"
-  let fts_statp   = ptr void   -: "fts_statp" (* really a struct stat * *)
-  let fts_name    = char       -: "fts_name"
-  let () = seal ftsent
+  let struct_ftsent : ftsent structure typ = structure "FTSENT"
+  let ( -: ) ty label = field struct_ftsent label ty
+  let fts_cycle   = ptr struct_ftsent -: "fts_cycle"
+  let fts_parent  = ptr struct_ftsent -: "fts_parent"
+  let fts_link    = ptr struct_ftsent -: "fts_link"
+  let fts_number  = int               -: "fts_number"
+  let fts_pointer = ptr void          -: "fts_pointer"
+  let fts_accpath = string            -: "fts_accpath"
+  let fts_path    = string            -: "fts_path"
+  let fts_errno   = int               -: "fts_errno"
+  let fts_symfd   = int               -: "fts_symfd"
+  let fts_pathlen = ushort            -: "fts_pathlen"
+  let fts_namelen = ushort            -: "fts_namelen"
+  let fts_ino     = ino_t             -: "fts_ino"
+  let fts_dev     = dev_t             -: "fts_dev"
+  let fts_nlink   = nlink_t           -: "fts_nlink"
+  let fts_level   = short             -: "fts_level"
+  let fts_info    = ushort            -: "fts_info"
+  let fts_flags   = ushort            -: "fts_flags"
+  let fts_instr   = ushort            -: "fts_instr"
+  let fts_statp   = ptr void          -: "fts_statp" (* really a struct stat * *)
+  let fts_name    = char              -: "fts_name"
+  let () = seal struct_ftsent
+  let ftsent = view struct_ftsent
+    ~read:id ~write:id ~format_typ:(fun k fmt -> Format.pp_print_string fmt "FTSENT"; k fmt)
 
   type t = ftsent structure ptr
   let t = ptr ftsent
@@ -155,8 +159,8 @@ struct
     Foreign.funptr_opt (ptr FTSENT.t @-> ptr FTSENT.t @-> returning int)
 
   type fts
-  let fts : fts structure typ = structure "FTS"
-  let ( -: ) ty label = field fts label ty
+  let struct_fts : fts structure typ = structure "FTS"
+  let ( -: ) ty label = field struct_fts label ty
   let fts_cur     = ptr ftsent       -: "fts_cur"
   let fts_child   = ptr ftsent       -: "fts_child"
   let fts_array   = ptr (ptr ftsent) -: "fts_array"
@@ -168,7 +172,9 @@ struct
   let fts_compar  = compar_typ       -: "fts_compar"
   (* fts_options would work well as a view *)
   let fts_options = int              -: "fts_options"
-  let () = seal fts
+  let () = seal struct_fts
+  let fts = view struct_fts
+    ~read:id ~write:id ~format_typ:(fun k fmt -> Format.pp_print_string fmt "FTS"; k fmt)
 
   type t = { ptr : fts structure ptr;
              (* The compar field ties the lifetime of the comparison function
