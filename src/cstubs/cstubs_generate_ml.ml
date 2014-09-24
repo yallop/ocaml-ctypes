@@ -192,9 +192,7 @@ let attributes : type a. a fn -> attributes =
 let managed_buffer = `Ident (path_of_string "Memory_stubs.managed_buffer")
 let voidp = `Ident (path_of_string "CI.voidp")
 let fatptr = `Appl (path_of_string "CI.fatptr", [`Ident (path_of_string "_")])
-let string = `Ident (path_of_string "string")
-let float_array = `Appl (path_of_string "array",
-                         [`Ident (path_of_string "float")])
+
 
 (* These functions determine the type that should appear in the extern
    signature *)
@@ -206,8 +204,6 @@ let rec ml_typ_of_return_typ : type a. a typ -> ml_type =
   | Union _     -> managed_buffer
   | Pointer _   -> voidp
   | View { ty } -> ml_typ_of_return_typ ty
-  | Array _    as a -> internal_error
-    "Unexpected array type in the return type: %s" (Ctypes.string_of_typ a)
 
 let rec ml_typ_of_arg_typ : type a. a typ -> ml_type = function
   | Void -> `Ident (path_of_string "unit")
@@ -216,8 +212,6 @@ let rec ml_typ_of_arg_typ : type a. a typ -> ml_type = function
   | Struct _    -> fatptr
   | Union _     -> fatptr
   | View { ty } -> ml_typ_of_arg_typ ty
-  | Array _    as a -> internal_error
-    "Unexpected array in an argument type: %s" (Ctypes.string_of_typ a)
 
 let rec ml_external_type_of_fn : type a. a fn -> ml_external_type = function
   | Returns t -> `Prim ([], ml_typ_of_return_typ t)
@@ -306,9 +300,6 @@ let rec pattern_and_exp_of_typ :
                   path_of_string "read", `Var x]] in
       (pat, Some (`Appl (`Ident (path_of_string x), e)))
     end
-  | Array _ as ty -> internal_error
-    "Unexpected array type encountered during ML code generation: %s"
-    (Ctypes.string_of_typ ty)
 
 type wrapper_state = {
   pat: ml_pat;

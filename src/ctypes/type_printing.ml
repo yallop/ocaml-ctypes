@@ -51,9 +51,6 @@ let rec format_typ' : type a. a typ ->
             | `array -> fprintf fmt "(*%t)" (k `nonarray)
             | _      -> fprintf fmt "*%t" (k `nonarray))
         `nonarray fmt
-    | Array (ty, n) ->
-      format_typ' ty (fun _ fmt -> fprintf fmt "%t[%d]" (k `array) n) `nonarray
-        fmt
 
 and format_fields : type a. a boxed_field list -> Format.formatter -> unit =
   fun fields fmt ->

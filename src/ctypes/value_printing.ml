@@ -16,7 +16,6 @@ let rec format : type a. a typ -> Format.formatter -> a -> unit
   | Pointer _ -> format_ptr fmt v
   | Struct _ -> format_structured fmt v
   | Union _ -> format_structured fmt v
-  | Array (a, n) -> format_array fmt v
   | View {write; ty; format=f} ->
     begin match f with
       | None -> format ty fmt (write v)
@@ -35,16 +34,6 @@ and format_structured : type a b. Format.formatter -> (a, b) structured -> unit
       format_fields " |" ufields fmt s;
       fprintf fmt "@]@;<1 0>}"
     | _ -> raise (Unsupported "unknown structured type")
-and format_array : type a. Format.formatter -> a carray -> unit
-  = fun fmt ({astart = CPointer p; alength} as arr) ->
-    let open Format in
-    fprintf fmt "{@;<1 2>@[";
-    for i = 0 to alength - 1 do
-      format (Ctypes_ptr.Fat.reftype p) fmt (CArray.get arr i);
-      if i <> alength - 1 then
-        fprintf fmt ",@;"
-    done;
-    fprintf fmt "@]@;<1 0>}"
 and format_fields : type a b. string -> (a, b) structured boxed_field list ->
                               Format.formatter -> (a, b) structured -> unit
   = fun sep fields fmt s ->

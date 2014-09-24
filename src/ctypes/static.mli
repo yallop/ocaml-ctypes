@@ -22,8 +22,6 @@ type _ typ =
   | Struct          : 'a structure_type  -> 'a structure typ
   | Union           : 'a union_type      -> 'a union typ
   | View            : ('a, 'b) view      -> 'a typ
-  | Array           : 'a typ * int       -> 'a carray typ
-and 'a carray = { astart : 'a ptr; alength : int }
 and ('a, 'kind) structured = { structured : ('a, 'kind) structured ptr }
 and 'a union = ('a, [`Union]) structured
 and 'a structure = ('a, [`Struct]) structured
@@ -77,7 +75,6 @@ val int16_t : int typ
 val int32_t : int32 typ
 val int64_t : int64 typ
 val camlint : int typ
-val array : int -> 'a typ -> 'a carray typ
 val ptr : 'a typ -> 'a ptr typ
 val ( @-> ) : 'a typ -> 'b fn -> ('a -> 'b) fn
 val view : ?format_typ:((Format.formatter -> unit) ->

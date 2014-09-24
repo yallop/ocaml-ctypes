@@ -136,18 +136,6 @@ val string_opt : string option typ
 	except that null pointers appear in OCaml as [None].
 *)
 
-(** {3 Array types} *)
-
-(** {4 C array types} *)
-
-type 'a carray
-(** The type of C array values.  A value of type [t carray] can be used to read
-    and write array objects in C-managed storage. *)
-
-val array : int -> 'a typ -> 'a carray typ
-(** Construct a sized array type from a length and an existing type (called
-    the {i element type}). *)
-
 (** {3 Function types} *)
 
 type 'a fn = 'a Static.fn
@@ -361,72 +349,6 @@ val string_from_ptr : char ptr -> length:int -> string
     Raise [Invalid_argument "Ctypes.string_from_ptr"] if [length] is
     negative. *)
 
-(** {3 Array values} *)
-
-(** {4 C array values} *)
-
-module CArray :
-sig
-  type 'a t = 'a carray
-
-  val get : 'a t -> int -> 'a
-  (** [get a n] returns the [n]th element of the zero-indexed array [a].  The
-      semantics for non-scalar types are non-copying, as for {!(!@)}.
-
-      If you rebind the [CArray] module to [Array] then you can also use the
-      syntax [a.(n)] instead of [Array.get a n].
-
-      Raise [Invalid_argument "index out of bounds"] if [n] is outside of the
-      range [0] to [(CArray.length a - 1)]. *)
-
-  val set : 'a t -> int -> 'a -> unit
-  (** [set a n v] overwrites the [n]th element of the zero-indexed array [a]
-      with [v].
-
-      If you rebind the [CArray] module to [Array] then you can also use the
-      [a.(n) <- v] syntax instead of [Array.set a n v].
-
-      Raise [Invalid_argument "index out of bounds"] if [n] is outside of the
-      range [0] to [(CArray.length a - 1)]. *)
-
-  val unsafe_get : 'a t -> int -> 'a
-  (** [unsafe_get a n] behaves like [get a n] except that the check that [n]
-      between [0] and [(CArray.length a - 1)] is not performed. *)
-
-  val unsafe_set : 'a t -> int -> 'a -> unit
-  (** [unsafe_set a n v] behaves like [set a n v] except that the check that
-      [n] between [0] and [(CArray.length a - 1)] is not performed. *)
-
-  val of_list : 'a typ -> 'a list -> 'a t
-  (** [of_list t l] builds an array of type [t] of the same length as [l], and
-      writes the elements of [l] to the corresponding elements of the array. *)
-
-  val to_list : 'a t -> 'a list
-  (** [to_list a] builds a list of the same length as [a] such that each
-      element of the list is the result of reading the corresponding element of
-      [a]. *)
-
-  val length : 'a t -> int
-  (** Return the number of elements of the given array. *)
-
-  val start : 'a t -> 'a ptr
-  (** Return the address of the first element of the given array. *)
-
-  val from_ptr : 'a ptr -> int -> 'a t
-  (** [from_ptr p n] creates an [n]-length array reference to the memory at
-      address [p]. *)
-
-  val make : ?finalise:('a t -> unit) -> 'a typ -> ?initial:'a -> int -> 'a t
-  (** [make t n] creates an [n]-length array of type [t].  If the optional
-      argument [?initial] is supplied, it indicates a value that should be
-      used to initialise every element of the array.  The argument [?finalise],
-      if present, will be called just before the memory is freed. *)
-
-  val element_type : 'a t -> 'a typ
-(** Retrieve the element type of an array. *)
-end
-(** Operations on C arrays. *)
-
 (** {3 Struct and union values} *)
 
 val make : ?finalise:('s -> unit) -> ((_, _) structured as 's) typ -> 's
@@ -508,8 +430,8 @@ val coerce_fn : 'a fn -> 'b fn -> 'a -> 'b
 
 exception Unsupported of string
 (** An attempt was made to use a feature not currently supported by ctypes.
-    In practice this refers to attempts to use an union or array
-    type as an argument or return type of a function. *)
+    In practice this refers to attempts to use an union type as an argument or
+    return type of a function. *)
 
 exception ModifyingSealedType of string
 (** An attempt was made to modify a sealed struct or union type

@@ -37,7 +37,6 @@ type _ alloc =
 | Alloc_float : float alloc
 | Alloc_pointer : (_, _) pointer alloc
 | Alloc_structured : (_, _) structured alloc
-| Alloc_array : _ carray alloc
 | Alloc_view : ('a, 'b) view * 'b alloc -> 'a alloc
 
 type 'a allocation = [ `Noalloc of 'a noalloc | `Alloc of 'a alloc ]
@@ -68,7 +67,6 @@ let rec allocation : type a. a typ -> a allocation = function
    | `Alloc a -> `Alloc (Alloc_view (v, a))
    | `Noalloc na -> `Noalloc (Noalloc_view (v, na))
    end
- | Array _ -> `Alloc Alloc_array
 
 let rec may_allocate : type a. a fn -> bool = function
   | Returns t ->

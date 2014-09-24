@@ -28,7 +28,6 @@ type 'a typ = 'a Static.typ =
   | Struct          : 'a Static.structure_type  -> 'a Static.structure typ
   | Union           : 'a Static.union_type      -> 'a Static.union typ
   | View            : ('a, 'b) view             -> 'a typ
-  | Array           : 'a typ * int              -> 'a Static.carray typ
 and ('a, 'b) pointer = ('a, 'b) Static.pointer =
   CPointer : 'a typ Ctypes_ptr.Fat.t -> ('a, [`C]) pointer
 and 'a ptr = ('a, [`C]) pointer

@@ -87,7 +87,6 @@ struct
     fun e ->
       begin match ceff e with
       | Ty (Pointer ty) -> Ty ty
-      | Ty (Array (ty, _)) -> Ty ty
       | Ty t -> Cstubs_errors.internal_error
         "dereferencing expression of non-pointer type %s"
         (Ctypes.string_of_typ t)

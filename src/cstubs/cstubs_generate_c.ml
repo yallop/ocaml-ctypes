@@ -103,16 +103,6 @@ struct
                               (value @-> returning (ptr void))),
                    [x])
 
-  let string_to_ptr : cexp -> ccomp =
-    fun x -> `App (`Global (reader "CTYPES_PTR_OF_OCAML_STRING"
-                              (value @-> returning (ptr void))),
-                   [x])
-
-  let float_array_to_ptr : cexp -> ccomp =
-    fun x -> `App (`Global (reader "CTYPES_PTR_OF_FLOAT_ARRAY"
-                              (value @-> returning (ptr void))),
-                   [x])
-
   let from_ptr : cexp -> ceff =
     fun x -> `App (`Global (conser "CTYPES_FROM_PTR"
                               (ptr void @-> returning value)),
@@ -161,7 +151,6 @@ struct
       Some ((of_fatptr x, ptr void) >>= fun y ->
             `Deref (`Cast (Ty (ptr ty), y)))
     | View { ty } -> prj ty x
-    | Array _ -> report_unpassable "arrays"
 
   let rec inj : type a. a typ -> cexp -> ceff =
     fun ty x -> match ty with
@@ -171,7 +160,6 @@ struct
     | Struct s -> `App (copy_bytes, [`Addr x; `Int (sizeof ty)])
     | Union u -> `App (copy_bytes, [`Addr x; `Int (sizeof ty)])
     | View { ty } -> inj ty x
-    | Array _ -> report_unpassable "arrays"
 
   type _ fn =
   | Returns  : 'a typ   -> 'a fn
