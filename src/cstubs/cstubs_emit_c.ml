@@ -22,7 +22,7 @@ let format_seq lbr fmt_item sep rbr fmt items =
 let format_ty fmt (Ty ty) = Ctypes.format_typ fmt ty
 
 let cvar_name = function
-  | `Local (name, _) | `Global { name } -> name
+  | `Local { name } | `Global { name } -> name
 
 let cvar fmt v = fprintf fmt "%s" (cvar_name v)
 
@@ -88,28 +88,28 @@ let rec ccomp fmt : ccomp -> unit = function
       cexp e
   | `Let (xe, `Cast (ty, (#cexp as e'))) when cast_unnecessary ty e' ->
     ccomp fmt (`Let (xe, e'))
-  | `Let ((`Local (x, _), e), `Local (y, _)) when x = y ->
+  | `Let ((`Local {name = x}, e), `Local {name=y}) when x = y ->
     ccomp fmt (e :> ccomp)
-  | `Let ((`Local (_, Ty Void), `If (e, a, b)), s) ->
+  | `Let ((`Local {typ=Ty Void}, `If (e, a, b)), s) ->
     fprintf fmt "@[if@ (@[%a)@]@ {@[%a}@]@\nelse@ {@[%a}@]@]@ %a"
       cexp e ceff a ceff b ccomp s
-  | `Let ((`Local (_, Ty Void), e), s) ->
+  | `Let ((`Local {typ=Ty Void}, e), s) ->
     fprintf fmt "@[%a;@]@ %a" ceff e ccomp s
-  | `Let ((`Local (name, Ty (Struct { tag })), e), s) ->
+  | `Let ((`Local {name; typ=Ty (Struct { tag })}, e), s) ->
     fprintf fmt "@[struct@;%s@;%s@;=@;@[%a;@]@]@ %a"
       tag name ceff e ccomp s
-  | `Let ((`Local (name, Ty (Union { utag })), e), s) ->
+  | `Let ((`Local {name; typ=Ty (Union { utag })}, e), s) ->
     fprintf fmt "@[union@;%s@;%s@;=@;@[%a;@]@]@ %a"
       utag name ceff e ccomp s
-  | `Let ((`Local (name, Ty ty), e), s) ->
+  | `Let ((`Local {name; typ=Ty ty}, e), s) ->
     fprintf fmt "@[@[%a@]@;=@;@[%a;@]@]@ %a"
       (Ctypes.format_typ ~name) ty ceff e ccomp s
-  | `LetConst (`Local (x, _), `Int c, s) ->
+  | `LetConst (`Local {name=x}, `Int c, s) ->
     fprintf fmt "@[enum@ {@[@ %s@ =@ %d@ };@]@]@ %a"
       x c ccomp s
 
 let format_parameter_list parameters k fmt =
-  let format_arg fmt (name, Ty t) =
+  let format_arg fmt {name; typ=Ty t} =
     Type_printing.format_typ ~name fmt t
   in
   match parameters with

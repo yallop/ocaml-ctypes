@@ -30,7 +30,8 @@ struct
   let conser fname fn = { fname; allocates = true; reads_ocaml_heap = false; fn = Fn fn }
   let immediater fname fn = { fname; allocates = false; reads_ocaml_heap = false; fn = Fn fn }
 
-  let local name ty = `Local (name, Ty ty)
+  let local ?(references_ocaml_heap=true) name ty =
+    `Local {name; typ=Ty ty; references_ocaml_heap}
 
   let rec (>>=) : type a. ccomp * a typ -> (cexp -> ccomp) -> ccomp =
    fun (e, ty) k ->
@@ -206,9 +207,9 @@ struct
     | Static.Returns t -> Returns t
     | Static.Function (f, t) -> Function (fresh_var (), f, name_params t)
 
-  let rec value_params : type a. a fn -> (string * ty) list = function
+  let rec value_params : type a. a fn -> cvar_details list = function
     | Returns t -> []
-    | Function (x, _, t) -> (x, Ty value) :: value_params t
+    | Function (x, _, t) -> {name=x; typ=Ty value; references_ocaml_heap=true} :: value_params t
 
   let fundec : type a. string -> a Ctypes.fn -> cfundec =
     fun name fn -> `Fundec (name, args fn, return_type fn)
@@ -238,8 +239,8 @@ struct
 
   let byte_fn : type a. string -> a Static.fn -> int -> cfundef =
     fun fname fn nargs ->
-      let argv = ("argv", Ty (ptr value)) in
-      let argc = ("argc", Ty int) in
+      let (`Local argv as argv') = local "argv" (ptr value) in
+      let (`Local argc as argc') = local "argc" int in
       let f = { fname ;
                 allocates = true;
                 reads_ocaml_heap = true;
@@ -247,7 +248,7 @@ struct
       in
       let rec build_call ?(args=[]) = function
         | 0 -> `App (f, args)
-        | n -> (`Index (`Local argv, `Int (n - 1)), value) >>= fun x ->
+        | n -> (`Index (argv', `Int (n - 1)), value) >>= fun x ->
                build_call ~args:(x :: args) (n - 1)
       in
       let bytename = Printf.sprintf "%s_byte%d" fname nargs in
@@ -284,7 +285,7 @@ struct
       snd
         (ListLabels.fold_right  args
            ~init:(List.length args - 1, call)
-           ~f:(fun (x, Ty t) (i, c) ->
+           ~f:(fun {name=x; typ=Ty t} (i, c) ->
              i - 1,
              `Assign (`Index (local "locals" (ptr value), `Int i),
                       (inj t (local x t))) >> c))

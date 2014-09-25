@@ -25,14 +25,15 @@ type cfunction = {
   fn: tfn;
 }
 
-type cglobal = {
+type cvar_details = {
   name: string;
   typ: ty;
   references_ocaml_heap: bool;
 }
 
-type clocal = [ `Local of string * ty ]
-type cvar = [ clocal | `Global of cglobal ]
+type clocal = [ `Local of cvar_details ]
+type cglobal = [ `Global of cvar_details ]
+type cvar = [ clocal | cglobal ]
 type cconst = [ `Int of int ]
 type cexp = [ cconst
             | clocal
@@ -43,7 +44,7 @@ type camlop = [ `CAMLparam0
               | `CAMLlocalN of cexp * cexp ]
 type ceff = [ cexp
             | camlop
-            | `Global of cglobal
+            | cglobal
             | `App of cfunction * cexp list
             | `If of cexp * ceff * ceff
             | `Index of ceff * cexp
@@ -54,16 +55,17 @@ type ccomp = [ ceff
              | `LetConst of clocal * cconst * ccomp
              | `CAMLreturnT of ty * cexp
              | `Let of cbind * ccomp ]
-type cfundec = [ `Fundec of string * (string * ty) list * ty ]
+type cfundec = [ `Fundec of string * cvar_details list * ty ]
 type cfundef = [ `Function of cfundec * ccomp ]
 
 let rec return_type : type a. a fn -> ty = function
   | Function (_, f) -> return_type f
   | Returns t -> Ty t
 
-let args : type a. a fn -> (string * ty) list = fun fn ->
-  let rec loop : type a. a Ctypes.fn -> (string * ty) list = function
-    | Static.Function (ty, fn) -> (fresh_var (), Ty ty) :: loop fn
+let args : type a. a fn -> cvar_details list = fun fn ->
+  let rec loop : type a. a Ctypes.fn -> cvar_details list = function
+    | Static.Function (ty, fn) ->
+       {name=fresh_var (); references_ocaml_heap=true; typ=Ty ty} :: loop fn
     | Static.Returns _ -> []
   in loop fn
 
@@ -71,8 +73,8 @@ module Type_C =
 struct
   let rec cexp : cexp -> ty = function
     | `Int _ -> Ty int
-    | `Local (_, ty) -> ty
-    | `Cast (Ty ty, _) -> Ty ty
+    | `Local {typ} -> typ
+    | `Cast (typ, _) -> typ
     | `Addr e -> let Ty ty = cexp e in Ty (Pointer ty)
 
   let camlop : camlop -> ty = function
