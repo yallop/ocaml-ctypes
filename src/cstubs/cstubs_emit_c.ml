@@ -47,7 +47,7 @@ let rec cexp fmt : cexp -> unit = function
   | `Addr e -> fprintf fmt "@[&@[%a@]@]" cexp e
 
 let rec clvalue fmt : clvalue -> unit = function
-  | `Local _ as x -> cvar fmt x
+  | #cvar as x -> cvar fmt x
   | `Index (lv, i) ->
     fprintf fmt "@[@[%a@]@[[%a]@]@]" clvalue lv cexp i
 

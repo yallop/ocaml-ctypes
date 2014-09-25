@@ -38,7 +38,7 @@ type cexp = [ cconst
             | clocal
             | `Cast of ty * cexp
             | `Addr of cexp ]
-type clvalue = [ clocal | `Index of clvalue * cexp ]
+type clvalue = [ cvar | `Index of clvalue * cexp ]
 type camlop = [ `CAMLparam0
               | `CAMLlocalN of cexp * cexp ]
 type ceff = [ cexp
