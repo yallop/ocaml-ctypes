@@ -26,9 +26,9 @@ struct
     let msg = Printf.sprintf "cstubs does not support passing %s" what in
     raise (Unsupported msg)
 
-  let reader name fn = { name; allocates = false; reads_ocaml_heap = true; tfn = Fn fn }
-  let conser name fn = { name; allocates = true; reads_ocaml_heap = false; tfn = Fn fn }
-  let immediater name fn = { name; allocates = false; reads_ocaml_heap = false; tfn = Fn fn }
+  let reader fname fn = { fname; allocates = false; reads_ocaml_heap = true; fn = Fn fn }
+  let conser fname fn = { fname; allocates = true; reads_ocaml_heap = false; fn = Fn fn }
+  let immediater fname fn = { fname; allocates = false; reads_ocaml_heap = false; fn = Fn fn }
 
   let local name ty = `Local (name, Ty ty)
 
@@ -118,47 +118,45 @@ struct
     | Complex64 -> conser "ctypes_copy_double_complex" (complex64 @-> returning value)
 
   let of_fatptr : cexp -> ccomp =
-    fun x -> `App (`Global (reader "CTYPES_ADDR_OF_FATPTR"
-                              (value @-> returning (ptr void))),
+    fun x -> `App (reader "CTYPES_ADDR_OF_FATPTR"
+                          (value @-> returning (ptr void)),
                    [x])
 
   let string_to_ptr : cexp -> ccomp =
-    fun x -> `App (`Global (reader "CTYPES_PTR_OF_OCAML_STRING"
-                              (value @-> returning (ptr void))),
+    fun x -> `App (reader "CTYPES_PTR_OF_OCAML_STRING"
+                          (value @-> returning (ptr void)),
                    [x])
 
   let float_array_to_ptr : cexp -> ccomp =
-    fun x -> `App (`Global (reader "CTYPES_PTR_OF_FLOAT_ARRAY"
-                              (value @-> returning (ptr void))),
+    fun x -> `App (reader "CTYPES_PTR_OF_FLOAT_ARRAY"
+                          (value @-> returning (ptr void)),
                    [x])
 
   let from_ptr : cexp -> ceff =
-    fun x -> `App (`Global (conser "CTYPES_FROM_PTR"
-                              (ptr void @-> returning value)),
+    fun x -> `App (conser "CTYPES_FROM_PTR"
+                          (ptr void @-> returning value),
                    [x])
 
   let val_unit : ceff = `Global { name = "Val_unit";
-                                  allocates = false;
-                                  reads_ocaml_heap = false;
-                                  tfn = Typ value; }
+                                  references_ocaml_heap = true;
+                                  typ = Ty value }
 
   let functions : ceff = `Global
     { name = "functions";
-      allocates = false;
-      reads_ocaml_heap = true;
-      tfn = Typ (ptr value) }
+      references_ocaml_heap = true;
+      typ = Ty (ptr value) }
 
-  let caml_callbackN : [ `Fn] cglobal = `Global
-    { name = "caml_callbackN";
+  let caml_callbackN : cfunction =
+    { fname = "caml_callbackN";
       allocates = true;
       reads_ocaml_heap = true;
-      tfn = Fn (value @-> int @-> ptr value @-> returning value) }
+      fn = Fn (value @-> int @-> ptr value @-> returning value) }
 
-  let copy_bytes : [`Fn] cglobal =
-    `Global { name = "ctypes_copy_bytes";
-              allocates = true;
-              reads_ocaml_heap = true;
-              tfn = Fn (ptr void @-> size_t @-> returning value) }
+  let copy_bytes : cfunction =
+    { fname = "ctypes_copy_bytes";
+      allocates = true;
+      reads_ocaml_heap = true;
+      fn = Fn (ptr void @-> size_t @-> returning value) }
 
   let cast : type a b. from:ty -> into:ty -> ccomp -> ccomp =
     fun ~from:(Ty from) ~into e ->
@@ -169,9 +167,9 @@ struct
     fun ty x -> match ty with
     | Void -> None
     | Primitive p ->
-      let { tfn = Fn fn } as prj = prim_prj p in
+      let { fn = Fn fn } as prj = prim_prj p in
       let rt = return_type fn in
-      Some (cast ~from:rt ~into:(Ty (Primitive p)) (`App (`Global prj, [x])))
+      Some (cast ~from:rt ~into:(Ty (Primitive p)) (`App (prj, [x])))
     | Pointer _ -> Some (of_fatptr x)
     | Struct s ->
       Some ((of_fatptr x, ptr void) >>= fun y ->
@@ -190,7 +188,7 @@ struct
   let rec inj : type a. a typ -> cexp -> ceff =
     fun ty x -> match ty with
     | Void -> val_unit
-    | Primitive p -> `App (`Global (prim_inj p), [`Cast (Ty (Primitive p), x)])
+    | Primitive p -> `App (prim_inj p, [`Cast (Ty (Primitive p), x)])
     | Pointer _ -> from_ptr x
     | Struct s -> `App (copy_bytes, [`Addr x; `Int (sizeof ty)])
     | Union u -> `App (copy_bytes, [`Addr x; `Int (sizeof ty)])
@@ -217,10 +215,10 @@ struct
 
   let fn : type a. cname:string -> stub_name:string -> a Static.fn -> cfundef =
     fun ~cname ~stub_name f ->
-      let fvar = `Global { name = cname;
-                           allocates = false;
-                           reads_ocaml_heap = false;
-                           tfn = Fn f; } in
+      let fvar = { fname = cname;
+                   allocates = false;
+                   reads_ocaml_heap = false;
+                   fn = Fn f; } in
       let rec body : type a. _ -> a fn -> _ =
          fun vars -> function 
          | Returns t ->
@@ -239,20 +237,20 @@ struct
                  body [] f')
 
   let byte_fn : type a. string -> a Static.fn -> int -> cfundef =
-    fun name fn nargs ->
+    fun fname fn nargs ->
       let argv = ("argv", Ty (ptr value)) in
       let argc = ("argc", Ty int) in
-      let f = `Global { name ;
-                        allocates = true;
-                        reads_ocaml_heap = true;
-                        tfn = Fn fn }
+      let f = { fname ;
+                allocates = true;
+                reads_ocaml_heap = true;
+                fn = Fn fn }
       in
       let rec build_call ?(args=[]) = function
         | 0 -> `App (f, args)
         | n -> (`Index (`Local argv, `Int (n - 1)), value) >>= fun x ->
                build_call ~args:(x :: args) (n - 1)
       in
-      let bytename = Printf.sprintf "%s_byte%d" name nargs in
+      let bytename = Printf.sprintf "%s_byte%d" fname nargs in
       `Function (`Fundec (bytename, [argv; argc], Ty value),
                  build_call nargs)
 

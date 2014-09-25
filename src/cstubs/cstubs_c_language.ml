@@ -16,20 +16,23 @@ let fresh_var =
     Printf.sprintf "x%d" !var_counter
 
 type ty = Ty : _ typ -> ty
-type _ tfn =
-  Typ : _ typ -> [`Typ] tfn
-| Fn : _ fn -> [`Fn] tfn
+type tfn = Fn : _ fn -> tfn
 
-type 'a id_properties = {
-  name: string;
+type cfunction = {
+  fname: string;
   allocates: bool;
   reads_ocaml_heap: bool;
-  tfn: 'a tfn;
+  fn: tfn;
 }
 
-type 'a cglobal = [ `Global of 'a id_properties ]
+type cglobal = {
+  name: string;
+  typ: ty;
+  references_ocaml_heap: bool;
+}
+
 type clocal = [ `Local of string * ty ]
-type cvar = [ clocal | [`Typ] cglobal ]
+type cvar = [ clocal | `Global of cglobal ]
 type cconst = [ `Int of int ]
 type cexp = [ cconst
             | clocal
@@ -40,8 +43,8 @@ type camlop = [ `CAMLparam0
               | `CAMLlocalN of cexp * cexp ]
 type ceff = [ cexp
             | camlop
-            | [`Typ] cglobal
-            | `App of [`Fn] cglobal * cexp list
+            | `Global of cglobal
+            | `App of cfunction * cexp list
             | `Index of ceff * cexp
             | `Deref of cexp
             | `Assign of clvalue * ceff ]
@@ -78,8 +81,8 @@ struct
   let rec ceff : ceff -> ty = function
     | #cexp as e -> cexp e
     | #camlop as o -> camlop o
-    | `Global { tfn = Typ t } -> Ty t
-    | `App (`Global  { tfn = Fn f; name }, _) -> return_type f
+    | `Global { typ } -> typ
+    | `App ({ fn = Fn f }, _) -> return_type f
     | `Index (e, _) -> reference_ceff e
     | `Deref e -> reference_ceff (e :> ceff)
     | `Assign (_, rv) -> ceff rv

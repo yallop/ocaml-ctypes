@@ -60,8 +60,8 @@ let rec ceff fmt : ceff -> unit = function
   | #cexp as e -> cexp fmt e
   | #camlop as o -> camlop fmt o
   | `Global _ as x -> cvar fmt x
-  | `App (v, es) ->
-    fprintf fmt "@[%s(@[" (cvar_name v);
+  | `App ({fname}, es) ->
+    fprintf fmt "@[%s(@[" fname;
     let last_exp = List.length es - 1 in
     List.iteri
       (fun i e ->
