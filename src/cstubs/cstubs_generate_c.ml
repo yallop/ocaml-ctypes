@@ -15,10 +15,8 @@ let max_byte_args = 5
 (* We're using an abstract type ([value]) as an argument and return type, so
    we'll use the [Function] and [Return] constructors directly.  The smart
    constructors [@->] and [returning] would reject the abstract type. *)
-let (@->) f t = Function (f, t)
-let returning t = Returns t
-
-let value = abstract ~name:"value" ~size:0 ~alignment:0
+let (@->) f t = Function_ (f, t)
+let returning t = Returns_ t
 
 module Generate_C =
 struct
@@ -26,45 +24,52 @@ struct
     let msg = Printf.sprintf "cstubs does not support passing %s" what in
     raise (Unsupported msg)
 
-  let reader fname fn = { fname; allocates = false; reads_ocaml_heap = true; fn = Fn fn }
-  let conser fname fn = { fname; allocates = true; reads_ocaml_heap = false; fn = Fn fn }
-  let immediater fname fn = { fname; allocates = false; reads_ocaml_heap = false; fn = Fn fn }
+  let reader fname fn = { fname; allocates = false; reads_ocaml_heap = true; fn }
+  let conser fname fn = { fname; allocates = true; reads_ocaml_heap = false; fn }
+  let immediater fname fn = { fname; allocates = false; reads_ocaml_heap = false; fn }
 
-  let local ?(references_ocaml_heap=true) name ty =
-    `Local {name; typ=Ty ty; references_ocaml_heap}
+  let local ?(references_ocaml_heap=true) name typ =
+    {name; typ; references_ocaml_heap}
 
-  let rec (>>=) : type a. ccomp * a typ -> (cexp -> ccomp) -> ccomp =
-   fun (e, ty) k ->
+  let val_unit : value ceff = CGlobal { name = "Val_unit";
+                                        references_ocaml_heap = true;
+                                        typ = value }
+
+  let rec (>>=) : type a b. a ccomp (* * a typ *) -> (a cexp -> b ccomp) -> b ccomp =
+   fun e k ->
      let x = fresh_var () in
      match e with
        (* let x = v in e ~> e[x:=v] *) 
-     | #cexp as v ->
-       k v
-     | #ceff as e ->
-       `Let ((local x ty, e), k (local x ty))
-     | `LetConst (y, i, c) ->
+     | CEff (CExp v) ->
+        k v
+     | CEff e ->
+        let ty = Type_C.ceff e in
+        CLet (CBind (local x ty, e), k (CLocal (local x ty)))
+     | CLetConst (y, i, c) ->
        (* let x = (let const y = i in c) in e
           ~>
           let const y = i in (let x = c in e) *)
-       let Ty t = Type_C.ccomp c in
-       `LetConst (y, i, (c, t) >>= k)
-     | `CAMLreturnT (Ty ty, v) ->
-       (k v, ty) >>= fun e ->
-       `CAMLreturnT (Type_C.cexp e, e)
-     | `Let (ye, c) ->
+       CLetConst (y, i, c >>= k)
+     | CCAMLreturnT (ty, v) ->
+        k v >>= fun e ->
+        CCAMLreturnT (Type_C.cexp e, e)
+     | CCAMLreturn0 view ->
+        CEff val_unit >>= fun u ->
+        k (CCast (View view, u)) >>= fun e ->
+        CCAMLreturnT (Type_C.cexp e, e)
+     | CLet (ye, c) ->
        (* let x = (let y = e1 in e2) in e3
           ~>
           let y = e1 in (let x = e2 in e3) *)
-       let Ty t = Type_C.ccomp c in
-       `Let (ye, (c, t) >>= k)
+       CLet (ye, c >>= k)
 
-  let (>>) c1 c2 = (c1, Void) >>= fun _ -> c2
+  let (>>) c1 c2 = c1 >>= fun (_ : stmt cexp) -> c2
 
-  let prim_prj : type a. a Primitives.prim -> _ =
+  let prim_prj : type a. a Primitives.prim -> (value -> a, a) cfunction =
     let open Primitives in function
-    | Char -> reader "Int_val" (value @-> returning int)
+    | Char -> reader "Int_val" (value @-> returning char)
     | Schar -> reader "Int_val" (value @-> returning int)
-    | Uchar -> reader "Uint8_val" (value @-> returning uint8_t)
+    | Uchar -> reader "Uint8_val" (value @-> returning uchar)
     | Short -> reader "Int_val" (value @-> returning int)
     | Int -> reader "Int_val" (value @-> returning int)
     | Long -> reader "ctypes_long_val" (value @-> returning long)
@@ -89,11 +94,11 @@ struct
     | Complex32 -> reader "ctypes_float_complex_val" (value @-> returning complex32)
     | Complex64 -> reader "ctypes_double_complex_val" (value @-> returning complex64)
 
-  let prim_inj : type a. a Primitives.prim -> _ =
+  let prim_inj : type a. a Primitives.prim -> (a -> value, value) cfunction =
     let open Primitives in function
-    | Char -> immediater "Val_int" (int @-> returning value)
+    | Char -> immediater "Val_int" (char @-> returning value)
     | Schar -> immediater "Val_int" (int @-> returning value)
-    | Uchar -> conser "ctypes_copy_uint8" (uint8_t @-> returning value)
+    | Uchar -> conser "ctypes_copy_uint8" (uchar @-> returning value)
     | Short -> immediater "Val_int" (int @-> returning value)
     | Int -> immediater "Val_int" (int @-> returning value)
     | Long -> conser "ctypes_copy_long" (long @-> returning value)
@@ -118,208 +123,251 @@ struct
     | Complex32 -> conser "ctypes_copy_float_complex" (complex32 @-> returning value)
     | Complex64 -> conser "ctypes_copy_double_complex" (complex64 @-> returning value)
 
-  let of_fatptr : cexp -> ccomp =
-    fun x -> `App (reader "CTYPES_ADDR_OF_FATPTR"
-                          (value @-> returning (ptr void)),
-                   [x])
+  let app1 f x = CApp (f, Args (Arg x, End))
+  let app2 f x y = CApp (f, Args (Arg x, Args (Arg y, End)))
+  let app3 f x y z = CApp (f, Args (Arg x, Args (Arg y, Args (Arg z, End))))
 
-  let string_to_ptr : cexp -> ccomp =
-    fun x -> `App (reader "CTYPES_PTR_OF_OCAML_STRING"
-                          (value @-> returning (ptr void)),
-                   [x])
+  let of_fatptr : type a. a typ -> value cexp -> a ptr ceff =
+    fun typ x ->
+    app1 (reader "CTYPES_ADDR_OF_FATPTR" (value @-> returning (ptr typ))) x
 
-  let float_array_to_ptr : cexp -> ccomp =
-    fun x -> `App (reader "CTYPES_PTR_OF_FLOAT_ARRAY"
-                          (value @-> returning (ptr void)),
-                   [x])
+  let string_to_ptr : value cexp -> char ptr ceff =
+    fun x ->
+    app1 (reader "CTYPES_PTR_OF_OCAML_STRING" (value @-> returning (ptr char))) x
 
-  let from_ptr : cexp -> ceff =
-    fun x -> `App (conser "CTYPES_FROM_PTR"
-                          (ptr void @-> returning value),
-                   [x])
+  let float_array_to_ptr : value cexp -> float ptr ceff =
+    fun x -> app1 (reader "CTYPES_PTR_OF_FLOAT_ARRAY"
+                          (value @-> returning (ptr double)))
+                  x
 
-  let val_unit : ceff = `Global { name = "Val_unit";
-                                  references_ocaml_heap = true;
-                                  typ = Ty value }
+  let from_ptr : type a. a typ -> a ptr cexp -> value ceff =
+    fun typ x -> app1 (conser "CTYPES_FROM_PTR"
+                              (ptr typ @-> returning value))
+                      x
 
-  let functions : ceff = `Global
+  let functions : value ptr ceff = CGlobal
     { name = "functions";
       references_ocaml_heap = true;
-      typ = Ty (ptr value) }
+      typ = (ptr value) }
 
-  let caml_callbackN : cfunction =
+  let caml_callbackN n : (value -> int -> value carray -> value, value) cfunction =
     { fname = "caml_callbackN";
       allocates = true;
       reads_ocaml_heap = true;
-      fn = Fn (value @-> int @-> ptr value @-> returning value) }
+      fn = (value @-> int @-> array n value @-> returning value) }
 
-  let copy_bytes : cfunction =
+  let copy_bytes : type a. a typ -> (a ptr -> Unsigned.size_t -> value, value) cfunction =
+    fun typ ->
     { fname = "ctypes_copy_bytes";
       allocates = true;
       reads_ocaml_heap = true;
-      fn = Fn (ptr void @-> size_t @-> returning value) }
+      fn = (ptr typ @-> size_t @-> returning value) }
 
-  let cast : type a b. from:ty -> into:ty -> ccomp -> ccomp =
-    fun ~from:(Ty from) ~into e ->
-      (e, from) >>= fun x ->
-      `Cast (into, x)
+  let sizeof : type a. a typ -> Unsigned.Size_t.t cexp =
+    fun typ -> CConst (CSizeof typ)
 
-  let rec prj : type a. a typ -> cexp -> ccomp option =
+  let cast : type a b. into:b typ -> a ccomp -> b ccomp =
+    fun ~into e -> e >>= fun x -> CEff (CExp (CCast (into, x)))
+
+  type 'a prj_result = Prj of 'a ccomp
+                     | OPrj : ('a, 'b) ocaml_pointer * 'b ccomp -> 'a prj_result
+                     | NoPrj : ('a, unit) view -> 'a prj_result
+
+  let id_view : type a. a typ -> (a, a) view =
+    fun ty -> let id x = x in
+      { read = id; write = id; ty; format = None; format_typ = None }
+  let compose_view : type a b c. (a, b) view -> (b, c) view -> (a, c) view =
+    fun v1 v2 ->
+    let read x = v1.read (v2.read x) and write x = v2.write (v1.write x) in
+    { read; write; format = None; format_typ = None; ty = v2.ty }
+
+  let rec prj : type a. a typ -> value cexp -> a prj_result =
     fun ty x -> match ty with
-    | Void -> None
+    | Void -> NoPrj (id_view void)
     | Primitive p ->
-      let { fn = Fn fn } as prj = prim_prj p in
-      let rt = return_type fn in
-      Some (cast ~from:rt ~into:(Ty (Primitive p)) (`App (prj, [x])))
-    | Pointer _ -> Some (of_fatptr x)
+      let { fn } as prj = prim_prj p in
+      Prj (cast ~into:ty (CEff (app1 prj x)))
+    | Pointer t -> Prj (CEff (of_fatptr t x))
     | Struct s ->
-      Some ((of_fatptr x, ptr void) >>= fun y ->
-            `Deref (`Cast (Ty (ptr ty), y)))
+      Prj (CEff (of_fatptr ty x) >>= fun y -> CEff (CDeref y))
     | Union u -> 
-      Some ((of_fatptr x, ptr void) >>= fun y ->
-            `Deref (`Cast (Ty (ptr ty), y)))
+      Prj (CEff (of_fatptr ty x) >>= fun y -> CEff (CDeref y))
     | Abstract _ -> report_unpassable "values of abstract type"
-    | View { ty } -> prj ty x
+    | View ({ ty = ty' } as view) -> 
+       begin match prj ty' x with
+       | Prj c -> Prj (c >>= fun y ->
+                       CEff (CExp (CCast (ty, y))))
+       | OPrj _ -> assert false (* TODO *)
+       | NoPrj v -> NoPrj (compose_view view v)
+       end
     | Array _ -> report_unpassable "arrays"
     | Bigarray _ -> report_unpassable "bigarrays"
-    | OCaml String -> Some (string_to_ptr x)
-    | OCaml Bytes -> Some (string_to_ptr x)
-    | OCaml FloatArray -> Some (float_array_to_ptr x)
+    | OCaml String -> OPrj (OString, CEff (string_to_ptr x))
+    | OCaml Bytes -> OPrj (OBytes, CEff (string_to_ptr x))
+    | OCaml FloatArray -> OPrj (OFloatArray, CEff (float_array_to_ptr x))
 
-  let rec inj : type a. a typ -> cexp -> ceff =
+  let rec inj : type a. a typ -> a cexp -> value ceff =
     fun ty x -> match ty with
     | Void -> val_unit
-    | Primitive p -> `App (prim_inj p, [`Cast (Ty (Primitive p), x)])
-    | Pointer _ -> from_ptr x
-    | Struct s -> `App (copy_bytes, [`Addr x; `Int (sizeof ty)])
-    | Union u -> `App (copy_bytes, [`Addr x; `Int (sizeof ty)])
+    | Primitive p -> app1 (prim_inj p) (CCast (Primitive p, x))
+    | Pointer ty -> from_ptr ty x
+    | Struct s -> app2 (copy_bytes ty) (CAddr x) (sizeof ty)
+    | Union u -> app2 (copy_bytes ty) (CAddr x) (sizeof ty)
     | Abstract _ -> report_unpassable "values of abstract type"
-    | View { ty } -> inj ty x
+    | View {ty = ty'} -> inj ty' (CCast (ty', x))
     | Array _ -> report_unpassable "arrays"
     | Bigarray _ -> report_unpassable "bigarrays"
     | OCaml _ -> report_unpassable "ocaml references as return values"
 
-  type _ fn =
-  | Returns  : 'a typ   -> 'a fn
-  | Function : string * 'a typ * 'b fn  -> ('a -> 'b) fn
+  let fundec : type a r. string -> (a, r) fn -> (a, r) cfundec =
+    fun name fn -> Fundec (name, params fn, return_type fn)
 
-  let rec name_params : type a. a Static.fn -> a fn = function
-    | Static.Returns t -> Returns t
-    | Static.Function (f, t) -> Function (fresh_var (), f, name_params t)
+  type (_, _) value_conversion =
+      Value_returning : (_, value) value_conversion
+    | Value_arg : ('r, 's) value_conversion -> ('a -> 'r, value -> 's) value_conversion
 
-  let rec value_params : type a. a fn -> cvar_details list = function
-    | Returns t -> []
-    | Function (x, _, t) -> {name=x; typ=Ty value; references_ocaml_heap=true} :: value_params t
+  type ('a, 'r) wrapper_function =
+    Wrapper : ('a, 'r) fn * ('a, 'v) value_conversion * ('v, value) fn ->
+              ('a, 'r) wrapper_function
 
-  let fundec : type a. string -> a Ctypes.fn -> cfundec =
-    fun name fn -> `Fundec (name, args fn, return_type fn)
+  type 'a wrapper_dec =
+    WrapperD : ('a, _) fn * ('a, 'v) value_conversion * ('v, value) fn * 'v cfundef ->
+               'a wrapper_dec
 
-  let fn : type a. cname:string -> stub_name:string -> a Static.fn -> cfundef =
-    fun ~cname ~stub_name f ->
-      let fvar = { fname = cname;
+  let rec value_wrapper : type a r. (a, r) fn -> (a, r) wrapper_function =
+    fun fn -> match fn with
+   | Returns_ _ -> Wrapper (fn, Value_returning, Returns_ value)
+   | Function_ (p, fn') ->
+      let Wrapper (f', vc, fv') = value_wrapper fn' in
+      Wrapper (fn, Value_arg vc, Function_ (value, fv'))
+
+  let fn : type a. cname:string -> stub_name:string -> a Static.fn -> a wrapper_dec =
+    fun (type a) (type r) ~cname ~stub_name fn ->
+    let Fn_wrapped fn = wrap_fn fn in
+    let Wrapper (fn, vconv, value_fn) = value_wrapper fn in
+      let fvar : (a, _) cfunction = { fname = cname;
                    allocates = false;
                    reads_ocaml_heap = false;
-                   fn = Fn f; } in
-      let rec body : type a. _ -> a fn -> _ =
-         fun vars -> function 
-         | Returns t ->
-           (`App (fvar, (List.rev vars :> cexp list)), t) >>= fun x ->
-           (inj t x :> ccomp)
-         | Function (x, f, t) ->
-           begin match prj f (local x value) with
-             None -> body vars t
-           | Some projected -> 
-             (projected, f) >>= fun x' ->
-             body (x' :: vars) t
-           end
+                   fn } in
+      let rec body : type a r v.
+       (a, r) fn (* The C function type *) ->
+       (a, v) value_conversion (* The relation between the C type and the stub type *) ->
+       v params (* The stub function type *) ->
+       (a args -> r ccomp) -> 
+       value ccomp
+       = fun fn vconv params k ->
+         match fn, vconv, params with
+         | Returns_ t, Value_returning, NoParams ->
+            k End >>= fun x ->
+            CEff (inj t x)
+         | Function_ (t, fn'), Value_arg vconv', Param (var, params') ->
+            begin match prj t (CLocal var) with
+                  | Prj c ->
+                     c >>= fun x ->
+                     let k' args = k (Args (Arg x, args)) in
+                     body fn' vconv' params' k'
+                  | OPrj (optr, c) -> 
+                     c >>= fun x ->
+                     let k' args = k (Args (OCamlArg (optr, x), args)) in
+                     body fn' vconv' params' k'
+                  | NoPrj v ->
+                     let k' args = k (Args (Nothing v, args)) in
+                     body fn' vconv' params' k'
+            end
+         | _ -> assert false (* internal error *)
       in
-      let f' = name_params f in
-      `Function (`Fundec (stub_name, value_params f', Ty value),
-                 body [] f')
+      let params = params value_fn in
+      let stubdef = Fundef (Fundec (stub_name, params, value),
+                            body fn vconv params
+                                 (fun args -> CEff (CApp (fvar, args)))) in
+      WrapperD (fn, vconv, value_fn, stubdef)
 
-  let byte_fn : type a. string -> a Static.fn -> int -> cfundef =
-    fun fname fn nargs ->
-      let (`Local argv as argv') = local "argv" (ptr value) in
-      let (`Local argc as argc') = local "argc" int in
-      let f = { fname ;
-                allocates = true;
-                reads_ocaml_heap = true;
-                fn = Fn fn }
-      in
-      let rec build_call ?(args=[]) = function
-        | 0 -> `App (f, args)
-        | n -> (`Index (argv', `Int (n - 1)), value) >>= fun x ->
-               build_call ~args:(x :: args) (n - 1)
-      in
-      let bytename = Printf.sprintf "%s_byte%d" fname nargs in
-      `Function (`Fundec (bytename, [argv; argc], Ty value),
-                 build_call nargs)
+  let byte_fn : type v. bytename:string -> stubname:string ->
+                     (v, value) fn -> (_, v) value_conversion ->
+                     (value ptr -> int -> value) cfundef =
+    fun ~bytename ~stubname:fname fn vconv ->
+    let argv = local "argv" (ptr value) in
+    let argc = local "argc" int in
+    let f = { fname; allocates = true; reads_ocaml_heap = true; fn } in
+    let rec body : type a v. (v, value) fn -> (a, v) value_conversion -> int -> 
+                        (v args -> value ccomp) -> value ccomp =
+     fun fn vconv i k -> match fn, vconv with
+     | Returns_ _, Value_returning ->
+        k End
+     | Function_ (_, fn'), Value_arg vconv' ->
+        CEff (CPIndex (CExp (CLocal argv), CConst (CInt i))) >>= fun x ->
+        let k' args = k (Args (Arg x, args)) in
+        body fn' vconv' (i+1) k'
+     | _ -> assert false
+    in
+    Fundef (Fundec (bytename, Param (argv, Param (argc, NoParams)), value),
+            body fn vconv 0 (fun args -> CEff (CApp (f, args))))
 
-  let inverse_fn ~stub_name f =
-    let `Fundec (_, args, Ty rtyp) as dec = fundec stub_name f in
-    let idx = local (Printf.sprintf "fn_%s" stub_name) int in
-    let project typ e =
-      match prj typ e with
-        None -> (e :> ccomp)
-      | Some e -> e
+  let inverse_fn : type a r. stub_name:string -> (a, r) wrapper_function ->
+                             r typ -> a cfundef =
+    fun ~stub_name (Wrapper (fn, vconv, vfn)) rtyp ->
+    let idx = CLocal (local (Printf.sprintf "fn_%s" stub_name) int) in
+    let params = params fn in
+    let nparams = params_length params in
+    let nargs = local "nargs" int in
+    let locals = local "locals" (array nparams value) in
+    let rec body : type a. a params -> int -> r ccomp =
+     fun params i -> match params with
+      | NoParams ->
+         (* f := functions[fn_name];
+            x := caml_callbackN(f, nargs, locals);
+            y := T_val(x);
+            CAMLreturnT(T, y);    *)
+         CEff (CPIndex (functions, idx)) >>= fun f ->
+         CEff (app3 (caml_callbackN nparams) f (CLocal nargs) (CLocal locals)) >>= fun x ->
+         begin match prj rtyp x with
+               | Prj c ->
+                  c >>= fun y ->
+                  CCAMLreturnT (rtyp, y)
+               | OPrj _ -> assert false (* TODO *)
+               | NoPrj v ->
+                  CCAMLreturn0 v
+         end
+      | Param (var, params') ->
+         (* locals[i] = Val_Ti(xi); *)
+         CEff (CAssign (CPIndex_ (CVar (`Local (local "locals" (ptr value))),
+                                  CConst (CInt i)), inj var.typ (CLocal var))) >>
+         body params' (i + 1)
     in
-    let call =
-      (* f := functions[fn_name];
-         x := caml_callbackN(f, nargs, locals);
-         y := T_val(x);
-         CAMLreturnT(T, y);    *)
-      (`Index (functions, idx), value) >>= fun f ->
-      (`App (caml_callbackN, [f;
-                              local "nargs" int;
-                              local "locals" (ptr value)]),
-       value) >>= fun x ->
-      (project rtyp x, rtyp) >>= fun y -> 
-      `CAMLreturnT (Ty rtyp, y)
-    in
-    let body =
-      (* locals[0] = Val_T0(x0);
-         locals[1] = Val_T1(x1);
-         ...
-         locals[n] = Val_Tn(xn);
-         call;       *)
-      snd
-        (ListLabels.fold_right  args
-           ~init:(List.length args - 1, call)
-           ~f:(fun {name=x; typ=Ty t} (i, c) ->
-             i - 1,
-             `Assign (`Index (local "locals" (ptr value), `Int i),
-                      (inj t (local x t))) >> c))
-    in
+
       (* T f(T0 x0, T1 x1, ..., Tn xn) {
             enum { nargs = n };
             CAMLparam0();
             CAMLlocalN(locals, nargs);
             body
          }      *)
-    `Function
-      (dec,
-       `LetConst (local "nargs" int, `Int (List.length args),
-                  `CAMLparam0 >>
-                  `CAMLlocalN (local "locals" (array (List.length args) value),
-                               local "nargs" int) >>
-                    body))
+    Fundef (Fundec (stub_name, params, rtyp),
+            CLetConst (nargs, CInt nparams,
+                       CEff (CamlOp `CAMLparam0) >>
+                       CEff (CamlOp (`CAMLlocalN (locals, CLocal nargs))) >>
+                       body params 0))
 end
 
-let fn ~cname  ~stub_name fmt fn =
-  let `Function (`Fundec (f, xs, _), _) as dec
+let fn ~cname ~stub_name fmt fn =
+  let Generate_C.WrapperD (fn2, vconv, value_fn,
+                           (Fundef (Fundec (f, xs, _), _) as dec))
       = Generate_C.fn ~stub_name ~cname fn
   in
-  let nargs = List.length xs in
-  if nargs > max_byte_args then begin
+  let nargs = params_length xs in
+  begin
     Cstubs_emit_c.cfundef fmt dec;
-    Cstubs_emit_c.cfundef fmt (Generate_C.byte_fn f fn nargs)
+    if nargs > max_byte_args then
+      let bytename = Printf.sprintf "%s_byte%d" f nargs in
+      Cstubs_emit_c.cfundef fmt (Generate_C.byte_fn ~bytename ~stubname:f value_fn vconv)
   end
-  else
-    Cstubs_emit_c.cfundef fmt dec
 
 let inverse_fn ~stub_name fmt fn : unit =
-  Cstubs_emit_c.cfundef fmt (Generate_C.inverse_fn ~stub_name fn)
+  let Fn_wrapped fn = wrap_fn fn in
+  let rtyp = return_type fn in
+  Cstubs_emit_c.cfundef fmt
+    (Generate_C.inverse_fn ~stub_name (Generate_C.value_wrapper fn) rtyp)
 
 let inverse_fn_decl ~stub_name fmt fn =
+  let Fn_wrapped fn = wrap_fn fn in
   Format.fprintf fmt "@[%a@];@\n"
     Cstubs_emit_c.cfundec (Generate_C.fundec stub_name fn)
