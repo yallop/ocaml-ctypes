@@ -241,11 +241,22 @@ let rec ml_typ_of_arg_typ : type a. a typ -> ml_type = function
            [`Appl (path_of_string "array",
                    [`Ident (path_of_string "float")])])
 
-let rec ml_external_type_of_fn : type a. a fn -> ml_external_type = function
-  | Returns t -> `Prim ([], ml_typ_of_return_typ t)
+type polarity = In | Out
+
+let flip = function
+  | In -> Out
+  | Out -> In
+
+let ml_typ_of_typ = function
+    In -> ml_typ_of_arg_typ
+  | Out -> ml_typ_of_return_typ
+
+let rec ml_external_type_of_fn : type a. a fn -> polarity -> ml_external_type =
+  fun fn polarity -> match fn with
+  | Returns t -> `Prim ([], ml_typ_of_typ polarity t)
   | Function (f, t) ->
-    let `Prim (l, t) = ml_external_type_of_fn t in
-    `Prim (ml_typ_of_arg_typ f :: l, t)
+    let `Prim (l, t) = ml_external_type_of_fn t polarity in
+    `Prim (ml_typ_of_typ (flip polarity) f :: l, t)
 
 let var_counter = ref 0
 let fresh_var () =
@@ -254,7 +265,7 @@ let fresh_var () =
 
 let extern ~stub_name ~external_name fmt fn =
   let ext =
-    let typ = ml_external_type_of_fn fn in
+    let typ = ml_external_type_of_fn fn Out in
     ({ ident = external_name;
        typ = typ;
        primname = stub_name;
@@ -264,12 +275,6 @@ let extern ~stub_name ~external_name fmt fn =
 
 let static_con c args =
   `Con (Ctypes_path.path_of_string ("CI." ^ c), args)
-
-type polarity = In | Out
-
-let flip = function
-  | In -> Out
-  | Out -> In
 
 let rec pattern_and_exp_of_typ :
   type a. a typ -> ml_exp -> polarity -> ml_pat * ml_exp option =
@@ -398,7 +403,7 @@ let case ~stub_name ~external_name fmt fn =
 let constructor_decl : type a. string -> a fn -> Format.formatter -> unit =
   fun name fn fmt ->
     Format.fprintf fmt "@[|@ %s@ : (@[%a@])@ name@]@\n" name
-      Emit_ML.ml_external_type (ml_external_type_of_fn fn)
+      Emit_ML.ml_external_type (ml_external_type_of_fn fn In)
 
 let inverse_case ~register_name ~constructor name fmt fn : unit =
   let p, e = match wrapper fn "f" Out with
