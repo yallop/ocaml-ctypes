@@ -109,9 +109,9 @@ let test_ocaml_types_rejected_as_fields _ =
     let u = union "u"
     let () = assert_raises IncompleteType
       (fun () ->
-        field u "o" ocaml_string;
-        (* The error is currently only caught on sealing the union *)
-        seal u)
+       let _ =  field u "o" ocaml_string in
+       (* The error is currently only caught on sealing the union *)
+       seal u)
   end in ()
 
 
