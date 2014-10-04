@@ -173,12 +173,12 @@ struct
         arr.(len) <- '\000';
         arr
 
-    let as_string : char ptr -> string =
+    let as_string : char ptr -> Bytes.t =
       fun p ->
         let len = Size_t.to_int (strlen p) in
-        let s = String.create len in
+        let s = Bytes.create len in
         for i = 0 to len - 1 do
-          s.[i] <- !@(p +@ i);
+          Bytes.set s i (!@(p +@ i));
         done;
         s
 

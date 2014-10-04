@@ -23,7 +23,7 @@ struct
   let test_passing_strings _ =
     let input = "abcdefghijklmnopqrstuvwxyz" in
     let len = String.length input in
-    let buf = String.create len in
+    let buf = String.make len 'Z' in
     let _ = memcpy_string_string
       (ocaml_string_start buf)
       (ocaml_string_start input)
@@ -33,7 +33,7 @@ struct
     end;
 
     let bbuf = Bytes.create len in
-    let binput = Bytes.unsafe_of_string (String.copy input) in
+    let binput = Bytes.of_string input in
     let _ = memcpy_bytes_bytes
       (ocaml_bytes_start bbuf)
       (ocaml_bytes_start binput)
@@ -44,7 +44,7 @@ struct
     
     let arr = CArray.make char len in
     let () = String.iteri (CArray.set arr) input in
-    let buf = String.create len in
+    let buf = String.make len 'Z' in
     let _ = memcpy_string_ptr
       (ocaml_string_start buf)
       (coerce (ptr char) (ptr void) (CArray.start arr))
