@@ -15,13 +15,71 @@ let fresh_var =
     incr var_counter;
     Printf.sprintf "x%d" !var_counter
 
+type custom_formatter = 
+  (Type_printing.format_context -> Format.formatter -> unit) ->
+  (Type_printing.format_context -> Format.formatter -> unit)
+
+type 'a typ = {
+  format: custom_formatter;
+  ty_: 'a Static.typ;
+}
+
 type value_
 type value = value_ abstract
-let value : value typ = abstract ~name:"value" ~size:0 ~alignment:0
+let value_ : value Static.typ =
+  abstract ~name:"value" ~size:0 ~alignment:0
 
 type stmt_
 type stmt = stmt_ abstract
-let stmt : stmt typ = abstract ~name:"stmt" ~size:0 ~alignment:0
+let stmt_ = abstract ~name:"stmt" ~size:0 ~alignment:0
+
+module Typ =
+struct
+  type 'a t = 'a typ
+  let primitive : 'a. 'a Static.typ -> 'a t =
+    fun ty_ -> { ty_; format = (Type_printing.format_typ' ty_) }
+
+  let void = primitive void
+  let int = primitive int
+  let size_t = primitive size_t
+  let value = primitive value_
+  let stmt = primitive stmt_
+
+  let ptr {format;ty_} =
+    let format k context fmt =
+      format
+        (fun context fmt ->
+           match context with
+           | `array -> Format.fprintf fmt "(*%t)" (k `nonarray)
+           | _      -> Format.fprintf fmt "*%t" (k `nonarray))
+        `nonarray fmt in
+    { ty_ = ptr ty_; format }
+
+  let array n {format;ty_} =
+    let format k context fmt =
+      Type_printing.format_typ' ty_
+        (fun _ fmt -> Format.fprintf fmt "%t[%d]" (k `array) n)
+        `nonarray fmt
+    in
+    { ty_ = array n ty_; format }
+
+  let of_typ ?format ty_ = match format with
+      None -> primitive ty_
+    | Some format -> { ty_; format }
+end
+
+let value = Typ.value
+
+let format_typ : 'a. Format.formatter -> 'a typ -> unit =
+   fun fmt { format } ->
+   Format.fprintf fmt "@[%t@]"
+     (format (fun _ _ -> ()) `nonarray)
+
+let format_decl : 'a. name:string -> Format.formatter -> 'a typ -> unit =
+   fun ~name fmt { format } ->
+   let format_name _ fmt =
+     Format.fprintf fmt "@ %s" name in
+   Format.fprintf fmt "@[%t@]" (format format_name `nonarray)
 
 type (_, _) fn =
     Returns_  : 'r typ  -> ('r, 'r) fn
@@ -31,10 +89,10 @@ type 'a fn_wrapper = Fn_wrapped : ('a, 'r) fn -> 'a fn_wrapper
 
 let rec wrap_fn : type a. a Static.fn -> a fn_wrapper =
  fun fn -> match fn with
-   Returns ty  -> Fn_wrapped (Returns_ ty)
+   Returns ty  -> Fn_wrapped (Returns_ (Typ.of_typ ty))
  | Function (p, fn') ->
     let (Fn_wrapped fn'') = wrap_fn fn' in
-    Fn_wrapped (Function_ (p, fn''))
+    Fn_wrapped (Function_ (Typ.of_typ p, fn''))
 
 type ('a, 'r) cfunction = {
   fname: string;
@@ -148,37 +206,39 @@ let rec iteri_params : type a. f:iteri_param -> a params -> unit =
 module Type_C =
 struct
   let cconst : type a. a cconst -> a typ = function
-      CInt _ -> int
-    | CSizeof _ -> size_t
+      CInt _ -> Typ.int
+    | CSizeof _ -> Typ.size_t
 
   let rec cexp : type a. a cexp -> a typ = function
       CConst c -> cconst c
     | CLocal {typ} -> typ
     | CCast (typ, _) -> typ
-    | CAddr e -> ptr (cexp e)
+    | CAddr e -> Typ.ptr (cexp e)
 
   let rec ceff : type a. a ceff -> a typ = function
       CExp e -> cexp e
-    | CamlOp o -> stmt
+    | CamlOp o -> Typ.stmt
     | CGlobal { typ } -> typ
     | CApp ({fn}, _) -> return_type fn
     | CIf (_, e, _) -> ceff e
     | CAIndex (e, _) -> array_reference_ceff e
     | CPIndex (e, _) -> ptr_reference_ceff e
     | CDeref e -> ptr_reference_ceff (CExp e)
-    | CAssign (_, rv) -> stmt
+    | CAssign (_, rv) -> Typ.stmt
   and ptr_reference_ceff : type a. a ptr ceff -> a typ =
     fun e ->
-      begin match ceff e with
-        Pointer ty -> ty
+      (* Here *)
+      begin match (ceff e).ty_ with
+        Pointer ty -> Typ.of_typ ty
       | t -> Cstubs_errors.internal_error
         "dereferencing expression of non-pointer type %s"
         (Ctypes.string_of_typ t)
       end
   and array_reference_ceff : type a. a carray ceff -> a typ =
     fun e ->
-      begin match ceff e with
-        Array (ty, _) -> ty
+      (* Here *)
+      begin match (ceff e).ty_ with
+        Array (ty, _) -> Typ.of_typ ty
       | t -> Cstubs_errors.internal_error
         "dereferencing expression of non-array type %s"
         (Ctypes.string_of_typ t)
