@@ -55,7 +55,7 @@ struct
         CCAMLreturnT (Type_C.cexp e, e)
      | CCAMLreturn0 view ->
         CEff val_unit >>= fun u ->
-        k (CCast (View view, u)) >>= fun e ->
+        k (CCast (Typ.of_typ (View view), u)) >>= fun e ->
         CCAMLreturnT (Type_C.cexp e, e)
      | CLet (ye, c) ->
        (* let x = (let y = e1 in e2) in e3
@@ -67,61 +67,62 @@ struct
 
   let prim_prj : type a. a Primitives.prim -> (value -> a, a) cfunction =
     let open Primitives in function
-    | Char -> reader "Int_val" (value @-> returning char)
-    | Schar -> reader "Int_val" (value @-> returning int)
-    | Uchar -> reader "Uint8_val" (value @-> returning uchar)
-    | Short -> reader "Int_val" (value @-> returning int)
-    | Int -> reader "Int_val" (value @-> returning int)
-    | Long -> reader "ctypes_long_val" (value @-> returning long)
-    | Llong -> reader "ctypes_llong_val" (value @-> returning llong)
-    | Ushort -> reader "ctypes_ushort_val" (value @-> returning ushort)
-    | Uint -> reader "ctypes_uint_val" (value @-> returning uint)
-    | Ulong -> reader "ctypes_ulong_val" (value @-> returning ulong)
-    | Ullong -> reader "ctypes_ullong_val" (value @-> returning ullong)
-    | Size_t -> reader "ctypes_size_t_val" (value @-> returning size_t)
-    | Int8_t -> reader "Int_val" (value @-> returning int)
-    | Int16_t -> reader "Int_val" (value @-> returning int)
-    | Int32_t -> reader "Int32_val" (value @-> returning int32_t)
-    | Int64_t -> reader "Int64_val" (value @-> returning int64_t)
-    | Uint8_t -> reader "Uint8_val" (value @-> returning uint8_t)
-    | Uint16_t -> reader "Uint16_val" (value @-> returning uint16_t)
-    | Uint32_t -> reader "Uint32_val" (value @-> returning uint32_t)
-    | Uint64_t -> reader "Uint64_val" (value @-> returning uint64_t)
-    | Camlint -> reader "Int_val" (value @-> returning int)
-    | Nativeint -> reader "Nativeint_val" (value @-> returning nativeint)
-    | Float -> reader "Double_val" (value @-> returning double)
-    | Double -> reader "Double_val" (value @-> returning double)
-    | Complex32 -> reader "ctypes_float_complex_val" (value @-> returning complex32)
-    | Complex64 -> reader "ctypes_double_complex_val" (value @-> returning complex64)
+    | Char -> reader "Int_val" (value @-> returning (Typ.of_typ char))
+    | Schar -> reader "Int_val" (value @-> returning (Typ.of_typ int))
+    | Uchar -> reader "Uint8_val" (value @-> returning (Typ.of_typ uchar))
+    | Short -> reader "Int_val" (value @-> returning (Typ.of_typ int))
+    | Int -> reader "Int_val" (value @-> returning (Typ.of_typ int))
+    | Long -> reader "ctypes_long_val" (value @-> returning (Typ.of_typ long))
+    | Llong -> reader "ctypes_llong_val" (value @-> returning (Typ.of_typ llong))
+    | Ushort -> reader "ctypes_ushort_val" (value @-> returning (Typ.of_typ ushort))
+    | Uint -> reader "ctypes_uint_val" (value @-> returning (Typ.of_typ uint))
+    | Ulong -> reader "ctypes_ulong_val" (value @-> returning (Typ.of_typ ulong))
+    | Ullong -> reader "ctypes_ullong_val" (value @-> returning (Typ.of_typ ullong))
+    | Size_t -> reader "ctypes_size_t_val" (value @-> returning (Typ.of_typ size_t))
+    | Int8_t -> reader "Int_val" (value @-> returning (Typ.of_typ int))
+    | Int16_t -> reader "Int_val" (value @-> returning (Typ.of_typ int))
+    | Int32_t -> reader "Int32_val" (value @-> returning (Typ.of_typ int32_t))
+    | Int64_t -> reader "Int64_val" (value @-> returning (Typ.of_typ int64_t))
+    | Uint8_t -> reader "Uint8_val" (value @-> returning (Typ.of_typ uint8_t))
+    | Uint16_t -> reader "Uint16_val" (value @-> returning (Typ.of_typ uint16_t))
+    | Uint32_t -> reader "Uint32_val" (value @-> returning (Typ.of_typ uint32_t))
+    | Uint64_t -> reader "Uint64_val" (value @-> returning (Typ.of_typ uint64_t))
+    | Camlint -> reader "Int_val" (value @-> returning (Typ.of_typ int))
+    | Nativeint -> reader "Nativeint_val" (value @-> returning (Typ.of_typ nativeint))
+    | Float -> reader "Double_val" (value @-> returning (Typ.of_typ double))
+    | Double -> reader "Double_val" (value @-> returning (Typ.of_typ double))
+    | Complex32 -> reader "ctypes_float_complex_val" (value @-> returning (Typ.of_typ complex32))
+    | Complex64 -> reader "ctypes_double_complex_val" (value @-> returning (Typ.of_typ complex64))
 
   let prim_inj : type a. a Primitives.prim -> (a -> value, value) cfunction =
+    let ty t = Typ.of_typ t in
     let open Primitives in function
-    | Char -> immediater "Val_int" (char @-> returning value)
-    | Schar -> immediater "Val_int" (int @-> returning value)
-    | Uchar -> conser "ctypes_copy_uint8" (uchar @-> returning value)
-    | Short -> immediater "Val_int" (int @-> returning value)
-    | Int -> immediater "Val_int" (int @-> returning value)
-    | Long -> conser "ctypes_copy_long" (long @-> returning value)
-    | Llong -> conser "ctypes_copy_llong" (llong @-> returning value)
-    | Ushort -> conser "ctypes_copy_ushort" (ushort @-> returning value)
-    | Uint -> conser "ctypes_copy_uint" (uint @-> returning value)
-    | Ulong -> conser "ctypes_copy_ulong" (ulong @-> returning value)
-    | Ullong -> conser "ctypes_copy_ullong" (ullong @-> returning value)
-    | Size_t -> conser "ctypes_copy_size_t" (size_t @-> returning value)
-    | Int8_t -> immediater "Val_int" (int @-> returning value)
-    | Int16_t -> immediater "Val_int" (int @-> returning value)
-    | Int32_t -> conser "caml_copy_int32" (int32_t @-> returning value)
-    | Int64_t -> conser "caml_copy_int64" (int64_t @-> returning value)
-    | Uint8_t -> conser "ctypes_copy_uint8" (uint8_t @-> returning value)
-    | Uint16_t -> conser "ctypes_copy_uint16" (uint16_t @-> returning value)
-    | Uint32_t -> conser "ctypes_copy_uint32" (uint32_t @-> returning value)
-    | Uint64_t -> conser "ctypes_copy_uint64" (uint64_t @-> returning value)
-    | Camlint -> immediater "Val_int" (int @-> returning value)
-    | Nativeint -> conser "caml_copy_nativeint" (nativeint @-> returning value)
-    | Float -> conser "caml_copy_double" (double @-> returning value)
-    | Double -> conser "caml_copy_double" (double @-> returning value)
-    | Complex32 -> conser "ctypes_copy_float_complex" (complex32 @-> returning value)
-    | Complex64 -> conser "ctypes_copy_double_complex" (complex64 @-> returning value)
+    | Char -> immediater "Val_int" (ty char @-> returning value)
+    | Schar -> immediater "Val_int" (ty int @-> returning value)
+    | Uchar -> conser "ctypes_copy_uint8" (ty uchar @-> returning value)
+    | Short -> immediater "Val_int" (ty int @-> returning value)
+    | Int -> immediater "Val_int" (ty int @-> returning value)
+    | Long -> conser "ctypes_copy_long" (ty long @-> returning value)
+    | Llong -> conser "ctypes_copy_llong" (ty llong @-> returning value)
+    | Ushort -> conser "ctypes_copy_ushort" (ty ushort @-> returning value)
+    | Uint -> conser "ctypes_copy_uint" (ty uint @-> returning value)
+    | Ulong -> conser "ctypes_copy_ulong" (ty ulong @-> returning value)
+    | Ullong -> conser "ctypes_copy_ullong" (ty ullong @-> returning value)
+    | Size_t -> conser "ctypes_copy_size_t" (ty size_t @-> returning value)
+    | Int8_t -> immediater "Val_int" (ty int @-> returning value)
+    | Int16_t -> immediater "Val_int" (ty int @-> returning value)
+    | Int32_t -> conser "caml_copy_int32" (ty int32_t @-> returning value)
+    | Int64_t -> conser "caml_copy_int64" (ty int64_t @-> returning value)
+    | Uint8_t -> conser "ctypes_copy_uint8" (ty uint8_t @-> returning value)
+    | Uint16_t -> conser "ctypes_copy_uint16" (ty uint16_t @-> returning value)
+    | Uint32_t -> conser "ctypes_copy_uint32" (ty uint32_t @-> returning value)
+    | Uint64_t -> conser "ctypes_copy_uint64" (ty uint64_t @-> returning value)
+    | Camlint -> immediater "Val_int" (ty int @-> returning value)
+    | Nativeint -> conser "caml_copy_nativeint" (ty nativeint @-> returning value)
+    | Float -> conser "caml_copy_double" (ty double @-> returning value)
+    | Double -> conser "caml_copy_double" (ty double @-> returning value)
+    | Complex32 -> conser "ctypes_copy_float_complex" (ty complex32 @-> returning value)
+    | Complex64 -> conser "ctypes_copy_double_complex" (ty complex64 @-> returning value)
 
   let app1 f x = CApp (f, Args (Arg x, End))
   let app2 f x y = CApp (f, Args (Arg x, Args (Arg y, End)))
@@ -129,39 +130,39 @@ struct
 
   let of_fatptr : type a. a typ -> value cexp -> a ptr ceff =
     fun typ x ->
-    app1 (reader "CTYPES_ADDR_OF_FATPTR" (value @-> returning (ptr typ))) x
+    app1 (reader "CTYPES_ADDR_OF_FATPTR" (value @-> returning (Typ.ptr typ))) x
 
   let string_to_ptr : value cexp -> char ptr ceff =
     fun x ->
-    app1 (reader "CTYPES_PTR_OF_OCAML_STRING" (value @-> returning (ptr char))) x
+    app1 (reader "CTYPES_PTR_OF_OCAML_STRING" (value @-> returning (Typ.ptr (Typ.of_typ char)))) x
 
   let float_array_to_ptr : value cexp -> float ptr ceff =
     fun x -> app1 (reader "CTYPES_PTR_OF_FLOAT_ARRAY"
-                          (value @-> returning (ptr double)))
+                          (value @-> returning (Typ.ptr (Typ.of_typ double))))
                   x
 
   let from_ptr : type a. a typ -> a ptr cexp -> value ceff =
     fun typ x -> app1 (conser "CTYPES_FROM_PTR"
-                              (ptr typ @-> returning value))
+                              (Typ.ptr typ @-> returning value))
                       x
 
   let functions : value ptr ceff = CGlobal
     { name = "functions";
       references_ocaml_heap = true;
-      typ = (ptr value) }
+      typ = Typ.(ptr value) }
 
   let caml_callbackN n : (value -> int -> value carray -> value, value) cfunction =
     { fname = "caml_callbackN";
       allocates = true;
       reads_ocaml_heap = true;
-      fn = (value @-> int @-> array n value @-> returning value) }
+      fn = Typ.(value @-> int @-> array n value @-> returning value) }
 
   let copy_bytes : type a. a typ -> (a ptr -> Unsigned.size_t -> value, value) cfunction =
     fun typ ->
     { fname = "ctypes_copy_bytes";
       allocates = true;
       reads_ocaml_heap = true;
-      fn = (ptr typ @-> size_t @-> returning value) }
+      fn = Typ.(ptr typ @-> size_t @-> returning value) }
 
   let sizeof : type a. a typ -> Unsigned.Size_t.t cexp =
     fun typ -> CConst (CSizeof typ)
@@ -174,29 +175,33 @@ struct
                      | NoPrj : ('a, unit) view -> 'a prj_result
 
   let id_view : type a. a typ -> (a, a) view =
-    fun ty -> let id x = x in
-      { read = id; write = id; ty; format = None; format_typ = None }
+    (* Here *)
+    fun {ty_} -> let id x = x in
+      { Static.read = id; write = id; ty=ty_; format = None; format_typ = None }
   let compose_view : type a b c. (a, b) view -> (b, c) view -> (a, c) view =
     fun v1 v2 ->
     let read x = v1.read (v2.read x) and write x = v2.write (v1.write x) in
-    { read; write; format = None; format_typ = None; ty = v2.ty }
+    { Static.read; write; format = None; format_typ = None; ty = v2.Static.ty }
 
-  let rec prj : type a. a typ -> value cexp -> a prj_result =
-    fun ty x -> match ty with
-    | Void -> NoPrj (id_view void)
+  let prj : type a. a typ -> value cexp -> a prj_result =
+    fun ({format} as ty') ->
+    let rec prj  : type a. a typ -> value cexp -> a prj_result =
+    (* Here *)
+    fun ({ty_} as ty') x -> match ty_ with
+    | Void -> NoPrj (id_view (Typ.of_typ void))
     | Primitive p ->
       let { fn } as prj = prim_prj p in
-      Prj (cast ~into:ty (CEff (app1 prj x)))
-    | Pointer t -> Prj (CEff (of_fatptr t x))
+      Prj (cast ~into:ty' (CEff (app1 prj x)))
+    | Pointer t -> Prj (CEff (of_fatptr (Typ.of_typ t) x))
     | Struct s ->
-      Prj (CEff (of_fatptr ty x) >>= fun y -> CEff (CDeref y))
+      Prj (CEff (of_fatptr ty' x) >>= fun y -> CEff (CDeref y))
     | Union u -> 
-      Prj (CEff (of_fatptr ty x) >>= fun y -> CEff (CDeref y))
+      Prj (CEff (of_fatptr ty' x) >>= fun y -> CEff (CDeref y))
     | Abstract _ -> report_unpassable "values of abstract type"
-    | View ({ ty = ty' } as view) -> 
-       begin match prj ty' x with
+    | View ({ Static.ty = ty'' } as view) -> 
+       begin match prj (Typ.of_typ ty'') x with
        | Prj c -> Prj (c >>= fun y ->
-                       CEff (CExp (CCast (ty, y))))
+                       CEff (CExp (CCast ({ty' with format}, y))))
        | OPrj _ -> assert false (* TODO *)
        | NoPrj v -> NoPrj (compose_view view v)
        end
@@ -205,16 +210,18 @@ struct
     | OCaml String -> OPrj (OString, CEff (string_to_ptr x))
     | OCaml Bytes -> OPrj (OBytes, CEff (string_to_ptr x))
     | OCaml FloatArray -> OPrj (OFloatArray, CEff (float_array_to_ptr x))
+    in prj ty'
 
   let rec inj : type a. a typ -> a cexp -> value ceff =
-    fun ty x -> match ty with
+    (* Here *)
+    fun ({ty_} as ty') x -> match ty_ with
     | Void -> val_unit
-    | Primitive p -> app1 (prim_inj p) (CCast (Primitive p, x))
-    | Pointer ty -> from_ptr ty x
-    | Struct s -> app2 (copy_bytes ty) (CAddr x) (sizeof ty)
-    | Union u -> app2 (copy_bytes ty) (CAddr x) (sizeof ty)
+    | Primitive p -> app1 (prim_inj p) (CCast (ty', x))
+    | Pointer ty -> from_ptr (Typ.of_typ ty) x
+    | Struct _ -> app2 (copy_bytes ty') (CAddr x) (sizeof ty')
+    | Union _ -> app2 (copy_bytes ty') (CAddr x) (sizeof ty')
     | Abstract _ -> report_unpassable "values of abstract type"
-    | View {ty = ty'} -> inj ty' (CCast (ty', x))
+    | View {Static.ty = ty'} -> inj (Typ.of_typ ty') (CCast (Typ.of_typ ty', x))
     | Array _ -> report_unpassable "arrays"
     | Bigarray _ -> report_unpassable "bigarrays"
     | OCaml _ -> report_unpassable "ocaml references as return values"
@@ -286,8 +293,8 @@ struct
                      (v, value) fn -> (_, v) value_conversion ->
                      (value ptr -> int -> value) cfundef =
     fun ~bytename ~stubname:fname fn vconv ->
-    let argv = local "argv" (ptr value) in
-    let argc = local "argc" int in
+    let argv = local "argv" (Typ.ptr value) in
+    let argc = local "argc" (Typ.of_typ int) in
     let f = { fname; allocates = true; reads_ocaml_heap = true; fn } in
     let rec body : type a v. (v, value) fn -> (a, v) value_conversion -> int -> 
                         (v args -> value ccomp) -> value ccomp =
@@ -295,7 +302,7 @@ struct
      | Returns_ _, Value_returning ->
         k End
      | Function_ (_, fn'), Value_arg vconv' ->
-        CEff (CPIndex (CExp (CLocal argv), CConst (CInt i))) >>= fun x ->
+        CEff (CPIndex (CExp (CLocal argv), CConst (CInt i))) >>= fun (x : value cexp) ->
         let k' args = k (Args (Arg x, args)) in
         body fn' vconv' (i+1) k'
      | _ -> assert false
@@ -306,11 +313,11 @@ struct
   let inverse_fn : type a r. stub_name:string -> (a, r) wrapper_function ->
                              r typ -> a cfundef =
     fun ~stub_name (Wrapper (fn, vconv, vfn)) rtyp ->
-    let idx = CLocal (local (Printf.sprintf "fn_%s" stub_name) int) in
+    let idx = CLocal (local (Printf.sprintf "fn_%s" stub_name) (Typ.of_typ int)) in
     let params = params fn in
     let nparams = params_length params in
-    let nargs = local "nargs" int in
-    let locals = local "locals" (array nparams value) in
+    let nargs = local "nargs" (Typ.of_typ int) in
+    let locals = local "locals" (Typ.array nparams value) in
     let rec body : type a. a params -> int -> r ccomp =
      fun params i -> match params with
       | NoParams ->
@@ -330,7 +337,7 @@ struct
          end
       | Param (var, params') ->
          (* locals[i] = Val_Ti(xi); *)
-         CEff (CAssign (CPIndex_ (CVar (`Local (local "locals" (ptr value))),
+         CEff (CAssign (CPIndex_ (CVar (`Local (local "locals" (Typ.ptr value))),
                                   CConst (CInt i)), inj var.typ (CLocal var))) >>
          body params' (i + 1)
     in

@@ -20,26 +20,27 @@ let cvar fmt v = fprintf fmt "%s" (cvar_name v)
 
 let cconst : type a. formatter -> a cconst -> unit = fun fmt -> function
   | CInt i -> fprintf fmt "%d" i
-  | CSizeof typ -> fprintf fmt "sizeof (%a)" format_ty typ
+  | CSizeof t -> fprintf fmt "sizeof (%a)" format_typ t
 
 (* Determine whether the C expression [(ty)e] is equivalent to [e] *)
 type prim = Prim : _ Primitives.prim -> prim
 let cast_unnecessary : type a b. a typ -> b cexp -> bool =
-  let rec harmless : type a b. a typ -> b typ -> bool =
+  let rec harmless : type a b. a Static.typ -> b Static.typ -> bool =
     fun l r -> match l, r with
   | Pointer Void, Pointer _ -> true
-  | View { ty }, t -> harmless ty t
-  | t,  View { ty } -> harmless t ty
+  | View { Static.ty }, t -> harmless ty t
+  | t,  View { Static.ty } -> harmless t ty
   | Primitive l, Primitive r -> Prim l = Prim r
   | _ -> false
   in
-  fun ty e -> harmless ty (Type_C.cexp e)
+  (* Here *)
+  fun {ty_} e -> harmless ty_ (Type_C.cexp e).ty_
 
 let rec cexp : type a. formatter -> a cexp -> unit = fun fmt -> function
   | CConst c  -> cconst fmt c
   | CLocal x -> cvar fmt (`Local x)
   | CCast (ty, e) when cast_unnecessary ty e -> cexp fmt e
-  | CCast (ty, e) -> fprintf fmt "@[@[(%a)@]%a@]" format_ty ty cexp e
+  | CCast (ty, e) -> fprintf fmt "@[@[(%a)@]%a@]" Cstubs_c_language.format_typ ty cexp e
   | CAddr e -> fprintf fmt "@[&@[%a@]@]" cexp e
 
 let rec clvalue : type a. formatter -> a clvalue -> unit = fun fmt -> function
@@ -78,13 +79,14 @@ let rec ceff : type a. formatter -> a ceff -> unit = fun fmt -> function
 
 let rec ccomp : type a. formatter -> a ccomp -> unit = fun fmt -> function
   | CEff e -> fprintf fmt "@[<2>return@;@[%a@]@];" ceff e
-  | CCAMLreturnT (Void, e) ->
+  (* Here *)
+  | CCAMLreturnT ({ty_=Void}, e) ->
     fprintf fmt "@[CAMLreturn0@];"
   | CCAMLreturn0 _ ->
     fprintf fmt "@[CAMLreturn0@];"
-  | CCAMLreturnT (ty, e) ->
+  | CCAMLreturnT (t, e) ->
     fprintf fmt "@[<2>CAMLreturnT(@[%a@],@;@[%a@])@];"
-      format_ty ty cexp e
+      format_typ t cexp e
   | CLet (CBind (_, (CamlOp _ as e)), s) ->
      fprintf fmt "@[%a;@]@ %a" ceff e ccomp s
   | CLet (CBind (_, (CAssign _ as e)), s) ->
@@ -93,27 +95,29 @@ let rec ccomp : type a. formatter -> a ccomp -> unit = fun fmt -> function
     ccomp fmt (CLet (xe, CEff (CExp e')))
   | CLet (CBind ({name = x}, e), CEff (CExp (CLocal {name=y}))) when x = y ->
     ccomp fmt (CEff e)
-  | CLet (CBind ({typ=Void}, CIf (e, a, b)), s) ->
+  (* Here *)
+  | CLet (CBind ({typ={ty_=Void}}, CIf (e, a, b)), s) ->
     fprintf fmt "@[if@ (@[%a)@]@ {@[%a}@]@\nelse@ {@[%a}@]@]@ %a"
       cexp e ceff a ceff b ccomp s
-  | CLet (CBind ({typ=Void}, e), s) ->
+  (* Here *)
+  | CLet (CBind ({typ={ty_=Void}}, e), s) ->
     fprintf fmt "@[%a;@]@ %a" ceff e ccomp s
-  | CLet (CBind ({name; typ=Struct { tag }}, e), s) ->
-    fprintf fmt "@[struct@;%s@;%s@;=@;@[%a;@]@]@ %a"
-      tag name ceff e ccomp s
-  | CLet (CBind ({name; typ=Union { utag }}, e), s) ->
-    fprintf fmt "@[union@;%s@;%s@;=@;@[%a;@]@]@ %a"
-      utag name ceff e ccomp s
-  | CLet (CBind ({name; typ=ty}, e), s) ->
+  (* | CLet (CBind ({name; typ={ty=Struct { tag }}}, e), s) -> *)
+  (*   fprintf fmt "@[struct@;%s@;%s@;=@;@[%a;@]@]@ %a" *)
+  (*     tag name ceff e ccomp s *)
+  (* | CLet (CBind ({name; typ={ty=Union { utag }}}, e), s) -> *)
+  (*   fprintf fmt "@[union@;%s@;%s@;=@;@[%a;@]@]@ %a" *)
+  (*     utag name ceff e ccomp s *)
+  | CLet (CBind ({name; typ}, e), s) ->
     fprintf fmt "@[@[%a@]@;=@;@[%a;@]@]@ %a"
-      (Ctypes.format_typ ~name) ty ceff e ccomp s
+      (format_decl ~name) typ ceff e ccomp s
   | CLetConst ({name=x}, c, s) ->
     fprintf fmt "@[enum@ {@[@ %s@ =@ %a@ };@]@]@ %a"
      x cconst c ccomp s
 
 let format_params : type a. a params -> (formatter -> unit) -> (formatter -> unit) =
   fun parameters k fmt ->
-  let format_param fmt {name; typ=t} = Type_printing.format_typ ~name fmt t in
+  let format_param fmt {name; typ} = format_decl ~name fmt typ in
   let format_seq fmt parameters =
     fprintf fmt "(@[@[";
     iteri_params parameters
@@ -128,7 +132,8 @@ let format_params : type a. a params -> (formatter -> unit) -> (formatter -> uni
   | _ -> fprintf fmt "@[%t@[%a@]@]" k format_seq parameters
 
 let cfundec : type a r. formatter -> (a, r) cfundec -> unit =
-  fun fmt (Fundec (name, params, return)) ->
+  (* Here *)
+  fun fmt (Fundec (name, params, {ty_=return})) ->
     Type_printing.format_typ' return
       (fun context fmt ->
        format_params params (Type_printing.format_name ~name) fmt)
