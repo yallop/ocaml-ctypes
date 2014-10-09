@@ -20,3 +20,4 @@ B _build/src/ctypes-foreign-threaded
 B _build/src/configure
 B _build/src/ctypes-foreign-base
 B _build/src/ctypes-foreign-unthreaded
+PKG bytes
