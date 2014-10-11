@@ -1,0 +1,5 @@
+libdl_opt=
+libdl_lib=
+as_needed_flags=-Wl,--no-as-needed
+libffi_opt=-I/usr/local/include 
+libffi_lib=-L/usr/local/lib -lffi
