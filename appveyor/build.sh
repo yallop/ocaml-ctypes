@@ -19,6 +19,7 @@ cygcheck -l libffi6
 (
   wget http://download.camlcity.org/download/findlib-1.5.3.tar.gz
   tar xvfz findlib-1.5.3.tar.gz
+  patch -p1 < appveyor/findlib-patch-create-process.patch 
   cd findlib-1.5.3
   ./configure && make all opt install
 )
