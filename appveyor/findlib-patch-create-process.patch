@@ -1,0 +1,28 @@
+diff --git a/findlib-1.5.3/src/findlib/frontend.ml b/findlib-1.5.3/src/findlib/frontend.ml
+index 1fdb117..bf09ce9 100644
+--- a/findlib-1.5.3/src/findlib/frontend.ml
++++ b/findlib-1.5.3/src/findlib/frontend.ml
+@@ -384,13 +384,8 @@ let run_command ?filter verbose cmd args =
+   let () = prerr_endline ("Findlib_config.system : " ^ Findlib_config.system) in
+   let () = prerr_endline ("fixed_cmd : " ^ fixed_cmd) in
+ 
+-  let pid =
+-    Unix.create_process
+-      fixed_cmd
+-      (Array.of_list (cmd :: args))
+-      Unix.stdin
+-      cmd_output
+-      Unix.stderr
++  let status =
++    Unix.system (Printf.sprintf "%s %s" fixed_cmd (String.concat " " args))
+   in
+ 
+   begin match filter with
+@@ -414,7 +409,6 @@ let run_command ?filter verbose cmd args =
+     | None -> ()
+   end;
+ 
+-  let (_,status) = Unix.waitpid [] pid in
+   Sys.set_signal Sys.sigint old_sigint;
+   begin
+     match status with
