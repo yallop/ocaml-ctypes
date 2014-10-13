@@ -21,3 +21,6 @@ install:
 build_script:
     - '%CYG_ROOT%/bin/bash -lc "cd \"$OLDPWD\" && ./appveyor/build.sh"'
 
+artifacts:
+  - path: test.log
+    name: test-logs
