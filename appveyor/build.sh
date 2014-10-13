@@ -3,7 +3,6 @@ set -ex
 
 type -p ocamlc
 ocamlc -version
-cygcheck -l libffi6
 
 # libffi
 (
@@ -24,4 +23,13 @@ cygcheck -l libffi6
   ./configure && make all opt install
 )
 
+# oUnit
+(
+  wget -O ounit-2.0.0.tar.gz http://ftp.de.debian.org/debian/pool/main/o/ounit/ounit_2.0.0.orig.tar.gz
+  tar xvfz ounit-2.0.0.tar.gz
+  cd ounit-2.0.0
+  ./configure && make && make install
+)
+
 make all
+make -k test &>test.log || true
