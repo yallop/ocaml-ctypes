@@ -36,24 +36,28 @@ external _dlerror : unit -> string option
 external resolve_flag : flag -> int
   = "ctypes_resolve_dl_flag"
 
-let _report_dl_error () =
+let _report_dl_error noload =
   match _dlerror () with
-    | None       -> failwith "dl_error: expected error, but no error reported"
     | Some error -> raise (DL_error (error))
+    | None       ->
+      if noload then
+        raise (DL_error "library not loaded")
+      else
+        failwith "dl_error: expected error, but no error reported"
 
 let crush_flags f : 'a list -> int = List.fold_left (fun i o -> i lor (f o)) 0
 
 let dlopen ?filename ~flags =
   match _dlopen ?filename ~flags:(crush_flags resolve_flag flags) with
     | Some library -> library
-    | None         -> _report_dl_error ()
+    | None         -> _report_dl_error (List.mem RTLD_NOLOAD flags)
 
 let dlclose ~handle =
   match _dlclose ~handle with
     | 0 -> ()
-    | _ -> _report_dl_error ()
+    | _ -> _report_dl_error false
 
 let dlsym ?handle ~symbol =
   match _dlsym ?handle ~symbol with
     | Some symbol -> Ctypes_ptr.Raw.of_nativeint symbol
-    | None        -> _report_dl_error ()
+    | None        -> _report_dl_error false
