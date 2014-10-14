@@ -15,7 +15,7 @@ init:
 
 install:
     - 'appveyor DownloadFile http://cygwin.com/setup-%CYG_ARCH%.exe -FileName setup.exe'
-    - 'setup.exe -qnNdO -R "%CYG_ROOT%" -s "%CYG_MIRROR%" -l "%CYG_CACHE%"  -P dos2unix -P diffutils -P cpio -P make -P patch -P mingw64-i686-gcc-core -P mingw64-i686-gcc-g++ >NUL'
+    - 'setup.exe -qnNdO -R "%CYG_ROOT%" -s "%CYG_MIRROR%" -l "%CYG_CACHE%" -P wget  -P dos2unix -P diffutils -P cpio -P make -P patch -P mingw64-i686-gcc-core -P mingw64-i686-gcc-g++ >NUL'
     - '%CYG_ROOT%/bin/bash -lc "cygcheck -dc cygwin"'
     - '%CYG_ROOT%/bin/bash -lc "wget -q http://ml.ignorelist.com/wodi/7/wodi32.tar.xz -O /tmp/wodi32.tar.xz"'
     - '%CYG_ROOT%/bin/bash -lc "rm -rf /tmp/wodi32 && tar -xf /tmp/wodi32.tar.xz"'
