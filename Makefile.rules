@@ -2,15 +2,28 @@
 
 .SECONDARY:
 
+ifneq (,$(filter mingw%,$(OSYSTEM)))
+lib_process=-lpsapi
+ifeq ($(DEBUG),false)
+  CFLAGS=-std=gnu99 -Wall -O3 $(OCAML_FFI_INCOPTS)
+else
+  CFLAGS=-std=gnu99 -Wall -g $(OCAML_FFI_INCOPTS)
+endif
+else
 ifeq ($(DEBUG),false)
   CFLAGS=-fPIC -Wall -O3 $(OCAML_FFI_INCOPTS)
-  OCAMLFLAGS=
 else
   CFLAGS=-fPIC -Wall -g $(OCAML_FFI_INCOPTS)
+endif
+endif
+
+ifeq ($(DEBUG),false)
+  OCAMLFLAGS=
+else
   OCAMLFLAGS=-g
 endif
 
-C_SOURCE  = $(wildcard $($(PROJECT).dir)/*.c)
+C_SOURCE  = $(wildcard $($(PROJECT).dir)/*.c) $(patsubst %,$($(PROJECT).dir)/%,$($(PROJECT).extra_cs))
 ML_SOURCE = $(shell $(OCAMLDEP) -sort $(sort $(wildcard $($(PROJECT).dir)/*.ml) \
                     $(patsubst %,$($(PROJECT).dir)/%,$($(PROJECT).extra_mls))))
 
@@ -18,7 +31,7 @@ NATIVE_OBJECTS = $(ML_SOURCE:$($(PROJECT).dir)/%.ml=$(BUILDDIR)/$($(PROJECT).dir
 BYTE_OBJECTS = $(ML_SOURCE:$($(PROJECT).dir)/%.ml=$(BUILDDIR)/$($(PROJECT).dir)/%.cmo)
 C_OBJECTS = $(C_SOURCE:$($(PROJECT).dir)/%.c=$(BUILDDIR)/$($(PROJECT).dir)/%.o)
 
-STUB_LIB = $(if $(C_OBJECTS),$(BUILDDIR)/dll$(PROJECT)_stubs.so)
+STUB_LIB = $(if $(C_OBJECTS),$(BUILDDIR)/dll$(PROJECT)_stubs$(EXTDLL))
 
 CMO_OPTS = $($(PROJECT).cmo_opts)
 CMX_OPTS = $($(PROJECT).cmx_opts)
@@ -50,7 +63,7 @@ OCAMLFIND_PACKAGE_FLAGS=$(patsubst %,-package %,$($(PROJECT).deps)) \
 $(BUILDDIR)/%.cmxa: $$(NATIVE_OBJECTS)
 	$(OCAMLFIND) opt -a -linkall $(OCAMLFLAGS) $(THREAD_FLAG) $(OCAMLFIND_PACKAGE_FLAGS) $(CMXA_OPTS) -o $@ $(NATIVE_OBJECTS) $(OCAML_LINK_FLAGS)
 
-$(BUILDDIR)/dll%_stubs.so: $$(C_OBJECTS)
+$(BUILDDIR)/dll%_stubs$(EXTDLL): $$(C_OBJECTS)
 	$(OCAMLMKLIB) -o $(BUILDDIR)/$*_stubs $^ $(OCAML_LINK_FLAGS)
 
 $(BUILDDIR)/%.cmxs : $$(NATIVE_OBJECTS)

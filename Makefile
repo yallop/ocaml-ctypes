@@ -8,9 +8,18 @@ OCAMLMKLIB=$(OCAMLFIND) ocamlmklib
 VPATH=src examples
 BUILDDIR=_build
 PROJECTS=configure libffi-abigen configured ctypes cstubs ctypes-foreign-base ctypes-foreign-threaded ctypes-foreign-unthreaded ctypes-top
-GENERATED=src/ctypes_config.h src/ctypes_config.ml setup.data src/ctypes/ctypes_primitives.ml
+GENERATED=src/ctypes_config.h src/ctypes_config.ml setup.data src/ctypes/ctypes_primitives.ml src/ctypes-foreign-base/dl.ml src/ctypes-foreign-base/dl_stubs.c
 OCAML_FFI_INCOPTS=$(libffi_opt)
 export CFLAGS DEBUG
+
+EXTDLL:=$(shell $(OCAMLFIND) ocamlc -config | grep '^ext_dll: ' | awk '{print $$2}')
+OSYSTEM:=$(shell $(OCAMLFIND) ocamlc -config | grep '^system: ' | awk '{print $$2}')
+
+ifneq (,$(filter mingw%,$(OSYSTEM)))
+OS_ALT_SUFFIX=.win
+else
+OS_ALT_SUFFIX=.unix
+endif
 
 # public targets
 all: setup.data build
@@ -51,8 +60,9 @@ ctypes-foreign-base.install_native_objects = yes
 ctypes-foreign-base.threads = no
 ctypes-foreign-base.dir = src/ctypes-foreign-base
 ctypes-foreign-base.subproject_deps = ctypes
-ctypes-foreign-base.extra_mls = libffi_abi.ml
-ctypes-foreign-base.link_flags = $(as_needed_flags) $(libffi_lib)
+ctypes-foreign-base.extra_mls = libffi_abi.ml dl.ml
+ctypes-foreign-base.extra_cs = dl_stubs.c
+ctypes-foreign-base.link_flags = $(as_needed_flags) $(libffi_lib) $(lib_process)
 ctypes-foreign-base.cmo_opts = $(OCAML_FFI_INCOPTS:%=-ccopt %)
 ctypes-foreign-base.cmx_opts = $(OCAML_FFI_INCOPTS:%=-ccopt %)
 
@@ -65,7 +75,7 @@ ctypes-foreign-threaded.install = yes
 ctypes-foreign-threaded.threads = yes
 ctypes-foreign-threaded.dir = src/ctypes-foreign-threaded
 ctypes-foreign-threaded.subproject_deps = ctypes ctypes-foreign-base
-ctypes-foreign-threaded.link_flags = $(as_needed_flags) $(libffi_lib)
+ctypes-foreign-threaded.link_flags = $(as_needed_flags) $(libffi_lib) $(lib_process)
 ctypes-foreign-threaded.cmo_opts = $(OCAML_FFI_INCOPTS:%=-ccopt %)
 ctypes-foreign-threaded.cmx_opts = $(OCAML_FFI_INCOPTS:%=-ccopt %)
 ctypes-foreign-threaded.install_native_objects = no
@@ -79,7 +89,7 @@ ctypes-foreign-unthreaded.install = yes
 ctypes-foreign-unthreaded.threads = no
 ctypes-foreign-unthreaded.dir = src/ctypes-foreign-unthreaded
 ctypes-foreign-unthreaded.subproject_deps = ctypes ctypes-foreign-base
-ctypes-foreign-unthreaded.link_flags = $(as_needed_flags) $(libffi_lib)
+ctypes-foreign-unthreaded.link_flags = $(as_needed_flags) $(libffi_lib) $(lib_process)
 ctypes-foreign-unthreaded.cmo_opts = $(OCAML_FFI_INCOPTS:%=-ccopt %)
 ctypes-foreign-unthreaded.cmx_opts = $(OCAML_FFI_INCOPTS:%=-ccopt %)
 ctypes-foreign-unthreaded.install_native_objects = no
@@ -112,7 +122,12 @@ libffi-abigen: PROJECT=libffi-abigen
 libffi-abigen: $$(NATIVE_TARGET)
 
 # configuration
-configured: src/ctypes/ctypes_primitives.ml src/ctypes-foreign-base/libffi_abi.ml
+configured: src/ctypes/ctypes_primitives.ml src/ctypes-foreign-base/libffi_abi.ml src/ctypes-foreign-base/dl.ml src/ctypes-foreign-base/dl_stubs.c
+
+src/ctypes-foreign-base/dl.ml: src/ctypes-foreign-base/dl.ml$(OS_ALT_SUFFIX)
+	cp $< $@
+src/ctypes-foreign-base/dl_stubs.c: src/ctypes-foreign-base/dl_stubs.c$(OS_ALT_SUFFIX)
+	cp $< $@
 
 src/ctypes/ctypes_primitives.ml: $(BUILDDIR)/configure.native
 	$< > $@

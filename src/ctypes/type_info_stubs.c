@@ -5,6 +5,10 @@
  * See the file LICENSE for details.
  */
 
+#if !__USE_MINGW_ANSI_STDIO && (defined(__MINGW32__) || defined(__MINGW64__))
+#define __USE_MINGW_ANSI_STDIO 1
+#endif
+
 #include <inttypes.h>
 #include <stdio.h>
 #include <assert.h>
@@ -19,6 +23,12 @@
 #include "complex_stubs.h"
 #include "raw_pointer.h"
 #include "primitives.h"
+
+#if __USE_MINGW_ANSI_STDIO && defined(__MINGW64__)
+#define REAL_ARCH_INTNAT_PRINTF_FORMAT "ll"
+#else
+#define REAL_ARCH_INTNAT_PRINTF_FORMAT ARCH_INTNAT_PRINTF_FORMAT
+#endif
 
 /* Read a C value from a block of memory */
 /* read : 'a prim -> fat_pointer -> 'a */
@@ -131,9 +141,9 @@ value ctypes_string_of_prim(value prim_, value v)
   case Uint16_t: len = snprintf(buf, sizeof buf, "%" PRIu16, Uint16_val(v)); break;
   case Uint32_t: len = snprintf(buf, sizeof buf, "%" PRIu32, Uint32_val(v)); break;
   case Uint64_t: len = snprintf(buf, sizeof buf, "%" PRIu64, Uint64_val(v)); break;
-  case Camlint: len = snprintf(buf, sizeof buf, "%" ARCH_INTNAT_PRINTF_FORMAT "d",
+  case Camlint: len = snprintf(buf, sizeof buf, "%" REAL_ARCH_INTNAT_PRINTF_FORMAT "d",
                          (intnat)Int_val(v)); break;
-  case Nativeint: len = snprintf(buf, sizeof buf, "%" ARCH_INTNAT_PRINTF_FORMAT "d",
+  case Nativeint: len = snprintf(buf, sizeof buf, "%" REAL_ARCH_INTNAT_PRINTF_FORMAT "d",
                            (intnat)Nativeint_val(v)); break;
   case Float: len = snprintf(buf, sizeof buf, "%.12g", Double_val(v)); break;
   case Double: len = snprintf(buf, sizeof buf, "%.12g", Double_val(v)); break;

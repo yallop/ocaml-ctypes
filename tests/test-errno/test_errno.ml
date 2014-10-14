@@ -9,14 +9,16 @@ open OUnit2
 open Ctypes
 
 
+let us x = if Sys.os_type <> "Win32" then x else "_" ^ x
+
 (*
-   Call fdopendir() with a bogus file descriptor and check that an exception
+   Call close() with a bogus file descriptor and check that an exception
    is raised.
 *)
 let test_errno_exception_raised _ =
-  let close = Foreign.foreign "close" ~check_errno:true
+  let close = Foreign.foreign (us "close") ~check_errno:true
     (int @-> returning int) in
-  assert_raises (Unix.Unix_error(Unix.EBADF, "close", ""))
+  assert_raises (Unix.Unix_error(Unix.EBADF, us "close", ""))
     (fun () -> close (-300))
     
 
@@ -24,24 +26,30 @@ let test_errno_exception_raised _ =
   Call chdir() with a valid directory path and check that zero is returned. 
 *)
 let test_int_return_errno_exception_raised _ =
-  let chdir = Foreign.foreign "chdir" ~check_errno:true
+  let unlikely_to_exist =
+    if Sys.os_type <> "Win32" then
+      "/unlikely_to_exist"
+    else
+      "C:\\unlikely_to_exist"
+  in
+  let chdir = Foreign.foreign (us "chdir") ~check_errno:true
     (string @-> returning int) in
-  assert_raises (Unix.Unix_error(Unix.ENOENT, "chdir", ""))
-    (fun () -> chdir "/unlikely_to_exist")
+  assert_raises (Unix.Unix_error(Unix.ENOENT, us "chdir", ""))
+    (fun () -> chdir unlikely_to_exist)
     
 
 (*
   Call chdir() with a valid directory path and check that zero is returned. 
 *)
 let test_errno_no_exception_raised _ =
-  let chdir = Foreign.foreign "chdir" ~check_errno:true
+  let chdir = Foreign.foreign (us "chdir") ~check_errno:true
     (string @-> returning int) in
   assert_equal 0 (chdir (Sys.getcwd ()))
 
     
 
 let suite = "errno tests" >:::
-  ["Exception from fdopendir"
+  ["Exception from close"
     >:: test_errno_exception_raised;
 
    "Exception from chdir"

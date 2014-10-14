@@ -12,7 +12,10 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <signal.h>
+#if !defined _WIN32 || defined __CYGWIN__
 #include <pthread.h>
+#endif
+#include <time.h>
 
 #include <stdint.h>
 
@@ -58,38 +61,67 @@ static enum arithmetic _underlying_type(size_t typeinfo)
   }
 }
 
-#define EXPOSE_TYPEINFO(TYPENAME)                            \
+#define EXPOSE_TYPEINFO_COMMON(TYPENAME,STYPENAME)           \
   value ctypes_typeof_ ## TYPENAME(value unit)               \
   {                                                          \
-    size_t typeinfo = ARITHMETIC_TYPEINFO(TYPENAME);         \
+    size_t typeinfo = ARITHMETIC_TYPEINFO(STYPENAME);        \
     enum arithmetic underlying = _underlying_type(typeinfo); \
     return Val_int(underlying);                              \
   }
 
-EXPOSE_TYPEINFO(blkcnt_t)
-EXPOSE_TYPEINFO(blksize_t)
+#define EXPOSE_TYPEINFO(TYPENAME) \
+    EXPOSE_TYPEINFO_COMMON(TYPENAME,TYPENAME)
+
+#if !defined _WIN32 || defined __CYGWIN__
+
+#define EXPOSE_TYPEINFO_NO_WIN EXPOSE_TYPEINFO
+#define EXPOSE_TYPEINFO_S EXPOSE_TYPEINFO
+
+#else
+
+#define EXPOSE_TYPEINFO_NO_WIN(TYPENAME)                     \
+  value ctypes_typeof_ ## TYPENAME(value unit)               \
+  {                                                          \
+    return Val_int(sizeof(int64_t));                         \
+  }
+#define EXPOSE_TYPEINFO_S(X)                    \
+    EXPOSE_TYPEINFO_COMMON(X,_## X )
+
+#endif
+
+
+EXPOSE_TYPEINFO_NO_WIN(blkcnt_t)
+EXPOSE_TYPEINFO_NO_WIN(blksize_t)
 EXPOSE_TYPEINFO(clock_t)
-EXPOSE_TYPEINFO(dev_t)
-EXPOSE_TYPEINFO(fsblkcnt_t)
-EXPOSE_TYPEINFO(fsfilcnt_t)
-EXPOSE_TYPEINFO(gid_t)
-EXPOSE_TYPEINFO(id_t)
-EXPOSE_TYPEINFO(ino_t)
-EXPOSE_TYPEINFO(mode_t)
-EXPOSE_TYPEINFO(nlink_t)
-EXPOSE_TYPEINFO(off_t)
-EXPOSE_TYPEINFO(pid_t)
+EXPOSE_TYPEINFO_S(dev_t)
+EXPOSE_TYPEINFO_NO_WIN(fsblkcnt_t)
+EXPOSE_TYPEINFO_NO_WIN(fsfilcnt_t)
+EXPOSE_TYPEINFO_NO_WIN(gid_t)
+EXPOSE_TYPEINFO_NO_WIN(id_t)
+EXPOSE_TYPEINFO_S(ino_t)
+EXPOSE_TYPEINFO_S(mode_t)
+EXPOSE_TYPEINFO_NO_WIN(nlink_t)
+EXPOSE_TYPEINFO_S(off_t)
+EXPOSE_TYPEINFO_S(pid_t)
 EXPOSE_TYPEINFO(ssize_t)
-EXPOSE_TYPEINFO(suseconds_t)
+EXPOSE_TYPEINFO_NO_WIN(suseconds_t)
 EXPOSE_TYPEINFO(time_t)
-EXPOSE_TYPEINFO(uid_t)
+EXPOSE_TYPEINFO_NO_WIN(uid_t)
 EXPOSE_TYPEINFO(useconds_t)
 
+#if !defined _WIN32 || defined __CYGWIN__
 #define EXPOSE_TYPESIZE(TYPENAME)              \
   value ctypes_sizeof_ ## TYPENAME(value unit) \
   {                                            \
     return Val_int(sizeof(TYPENAME));          \
   }
+#else
+#define EXPOSE_TYPESIZE(TYPENAME)              \
+  value ctypes_sizeof_ ## TYPENAME(value unit) \
+  {                                            \
+    return Val_int(sizeof(int64_t));           \
+  }
+#endif
 
 EXPOSE_TYPESIZE(key_t)
 EXPOSE_TYPESIZE(pthread_t)
@@ -102,14 +134,32 @@ EXPOSE_TYPESIZE(pthread_mutexattr_t)
 EXPOSE_TYPESIZE(pthread_once_t)
 EXPOSE_TYPESIZE(pthread_rwlock_t)
 EXPOSE_TYPESIZE(pthread_rwlockattr_t)
-EXPOSE_TYPESIZE(sigset_t)
 
+#if !defined _WIN32 || defined __CYGWIN__
+EXPOSE_TYPESIZE(sigset_t)
+#else
+value ctypes_sizeof_sigset_t(value unit)
+{
+  return Val_int(sizeof(_sigset_t));
+}
+#endif
+
+#if !defined _WIN32 || defined __CYGWIN__
 #define EXPOSE_ALIGNMENT(TYPENAME)                  \
   value ctypes_alignmentof_ ## TYPENAME(value unit) \
   {                                                 \
     struct s { char c; TYPENAME t; };               \
     return Val_int(offsetof(struct s, t));          \
   }
+
+#else
+#define EXPOSE_ALIGNMENT(TYPENAME)                  \
+  value ctypes_alignmentof_ ## TYPENAME(value unit) \
+  {                                                 \
+    struct s { char c; int64_t t; };                \
+    return Val_int(offsetof(struct s, t));          \
+  }
+#endif
 
 EXPOSE_ALIGNMENT(key_t)
 EXPOSE_ALIGNMENT(pthread_t)
@@ -122,4 +172,12 @@ EXPOSE_ALIGNMENT(pthread_mutexattr_t)
 EXPOSE_ALIGNMENT(pthread_once_t)
 EXPOSE_ALIGNMENT(pthread_rwlock_t)
 EXPOSE_ALIGNMENT(pthread_rwlockattr_t)
+#if !defined _WIN32 || defined __CYGWIN__
 EXPOSE_ALIGNMENT(sigset_t)
+#else
+value ctypes_alignmentof_sigset_t(value unit)
+{
+  struct s { char c; _sigset_t t; };
+  return Val_int(offsetof(struct s, t));
+}
+#endif
