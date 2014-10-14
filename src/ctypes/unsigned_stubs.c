@@ -5,6 +5,10 @@
  * See the file LICENSE for details.
  */
 
+#if !__USE_MINGW_ANSI_STDIO && (defined(__MINGW32__) || defined(__MINGW64__))
+#define __USE_MINGW_ANSI_STDIO 1
+#endif
+
 #include <caml/mlvalues.h>
 #include <caml/custom.h>
 #include <caml/alloc.h>

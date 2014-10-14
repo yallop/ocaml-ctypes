@@ -16,7 +16,11 @@
 #include <string.h>
 #include <complex.h>
 
+#if defined _WIN32 && !defined __CYGWIN__
+#include <windows.h>
+#else
 #include <semaphore.h>
+#endif
 
 #include "test_functions.h"
 
@@ -517,6 +521,15 @@ void call_registered_callback(int times, int starting_value)
     assert (result == starting_value++);
   }
 }
+
+#if defined _WIN32 && !defined __CYGWIN__
+#define sem_t HANDLE
+#define sem_init(sem, sem_attr1, sem_init_value)        \
+  (void)((*sem = CreateSemaphore(NULL,0,32768,NULL))==NULL)
+#define sem_wait(sem) \
+  (void)(WAIT_OBJECT_0 != WaitForSingleObject(*sem,INFINITE))
+#define sem_post(sem) (void)ReleaseSemaphore(*sem,1,NULL)
+#endif
 
 static sem_t semaphore1;
 static sem_t semaphore2;

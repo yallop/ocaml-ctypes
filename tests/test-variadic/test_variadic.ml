@@ -37,9 +37,19 @@ struct
         (write snprintf_char_unsigned
            (fun k -> k "a char %c and a uint %u." 'A' (UInt.of_int 33)));
 
-      assert_equal "a long long 9223372036854775807 and an int -4."
+      let ref_string =
+        match Sys.word_size with
+          | 32 -> "a long long 2147483647 and an int -4."
+          | _  -> "a long long 9223372036854775807 and an int -4."
+      in
+      let format_string =
+        match Sys.os_type with
+          | "Win32" -> "a long long %I64d and an int %d."
+          | _ -> "a long long %lld and an int %d."
+      in
+      assert_equal ref_string
         (write snprintf_longlong_int
-           (fun k -> k "a long long %lld and an int %d."
+           (fun k -> k format_string
              (LLong.of_nativeint Nativeint.max_int) (-4)));
 
       assert_equal "a string abcde and an unsigned short ffd."

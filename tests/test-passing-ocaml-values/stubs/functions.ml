@@ -9,6 +9,11 @@
 
 open Ctypes
 
+let name_strdup =
+  match Sys.os_type with
+    | "Win32" -> "_strdup"
+    | _ -> "strdup"
+
 module Stubs (F: Cstubs.FOREIGN) =
 struct
   open F
@@ -22,6 +27,6 @@ struct
   let memcpy_string_ptr = foreign "memcpy"
     (ocaml_string @-> ptr void @-> size_t @-> returning (ptr void))
 
-  let strdup = foreign "strdup"
+  let strdup = foreign name_strdup
     (ocaml_string @-> returning string)
 end

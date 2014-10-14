@@ -57,13 +57,20 @@ let getenv ~default name =
   try Sys.getenv name
   with Not_found -> default
 
+let null_device =
+  if Sys.os_type = "Win32" then
+    "nul"
+  else
+    "/dev/null"
+
 let read_output_int input_filename output_filename =
   let cmd = 
-    Printf.sprintf "%s -o %s %s %s 2>/dev/null && %s"
+    Printf.sprintf "%s -o %s %s %s 2>%s && %s"
       (getenv ~default:"cc" "CC")
       output_filename
       (getenv ~default:"" "CFLAGS")
       input_filename
+      null_device
       output_filename
   in
   let inch = Unix.open_process_in cmd in
