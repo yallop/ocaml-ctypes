@@ -40,7 +40,8 @@ struct
       let ref_string =
         match Sys.word_size with
           | 32 -> "a long long 2147483647 and an int -4."
-          | _  -> "a long long 9223372036854775807 and an int -4."
+          | 64 -> "a long long 9223372036854775807 and an int -4."
+          | n  -> failwith (Printf.sprintf "This test doesn't yet support word size %d" n)
       in
       let format_string =
         match Sys.os_type with
