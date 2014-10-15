@@ -12,8 +12,8 @@ GENERATED=src/ctypes_config.h src/ctypes_config.ml setup.data src/ctypes/ctypes_
 OCAML_FFI_INCOPTS=$(libffi_opt)
 export CFLAGS DEBUG
 
-EXTDLL:=$(shell $(OCAMLFIND) ocamlc -config | grep '^ext_dll: ' | awk '{print $$2}')
-OSYSTEM:=$(shell $(OCAMLFIND) ocamlc -config | grep '^system: ' | awk '{print $$2}')
+EXTDLL:=$(shell $(OCAMLFIND) ocamlc -config | awk '/^ext_dll:/{print $$2}')
+OSYSTEM:=$(shell $(OCAMLFIND) ocamlc -config | awk '/^system:/{print $$2}')
 
 ifneq (,$(filter mingw%,$(OSYSTEM)))
 OS_ALT_SUFFIX=.win
