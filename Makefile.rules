@@ -5,9 +5,9 @@
 ifneq (,$(filter mingw%,$(OSYSTEM)))
 lib_process=-lpsapi
 ifeq ($(DEBUG),false)
-  CFLAGS=-std=gnu99 -Wall -O3 $(OCAML_FFI_INCOPTS)
+  CFLAGS=-std=c99 -Wall -O3 $(OCAML_FFI_INCOPTS)
 else
-  CFLAGS=-std=gnu99 -Wall -g $(OCAML_FFI_INCOPTS)
+  CFLAGS=-std=c99 -Wall -g $(OCAML_FFI_INCOPTS)
 endif
 else
 ifeq ($(DEBUG),false)
