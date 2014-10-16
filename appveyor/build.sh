@@ -44,19 +44,21 @@ export WINDRES=${MINGW_TOOL_PREFIX}windres.exe
 
 # libffi:  we need a static version and only a static version
 (
-  rm -rf /opt/libffi
-  mkdir -p /opt/libffi
+  rm -rf /usr/local
+  mkdir -p /usr/local
   wget ftp://sourceware.org/pub/libffi/libffi-3.1.tar.gz
   tar xfvz libffi-3.1.tar.gz
   cd libffi-3.1
-  (./configure --build="$build" --host="$host" --prefix /opt/libffi --disable-shared --enable-static </dev/null && make </dev/null && make install </dev/null) || cat config.log
+  (./configure --build="$build" --host="$host" --prefix /usr/local --disable-shared --enable-static </dev/null && make </dev/null && make install </dev/null) || cat config.log
+  mkdir -p /usr/local/include/
+  ln -s -t /usr/local/include/ /usr/local/lib/libffi-3.1/include/*
 )
 
 # ounit
 godi_add -u godi-ounit
 
-export LIBFFI_CFLAGS="-I/opt/libffi/lib/libffi-3.1/include"
-export LIBFFI_LIBS="-L/opt/libffi/lib -lffi"
+export LIBFFI_CFLAGS="-I/usr/local/include"
+export LIBFFI_LIBS="-L/usr/local/lib -lffi"
 
 
 make all
