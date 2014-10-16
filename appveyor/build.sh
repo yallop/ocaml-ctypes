@@ -47,6 +47,7 @@ export WINDRES=${MINGW_TOOL_PREFIX}windres.exe
   rm -rf /usr/local
   mkdir -p /usr/local/include
   wget ftp://sourceware.org/pub/libffi/libffi-3.1.tar.gz
+  rm -rf libffi-3.1
   tar xfvz libffi-3.1.tar.gz
   cd libffi-3.1
   (./configure --build="$build" --host="$host" --prefix /usr/local --disable-shared --enable-static </dev/null && make </dev/null && make install </dev/null) || cat config.log
@@ -57,7 +58,9 @@ export WINDRES=${MINGW_TOOL_PREFIX}windres.exe
 export LIBFFI_CFLAGS="-I/usr/local/include"
 export LIBFFI_LIBS="-L/usr/local/lib -lffi"
 
-
+touch setup.data
+make distclean || true
+rm -f setup.data
 make all
 if ! make -k test &>test.log ; then
     echo "test case failure" >&2
