@@ -45,7 +45,7 @@ export WINDRES=${MINGW_TOOL_PREFIX}windres.exe
 # libffi:  we need a static version and only a static version
 (
   rm -rf /usr/local
-  mkdir -p /usr/local
+  mkdir -p /usr/local/include
   wget ftp://sourceware.org/pub/libffi/libffi-3.1.tar.gz
   tar xfvz libffi-3.1.tar.gz
   cd libffi-3.1
