@@ -59,4 +59,7 @@ export LIBFFI_LIBS="-L/usr/local/lib -lffi"
 
 
 make all
-make -k test &>test.log || true
+if ! make -k test &>test.log ; then
+    echo "test case failure" >&2
+    exit 1
+fi
