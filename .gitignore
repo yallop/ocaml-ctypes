@@ -3,6 +3,8 @@ setup.data
 src/ctypes/ctypes_primitives.ml
 src/ctypes_config.h
 src/ctypes_config.ml
+src/ctypes-foreign-base/dl_stubs.c
+src/ctypes-foreign-base/dl.ml
 *~
 generated_stubs.c
 generated_bindings.ml
