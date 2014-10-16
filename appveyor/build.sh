@@ -52,9 +52,6 @@ export WINDRES=${MINGW_TOOL_PREFIX}windres.exe
   (./configure --build="$build" --host="$host" --prefix /opt/libffi --disable-shared --enable-static </dev/null && make </dev/null && make install </dev/null) || cat config.log
 )
 
-# ounit
-godi_add -u godi-ounit
-
 export LIBFFI_CFLAGS="-I/opt/libffi/lib/libffi-3.1/include"
 export LIBFFI_LIBS="-L/opt/libffi/lib -lffi"
 
