@@ -53,9 +53,6 @@ export WINDRES=${MINGW_TOOL_PREFIX}windres.exe
   ln -s -t /usr/local/include/ /usr/local/lib/libffi-3.1/include/*
 )
 
-# ounit
-godi_add -u godi-ounit
-
 export LIBFFI_CFLAGS="-I/usr/local/include"
 export LIBFFI_LIBS="-L/usr/local/lib -lffi"
 
