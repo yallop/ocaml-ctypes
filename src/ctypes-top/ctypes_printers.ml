@@ -43,22 +43,10 @@ let format_array fmt v =
   Ctypes.(format CArray.(array (length v) (reference_type (start v))) fmt v)
 let format_ocaml fmt (Static.OCamlRef (_, _, ty) as v) =
   Ctypes.format (Static.OCaml ty) fmt v
-let format_blkcnt_t fmt v =
-  Ctypes.format PosixTypes.blkcnt_t fmt v
-let format_blksize_t fmt v =
-  Ctypes.format PosixTypes.blksize_t fmt v
 let format_clock_t fmt v =
   Ctypes.format PosixTypes.clock_t fmt v
 let format_dev_t fmt v =
   Ctypes.format PosixTypes.dev_t fmt v
-let format_fsblkcnt_t fmt v =
-  Ctypes.format PosixTypes.fsblkcnt_t fmt v
-let format_fsfilcnt_t fmt v =
-  Ctypes.format PosixTypes.fsfilcnt_t fmt v
-let format_gid_t fmt v =
-  Ctypes.format PosixTypes.gid_t fmt v
-let format_id_t fmt v =
-  Ctypes.format PosixTypes.id_t fmt v
 let format_ino_t fmt v =
   Ctypes.format PosixTypes.ino_t fmt v
 let format_mode_t fmt v =
@@ -73,11 +61,7 @@ let format_size_t fmt v =
   Ctypes.format PosixTypes.size_t fmt v
 let format_ssize_t fmt v =
   Ctypes.format PosixTypes.ssize_t fmt v
-let format_suseconds_t fmt v =
-  Ctypes.format PosixTypes.suseconds_t fmt v
 let format_time_t fmt v =
   Ctypes.format PosixTypes.time_t fmt v
-let format_uid_t fmt v =
-  Ctypes.format PosixTypes.uid_t fmt v
 let format_useconds_t fmt v =
   Ctypes.format PosixTypes.useconds_t fmt v

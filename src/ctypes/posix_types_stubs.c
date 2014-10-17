@@ -90,23 +90,15 @@ static enum arithmetic _underlying_type(size_t typeinfo)
 #endif
 
 
-EXPOSE_TYPEINFO_NO_WIN(blkcnt_t)
-EXPOSE_TYPEINFO_NO_WIN(blksize_t)
 EXPOSE_TYPEINFO(clock_t)
 EXPOSE_TYPEINFO_S(dev_t)
-EXPOSE_TYPEINFO_NO_WIN(fsblkcnt_t)
-EXPOSE_TYPEINFO_NO_WIN(fsfilcnt_t)
-EXPOSE_TYPEINFO_NO_WIN(gid_t)
-EXPOSE_TYPEINFO_NO_WIN(id_t)
 EXPOSE_TYPEINFO_S(ino_t)
 EXPOSE_TYPEINFO_S(mode_t)
 EXPOSE_TYPEINFO_NO_WIN(nlink_t)
 EXPOSE_TYPEINFO_S(off_t)
 EXPOSE_TYPEINFO_S(pid_t)
 EXPOSE_TYPEINFO(ssize_t)
-EXPOSE_TYPEINFO_NO_WIN(suseconds_t)
 EXPOSE_TYPEINFO(time_t)
-EXPOSE_TYPEINFO_NO_WIN(uid_t)
 EXPOSE_TYPEINFO(useconds_t)
 
 #if !defined _WIN32 || defined __CYGWIN__
@@ -122,18 +114,6 @@ EXPOSE_TYPEINFO(useconds_t)
     return Val_int(sizeof(int64_t));           \
   }
 #endif
-
-EXPOSE_TYPESIZE(key_t)
-EXPOSE_TYPESIZE(pthread_t)
-EXPOSE_TYPESIZE(pthread_attr_t)
-EXPOSE_TYPESIZE(pthread_cond_t)
-EXPOSE_TYPESIZE(pthread_condattr_t)
-EXPOSE_TYPESIZE(pthread_key_t)
-EXPOSE_TYPESIZE(pthread_mutex_t)
-EXPOSE_TYPESIZE(pthread_mutexattr_t)
-EXPOSE_TYPESIZE(pthread_once_t)
-EXPOSE_TYPESIZE(pthread_rwlock_t)
-EXPOSE_TYPESIZE(pthread_rwlockattr_t)
 
 #if !defined _WIN32 || defined __CYGWIN__
 EXPOSE_TYPESIZE(sigset_t)
@@ -161,17 +141,6 @@ value ctypes_sizeof_sigset_t(value unit)
   }
 #endif
 
-EXPOSE_ALIGNMENT(key_t)
-EXPOSE_ALIGNMENT(pthread_t)
-EXPOSE_ALIGNMENT(pthread_attr_t)
-EXPOSE_ALIGNMENT(pthread_cond_t)
-EXPOSE_ALIGNMENT(pthread_condattr_t)
-EXPOSE_ALIGNMENT(pthread_key_t)
-EXPOSE_ALIGNMENT(pthread_mutex_t)
-EXPOSE_ALIGNMENT(pthread_mutexattr_t)
-EXPOSE_ALIGNMENT(pthread_once_t)
-EXPOSE_ALIGNMENT(pthread_rwlock_t)
-EXPOSE_ALIGNMENT(pthread_rwlockattr_t)
 #if !defined _WIN32 || defined __CYGWIN__
 EXPOSE_ALIGNMENT(sigset_t)
 #else
