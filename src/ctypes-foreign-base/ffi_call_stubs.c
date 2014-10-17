@@ -336,31 +336,37 @@ value ctypes_call(value fnname, value function, value callspec_,
   }
 
   void (*cfunction)(void) = (void (*)(void)) CTYPES_ADDR_OF_FATPTR(function);
-
-  if (context.check_errno)
-  {
-    errno = 0;
-  }
+  int check_errno = context.check_errno;
+  int saved_errno = 0;
   if (context.runtime_lock)
   {
     caml_release_runtime_system();
+  }
+
+  if (check_errno)
+  {
+    errno=0;
   }
 
   ffi_call(cif,
            cfunction,
            return_slot,
            (void **)(callbuffer + arg_array_offset));
+  if (check_errno)
+  {
+    saved_errno=errno;
+  }
 
   if (context.runtime_lock)
   {
     caml_acquire_runtime_system();
   }
 
-  if (context.check_errno && errno != 0)
+  if (check_errno && saved_errno != 0)
   {
     char *buffer = alloca(caml_string_length(fnname) + 1);
     strcpy(buffer, String_val(fnname));
-    unix_error(errno, buffer, Nothing);
+    unix_error(saved_errno, buffer, Nothing);
   }
 
   callback_rv_buf = CTYPES_FROM_PTR(return_slot);
