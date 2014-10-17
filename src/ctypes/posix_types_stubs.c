@@ -69,84 +69,48 @@ static enum arithmetic _underlying_type(size_t typeinfo)
     return Val_int(underlying);                              \
   }
 
-#define EXPOSE_TYPEINFO(TYPENAME) \
-    EXPOSE_TYPEINFO_COMMON(TYPENAME,TYPENAME)
+#define EXPOSE_ALIGNMENT_COMMON(TYPENAME,STYPENAME)          \
+  value ctypes_alignmentof_ ## TYPENAME(value unit)          \
+  {                                                          \
+    struct s { char c; STYPENAME t; };                       \
+    return Val_int(offsetof(struct s, t));                   \
+  }
+
+#define EXPOSE_TYPESIZE_COMMON(TYPENAME,STYPENAME)           \
+  value ctypes_sizeof_ ## TYPENAME(value unit)               \
+  {                                                          \
+    return Val_int(sizeof(STYPENAME));                       \
+  }
 
 #if !defined _WIN32 || defined __CYGWIN__
-
-#define EXPOSE_TYPEINFO_NO_WIN EXPOSE_TYPEINFO
-#define EXPOSE_TYPEINFO_S EXPOSE_TYPEINFO
-
+  #define UNDERSCORE(X) X
 #else
-
-#define EXPOSE_TYPEINFO_NO_WIN(TYPENAME)                     \
-  value ctypes_typeof_ ## TYPENAME(value unit)               \
-  {                                                          \
-    return Val_int(sizeof(int64_t));                         \
-  }
-#define EXPOSE_TYPEINFO_S(X)                    \
-    EXPOSE_TYPEINFO_COMMON(X,_## X )
-
+  #define UNDERSCORE(X) _## X
 #endif
 
+#define EXPOSE_TYPEINFO(X) EXPOSE_TYPEINFO_COMMON(X, X)
+#define EXPOSE_TYPEINFO_S(X) EXPOSE_TYPEINFO_COMMON(X, UNDERSCORE(X))
+#define EXPOSE_TYPESIZE(X) EXPOSE_TYPESIZE_COMMON(X, X)
+#define EXPOSE_TYPESIZE_S(X) EXPOSE_TYPESIZE_COMMON(X, UNDERSCORE(X))
+#define EXPOSE_ALIGNMENT(X) EXPOSE_ALIGNMENT_COMMON(X, X)
+#define EXPOSE_ALIGNMENT_S(X) EXPOSE_ALIGNMENT_COMMON(X, UNDERSCORE(X))
 
 EXPOSE_TYPEINFO(clock_t)
 EXPOSE_TYPEINFO_S(dev_t)
 EXPOSE_TYPEINFO_S(ino_t)
 EXPOSE_TYPEINFO_S(mode_t)
-EXPOSE_TYPEINFO_NO_WIN(nlink_t)
 EXPOSE_TYPEINFO_S(off_t)
 EXPOSE_TYPEINFO_S(pid_t)
 EXPOSE_TYPEINFO(ssize_t)
 EXPOSE_TYPEINFO(time_t)
 EXPOSE_TYPEINFO(useconds_t)
-
 #if !defined _WIN32 || defined __CYGWIN__
-#define EXPOSE_TYPESIZE(TYPENAME)              \
-  value ctypes_sizeof_ ## TYPENAME(value unit) \
-  {                                            \
-    return Val_int(sizeof(TYPENAME));          \
-  }
+  EXPOSE_TYPEINFO(nlink_t)
 #else
-#define EXPOSE_TYPESIZE(TYPENAME)              \
-  value ctypes_sizeof_ ## TYPENAME(value unit) \
-  {                                            \
-    return Val_int(sizeof(int64_t));           \
-  }
+  /* the mingw port of fts uses an int for nlink_t */
+  EXPOSE_TYPEINFO_COMMON(nlink_t, int)
 #endif
 
-#if !defined _WIN32 || defined __CYGWIN__
-EXPOSE_TYPESIZE(sigset_t)
-#else
-value ctypes_sizeof_sigset_t(value unit)
-{
-  return Val_int(sizeof(_sigset_t));
-}
-#endif
 
-#if !defined _WIN32 || defined __CYGWIN__
-#define EXPOSE_ALIGNMENT(TYPENAME)                  \
-  value ctypes_alignmentof_ ## TYPENAME(value unit) \
-  {                                                 \
-    struct s { char c; TYPENAME t; };               \
-    return Val_int(offsetof(struct s, t));          \
-  }
-
-#else
-#define EXPOSE_ALIGNMENT(TYPENAME)                  \
-  value ctypes_alignmentof_ ## TYPENAME(value unit) \
-  {                                                 \
-    struct s { char c; int64_t t; };                \
-    return Val_int(offsetof(struct s, t));          \
-  }
-#endif
-
-#if !defined _WIN32 || defined __CYGWIN__
-EXPOSE_ALIGNMENT(sigset_t)
-#else
-value ctypes_alignmentof_sigset_t(value unit)
-{
-  struct s { char c; _sigset_t t; };
-  return Val_int(offsetof(struct s, t));
-}
-#endif
+EXPOSE_TYPESIZE_S(sigset_t)
+EXPOSE_ALIGNMENT_S(sigset_t)
