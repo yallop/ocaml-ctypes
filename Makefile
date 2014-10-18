@@ -2,9 +2,9 @@
 
 DEBUG=false
 OCAML=ocaml
-OCAMLDEP=ocamldep
 OCAMLFIND=ocamlfind
-OCAMLMKLIB=ocamlmklib
+OCAMLDEP=$(OCAMLFIND) ocamldep
+OCAMLMKLIB=$(OCAMLFIND) ocamlmklib
 VPATH=src examples
 BUILDDIR=_build
 PROJECTS=configure libffi-abigen configured ctypes cstubs ctypes-foreign-base ctypes-foreign-threaded ctypes-foreign-unthreaded ctypes-top
