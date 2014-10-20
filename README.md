@@ -47,7 +47,7 @@ The documentation and source distribution contain more complex examples, involvi
 
 #### Build status:
 
-AppVeyor: [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/g6wg82jvn14hjy58/branch/master?svg=true)](https://ci.appveyor.com/project/yallop/ocaml-ctypes-982/branch/master)  
+AppVeyor: [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/n5geenq8sinlptfv/branch/master?svg=true)](https://ci.appveyor.com/project/yallop/ocaml-ctypes/branch/master)  
 Travis: [![Travis build Status](https://travis-ci.org/ocamllabs/ocaml-ctypes.svg?branch=master)](https://travis-ci.org/ocamllabs/ocaml-ctypes)  
 
 [rwo-19]: https://realworldocaml.org/v1/en/html/foreign-function-interface.html
