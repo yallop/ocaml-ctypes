@@ -707,7 +707,7 @@ endif
 
 $(BUILDDIR)/clib/test_functions.o: tests/clib/test_functions.c
 	@mkdir -p $(@D)
-	$(CC) -c $(CFLAGS) -I `ocamlc -where | sed 's|\r$$||'` -o $@ $^
+	$(CC) -c $(CFLAGS) -I `$(OCAMLFIND) ocamlc -where | sed 's|\r$$||'` -o $@ $^
 tests/clib/test_functions.c: tests/clib/test_functions.h
 
 .PHONY: test testlib $(TESTS) tests-common
