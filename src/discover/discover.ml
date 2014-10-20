@@ -49,7 +49,9 @@ let default_search_paths =
     "/mingw";
   ]
 
-let path_sep = if Sys.os_type = "Win32" then ';' else ':'
+let is_win = Sys.os_type = "Win32"
+
+let path_sep = if is_win then ';' else ':'
 
 let split_path str =
   let len = String.length str in
@@ -385,7 +387,7 @@ let () =
     if not have_pkg_config then
       printf "Warning: the 'pkg-config' command is not available.";
     printf "
-The following recquired C libraries are missing: %s.
+The following required C libraries are missing: %s.
 Please install them and retry. If they are installed in a non-standard location
 or need special flags, set the environment variables <LIB>_CFLAGS and <LIB>_LIBS
 accordingly and retry.
@@ -401,9 +403,12 @@ export LIBFFI_LIBS=-L/opt/local/lib
 
   fprintf config "#endif\n";
 
-  test_feature "no_as_needed" ""
-    (fun () ->
-      ksprintf Sys.command "
+  (match is_win with
+   | true -> setup_data := ("as_needed_flags", []) :: !setup_data;
+   | false ->
+     test_feature "no_as_needed" ""
+       (fun () ->
+         ksprintf Sys.command "
          touch as_needed_test.ml;
          ocamlopt -shared -cclib -Wl,--no-as-needed as_needed_test.ml -o as_needed_test.cmxs > %s 2>&1;
          EXIT=$?;
@@ -411,10 +416,11 @@ export LIBFFI_LIBS=-L/opt/local/lib
          exit $EXIT"
         !log_file = 0);
 
-  if !not_available = [] then
-    setup_data := ("as_needed_flags", ["-Wl,--no-as-needed"]) :: !setup_data
-  else
-    setup_data := ("as_needed_flags", []) :: !setup_data;
+     if !not_available = [] then
+       setup_data := ("as_needed_flags", ["-Wl,--no-as-needed"]) :: !setup_data
+     else
+       setup_data := ("as_needed_flags", []) :: !setup_data;
+  );
   not_available := [];
 
   (* Our setup.data keys. *)

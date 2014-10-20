@@ -15,7 +15,15 @@ exception DL_error of string
     {!dlsym}.  The argument is the string returned by the [dlerror]
     function. *)
 
-(** Flags for {!dlopen} *)
+(** Flags for {!dlopen}
+
+Note for windows users: Only [RTLD_NOLOAD] and [RTLD_NODELETE] are supported.
+Passing no or any other flags to {!dlopen} will result in standard behaviour:
+just LoadLibrary is called. If [RTLD_NOLOAD] is specified and the module is
+not already loaded, a {!DL_error} with the string "library not loaded" is
+thrown; there is however no test, if such a library exists at all (like under
+linux).
+*)
 type flag = 
     RTLD_LAZY
   | RTLD_NOW
@@ -25,7 +33,9 @@ type flag =
   | RTLD_DEEPBIND
 
 val dlopen : ?filename:string -> flags:flag list -> library
-(** Open a dynamic library. *)
+(** Open a dynamic library.
+
+Note for windows users: the filename must be encoded in UTF-8 *)
 
 val dlclose : handle:library -> unit
 (** Close a dynamic library. *)

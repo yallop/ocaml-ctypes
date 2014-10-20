@@ -692,12 +692,22 @@ TESTS += test-coercions-stubs test-coercions-stub-generator test-coercions-gener
 TESTS += test-passing-ocaml-values-stubs test-passing-ocaml-values-stub-generator test-passing-ocaml-values-generated test-passing-ocaml-values
 TESTS += test-threads-stubs test-threads
 
-testlib: $(BUILDDIR)/clib/libtest_functions.so
-$(BUILDDIR)/clib/libtest_functions.so: $(BUILDDIR)/clib/test_functions.o
-	$(CC) -shared $(LDFLAGS) -o $@ $^
+
+ifneq (,$(filter mingw%,$(OSYSTEM)))
+WINLDFLAGS=-Wl,--out-implib,libtest_functions.dll.a
+LDFLAGS+=-static-libgcc
+endif
+
+testlib: $(BUILDDIR)/clib/libtest_functions$(EXTDLL)
+$(BUILDDIR)/clib/libtest_functions$(EXTDLL): $(BUILDDIR)/clib/test_functions.o
+	$(CC) -shared $(LDFLAGS) $(WINLDFLAGS) -o $@ $^
+ifneq (,$(filter mingw%,$(OSYSTEM)))
+	cp $@ libtest_functions.dll.a $(BUILDDIR)
+endif
+
 $(BUILDDIR)/clib/test_functions.o: tests/clib/test_functions.c
 	@mkdir -p $(@D)
-	$(CC) -c $(CFLAGS) -I `ocamlc -where` -o $@ $^
+	$(CC) -c $(CFLAGS) -I `$(OCAMLFIND) ocamlc -where | sed 's|\r$$||'` -o $@ $^
 tests/clib/test_functions.c: tests/clib/test_functions.h
 
 .PHONY: test testlib $(TESTS) tests-common

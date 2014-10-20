@@ -10,6 +10,11 @@
 open Ctypes
 open Foreign
 
+let () =
+  (* temporary workaround due to flexlink limitations *)
+  if Sys.os_type = "Win32" then
+    ignore (Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW]))
+
 let initialize_waiters = foreign "initialize_waiters"
   (void @-> returning void)
 

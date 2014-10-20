@@ -84,9 +84,15 @@ let test_ocaml_types_rejected_as_pointer_reference_types _ =
 (*
   Test that OCaml values cannot be used as return types.
 *)
+let strdup =
+  if Sys.os_type = "Win32" then
+    "_strdup"
+  else
+    "strdup"
+
 let test_ocaml_types_rejected_as_return_types _ =
   assert_raises IncompleteType
-    (fun () -> Foreign.foreign "strdup" (string @-> returning ocaml_string))
+    (fun () -> Foreign.foreign strdup (string @-> returning ocaml_string))
 
 
 (*

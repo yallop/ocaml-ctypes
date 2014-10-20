@@ -17,7 +17,6 @@
 #include <caml/fail.h>
 #include <caml/hash.h>
 #include <caml/unixsupport.h>
-#include <caml/unixsupport.h>
 #include <caml/threads.h>
 
 #include <ffi.h>

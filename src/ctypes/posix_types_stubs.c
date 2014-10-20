@@ -12,7 +12,10 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <signal.h>
+#if !defined _WIN32 || defined __CYGWIN__
 #include <pthread.h>
+#endif
+#include <time.h>
 
 #include <stdint.h>
 
@@ -58,68 +61,56 @@ static enum arithmetic _underlying_type(size_t typeinfo)
   }
 }
 
-#define EXPOSE_TYPEINFO(TYPENAME)                            \
+#define EXPOSE_TYPEINFO_COMMON(TYPENAME,STYPENAME)           \
   value ctypes_typeof_ ## TYPENAME(value unit)               \
   {                                                          \
-    size_t typeinfo = ARITHMETIC_TYPEINFO(TYPENAME);         \
+    size_t typeinfo = ARITHMETIC_TYPEINFO(STYPENAME);        \
     enum arithmetic underlying = _underlying_type(typeinfo); \
     return Val_int(underlying);                              \
   }
 
-EXPOSE_TYPEINFO(blkcnt_t)
-EXPOSE_TYPEINFO(blksize_t)
+#define EXPOSE_ALIGNMENT_COMMON(TYPENAME,STYPENAME)          \
+  value ctypes_alignmentof_ ## TYPENAME(value unit)          \
+  {                                                          \
+    struct s { char c; STYPENAME t; };                       \
+    return Val_int(offsetof(struct s, t));                   \
+  }
+
+#define EXPOSE_TYPESIZE_COMMON(TYPENAME,STYPENAME)           \
+  value ctypes_sizeof_ ## TYPENAME(value unit)               \
+  {                                                          \
+    return Val_int(sizeof(STYPENAME));                       \
+  }
+
+#if !defined _WIN32 || defined __CYGWIN__
+  #define UNDERSCORE(X) X
+#else
+  #define UNDERSCORE(X) _## X
+#endif
+
+#define EXPOSE_TYPEINFO(X) EXPOSE_TYPEINFO_COMMON(X, X)
+#define EXPOSE_TYPEINFO_S(X) EXPOSE_TYPEINFO_COMMON(X, UNDERSCORE(X))
+#define EXPOSE_TYPESIZE(X) EXPOSE_TYPESIZE_COMMON(X, X)
+#define EXPOSE_TYPESIZE_S(X) EXPOSE_TYPESIZE_COMMON(X, UNDERSCORE(X))
+#define EXPOSE_ALIGNMENT(X) EXPOSE_ALIGNMENT_COMMON(X, X)
+#define EXPOSE_ALIGNMENT_S(X) EXPOSE_ALIGNMENT_COMMON(X, UNDERSCORE(X))
+
 EXPOSE_TYPEINFO(clock_t)
-EXPOSE_TYPEINFO(dev_t)
-EXPOSE_TYPEINFO(fsblkcnt_t)
-EXPOSE_TYPEINFO(fsfilcnt_t)
-EXPOSE_TYPEINFO(gid_t)
-EXPOSE_TYPEINFO(id_t)
-EXPOSE_TYPEINFO(ino_t)
-EXPOSE_TYPEINFO(mode_t)
-EXPOSE_TYPEINFO(nlink_t)
-EXPOSE_TYPEINFO(off_t)
-EXPOSE_TYPEINFO(pid_t)
+EXPOSE_TYPEINFO_S(dev_t)
+EXPOSE_TYPEINFO_S(ino_t)
+EXPOSE_TYPEINFO_S(mode_t)
+EXPOSE_TYPEINFO_S(off_t)
+EXPOSE_TYPEINFO_S(pid_t)
 EXPOSE_TYPEINFO(ssize_t)
-EXPOSE_TYPEINFO(suseconds_t)
 EXPOSE_TYPEINFO(time_t)
-EXPOSE_TYPEINFO(uid_t)
 EXPOSE_TYPEINFO(useconds_t)
+#if !defined _WIN32 || defined __CYGWIN__
+  EXPOSE_TYPEINFO(nlink_t)
+#else
+  /* the mingw port of fts uses an int for nlink_t */
+  EXPOSE_TYPEINFO_COMMON(nlink_t, int)
+#endif
 
-#define EXPOSE_TYPESIZE(TYPENAME)              \
-  value ctypes_sizeof_ ## TYPENAME(value unit) \
-  {                                            \
-    return Val_int(sizeof(TYPENAME));          \
-  }
 
-EXPOSE_TYPESIZE(key_t)
-EXPOSE_TYPESIZE(pthread_t)
-EXPOSE_TYPESIZE(pthread_attr_t)
-EXPOSE_TYPESIZE(pthread_cond_t)
-EXPOSE_TYPESIZE(pthread_condattr_t)
-EXPOSE_TYPESIZE(pthread_key_t)
-EXPOSE_TYPESIZE(pthread_mutex_t)
-EXPOSE_TYPESIZE(pthread_mutexattr_t)
-EXPOSE_TYPESIZE(pthread_once_t)
-EXPOSE_TYPESIZE(pthread_rwlock_t)
-EXPOSE_TYPESIZE(pthread_rwlockattr_t)
-EXPOSE_TYPESIZE(sigset_t)
-
-#define EXPOSE_ALIGNMENT(TYPENAME)                  \
-  value ctypes_alignmentof_ ## TYPENAME(value unit) \
-  {                                                 \
-    struct s { char c; TYPENAME t; };               \
-    return Val_int(offsetof(struct s, t));          \
-  }
-
-EXPOSE_ALIGNMENT(key_t)
-EXPOSE_ALIGNMENT(pthread_t)
-EXPOSE_ALIGNMENT(pthread_attr_t)
-EXPOSE_ALIGNMENT(pthread_cond_t)
-EXPOSE_ALIGNMENT(pthread_condattr_t)
-EXPOSE_ALIGNMENT(pthread_key_t)
-EXPOSE_ALIGNMENT(pthread_mutex_t)
-EXPOSE_ALIGNMENT(pthread_mutexattr_t)
-EXPOSE_ALIGNMENT(pthread_once_t)
-EXPOSE_ALIGNMENT(pthread_rwlock_t)
-EXPOSE_ALIGNMENT(pthread_rwlockattr_t)
-EXPOSE_ALIGNMENT(sigset_t)
+EXPOSE_TYPESIZE_S(sigset_t)
+EXPOSE_ALIGNMENT_S(sigset_t)
