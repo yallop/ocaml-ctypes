@@ -35,7 +35,7 @@ export RANLIB=${MINGW_TOOL_PREFIX}ranlib.exe
 export RC=${MINGW_TOOL_PREFIX}windres.exe
 export READELF=${MINGW_TOOL_PREFIX}readelf.exe
 export SIZE=${MINGW_TOOL_PREFIX}size.exe
-export STRINGS=${MINGW_TOOL_PREFIX}strip.exe
+export STRINGS=${MINGW_TOOL_PREFIX}strings.exe
 export STRIP=${MINGW_TOOL_PREFIX}strip.exe
 export WINDMC=${MINGW_TOOL_PREFIX}windmc.exe
 export WINDRES=${MINGW_TOOL_PREFIX}windres.exe
@@ -62,6 +62,9 @@ touch setup.data
 make distclean || true
 rm -f setup.data
 make all
+make date date-stubs date-stub-generator date-cmd-build date-cmd
+./_build/date-cmd.native
+./_build/date.native
 if ! make -k test &>test.log ; then
     echo "test case failure" >&2
     exit 1
