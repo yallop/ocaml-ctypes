@@ -59,6 +59,7 @@ ctypes-foreign-base.install = yes
 ctypes-foreign-base.install_native_objects = yes
 ctypes-foreign-base.threads = no
 ctypes-foreign-base.dir = src/ctypes-foreign-base
+ctypes-foreign-base.deps = bytes
 ctypes-foreign-base.subproject_deps = ctypes
 ctypes-foreign-base.extra_mls = libffi_abi.ml dl.ml
 ctypes-foreign-base.extra_cs = dl_stubs.c
