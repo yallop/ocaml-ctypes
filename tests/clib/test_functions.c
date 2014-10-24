@@ -544,3 +544,16 @@ void post2_wait1(void)
   sem_post(&semaphore2);
   sem_wait(&semaphore1);
 }
+
+size_t sizeof_s1(void) { return sizeof(struct s1); }
+size_t alignmentof_s1(void) { return offsetof(struct { char c; struct s1 x; }, x); }
+size_t offsetof_x1(void) { return offsetof(struct s1, x1); }
+size_t offsetof_x2(void) { return offsetof(struct s1, x2); }
+size_t offsetof_x3(void) { return offsetof(struct s1, x3); }
+size_t offsetof_x4(void) { return offsetof(struct s1, x4); }
+size_t sizeof_s2(void) { return sizeof(struct s2); }
+size_t alignmentof_s2(void) { return offsetof(struct { char c; struct s2 x; }, x); }
+size_t offsetof_y1(void) { return offsetof(struct s2, y1); }
+size_t offsetof_y2(void) { return offsetof(struct s2, y2); }
+size_t offsetof_y3(void) { return offsetof(struct s2, y3); }
+size_t offsetof_y4(void) { return offsetof(struct s2, y4); }
