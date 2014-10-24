@@ -179,4 +179,9 @@ size_t offsetof_y2(void);
 size_t offsetof_y3(void);
 size_t offsetof_y4(void);
 
+union u1 { char x1; float x2; double x3; char x4[13]; };
+
+size_t sizeof_u1(void);
+size_t alignmentof_u1(void);
+
 #endif /* TEST_FUNCTIONS_H */
