@@ -80,13 +80,6 @@ int write_through_callback_pointer_pointer(int (*f)(int **, int *))
 {
   int x = 10, y = 20;
   int *p =&x;
-  fprintf(stderr, "[before] x = %d, y = %d, &x = %p, &y = %p, p = %p, &p = %p\n",
-          x, y, &x, &y, p, &p);
-
-  fprintf(stderr, "calling f(%p, %p)\n", &p, &y);
-          
-  fprintf(stderr, "[after] x = %d, y = %d, p = %p, *p = %d\n",
-          x, y, p, *p);
   return f(&p, &y) + *p + x + y;
 }
 
