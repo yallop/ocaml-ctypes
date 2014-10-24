@@ -65,7 +65,7 @@ make all
 make date date-stubs date-stub-generator date-cmd-build date-cmd
 ./_build/date-cmd.native
 ./_build/date.native
-if ! make -k test &>test.log ; then
+if ! (make -k test 2>&1 | tee test.log; test ${PIPESTATUS[0]} -eq 0) ; then
     echo "test case failure" >&2
     exit 1
 fi
