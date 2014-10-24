@@ -136,7 +136,7 @@ value ctypes_string_of_prim(value prim_, value v)
   case Int8_t: len = snprintf(buf, sizeof buf, "%" PRId8, (int8_t)Int_val(v)); break;
   case Int16_t: len = snprintf(buf, sizeof buf, "%" PRId16, (int16_t)Int_val(v)); break;
   case Int32_t: len = snprintf(buf, sizeof buf, "%" PRId32, Int32_val(v)); break;
-  case Int64_t: len = snprintf(buf, sizeof buf, "%" PRId64, Int64_val(v)); break;
+  case Int64_t: len = snprintf(buf, sizeof buf, "%" PRId64, (int64_t)Int64_val(v)); break;
   case Uint8_t: len = snprintf(buf, sizeof buf, "%" PRIu8, Uint8_val(v)); break;
   case Uint16_t: len = snprintf(buf, sizeof buf, "%" PRIu16, Uint16_val(v)); break;
   case Uint32_t: len = snprintf(buf, sizeof buf, "%" PRIu32, Uint32_val(v)); break;
