@@ -458,7 +458,7 @@ struct one_int return_struct_by_value(void)
 {
   struct one_int v = { 3 };
   return v;
-};
+}
 
 /* naive matrix operations */
 void matrix_mul(int lrows, int lcols, int rcols,
