@@ -302,7 +302,7 @@ type 'a structure = ('a, [`Struct]) structured
 type 'a union = ('a, [`Union]) structured
 (** The type of values representing C union types. *)
 
-type ('a, 't) field
+type ('a, 't) field = ('a, 't) Static.field
 (** The type of values representing C struct or union members (called "fields"
     here).  A value of type [(a, s) field] represents a field of type [a] in a
     struct or union of type [s]. *)
