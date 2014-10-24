@@ -98,7 +98,7 @@ value ctypes_write(value prim_, value v, value buffer_)
    case Uint8_t: *(uint8_t *)buf = Uint8_val(v); break;
    case Uint16_t: *(uint16_t *)buf = Uint16_val(v); break;
    case Uint32_t: *(uint32_t *)buf = Uint32_val(v); break;
-   case Uint64_t: *(uint64 *)buf = Uint64_val(v); break;
+   case Uint64_t: *(uint64_t *)buf = Uint64_val(v); break;
    case Camlint: *(intnat *)buf = Int_val(v); break;
    case Nativeint: *(intnat *)buf = Nativeint_val(v); break;
    case Float: *(float *)buf = Double_val(v); break;
