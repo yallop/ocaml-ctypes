@@ -55,8 +55,9 @@ INSTALL_CMIS = $($(PROJECT).public:%=$(BUILDDIR)/$($(PROJECT).dir)/%.cmi)
 INSTALL_MLIS = $($(PROJECT).public:%=$($(PROJECT).dir)/%.mli)
 INSTALL_HEADERS = $(wildcard $($(PROJECT).dir)/*.h)
 THREAD_FLAG = $(if $(filter yes,$($(PROJECT).threads)),-thread)
-LINK_FLAGS = $($(PROJECT).link_flags)
+LINK_FLAGS = $(as_needed_flags) $($(PROJECT).link_flags)
 OCAML_LINK_FLAGS=$(LINK_FLAGS:%=-cclib %)
+OCAMLMKLIB_FLAGS=$($(PROJECT).link_flags)
 OCAMLFIND_PACKAGE_FLAGS=$(patsubst %,-package %,$($(PROJECT).deps)) \
                         $(patsubst %,-thread -package threads,$(THREAD_FLAG))
 
@@ -64,7 +65,7 @@ $(BUILDDIR)/%.cmxa: $$(NATIVE_OBJECTS)
 	$(OCAMLFIND) opt -a -linkall $(OCAMLFLAGS) $(THREAD_FLAG) $(OCAMLFIND_PACKAGE_FLAGS) $(CMXA_OPTS) -o $@ $(NATIVE_OBJECTS) $(OCAML_LINK_FLAGS)
 
 $(BUILDDIR)/dll%_stubs$(EXTDLL): $$(C_OBJECTS)
-	$(OCAMLMKLIB) -o $(BUILDDIR)/$*_stubs $^ $(OCAML_LINK_FLAGS)
+	$(OCAMLMKLIB) -o $(BUILDDIR)/$*_stubs $^ $(OCAMLMKLIB_FLAGS)
 
 $(BUILDDIR)/%.cmxs : $$(NATIVE_OBJECTS)
 	$(OCAMLFIND) opt -shared -linkall $(OCAMLFLAGS) $(THREAD_FLAG) $(OCAMLFIND_PACKAGE_FLAGS) -o $@ $(NATIVE_OBJECTS) $(C_OBJECTS) $(OCAML_LINK_FLAGS)

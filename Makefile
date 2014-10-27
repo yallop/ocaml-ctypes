@@ -63,7 +63,7 @@ ctypes-foreign-base.deps = bytes
 ctypes-foreign-base.subproject_deps = ctypes
 ctypes-foreign-base.extra_mls = libffi_abi.ml dl.ml
 ctypes-foreign-base.extra_cs = dl_stubs.c
-ctypes-foreign-base.link_flags = $(as_needed_flags) $(libffi_lib) $(lib_process)
+ctypes-foreign-base.link_flags = $(libffi_lib) $(lib_process)
 ctypes-foreign-base.cmo_opts = $(OCAML_FFI_INCOPTS:%=-ccopt %)
 ctypes-foreign-base.cmx_opts = $(OCAML_FFI_INCOPTS:%=-ccopt %)
 
@@ -76,7 +76,7 @@ ctypes-foreign-threaded.install = yes
 ctypes-foreign-threaded.threads = yes
 ctypes-foreign-threaded.dir = src/ctypes-foreign-threaded
 ctypes-foreign-threaded.subproject_deps = ctypes ctypes-foreign-base
-ctypes-foreign-threaded.link_flags = $(as_needed_flags) $(libffi_lib) $(lib_process)
+ctypes-foreign-threaded.link_flags = $(libffi_lib) $(lib_process)
 ctypes-foreign-threaded.cmo_opts = $(OCAML_FFI_INCOPTS:%=-ccopt %)
 ctypes-foreign-threaded.cmx_opts = $(OCAML_FFI_INCOPTS:%=-ccopt %)
 ctypes-foreign-threaded.install_native_objects = no
@@ -90,7 +90,7 @@ ctypes-foreign-unthreaded.install = yes
 ctypes-foreign-unthreaded.threads = no
 ctypes-foreign-unthreaded.dir = src/ctypes-foreign-unthreaded
 ctypes-foreign-unthreaded.subproject_deps = ctypes ctypes-foreign-base
-ctypes-foreign-unthreaded.link_flags = $(as_needed_flags) $(libffi_lib) $(lib_process)
+ctypes-foreign-unthreaded.link_flags = $(libffi_lib) $(lib_process)
 ctypes-foreign-unthreaded.cmo_opts = $(OCAML_FFI_INCOPTS:%=-ccopt %)
 ctypes-foreign-unthreaded.cmx_opts = $(OCAML_FFI_INCOPTS:%=-ccopt %)
 ctypes-foreign-unthreaded.install_native_objects = no
