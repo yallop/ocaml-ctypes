@@ -214,12 +214,20 @@ test-structs: $$(NATIVE_TARGET)
 
 test-structs-generated: \
   tests/test-structs/generated_bindings.ml \
-  tests/test-structs/generated_stubs.c
+  tests/test-structs/generated_stubs.c \
+  tests/test-structs/generated_struct_bindings.ml \
+  $(BUILDDIR)/tests/test-structs/generated_struct_stubs.c
 
 tests/test-structs/generated_stubs.c: $(BUILDDIR)/test-structs-stub-generator.native
 	$< --c-file $@
 tests/test-structs/generated_bindings.ml: $(BUILDDIR)/test-structs-stub-generator.native
 	$< --ml-file $@
+tests/test-structs/generated_struct_bindings.ml: $(BUILDDIR)/test-structs-ml-stub-generator.native
+	$< > $@
+$(BUILDDIR)/test-structs-ml-stub-generator.native: $(BUILDDIR)/tests/test-structs/generated_struct_stubs.c
+	$(CC) -I `$(OCAMLFIND) ocamlc -where | sed 's|\r$$||'` $(CFLAGS) $(LDFLAGS) $(WINLDFLAGS) -o $@ $^
+$(BUILDDIR)/tests/test-structs/generated_struct_stubs.c: $(BUILDDIR)/test-structs-stub-generator.native
+	$< --c-struct-file $@
 
 test-finalisers.dir = tests/test-finalisers
 test-finalisers.threads = yes
@@ -301,12 +309,20 @@ test-unions: $$(NATIVE_TARGET)
 
 test-unions-generated: \
   tests/test-unions/generated_bindings.ml \
-  tests/test-unions/generated_stubs.c
+  tests/test-unions/generated_stubs.c \
+  tests/test-unions/generated_struct_bindings.ml \
+  $(BUILDDIR)/tests/test-unions/generated_struct_stubs.c
 
 tests/test-unions/generated_stubs.c: $(BUILDDIR)/test-unions-stub-generator.native
 	$< --c-file $@
 tests/test-unions/generated_bindings.ml: $(BUILDDIR)/test-unions-stub-generator.native
 	$< --ml-file $@
+tests/test-unions/generated_struct_bindings.ml: $(BUILDDIR)/test-unions-ml-stub-generator.native
+	$< > $@
+$(BUILDDIR)/test-unions-ml-stub-generator.native: $(BUILDDIR)/tests/test-unions/generated_struct_stubs.c
+	$(CC) -I `$(OCAMLFIND) ocamlc -where | sed 's|\r$$||'` $(CFLAGS) $(LDFLAGS) $(WINLDFLAGS) -o $@ $^
+$(BUILDDIR)/tests/test-unions/generated_struct_stubs.c: $(BUILDDIR)/test-unions-stub-generator.native
+	$< --c-struct-file $@
 
 test-custom_ops.dir = tests/test-custom_ops
 test-custom_ops.threads = yes

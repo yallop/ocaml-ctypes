@@ -19,6 +19,10 @@ _build/src/cstubs/cstubs_internals.cmx : _build/src/ctypes/static.cmx \
     _build/src/ctypes/primitives.cmx _build/src/ctypes/memory_stubs.cmx \
     _build/src/ctypes/ctypes_ptr.cmx _build/src/ctypes/ctypes.cmx \
     _build/src/cstubs/cstubs_internals.cmi
+_build/src/cstubs/cstubs_structs.cmo : _build/src/ctypes/ctypes.cmi \
+    _build/src/cstubs/cstubs_structs.cmi
+_build/src/cstubs/cstubs_structs.cmx : _build/src/ctypes/ctypes.cmx \
+    _build/src/cstubs/cstubs_structs.cmi
 _build/src/cstubs/cstubs_internals.cmi : _build/src/ctypes/unsigned.cmi \
     _build/src/ctypes/static.cmi _build/src/ctypes/signed.cmi _build/src/ctypes/primitives.cmi \
     _build/src/ctypes/memory_stubs.cmo _build/src/ctypes/ctypes_ptr.cmo \
@@ -70,6 +74,7 @@ _build/src/cstubs/cstubs_generate_ml.cmx : _build/src/ctypes/static.cmx \
     _build/src/cstubs/cstubs_errors.cmx _build/src/cstubs/cstubs_analysis.cmx \
     _build/src/cstubs/cstubs_generate_ml.cmi
 _build/src/cstubs/cstubs_analysis.cmi : _build/src/ctypes/static.cmi
+_build/src/cstubs/cstubs_structs.cmi : _build/src/ctypes/ctypes.cmi
 _build/src/cstubs/cstubs_public_name.cmi : _build/src/ctypes/primitives.cmi \
     _build/src/ctypes/ctypes_path.cmi
 _build/src/libffi-abigen/libffi_abigen.cmo :
@@ -109,10 +114,8 @@ _build/src/ctypes/primitives.cmo : _build/src/ctypes/unsigned.cmi _build/src/cty
     _build/src/ctypes/primitives.cmi
 _build/src/ctypes/primitives.cmx : _build/src/ctypes/unsigned.cmx _build/src/ctypes/signed.cmx \
     _build/src/ctypes/primitives.cmi
-_build/src/ctypes/ctypes_ptr.cmo : _build/src/ctypes/signed.cmi \
-    _build/src/ctypes/ctypes_primitives.cmo
-_build/src/ctypes/ctypes_ptr.cmx : _build/src/ctypes/signed.cmx \
-    _build/src/ctypes/ctypes_primitives.cmx
+_build/src/ctypes/ctypes_ptr.cmo : _build/src/ctypes/signed.cmi
+_build/src/ctypes/ctypes_ptr.cmx : _build/src/ctypes/signed.cmx
 _build/src/ctypes/ctypes_primitives.cmo : _build/src/ctypes/primitives.cmi
 _build/src/ctypes/ctypes_primitives.cmx : _build/src/ctypes/primitives.cmx
 _build/src/ctypes/posixTypes.cmi : _build/src/ctypes/unsigned.cmi _build/src/ctypes/ctypes.cmi

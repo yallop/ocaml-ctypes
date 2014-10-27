@@ -7,5 +7,6 @@
 
 (* Stub generation driver for the struct tests. *)
 
-let () = Tests_common.run Sys.argv (module Functions.Stubs)
-
+let () = Tests_common.run Sys.argv
+   ~structs:(module Types.Struct_stubs)
+   (module Functions.Stubs)

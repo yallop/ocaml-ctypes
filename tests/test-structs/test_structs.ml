@@ -420,6 +420,71 @@ module Foreign_tests = Build_foreign_tests(Tests_common.Foreign_binder)
 module Stub_tests = Build_stub_tests(Generated_bindings)
 
 
+module Build_struct_stub_tests
+    (S : Cstubs_structs.STRUCT
+          with type 'a typ = 'a Ctypes.typ
+           and type ('a, 's) field = ('a, 's) Ctypes.field) =
+struct
+  module M = Types.Struct_stubs(S)
+
+  let retrieve_size name = 
+    let f = Foreign.foreign ~from:testlib name (void @-> returning size_t) in
+    Unsigned.Size_t.to_int (f ())
+  let sizeof_s1 = retrieve_size "sizeof_s1"
+  let alignmentof_s1 = retrieve_size "alignmentof_s1"
+  let offsetof_x1 = retrieve_size "offsetof_x1"
+  let offsetof_x2 = retrieve_size "offsetof_x2"
+  let offsetof_x3 = retrieve_size "offsetof_x3"
+  let offsetof_x4 = retrieve_size "offsetof_x4"
+  let sizeof_s2 = retrieve_size "sizeof_s2"
+  let alignmentof_s2 = retrieve_size "alignmentof_s2"
+  let offsetof_y1 = retrieve_size "offsetof_y1"
+  let offsetof_y2 = retrieve_size "offsetof_y2"
+  let offsetof_y3 = retrieve_size "offsetof_y3"
+  let offsetof_y4 = retrieve_size "offsetof_y4"
+
+  (*
+    Test that struct layout retrieved from C correctly accounts for missing
+    fields.
+  *)
+  let test_missing_fields _ =
+    begin
+      assert_equal sizeof_s1
+        (sizeof M.s1);
+
+      assert_equal alignmentof_s1
+        (alignment M.s1);
+
+      assert_equal offsetof_x1
+        (offsetof M.x1);
+
+      assert_equal offsetof_x4
+        (offsetof M.x4);
+    end
+
+  (*
+    Test that struct layout retrieved from C correctly accounts for reordered
+    fields.
+  *)
+  let test_reordered_fields _ =
+    begin
+      assert_equal sizeof_s2
+        (sizeof M.s2);
+
+      assert_equal alignmentof_s2
+        (alignment M.s2);
+
+      assert_equal offsetof_y1
+        (offsetof M.y1);
+
+      assert_equal offsetof_y2
+        (offsetof M.y2);
+    end
+end
+
+module Struct_stubs_tests = Build_struct_stub_tests(Generated_struct_bindings)
+
+
 let suite = "Struct tests" >:::
   ["passing struct (foreign)"
    >:: Foreign_tests.test_passing_struct;
@@ -465,6 +530,12 @@ let suite = "Struct tests" >:::
 
    "test struct ffi_type lifetime"
    >:: test_struct_ffi_type_lifetime;
+
+   "test layout of structs with missing fields"
+   >:: Struct_stubs_tests.test_missing_fields;
+
+   "test layout of structs with reordered fields"
+   >:: Struct_stubs_tests.test_reordered_fields;
   ]
 
 

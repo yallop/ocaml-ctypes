@@ -163,4 +163,25 @@ void initialize_waiters(void);
 void post1_wait2(void);
 void post2_wait1(void);
 
+struct s1 { int x1, x2, x3, x4; };
+struct s2 { int y1, y2, y3, y4; };
+
+size_t sizeof_s1(void);
+size_t alignmentof_s1(void);
+size_t offsetof_x1(void);
+size_t offsetof_x2(void);
+size_t offsetof_x3(void);
+size_t offsetof_x4(void);
+size_t sizeof_s2(void);
+size_t alignmentof_s2(void);
+size_t offsetof_y1(void);
+size_t offsetof_y2(void);
+size_t offsetof_y3(void);
+size_t offsetof_y4(void);
+
+union u1 { char x1; float x2; double x3; char x4[13]; };
+
+size_t sizeof_u1(void);
+size_t alignmentof_u1(void);
+
 #endif /* TEST_FUNCTIONS_H */

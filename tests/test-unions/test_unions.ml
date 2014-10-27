@@ -10,6 +10,9 @@ open Ctypes
 open Unsigned
 
 
+let testlib = Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW])
+
+
 (* 
    Check that using a union to inspect the representation of a float (double)
    value gives the same result as Int64.of_bits.
@@ -145,6 +148,37 @@ struct
     end in ()
 end
 
+
+module Build_struct_stub_tests
+    (S : Cstubs_structs.STRUCT
+          with type 'a typ = 'a Ctypes.typ
+           and type ('a, 's) field = ('a, 's) Ctypes.field) =
+struct
+  module M = Types.Struct_stubs(S)
+
+  let retrieve_size name = 
+    let f = Foreign.foreign ~from:testlib name (void @-> returning size_t) in
+    Unsigned.Size_t.to_int (f ())
+  let sizeof_u1 = retrieve_size "sizeof_u1"
+  let alignmentof_u1 = retrieve_size "alignmentof_u1"
+
+  (*
+    Test that union layout retrieved from C correctly accounts for missing
+    fields.
+  *)
+  let test_missing_fields _ =
+    begin
+      assert_equal sizeof_u1
+        (sizeof M.u1);
+
+      assert_equal alignmentof_u1
+        (alignment M.u1);
+    end
+end
+
+
+module Struct_stubs_tests = Build_struct_stub_tests(Generated_struct_bindings)
+
 (* Check that the address of a union is equal to the addresses of each
    of its members.
 *)
@@ -224,6 +258,9 @@ let suite = "Union tests" >:::
 
    "sealing empty union"
     >:: test_sealing_empty_union;
+
+   (* "test layout of unions with missing fields" *)
+   (* >:: Struct_stubs_tests.test_missing_fields; *)
   ]
 
 
