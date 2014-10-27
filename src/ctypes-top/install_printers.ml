@@ -19,14 +19,8 @@ let printers = [ "Ctypes_printers.format_typ";
                  "Ctypes_printers.format_union";
                  "Ctypes_printers.format_array";
                  "Ctypes_printers.format_ocaml";
-                 "Ctypes_printers.format_blkcnt_t";
-                 "Ctypes_printers.format_blksize_t";
                  "Ctypes_printers.format_clock_t";
                  "Ctypes_printers.format_dev_t";
-                 "Ctypes_printers.format_fsblkcnt_t";
-                 "Ctypes_printers.format_fsfilcnt_t";
-                 "Ctypes_printers.format_gid_t";
-                 "Ctypes_printers.format_id_t";
                  "Ctypes_printers.format_ino_t";
                  "Ctypes_printers.format_mode_t";
                  "Ctypes_printers.format_nlink_t";
@@ -34,9 +28,7 @@ let printers = [ "Ctypes_printers.format_typ";
                  "Ctypes_printers.format_pid_t";
                  "Ctypes_printers.format_size_t";
                  "Ctypes_printers.format_ssize_t";
-                 "Ctypes_printers.format_suseconds_t";
                  "Ctypes_printers.format_time_t";
-                 "Ctypes_printers.format_uid_t";
                  "Ctypes_printers.format_useconds_t";]
 
 let eval_string
