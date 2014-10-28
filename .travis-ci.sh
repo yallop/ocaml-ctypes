@@ -41,4 +41,10 @@ opam --git-version
 opam install ${OPAM_DEPENDS}
 eval `opam config env`
 make
+# build and run the tests
 make test
+# build and run the examples
+make examples
+_build/date.native
+_build/date-cmd.native
+_build/fts-cmd.native examples
