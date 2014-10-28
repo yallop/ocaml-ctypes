@@ -98,7 +98,7 @@ ncurses.install = no
 ncurses.dir = examples/ncurses/foreign
 ncurses.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
 ncurses.deps = bytes unix bigarray str
-ncurses.link_flags = -Wl,-no-as-needed -lncurses
+ncurses.link_flags = -lncurses
 ncurses: PROJECT=ncurses
 ncurses: $$(NATIVE_TARGET)
 
