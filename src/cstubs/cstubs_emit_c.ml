@@ -11,117 +11,134 @@ open Static
 open Cstubs_c_language
 open Format
 
-let format_seq lbr fmt_item sep rbr fmt items =
-  let open Format in
-  fprintf fmt "%s@[@[" lbr;
-    ListLabels.iteri items ~f:(fun i item ->
-      if i <> 0 then fprintf fmt "@]%s@ @[" sep;
-      fmt_item fmt item);
-  fprintf fmt "@]%s@]" rbr
-
-let format_ty fmt (Ty ty) = Ctypes.format_typ fmt ty
+let format_ty fmt ty = Ctypes.format_typ fmt ty
 
 let cvar_name = function
-  | `Local (name, _) | `Global { name } -> name
+  | `Local { name } | `Global { name } -> name
 
 let cvar fmt v = fprintf fmt "%s" (cvar_name v)
 
-let cconst fmt (`Int i) = fprintf fmt "%d" i
+let cconst : type a. formatter -> a cconst -> unit = fun fmt -> function
+  | CInt i -> fprintf fmt "%d" i
+  | CSizeof t -> fprintf fmt "sizeof (%a)" format_typ t
 
 (* Determine whether the C expression [(ty)e] is equivalent to [e] *)
-let cast_unnecessary : ty -> cexp -> bool =
-  let rec harmless l r = match l, r with
-  | Ty (Pointer Void), Ty (Pointer _) -> true
-  | Ty (View { ty }), t -> harmless (Ty ty) t
-  | t, Ty (View { ty }) -> harmless t (Ty ty)
-  | (Ty (Primitive _) as l), (Ty (Primitive _) as r) -> l = r
+type prim = Prim : _ Primitives.prim -> prim
+let cast_unnecessary : type a b. a typ -> b cexp -> bool =
+  let rec harmless : type a b. a Static.typ -> b Static.typ -> bool =
+    fun l r -> match l, r with
+  | Pointer Void, Pointer _ -> true
+  | View { Static.ty }, t -> harmless ty t
+  | t,  View { Static.ty } -> harmless t ty
+  | Primitive l, Primitive r -> Prim l = Prim r
   | _ -> false
   in
-  fun ty e -> harmless ty (Type_C.cexp e)
+  (* Here *)
+  fun {ty_} e -> harmless ty_ (Type_C.cexp e).ty_
 
-let rec cexp fmt : cexp -> unit = function
-  | #cconst as c -> cconst fmt c
-  | `Local _ as x -> cvar fmt x
-  | `Cast (ty, e) when cast_unnecessary ty e -> cexp fmt e
-  | `Cast (ty, e) -> fprintf fmt "@[@[(%a)@]%a@]" format_ty ty cexp e
-  | `Addr e -> fprintf fmt "@[&@[%a@]@]" cexp e
+let rec cexp : type a. formatter -> a cexp -> unit = fun fmt -> function
+  | CConst c  -> cconst fmt c
+  | CLocal x -> cvar fmt (`Local x)
+  | CCast (ty, e) when cast_unnecessary ty e -> cexp fmt e
+  | CCast (ty, e) -> fprintf fmt "@[@[(%a)@]%a@]" Cstubs_c_language.format_typ ty cexp e
+  | CAddr e -> fprintf fmt "@[&@[%a@]@]" cexp e
 
-let rec clvalue fmt : clvalue -> unit = function
-  | `Local _ as x -> cvar fmt x
-  | `Index (lv, i) ->
+let rec clvalue : type a. formatter -> a clvalue -> unit = fun fmt -> function
+  | CVar x -> cvar fmt x
+  | CAIndex_ (lv, i) ->
+    fprintf fmt "@[@[%a@]@[[%a]@]@]" clvalue lv cexp i
+  | CPIndex_ (lv, i) ->
     fprintf fmt "@[@[%a@]@[[%a]@]@]" clvalue lv cexp i
 
 let camlop fmt : camlop -> unit = function
-  | `CAMLparam0 -> Format.fprintf fmt "CAMLparam0()"
-  | `CAMLlocalN (e, c) -> Format.fprintf fmt "CAMLlocalN(@[%a@],@ @[%a@])"
-    cexp e cexp c
+  | `CAMLparam0 -> fprintf fmt "CAMLparam0()"
+  | `CAMLlocalN ({name}, c) -> fprintf fmt "CAMLlocalN(@[%s@],@ @[%a@])"
+    name cexp c
 
-let rec ceff fmt : ceff -> unit = function
-  | #cexp as e -> cexp fmt e
-  | #camlop as o -> camlop fmt o
-  | `Global _ as x -> cvar fmt x
-  | `App ({fname}, es) ->
+let rec ceff : type a. formatter -> a ceff -> unit = fun fmt -> function
+  | CExp e -> cexp fmt e
+  | CamlOp o -> camlop fmt o
+  | CGlobal x -> cvar fmt (`Global x)
+  | CApp ({fname}, es) ->
     fprintf fmt "@[%s(@[" fname;
-    let last_exp = List.length es - 1 in
-    List.iteri
-      (fun i e ->
-        fprintf fmt "@[%a@]%(%)" cexp e
-          (if i <> last_exp then ",@ " else ""))
-      es;
+    let last_exp = args_length es - 1 in
+    iteri_args es
+     ~f:{ argf = fun i e ->
+                 fprintf fmt "@[%a@]%(%)" cexp e
+                         (if i <> last_exp then ",@ " else "")};
     fprintf fmt ")@]@]";
-  | `Index (e, i) ->
+  | CIf (e, s, t) ->
+    fprintf fmt "@[(%a)@]@ ?@ @[(%a)@]@ :@ @[(%a)@]" cexp e ceff s ceff t
+  | CAIndex (e, i) ->
     fprintf fmt "@[@[%a@]@[[%a]@]@]" ceff e cexp i
-  | `Deref e -> fprintf fmt "@[*@[%a@]@]" cexp e
-  | `Assign (lv, e) ->
+  | CPIndex (e, i) ->
+    fprintf fmt "@[@[%a@]@[[%a]@]@]" ceff e cexp i
+  | CDeref e -> fprintf fmt "@[*@[%a@]@]" cexp e
+  | CAssign (lv, e) ->
     fprintf fmt "@[@[%a@]@;=@;@[%a@]@]" clvalue lv ceff e
 
-let rec ccomp fmt : ccomp -> unit = function
-  | #cexp as e -> fprintf fmt "@[<2>return@;@[%a@]@];" cexp e
-  | #ceff as e -> fprintf fmt "@[<2>return@;@[%a@]@];" ceff e
-  | `CAMLreturnT (Ty Void, e) ->
+let rec ccomp : type a. formatter -> a ccomp -> unit = fun fmt -> function
+  | CEff e -> fprintf fmt "@[<2>return@;@[%a@]@];" ceff e
+  (* Here *)
+  | CCAMLreturnT ({ty_=Void}, e) ->
     fprintf fmt "@[CAMLreturn0@];"
-  | `CAMLreturnT (Ty ty, e) ->
+  | CCAMLreturn0 _ ->
+    fprintf fmt "@[CAMLreturn0@];"
+  | CCAMLreturnT (t, e) ->
     fprintf fmt "@[<2>CAMLreturnT(@[%a@],@;@[%a@])@];"
-      (fun t -> Ctypes.format_typ t) ty
-      cexp e
-  | `Let (xe, `Cast (ty, (#cexp as e'))) when cast_unnecessary ty e' ->
-    ccomp fmt (`Let (xe, e'))
-  | `Let ((`Local (x, _), e), `Local (y, _)) when x = y ->
-    ccomp fmt (e :> ccomp)
-  | `Let ((`Local (name, Ty Void), e), s) ->
+      format_typ t cexp e
+  | CLet (CBind (_, (CamlOp _ as e)), s) ->
+     fprintf fmt "@[%a;@]@ %a" ceff e ccomp s
+  | CLet (CBind (_, (CAssign _ as e)), s) ->
+     fprintf fmt "@[%a;@]@ %a" ceff e ccomp s
+  | CLet (xe, CEff (CExp (CCast (ty, e')))) when cast_unnecessary ty e' ->
+    ccomp fmt (CLet (xe, CEff (CExp e')))
+  | CLet (CBind ({name = x}, e), CEff (CExp (CLocal {name=y}))) when x = y ->
+    ccomp fmt (CEff e)
+  (* Here *)
+  | CLet (CBind ({typ={ty_=Void}}, CIf (e, a, b)), s) ->
+    fprintf fmt "@[if@ (@[%a)@]@ {@[%a}@]@\nelse@ {@[%a}@]@]@ %a"
+      cexp e ceff a ceff b ccomp s
+  (* Here *)
+  | CLet (CBind ({typ={ty_=Void}}, e), s) ->
     fprintf fmt "@[%a;@]@ %a" ceff e ccomp s
-  | `Let ((`Local (name, Ty (Struct { tag })), e), s) ->
-    fprintf fmt "@[struct@;%s@;%s@;=@;@[%a;@]@]@ %a"
-      tag name ceff e ccomp s
-  | `Let ((`Local (name, Ty (Union { utag })), e), s) ->
-    fprintf fmt "@[union@;%s@;%s@;=@;@[%a;@]@]@ %a"
-      utag name ceff e ccomp s
-  | `Let ((`Local (name, Ty ty), e), s) ->
+  (* | CLet (CBind ({name; typ={ty=Struct { tag }}}, e), s) -> *)
+  (*   fprintf fmt "@[struct@;%s@;%s@;=@;@[%a;@]@]@ %a" *)
+  (*     tag name ceff e ccomp s *)
+  (* | CLet (CBind ({name; typ={ty=Union { utag }}}, e), s) -> *)
+  (*   fprintf fmt "@[union@;%s@;%s@;=@;@[%a;@]@]@ %a" *)
+  (*     utag name ceff e ccomp s *)
+  | CLet (CBind ({name; typ}, e), s) ->
     fprintf fmt "@[@[%a@]@;=@;@[%a;@]@]@ %a"
-      (Ctypes.format_typ ~name) ty ceff e ccomp s
-  | `LetConst (`Local (x, _), `Int c, s) ->
-    fprintf fmt "@[enum@ {@[@ %s@ =@ %d@ };@]@]@ %a"
-      x c ccomp s
+      (format_decl ~name) typ ceff e ccomp s
+  | CLetConst ({name=x}, c, s) ->
+    fprintf fmt "@[enum@ {@[@ %s@ =@ %a@ };@]@]@ %a"
+     x cconst c ccomp s
 
-let format_parameter_list parameters k fmt =
-  let format_arg fmt (name, Ty t) =
-    Type_printing.format_typ ~name fmt t
+let format_params : type a. a params -> (formatter -> unit) -> (formatter -> unit) =
+  fun parameters k fmt ->
+  let format_param fmt {name; typ} = format_decl ~name fmt typ in
+  let format_seq fmt parameters =
+    fprintf fmt "(@[@[";
+    iteri_params parameters
+      ~f:{ paramf =
+             fun i item ->
+             if i <> 0 then fprintf fmt "@],@ @[";
+             format_param fmt item };
+    fprintf fmt "@]%s@]" ")"
   in
   match parameters with
-  | [] ->
-    Format.fprintf fmt "%t(void)" k
-  | _ ->
-    Format.fprintf fmt "@[%t@[%a@]@]" k
-      (format_seq "(" format_arg "," ")")
-      parameters
+  | NoParams -> fprintf fmt "%t(void)" k
+  | _ -> fprintf fmt "@[%t@[%a@]@]" k format_seq parameters
 
-let cfundec : Format.formatter -> cfundec -> unit =
-  fun fmt (`Fundec (name, args, Ty return)) ->
+let cfundec : type a r. formatter -> (a, r) cfundec -> unit =
+  (* Here *)
+  fun fmt (Fundec (name, params, {ty_=return})) ->
     Type_printing.format_typ' return
       (fun context fmt ->
-        format_parameter_list args (Type_printing.format_name ~name) fmt)
+       format_params params (Type_printing.format_name ~name) fmt)
       `nonarray fmt
 
-let cfundef fmt (`Function (dec, body) : cfundef) =
+let cfundef fmt (Fundef (dec, body) : _ cfundef) =
   fprintf fmt "%a@\n{@[<v 2>@\n%a@]@\n}@\n" 
     cfundec dec ccomp body

@@ -15,91 +15,232 @@ let fresh_var =
     incr var_counter;
     Printf.sprintf "x%d" !var_counter
 
-type ty = Ty : _ typ -> ty
-type tfn = Fn : _ fn -> tfn
+type custom_formatter = 
+  (Type_printing.format_context -> Format.formatter -> unit) ->
+  (Type_printing.format_context -> Format.formatter -> unit)
 
-type cfunction = {
+type 'a typ = {
+  format: custom_formatter;
+  ty_: 'a Static.typ;
+}
+
+type value_
+type value = value_ abstract
+let value_ : value Static.typ =
+  abstract ~name:"value" ~size:0 ~alignment:0
+
+type stmt_
+type stmt = stmt_ abstract
+let stmt_ = abstract ~name:"stmt" ~size:0 ~alignment:0
+
+module Typ =
+struct
+  type 'a t = 'a typ
+  let primitive : 'a. 'a Static.typ -> 'a t =
+    fun ty_ -> { ty_; format = (Type_printing.format_typ' ty_) }
+
+  let void = primitive void
+  let int = primitive int
+  let size_t = primitive size_t
+  let value = primitive value_
+  let stmt = primitive stmt_
+
+  let ptr {format;ty_} =
+    let format k context fmt =
+      format
+        (fun context fmt ->
+           match context with
+           | `array -> Format.fprintf fmt "(*%t)" (k `nonarray)
+           | _      -> Format.fprintf fmt "*%t" (k `nonarray))
+        `nonarray fmt in
+    { ty_ = ptr ty_; format }
+
+  let array n {format;ty_} =
+    let format k context fmt =
+      Type_printing.format_typ' ty_
+        (fun _ fmt -> Format.fprintf fmt "%t[%d]" (k `array) n)
+        `nonarray fmt
+    in
+    { ty_ = array n ty_; format }
+
+  let of_typ ?format ty_ = match format with
+      None -> primitive ty_
+    | Some format -> { ty_; format }
+end
+
+let value = Typ.value
+
+let format_typ : 'a. Format.formatter -> 'a typ -> unit =
+   fun fmt { format } ->
+   Format.fprintf fmt "@[%t@]"
+     (format (fun _ _ -> ()) `nonarray)
+
+let format_decl : 'a. name:string -> Format.formatter -> 'a typ -> unit =
+   fun ~name fmt { format } ->
+   let format_name _ fmt =
+     Format.fprintf fmt "@ %s" name in
+   Format.fprintf fmt "@[%t@]" (format format_name `nonarray)
+
+type (_, _) fn =
+    Returns_  : 'r typ  -> ('r, 'r) fn
+  | Function_ : 'a typ * ('b, 'r) fn  -> ('a -> 'b, 'r) fn
+
+type 'a fn_wrapper = Fn_wrapped : ('a, 'r) fn -> 'a fn_wrapper
+
+let rec wrap_fn : type a. a Static.fn -> a fn_wrapper =
+ fun fn -> match fn with
+   Returns ty  -> Fn_wrapped (Returns_ (Typ.of_typ ty))
+ | Function (p, fn') ->
+    let (Fn_wrapped fn'') = wrap_fn fn' in
+    Fn_wrapped (Function_ (Typ.of_typ p, fn''))
+
+type ('a, 'r) cfunction = {
   fname: string;
   allocates: bool;
   reads_ocaml_heap: bool;
-  fn: tfn;
+  fn: ('a, 'r) fn;
 }
 
-type cglobal = {
+type 'a cvar_details = {
   name: string;
-  typ: ty;
+  typ: 'a typ;
   references_ocaml_heap: bool;
 }
 
-type clocal = [ `Local of string * ty ]
-type cvar = [ clocal | `Global of cglobal ]
-type cconst = [ `Int of int ]
-type cexp = [ cconst
-            | clocal
-            | `Cast of ty * cexp
-            | `Addr of cexp ]
-type clvalue = [ clocal | `Index of clvalue * cexp ]
+type 'a clocal = [ `Local of 'a cvar_details ]
+type 'a cglobal = [ `Global of 'a cvar_details ]
+type 'a cvar = [ 'a clocal | 'a cglobal ]
+type _ cconst =
+    CInt : int -> int cconst
+  | CSizeof : _ typ -> Unsigned.size_t cconst
+type 'a cexp = CConst of 'a cconst
+             | CLocal of 'a cvar_details
+             | CCast : 'a typ * _ cexp -> 'a cexp
+             | CAddr : 'a cexp -> 'a ptr cexp
+type 'a clvalue =
+    CVar of 'a cvar
+  | CAIndex_ : 'a carray clvalue * int cexp -> 'a clvalue
+  | CPIndex_ : 'a ptr clvalue * int cexp -> 'a clvalue
 type camlop = [ `CAMLparam0
-              | `CAMLlocalN of cexp * cexp ]
-type ceff = [ cexp
-            | camlop
-            | `Global of cglobal
-            | `App of cfunction * cexp list
-            | `Index of ceff * cexp
-            | `Deref of cexp
-            | `Assign of clvalue * ceff ]
-type cbind = clocal * ceff
-type ccomp = [ ceff
-             | `LetConst of clocal * cconst * ccomp
-             | `CAMLreturnT of ty * cexp
-             | `Let of cbind * ccomp ]
-type cfundec = [ `Fundec of string * (string * ty) list * ty ]
-type cfundef = [ `Function of cfundec * ccomp ]
+              | `CAMLlocalN of value carray cvar_details * int cexp ]
 
-let rec return_type : type a. a fn -> ty = function
-  | Function (_, f) -> return_type f
-  | Returns t -> Ty t
+type (_, _) ocaml_pointer =
+    OString : (string ocaml, char ptr) ocaml_pointer
+  | OBytes : (Bytes.t ocaml, char ptr) ocaml_pointer
+  | OFloatArray : (float array ocaml, float ptr) ocaml_pointer
 
-let args : type a. a fn -> (string * ty) list = fun fn ->
-  let rec loop : type a. a Ctypes.fn -> (string * ty) list = function
-    | Static.Function (ty, fn) -> (fresh_var (), Ty ty) :: loop fn
-    | Static.Returns _ -> []
+type 'a arg =
+    Arg of 'a cexp
+  | Nothing of ('a, unit) view
+  | OCamlArg : ('a, 'o) ocaml_pointer * 'o cexp -> 'a arg
+
+type 'a args =
+    End
+  | Args : 'a arg * 'b args -> ('a -> 'b) args
+
+type 'a ceff =
+    CExp of 'a cexp
+  | CamlOp : camlop -> stmt ceff
+  | CGlobal of 'a cvar_details
+  | CApp : ('a, 'r) cfunction * 'a args -> 'r ceff
+  | CIf of bool cexp * 'a ceff * 'a ceff
+  | CPIndex of 'a ptr ceff * int cexp
+  | CAIndex of 'a carray ceff * int cexp
+  | CDeref of 'a ptr cexp
+  | CAssign : 'a clvalue * 'a ceff -> stmt ceff
+type 'a cbind = CBind of 'a cvar_details * 'a ceff
+type 'a ccomp = (* This isn't quite right: it doesn't handle the return type properly *)
+    CEff of 'a ceff
+  | CLetConst : _ cvar_details * _ cconst * 'a ccomp -> 'a ccomp
+  | CCAMLreturnT of 'a typ * 'a cexp
+  | CCAMLreturn0 of ('a, unit) view
+  | CLet : _ cbind * 'a ccomp -> 'a ccomp
+type _ params =
+    NoParams
+  | Param : 'a cvar_details * 'b params -> ('a -> 'b) params
+type ('a, 'r) cfundec = Fundec of string * 'a params * 'r typ
+type 'a cfundef = Fundef : ('a, 'r) cfundec * 'r ccomp -> 'a cfundef
+
+let rec args_length : type a. a args -> int = function
+ | End -> 0
+ | Args (Nothing _, xs) -> args_length xs
+ | Args ((OCamlArg _| Arg _), xs) -> 1 + args_length xs
+
+let rec params_length : type a. a params -> int = function
+    NoParams -> 0
+  | Param (_, p) -> 1 + params_length p
+
+let rec return_type : type a r. (a, r) fn -> r typ = function
+    Returns_ t -> t
+  | Function_ (_, f) -> return_type f
+
+let params : type a r. (a, r) fn -> a params = fun fn ->
+  let rec loop : type a. (a, r) fn -> a params = function
+      Returns_ _ -> NoParams
+    | Function_ (typ, fn) ->
+       Param ({name=fresh_var (); references_ocaml_heap=true; typ}, loop fn)
   in loop fn
+
+type iteri_arg = { argf : 'a. int -> 'a cexp -> unit }
+
+let iteri_args : type a. f:iteri_arg -> a args -> unit =
+  fun ~f:{argf=f} args ->
+  let rec loop : type a. int -> a args -> unit =
+    fun i -> function
+   | End -> ()
+   | Args (Arg x, xs) -> f i x; loop (i+1) xs
+   | Args (OCamlArg (_, x), xs) -> f i x; loop (i+1) xs
+   | Args (Nothing _, xs) -> loop (i+1) xs
+ in loop 0 args
+
+type iteri_param = { paramf : 'a. int -> 'a cvar_details -> unit }
+
+let rec iteri_params : type a. f:iteri_param -> a params -> unit =
+  fun ~f:{paramf=f} params ->
+  let rec loop : type a r. int -> a params -> unit =
+    fun i -> function
+   | NoParams -> ()
+   | Param (x, xs) -> f i x; loop (i+1) xs
+ in loop 0 params
 
 module Type_C =
 struct
-  let rec cexp : cexp -> ty = function
-    | `Int _ -> Ty int
-    | `Local (_, ty) -> ty
-    | `Cast (Ty ty, _) -> Ty ty
-    | `Addr e -> let Ty ty = cexp e in Ty (Pointer ty)
+  let cconst : type a. a cconst -> a typ = function
+      CInt _ -> Typ.int
+    | CSizeof _ -> Typ.size_t
 
-  let camlop : camlop -> ty = function
-    | `CAMLparam0
-    | `CAMLlocalN _ -> Ty Void
+  let rec cexp : type a. a cexp -> a typ = function
+      CConst c -> cconst c
+    | CLocal {typ} -> typ
+    | CCast (typ, _) -> typ
+    | CAddr e -> Typ.ptr (cexp e)
 
-  let rec ceff : ceff -> ty = function
-    | #cexp as e -> cexp e
-    | #camlop as o -> camlop o
-    | `Global { typ } -> typ
-    | `App ({ fn = Fn f }, _) -> return_type f
-    | `Index (e, _) -> reference_ceff e
-    | `Deref e -> reference_ceff (e :> ceff)
-    | `Assign (_, rv) -> ceff rv
-  and reference_ceff : ceff -> ty =
+  let rec ceff : type a. a ceff -> a typ = function
+      CExp e -> cexp e
+    | CamlOp o -> Typ.stmt
+    | CGlobal { typ } -> typ
+    | CApp ({fn}, _) -> return_type fn
+    | CIf (_, e, _) -> ceff e
+    | CAIndex (e, _) -> array_reference_ceff e
+    | CPIndex (e, _) -> ptr_reference_ceff e
+    | CDeref e -> ptr_reference_ceff (CExp e)
+    | CAssign (_, rv) -> Typ.stmt
+  and ptr_reference_ceff : type a. a ptr ceff -> a typ =
     fun e ->
-      begin match ceff e with
-      | Ty (Pointer ty) -> Ty ty
-      | Ty (Array (ty, _)) -> Ty ty
-      | Ty t -> Cstubs_errors.internal_error
+      (* Here *)
+      begin match (ceff e).ty_ with
+        Pointer ty -> Typ.of_typ ty
+      | t -> Cstubs_errors.internal_error
         "dereferencing expression of non-pointer type %s"
         (Ctypes.string_of_typ t)
       end
-
-  let rec ccomp : ccomp -> ty = function
-    | #cexp as e -> cexp e
-    | #ceff as e -> ceff e
-    | `Let (_, c)
-    | `LetConst (_, _, c) -> ccomp c
-    | `CAMLreturnT (ty, _) -> ty
+  and array_reference_ceff : type a. a carray ceff -> a typ =
+    fun e ->
+      (* Here *)
+      begin match (ceff e).ty_ with
+        Array (ty, _) -> Typ.of_typ ty
+      | t -> Cstubs_errors.internal_error
+        "dereferencing expression of non-array type %s"
+        (Ctypes.string_of_typ t)
+      end
 end
