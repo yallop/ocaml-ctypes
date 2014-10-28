@@ -27,7 +27,7 @@ fts-cmd: PROJECT=fts-cmd
 fts-cmd: $$(NATIVE_TARGET)
 
 fts-cmd-build: examples/fts/stub-generation/fts_generated.ml
-examples/fts/stub-generation/fts_generated.ml:
+examples/fts/stub-generation/fts_generated.ml: fts-stub-generator
 	_build/fts-stub-generator.native
 
 # subproject: fts using dynamic linking (foreign)
@@ -90,7 +90,7 @@ ncurses-cmd: PROJECT=ncurses-cmd
 ncurses-cmd: $$(NATIVE_TARGET)
 
 ncurses-cmd-build: examples/ncurses/stub-generation/ncurses_generated.ml
-examples/ncurses/stub-generation/ncurses_generated.ml:
+examples/ncurses/stub-generation/ncurses_generated.ml: ncurses-stubs
 	_build/ncurses-stubs.native
 
 # subproject: ncurses using dynamic linking (foreign)
@@ -98,8 +98,15 @@ ncurses.install = no
 ncurses.dir = examples/ncurses/foreign
 ncurses.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
 ncurses.deps = bytes unix bigarray str
-ncurses.link_flags = -Wl,-no-as-needed -lncurses
+ncurses.link_flags = -lncurses
 ncurses: PROJECT=ncurses
 ncurses: $$(NATIVE_TARGET)
 
-examples: build ncurses ncurses-stubs ncurses-cmd-build ncurses-cmd fts fts-stubs fts-stub-generator fts-cmd-build fts-cmd date date-stubs date-stub-generator date-cmd-build date-cmd
+EXAMPLES =
+EXAMPLES += ncurses ncurses-stubs                     ncurses-cmd-build ncurses-cmd
+EXAMPLES += fts     fts-stubs     fts-stub-generator  fts-cmd-build     fts-cmd
+EXAMPLES += date    date-stubs    date-stub-generator date-cmd-build    date-cmd
+
+.PHONY: build $(EXAMPLES)
+
+examples: build $(EXAMPLES)
