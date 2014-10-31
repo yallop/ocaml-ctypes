@@ -7,18 +7,27 @@
 
 open Ctypes
 
+type computed = Computed and immediate = Immediate
+
+module type FUTURE =
+sig
+  type (_, _) future
+
+  val (!^) : 'a -> (computed, 'a) future
+  val (<*>) : (_, 'a -> 'b) future -> (_, 'a) future -> (computed, 'b) future
+end
+
 module type STRUCT =
 sig
-  type _ typ
-  type (_, _) field
+  include FUTURE
 
-  val structure : string -> 's structure typ
-  val union : string -> 's union typ
+  val structure : string -> (immediate, 's structure typ) future
+  val union : string -> (immediate, 's union typ) future
 
-  val field : 't typ -> string -> 'a Ctypes.typ ->
-    ('a, (('s, [<`Struct | `Union]) structured as 't)) field
+  val field : (immediate, 't typ) future -> string -> (_, 'a typ) future ->
+    (computed, ('a, (('s, [<`Struct | `Union]) structured as 't)) field) future
 
-  val seal : (_, [< `Struct | `Union]) structured typ -> unit
+  val seal : (immediate, (_, [< `Struct | `Union]) structured typ) future -> unit
 end
 
 module type BINDINGS = functor (F : STRUCT) -> sig end

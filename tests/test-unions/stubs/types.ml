@@ -12,7 +12,7 @@ struct
   open S
 
   (* missing fields *)
-  let u1 : [`u1] union typ = union "u1"
-  let x1 = field u1 "x1" char
+  let u1 : (Cstubs_structs.immediate, [`u1] union typ) future = union "u1"
+  let x1 = field u1 "x1" !^char
   let () = seal u1
 end

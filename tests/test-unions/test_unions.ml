@@ -151,8 +151,7 @@ end
 
 module Build_struct_stub_tests
     (S : Cstubs_structs.STRUCT
-          with type 'a typ = 'a Ctypes.typ
-           and type ('a, 's) field = ('a, 's) Ctypes.field) =
+          with type ('s, 'a) future = 'a) =
 struct
   module M = Types.Struct_stubs(S)
 

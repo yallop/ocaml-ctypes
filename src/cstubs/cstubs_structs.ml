@@ -7,18 +7,27 @@
 
 open Ctypes
 
+type computed = Computed and immediate = Immediate
+
+module type FUTURE =
+sig
+  type (_, _) future
+
+  val (!^) : 'a -> (computed, 'a) future
+  val (<*>) : (_, 'a -> 'b) future -> (_, 'a) future -> (computed, 'b) future
+end
+
 module type STRUCT =
 sig
-  type _ typ
-  type (_, _) field
+  include FUTURE
 
-  val structure : string -> 's structure typ
-  val union : string -> 's union typ
+  val structure : string -> (immediate, 's structure typ) future
+  val union : string -> (immediate, 's union typ) future
 
-  val field : 't typ -> string -> 'a Ctypes.typ ->
-    ('a, (('s, [<`Struct | `Union]) structured as 't)) field
+  val field : (immediate, 't typ) future -> string -> (_, 'a typ) future ->
+    (computed, ('a, (('s, [<`Struct | `Union]) structured as 't)) field) future
 
-  val seal : (_, [< `Struct | `Union]) structured typ -> unit
+  val seal : (immediate, (_, [< `Struct | `Union]) structured typ) future -> unit
 end
 
 module type BINDINGS = functor (F : STRUCT) -> sig end
@@ -51,8 +60,9 @@ let mlprologue = [
 
   "let (structure, union) = Static.(structure, union)";
   "";
-  "type 'a typ = 'a Static.typ";
-  "type ('a, 's) field = ('a, 's) Static.field";
+  "type (_, 'a) future = 'a";
+  "let (!^) v = v";
+  "let (<*>) f x = f x";
 ]
 
 (* [puts fmt s] writes the call [puts(s);] on [fmt]. *)
@@ -138,12 +148,29 @@ let gen_c () =
   let finally fmt = write_c fmt (fun fmt -> write_ml fmt !fields !structures) in
   let m = 
     (module struct
-      type _ typ = [`Struct | `Union] * string
-      type (_, _) field = unit
-      let structure tag = (`Struct, tag)
-      let union tag = (`Union, tag)
-      let field (tag, kw) name _ = fields := (tag, kw, name) :: !fields
-      let seal (structure : _ typ) = structures := structure :: !structures
+      type (_, _) future =
+          Struct : string -> (immediate, _ structure typ) future
+        | Union : string -> (immediate, _ union typ) future
+        | Computed : (computed, _) future
+      let (!^) value = Computed
+      let (<*>) _ _ = Computed
+      let structure tag = Struct tag
+      let union tag = Union tag
+      let field : type a s.
+                  (immediate, 't typ) future -> string -> (_, a typ) future ->
+                  (computed, (a, ((s, [<`Struct | `Union]) structured as 't)) field) future =    fun (type t) (structured : (immediate, (s, t) structured typ) future) name _ ->
+        match structured with
+          | Struct tag  ->
+              fields := (`Struct, tag, name) :: !fields;
+              Computed
+          | Union tag  ->
+              fields := (`Union, tag, name) :: !fields;
+              Computed
+      let seal : type s a. (immediate, (a, s) structured typ) future -> unit = function
+        | Struct tag  ->
+          structures := (`Struct, tag) :: !structures
+        | Union tag  ->
+          structures := (`Union, tag) :: !structures
      end : STRUCT)
   in (m, finally)
 
