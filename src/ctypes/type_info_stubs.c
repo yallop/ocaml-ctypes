@@ -58,7 +58,7 @@ value ctypes_read(value prim_, value buffer_)
    case Uint8_t: b = ctypes_copy_uint8(*(uint8_t *)buf); break;
    case Uint16_t: b = ctypes_copy_uint16(*(uint16_t *)buf); break;
    case Uint32_t: b = ctypes_copy_uint32(*(uint32_t *)buf); break;
-   case Uint64_t: b = ctypes_copy_uint64(*(uint64 *)buf); break;
+   case Uint64_t: b = ctypes_copy_uint64(*(uint64_t *)buf); break;
    case Camlint: b = Val_int(*(intnat *)buf); break;
    case Nativeint: b = caml_copy_nativeint(*(intnat *)buf); break;
    case Float: b = caml_copy_double(*(float *)buf); break;
