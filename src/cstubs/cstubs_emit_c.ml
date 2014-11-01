@@ -105,11 +105,12 @@ let rec ccomp fmt : ccomp -> unit = function
 
 let format_parameter_list parameters k fmt =
   let format_arg fmt (name, Ty t) =
-    Type_printing.format_typ ~name fmt t
+      Type_printing.format_typ ~name fmt t
   in
   match parameters with
   | [] ->
     Format.fprintf fmt "%t(void)" k
+  | [(_, Ty Void)] -> Format.fprintf fmt "@[%t@[(void)@]@]" k
   | _ ->
     Format.fprintf fmt "@[%t@[%a@]@]" k
       (format_seq "(" format_arg "," ")")
