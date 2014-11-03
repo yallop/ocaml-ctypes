@@ -30,7 +30,7 @@ struct
 
   let castp typ p = Memory.(from_voidp typ (to_voidp p))
 
-  let funptr_opt ?abi fn = Std_views.nullable_view (funptr ?abi fn)
+  let funptr_opt ?abi fn = Std_views.nullable_view (funptr ?abi fn) void
 
   let ptr_of_raw_ptr p = 
     Ctypes.ptr_of_raw_address (Ctypes_ptr.Raw.to_nativeint p)
