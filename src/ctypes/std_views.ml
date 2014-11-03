@@ -16,19 +16,19 @@ let char_ptr_of_string s =
 let string = Static.(view (ptr char))
   ~read:string_of_char_ptr ~write:char_ptr_of_string
 
-let read_nullable t =
-  let coerce = Coerce.coerce Static.(ptr void) t in
-  fun p -> Memory.(if p = null then None else Some (coerce p))
+let read_nullable t reftyp =
+  let coerce = Coerce.coerce Static.(ptr reftyp) t in
+  fun p -> Memory.(if to_voidp p = null then None else Some (coerce p))
 
-let write_nullable t =
-  let coerce = Coerce.coerce t Static.(ptr void) in
-  Memory.(function None -> null | Some f -> coerce f)
+let write_nullable t reftyp =
+  let coerce = Coerce.coerce t Static.(ptr reftyp) in
+  Memory.(function None -> from_voidp reftyp null | Some f -> coerce f)
 
-let nullable_view t =
-  let read = read_nullable t
-  and write = write_nullable t in
-  Static.(view ~read ~write (ptr void))
+let nullable_view t reftyp =
+  let read = read_nullable t reftyp
+  and write = write_nullable t reftyp in
+  Static.(view ~read ~write (ptr reftyp))
 
-let ptr_opt t = nullable_view (Static.ptr t)
+let ptr_opt t = nullable_view (Static.ptr t) t
 
-let string_opt = nullable_view string
+let string_opt = nullable_view string Static.char
