@@ -309,7 +309,7 @@ type ('a, 't) field = ('a, 't) Static.field
 
 val structure : string -> 's structure typ
 (** Construct a new structure type.  The type value returned is incomplete and
-    can be updated using {!(*:*)} until it is passed to {!seal}, at which point
+    can be updated using {!field} until it is passed to {!seal}, at which point
     the set of fields is fixed.
 
     The type (['_s structure typ]) of the expression returned by the call
@@ -324,7 +324,7 @@ val structure : string -> 's structure typ
 
 val union : string -> 's union typ
 (** Construct a new union type.  This behaves analogously to {!structure};
-    fields are added with {!(+:+)}. *)
+    fields are added with {!field}. *)
 
 val field : 't typ -> string -> 'a typ ->
   ('a, (('s, [<`Struct | `Union]) structured as 't)) field
