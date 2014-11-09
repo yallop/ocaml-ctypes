@@ -69,6 +69,9 @@ let test_atomic_printing _ =
     assert_typ_printed_as "unsigned char"
       uchar;
 
+    assert_typ_printed_as "_Bool"
+      bool;
+
     assert_typ_printed_as ~name:"g" "uint8_t g"
       uint8_t;
 

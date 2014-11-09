@@ -60,6 +60,7 @@ type 'a prim = 'a Primitives.prim =
   Char : char prim
 | Schar : int prim
 | Uchar : uchar prim
+| Bool : bool prim
 | Short : int prim
 | Int : int prim
 | Long : long prim

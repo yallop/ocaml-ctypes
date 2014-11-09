@@ -18,6 +18,7 @@ enum ctypes_primitive {
   Char,
   Schar,
   Uchar,
+  Bool,
   Short,
   Int,
   Long,

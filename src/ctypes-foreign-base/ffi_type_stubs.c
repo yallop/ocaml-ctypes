@@ -53,6 +53,7 @@ static ffi_type *primitive_ffi_types[] = {
   &ctypes_ffi_type_char,    /* Char */
   &ffi_type_schar,          /* Schar */
   &ffi_type_uchar,          /* Uchar */
+  NULL,                     /* Bool */
   &ffi_type_sshort,         /* Short */
   &ffi_type_sint,           /* Int */
   &ffi_type_slong,          /* Long */

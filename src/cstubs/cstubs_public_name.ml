@@ -13,6 +13,7 @@ open Ctypes_path
 let ident_of_ml_prim : type a. a Primitives.ml_prim -> path =
   let open Primitives in function
    | ML_char -> path_of_string "char"
+   | ML_bool -> path_of_string "bool"
    | ML_complex -> path_of_string "Complex.t"
    | ML_float -> path_of_string "float"
    | ML_int -> path_of_string "int"
@@ -37,6 +38,7 @@ let constructor_ident_of_prim : type a. a Primitives.prim -> path =
    | Char -> path_of_string "Ctypes.char"
    | Schar -> path_of_string "Ctypes.schar"
    | Uchar -> path_of_string "Ctypes.uchar"
+   | Bool -> path_of_string "Ctypes.bool"
    | Short -> path_of_string "Ctypes.short"
    | Int -> path_of_string "Ctypes.int"
    | Long -> path_of_string "Ctypes.long"
@@ -70,6 +72,7 @@ let constructor_cident_of_prim :
     | Char -> path "Char"
     | Schar -> path "Schar"
     | Uchar -> path "Uchar"
+    | Bool -> path "Bool"
     | Short -> path "Short"
     | Int -> path "Int"
     | Long -> path "Long"

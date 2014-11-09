@@ -105,6 +105,9 @@ val camlint : int typ
 val uchar : uchar typ
 (** Value representing the C type [unsigned char]. *)
 
+val bool : bool typ
+(** Value representing the C type [bool]. *)
+
 val uint8_t : uint8 typ
 (** Value representing an 8-bit unsigned integer C type. *)
 
