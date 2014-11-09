@@ -12,6 +12,7 @@ type _ prim =
  | Char : char prim
  | Schar : int prim
  | Uchar : uchar prim
+ | Bool : bool prim
  | Short : int prim
  | Int : int prim
  | Long : long prim
@@ -48,6 +49,7 @@ type _ ml_prim =
   | ML_nativeint :  nativeint ml_prim
   | ML_size_t :  size_t ml_prim
   | ML_uchar :  uchar ml_prim
+  | ML_bool :  bool ml_prim
   | ML_uint :  uint ml_prim
   | ML_uint16 :  uint16 ml_prim
   | ML_uint32 :  uint32 ml_prim
@@ -61,6 +63,7 @@ let ml_prim : type a. a prim -> a ml_prim = function
   | Char -> ML_char
   | Schar -> ML_int
   | Uchar -> ML_uchar
+  | Bool -> ML_bool
   | Short -> ML_int
   | Int -> ML_int
   | Long -> ML_long

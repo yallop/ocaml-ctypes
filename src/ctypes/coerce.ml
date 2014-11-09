@@ -32,6 +32,7 @@ let ml_prim_coercion :
   | ML_nativeint, ML_nativeint -> Id
   | ML_size_t, ML_size_t -> Id
   | ML_uchar, ML_uchar -> Id
+  | ML_bool, ML_bool -> Id
   | ML_uint, ML_uint -> Id
   | ML_uint16, ML_uint16 -> Id
   | ML_uint32, ML_uint32 -> Id

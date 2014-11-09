@@ -59,6 +59,7 @@ type 'a allocation = [ `Noalloc of 'a noalloc | `Alloc of 'a alloc ]
 let primitive_allocation : type a. a Primitives.prim -> a allocation =
  let open Primitives in function
  | Char -> `Noalloc Noalloc_char
+ | Bool -> `Noalloc Noalloc_bool
  | Schar -> `Noalloc Noalloc_int
  | Short -> `Noalloc Noalloc_int
  | Int -> `Noalloc Noalloc_int

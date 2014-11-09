@@ -201,6 +201,7 @@ let test_pointer_assignment_with_primitives _ =
   let open Unsigned in
   let p_char = allocate char '1'
   and p_uchar = allocate uchar (UChar.of_int 2)
+  and p_bool = allocate bool false
   and p_schar = allocate schar 3
   and p_float = allocate float 4.0
   and p_double = allocate double 5.0
@@ -225,6 +226,7 @@ let test_pointer_assignment_with_primitives _ =
   in begin
     assert_equal '1' (!@p_char);
     assert_equal (UChar.of_int 2) (!@p_uchar);
+    assert_equal false (!@p_bool);
     assert_equal 3 (!@p_schar);
     assert_equal 4.0 (!@p_float);
     assert_equal 5.0 (!@p_double);
@@ -249,6 +251,7 @@ let test_pointer_assignment_with_primitives _ =
 
     p_char <-@ '2';
     p_uchar <-@ (UChar.of_int 102);
+    p_bool <-@ true;
     p_schar <-@ 103;
     p_float <-@ 104.0;
     p_double <-@ 105.0;
@@ -273,6 +276,7 @@ let test_pointer_assignment_with_primitives _ =
 
     assert_equal '2' (!@p_char);
     assert_equal (UChar.of_int 102) (!@p_uchar);
+    assert_equal true (!@p_bool);
     assert_equal 103 (!@p_schar);
     assert_equal 104.0 (!@p_float);
     assert_equal 105.0 (!@p_double);

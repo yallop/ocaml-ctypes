@@ -175,6 +175,7 @@ let int32_t = Primitive Primitives.Int32_t
 let int64_t = Primitive Primitives.Int64_t
 let camlint = Primitive Primitives.Camlint
 let uchar = Primitive Primitives.Uchar
+let bool = Primitive Primitives.Bool
 let uint8_t = Primitive Primitives.Uint8_t
 let uint16_t = Primitive Primitives.Uint16_t
 let uint32_t = Primitive Primitives.Uint32_t

@@ -11,6 +11,7 @@
 #include <errno.h>
 #include <stdint.h>
 #include <complex.h>
+#include <stdbool.h>
 
 #include <caml/mlvalues.h>
 
@@ -26,6 +27,7 @@ static struct details {
   ENTRY(Char, char),
   ENTRY(Schar, signed char),
   ENTRY(Uchar, unsigned char),
+  ENTRY(Bool, bool),
   ENTRY(Short, short),
   ENTRY(Int, int),
   ENTRY(Long, long),

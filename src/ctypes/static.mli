@@ -126,6 +126,7 @@ val int32_t : Signed.Int32.t typ
 val int64_t : Signed.Int64.t typ
 val camlint : int typ
 val uchar : Unsigned.uchar typ
+val bool : bool typ
 val uint8_t : Unsigned.UInt8.t typ
 val uint16_t : Unsigned.UInt16.t typ
 val uint32_t : Unsigned.UInt32.t typ

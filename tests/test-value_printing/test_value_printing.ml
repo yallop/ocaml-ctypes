@@ -98,6 +98,10 @@ struct
     UChar.(assert_equal (string_of uchar (of_int 5)) (to_string (of_int 5)));
     UChar.(assert_equal (string_of uchar _UCHAR_MAX) (to_string _UCHAR_MAX));
 
+    (* bool *)
+    assert_equal (string_of bool true) "true";
+    assert_equal (string_of bool false) "false";
+
     (* unsigned short *)
     let _USHRT_MAX = retrieve_USHRT_MAX () in
 

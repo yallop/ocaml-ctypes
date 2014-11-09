@@ -14,6 +14,7 @@
 #include <assert.h>
 #include <complex.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include <caml/memory.h>
 #include <caml/alloc.h>
@@ -42,6 +43,7 @@ value ctypes_read(value prim_, value buffer_)
    case Char: b = Val_int(*(char *)buf); break;
    case Schar: b = Val_int(*(signed char *)buf); break;
    case Uchar: b = ctypes_copy_uint8(*(unsigned char *)buf); break;
+   case Bool: b = Val_bool(*(bool *)buf); break;
    case Short: b = Val_int(*(short *)buf); break;
    case Int: b = Val_int(*(int *)buf); break;
    case Long: b = ctypes_copy_long(*(long *)buf); break;
@@ -82,6 +84,7 @@ value ctypes_write(value prim_, value v, value buffer_)
    case Char: *(char *)buf = Int_val(v); break;
    case Schar: *(signed char *)buf = Int_val(v); break;
    case Uchar: *(unsigned char *)buf = Uint8_val(v); break;
+   case Bool: *(bool *)buf = Bool_val(v); break;
    case Short: *(short *)buf = Int_val(v); break;
    case Int: *(int *)buf = Int_val(v); break;
    case Long: *(long *)buf = ctypes_long_val(v); break;
@@ -124,6 +127,7 @@ value ctypes_string_of_prim(value prim_, value v)
   case Char: len = snprintf(buf, sizeof buf, "'%c'", Int_val(v)); break;
   case Schar: len = snprintf(buf, sizeof buf, "%d", Int_val(v)); break;
   case Uchar: len = snprintf(buf, sizeof buf, "%d", (unsigned char)Uint8_val(v)); break;
+  case Bool: len = snprintf(buf, sizeof buf, "%s", Bool_val(v) ? "true" : "false"); break;
   case Short: len = snprintf(buf, sizeof buf, "%hd", (short)Int_val(v)); break;
   case Int: len = snprintf(buf, sizeof buf, "%d", Int_val(v)); break;
   case Long: len = snprintf(buf, sizeof buf, "%ld", (long)ctypes_long_val(v)); break;
