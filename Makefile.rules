@@ -23,7 +23,7 @@ else
   OCAMLFLAGS=-g
 endif
 
-C_SOURCE  = $(wildcard $($(PROJECT).dir)/*.c) $(patsubst %,$($(PROJECT).dir)/%,$($(PROJECT).extra_cs))
+C_SOURCE  = $(sort $(wildcard $($(PROJECT).dir)/*.c) $(patsubst %,$($(PROJECT).dir)/%,$($(PROJECT).extra_cs)))
 ML_SOURCE = $(shell $(OCAMLDEP) -sort $(sort $(wildcard $($(PROJECT).dir)/*.ml) \
                     $(patsubst %,$($(PROJECT).dir)/%,$($(PROJECT).extra_mls))))
 
