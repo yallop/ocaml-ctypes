@@ -69,70 +69,6 @@ let test_pointers_to_struct_members _ =
 
 
 (*
-  Test structs with array members.
-*)
-let test_structs_with_array_members _ =
-  let module M = struct
-    type u and s
-
-    let styp : s structure typ = structure "s"
-    let (-:) ty label = field styp label ty
-    let i = int            -: "i"
-    let a = array 3 double -: "a"
-    let c = char           -: "c"
-    let () = seal styp
-
-    let s = make styp
-
-    module Array = CArray
-    let arr = Array.of_list double [3.3; 4.4; 5.5]
-
-    let () = begin
-      setf s i 22;
-      setf s a arr;
-      setf s c 'z';
-
-      assert_equal ~msg:"s.i = 22" ~printer:string_of_int
-        22 (getf s i);
-      
-      assert_equal ~msg:"s.a[0] = 3.3" ~printer:string_of_float
-        3.3 (getf s a).(0);
-
-      assert_equal ~msg:"s.a[0] = 3.3" ~printer:string_of_float
-        3.3 (getf s a).(0);
-
-      assert_equal ~msg:"s.a[1] = 4.4" ~printer:string_of_float
-        4.4 (getf s a).(1);
-
-      assert_equal ~msg:"s.a[2] = 5.5" ~printer:string_of_float
-        5.5 (getf s a).(2);
-
-      assert_raises (Invalid_argument "index out of bounds")
-        (fun () -> (getf s a).(3));
-
-      assert_equal ~msg:"s.c = 'z'" ~printer:(String.make 1)
-        'z' (getf s c);
-
-      (* References to the array member should alias the original *)
-      let arr' = getf s a in
-      
-      arr'.(0) <- 13.3;
-      arr'.(1) <- 24.4;
-      arr'.(2) <- 35.5;
-
-      assert_equal ~msg:"s.a[0] = 13.3" ~printer:string_of_float
-        13.3 (getf s a).(0);
-
-      assert_equal ~msg:"s.a[1] = 24.4" ~printer:string_of_float
-        24.4 (getf s a).(1);
-
-      assert_equal ~msg:"s.a[2] = 35.5" ~printer:string_of_float
-        35.5 (getf s a).(2);
-    end
-  end in ()
-
-
-(*
   Test that attempting to update a sealed struct is treated as an error.
 *)
 let test_updating_sealed_struct _ =
@@ -192,9 +128,6 @@ let suite = "Struct tests" >:::
 
    "pointers to struct members"
    >:: test_pointers_to_struct_members;
-
-   "structs with array members"
-   >:: test_structs_with_array_members;
 
    "updating sealed struct"
    >:: test_updating_sealed_struct;

@@ -31,19 +31,6 @@ let test_primitives_are_passable _ =
 
 
 (*
-  Test that arrays are not passable
-*)
-let test_arrays_are_not_passable _ =
-  assert_raises ~msg:"Array type rejected as argument"
-    (Unsupported "Unsupported argument type")
-    (fun () -> array 1 int @-> returning void);
-      
-  assert_raises ~msg:"Array type rejected as return type"
-    (Unsupported "Unsupported return type")
-    (fun () -> void @-> returning (array 1 int))
-
-
-(*
   Test that function pointers are passable
 *)
 let test_function_pointers_are_passable _ =
@@ -69,9 +56,6 @@ let test_incomplete_passability _ =
 let suite = "Passability tests" >:::
   ["primitives are passable"
     >:: test_primitives_are_passable;
-
-   "arrays are not passable"
-    >:: test_arrays_are_not_passable;
 
    "function pointers are passable"
     >:: test_function_pointers_are_passable;

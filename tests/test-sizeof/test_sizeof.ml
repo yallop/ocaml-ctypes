@@ -82,18 +82,6 @@ let test_sizeof_void _ =
  
 
 (*
-  Test the behaviour of sizeof on array types.
-*)
-let test_sizeof_arrays _ = begin
-  assert_equal ~msg:"The size of an array is the sum of the size of its members"
-    (12 * (sizeof int8_t)) (sizeof (array 12 int8_t));
-
-  assert_equal ~msg:"Arrays of arrays are correctly sized"
-    (5 * 7 * (sizeof nativeint)) (sizeof (array 7 (array 5 nativeint)))
-end
- 
-
-(*
   Test that all pointers have equal size.
 *)
 let test_sizeof_pointers _ = begin
@@ -140,9 +128,6 @@ let suite = "sizeof tests" >:::
 
    "sizeof void"
    >:: test_sizeof_void;
-
-   "sizeof arrays"
-   >:: test_sizeof_arrays;
 
    "sizeof pointers"
    >:: test_sizeof_pointers;

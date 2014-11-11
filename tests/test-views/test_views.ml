@@ -17,29 +17,6 @@ struct
   (*
     Call a function of type
 
-       void (char **sv, int sc, char *buffer)
-
-    using strings for input parameters and a char array for an output
-    parameter.  Examine the output buffer using a cast to a string view.
-  *)
-  let test_passing_string_array _ =
-    let l = ["the "; "quick "; "brown "; "fox "; "etc. "; "etc. "; ] in
-    let arr = CArray.of_list string l in
-
-    let outlen = List.fold_left (fun a s -> String.length s + a) 1 l in
-    let buf = CArray.make char outlen in
-
-    let () = CArray.(concat_strings (start arr) (length arr) (start buf)) in
-    let buf_addr = allocate (ptr char) (CArray.start buf) in
-    let s = from_voidp string (to_voidp buf_addr) in
-
-    assert_equal ~msg:"Check output"
-      "the quick brown fox etc. etc. " !@s
-
-
-  (*
-    Call a function of type
-
        int (int)
 
     using a custom view that treats chars as ints.
@@ -111,10 +88,7 @@ module Foreign_tests = Common_tests(Tests_common.Foreign_binder)
 
 
 let suite = "View tests" >:::
-  ["passing array of strings (foreign)"
-   >:: Foreign_tests.test_passing_string_array;
-
-   "custom views (foreign)"
+  ["custom views (foreign)"
    >:: Foreign_tests.test_passing_chars_as_ints;
 
    "nullable function pointers (foreign)"

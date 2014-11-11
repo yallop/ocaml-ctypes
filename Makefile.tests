@@ -183,39 +183,6 @@ test-custom_ops.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unth
 test-custom_ops: PROJECT=test-custom_ops
 test-custom_ops: $$(NATIVE_TARGET)
 
-test-arrays-stubs.dir  = tests/test-arrays/stubs
-test-arrays-stubs.threads = yes
-test-arrays-stubs.subproject_deps = ctypes \
-   ctypes-foreign-base ctypes-foreign-unthreaded tests-common
-test-arrays-stubs: PROJECT=test-arrays-stubs
-test-arrays-stubs: $$(LIB_TARGETS)
-
-test-arrays-stub-generator.dir = tests/test-arrays/stub-generator
-test-arrays-stub-generator.threads = yes
-test-arrays-stub-generator.subproject_deps = ctypes \
-     ctypes-foreign-base ctypes-foreign-unthreaded test-arrays-stubs tests-common
-test-arrays-stub-generator.deps = str bytes
-test-arrays-stub-generator: PROJECT=test-arrays-stub-generator
-test-arrays-stub-generator: $$(NATIVE_TARGET)
-
-test-arrays.dir = tests/test-arrays
-test-arrays.threads = yes
-test-arrays.deps = str oUnit bytes
-test-arrays.subproject_deps = ctypes ctypes-foreign-base \
-  ctypes-foreign-unthreaded test-arrays-stubs tests-common
-test-arrays.link_flags = -L$(BUILDDIR)/clib -ltest_functions
-test-arrays: PROJECT=test-arrays
-test-arrays: $$(NATIVE_TARGET)
-
-test-arrays-generated: \
-  tests/test-arrays/generated_bindings.ml \
-  tests/test-arrays/generated_stubs.c
-
-tests/test-arrays/generated_stubs.c: $(BUILDDIR)/test-arrays-stub-generator.native
-	$< --c-file $@
-tests/test-arrays/generated_bindings.ml: $(BUILDDIR)/test-arrays-stub-generator.native
-	$< --ml-file $@
-
 test-errno.dir = tests/test-errno
 test-errno.threads = yes
 test-errno.deps = str oUnit bytes
@@ -401,7 +368,6 @@ TESTS += test-cstdlib-stubs test-cstdlib-stub-generator test-cstdlib-generated t
 TESTS += test-sizeof
 TESTS += test-foreign_values
 TESTS += test-custom_ops
-TESTS += test-arrays-stubs test-arrays-stub-generator test-arrays-generated test-arrays
 TESTS += test-errno
 TESTS += test-passable
 TESTS += test-alignment

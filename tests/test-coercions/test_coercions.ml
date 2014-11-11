@@ -23,7 +23,6 @@ let test_pointer_coercions _ =
       T short;
       T (ptr double);
       T string;
-      T (array 5 int32_t);
       T (structure "s");
     ]
 
@@ -143,27 +142,23 @@ let test_unsupported_coercions _ =
     let types = [
       T int8_t,
       [T float;
-       T (array 5 int32_t); T (structure "s")];
+       T (structure "s")];
 
       T int,
       [T float;
-       T (array 5 int32_t); T (structure "s")];
+       T (structure "s")];
 
       T float,
       [T int8_t; T int; T short;
-       T (array 5 int32_t); T (structure "s")];
+       T (structure "s")];
 
       T short,
       [T float;
-       T (array 5 int32_t); T (structure "s")];
-
-      T (array 5 int32_t),
-      [T int8_t; T int; T float; T short;
-       T (array 5 int32_t); T (structure "s")];
+       T (structure "s")];
 
       T (structure "s"),
       [T int8_t; T int; T float; T short;
-       T (array 5 int32_t); T (structure "s")];
+       T (structure "s")];
     ]
 
     (* None of the types in the list are currently intercoercible. *)

@@ -247,47 +247,6 @@ let test_reading_strings _ =
 
 
 (*
-  Tests for various aspects of pointer arithmetic.
-*)
-let test_pointer_arithmetic _ =
-  let module Array = CArray in
-  let arr = Array.of_list int [1;2;3;4;5;6;7;8] in
-
-  (* Traverse the array using an int pointer *)
-  let p = Array.start arr in
-  for i = 0 to 7 do
-    assert_equal !@(p +@ i) (succ i)
-  done;
-
-  let twoints = structure "s" in
-  let i1 = field twoints "i" int in
-  let i2 = field twoints "j" int in
-  let () = seal twoints in
-
-  (* Traverse the array using a 'struct twoints' pointer *)
-  let ps = from_voidp twoints (to_voidp p) in
-
-  for i = 0 to 3 do
-    assert_equal !@((ps +@ i) |-> i1) (2 * i + 1);
-    assert_equal !@((ps +@ i) |-> i2) (2 * i + 2);
-  done;
-
-  (* Traverse the array using a char pointer *)
-  let pc = from_voidp char (to_voidp p) in
-
-  for i = 0 to 7 do
-    let p' = pc +@ i * sizeof int in
-    assert_equal !@(from_voidp int (to_voidp p')) (succ i)
-  done;
-
-  (* Reverse traversal *)
-  let pend = p +@ 7 in
-  for i = 0 to 7 do
-    assert_equal !@(pend -@ i) (8 - i)
-  done
-
-
-(*
   Test pointer comparisons.
 *)
 let test_pointer_comparison _ =
@@ -389,7 +348,6 @@ let test_pointer_differences _ =
   let s = structure "s" in
   let (-:) ty label = field s label ty in
   let i = int           -: "i" in
-  let j = array 17 char -: "j" in
   let k = double        -: "k" in
   let l = char          -: "l" in
   let () = seal s in
@@ -401,22 +359,18 @@ let test_pointer_differences _ =
   let cp = to_charp p in
 
   assert_equal (offsetof i) (ptr_diff cp (to_charp (p |-> i)));
-  assert_equal (offsetof j) (ptr_diff cp (to_charp (p |-> j)));
   assert_equal (offsetof k) (ptr_diff cp (to_charp (p |-> k)));
   assert_equal (offsetof l) (ptr_diff cp (to_charp (p |-> l)));
 
   assert_equal (-offsetof i) (ptr_diff (to_charp (p |-> i)) cp);
-  assert_equal (-offsetof j) (ptr_diff (to_charp (p |-> j)) cp);
   assert_equal (-offsetof k) (ptr_diff (to_charp (p |-> k)) cp);
   assert_equal (-offsetof l) (ptr_diff (to_charp (p |-> l)) cp);
 
   assert_equal (offsetof i) (ptr_diff cp (to_charp (canonicalize (p |-> i))));
-  assert_equal (offsetof j) (ptr_diff cp (to_charp (canonicalize (p |-> j))));
   assert_equal (offsetof k) (ptr_diff cp (to_charp (canonicalize (p |-> k))));
   assert_equal (offsetof l) (ptr_diff cp (to_charp (canonicalize (p |-> l))));
 
   assert_equal (-offsetof i) (ptr_diff (to_charp (canonicalize (p |-> i))) cp);
-  assert_equal (-offsetof j) (ptr_diff (to_charp (canonicalize (p |-> j))) cp);
   assert_equal (-offsetof k) (ptr_diff (to_charp (canonicalize (p |-> k))) cp);
   assert_equal (-offsetof l) (ptr_diff (to_charp (canonicalize (p |-> l))) cp)
 
@@ -470,9 +424,6 @@ let suite = "Pointer tests" >:::
 
    "reading strings"
     >:: test_reading_strings;
-
-   "arithmetic"
-    >:: test_pointer_arithmetic;
 
    "comparisons"
     >:: test_pointer_comparison;
