@@ -12,7 +12,7 @@ let aligned_offset offset alignment =
     0 -> offset
   | overhang -> offset - overhang + alignment
 
-let field (type k) (structured : (_, k) structured typ) fname ftype =
+let field structured fname ftype =
   match structured with
   | Struct { complete = true; tag } -> raise (ModifyingSealedType tag)
   | Struct spec ->
@@ -26,7 +26,7 @@ let field (type k) (structured : (_, k) structured typ) fname ftype =
     end
   | _ -> raise (Unsupported "Adding a field to non-structured type")
 
-let seal (type a) (type s) : (a, s) structured typ -> unit = function
+let seal (type a) : a structure typ -> unit = function
   | Struct { size = 0 } -> raise (Unsupported "struct with no fields")
   | Struct { complete = true; tag } -> raise (ModifyingSealedType tag)
   | Struct spec ->

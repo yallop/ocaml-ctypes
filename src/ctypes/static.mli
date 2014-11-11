@@ -15,8 +15,7 @@ type _ typ =
   | View            : ('a, 'b) view      -> 'a typ
   | Array           : 'a typ * int       -> 'a carray typ
 and 'a carray = { astart : 'a ptr; alength : int }
-and ('a, 'kind) structured = { structured : ('a, 'kind) structured ptr }
-and 'a structure = ('a, [`Struct]) structured
+and 'a structure = { structure : 'a structure ptr }
 and (_, _) pointer =
   CPointer : 'a typ Ctypes_ptr.Fat.t -> ('a, [`C]) pointer
 and 'a ptr = ('a, [`C]) pointer

@@ -10,7 +10,6 @@ open Static
 module type S =
 sig
   type (_, _) field
-  val field : 't typ -> string -> 'a typ ->
-    ('a, (('s, [<`Struct | `Union]) structured as 't)) field
-  val seal : (_, [< `Struct | `Union]) Static.structured Static.typ -> unit
+  val field : 's structure typ -> string -> 'a typ -> ('a, 's structure) field
+  val seal : _ structure typ -> unit
 end

@@ -26,7 +26,7 @@ let rec build : type a b. a typ -> b typ Fat.t -> a
         let managed = Stubs.allocate size in
         let dst = Fat.make ~managed ~reftyp (Stubs.block_address managed) in
         let () = Stubs.memcpy ~size ~dst ~src:buf in
-        { structured = CPointer dst})
+        { structure = CPointer dst})
     | Pointer reftyp ->
       (fun buf -> CPointer (Fat.make ~reftyp (Stubs.Pointer.read buf)))
     | View { read; ty } ->
@@ -37,7 +37,7 @@ let rec build : type a b. a typ -> b typ Fat.t -> a
     | Array _ -> assert false
 
 let rec write : type a b. a typ -> a -> b Fat.t -> unit
-  = let write_aggregate size { structured = CPointer src } dst =
+  = let write_aggregate size { structure = CPointer src } dst =
       Stubs.memcpy ~size ~dst ~src
     in
     function
@@ -64,7 +64,7 @@ let rec (!@) : type a. a ptr -> a
       | Struct { complete = false } -> raise IncompleteType
       | View { read; ty } -> read (!@ (CPointer (Fat.coerce cptr ty)))
       (* If it's a reference type then we take a reference *)
-      | Struct _ -> { structured = ptr }
+      | Struct _ -> { structure = ptr }
       | Array (elemtype, alength) ->
         { astart = CPointer (Fat.coerce cptr elemtype); alength }
       (* If it's a value type then we cons a new value. *)
@@ -183,17 +183,17 @@ end
 
 let make ?finalise s =
   let finalise = match finalise with
-    | Some f -> Some (fun structured -> f { structured })
+    | Some f -> Some (fun structure -> f { structure })
     | None -> None in
-  { structured = allocate_n ?finalise s ~count:1 }
+  { structure = allocate_n ?finalise s ~count:1 }
 let (|->) (CPointer p) { ftype; foffset } =
   CPointer (Fat.(add_bytes (Fat.coerce p ftype) foffset))
 
-let (@.) { structured = p } f = p |-> f
+let (@.) { structure = p } f = p |-> f
 let setf s field v = (s @. field) <-@ v
 let getf s field = !@(s @. field)
 
-let addr { structured } = structured
+let addr { structure } = structure
 
 let string_from_ptr (CPointer p) ~length:len =
   if len < 0 then invalid_arg "Ctypes.string_from_ptr"

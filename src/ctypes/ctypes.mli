@@ -172,10 +172,7 @@ val returning : 'a typ -> 'a fn
 
 (** {3 Struct types} *)
 
-type ('a, 'kind) structured = ('a, 'kind) Static.structured
-(** The base type of values representing C struct types. *)
-
-type 'a structure = ('a, [`Struct]) structured
+type 'a structure = 'a Static.structure
 (** The type of values representing C struct types. *)
 
 type ('a, 't) field
@@ -198,8 +195,8 @@ val structure : string -> 's structure typ
     [let tagname : tagname structure typ = structure "tagname"]
 *)
 
-val field : 't typ -> string -> 'a typ ->
-  ('a, (('s, [<`Struct]) structured as 't)) field
+val field : 's structure typ -> string -> 'a typ ->
+  ('a, 's structure) field
 (** [field ty label ty'] adds a field of type [ty'] with label [label] to the
     structure type [ty] and returns a field value that can be used to
     read and write the field in structure instances (e.g. using
@@ -208,10 +205,7 @@ val field : 't typ -> string -> 'a typ ->
     Attempting to add a field to a structure type that has been sealed with [seal]
     is an error, and will raise {!ModifyingSealedType}. *)
 
-val ( *:* ) : 't typ -> 'a typ -> ('a, (('s, [`Struct]) structured as 't)) field
-(** @deprecated Add an anonymous field to a structure.  Use {!field} instead. *)
-
-val seal : (_, [< `Struct]) structured typ -> unit
+val seal : _ structure typ -> unit
 (** [seal t] completes the struct type [t] so that no further fields
     can be added.  Struct types must be sealed before they can be used
     in a way that involves their size or alignment; see the documentation for
@@ -382,25 +376,25 @@ end
 
 (** {3 Struct values} *)
 
-val make : ?finalise:('s -> unit) -> ((_, _) structured as 's) typ -> 's
+val make : ?finalise:('s -> unit) -> (_ structure as 's) typ -> 's
 (** Allocate a fresh, uninitialised structure value.  The argument
     [?finalise], if present, will be called just before the underlying memory is
     freed. *)
 
-val setf : ((_, _) structured as 's) -> ('a, 's) field -> 'a -> unit
+val setf : (_ structure as 's) -> ('a, 's) field -> 'a -> unit
 (** [setf s f v] overwrites the value of the field [f] in the structure [s]
     with [v]. *)
 
-val getf : ((_, _) structured as 's) -> ('a, 's) field -> 'a
+val getf : (_ structure as 's) -> ('a, 's) field -> 'a
 (** [getf s f] retrieves the value of the field [f] in the structure
     [s].  The semantics for non-scalar types are non-copying, as for
     {!(!@)}.*)
 
-val (@.) : ((_, _) structured as 's) -> ('a, 's) field -> 'a ptr
+val (@.) : (_ structure as 's) -> ('a, 's) field -> 'a ptr
 (** [s @. f] computes the address of the field [f] in the structure
     value [s]. *)
 
-val (|->) : ((_, _) structured as 's) ptr -> ('a, 's) field -> 'a ptr
+val (|->) : (_ structure as 's) ptr -> ('a, 's) field -> 'a ptr
 (** [p |-> f] computes the address of the field [f] in the structure
     value pointed to by [p]. *)
 
@@ -414,7 +408,7 @@ val field_type : ('a, _) field -> 'a typ
 val field_name : (_, _) field -> string
 (** [field_name f] returns the name of the field [f]. *)
 
-val addr : ((_, _) structured as 's) -> 's ptr
+val addr : (_ structure as 's) -> 's ptr
 (** [addr s] returns the address of the structure [s]. *)
 
 (** {3 Coercions} *)
