@@ -42,8 +42,6 @@ type _ fn =
   | Returns  : 'a typ   -> 'a fn
   | Function : 'a typ * 'b fn  -> ('a -> 'b) fn
 
-type boxed_typ = BoxedType : 'a typ -> boxed_typ
-
 let rec sizeof : type a. a typ -> int = function
     Void                           -> raise IncompleteType
   | Primitive p                    -> Ctypes_primitives.sizeof p

@@ -36,8 +36,6 @@ type _ fn =
   | Returns  : 'a typ   -> 'a fn
   | Function : 'a typ * 'b fn  -> ('a -> 'b) fn
 
-type boxed_typ = BoxedType : 'a typ -> boxed_typ
-
 val sizeof : 'a typ -> int
 val alignment : 'a typ -> int
 val passable : 'a typ -> bool
