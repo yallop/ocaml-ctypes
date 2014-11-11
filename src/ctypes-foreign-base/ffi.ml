@@ -54,7 +54,6 @@ struct
     | Pointer _                           -> ArgType (Ffi_stubs.pointer_ffitype ())
     | Struct  ({ complete = true } as s)  -> report_unpassable "struct arguments"
     | View { ty }                         -> arg_type ty
-    | Array _                             -> report_unpassable "arrays"
     (* The following case should never happen; incomplete types are excluded
        during type construction. *)
     | Struct { complete = false }         -> report_unpassable "incomplete types"

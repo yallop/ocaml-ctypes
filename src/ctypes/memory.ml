@@ -32,9 +32,6 @@ let rec build : type a b. a typ -> b typ Fat.t -> a
     | View { read; ty } ->
       let buildty = build ty in
       (fun buf -> read (buildty buf))
-    (* The following cases should never happen; non-struct aggregate
-       types are excluded during type construction. *)
-    | Array _ -> assert false
 
 let rec write : type a b. a typ -> a -> b Fat.t -> unit
   = let write_aggregate size { structure = CPointer src } dst =
@@ -47,10 +44,6 @@ let rec write : type a b. a typ -> a -> b Fat.t -> unit
       (fun (CPointer p) dst -> Stubs.Pointer.write p dst)
     | Struct { complete = false } -> raise IncompleteType
     | Struct { complete = true } as s -> write_aggregate (sizeof s)
-    | Array _ as a ->
-      let size = sizeof a in
-      (fun { astart = CPointer src } dst ->
-        Stubs.memcpy ~size ~dst ~src)
     | View { write = w; ty } ->
       let writety = write ty in
       (fun v -> writety (w v))
@@ -65,8 +58,6 @@ let rec (!@) : type a. a ptr -> a
       | View { read; ty } -> read (!@ (CPointer (Fat.coerce cptr ty)))
       (* If it's a reference type then we take a reference *)
       | Struct _ -> { structure = ptr }
-      | Array (elemtype, alength) ->
-        { astart = CPointer (Fat.coerce cptr elemtype); alength }
       (* If it's a value type then we cons a new value. *)
       | _ -> build (Fat.reftype cptr) cptr
 
@@ -127,59 +118,6 @@ let raw_address_of_ptr (CPointer p) =
      If there is an OCaml object associated with [p] then it is vital
      that the caller retains a reference to it. *)
   Raw.to_nativeint (Fat.unsafe_raw_addr p)
-
-module CArray =
-struct
-  type 'a t = 'a carray
-
-  let check_bound { alength } i =
-    if i >= alength then
-      invalid_arg "index out of bounds"
-
-  let unsafe_get { astart } n = !@(astart +@ n)
-  let unsafe_set { astart } n v = (astart +@ n) <-@ v
-
-  let get arr n =
-    check_bound arr n;
-    unsafe_get arr n
-
-  let set arr n v =
-    check_bound arr n;
-    unsafe_set arr n v
-
-  let start { astart } = astart
-  let length { alength } = alength
-  let from_ptr astart alength = { astart; alength }
-
-  let fill ({ alength } as arr) v =
-    for i = 0 to alength - 1 do unsafe_set arr i v done
-
-  let make : type a. ?finalise:(a t -> unit) -> a typ -> ?initial:a -> int -> a t
-    = fun ?finalise reftype ?initial count ->
-      let finalise = match finalise with
-        | Some f -> Some (fun astart -> f { astart; alength = count } )
-        | None -> None
-      in
-      let arr = { astart = allocate_n ?finalise ~count reftype;
-                  alength = count } in
-      match initial with
-        | None -> arr
-        | Some v -> fill arr v; arr
-
-  let element_type { astart } = reference_type astart
-
-  let of_list typ list =
-    let arr = make typ (List.length list) in
-    List.iteri (set arr) list;
-    arr
-
-  let to_list a =
-    let l = ref [] in
-    for i = length a - 1 downto 0 do
-      l := get a i :: !l
-    done;
-    !l
-end
 
 let make ?finalise s =
   let finalise = match finalise with

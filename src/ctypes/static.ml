@@ -19,8 +19,6 @@ type _ typ =
   | Pointer         : 'a typ             -> 'a ptr typ
   | Struct          : 'a structure_type  -> 'a structure typ
   | View            : ('a, 'b) view      -> 'a typ
-  | Array           : 'a typ * int       -> 'a carray typ
-and 'a carray = { astart : 'a ptr; alength : int }
 and 'a structure = { structure : 'a structure ptr }
 and (_, _) pointer =
   CPointer : 'a typ Ctypes_ptr.Fat.t -> ('a, [`C]) pointer
@@ -53,7 +51,6 @@ let rec sizeof : type a. a typ -> int = function
   | Primitive p                    -> Ctypes_primitives.sizeof p
   | Struct { complete = false }    -> raise IncompleteType
   | Struct { size }                -> size
-  | Array (t, i)                   -> i * sizeof t
   | Pointer _                      -> Ctypes_primitives.pointer_size
   | View { ty }                    -> sizeof ty
 
@@ -62,7 +59,6 @@ let rec alignment : type a. a typ -> int = function
   | Primitive p                      -> Ctypes_primitives.alignment p
   | Struct { complete = false }      -> raise IncompleteType
   | Struct { align }                 -> align
-  | Array (t, _)                     -> alignment t
   | Pointer _                        -> Ctypes_primitives.pointer_alignment
   | View { ty }                      -> alignment ty
 
@@ -71,7 +67,6 @@ let rec passable : type a. a typ -> bool = function
   | Primitive _                    -> true
   | Struct { complete = false }    -> raise IncompleteType
   | Struct _                       -> true
-  | Array _                        -> false
   | Pointer _                      -> true
   | View { ty }                    -> passable ty
 
@@ -88,7 +83,6 @@ let int16_t = Primitive Primitives.Int16_t
 let int32_t = Primitive Primitives.Int32_t
 let int64_t = Primitive Primitives.Int64_t
 let camlint = Primitive Primitives.Camlint
-let array i t = Array (t, i)
 let ptr t = Pointer t
 let ( @->) f t =
   if not (passable f) then
