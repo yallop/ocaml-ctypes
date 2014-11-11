@@ -10,7 +10,7 @@ open OUnit2
 open Foreign
 
 
-module Common_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
+module Common_tests(S : Tests_common.FOREIGN with type 'a fn = 'a) =
 struct
   module M = Functions.Stubs(S)
   open M
@@ -111,39 +111,23 @@ end
 
 
 module Foreign_tests = Common_tests(Tests_common.Foreign_binder)
-module Stub_tests = Common_tests(Generated_bindings)
 
 
 let suite = "Higher-order tests" >:::
   ["test_higher_order_basic (foreign)"
    >:: Foreign_tests.test_higher_order_basic;
 
-   "test_higher_order_basic (stubs)"
-   >:: Stub_tests.test_higher_order_basic;
-
    "test_higher_higher_order (foreign)"
    >:: Foreign_tests.test_higher_higher_order;
-
-   "test_higher_higher_order (stubs)"
-   >:: Stub_tests.test_higher_higher_order;
 
    "test_returning_pointer_to_function (foreign)"
    >:: Foreign_tests.test_returning_pointer_to_function;
 
-   "test_returning_pointer_to_function (stubs)"
-   >:: Stub_tests.test_returning_pointer_to_function;
-
    "test_callback_returns_pointer_to_function (foreign)"
    >:: Foreign_tests.test_callback_returns_pointer_to_function;
 
-   "test_callback_returns_pointer_to_function (stubs)"
-   >:: Stub_tests.test_callback_returns_pointer_to_function;
-
    "test_zero_argument_callbacks (foreign)"
    >:: Foreign_tests.test_zero_argument_callbacks;
-
-   "test_zero_argument_callbacks (stubs)"
-   >:: Stub_tests.test_zero_argument_callbacks;
   ]
 
 

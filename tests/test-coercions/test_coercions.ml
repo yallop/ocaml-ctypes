@@ -25,7 +25,6 @@ let test_pointer_coercions _ =
       T string;
       T (array 5 int32_t);
       T (structure "s");
-      T (union "u");
     ]
 
     (* Check that we can construct a coercion between any two pointer types *)
@@ -70,38 +69,6 @@ let test_struct_first_member_coercions _ =
 
 
 (* 
-   Check that coercions between a pointer to a union and a pointer to
-   a member succeed.
-*)
-let test_union_coercions _ =
-  let module M = struct
-    let u = union "u"
-    let f = field u "f" double
-    let i = field u "i" int
-    let () = seal u
-
-    let () = begin
-      let v = make u in
-      let pf = coerce (ptr u) (ptr double) (addr v) in
-      let pi = coerce (ptr u) (ptr int) (addr v) in
-
-      setf v f 5.5;
-      assert_equal !@pf 5.5;
-
-      pi <-@ 12;
-      assert_equal (getf v i) 12;
-
-      setf v i 14;
-      assert_equal !@pi 14;
-      
-      pf <-@ 6.6;
-      assert_equal (getf v f) 6.6;
-    end
-
-  end in ()
-
-
-(* 
    Check coercions between views.
 *)
 let test_view_coercions _ =
@@ -130,7 +97,7 @@ let test_view_coercions _ =
   end in ()
 
 
-module Common_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
+module Common_tests(S : Tests_common.FOREIGN with type 'a fn = 'a) =
 struct
   module M = Functions.Stubs(S)
   open M
@@ -176,31 +143,27 @@ let test_unsupported_coercions _ =
     let types = [
       T int8_t,
       [T float;
-       T (array 5 int32_t); T (structure "s"); T (union "u")];
+       T (array 5 int32_t); T (structure "s")];
 
       T int,
       [T float;
-       T (array 5 int32_t); T (structure "s"); T (union "u")];
+       T (array 5 int32_t); T (structure "s")];
 
       T float,
       [T int8_t; T int; T short;
-       T (array 5 int32_t); T (structure "s"); T (union "u")];
+       T (array 5 int32_t); T (structure "s")];
 
       T short,
       [T float;
-       T (array 5 int32_t); T (structure "s"); T (union "u")];
+       T (array 5 int32_t); T (structure "s")];
 
       T (array 5 int32_t),
       [T int8_t; T int; T float; T short;
-       T (array 5 int32_t); T (structure "s"); T (union "u")];
+       T (array 5 int32_t); T (structure "s")];
 
       T (structure "s"),
       [T int8_t; T int; T float; T short;
-       T (array 5 int32_t); T (structure "s"); T (union "u")];
-
-      T (union "u"),
-      [T int8_t; T int; T float; T short;
-       T (array 5 int32_t); T (structure "s"); T (union "u")];
+       T (array 5 int32_t); T (structure "s")];
     ]
 
     (* None of the types in the list are currently intercoercible. *)
@@ -212,7 +175,6 @@ let test_unsupported_coercions _ =
 
 
 module Foreign_tests = Common_tests(Tests_common.Foreign_binder)
-module Stub_tests = Common_tests(Generated_bindings)
 
 
 let suite = "Coercsion tests" >:::
@@ -222,17 +184,11 @@ let suite = "Coercsion tests" >:::
    "test struct first member coercions"
     >:: test_struct_first_member_coercions;
 
-   "test union coercions"
-    >:: test_union_coercions;
-
    "test view coercions"
     >:: test_view_coercions;
 
    "test function coercions (foreign)"
     >:: Foreign_tests.test_function_coercions;
-
-   "test function coercions (stubs)"
-    >:: Stub_tests.test_function_coercions;
 
    "test identity coercions"
     >:: test_identity_coercions;

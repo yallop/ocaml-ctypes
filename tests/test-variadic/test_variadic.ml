@@ -11,7 +11,7 @@ open OUnit2
 open Ctypes
 
 
-module Common_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
+module Common_tests(S : Tests_common.FOREIGN with type 'a fn = 'a) =
 struct
   module M = Functions.Stubs(S)
   open M
@@ -43,12 +43,8 @@ struct
 end
 
 
-module Stub_tests = Common_tests(Generated_bindings)
-
 let suite = "Variadic tests" >:::
-  ["snprintf"
-    >:: Stub_tests.test_snprintf;
-  ]
+  []
 
 
 let _ =

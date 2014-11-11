@@ -12,7 +12,7 @@ open Foreign
 
 let testlib = Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW])
 
-module Common_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
+module Common_tests(S : Tests_common.FOREIGN with type 'a fn = 'a) =
 struct
   module M = Functions.Stubs(S)
   open M
@@ -212,9 +212,6 @@ let test_dereferencing_pointers_to_incomplete_types _ =
 
     assert_raises IncompleteType
       (fun () -> !@(from_voidp (structure "incomplete") null));
-
-    assert_raises IncompleteType
-      (fun () -> !@(from_voidp (union "incomplete") null));
   end
 
 
@@ -436,32 +433,19 @@ let test_raw_pointers _ =
 
 
 module Foreign_tests = Common_tests(Tests_common.Foreign_binder)
-module Stub_tests = Common_tests(Generated_bindings)
 
 let suite = "Pointer tests" >:::
   ["passing pointers (foreign)"
     >:: Foreign_tests.test_passing_pointers;
 
-   "passing pointers (stubs)"
-    >:: Stub_tests.test_passing_pointers;
-
    "passing pointers to pointers (foreign)"
     >:: Foreign_tests.test_passing_pointers_to_pointers;
-
-   "passing pointers to pointers (stubs)"
-    >:: Stub_tests.test_passing_pointers_to_pointers;
 
    "callback receiving pointers (foreign)"
     >:: Foreign_tests.test_callback_receiving_pointers;
 
-   "callback receiving pointers (stubs)"
-    >:: Stub_tests.test_callback_receiving_pointers;
-
    "callback returning pointers (foreign)"
     >:: Foreign_tests.test_callback_returning_pointers;
-
-   "callback returning pointers (stubs)"
-    >:: Stub_tests.test_callback_returning_pointers;
 
    "pointer assignment with primitives"
     >:: test_pointer_assignment_with_primitives;
@@ -469,14 +453,8 @@ let suite = "Pointer tests" >:::
    "passing pointer to function pointer (foreign)"
     >:: Foreign_tests.test_passing_pointer_to_function_pointer;
 
-   "passing pointer to function pointer (stubs)"
-    >:: Stub_tests.test_passing_pointer_to_function_pointer;
-
    "callback returning pointer to function pointer (foreign)"
     >:: Foreign_tests.test_callback_returning_pointer_to_function_pointer;
-
-   "callback returning pointer to function pointer (stubs)"
-    >:: Stub_tests.test_callback_returning_pointer_to_function_pointer;
 
    "incomplete types"
     >:: test_dereferencing_pointers_to_incomplete_types;
@@ -487,14 +465,8 @@ let suite = "Pointer tests" >:::
    "passing pointers through functions (foreign)"
     >:: Foreign_tests.test_passing_pointer_through;
 
-   "passing pointers through functions (stubs)"
-    >:: Stub_tests.test_passing_pointer_through;
-
    "returned globals (foreign)"
     >:: Foreign_tests.test_reading_returned_global;
-
-   "returned globals (stubs)"
-    >:: Stub_tests.test_reading_returned_global;
 
    "reading strings"
     >:: test_reading_strings;

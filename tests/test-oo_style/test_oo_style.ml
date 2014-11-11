@@ -9,7 +9,7 @@ open OUnit2
 open Ctypes
 
 
-module Common_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
+module Common_tests(S : Tests_common.FOREIGN with type 'a fn = 'a) =
 struct
   module M = Functions.Stubs(S)
   open M
@@ -79,15 +79,11 @@ struct
 end
 
 module Foreign_tests = Common_tests(Tests_common.Foreign_binder)
-module Stub_tests = Common_tests(Generated_bindings)
 
 
 let suite = "OO-style tests" >:::
   ["OO style (foreign)"
     >:: Foreign_tests.test_oo_hierarchy;
-
-   "OO style (stubs)"
-    >:: Stub_tests.test_oo_hierarchy;
   ]
 
 

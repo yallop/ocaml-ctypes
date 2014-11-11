@@ -9,7 +9,7 @@ open OUnit2
 open Ctypes
 
 
-module Common_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
+module Common_tests(S : Tests_common.FOREIGN with type 'a fn = 'a) =
 struct
   module M = Functions.Stubs(S)
   open M
@@ -108,27 +108,17 @@ let test_nullable_pointer_view _ =
 
 
 module Foreign_tests = Common_tests(Tests_common.Foreign_binder)
-module Stub_tests = Common_tests(Generated_bindings)
 
 
 let suite = "View tests" >:::
   ["passing array of strings (foreign)"
    >:: Foreign_tests.test_passing_string_array;
 
-   "passing array of strings (stubs)"
-   >:: Stub_tests.test_passing_string_array;
-
    "custom views (foreign)"
    >:: Foreign_tests.test_passing_chars_as_ints;
 
-   "custom views (stubs)"
-   >:: Stub_tests.test_passing_chars_as_ints;
-
    "nullable function pointers (foreign)"
    >:: Foreign_tests.test_nullable_function_pointer_view;
-
-   "nullable function pointers (stubs)"
-   >:: Stub_tests.test_nullable_function_pointer_view;
 
    "nullable pointers"
     >:: test_nullable_pointer_view;

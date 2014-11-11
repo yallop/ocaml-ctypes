@@ -22,35 +22,15 @@ let filenames argv =
     (!ml_filename, !c_filename)
   end
 
-module Foreign_binder : Cstubs.FOREIGN with type 'a fn = 'a =
+module Foreign_binder =
 struct
   type 'a fn = 'a
   let foreign name fn = Foreign.foreign name fn
 end
 
-module type STUBS = functor  (F : Cstubs.FOREIGN) -> sig end
+module type FOREIGN = sig
+  type 'a fn = 'a
+  val foreign : string -> ('a -> 'b) Ctypes.fn -> ('a -> 'b) fn
+end
 
-let with_open_formatter filename f =
-  let out = open_out filename in
-  let fmt = Format.formatter_of_out_channel out in
-  let close_channel () = close_out out in
-  try
-    let rv = f fmt in
-    close_channel ();
-    rv
-  with e ->
-    close_channel ();
-    raise e
-
-let header = "#include \"clib/test_functions.h\""
-
-let run ?(cheader="") argv specs =
-  let ml_filename, c_filename = filenames argv in
-  if ml_filename <> "" then
-    with_open_formatter ml_filename
-      (fun fmt -> Cstubs.write_ml fmt ~prefix:"cstubs_tests" specs);
-  if c_filename <> "" then
-    with_open_formatter c_filename
-      (fun fmt -> 
-        Format.fprintf fmt "%s@\n%s@\n" header cheader;
-        Cstubs.write_c fmt ~prefix:"cstubs_tests" specs)
+module type STUBS = functor  (F : FOREIGN) -> sig end

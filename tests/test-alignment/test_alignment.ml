@@ -36,15 +36,6 @@ let test_incomplete_alignment _ =
       assert_raises IncompleteType
         (fun () -> alignment t)
   end in
-
-  let module M = struct
-    let u = union "u"
-    let i = field u "i" int
-
-    let () =
-      assert_raises IncompleteType
-        (fun () -> alignment u)
-  end in
   ()
 
 
@@ -117,21 +108,7 @@ let test_struct_tail_padding _ =
     let c = char -: "c"
     let () = seal (struct_a : a structure typ)
 
-    let u = union "U"
-    let (-:) ty label = field u label ty
-    let x = char -: "x"
-    let () = seal (u : u union typ)
-
-    let struct_b = structure "B"
-    let (-:) ty label = field struct_b label ty
-    let d = struct_a -: "d"
-    let e = u        -: "e"
-    let () = seal (struct_b : b structure typ)
-
     let char_ptr p = from_voidp char (to_voidp p)
-
-    let va = make struct_a and vb = make struct_b
-    let pa = addr va and pb = addr vb
 
     let () = begin
       assert_equal
@@ -145,12 +122,6 @@ let test_struct_tail_padding _ =
         ~printer:string_of_int;
 
       assert_equal
-        ~msg:"((char *)&pa->b - (char *)&pa->a) == alignmentof(int)"
-        (ptr_diff (char_ptr (pa |-> a)) (char_ptr (pa |-> b)))
-        (alignment int)
-        ~printer:string_of_int;
-
-      assert_equal
         ~msg:"offsetof(A, c) == 2 * alignmentof(int)"
         (offsetof c) (2 * alignment int)
         ~printer:string_of_int;
@@ -160,21 +131,6 @@ let test_struct_tail_padding _ =
         (sizeof struct_a)  (3 * alignment int)
         ~printer:string_of_int;
 
-      assert_equal
-        ~msg:"offsetof(B, e) == 3 * alignmentof(int)"
-        (offsetof e) (3 * alignment int)
-        ~printer:string_of_int;
-
-      assert_equal
-        ~msg:"((char *)&pb->e - (char *)&pb->d) == 3 * alignmentof(int)"
-        (ptr_diff (char_ptr (pb |-> d)) (char_ptr (pb |-> e)))
-        (3 * alignment int)
-        ~printer:string_of_int;
-
-      assert_equal
-        ~msg:"sizeof(struct B) == 4 * alignmentof(int)"
-        (sizeof struct_b) (4 * alignment int)
-        ~printer:string_of_int;
     end
   end in ()
 

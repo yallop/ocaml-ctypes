@@ -28,36 +28,6 @@ let test_primitives_are_passable _ =
   in ()
 
 
-(*
-  Test that unions are not passable
-*)
-let test_unions_are_not_passable _ =
-  let module M = struct
-    type u
-
-    let u : u union typ = union "u"
-    let (-:) ty label = field u label ty
-    let c = int    -: "c"
-    let f = double -: "f"
-    let p = ptr u  -: "p"
-    let () = seal u
-
-    let _ = begin
-      (* union types can be used as argument types *)
-      ignore (u @-> returning void);
-
-      assert_raises ~msg:"Foreign rejects union types as argument types"
-        (Unsupported "libffi does not support passing unions")
-        (fun () -> Foreign.funptr (u @-> returning void));
-      
-      (* union types can be used as return types *)
-      ignore (u @-> returning void);
-
-      assert_raises ~msg:"Foreign rejects union types as return types"
-        (Unsupported "libffi does not support passing unions")
-        (fun () -> Foreign.funptr (void @-> returning u));
-    end
-  end in ()
 
 
 (*
@@ -74,36 +44,6 @@ let test_arrays_are_not_passable _ =
 
 
 (*
-  Test that pointers are passable
-*)
-let test_pointers_are_passable _ =
-  (* Pointers to primitives are passable *)
-  let _ = ptr void @-> returning (ptr void)
-  and _ = ptr int @-> returning (ptr int)
-  and _ = ptr (ptr int) @-> returning (ptr (ptr int))
-  in
-
-  (* Pointers to unpassable types are passable *)
-  let module M = struct
-    type s1 and u
-
-    let s1 : s1 structure typ = structure "s1"
-    let _ = field s1 "_" int
-    let _ = field s1 "_" (ptr s1)
-    let () = seal s1
-
-    let u : u union typ = union "u"
-    let _ = field u "_" int
-    let () = seal u
-  end in
-  let open M in
-
-  let _ = ptr s1 @-> returning (ptr s1)
-  and _ = ptr u @-> returning (ptr u) in
-  ()
-
-
-(*
   Test that function pointers are passable
 *)
 let test_function_pointers_are_passable _ =
@@ -111,124 +51,18 @@ let test_function_pointers_are_passable _ =
   ignore (Foreign.funptr (int @-> returning int)
           @-> returning (Foreign.funptr (int @-> returning int)))
 
-
-(*
-  Test struct passability.  Structs are passable unless they contain
-  unpassable members (unions, arrays, or unpassable structs).
-*)
-let test_struct_passability _ =
-  let module M = struct
-    type s1 and s2 and s3 and s4 and s5 and s6 and u
-
-    let s1 : s1 structure typ = structure "s1"
-    let (-:) ty label = field s1 label ty
-    let _ = int -: "_"
-    let _ = double -: "_"
-    let _ = ptr s1 -: "_"
-    let _ = Foreign.funptr (int @-> returning int) -: "_"
-    let () = seal s1
-
-    let s2 : s2 structure typ = structure "s2"
-    let (-:) ty label = field s2 label ty
-    let _ = s1 -: "_"
-    let _ = double -: "_"
-    let _ = ptr (array 10 int) -: "_"
-    let () = seal s2
-
-    let s3 : s3 structure typ = structure "s3"
-    let (-:) ty label = field s3 label ty
-    let _ = array 10 (ptr char) -: "_"
-    let () = seal s3
-
-    let s4 : s4 structure typ = structure "s4"
-    let (-:) ty label = field s4 label ty
-    let _ = s3 -: "_"
-    let () = seal s4
-
-    let u : u union typ = union "u"
-    let (-:) ty label = field u label ty
-    let _ = int -: "_"
-    let () = seal u
-
-    let s5 : s5 structure typ = structure "s5"
-    let (-:) ty label = field s5 label ty
-    let _ = u -: "_"
-    let () = seal s5
-
-    let _ = begin
-      (* Struct types can be argument types *)
-      ignore (s1 @-> returning void);
-      ignore (s2 @-> returning void);
-
-      (* Struct types can be return types *)
-      ignore (void @-> returning s1);
-      ignore (void @-> returning s2);
-
-      (* Structs with array members can be arguments *)
-      ignore (s3 @-> returning void);
-
-      assert_raises
-        ~msg:"Foreign rejects structs with array members as arguments"
-        (Unsupported "libffi does not support passing arrays")
-        (fun () -> Foreign.funptr (s3 @-> returning void));
-
-      (* Structs with array members can be return types *)
-      ignore (void @-> returning s3);
-
-      assert_raises
-        ~msg:"Foreign rejects structs with array members as return types"
-        (Unsupported "libffi does not support passing arrays")
-        (fun () -> Foreign.funptr (void @-> returning s3));
-
-
-      assert_raises
-        ~msg:"Foreign rejects structs with unpassable struct members as arguments"
-        (Unsupported "libffi does not support passing arrays")
-        (fun () -> Foreign.funptr (s4 @-> returning void));
-
-      assert_raises
-        ~msg:"Foreign rejects structs with unpassable struct members as return types"
-        (Unsupported "libffi does not support passing arrays")
-        (fun () -> Foreign.funptr (void @-> returning s4));
- 
-      (* Structs with union members can be arguments *)
-      ignore (s5 @-> returning void);
-
-      assert_raises
-        ~msg:"Foreign rejects structs with union members as arguments"
-        (Unsupported "libffi does not support passing unions")
-        (fun () -> Foreign.funptr (s5 @-> returning void));
- 
-      (* Structs with union members can be return types *)
-      ignore (void @-> returning s5);
-
-      assert_raises
-        ~msg:"Foreign rejects structs with union members as return types"
-        (Unsupported "libffi does not support passing unions")
-        (fun () -> Foreign.funptr (void @-> returning s5));
-    end
-  end in ()
-
-
 (*
   Test passability of incomplete types.  Trying to use an incomplete type
   in a function specification should give rise to an error.
 *)
 let test_incomplete_passability _ =
   let s = structure "incomplete"
-  and u = union "incomplete"
   in begin
     assert_raises IncompleteType
       (fun () -> s @-> returning void);
     
     assert_raises IncompleteType
       (fun () -> void @-> returning s);
-    
-    assert_raises IncompleteType
-      (fun () -> u @-> returning void);
-    
-    assert_raises IncompleteType
-      (fun () -> void @-> returning u);
   end
 
 
@@ -236,20 +70,11 @@ let suite = "Passability tests" >:::
   ["primitives are passable"
     >:: test_primitives_are_passable;
 
-   "unions are not passable"
-    >:: test_unions_are_not_passable;
-
    "arrays are not passable"
     >:: test_arrays_are_not_passable;
 
-   "pointers are passable"
-    >:: test_pointers_are_passable;
-
    "function pointers are passable"
     >:: test_function_pointers_are_passable;
-
-   "struct passability"
-    >:: test_struct_passability;
 
    "incomplete types are not passable"
     >:: test_incomplete_passability;

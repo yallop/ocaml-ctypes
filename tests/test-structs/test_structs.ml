@@ -12,73 +12,6 @@ open Ctypes
 let testlib = Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW])
 
 
-module Build_foreign_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
-struct
-  module M = Functions.Common(S)
-  open M
-
-  (*
-    Call a function of type
-
-       void (struct simple)
-
-    where
-
-       struct simple {
-         int i;
-         double f;
-         struct simple *self;
-       };
-  *)
-  let test_passing_struct _ =
-    let module M = struct
-      let s = make simple
-
-      let () = begin
-        setf s i 10;
-        setf s f 14.5;
-        setf s self (from_voidp simple null)
-      end
-
-      let v = accept_struct s
-
-      let () = assert_equal 25 v
-        ~printer:string_of_int
-
-    end in ()
-
-
-  (*
-    Call a function of type
-
-       struct simple(void)
-
-    where
-
-       struct simple {
-         int i;
-         double f;
-         struct simple *self;
-       };
-  *)
-  let test_returning_struct _ =
-    let module M = struct
-      let s = return_struct ()
-
-      let () = assert_equal 20 (getf s i)
-      let () = assert_equal 35.0 (getf s f)
-
-      let t = getf s self
-
-      let () = assert_equal 10 !@(t |-> i)
-        ~printer:string_of_int
-      let () = assert_equal 12.5 !@(t |-> f)
-        ~printer:string_of_float
-
-      let () = assert_equal (to_voidp !@(t |-> self)) (to_voidp t)
-
-    end in ()
-end
 
 (*
   Check that attempts to use incomplete types for struct members are rejected.
@@ -91,9 +24,6 @@ let test_incomplete_struct_members _ =
 
     assert_raises IncompleteType
       (fun () -> field s "_" (structure "incomplete"));
-
-    assert_raises IncompleteType
-      (fun () -> field s "_" (union "incomplete"));
   end
 
 
@@ -134,64 +64,6 @@ let test_pointers_to_struct_members _ =
       (sp |-> k) <-@ (sp |-> i);
       assert_equal ~msg:"*sp->k = 15" ~printer:string_of_int
         15 (!@(!@(sp |-> k)));
-    end
-  end in ()
-
-
-(*
-  Test structs with union members.
-*)
-let test_structs_with_union_members _ =
-  let module M = struct
-    type u and s
-
-    let double_eq l r =
-      let eps = 1e-12 in abs_float (l -. r) < eps
-
-    let utyp : u union typ = union "u"
-    let (-:) ty label = field utyp label ty
-    let uc = char      -: "uc"
-    let ui = int       -: "ui"
-    let uz = double    -: "uz"
-    let () = seal utyp
-
-    let u = make utyp
-
-    let () = begin
-      setf u ui 14;
-      assert_equal ~msg:"u.ui = 14" ~printer:string_of_int
-        14 (getf u ui);
-
-      setf u uc 'x';
-      assert_equal ~msg:"u.uc = 'x'" ~printer:(String.make 1)
-        'x' (getf u uc);
-
-      setf u uz 5.55;
-      assert_equal ~msg:"u.uz = 5.55 - 3.3i" ~cmp:double_eq 5.55 (getf u uz);
-    end
-
-    let styp : s structure typ = structure "s"
-    let (-:) ty label = field styp label ty
-    let si = int  -: "si"
-    let su = utyp -: "su"
-    let sc = char -: "sc"
-    let () = seal styp
-
-    let s = make styp
-
-    let () = begin
-      setf s si 22;
-      setf s su u;
-      setf s sc 'z';
-
-      assert_equal ~msg:"s.si = 22" ~printer:string_of_int
-        22 (getf s si);
-      
-      assert_equal ~msg:"s.su.uc = 0.0" ~cmp:double_eq
-        5.55 (getf (getf s su) uz);
-
-      assert_equal ~msg:"s.sc = 'z'" ~printer:(String.make 1)
-        'z' (getf s sc);
     end
   end in ()
 
@@ -314,117 +186,12 @@ let test_field_references_not_invalidated _ =
   end in ()
 
 
-(* 
-   Check that references to ffi_type values for structs aren't collected while
-   they're still needed
-*)
-let test_struct_ffi_type_lifetime _ =
-  let module M = struct
-    let f =
-      let t = 
-        void @->
-        returning
-          (begin
-            let s = structure "one_int" in
-            let _ = field s "i" int in
-            let () = seal s in
-            s
-           end)
-      in
-      Foreign.foreign ~from:testlib "return_struct_by_value" t
-
-    let () = Gc.major()
-    let x = f ()
-  end in ()
-
-
-module Build_stub_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
-struct
-  open Functions
-  include Build_foreign_tests(S)
-  module N = Functions.Stubs(S)
-  open N
-
-  (*
-    Test passing structs with union members.
-  *)
-  let test_passing_structs_with_union_members _ =
-    let mkInt v =
-      let t = make tagged in
-      t @. tag <-@ 'i';
-      (t @. num |-> i) <-@ v;
-      t
-    and mkDbl v =
-      let t = make tagged in
-      t @. tag <-@ 'd';
-      (t @. num |-> d) <-@ v;
-      t
-    and readDbl t =
-      assert_equal 'd' !@(t @. tag);
-      !@(t @. num |-> d)
-    in
-    begin
-      assert_equal 10.0 (readDbl (add_tagged_numbers (mkInt 3) (mkInt 7)));
-      assert_equal 10.0 (readDbl (add_tagged_numbers (mkInt 3) (mkDbl 7.0)));
-      assert_equal 10.0 (readDbl (add_tagged_numbers (mkDbl 3.0) (mkInt 7)));
-      assert_equal 10.0 (readDbl (add_tagged_numbers (mkDbl 3.0) (mkDbl 7.0)));
-    end
-
-
-  (*
-    Test passing structs with array members.
-  *)
-  let test_passing_structs_with_array_members _ =
-    let mkTriple (x, y, z) =
-      let t = make triple in
-      t @. elements <-@ CArray.of_list double [x; y; z];
-      t
-    and readTriple t =
-      match CArray.to_list (getf t elements) with
-      | [x; y; z] -> (x, y, z)
-      | _ -> assert false
-    in
-    begin
-      assert_equal
-        (10.0, 20.0, 30.0)
-        (readTriple
-           (add_triples
-              (mkTriple (5.0, 12.0, 17.0))
-              (mkTriple (5.0,  8.0, 13.0))))
-    end
-end
-
-module Foreign_tests = Build_foreign_tests(Tests_common.Foreign_binder)
-module Stub_tests = Build_stub_tests(Generated_bindings)
-
-
 let suite = "Struct tests" >:::
-  ["passing struct (foreign)"
-   >:: Foreign_tests.test_passing_struct;
-
-   "passing struct (stubs)"
-   >:: Stub_tests.test_passing_struct;
-
-   "returning struct (foreign)"
-   >:: Foreign_tests.test_returning_struct;
-
-   "returning struct (stubs)"
-   >:: Stub_tests.test_returning_struct;
-
-   "incomplete struct members rejected"
+  ["incomplete struct members rejected"
    >:: test_incomplete_struct_members;
 
    "pointers to struct members"
    >:: test_pointers_to_struct_members;
-
-   "structs with union members"
-   >:: test_structs_with_union_members;
-
-   "passing structs with union members (stubs)"
-   >:: Stub_tests.test_passing_structs_with_union_members;
-
-   "passing structs with array members (stubs)"
-   >:: Stub_tests.test_passing_structs_with_array_members;
 
    "structs with array members"
    >:: test_structs_with_array_members;
@@ -437,9 +204,6 @@ let suite = "Struct tests" >:::
 
    "field references not invalidated"
    >:: test_field_references_not_invalidated;
-
-   "test struct ffi_type lifetime"
-   >:: test_struct_ffi_type_lifetime;
   ]
 
 

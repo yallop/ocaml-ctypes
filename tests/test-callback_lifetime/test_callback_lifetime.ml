@@ -10,7 +10,7 @@ open Ctypes
 open Foreign
 
 
-module Common_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
+module Common_tests(S : Tests_common.FOREIGN with type 'a fn = 'a) =
 struct
   module M = Functions.Stubs(S)
   open M
@@ -132,26 +132,16 @@ struct
 end
 
 module Foreign_tests = Common_tests(Tests_common.Foreign_binder)
-module Stub_tests = Common_tests(Generated_bindings)
 
 let suite = "Callback lifetime tests" >:::
   ["storing references to OCaml functions (foreign)"
     >:: Foreign_tests.test_storing_function_reference;
 
-   "storing references to OCaml functions (stubs)"
-    >:: Stub_tests.test_storing_function_reference;
-   
    "calling expired closures (foreign)"
     >:: Foreign_tests.test_calling_collected_closure_raises_exception;
 
-   "calling expired closures (stubs)"
-    >:: Stub_tests.test_calling_collected_closure_raises_exception;
-
    "controlling the lifetime of closures passed to C (foreign)"
     >:: Foreign_tests.test_controlling_closure_lifetime;
-
-   "controlling the lifetime of closures passed to C (stubs)"
-    >:: Stub_tests.test_controlling_closure_lifetime;
   ]
 
 

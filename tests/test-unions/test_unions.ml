@@ -44,7 +44,7 @@ let test_inspecting_float _ =
   end in ()
 
 
-module Build_foreign_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
+module Build_foreign_tests(S : Tests_common.FOREIGN with type 'a fn = 'a) =
 struct
   open Functions
   module M = Common(S)
@@ -79,7 +79,7 @@ struct
     end in ()
 end
 
-module Build_stub_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
+module Build_stub_tests(S : Tests_common.FOREIGN with type 'a fn = 'a) =
 struct
   open Functions
   include Build_foreign_tests(S)

@@ -10,7 +10,7 @@ open Ctypes
 open Foreign
 
 
-module Common_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
+module Common_tests(S : Tests_common.FOREIGN with type 'a fn = 'a) =
 struct
   module M = Functions.Stubs(S)
   open M
@@ -90,61 +90,15 @@ struct
       (strcmp "abc" "abc" = 0)
 end
 
-(*
-  Call the functions
-
-     div_t div(int numerator, int denominator)
-
-  where div_t is defined as follows:
-
-    typedef struct
-      {
-        int quot;			/* Quotient.  */
-        int rem;			/* Remainder.  */
-      } div_t;
-*)
-let test_div _ =
-  let module M = struct
-    type div_t
-    let div_t : div_t structure typ = structure "div_t"
-    let (-:) ty label = field div_t label ty
-    let quot = int -: "quot"
-    let rem  = int -: "rem"
-    let () = seal div_t
-
-    let div = foreign "div" (int @-> int @-> returning div_t)
-
-    let test ~num ~dem ~quotient ~remainder =
-      let v = div num dem in
-      let () = assert_equal quotient (getf v quot) in
-      let () = assert_equal remainder (getf v rem) in
-      ()
-
-    let () = test ~num:10 ~dem:2 ~quotient:5 ~remainder:0
-
-    let () = test ~num:11 ~dem:2 ~quotient:5 ~remainder:1
-  end in ()
-
-
 module Foreign_tests = Common_tests(Tests_common.Foreign_binder)
-module Stub_tests = Common_tests(Generated_bindings)
 
 
 let suite = "C standard library tests" >:::
   ["test isX functions (foreign)"
     >:: Foreign_tests.test_isX_functions;
 
-   "test isX functions (stubs)"
-    >:: Stub_tests.test_isX_functions;
-
    "test string function (foreign)"
     >:: Foreign_tests.test_string_functions;
-
-   "test string function (stubs)"
-    >:: Stub_tests.test_string_functions;
-
-   "test div function"
-    >:: test_div;
   ]
 
 

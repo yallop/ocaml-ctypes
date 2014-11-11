@@ -44,25 +44,6 @@ end
 
 
 (*
-  Test some properties of the sizes of unions.
-*)
-let test_sizeof_unions _ =
-  let int_char = union "int_char" in
-  let _ = field int_char "_" int in
-  let _ = field int_char "_" char in
-  let _ = seal int_char in
-  
-  assert_equal (sizeof int) (sizeof int_char);
-
-
-  let char17 = union "char17" in
-  let _ = field char17 "_" (array 17 char) in
-  let _ = seal char17 in
-  
-  assert_equal 17 (sizeof char17)
-
-
-(*
   Test some properties of the sizes of structs.
 *)
 let test_sizeof_structs _ =
@@ -89,9 +70,6 @@ let test_sizeof_structs _ =
 let test_sizeof_incomplete _ = begin
   assert_raises IncompleteType
     (fun () -> sizeof (structure "incomplete"));
-
-  assert_raises IncompleteType
-    (fun () -> sizeof (union "incomplete"));
 end
   
 
@@ -157,9 +135,6 @@ let suite = "sizeof tests" >:::
    "sizeof structs"
    >:: test_sizeof_structs;
    
-   "sizeof unions"
-   >:: test_sizeof_unions;
-
    "sizeof incomplete"
    >:: test_sizeof_incomplete;
 

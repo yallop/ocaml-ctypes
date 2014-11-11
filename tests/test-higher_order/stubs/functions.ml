@@ -10,7 +10,7 @@
 open Ctypes
 open Foreign
 
-module Stubs (F: Cstubs.FOREIGN) =
+module Stubs (F: Tests_common.FOREIGN) =
 struct
   open F
   let higher_order_1 = foreign "higher_order_1"
