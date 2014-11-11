@@ -20,12 +20,10 @@ type _ typ =
   | Primitive       : 'a Primitives.prim -> 'a typ
   | Pointer         : 'a typ             -> 'a ptr typ
   | Struct          : 'a structure_type  -> 'a structure typ
-  | Union           : 'a union_type      -> 'a union typ
   | View            : ('a, 'b) view      -> 'a typ
   | Array           : 'a typ * int       -> 'a carray typ
 and 'a carray = { astart : 'a ptr; alength : int }
 and ('a, 'kind) structured = { structured : ('a, 'kind) structured ptr }
-and 'a union = ('a, [`Union]) structured
 and 'a structure = ('a, [`Struct]) structured
 and (_, _) pointer =
   CPointer : 'a typ Ctypes_ptr.Fat.t -> ('a, [`C]) pointer
@@ -44,11 +42,6 @@ and 'a structure_type = {
   tag: string;
   mutable spec: 'a structspec;
   mutable fields : 'a structure boxed_field list;
-}
-and 'a union_type = {
-  utag: string;
-  mutable uspec: structured_spec option;
-  mutable ufields : 'a union boxed_field list;
 }
 and 's boxed_field = BoxedField : ('a, 's) field -> 's boxed_field
 
@@ -81,7 +74,6 @@ val ( @-> ) : 'a typ -> 'b fn -> ('a -> 'b) fn
 val view : read:('a -> 'b) -> write:('b -> 'a) -> 'a typ -> 'b typ
 val returning : 'a typ -> 'a fn
 val structure : string -> 'a structure typ
-val union : string -> 'a union typ
 val offsetof : ('a, 'b) field -> int
 val field_type : ('a, 'b) field -> 'a typ
 val field_name : ('a, 'b) field -> string

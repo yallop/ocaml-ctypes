@@ -34,12 +34,7 @@ let field (type k) (structured : (_, k) structured typ) label ftype =
       s.fields <- BoxedField field :: s.fields;
       field
     end
-  | Union ({ uspec = None } as u) ->
-    let field = { ftype; foffset = 0; fname = label } in
-    u.ufields <- BoxedField field :: u.ufields;
-    field
   | Struct { tag; spec = Complete _ } -> raise (ModifyingSealedType tag)
-  | Union { utag } -> raise (ModifyingSealedType utag)
   | _ -> raise (Unsupported "Adding a field to non-structured type")
 
 let seal (type a) (type s) : (a, s) structured typ -> unit = function
@@ -50,14 +45,4 @@ let seal (type a) (type s) : (a, s) structured typ -> unit = function
     let align = max_field_alignment s.fields in
     let size = aligned_offset isize align in
     s.spec <- Complete { (* sraw_io;  *)size; align }
-  | Union { utag; uspec = Some _ } ->
-    raise (ModifyingSealedType utag)
-  | Union { ufields = [] } ->
-    raise (Unsupported "union with no fields")
-  | Union u -> begin
-    u.ufields <- List.rev u.ufields;
-    let size = max_field_size u.ufields
-    and align = max_field_alignment u.ufields in
-    u.uspec <- Some { align; size = aligned_offset size align }
-  end
   | _ -> raise (Unsupported "Sealing a non-structured type")

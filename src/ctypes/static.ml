@@ -26,7 +26,6 @@ type _ typ =
   | Primitive       : 'a Primitives.prim -> 'a typ
   | Pointer         : 'a typ             -> 'a ptr typ
   | Struct          : 'a structure_type  -> 'a structure typ
-  | Union           : 'a union_type      -> 'a union typ
   | View            : ('a, 'b) view      -> 'a typ
   | Array           : 'a typ * int       -> 'a carray typ
 and 'a carray = { astart : 'a ptr; alength : int }
@@ -52,12 +51,6 @@ and 'a structure_type = {
   (* fields are in reverse order iff the struct type is incomplete *)
   mutable fields : 'a structure boxed_field list;
 }
-and 'a union_type = {
-  utag: string;
-  mutable uspec: structured_spec option;
-  (* fields are in reverse order iff the union type is incomplete *)
-  mutable ufields : 'a union boxed_field list;
-}
 and 's boxed_field = BoxedField : ('a, 's) field -> 's boxed_field
 
 type _ fn =
@@ -72,9 +65,6 @@ let rec sizeof : type a. a typ -> int = function
   | Struct { spec = Incomplete _ } -> raise IncompleteType
   | Struct { spec = Complete
       { size } }                   -> size
-  | Union { uspec = None }         -> raise IncompleteType
-  | Union { uspec = Some { size } }
-                                   -> size
   | Array (t, i)                   -> i * sizeof t
   | Pointer _                      -> Ctypes_primitives.pointer_size
   | View { ty }                    -> sizeof ty
@@ -85,8 +75,6 @@ let rec alignment : type a. a typ -> int = function
   | Struct { spec = Incomplete _ }   -> raise IncompleteType
   | Struct { spec = Complete
       { align } }                    -> align
-  | Union { uspec = None }           -> raise IncompleteType
-  | Union { uspec = Some { align } } -> align
   | Array (t, _)                     -> alignment t
   | Pointer _                        -> Ctypes_primitives.pointer_alignment
   | View { ty }                      -> alignment ty
@@ -96,8 +84,6 @@ let rec passable : type a. a typ -> bool = function
   | Primitive _                    -> true
   | Struct { spec = Incomplete _ } -> raise IncompleteType
   | Struct { spec = Complete _ }   -> true
-  | Union  { uspec = None }        -> raise IncompleteType
-  | Union  { uspec = Some _ }      -> true
   | Array _                        -> false
   | Pointer _                      -> true
   | View { ty }                    -> passable ty
@@ -131,8 +117,6 @@ let returning v =
 
 let structure tag =
   Struct { spec = Incomplete { isize = 0 }; tag; fields = [] }
-
-let union utag = Union { utag; uspec = None; ufields = [] }
 
 let offsetof { foffset } = foffset
 let field_type { ftype } = ftype

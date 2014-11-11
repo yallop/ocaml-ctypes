@@ -28,8 +28,7 @@ type 'a typ = 'a Static.typ
     - constructing pointers for reading and writing locations in C-managed
     storage using {!ptr}
 
-    - describing the fields of structured types built with {!structure} and
-    {!union}.
+    - describing the fields of structured types built with {!structure} .
 *)
 
 (** {3 The void type} *)
@@ -171,23 +170,18 @@ val returning : 'a typ -> 'a fn
     to be used together with {!(@->)}; see the documentation for {!(@->)} for an
     example. *)
 
-(** {3 Struct and union types} *)
+(** {3 Struct types} *)
 
 type ('a, 'kind) structured = ('a, 'kind) Static.structured
-(** The base type of values representing C struct and union types.  The
-    ['kind] parameter is a polymorphic variant type indicating whether the type
-    represents a struct ([`Struct]) or a union ([`Union]). *)
+(** The base type of values representing C struct types. *)
 
 type 'a structure = ('a, [`Struct]) structured
 (** The type of values representing C struct types. *)
 
-type 'a union = ('a, [`Union]) structured
-(** The type of values representing C union types. *)
-
 type ('a, 't) field
-(** The type of values representing C struct or union members (called "fields"
+(** The type of values representing C struct members (called "fields"
     here).  A value of type [(a, s) field] represents a field of type [a] in a
-    struct or union of type [s]. *)
+    struct of type [s]. *)
 
 val structure : string -> 's structure typ
 (** Construct a new structure type.  The type value returned is incomplete and
@@ -204,29 +198,22 @@ val structure : string -> 's structure typ
     [let tagname : tagname structure typ = structure "tagname"]
 *)
 
-val union : string -> 's union typ
-(** Construct a new union type.  This behaves analogously to {!structure};
-    fields are added with {!(+:+)}. *)
-
 val field : 't typ -> string -> 'a typ ->
-  ('a, (('s, [<`Struct | `Union]) structured as 't)) field
+  ('a, (('s, [<`Struct]) structured as 't)) field
 (** [field ty label ty'] adds a field of type [ty'] with label [label] to the
-    structure or union type [ty] and returns a field value that can be used to
-    read and write the field in structure or union instances (e.g. using
+    structure type [ty] and returns a field value that can be used to
+    read and write the field in structure instances (e.g. using
     {!getf} and {!setf}).
 
-    Attempting to add a field to a union type that has been sealed with [seal]
+    Attempting to add a field to a structure type that has been sealed with [seal]
     is an error, and will raise {!ModifyingSealedType}. *)
 
 val ( *:* ) : 't typ -> 'a typ -> ('a, (('s, [`Struct]) structured as 't)) field
 (** @deprecated Add an anonymous field to a structure.  Use {!field} instead. *)
 
-val ( +:+ ) : 't typ -> 'a typ -> ('a, (('s, [`Union]) structured as 't)) field
-(** @deprecated Add an anonymous field to a union.  Use {!field} instead. *)
-
-val seal : (_, [< `Struct | `Union]) structured typ -> unit
-(** [seal t] completes the struct or union type [t] so that no further fields
-    can be added.  Struct and union types must be sealed before they can be used
+val seal : (_, [< `Struct]) structured typ -> unit
+(** [seal t] completes the struct type [t] so that no further fields
+    can be added.  Struct types must be sealed before they can be used
     in a way that involves their size or alignment; see the documentation for
     {!IncompleteType} for further details.  *)
 
@@ -393,28 +380,28 @@ sig
 end
 (** Operations on C arrays. *)
 
-(** {3 Struct and union values} *)
+(** {3 Struct values} *)
 
 val make : ?finalise:('s -> unit) -> ((_, _) structured as 's) typ -> 's
-(** Allocate a fresh, uninitialised structure or union value.  The argument
+(** Allocate a fresh, uninitialised structure value.  The argument
     [?finalise], if present, will be called just before the underlying memory is
     freed. *)
 
 val setf : ((_, _) structured as 's) -> ('a, 's) field -> 'a -> unit
-(** [setf s f v] overwrites the value of the field [f] in the structure or
-    union [s] with [v]. *)
+(** [setf s f v] overwrites the value of the field [f] in the structure [s]
+    with [v]. *)
 
 val getf : ((_, _) structured as 's) -> ('a, 's) field -> 'a
-(** [getf s f] retrieves the value of the field [f] in the structure or union
+(** [getf s f] retrieves the value of the field [f] in the structure
     [s].  The semantics for non-scalar types are non-copying, as for
     {!(!@)}.*)
 
 val (@.) : ((_, _) structured as 's) -> ('a, 's) field -> 'a ptr
-(** [s @. f] computes the address of the field [f] in the structure or union
+(** [s @. f] computes the address of the field [f] in the structure
     value [s]. *)
 
 val (|->) : ((_, _) structured as 's) ptr -> ('a, 's) field -> 'a ptr
-(** [p |-> f] computes the address of the field [f] in the structure or union
+(** [p |-> f] computes the address of the field [f] in the structure
     value pointed to by [p]. *)
 
 val offsetof : (_, _ structure) field -> int
@@ -428,7 +415,7 @@ val field_name : (_, _) field -> string
 (** [field_name f] returns the name of the field [f]. *)
 
 val addr : ((_, _) structured as 's) -> 's ptr
-(** [addr s] returns the address of the structure or union [s]. *)
+(** [addr s] returns the address of the structure [s]. *)
 
 (** {3 Coercions} *)
 
@@ -474,24 +461,24 @@ val coerce_fn : 'a fn -> 'b fn -> 'a -> 'b
 
 exception Unsupported of string
 (** An attempt was made to use a feature not currently supported by ctypes.
-    In practice this refers to attempts to use an union or array
+    In practice this refers to attempts to use an array
     type as an argument or return type of a function. *)
 
 exception ModifyingSealedType of string
-(** An attempt was made to modify a sealed struct or union type
+(** An attempt was made to modify a sealed struct type
     description.  *)
 
 exception IncompleteType
 (** An attempt was made to compute the size or alignment of an incomplete
     type.
 
-    The incomplete types are struct and union types that have not been sealed,
+    The incomplete types are struct types that have not been sealed,
     and the void type.
 
     It is not permitted to compute the size or alignment requirements of an
-    incomplete type, to use it as a struct or union member, to read or write a
+    incomplete type, to use it as a struct member, to read or write a
     value of the type through a pointer or to use it as the referenced type in
-    pointer arithmetic.  Additionally, incomplete struct and union types
+    pointer arithmetic.  Additionally, incomplete struct types
     cannot be used as argument or return types.
 *)
 

@@ -34,7 +34,6 @@ let rec build : type a b. a typ -> b typ Fat.t -> a
       (fun buf -> read (buildty buf))
     (* The following cases should never happen; non-struct aggregate
        types are excluded during type construction. *)
-    | Union _ -> assert false
     | Array _ -> assert false
 
 let rec write : type a b. a typ -> a -> b Fat.t -> unit
@@ -48,8 +47,6 @@ let rec write : type a b. a typ -> a -> b Fat.t -> unit
       (fun (CPointer p) dst -> Stubs.Pointer.write p dst)
     | Struct { spec = Incomplete _ } -> raise IncompleteType
     | Struct { spec = Complete _ } as s -> write_aggregate (sizeof s)
-    | Union { uspec = None } -> raise IncompleteType
-    | Union { uspec = Some { size } } -> write_aggregate size
     | Array _ as a ->
       let size = sizeof a in
       (fun { astart = CPointer src } dst ->
@@ -64,11 +61,9 @@ let rec (!@) : type a. a ptr -> a
   = fun (CPointer cptr as ptr) ->
     match Fat.reftype cptr with
       | Void -> raise IncompleteType
-      | Union { uspec = None } -> raise IncompleteType
       | Struct { spec = Incomplete _ } -> raise IncompleteType
       | View { read; ty } -> read (!@ (CPointer (Fat.coerce cptr ty)))
       (* If it's a reference type then we take a reference *)
-      | Union _ -> { structured = ptr }
       | Struct _ -> { structured = ptr }
       | Array (elemtype, alength) ->
         { astart = CPointer (Fat.coerce cptr elemtype); alength }
