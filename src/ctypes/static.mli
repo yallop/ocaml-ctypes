@@ -7,11 +7,18 @@
 
 (* C type construction.  Internal representation, not for public use. *)
 
+type structure_type = {
+  tag: string;
+  mutable size: int;
+  mutable align: int;
+  mutable complete: bool;
+}
+
 type _ typ =
     Void            :                       unit typ
   | Primitive       : 'a Primitives.prim -> 'a typ
   | Pointer         : 'a typ             -> 'a ptr typ
-  | Struct          : 'a structure_type  -> 'a structure typ
+  | Struct          : structure_type     -> 'a structure typ
   | View            : ('a, 'b) view      -> 'a typ
 and 'a structure = { structure : 'a structure ptr }
 and 'a ptr = CPointer of 'a typ Ctypes_ptr.Fat.t
@@ -20,16 +27,11 @@ and ('a, 'b) view = {
   write : 'a -> 'b;
   ty: 'b typ;
 }
-and ('a, 's) field = {
+
+type ('a, 's) field = {
   ftype: 'a typ;
   foffset: int;
   fname: string;
-}
-and 'a structure_type = {
-  tag: string;
-  mutable size: int;
-  mutable align: int;
-  mutable complete: bool;
 }
 
 type _ fn =
