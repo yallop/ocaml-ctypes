@@ -13,14 +13,6 @@ exception Unsupported of string
 
 let unsupported fmt = Printf.ksprintf (fun s -> raise (Unsupported s)) fmt
 
-type incomplete_size = { mutable isize: int }
-
-type structured_spec = { size: int; align: int; }
-
-type 'a structspec =
-    Incomplete of incomplete_size
-  | Complete of structured_spec
-
 type _ typ =
     Void            :                       unit typ
   | Primitive       : 'a Primitives.prim -> 'a typ
@@ -47,11 +39,10 @@ and ('a, 's) field = {
 }
 and 'a structure_type = {
   tag: string;
-  mutable spec: 'a structspec;
-  (* fields are in reverse order iff the struct type is incomplete *)
-  mutable fields : 'a structure boxed_field list;
+  mutable size: int;
+  mutable align: int;
+  mutable complete: bool;
 }
-and 's boxed_field = BoxedField : ('a, 's) field -> 's boxed_field
 
 type _ fn =
   | Returns  : 'a typ   -> 'a fn
@@ -62,9 +53,8 @@ type boxed_typ = BoxedType : 'a typ -> boxed_typ
 let rec sizeof : type a. a typ -> int = function
     Void                           -> raise IncompleteType
   | Primitive p                    -> Ctypes_primitives.sizeof p
-  | Struct { spec = Incomplete _ } -> raise IncompleteType
-  | Struct { spec = Complete
-      { size } }                   -> size
+  | Struct { complete = false }    -> raise IncompleteType
+  | Struct { size }                -> size
   | Array (t, i)                   -> i * sizeof t
   | Pointer _                      -> Ctypes_primitives.pointer_size
   | View { ty }                    -> sizeof ty
@@ -72,9 +62,8 @@ let rec sizeof : type a. a typ -> int = function
 let rec alignment : type a. a typ -> int = function
     Void                             -> raise IncompleteType
   | Primitive p                      -> Ctypes_primitives.alignment p
-  | Struct { spec = Incomplete _ }   -> raise IncompleteType
-  | Struct { spec = Complete
-      { align } }                    -> align
+  | Struct { complete = false }      -> raise IncompleteType
+  | Struct { align }                 -> align
   | Array (t, _)                     -> alignment t
   | Pointer _                        -> Ctypes_primitives.pointer_alignment
   | View { ty }                      -> alignment ty
@@ -82,8 +71,8 @@ let rec alignment : type a. a typ -> int = function
 let rec passable : type a. a typ -> bool = function
     Void                           -> true
   | Primitive _                    -> true
-  | Struct { spec = Incomplete _ } -> raise IncompleteType
-  | Struct { spec = Complete _ }   -> true
+  | Struct { complete = false }    -> raise IncompleteType
+  | Struct _                       -> true
   | Array _                        -> false
   | Pointer _                      -> true
   | View { ty }                    -> passable ty
@@ -116,7 +105,7 @@ let returning v =
     Returns v
 
 let structure tag =
-  Struct { spec = Incomplete { isize = 0 }; tag; fields = [] }
+  Struct { complete = false; size = 0; align = 0; tag }
 
 let offsetof { foffset } = foffset
 let field_type { ftype } = ftype

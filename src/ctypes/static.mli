@@ -7,14 +7,6 @@
 
 (* C type construction.  Internal representation, not for public use. *)
 
-type incomplete_size = { mutable isize: int }
-
-type structured_spec = { size: int; align: int; }
-
-type 'a structspec =
-    Incomplete of incomplete_size
-  | Complete of structured_spec
-
 type _ typ =
     Void            :                       unit typ
   | Primitive       : 'a Primitives.prim -> 'a typ
@@ -40,10 +32,10 @@ and ('a, 's) field = {
 }
 and 'a structure_type = {
   tag: string;
-  mutable spec: 'a structspec;
-  mutable fields : 'a structure boxed_field list;
+  mutable size: int;
+  mutable align: int;
+  mutable complete: bool;
 }
-and 's boxed_field = BoxedField : ('a, 's) field -> 's boxed_field
 
 type _ fn =
   | Returns  : 'a typ   -> 'a fn

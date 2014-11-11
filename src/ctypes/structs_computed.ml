@@ -7,42 +7,31 @@
 
 open Static
 
-let max_field_alignment fields =
-  List.fold_left
-    (fun align (BoxedField {ftype}) -> max align (alignment ftype))
-    0
-    fields
-
-let max_field_size fields =
-  List.fold_left
-    (fun size (BoxedField {ftype}) -> max size (sizeof ftype))
-    0
-    fields
-
 let aligned_offset offset alignment =
   match offset mod alignment with
     0 -> offset
   | overhang -> offset - overhang + alignment
 
-let field (type k) (structured : (_, k) structured typ) label ftype =
+let field (type k) (structured : (_, k) structured typ) fname ftype =
   match structured with
-  | Struct ({ spec = Incomplete spec } as s) ->
-    let foffset = aligned_offset spec.isize (alignment ftype) in
-    let field = { ftype; foffset; fname = label } in
+  | Struct { complete = true; tag } -> raise (ModifyingSealedType tag)
+  | Struct spec ->
+    let falign = alignment ftype in
+    let foffset = aligned_offset spec.size falign in
+    let field = { ftype; foffset; fname } in
     begin
-      spec.isize <- foffset + sizeof ftype;
-      s.fields <- BoxedField field :: s.fields;
+      spec.size <- foffset + sizeof ftype;
+      spec.align <- max falign spec.align;
       field
     end
-  | Struct { tag; spec = Complete _ } -> raise (ModifyingSealedType tag)
   | _ -> raise (Unsupported "Adding a field to non-structured type")
 
 let seal (type a) (type s) : (a, s) structured typ -> unit = function
-  | Struct { fields = [] } -> raise (Unsupported "struct with no fields")
-  | Struct { spec = Complete _; tag } -> raise (ModifyingSealedType tag)
-  | Struct ({ spec = Incomplete { isize } } as s) ->
-    s.fields <- List.rev s.fields;
-    let align = max_field_alignment s.fields in
-    let size = aligned_offset isize align in
-    s.spec <- Complete { (* sraw_io;  *)size; align }
+  | Struct { size = 0 } -> raise (Unsupported "struct with no fields")
+  | Struct { complete = true; tag } -> raise (ModifyingSealedType tag)
+  | Struct spec ->
+    begin
+      spec.size <- aligned_offset spec.size spec.align;
+      spec.complete <- true
+    end
   | _ -> raise (Unsupported "Sealing a non-structured type")

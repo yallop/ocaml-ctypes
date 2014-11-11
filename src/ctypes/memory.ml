@@ -19,9 +19,9 @@ let rec build : type a b. a typ -> b typ Fat.t -> a
     | Void ->
       fun _ -> ()
     | Primitive p -> Stubs.read p
-    | Struct { spec = Incomplete _ } ->
+    | Struct { complete = false } ->
       raise IncompleteType
-    | Struct { spec = Complete { size } } as reftyp ->
+    | Struct { complete = true; size } as reftyp ->
       (fun buf ->
         let managed = Stubs.allocate size in
         let dst = Fat.make ~managed ~reftyp (Stubs.block_address managed) in
@@ -45,8 +45,8 @@ let rec write : type a b. a typ -> a -> b Fat.t -> unit
     | Primitive p -> Stubs.write p
     | Pointer _ ->
       (fun (CPointer p) dst -> Stubs.Pointer.write p dst)
-    | Struct { spec = Incomplete _ } -> raise IncompleteType
-    | Struct { spec = Complete _ } as s -> write_aggregate (sizeof s)
+    | Struct { complete = false } -> raise IncompleteType
+    | Struct { complete = true } as s -> write_aggregate (sizeof s)
     | Array _ as a ->
       let size = sizeof a in
       (fun { astart = CPointer src } dst ->
@@ -61,7 +61,7 @@ let rec (!@) : type a. a ptr -> a
   = fun (CPointer cptr as ptr) ->
     match Fat.reftype cptr with
       | Void -> raise IncompleteType
-      | Struct { spec = Incomplete _ } -> raise IncompleteType
+      | Struct { complete = false } -> raise IncompleteType
       | View { read; ty } -> read (!@ (CPointer (Fat.coerce cptr ty)))
       (* If it's a reference type then we take a reference *)
       | Struct _ -> { structured = ptr }

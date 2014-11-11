@@ -52,24 +52,12 @@ struct
                                                ("unpassable")
                                              else ArgType ffitype
     | Pointer _                           -> ArgType (Ffi_stubs.pointer_ffitype ())
-    | Struct ({ spec = Complete _ } as s) -> struct_arg_type s
+    | Struct  ({ complete = true } as s)  -> report_unpassable "struct arguments"
     | View { ty }                         -> arg_type ty
     | Array _                             -> report_unpassable "arrays"
     (* The following case should never happen; incomplete types are excluded
        during type construction. *)
-    | Struct { spec = Incomplete _ }      -> report_unpassable "incomplete types"
-  and struct_arg_type : type s. s structure_type -> arg_type =
-     fun ({fields} as s) ->
-       let bufspec = Ffi_stubs.allocate_struct_ffitype (List.length fields) in
-       (* Ensure that `bufspec' stays alive as long as the type does. *)
-       keep_alive bufspec ~while_live:s;
-       List.iteri
-         (fun i (BoxedField {ftype; foffset}) ->
-           let ArgType t = arg_type ftype in
-           Ffi_stubs.struct_type_set_argument bufspec i t)
-         fields;
-       Ffi_stubs.complete_struct_type bufspec;
-       ArgType (Ffi_stubs.ffi_type_of_struct_type bufspec)
+    | Struct { complete = false }         -> report_unpassable "incomplete types"
 
   (*
     call addr callspec
