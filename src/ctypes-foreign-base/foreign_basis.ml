@@ -14,10 +14,6 @@ struct
 
   exception CallToExpiredClosure = Ffi_stubs.CallToExpiredClosure
 
-  let format_function_pointer fn k fmt =
-    Type_printing.format_fn' fn
-      (fun fmt -> Format.fprintf fmt "(*%t)" k) fmt
-
   let funptr ?(abi=Libffi_abi.default_abi) ?name ?(check_errno=false)
       ?(runtime_lock=false) fn =
     let open Ffi in
@@ -25,8 +21,8 @@ struct
       ~abi ~check_errno ~release_runtime_lock:runtime_lock ?name fn
     and write = pointer_of_function
       ~abi ~acquire_runtime_lock:runtime_lock fn
-    and format_typ = format_function_pointer fn in
-    Static.(view ~format_typ ~read ~write (ptr void))
+    in
+    Static.(view ~read ~write (ptr void))
 
   let castp typ p = Memory.(from_voidp typ (to_voidp p))
 

@@ -39,8 +39,6 @@ and 'a ptr = ('a, [`C]) pointer
 and ('a, 'b) view = {
   read : 'b -> 'a;
   write : 'a -> 'b;
-  format_typ: ((Format.formatter -> unit) -> Format.formatter -> unit) option;
-  format: (Format.formatter -> 'a -> unit) option;
   ty: 'b typ;
 }
 and ('a, 's) field = {
@@ -124,8 +122,7 @@ let ( @->) f t =
     raise (Unsupported "Unsupported argument type")
   else
     Function (f, t)
-let view ?format_typ ?format ~read ~write ty =
-  View { read; write; format_typ; format; ty }
+let view ~read ~write ty = View { read; write; ty }
 let returning v =
   if not (passable v) then
     raise (Unsupported "Unsupported return type")

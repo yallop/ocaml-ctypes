@@ -34,16 +34,6 @@ ctypes.install_native_objects = yes
 ctypes: PROJECT=ctypes
 ctypes: $(ctypes.dir)/$(ctypes.extra_mls) $$(LIB_TARGETS)
 
-# cstubs subproject
-cstubs.public = cstubs_internals cstubs cstubs_inverted
-cstubs.dir = src/cstubs
-cstubs.subproject_deps = ctypes
-cstubs.deps = str bytes
-cstubs.install = yes
-
-cstubs: PROJECT=cstubs
-cstubs: $(cstubs.dir)/$(cstubs.extra_mls) $$(LIB_TARGETS)
-
 # ctypes-foreign-base subproject
 ctypes-foreign-base.public = dl libffi_abi
 ctypes-foreign-base.install = yes
@@ -86,17 +76,6 @@ ctypes-foreign-unthreaded.install_native_objects = no
 
 ctypes-foreign-unthreaded: PROJECT=ctypes-foreign-unthreaded
 ctypes-foreign-unthreaded: $$(LIB_TARGETS)
-
-# ctypes-top subproject
-ctypes-top.public = ctypes_printers
-ctypes-top.dir = src/ctypes-top
-ctypes-top.install = yes
-ctypes-top.deps = compiler-libs
-ctypes-top.subproject_deps = ctypes
-ctypes-top.install_native_objects = yes
-
-ctypes-top: PROJECT=ctypes-top
-ctypes-top: $$(LIB_TARGETS)
 
 # configure subproject
 configure.dir = src/configure

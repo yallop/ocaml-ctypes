@@ -232,9 +232,7 @@ val seal : (_, [< `Struct | `Union]) structured typ -> unit
 
 (** {3 View types} *)
 
-val view : ?format_typ:((Format.formatter -> unit) -> Format.formatter -> unit) ->
-           ?format:(Format.formatter -> 'b -> unit) ->
-           read:('a -> 'b) -> write:('b -> 'a) -> 'a typ -> 'b typ
+val view : read:('a -> 'b) -> write:('b -> 'a) -> 'a typ -> 'b typ
 (** [view ~read:r ~write:w t] creates a C type representation [t'] which
     behaves like [t] except that values read using [t'] are subsequently
     transformed using the function [r] and values written using [t'] are first
@@ -247,18 +245,7 @@ val view : ?format_typ:((Format.formatter -> unit) -> Format.formatter -> unit) 
 
     can be used to pass OCaml strings directly to and from bound C functions,
     or to read and write string members in structs and arrays.  (In fact, the
-    {!string} type representation is defined in exactly this way.)
-
-    The optional argument [format_typ] is used by the {!Ctypes.format_typ} and
-    {!string_of_typ} functions to print the type at the top level and
-    elsewhere.  If [format_typ] is not supplied the printer for [t] is used
-    instead.
-
-    The optional argument [format] is used by the {!Ctypes.format}
-    and {!string_of} functions to print the values. If [format_val]
-    is not supplied the printer for [t] is used instead.
-
-*)
+    {!string} type representation is defined in exactly this way.) *)
 
 (** {3 Operations on types} *)
 
@@ -269,27 +256,6 @@ val sizeof : 'a typ -> int
 val alignment : 'a typ -> int
 (** [alignment t] computes the alignment requirements of the type [t].  The
     exception {!IncompleteType} is raised if [t] is incomplete. *)
-
-val format_typ : ?name:string -> Format.formatter -> 'a typ -> unit
-(** Pretty-print a C representation of the type to the specified formatter. *)
-
-val format_fn : ?name:string -> Format.formatter -> 'a fn -> unit
-(** Pretty-print a C representation of the function type to the specified
-    formatter. *)
-
-val string_of_typ : ?name:string -> 'a typ -> string
-(** Return a C representation of the type. *)
-
-val string_of_fn : ?name:string -> 'a fn -> string
-(** Return a C representation of the function type. *)
-
-(** {2:values Values representing C values} *)
-
-val format : 'a typ -> Format.formatter -> 'a -> unit
-(** Pretty-print a representation of the C value to the specified formatter. *)
-
-val string_of : 'a typ -> 'a -> string
-(** Return a string representation of the C value. *)
 
 (** {3 Pointer values} *)
 

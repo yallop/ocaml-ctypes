@@ -33,8 +33,6 @@ and 'a ptr = ('a, [`C]) pointer
 and ('a, 'b) view = {
   read : 'b -> 'a;
   write : 'a -> 'b;
-  format_typ: ((Format.formatter -> unit) -> Format.formatter -> unit) option;
-  format: (Format.formatter -> 'a -> unit) option;
   ty: 'b typ;
 }
 and ('a, 's) field = {
@@ -80,10 +78,7 @@ val camlint : int typ
 val array : int -> 'a typ -> 'a carray typ
 val ptr : 'a typ -> 'a ptr typ
 val ( @-> ) : 'a typ -> 'b fn -> ('a -> 'b) fn
-val view : ?format_typ:((Format.formatter -> unit) ->
-                        Format.formatter -> unit) ->
-           ?format: (Format.formatter -> 'b -> unit) ->
-           read:('a -> 'b) -> write:('b -> 'a) -> 'a typ -> 'b typ
+val view : read:('a -> 'b) -> write:('b -> 'a) -> 'a typ -> 'b typ
 val returning : 'a typ -> 'a fn
 val structure : string -> 'a structure typ
 val union : string -> 'a union typ

@@ -9,13 +9,9 @@ include Static
 
 include Structs_computed
 
-include Type_printing
-
 include Memory
 
 include Std_views
-
-include Value_printing
 
 include Coerce
 
