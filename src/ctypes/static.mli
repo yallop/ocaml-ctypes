@@ -14,9 +14,7 @@ type _ typ =
   | Struct          : 'a structure_type  -> 'a structure typ
   | View            : ('a, 'b) view      -> 'a typ
 and 'a structure = { structure : 'a structure ptr }
-and (_, _) pointer =
-  CPointer : 'a typ Ctypes_ptr.Fat.t -> ('a, [`C]) pointer
-and 'a ptr = ('a, [`C]) pointer
+and 'a ptr = CPointer of 'a typ Ctypes_ptr.Fat.t
 and ('a, 'b) view = {
   read : 'b -> 'a;
   write : 'a -> 'b;

@@ -99,14 +99,7 @@ val double : float typ
 
 (** {4:pointer_types Pointer types} *)
 
-type ('a, 'b) pointer = ('a, 'b) Static.pointer
-(** The type of pointer values. A value of type [('a, [`C]) pointer] contains
-    a C-compatible pointer, and a value of type [('a, [`OCaml]) pointer]
-    contains a pointer to a value that can be moved by OCaml runtime. *)
-
-(** {4 C-compatible pointers} *)
-
-type 'a ptr = ('a, [`C]) pointer
+type 'a ptr
 (** The type of C-compatible pointer values.  A value of type [t ptr] can be
     used to read and write values of type [t] at particular addresses. *)
 
@@ -240,15 +233,15 @@ val (!@) : 'a ptr -> 'a
 val (<-@) : 'a ptr -> 'a -> unit
 (** [p <-@ v] writes the value [v] to the address [p]. *)
 
-val (+@) : ('a, 'b) pointer -> int -> ('a, 'b) pointer
+val (+@) : 'a ptr -> int -> 'a ptr
 (** If [p] is a pointer to an array element then [p +@ n] computes the
     address of the [n]th next element. *)
 
-val (-@) : ('a, 'b) pointer -> int -> ('a, 'b) pointer
+val (-@) : 'a ptr -> int -> 'a ptr
 (** If [p] is a pointer to an array element then [p -@ n] computes the address
     of the nth previous element. *)
 
-val ptr_diff : ('a, 'b) pointer -> ('a, 'b) pointer -> int
+val ptr_diff : 'a ptr -> 'a ptr -> int
 (** [ptr_diff p q] computes [q - p].  As in C, both [p] and [q] must point
     into the same array, and the result value is the difference of the
     subscripts of the two array elements. *)

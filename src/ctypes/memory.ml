@@ -61,7 +61,7 @@ let rec (!@) : type a. a ptr -> a
       (* If it's a value type then we cons a new value. *)
       | _ -> build (Fat.reftype cptr) cptr
 
-let ptr_diff : type a b. (a, b) pointer -> (a, b) pointer -> int
+let ptr_diff : type a. a ptr -> a ptr -> int
   = fun l r ->
     match l, r with
     | CPointer lp, CPointer rp ->
@@ -69,7 +69,7 @@ let ptr_diff : type a b. (a, b) pointer -> (a, b) pointer -> int
          the difference is a multiple of sizeof reftype. *)
       Fat.diff_bytes lp rp / sizeof (Fat.reftype lp)
 
-let (+@) : type a b. (a, b) pointer -> int -> (a, b) pointer
+let (+@) : type a. a ptr -> int -> a ptr
   = fun p x ->
     match p with
     | CPointer p ->
