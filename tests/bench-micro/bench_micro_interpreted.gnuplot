@@ -12,5 +12,5 @@ set ylabel "Time (ns)"
 
 set style data linespoints
 
-plot "interpreted_shared.txt" using 1:2 title "Interpreted", \
-     "traditional.txt"        using 1:2 title "Official"
+plot "interpreted_shared.txt" using 1:2 title "Cmeleon libffi Interpreted", \
+     "traditional.txt"        using 1:2 title "OCaml Manual"

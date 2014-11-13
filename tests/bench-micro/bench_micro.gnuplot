@@ -12,6 +12,6 @@ set ylabel "Time (ns)"
 
 set style data linespoints
 
-plot "staged_functor.txt"     using 1:2 title "Staged", \
-     "traditional.txt"        using 1:2 title "Official", \
-     "cowboy.txt"             using 1:2 title "Expert"
+plot "staged_functor.txt"     using 1:2 title "Cmeleon Staged", \
+     "traditional.txt"        using 1:2 title "OCaml Manual", \
+     "cowboy.txt"             using 1:2 title "OCaml Expert"
