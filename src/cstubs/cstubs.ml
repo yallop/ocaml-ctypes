@@ -167,6 +167,8 @@ let write_frame_structs fmt ~prefix (module B : BINDINGS) =
           let _ = Ctypes.field s "fn_name" Ctypes.int in
           let rec loop : type a. int -> a Ctypes.fn -> unit =
             fun i -> function
+              | Static.Function (Static.Void, fn) ->
+                loop i fn
               | Static.Function (typ, fn) ->
                 let _ = Ctypes.field s (Printf.sprintf "x%d" i) typ in
                 loop (i + 1) fn
@@ -185,7 +187,8 @@ let write_frame_structs fmt ~prefix (module B : BINDINGS) =
 let write_remote_dispatcher fmt ~prefix (module B : BINDINGS) =
   let write x = Format.fprintf fmt x in
   let rec arity : type a. a Static.fn -> int = function
-      Static.Returns _ -> 0
+    | Static.Returns _ -> 0
+    | Static.Function (Static.Void, f) -> arity f
     | Static.Function (_, f) -> 1 + arity f
   in
   let write_call fmt (name, nargs) =

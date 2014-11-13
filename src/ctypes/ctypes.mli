@@ -17,9 +17,10 @@
 (* open Unsigned *)
 
 include Ctypes_types.TYPES
+ with type 'a ptr = 'a Ctypes_types.Types.ptr
 include Ctypes_types.TYP
  with type ('a, 's) field := ('a, 's) field
-  and type 'a typ = 'a Static.typ
+ and type 'a typ = 'a Static.typ
 include Ctypes_types.FUNCTION
 
 (** {3 Operations on types} *)
