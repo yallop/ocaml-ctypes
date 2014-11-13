@@ -1,6 +1,8 @@
 set terminal eps
 set output 'bench_micro_interpreted.eps'
 
+set key left top
+
 set xlabel "Arity"
 
 set autoscale

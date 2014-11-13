@@ -15,6 +15,18 @@ module Make(Bench : Bindings.API with type 'a fn = 'a) = struct
     | 7 -> Staged.stage (fun () -> ignore (Bench.f_i7 1 2 3 4 5 6 7))
     | 8 -> Staged.stage (fun () -> ignore (Bench.f_i8 1 2 3 4 5 6 7 8))
     | 9 -> Staged.stage (fun () -> ignore (Bench.f_i9 1 2 3 4 5 6 7 8 9))
+    | 10-> Staged.stage (fun () ->
+      ignore (Bench.f_i10 1 2 3 4 5 6 7 8 9 10))
+    | 11-> Staged.stage (fun () ->
+      ignore (Bench.f_i11 1 2 3 4 5 6 7 8 9 10 11))
+    | 12-> Staged.stage (fun () ->
+      ignore (Bench.f_i12 1 2 3 4 5 6 7 8 9 10 11 12))
+    | 13-> Staged.stage (fun () ->
+      ignore (Bench.f_i13 1 2 3 4 5 6 7 8 9 10 11 12 13))
+    | 14-> Staged.stage (fun () ->
+      ignore (Bench.f_i14 1 2 3 4 5 6 7 8 9 10 11 12 13 14))
+    | 15-> Staged.stage (fun () ->
+      ignore (Bench.f_i15 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15))
     | _ -> assert false
 end
 
@@ -35,12 +47,24 @@ module Staged_no_functor = struct
     | 7 -> Staged.stage (fun () -> ignore (Staged_bench.f_i7 1 2 3 4 5 6 7))
     | 8 -> Staged.stage (fun () -> ignore (Staged_bench.f_i8 1 2 3 4 5 6 7 8))
     | 9 -> Staged.stage (fun () -> ignore (Staged_bench.f_i9 1 2 3 4 5 6 7 8 9))
+    | 10-> Staged.stage (fun () ->
+      ignore (Staged_bench.f_i10 1 2 3 4 5 6 7 8 9 10))
+    | 11-> Staged.stage (fun () ->
+      ignore (Staged_bench.f_i11 1 2 3 4 5 6 7 8 9 10 11))
+    | 12-> Staged.stage (fun () ->
+      ignore (Staged_bench.f_i12 1 2 3 4 5 6 7 8 9 10 11 12))
+    | 13-> Staged.stage (fun () ->
+      ignore (Staged_bench.f_i13 1 2 3 4 5 6 7 8 9 10 11 12 13))
+    | 14-> Staged.stage (fun () ->
+      ignore (Staged_bench.f_i14 1 2 3 4 5 6 7 8 9 10 11 12 13 14))
+    | 15-> Staged.stage (fun () ->
+      ignore (Staged_bench.f_i15 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15))
     | _ -> assert false
 end
 module Traditional = Make(Bindings.Traditional)
 module Cowboy = Make(Bindings.Cowboy)
 
-let zero_to_nine = [0;1;2;3;4;5;6;7;8;9]
+let zero_to_nine = [0;1;2;3;4;5;6;7;8;9;10;11;12;13;14;15]
 
 let () =
   Command.run (Bench.make_command [
