@@ -18,7 +18,7 @@ type _ ocaml_type =
 | Bytes      : Bytes.t ocaml_type
 | FloatArray : float array ocaml_type
 
-type incomplete_size = { mutable isize: int }
+type incomplete_size = { mutable isize: int; compact: bool }
 
 type structured_spec = { size: int; align: int; }
 
@@ -153,7 +153,7 @@ val bigarray : < ba_repr : 'c;
                  element : 'a > bigarray_class ->
                'b -> ('a, 'c) Bigarray.kind -> 'd typ
 val returning : 'a typ -> 'a fn
-val structure : string -> 'a structure typ
+val structure : ?compact:bool -> string -> 'a structure typ
 val union : string -> 'a union typ
 val offsetof : ('a, 'b) field -> int
 val field_type : ('a, 'b) field -> 'a typ

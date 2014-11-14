@@ -307,7 +307,7 @@ type ('a, 't) field = ('a, 't) Static.field
     here).  A value of type [(a, s) field] represents a field of type [a] in a
     struct or union of type [s]. *)
 
-val structure : string -> 's structure typ
+val structure : ?compact:bool -> string -> 's structure typ
 (** Construct a new structure type.  The type value returned is incomplete and
     can be updated using {!field} until it is passed to {!seal}, at which point
     the set of fields is fixed.
