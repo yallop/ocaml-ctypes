@@ -28,8 +28,6 @@ struct
     and format_typ = format_function_pointer fn in
     Static.(view ~format_typ ~read ~write (ptr void))
 
-  let castp typ p = Memory.(from_voidp typ (to_voidp p))
-
   let funptr_opt ?abi fn = Std_views.nullable_view (funptr ?abi fn) void
 
   let ptr_of_raw_ptr p = 
