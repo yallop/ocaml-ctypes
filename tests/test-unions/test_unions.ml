@@ -150,7 +150,7 @@ end
 
 
 module Build_struct_stub_tests
-    (S : Cstubs_structs.TYPES
+    (S : Ctypes_types.TYPE
           with type 'a typ = 'a Ctypes.typ
            and type ('a, 's) field = ('a, 's) Ctypes.field) =
 struct

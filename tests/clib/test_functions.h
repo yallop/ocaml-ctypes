@@ -166,6 +166,8 @@ void post2_wait1(void);
 
 struct s1 { int x1, x2, x3, x4; };
 struct s2 { int y1, y2, y3, y4; };
+struct s3 { int z1; struct s3 *z2; };
+struct s4 { struct s3 z3; struct s3 *z4; };
 
 size_t sizeof_s1(void);
 size_t alignmentof_s1(void);
@@ -179,6 +181,16 @@ size_t offsetof_y1(void);
 size_t offsetof_y2(void);
 size_t offsetof_y3(void);
 size_t offsetof_y4(void);
+
+size_t sizeof_s3(void);
+size_t alignmentof_s3(void);
+size_t offsetof_z1(void);
+size_t offsetof_z2(void);
+
+size_t sizeof_s4(void);
+size_t alignmentof_s4(void);
+size_t offsetof_z3(void);
+size_t offsetof_z4(void);
 
 union u1 { char x1; float x2; double x3; char x4[13]; };
 
