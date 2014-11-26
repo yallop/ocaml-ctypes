@@ -560,3 +560,8 @@ size_t offsetof_y4(void) { return offsetof(struct s2, y4); }
 
 size_t sizeof_u1(void) { return sizeof(union u1); }
 size_t alignmentof_u1(void) { return offsetof (struct { char c; union u1 x; }, x); }
+
+bool bool_and(bool l, bool r)
+{
+  return l && r;
+}

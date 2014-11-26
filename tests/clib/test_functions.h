@@ -9,6 +9,7 @@
 #define TEST_FUNCTIONS_H
 
 #include <inttypes.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <complex.h>
 
@@ -183,5 +184,7 @@ union u1 { char x1; float x2; double x3; char x4[13]; };
 
 size_t sizeof_u1(void);
 size_t alignmentof_u1(void);
+
+bool bool_and(bool, bool);
 
 #endif /* TEST_FUNCTIONS_H */

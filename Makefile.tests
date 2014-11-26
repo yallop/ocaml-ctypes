@@ -523,6 +523,39 @@ tests/test-complex/generated_stubs.c: $(BUILDDIR)/test-complex-stub-generator.na
 tests/test-complex/generated_bindings.ml: $(BUILDDIR)/test-complex-stub-generator.native
 	$< --ml-file $@
 
+test-bools-stubs.dir  = tests/test-bools/stubs
+test-bools-stubs.threads = yes
+test-bools-stubs.subproject_deps = ctypes cstubs \
+   ctypes-foreign-base ctypes-foreign-unthreaded tests-common
+test-bools-stubs: PROJECT=test-bools-stubs
+test-bools-stubs: $$(LIB_TARGETS)
+
+test-bools-stub-generator.dir = tests/test-bools/stub-generator
+test-bools-stub-generator.threads = yes
+test-bools-stub-generator.subproject_deps = ctypes cstubs \
+     ctypes-foreign-base ctypes-foreign-unthreaded test-bools-stubs tests-common
+test-bools-stub-generator.deps = str bigarray bytes
+test-bools-stub-generator: PROJECT=test-bools-stub-generator
+test-bools-stub-generator: $$(NATIVE_TARGET)
+
+test-bools.dir = tests/test-bools
+test-bools.threads = yes
+test-bools.deps = str bigarray oUnit bytes
+test-bools.subproject_deps = ctypes ctypes-foreign-base \
+  ctypes-foreign-unthreaded cstubs tests-common test-bools-stubs
+test-bools.link_flags = -L$(BUILDDIR)/clib -ltest_functions
+test-bools: PROJECT=test-bools
+test-bools: $$(NATIVE_TARGET)
+
+test-bools-generated: \
+  tests/test-bools/generated_bindings.ml \
+  tests/test-bools/generated_stubs.c
+
+tests/test-bools/generated_stubs.c: $(BUILDDIR)/test-bools-stub-generator.native
+	$< --c-file $@
+tests/test-bools/generated_bindings.ml: $(BUILDDIR)/test-bools-stub-generator.native
+	$< --ml-file $@
+
 test-callback_lifetime-stubs.dir  = tests/test-callback_lifetime/stubs
 test-callback_lifetime-stubs.threads = yes
 test-callback_lifetime-stubs.subproject_deps = ctypes cstubs \
@@ -701,6 +734,7 @@ TESTS += test-oo_style-stubs test-oo_style-stub-generator test-oo_style-generate
 TESTS += test-type_printing
 TESTS += test-value_printing-stubs test-value_printing-stub-generator test-value_printing-generated test-value_printing
 TESTS += test-complex-stubs test-complex-stub-generator test-complex-generated test-complex
+TESTS += test-bools-stubs test-bools-stub-generator test-bools-generated test-bools
 TESTS += test-callback_lifetime-stubs test-callback_lifetime-stub-generator test-callback_lifetime-generated test-callback_lifetime
 TESTS += test-stubs
 TESTS += test-bigarrays-stubs test-bigarrays-stub-generator test-bigarrays-generated test-bigarrays
