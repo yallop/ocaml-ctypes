@@ -6,12 +6,14 @@
  */
 
 #include <limits.h>
+#include <stdbool.h>
 
 #include <caml/mlvalues.h>
 #include <caml/memory.h>
 
 #include <ffi.h>
 
+#include "../ctypes/primitives.h"
 #include "../ctypes/raw_pointer.h"
 #include "../ctypes/managed_buffer_stubs.h"
 
@@ -48,43 +50,53 @@
 # error "No suitable OCaml type available for representing size_t values"
 #endif
 
-/* The order here must correspond to the constructor order in primitives.ml */
-static ffi_type *primitive_ffi_types[] = {
-  &ctypes_ffi_type_char,    /* Char */
-  &ffi_type_schar,          /* Schar */
-  &ffi_type_uchar,          /* Uchar */
-  NULL,                     /* Bool */
-  &ffi_type_sshort,         /* Short */
-  &ffi_type_sint,           /* Int */
-  &ffi_type_slong,          /* Long */
-  &ctypes_ffi_type_sllong,  /* Llong */
-  &ffi_type_ushort,         /* Ushort */
-  &ffi_type_ulong,          /* Uint */
-  &ffi_type_ulong,          /* Ulong */
-  &ctypes_ffi_type_ullong,  /* Ullong */
-  &ctypes_ffi_type_size_t,  /* Size */
-  &ffi_type_sint8,          /* Int8 */
-  &ffi_type_sint16,         /* Int16 */
-  &ffi_type_sint32,         /* Int32 */
-  &ffi_type_sint64,         /* Int64 */
-  &ffi_type_uint8,          /* Uint8 */
-  &ffi_type_uint16,         /* Uint16 */
-  &ffi_type_uint32,         /* Uint32 */
-  &ffi_type_uint64,         /* Uint64 */
-  &ctypes_ffi_type_camlint, /* Camlint */
-  &ctypes_ffi_type_camlint, /* Nativeint */
-  &ffi_type_float,          /* Float */
-  &ffi_type_double,         /* Double */
-  NULL,                     /* Complex32 */
-  NULL,                     /* Complex64 */
-};
-
+static ffi_type *bool_ffi_type(void)
+{
+  switch (sizeof(bool)) {
+  case sizeof(uint8_t):  return &ffi_type_uint8;
+  case sizeof(uint16_t): return &ffi_type_uint16;
+  case sizeof(uint32_t): return &ffi_type_uint32;
+  case sizeof(uint64_t): return &ffi_type_uint64;
+  default: return NULL;
+  }
+}
 
 /* primitive_ffitype : 'a prim -> 'a ffitype */
 value ctypes_primitive_ffitype(value prim)
 {
-  return CTYPES_FROM_PTR(primitive_ffi_types[Int_val(prim)]);
+  void *ft = NULL;
+  switch ((enum ctypes_primitive)Int_val(prim)) {
+    case Char:      ft = &ctypes_ffi_type_char;    break; /* Char */
+    case Schar:     ft = &ffi_type_schar;          break; /* Schar */
+    case Uchar:     ft = &ffi_type_uchar;          break; /* Uchar */
+    case Bool:      ft = bool_ffi_type();          break;
+    case Short:     ft = &ffi_type_sshort;         break; /* Short */
+    case Int:       ft = &ffi_type_sint;           break; /* Int */
+    case Long:      ft = &ffi_type_slong;          break; /* Long */
+    case Llong:     ft = &ctypes_ffi_type_sllong;  break; /* Llong */
+    case Ushort:    ft = &ffi_type_ushort;         break; /* Ushort */
+    case Uint:      ft = &ffi_type_ulong;          break; /* Uint */
+    case Ulong:     ft = &ffi_type_ulong;          break; /* Ulong */
+    case Ullong:    ft = &ctypes_ffi_type_ullong;  break; /* Ullong */
+    case Size_t:    ft = &ctypes_ffi_type_size_t;  break; /* Size */
+    case Int8_t:    ft = &ffi_type_sint8;          break; /* Int8 */
+    case Int16_t:   ft = &ffi_type_sint16;         break; /* Int16 */
+    case Int32_t:   ft = &ffi_type_sint32;         break; /* Int32 */
+    case Int64_t:   ft = &ffi_type_sint64;         break; /* Int64 */
+    case Uint8_t:   ft = &ffi_type_uint8;          break; /* Uint8 */
+    case Uint16_t:  ft = &ffi_type_uint16;         break; /* Uint16 */
+    case Uint32_t:  ft = &ffi_type_uint32;         break; /* Uint32 */
+    case Uint64_t:  ft = &ffi_type_uint64;         break; /* Uint64 */
+    case Camlint:   ft = &ctypes_ffi_type_camlint; break; /* Camlint */
+    case Nativeint: ft = &ctypes_ffi_type_camlint; break; /* Nativeint */
+    case Float:     ft = &ffi_type_float;          break; /* Float */
+    case Double:    ft = &ffi_type_double;         break; /* Double */
+    case Complex32: ft = NULL;                     break; /* Complex32 */
+    case Complex64: ft = NULL;                     break; /* Complex64 */
+  }
+  return CTYPES_FROM_PTR(ft);
 }
+
 
 /* pointer_ffitype : unit -> voidp ffitype */
 value ctypes_pointer_ffitype(value _)
