@@ -150,7 +150,7 @@ depend: configure
 
 #installation
 META-install:
-	$(OCAMLFIND) install ctypes META
+	$(OCAMLFIND) install ctypes META CHANGES.md
 
 install-%: PROJECT=$*
 install-%:
