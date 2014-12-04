@@ -1,89 +1,176 @@
-== ctypes 0.3.3 ==
+## ctypes 0.4
 
-2e3b3a: respect `pbyte_offset` with cstubs
+Thanks to A. Hauptmann (@fdopen), David Sheets (@dsheets), Maverick Woo (@maverickwoo), Peter Zotov (@whitequark), David Kaloper (@pqwy), Ramkumar Ramachandra (@artagnon), Thomas Braibant (@braibant) and Yakov Zaytsev (@ysz) for contributions to this release.
 
-== ctypes 0.3.2 ==
+### Major features
 
-2a651f: Add bytes to the META "requires" field
+#### Support for the C99 bool type
 
-== ctypes 0.3.1 ==
+#### Windows support
 
-3d6ea0: Support for 'bytes'
-518335: Avoid invalidated pointer access
+There is now support for Windows (32-bit and 64-bit, using MinGW) and automatic building and testing on Windows using [Appveyor][appveyor-builds]. 
 
-== ctypes 0.3 ==
+[appveyor-builds]: https://ci.appveyor.com/project/yallop/ocaml-ctypes/branch/master
 
-4e6d65: Support for exposing OCaml code as C libraries
-3d3747: Support passing OCaml strings directly to C
-6e87ed: Support for stub generation 
-b01009: Support for selecting libffi ABIs
-b09d74: Rename Array to 'CArray' and array to 'carray'
-e4b51e: Add raw_address_of_ptr
-a759ca: Add typ_of_bigarray_kind
-9e1065: Mention coercion transitivity.
-405d5a: Clarify when copying occurs.
-c83532: Add debug build support
-014f1c: Fix raw pointer conversions arithmetic
-4050fa: Make RTLD_NODELETE/RTLD_NOLOAD (unavailable on OpenBSD) optional
-381982: Add string_from_ptr
-4cef4e: Add ctypes_copy_bytes
-68e568: Print bigarray types using the C type syntax
-372d0f: Handle value printing where the result contains null characters
-061128: Handle non-array values masquerading as arrays
-a8f639: Catch attempts to treat unstructured types as structured types
-dab586: Function coercions
-dd1058: Eliminate the cost of identity coercions
-7d90de: Include C objects in the native plugins
-99c576: Improved --no-as-needed support
-579766: Fix Makefile typo for install_native_objects
-2a0cbc: Allow coercions between identical primitive types
-399833: Switch bigarray_of_array/array_of_bigarray docstrings
+#### Support for releasing the runtime lock in C calls
 
-== ctypes 0.2.3 ==
+The new `release_runtime_lock` argument to `Foreign.foreign` indicates whether the OCaml runtime lock should be released during the call to the bound C function, allowing other threads to run.
 
-39cacd: Fix GC-related bug that shows up on OS X.
+#### Support for acquiring the runtime lock in callbacks
 
-== ctypes 0.2.2 ==
+There is a  new `runtime_lock` argument to `Foreign.funptr`.  Setting `runtime_lock` to `true` indicates that the OCaml runtime lock should be acquired during calls from C to OCaml and released during calls through function pointers from OCaml to C.
 
-608714: Don't install ctypes-foreign cmx files.
+#### Support for passing 'bytes' values directly to C
 
-== ctypes 0.2.1 ==
+See the [relevant section of the FAQ][strings_faq].
 
-d5389f: Bump META version
+#### Add support for custom printers in views.
 
-== ctypes 0.2 ==
+#### Optionally obtain struct and union layout from C
 
-c8d54a: Basic coercion support
-2552d3: Build fix for Debian Squeeze
-d1131d: Bigarray support
-816b56: Replace returning_checking_errno with an option to Foreign.foreign
-1a8ead: Check homebrew prefix during configuration
-554939: Foreign.foreign, give the choice of not failing if symbol is absent.
-038420: Tweak passability tests to distinguish libffi's restrictions from C's.
-df10e1: Move funptr and funptr_opt to the Foreign module.
-71a4c7: Struct type equality is now structural, not physical
-510b7a: Compulsory field names (deprecate *:* and +:+)
-349422: Fix bug on 32-bit platforms
-7d0037: More efficient string view implementation.
-8c5b93: Expose field type function.
-2d38bc: UInt32.(of|to)_int32 and UInt64.(of|to)_int64 functions.
-ea135b: Eliminate build-time oasis dependency
-d6fc68: Finalisers for ctypes-allocated memory.
-ea6ef2: Expose the camlint type in the public interface.
-7a7106: Add the 'camlint' basic type.
-9caf55: Treat sealing empty structs or unions as an error.
-84ea43: Support for C99's complex number types.
-e2a42e: Add string_opt view
-8ae5a3: Give the user control over the lifetime of closures passed to C.
-db1ee3: Findlib target for installing top-level pretty printers.
-378a02: Pretty-printing for C values.
-ee178a: Pretty-printing for C types.
-4ce9b5: Abstract types now have names
+#### Other changes
+* string_opt wraps char *, not void *.
+* No parameter name for nullary functions
+* Remove some poorly-supported POSIX types
+* Use nativeint to represent pointers
+* Support zero-argument callbacks
+* findlib package naming: ctypes.foreign-base ~> ctypes.foreign.base &c.
+* Make it possible to print a field name
+* Better exception handling when using RTLD_NOLOAD
 
-== ctypes 0.1.1 ==
+## ctypes 0.3.3
 
-28c06: Bugfix (hard-coded alloc size)
+#### Bug fixes
 
-== ctypes 0.1 ==
+* respect `pbyte_offset` with cstubs
+
+## ctypes 0.3.2
+
+* Add bytes to the META "requires" field
+
+## ctypes 0.3.1
+
+#### New features
+
+* Support for 'bytes'
+
+#### Bug fixes
+
+* Avoid invalidated pointer access
+
+## ctypes 0.3
+
+Thanks to Peter Zotov (@whitequark), David Sheets (@dsheets), Mike McClurg (@mcclurmc) and Anil Madhavapeddy (@avsm) for contributions to this release.
+
+#### Major features
+
+##### Support for passing OCaml strings directly to C
+(Patch by Peter Zotov.)
+
+The implications are discussed [in the FAQ][strings_faq].
+
+[strings_faq]: https://github.com/ocamllabs/ocaml-ctypes/wiki/FAQ#strings
+
+##### Support for generating C stubs from names and type declarations.
+There are various examples available of packages which use stub support: see the [fts example][fts-example] in the distribution (which uses a custom Makefile), [this fork of async_ssl][async_ssl] (which uses OCamlMakefile), and [the cstubs branch of ocaml-lz4][ocaml-lz4] (which uses oasis and ocamlbuild).
+
+[fts-example]: https://github.com/ocamllabs/ocaml-ctypes/tree/master/examples/fts/stub-generation
+[async_ssl]: https://github.com/yallop/async_ssl/tree/stub-generation
+[ocaml-lz4]: https://github.com/whitequark/ocaml-lz4/tree/cstubs
+
+##### Support for turning OCaml modules into C libraries.
+See the [ocaml-ctypes-inverted-stubs-example][inverted-stubs-example] repository for a sample project which exposes a part of [Xmlm][xmlm]'s API to C.
+
+[inverted-stubs-example]: https://github.com/yallop/ocaml-ctypes-inverted-stubs-example/ 
+[xmlm]: http://erratique.ch/software/xmlm
+
+#### Other changes
+
+* Add a function [`string_from_ptr`][string_from_ptr] for creating a string from an address and length.
+* Generate [codes for libffi ABI specifications][libffi_abi].
+* Support for passing complex numbers to C using the stub generation backend.
+* Add [`raw_address_of_ptr`][raw_address_of_ptr], an inverse of [`ptr_of_raw_address`][ptr_of_raw_address].
+* Add a function [`typ_of_bigarray_kind`][typ_of_bigarray_kind] for converting `Bigarray.kind` values to `Ctypes.typ` values.
+* Improved [coercion][coercion] support
+
+[typ_of_bigarray_kind]: http://ocamllabs.github.io/ocaml-ctypes/Ctypes.html#VALtyp_of_bigarray_kind
+[string_from_ptr]: http://ocamllabs.github.io/ocaml-ctypes/Ctypes.html#VALstring_from_ptr
+[raw_address_of_ptr]: http://ocamllabs.github.io/ocaml-ctypes/Ctypes.html#VALraw_address_of_ptr
+[ptr_of_raw_address]: http://ocamllabs.github.io/ocaml-ctypes/Ctypes.html#VALptr_of_raw_address
+[CArray]: http://ocamllabs.github.io/ocaml-ctypes/Ctypes.Array.html
+[libffi_abi]: http://ocamllabs.github.io/ocaml-ctypes/Libffi_abi.html
+[coercion]: http://ocamllabs.github.io/ocaml-ctypes/Ctypes.html#VALcoerce
+
+#### Backwards incompatibilities
+
+* `Array` has been renamed to [`CArray`][CArray].
+
+## ctypes 0.2.3
+
+#### Bug fixes
+
+* Fix GC-related bug that shows up on OS X.
+
+## ctypes 0.2.2
+
+* Don't install ctypes-foreign cmx files.
+
+## ctypes 0.2.1
+
+* Bump META version
+
+## ctypes 0.2
+
+Thanks to Ivan Gotovchits, Greg Perkins, Daniel Bünzli, Rob Hoes and Anil Madhavapeddy for contributions to this release.
+
+#### Major features
+
+##### Bigarray support.
+See [Bigarray types][bigarray-types] and [Bigarray values][bigarray-values] for details.
+
+[bigarray-types]: http://ocamllabs.github.io/ocaml-ctypes/Ctypes.html#4_Bigarraytypes
+[bigarray-values]: http://ocamllabs.github.io/ocaml-ctypes/Ctypes.html#4_Bigarrayvalues
+
+##### Give the user control over the lifetime of closures passed to C.
+See [the FAQ][faq-lifetime] for details.
+
+[faq-lifetime]: https://github.com/ocamllabs/ocaml-ctypes/wiki/FAQ#function-lifetime
+
+##### Top level printing for C values and types
+Loading the new findlib package `ctypes.top` in the toplevel will install custom printers for C types and values.
+
+#### Other changes
+
+* Basic [coercion][coercion] support
+* Remove `returning_checking_errno`; pass a flag to [`foreign`][foreign] instead.
+* Add an optional argument to [`Foreign.foreign`][foreign] that ignores absent symbols.
+  (Patch by Daniel Bünzli.)
+* More precise tests for whether types are 'passable'
+* Compulsory names for structure and union fields (`*:*` and `+:+` are deprecated, but still supported for now.)
+* [`UInt32.of_int32`][of_int32], [`UInt32.to_int32`][to_int32], [`UInt64.of_int64`][of_int64], and [`UInt64.to_int64`][to_int64] functions.
+* Finalisers for ctypes-allocated memory.
+* Add a [`string_opt`][string_opt] view
+  (Patch by Rob Hoes.)
+* Add the ['camlint'][camlint] basic type.
+* Complex number support
+* Abstract types [now have names][abstract].
+
+[foreign]: http://ocamllabs.github.io/ocaml-ctypes/Foreign.html#VALforeign
+[of_int32]: http://ocamllabs.github.io/ocaml-ctypes/Unsigned.Uint32.html#VALof_int32
+[to_int32]: http://ocamllabs.github.io/ocaml-ctypes/Unsigned.Uint32.html#VALto_int32
+[of_int64]: http://ocamllabs.github.io/ocaml-ctypes/Unsigned.Uint64.html#VALof_int64
+[to_int64]: http://ocamllabs.github.io/ocaml-ctypes/Unsigned.Uint64.html#VALto_int64
+[string_opt]: http://ocamllabs.github.io/ocaml-ctypes/Ctypes.html#VALstring_opt
+[camlint]: http://ocamllabs.github.io/ocaml-ctypes/Ctypes.html#VALcamlint
+[abstract]: http://ocamllabs.github.io/ocaml-ctypes/Ctypes.html#VALabstract
+[coercion]: http://ocamllabs.github.io/ocaml-ctypes/Ctypes.html#VALcoerce
+
+## ctypes 0.1.1
+
+#### Bug fixes
+
+* Remove hard-coded alloc size
+
+## ctypes 0.1
 
 initial release
