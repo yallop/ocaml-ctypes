@@ -27,7 +27,10 @@ let aligned_offset offset alignment =
 let field (type k) (structured : (_, k) structured typ) label ftype =
   match structured with
   | Struct ({ spec = Incomplete spec } as s) ->
-    let foffset = aligned_offset spec.isize (alignment ftype) in
+    let foffset =
+      if spec.compact
+      then spec.isize
+      else aligned_offset spec.isize (alignment ftype) in
     let field = { ftype; foffset; fname = label } in
     begin
       spec.isize <- foffset + sizeof ftype;
@@ -45,10 +48,13 @@ let field (type k) (structured : (_, k) structured typ) label ftype =
 let seal (type a) (type s) : (a, s) structured typ -> unit = function
   | Struct { fields = [] } -> raise (Unsupported "struct with no fields")
   | Struct { spec = Complete _; tag } -> raise (ModifyingSealedType tag)
-  | Struct ({ spec = Incomplete { isize } } as s) ->
+  | Struct ({ spec = Incomplete { isize; compact } } as s) ->
     s.fields <- List.rev s.fields;
     let align = max_field_alignment s.fields in
-    let size = aligned_offset isize align in
+    let size =
+      if compact
+      then isize
+      else aligned_offset isize align in
     s.spec <- Complete { (* sraw_io;  *)size; align }
   | Union { utag; uspec = Some _ } ->
     raise (ModifyingSealedType utag)

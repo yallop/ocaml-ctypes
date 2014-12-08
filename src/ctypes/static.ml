@@ -13,7 +13,7 @@ exception Unsupported of string
 
 let unsupported fmt = Printf.ksprintf (fun s -> raise (Unsupported s)) fmt
 
-type incomplete_size = { mutable isize: int }
+type incomplete_size = { mutable isize: int; compact : bool }
 
 type structured_spec = { size: int; align: int; }
 
@@ -219,8 +219,8 @@ let returning v =
   else
     Returns v
 
-let structure tag =
-  Struct { spec = Incomplete { isize = 0 }; tag; fields = [] }
+let structure ?(compact=false) tag =
+  Struct { spec = Incomplete { isize = 0; compact }; tag; fields = [] }
 
 let union utag = Union { utag; uspec = None; ufields = [] }
 
