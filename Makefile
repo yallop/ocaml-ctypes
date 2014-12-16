@@ -39,6 +39,9 @@ ctypes.extra_mls = ctypes_primitives.ml
 ctypes.deps = str bigarray bytes
 ctypes.install = yes
 ctypes.install_native_objects = yes
+ifeq ($(XEN),enable)
+ctypes.xen = yes
+endif
 
 ctypes: PROJECT=ctypes
 ctypes: $(ctypes.dir)/$(ctypes.extra_mls) $$(LIB_TARGETS)

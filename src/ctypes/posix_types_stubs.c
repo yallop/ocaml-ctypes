@@ -12,7 +12,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <signal.h>
-#if !defined _WIN32 || defined __CYGWIN__
+#if (!defined _WIN32 || defined __CYGWIN__) && !defined MINIOS
 #include <pthread.h>
 #endif
 #include <time.h>

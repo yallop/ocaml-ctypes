@@ -12,15 +12,18 @@ tags: [
   "org:mirage"
 ]
 build: [
-  [make]
+  [make "XEN=%{mirage-xen:enable}%"]
 ]
 install: [
-  [make "install"]
+  [make "install"  "XEN=%{mirage-xen:enable}%"]
 ]
 remove: ["ocamlfind" "remove" "ctypes"]
 depends: [
   "base-bytes"
   "ocamlfind"
+]
+depopts: [
+  "mirage-xen"
 ]
 depexts: [
   [["centos"] ["libffi-devel"]]
