@@ -11,6 +11,7 @@ install_on_linux () {
   sudo apt-get update -qq
   sudo apt-get install -qq ocaml ocaml-native-compilers camlp4-extra opam
   opam init
+  opam update
 }
 
 install_on_osx () {
@@ -48,3 +49,17 @@ make examples
 _build/date.native
 _build/date-cmd.native
 _build/fts-cmd.native examples
+
+# check Xen support builds too
+set -eu
+case "$OCAML_VERSION" in
+4.00.*)
+  echo "OCaml too old; not testing Mirage" ;;
+*)
+  if opam install mirage-xen; then
+    make XEN=enable
+    ls -l _build/libctypes_stubs_xen.a
+  else
+    echo "Mirage not installable, so not testing Xen build."
+  fi ;;
+esac
