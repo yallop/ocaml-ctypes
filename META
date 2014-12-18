@@ -26,6 +26,7 @@ package "stubs" (
   archive(byte, plugin) = "cstubs.cma"
   archive(native) = "cstubs.cmxa"
   archive(native, plugin) = "cstubs.cmxs"
+  xen_linkopts = "-lctypes_stubs_xen"
   exists_if = "cstubs.cma"
 )
 

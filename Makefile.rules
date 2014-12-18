@@ -30,8 +30,15 @@ ML_SOURCE = $(shell $(OCAMLDEP) -sort $(sort $(wildcard $($(PROJECT).dir)/*.ml) 
 NATIVE_OBJECTS = $(ML_SOURCE:$($(PROJECT).dir)/%.ml=$(BUILDDIR)/$($(PROJECT).dir)/%.cmx)
 BYTE_OBJECTS = $(ML_SOURCE:$($(PROJECT).dir)/%.ml=$(BUILDDIR)/$($(PROJECT).dir)/%.cmo)
 C_OBJECTS = $(C_SOURCE:$($(PROJECT).dir)/%.c=$(BUILDDIR)/$($(PROJECT).dir)/%.o)
+XEN_OBJECTS = $(C_SOURCE:$($(PROJECT).dir)/%.c=$(BUILDDIR)/xen/$($(PROJECT).dir)/%.o)
 
 STUB_LIB = $(if $(C_OBJECTS),$(BUILDDIR)/dll$(PROJECT)_stubs$(EXTDLL))
+
+OPAM_PREFIX=$(shell opam config var prefix)
+XEN_LIB = $(if $($(PROJECT).xen),$(BUILDDIR)/dll$(PROJECT)_stubs_xen$(EXTDLL))
+XEN_CFLAGS=$(if $(XEN_LIB), \
+        $(CFLAGS) -DMINIOS $(shell env PKG_CONFIG_PATH="$(OPAM_PREFIX)/lib/pkgconfig" \
+                                       pkg-config --cflags mirage-xen) -fno-builtin)
 
 CMO_OPTS = $($(PROJECT).cmo_opts)
 CMX_OPTS = $($(PROJECT).cmx_opts)
@@ -47,9 +54,11 @@ NATIVE_LIB=$(BUILDDIR)/$(PROJECT).cmxa
 NATIVE_TARGET=$(BUILDDIR)/$(PROJECT).native
 LIB_TARGETS = $(BUILDDIR)/$(PROJECT).cma \
               $(STUB_LIB) \
+              $(XEN_LIB) \
               $(BUILDDIR)/$(PROJECT).cmxa \
               $(BUILDDIR)/$(PROJECT).cmxs
 LIB_TARGET_EXTRAS = $(if $(STUB_LIB),$(BUILDDIR)/lib$(PROJECT)_stubs.a) \
+                    $(if $(XEN_LIB),$(BUILDDIR)/lib$(PROJECT)_stubs_xen.a) \
                     $(BUILDDIR)/$(PROJECT).a
 INSTALL_CMIS = $($(PROJECT).public:%=$(BUILDDIR)/$($(PROJECT).dir)/%.cmi)
 INSTALL_MLIS = $($(PROJECT).public:%=$($(PROJECT).dir)/%.mli)
@@ -66,6 +75,9 @@ $(BUILDDIR)/%.cmxa: $$(NATIVE_OBJECTS)
 
 $(BUILDDIR)/dll%_stubs$(EXTDLL): $$(C_OBJECTS)
 	$(OCAMLMKLIB) -o $(BUILDDIR)/$*_stubs $^ $(OCAMLMKLIB_FLAGS)
+
+$(BUILDDIR)/dll%_stubs_xen$(EXTDLL): $$(XEN_OBJECTS)
+	$(OCAMLMKLIB) -o $(BUILDDIR)/$*_stubs_xen $^ $(OCAMLMKLIB_FLAGS)
 
 $(BUILDDIR)/%.cmxs : $$(NATIVE_OBJECTS)
 	$(OCAMLFIND) opt -shared -linkall $(OCAMLFLAGS) $(THREAD_FLAG) $(OCAMLFIND_PACKAGE_FLAGS) -o $@ $(NATIVE_OBJECTS) $(C_OBJECTS) $(OCAML_LINK_FLAGS)
@@ -84,6 +96,10 @@ $(BUILDDIR)/%.cmx : %.ml
 $(BUILDDIR)/%.o : %.c
 	@mkdir -p $(@D)
 	cd $(@D) && $(OCAMLFIND) ocamlc -c $(CFLAGS:%=-ccopt %) -o $(@F) $(OCAMLFLAGS) $(realpath $<)
+
+$(BUILDDIR)/xen/%.o : %.c
+	@mkdir -p $(@D)
+	cd $(@D) && $(OCAMLFIND) ocamlc -c $(XEN_CFLAGS:%=-ccopt %) -o $(@F) $(OCAMLFLAGS) $(realpath $<)
 
 $(BUILDDIR)/%.cmi : %.mli
 	@mkdir -p $(@D)
