@@ -168,6 +168,7 @@ struct s1 { int x1, x2, x3, x4; };
 struct s2 { int y1, y2, y3, y4; };
 struct s3 { int z1; struct s3 *z2; };
 struct s4 { struct s3 z3; struct s3 *z4; };
+struct s5 { int (*w1)(struct s1 *); };
 
 size_t sizeof_s1(void);
 size_t alignmentof_s1(void);
@@ -198,5 +199,6 @@ size_t sizeof_u1(void);
 size_t alignmentof_u1(void);
 
 bool bool_and(bool, bool);
+int call_s5(struct s1 *, struct s5 *);
 
 #endif /* TEST_FUNCTIONS_H */

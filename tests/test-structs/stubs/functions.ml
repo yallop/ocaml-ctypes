@@ -27,6 +27,13 @@ struct
 
   let return_struct = foreign "return_struct"
     (void @-> returning simple)
+
+  (* Forward declarations *)
+  let s1 : [`s1] structure typ = structure "s1"
+  and s5 : [`s5] structure typ = structure "s5"
+
+  let call_s5 = foreign "call_s5"
+    (ptr s1 @-> ptr s5 @-> returning int);
 end
 
 

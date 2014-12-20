@@ -33,4 +33,13 @@ struct
   let z3 = field s4 "z3" s3
   let z4 = field s4 "z4" (ptr s3)
   let () = seal s4
+
+  (* dependencies involving function pointers *)
+
+  (* (incomplete types are available in the present) *)
+  let s1_fwd : [`s1] Ctypes.structure Ctypes.typ = Ctypes.structure "s1"
+
+  let s5 : [`s5] structure typ = structure "s5"
+  let w1 = field s5 "w1" (lift_typ (Foreign.funptr Ctypes.(ptr s1_fwd @-> returning int)))
+  let () = seal s5
 end

@@ -573,3 +573,8 @@ bool bool_and(bool l, bool r)
 {
   return l && r;
 }
+
+int call_s5(struct s1 *s1, struct s5 *s5)
+{
+  return s5->w1(s1);
+}

@@ -519,9 +519,42 @@ struct
         (offsetof M.z4);
     end
 
+
+  module Build_call_tests
+      (F : Cstubs.FOREIGN with type 'a fn = 'a) =
+  struct
+    module F = Functions.Common(F)
+    open F
+    open M
+
+    let callback p = !@(p |-> x1) + !@(p |-> x4)
+
+    (* Call a function passing two structs, one of which contains a function
+       pointer which accepts an argument to the other.
+
+       This is mostly testing that we can support complex dependencies together
+       with retrieved layout.
+    *)
+    let test_struct_dependencies _ =
+      let v5 = make s5 in
+      let v1 = make s1 in
+      begin
+        setf v1 x1 10;
+        setf v1 x4 20;
+        setf v5 w1 callback;
+        assert_equal 30
+          (call_s5 (addr v1) (addr v5))
+          ~printer:string_of_int;
+      end
+  end
+
 end
 
 module Struct_stubs_tests = Build_struct_stub_tests(Generated_struct_bindings)
+module Combined_foreign_tests =
+  Struct_stubs_tests.Build_call_tests(Tests_common.Foreign_binder)
+module Combined_stub_tests =
+  Struct_stubs_tests.Build_call_tests(Generated_bindings)
 
 
 let suite = "Struct tests" >:::
@@ -536,6 +569,12 @@ let suite = "Struct tests" >:::
 
    "returning struct (stubs)"
    >:: Stub_tests.test_returning_struct;
+
+   "struct dependencies (foreign)"
+   >:: Combined_foreign_tests.test_struct_dependencies;
+
+   "struct dependencies (stubs)"
+   >:: Combined_stub_tests.test_struct_dependencies;
 
    "incomplete struct members rejected"
    >:: test_incomplete_struct_members;
