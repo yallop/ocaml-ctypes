@@ -1,6 +1,6 @@
 ## ctypes 0.4
 
-Thanks to A. Hauptmann (@fdopen), David Sheets (@dsheets), Maverick Woo (@maverickwoo), Peter Zotov (@whitequark), David Kaloper (@pqwy), Ramkumar Ramachandra (@artagnon), Thomas Braibant (@braibant) and Yakov Zaytsev (@ysz) for contributions to this release.
+Thanks to A. Hauptmann (@fdopen), David Sheets (@dsheets), Maverick Woo (@maverickwoo), Peter Zotov (@whitequark), David Kaloper (@pqwy), Ramkumar Ramachandra (@artagnon), Thomas Braibant (@braibant) for contributions to this release.
 
 ### Major features
 
@@ -30,13 +30,20 @@ See the [relevant section of the FAQ][strings_faq].
 
 #### Other changes
 * string_opt wraps char *, not void *.
-* No parameter name for nullary functions
 * Remove some poorly-supported POSIX types
 * Use nativeint to represent pointers
 * Support zero-argument callbacks
 * findlib package naming: ctypes.foreign-base ~> ctypes.foreign.base &c.
 * Make it possible to print a field name
 * Better exception handling when using RTLD_NOLOAD
+
+## ctypes 0.3.4
+
+#### Bug fixes
+
+Thanks to Yakov Zaytsev (@ysz) for contributing to this release.
+
+* fix printing for nullary function stubs
 
 ## ctypes 0.3.3
 
