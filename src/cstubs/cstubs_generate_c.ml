@@ -215,6 +215,8 @@ struct
     match parameters with
     | [] ->
       Format.fprintf fmt "%t(void)" k
+    | [(_, Ty Void)] ->
+      Format.fprintf fmt "@[%t@[(void)@]@]" k
     | _ ->
       Format.fprintf fmt "@[%t@[%a@]@]" k
         (format_seq "(" format_arg "," ")")
