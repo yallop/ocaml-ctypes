@@ -1,3 +1,7 @@
+== ctypes 0.3.4 ==
+
+03da4b: fix printing for nullary function stubs
+
 == ctypes 0.3.3 ==
 
 2e3b3a: respect `pbyte_offset` with cstubs
