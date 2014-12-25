@@ -165,8 +165,8 @@ struct
       (e, from) >>= fun x ->
       `Cast (into, x)
 
-  let rec prj : type a. a typ -> cexp -> ccomp option =
-    fun ty x -> match ty with
+  let rec prj : type a b. a typ -> orig: b typ -> cexp -> ccomp option =
+    fun ty ~orig x -> match ty with
     | Void -> None
     | Primitive p ->
       let { fn = Fn fn } as prj = prim_prj p in
@@ -175,17 +175,19 @@ struct
     | Pointer _ -> Some (of_fatptr x)
     | Struct s ->
       Some ((of_fatptr x, ptr void) >>= fun y ->
-            `Deref (`Cast (Ty (ptr ty), y)))
+            `Deref (`Cast (Ty (ptr orig), y)))
     | Union u -> 
       Some ((of_fatptr x, ptr void) >>= fun y ->
-            `Deref (`Cast (Ty (ptr ty), y)))
+            `Deref (`Cast (Ty (ptr orig), y)))
     | Abstract _ -> report_unpassable "values of abstract type"
-    | View { ty } -> prj ty x
+    | View { ty } -> prj ty ~orig x
     | Array _ -> report_unpassable "arrays"
     | Bigarray _ -> report_unpassable "bigarrays"
     | OCaml String -> Some (string_to_ptr x)
     | OCaml Bytes -> Some (string_to_ptr x)
     | OCaml FloatArray -> Some (float_array_to_ptr x)
+
+  let prj ty x = prj ty ~orig:ty x
 
   let rec inj : type a. a typ -> cexp -> ceff =
     fun ty x -> match ty with

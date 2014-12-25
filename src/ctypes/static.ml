@@ -199,6 +199,10 @@ let abstract ~name ~size ~alignment =
   Abstract { aname = name; asize = size; aalignment = alignment }
 let view ?format_typ ?format ~read ~write ty =
   View { read; write; format_typ; format; ty }
+let id v = v
+let typedef old name =
+  view ~format_typ:(fun k fmt -> Format.fprintf fmt "%s%t" name k)
+    ~read:id ~write:id old
 let bigarray : type a b c d e.
   < element: a;
     dims: b;
