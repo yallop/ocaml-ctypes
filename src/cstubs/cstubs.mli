@@ -11,6 +11,14 @@ module type FOREIGN =
 sig
   type 'a fn
   val foreign : string -> ('a -> 'b) Ctypes.fn -> ('a -> 'b) fn
+  val view_invoke : ('a -> 'b) fn -> 'a -> 'b
+ (** [view_invoke f] is intended to be used when implementing the
+   read and write functions for a view.
+   When generating C stubs you cannot call the [foreign] functions
+   when defining the bindings themselves, but you may need to declare views
+   where the [read] and [write] functions would in turn call some
+   of the just defined bindings.
+ *)
 end
 
 module type BINDINGS = functor (F : FOREIGN with type 'a fn = unit) -> sig end

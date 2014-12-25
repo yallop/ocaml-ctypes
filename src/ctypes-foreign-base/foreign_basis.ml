@@ -44,4 +44,7 @@ struct
       coerce (ptr_of_raw_ptr (dlsym ?handle:from ~symbol))
     with 
     | exn -> if stub then fun _ -> raise exn else raise exn
+
+  type 'a fn = 'a
+  let view_invoke f x = f x
 end
