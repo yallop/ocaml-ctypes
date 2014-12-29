@@ -9,7 +9,14 @@
 
 module Types :
 sig
-  module type BINDINGS = functor (F : Ctypes_types.TYPE) -> sig end
+  module type TYPE =
+  sig
+    include Ctypes_types.TYPE
+    type 'a const
+    val constant : string -> 'a typ -> 'a const
+  end
+
+  module type BINDINGS = functor (F : TYPE) -> sig end
 
   val write_c : Format.formatter -> (module BINDINGS) -> unit
 end
