@@ -5,8 +5,8 @@
  * See the file LICENSE for details.
  */
 
-#ifndef RAW_POINTER_STUBS_H
-#define RAW_POINTER_STUBS_H
+#ifndef CTYPES_RAW_POINTER_STUBS_H
+#define CTYPES_RAW_POINTER_STUBS_H
 
 #include <caml/mlvalues.h>
 #include <caml/alloc.h>
@@ -18,4 +18,4 @@
 /* CTYPES_ADDR_OF_FATPTR : _ Ctypes_ptr.Fat.t -> void * */
 #define CTYPES_ADDR_OF_FATPTR(P) CTYPES_TO_PTR(Field(P, 1))
 
-#endif /* RAW_POINTER_STUBS_H */
+#endif /* CTYPES_RAW_POINTER_STUBS_H */

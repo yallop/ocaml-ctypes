@@ -5,8 +5,8 @@
  * See the file LICENSE for details.
  */
 
-#ifndef TYPE_INFO_STUBS_H
-#define TYPE_INFO_STUBS_H
+#ifndef CTYPES_TYPE_INFO_STUBS_H
+#define CTYPES_TYPE_INFO_STUBS_H
 
 #include <caml/mlvalues.h>
 
@@ -18,4 +18,4 @@ extern value ctypes_read(value ctype, value buffer);
 /* write : 'a prim -> 'a -> raw_pointer -> unit */
 extern value ctypes_write(value ctype, value v, value buffer);
 
-#endif /* TYPE_INFO_STUBS_H */
+#endif /* CTYPES_TYPE_INFO_STUBS_H */

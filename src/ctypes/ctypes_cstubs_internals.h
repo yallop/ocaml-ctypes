@@ -5,8 +5,8 @@
  * See the file LICENSE for details.
  */
 
-#ifndef CSTUBS_INTERNALS_H
-#define CSTUBS_INTERNALS_H
+#ifndef CTYPES_CSTUBS_INTERNALS_H
+#define CTYPES_CSTUBS_INTERNALS_H
 
 /* Types and functions used by generated C code. */
 
@@ -17,4 +17,4 @@
 #define CTYPES_PTR_OF_OCAML_STRING(s) \
   (String_val(Field(s, 1)) + Int_val(Field(s, 0)))
 
-#endif /* CSTUBS_INTERNALS_H */
+#endif /* CTYPES_CSTUBS_INTERNALS_H */
