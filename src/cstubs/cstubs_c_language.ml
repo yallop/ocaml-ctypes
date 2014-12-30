@@ -37,7 +37,7 @@ type cconst = [ `Int of int ]
 type cexp = [ cconst
             | clocal
             | `Cast of ty * cexp
-            | `Addr of cexp ]
+            | `Addr of cvar ]
 type clvalue = [ clocal | `Index of clvalue * cexp ]
 type camlop = [ `CAMLparam0
               | `CAMLlocalN of cexp * cexp ]
@@ -72,7 +72,8 @@ struct
     | `Int _ -> Ty int
     | `Local (_, ty) -> ty
     | `Cast (Ty ty, _) -> Ty ty
-    | `Addr e -> let Ty ty = cexp e in Ty (Pointer ty)
+    | `Addr (`Global { typ = Ty ty }) -> Ty (Pointer ty)
+    | `Addr (`Local (_,  Ty ty)) -> Ty (Pointer ty)
 
   let camlop : camlop -> ty = function
     | `CAMLparam0

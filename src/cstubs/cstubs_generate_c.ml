@@ -189,13 +189,13 @@ struct
 
   let prj ty x = prj ty ~orig:ty x
 
-  let rec inj : type a. a typ -> cexp -> ceff =
+  let rec inj : type a. a typ -> clocal -> ceff =
     fun ty x -> match ty with
     | Void -> val_unit
-    | Primitive p -> `App (prim_inj p, [`Cast (Ty (Primitive p), x)])
-    | Pointer _ -> from_ptr x
-    | Struct s -> `App (copy_bytes, [`Addr x; `Int (sizeof ty)])
-    | Union u -> `App (copy_bytes, [`Addr x; `Int (sizeof ty)])
+    | Primitive p -> `App (prim_inj p, [`Cast (Ty (Primitive p), (x :> cexp))])
+    | Pointer _ -> from_ptr (x:> cexp)
+    | Struct s -> `App (copy_bytes, [`Addr (x :> cvar); `Int (sizeof ty)])
+    | Union u -> `App (copy_bytes, [`Addr (x :> cvar); `Int (sizeof ty)])
     | Abstract _ -> report_unpassable "values of abstract type"
     | View { ty } -> inj ty x
     | Array _ -> report_unpassable "arrays"
@@ -226,8 +226,10 @@ struct
       let rec body : type a. _ -> a fn -> _ =
          fun vars -> function 
          | Returns t ->
-           (`App (fvar, (List.rev vars :> cexp list)), t) >>= fun x ->
-           (inj t x :> ccomp)
+           let x = fresh_var () in
+           let e, ty = `App (fvar, (List.rev vars :> cexp list)), t in
+           let k = fun x -> (inj t x :> ccomp)  in
+           `Let ((local x ty, e), k (local x ty))
          | Function (x, f, t) ->
            begin match prj f (local x value) with
              None -> body vars t
