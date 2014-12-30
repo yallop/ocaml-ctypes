@@ -42,6 +42,29 @@ struct
 
       plus <-@ None;
     end
+
+
+  (*
+    Read environment variables from the 'environ' global.
+  *)
+  let test_environ _ =
+    let parse_entry s =
+      match Str.(bounded_split (regexp "=") s 2), "" with
+        [k; v], _ | [k], v -> (String.uppercase k, v)
+      | _ -> Printf.ksprintf failwith "Parsing %S failed" s
+    in
+    let rec copy_environ acc env =
+      match !@env with
+        None -> acc
+      | Some s -> copy_environ (parse_entry s :: acc) (env +@ 1)
+    in
+    begin
+      let environment = copy_environ [] !@environ in
+
+      assert_equal ~printer:(fun x -> x)
+        (List.assoc "HOME" environment)
+        (Sys.getenv "HOME")
+    end
 end
 
 
@@ -56,11 +79,17 @@ let suite = "Foreign value tests" >:::
    "global callback function (foreign)"
     >:: Foreign_tests.test_global_callback;
 
+   "reading from 'environ' (foreign)"
+    >:: Foreign_tests.test_environ;
+
    "retrieving global struct (stubs)"
     >:: Stub_tests.test_retrieving_struct;
 
    "global callback function (stubs)"
     >:: Stub_tests.test_global_callback;
+
+   "reading from 'environ' (stubs)"
+    >:: Stub_tests.test_environ;
   ]
 
 

@@ -25,4 +25,6 @@ struct
 
   let sum = F.foreign "sum_range_with_plus_callback"
       (int @-> int @-> returning int)
+
+  let environ = F.foreign_value "environ" (ptr string_opt)
 end

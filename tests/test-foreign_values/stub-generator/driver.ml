@@ -7,4 +7,6 @@
 
 (* Stub generation driver for the foreign value tests. *)
 
-let () = Tests_common.run Sys.argv (module Functions.Stubs)
+let cheader = "extern char **environ;"
+
+let () = Tests_common.run ~cheader Sys.argv (module Functions.Stubs)
