@@ -41,8 +41,8 @@ let write_foreign fmt bindings =
     ~f:(fun (Bind (stub_name, external_name, fn)) ->
       Cstubs_generate_ml.case ~stub_name ~external_name fmt fn);
   Format.fprintf fmt "@[<hov 2>@[|@ s,@ _@ ->@]@ ";
-  Format.fprintf fmt " @[@[Printf.fprintf@ stderr@ \"No match for %%s\" s@];";
-  Format.fprintf fmt "@ @[assert false@]@]@]@]@."
+  Format.fprintf fmt
+    " @[Printf.ksprintf@ failwith@ \"No match for %%s\" s@]@]@]@.@\n"
 
 let gen_ml prefix fmt : (module FOREIGN') * (unit -> unit) =
   let bindings = ref []
