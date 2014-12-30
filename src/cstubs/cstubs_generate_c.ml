@@ -308,6 +308,16 @@ struct
                   `CAMLlocalN (local "locals" (array (List.length args) value),
                                local "nargs" int) >>
                     body))
+
+  let value : type a. cname:string -> stub_name:string -> a Static.typ -> cfundef =
+    fun ~cname ~stub_name typ ->
+      let (e, ty) = (`Addr (`Global { name = cname; typ = Ty typ;
+                                      references_ocaml_heap = false }), (ptr typ)) in
+      let x = fresh_var () in
+      `Function (`Fundec (stub_name, ["_", Ty value], Ty value),
+                 `Let ((local x ty, e),
+                       (inj (ptr typ) (local x ty) :> ccomp)))
+
 end
 
 let fn ~cname  ~stub_name fmt fn =
@@ -321,6 +331,10 @@ let fn ~cname  ~stub_name fmt fn =
   end
   else
     Cstubs_emit_c.cfundef fmt dec
+
+let value ~cname ~stub_name fmt typ =
+  let dec = Generate_C.value ~cname ~stub_name typ in
+  Cstubs_emit_c.cfundef fmt dec
 
 let inverse_fn ~stub_name fmt fn : unit =
   Cstubs_emit_c.cfundef fmt (Generate_C.inverse_fn ~stub_name fn)

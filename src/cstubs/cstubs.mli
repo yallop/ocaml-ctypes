@@ -19,6 +19,7 @@ module type FOREIGN =
 sig
   type 'a fn
   val foreign : string -> ('a -> 'b) Ctypes.fn -> ('a -> 'b) fn
+  val foreign_value : string -> 'a Ctypes.typ -> 'a Ctypes.ptr fn
 end
 
 module type BINDINGS = functor (F : FOREIGN with type 'a fn = unit) -> sig end
