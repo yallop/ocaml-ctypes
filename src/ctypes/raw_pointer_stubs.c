@@ -10,9 +10,9 @@
 #include <caml/memory.h>
 #include <caml/fail.h>
 
-#include "managed_buffer_stubs.h"
-#include "type_info_stubs.h"
-#include "raw_pointer.h"
+#include "ctypes_managed_buffer_stubs.h"
+#include "ctypes_type_info_stubs.h"
+#include "ctypes_raw_pointer.h"
 
 /* memcpy : dst:fat_pointer -> src:fat_pointer -> size:int -> unit */
 value ctypes_memcpy(value dst, value src, value size)

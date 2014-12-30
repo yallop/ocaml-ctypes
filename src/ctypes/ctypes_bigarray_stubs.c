@@ -8,7 +8,7 @@
 #include <caml/mlvalues.h>
 #include <caml/bigarray.h>
 
-#include "raw_pointer.h"
+#include "ctypes_raw_pointer.h"
 
 /* address : 'b -> pointer */
 value ctypes_bigarray_address(value ba)

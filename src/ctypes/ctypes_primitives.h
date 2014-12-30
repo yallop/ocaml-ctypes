@@ -11,7 +11,7 @@
 #include <limits.h>
 #include <stdint.h>
 
-#include "unsigned_stubs.h"
+#include "ctypes_unsigned_stubs.h"
 
 /* The order here must correspond to the constructor order in primitives.ml */
 enum ctypes_primitive {
