@@ -14,6 +14,7 @@
 #include <string.h>
 
 #include "ctypes_raw_pointer.h"
+#include "ctypes_managed_buffer_stubs.h"
 
 static void finalize_free(value v)
 {

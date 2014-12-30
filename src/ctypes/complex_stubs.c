@@ -10,6 +10,8 @@
 #include <caml/memory.h>
 #include <caml/alloc.h>
 
+#include "ctypes_complex_stubs.h"
+
 static value allocate_complex_value(double r, double i)
 {
   value v = caml_alloc(2 * sizeof(double), Double_array_tag);
