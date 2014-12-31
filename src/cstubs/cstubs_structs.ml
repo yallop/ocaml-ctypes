@@ -184,6 +184,7 @@ let write_consts fmt consts =
     function (name, Static.BoxedType ty) ->
       let p, e = ml_pat_and_exp_of_typ ty in
       Format.fprintf fmt "{@[<v 2>@\n";
+      Format.fprintf fmt "enum { check_%s_const = (int)%s };@\n" name name;
       (* Since printf is variadic we can't rely on implicit conversions.
          We'll use assignment rather than casts to coerce to the correct type
          because casts typically result in silent truncation whereas narrowing
