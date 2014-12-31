@@ -161,9 +161,15 @@ let primitive_format_string : type a. a Primitives.prim -> string =
     | Float, _ -> fail ()
     | Double, _ -> fail ()
 
-let ml_pat_and_exp_of_typ : type a. a typ -> string * string =
+let rec ml_pat_and_exp_of_typ : type a. a typ -> string * string =
   fun ty -> 
     match ty with
+    | Static.View { Static.ty } ->
+      let p, e = ml_pat_and_exp_of_typ ty in
+      let x = Cstubs_c_language.fresh_var ~prefix:"read" () in
+      let p' = Printf.sprintf "Static.View { Static.read = %s; ty = %s }" x p
+      and e' = Printf.sprintf "(%s (%s))" x e in
+      (p', e')
     | Static.Primitive p ->
       let pat = 
         (Common.asprintf "Static.Primitive %a"
