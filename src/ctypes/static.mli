@@ -147,6 +147,7 @@ val view : ?format_typ:((Format.formatter -> unit) ->
                         Format.formatter -> unit) ->
            ?format: (Format.formatter -> 'b -> unit) ->
            read:('a -> 'b) -> write:('b -> 'a) -> 'a typ -> 'b typ
+val typedef: 'a typ -> string -> 'a typ
 val bigarray : < ba_repr : 'c;
                  bigarray : 'd;
                  carray : 'e;

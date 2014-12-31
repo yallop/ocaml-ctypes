@@ -381,6 +381,14 @@ val view : ?format_typ:((Format.formatter -> unit) -> Format.formatter -> unit) 
 
 *)
 
+val typedef : 'a typ -> string -> 'a typ
+(** [typedef t name] creates a C type representation [t'] which
+    is equivalent to [t] except its name is printed as [name].
+
+    This is useful when generating C stubs involving "anonymous" types, for
+    example: [typedef struct { int f } typedef_name;]
+*)
+
 (** {3 Abstract types} *)
 
 type 'a abstract
