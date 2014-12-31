@@ -40,7 +40,7 @@ value ctypes_read(value prim_, value buffer_)
   void *buf = CTYPES_ADDR_OF_FATPTR(buffer_);
   switch (Int_val(prim_))
   {
-   case Char: b = Val_int(*(char *)buf); break;
+   case Char: b = Val_int(*(unsigned char*)buf); break;
    case Schar: b = Val_int(*(signed char *)buf); break;
    case Uchar: b = ctypes_copy_uint8(*(unsigned char *)buf); break;
    case Bool: b = Val_bool(*(bool *)buf); break;
@@ -81,7 +81,7 @@ value ctypes_write(value prim_, value v, value buffer_)
   void *buf = CTYPES_ADDR_OF_FATPTR(buffer_);
   switch (Int_val(prim_))
   {
-   case Char: *(char *)buf = Int_val(v); break;
+   case Char: *(unsigned char *)buf = Int_val(v); break;
    case Schar: *(signed char *)buf = Int_val(v); break;
    case Uchar: *(unsigned char *)buf = Uint8_val(v); break;
    case Bool: *(bool *)buf = Bool_val(v); break;
