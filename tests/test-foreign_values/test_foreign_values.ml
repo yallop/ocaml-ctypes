@@ -11,7 +11,7 @@ open Ctypes
 
 module Common_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
 struct
-  module M = Functions.Stubs(S)
+  module M = Functions.Common(S)
   open M
 
   (*
@@ -42,7 +42,13 @@ struct
 
       plus <-@ None;
     end
+end
 
+
+module Make_stub_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
+struct
+  module N = Functions.Stubs(S)
+  open N
 
   (*
     Read environment variables from the 'environ' global.
@@ -69,7 +75,11 @@ end
 
 
 module Foreign_tests = Common_tests(Tests_common.Foreign_binder)
-module Stub_tests = Common_tests(Generated_bindings)
+module Stub_tests =
+struct
+  include Common_tests(Generated_bindings)
+  include Make_stub_tests(Generated_bindings)
+end
 
 
 let suite = "Foreign value tests" >:::
@@ -78,9 +88,6 @@ let suite = "Foreign value tests" >:::
 
    "global callback function (foreign)"
     >:: Foreign_tests.test_global_callback;
-
-   "reading from 'environ' (foreign)"
-    >:: Foreign_tests.test_environ;
 
    "retrieving global struct (stubs)"
     >:: Stub_tests.test_retrieving_struct;

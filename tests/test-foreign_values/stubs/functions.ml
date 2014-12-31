@@ -9,7 +9,7 @@
 
 open Ctypes
 
-module Stubs (F: Cstubs.FOREIGN) =
+module Common (F: Cstubs.FOREIGN) =
 struct
   let s : [`global_struct] structure typ = structure "global_struct"
   let (-:) ty label = field s label ty
@@ -25,6 +25,11 @@ struct
 
   let sum = F.foreign "sum_range_with_plus_callback"
       (int @-> int @-> returning int)
+end
 
+
+module Stubs (F: Cstubs.FOREIGN) =
+struct
+  include Common(F)
   let environ = F.foreign_value "environ" (ptr string_opt)
 end
