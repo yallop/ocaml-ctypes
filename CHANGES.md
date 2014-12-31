@@ -1,10 +1,12 @@
 ## ctypes 0.4
 
-Thanks to A. Hauptmann (@fdopen), David Sheets (@dsheets), Maverick Woo (@maverickwoo), Peter Zotov (@whitequark), David Kaloper (@pqwy), Ramkumar Ramachandra (@artagnon), Thomas Braibant (@braibant) for contributions to this release.
+Thanks to A. Hauptmann (@fdopen), David Sheets (@dsheets), Maverick Woo (@maverickwoo), Peter Zotov (@whitequark), David Kaloper (@pqwy), Ramkumar Ramachandra (@artagnon), Thomas Braibant (@braibant) and Edwin Török (@edwintorok) for contributions to this release.
 
 ### Major features
 
 #### Support for the C99 bool type
+
+#### Typedef support
 
 #### Windows support
 
