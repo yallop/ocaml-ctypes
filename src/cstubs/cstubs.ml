@@ -11,6 +11,7 @@ module type FOREIGN =
 sig
   type 'a fn
   val foreign : string -> ('a -> 'b) Ctypes.fn -> ('a -> 'b) fn
+  val view_invoke : ('a -> 'b) fn -> 'a -> 'b
 end
 
 module type FOREIGN' = FOREIGN with type 'a fn = unit
@@ -26,6 +27,8 @@ let gen_c prefix fmt : (module FOREIGN') =
      type 'a fn = unit
      let foreign cname fn =
        Cstubs_generate_c.fn ~cname ~stub_name:(var prefix cname) fmt fn
+     let view_invoke _ _ =
+       failwith "must not invoke bindings during stub generation"
    end)
 
 type bind = Bind : string * string * ('a -> 'b) Ctypes.fn -> bind
@@ -44,6 +47,9 @@ let write_foreign fmt bindings =
   Format.fprintf fmt " @[@[Printf.fprintf@ stderr@ \"No match for %%s\" s@];";
   Format.fprintf fmt "@ @[assert false@]@]@]@]@."
 
+let write_invoke fmt =
+  Format.fprintf fmt "let view_invoke f v = f v@."
+
 let gen_ml prefix fmt : (module FOREIGN') * (unit -> unit) =
   let bindings = ref []
   and counter = ref 0 in
@@ -56,8 +62,10 @@ let gen_ml prefix fmt : (module FOREIGN') * (unit -> unit) =
        let name = var prefix cname in
        bindings := Bind (cname, name, fn) :: !bindings;
        Cstubs_generate_ml.extern ~stub_name:name ~external_name:name fmt fn
+     let view_invoke _ _ =
+       failwith "must not invoke bindings during stub generation"
    end),
-  fun () -> write_foreign fmt !bindings
+  fun () -> write_foreign fmt !bindings; write_invoke fmt
 
 let write_c fmt ~prefix (module B : BINDINGS) =
   Format.fprintf fmt

@@ -88,3 +88,10 @@ val funptr_opt :
 exception CallToExpiredClosure
 (** A closure passed to C was collected by the OCaml garbage collector before
     it was called. *)
+
+type 'a fn = 'a
+val view_invoke : ('a -> 'b) fn -> 'a -> 'b
+(** [view_invoke f] for compatibility with Cstubs.FOREIGN.
+    Usually you are not allowed to call the just defined bindings when
+    generating C stubs (because they are not real functions yet), but you
+    need the correct type for defining views *)

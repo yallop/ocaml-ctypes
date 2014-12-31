@@ -31,6 +31,7 @@ module Foreign_binder : Cstubs.FOREIGN with type 'a fn = 'a =
 struct
   type 'a fn = 'a
   let foreign name fn = Foreign.foreign name fn
+  let view_invoke f v = f v
 end
 
 module type STUBS = functor  (F : Cstubs.FOREIGN) -> sig end
