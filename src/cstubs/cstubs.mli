@@ -7,6 +7,14 @@
 
 (** Operations for generating C bindings stubs. *)
 
+module Types :
+sig
+  module type BINDINGS = functor (F : Ctypes_types.TYPE) -> sig end
+
+  val write_c : Format.formatter -> (module BINDINGS) -> unit
+end
+
+
 module type FOREIGN =
 sig
   type 'a fn

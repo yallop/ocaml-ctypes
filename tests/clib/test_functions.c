@@ -557,6 +557,14 @@ size_t offsetof_y1(void) { return offsetof(struct s2, y1); }
 size_t offsetof_y2(void) { return offsetof(struct s2, y2); }
 size_t offsetof_y3(void) { return offsetof(struct s2, y3); }
 size_t offsetof_y4(void) { return offsetof(struct s2, y4); }
+size_t sizeof_s3(void) { return sizeof(struct s3); }
+size_t alignmentof_s3(void) { return offsetof(struct { char c; struct s3 x; }, x); }
+size_t offsetof_z1(void) { return offsetof(struct s3, z1); }
+size_t offsetof_z2(void) { return offsetof(struct s3, z2); }
+size_t sizeof_s4(void) { return sizeof(struct s4); }
+size_t alignmentof_s4(void) { return offsetof(struct { char c; struct s4 x; }, x); }
+size_t offsetof_z3(void) { return offsetof(struct s4, z3); }
+size_t offsetof_z4(void) { return offsetof(struct s4, z4); }
 
 size_t sizeof_u1(void) { return sizeof(union u1); }
 size_t alignmentof_u1(void) { return offsetof (struct { char c; union u1 x; }, x); }
@@ -564,4 +572,9 @@ size_t alignmentof_u1(void) { return offsetof (struct { char c; union u1 x; }, x
 bool bool_and(bool l, bool r)
 {
   return l && r;
+}
+
+int call_s5(struct s1 *s1, struct s5 *s5)
+{
+  return s5->w1(s1);
 }

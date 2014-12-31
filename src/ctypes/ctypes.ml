@@ -22,3 +22,5 @@ include Coerce
 let ( *:* ) s t = field s "<unknown>" t
 
 let ( +:+ ) s t = field s "<unknown>" t
+
+let lift_typ x = x

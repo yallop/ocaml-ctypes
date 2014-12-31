@@ -7,21 +7,7 @@
 
 open Ctypes
 
-module type STRUCT =
-sig
-  type _ typ
-  type (_, _) field
-
-  val structure : string -> 's structure typ
-  val union : string -> 's union typ
-
-  val field : 't typ -> string -> 'a Ctypes.typ ->
-    ('a, (('s, [<`Struct | `Union]) structured as 't)) field
-
-  val seal : (_, [< `Struct | `Union]) structured typ -> unit
-end
-
-module type BINDINGS = functor (F : STRUCT) -> sig end
+module type BINDINGS = functor (F : Ctypes_types.TYPE) -> sig end
 
 let cstring s =
   (* Format a string for output as a C string literal. *)
@@ -47,12 +33,9 @@ let cepilogue = [
   "}";
   ]
 let mlprologue = [
+  "include Ctypes";
+  "let lift x = x";
   "open Static";
-
-  "let (structure, union) = Static.(structure, union)";
-  "";
-  "type 'a typ = 'a Static.typ";
-  "type ('a, 's) field = ('a, 's) Static.field";
 ]
 
 (* [puts fmt s] writes the call [puts(s);] on [fmt]. *)
@@ -85,16 +68,17 @@ let cases fmt list prologue epilogue ~case =
 
 let write_field fmt specs =
   let case = function
-  | `Struct, tag, name ->
+  | `Struct tag, name ->
     let foffset fmt = offsetof ("struct " ^ tag) name fmt in
     puts (Printf.sprintf "  | Struct ({ tag = %S} as s'), %S ->" tag name) fmt;
     printf1              "    let f = {ftype; fname; foffset = %zu} in \n" foffset fmt;
     puts                 "    (s'.fields <- BoxedField f :: s'.fields; f)" fmt;
-  | `Union, tag, name ->
+  | `Union tag, name ->
     let foffset fmt = offsetof ("union " ^ tag) name fmt in
     puts (Printf.sprintf "  | Union ({ utag = %S} as s'), %S ->" tag name) fmt;
     printf1              "    let f = {ftype; fname; foffset = %zu} in \n" foffset fmt;
     puts                 "    (s'.ufields <- BoxedField f :: s'.ufields; f)" fmt;
+  | _ -> raise (Unsupported "Adding a field to non-structured type")
   in
   cases fmt specs
   ["";
@@ -105,17 +89,19 @@ let write_field fmt specs =
   ["  | _ -> failwith (\"Unexpected field \"^ fname)"]
 
 let write_seal fmt specs =
-  let case (kw, tag) = match kw with
-    | `Struct ->
+  let case = function
+    | `Struct tag ->
         let ssize fmt = sizeof ~fmt ("struct " ^ tag)
         and salign fmt = offsetof ~fmt ("struct { char c; struct "^ tag ^" x; }") "x" in
         puts ~fmt (Printf.sprintf "  | Struct ({ tag = %S; spec = Incomplete _ } as s') ->" tag);
         printf2 ~fmt              "    s'.spec <- Complete { size = %zu; align = %zu }\n" ssize salign;
-    | `Union ->
+    | `Union tag ->
         let usize fmt = sizeof ~fmt ("union " ^ tag)
         and ualign fmt = offsetof ~fmt ("struct { char c; union "^ tag ^" x; }") "x" in
         puts ~fmt (Printf.sprintf "  | Union ({ utag = %S; uspec = None } as s') ->" tag);
         printf2 ~fmt              "    s'.uspec <- Some { size = %zu; align = %zu }\n" usize ualign;
+    | `Other -> 
+      raise (Unsupported "Sealing a non-structured type")
   in
   cases fmt specs
     ["";
@@ -138,13 +124,54 @@ let gen_c () =
   let finally fmt = write_c fmt (fun fmt -> write_ml fmt !fields !structures) in
   let m = 
     (module struct
-      type _ typ = [`Struct | `Union] * string
+      type _ typ = [`Struct of string | `Union of string | `Other]
       type (_, _) field = unit
-      let structure tag = (`Struct, tag)
-      let union tag = (`Union, tag)
-      let field (tag, kw) name _ = fields := (tag, kw, name) :: !fields
+      let structure tag = `Struct tag
+      let union tag = `Union tag
+      let field (s : _ typ) name _ = fields := (s, name) :: !fields
       let seal (structure : _ typ) = structures := structure :: !structures
-     end : STRUCT)
+      let abstract ~name ~size ~alignment = `Other
+      let view ?format_typ ?format ~read ~write _ = `Other
+      let typedef _ _ = `Other
+      let typ_of_bigarray_kind _ = `Other
+      let bigarray _ _ _ = `Other
+      let array _ _ = `Other
+      let ocaml_bytes = `Other
+      let ocaml_string = `Other
+      let string_opt = `Other
+      let string = `Other
+      let ptr_opt _ = `Other
+      let ptr _ = `Other
+      let complex64 = `Other
+      let complex32 = `Other
+      let double = `Other
+      let float = `Other
+      let ullong = `Other
+      let ulong = `Other
+      let uint = `Other
+      let ushort = `Other
+      let size_t = `Other
+      let uint64_t = `Other
+      let uint32_t = `Other
+      let uint16_t = `Other
+      let uint8_t = `Other
+      let bool = `Other
+      let uchar = `Other
+      let camlint = `Other
+      let int64_t = `Other
+      let int32_t = `Other
+      let int16_t = `Other
+      let int8_t = `Other
+      let nativeint = `Other
+      let llong = `Other
+      let long = `Other
+      let int = `Other
+      let short = `Other
+      let schar = `Other
+      let char = `Other
+      let void = `Other
+      let lift_typ _ = `Other
+     end : Ctypes_types.TYPE)
   in (m, finally)
 
 let write_c fmt (module B : BINDINGS) =

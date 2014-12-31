@@ -421,7 +421,7 @@ module Stub_tests = Build_stub_tests(Generated_bindings)
 
 
 module Build_struct_stub_tests
-    (S : Cstubs_structs.STRUCT
+    (S : Ctypes_types.TYPE
           with type 'a typ = 'a Ctypes.typ
            and type ('a, 's) field = ('a, 's) Ctypes.field) =
 struct
@@ -442,6 +442,15 @@ struct
   let offsetof_y2 = retrieve_size "offsetof_y2"
   let offsetof_y3 = retrieve_size "offsetof_y3"
   let offsetof_y4 = retrieve_size "offsetof_y4"
+
+  let sizeof_s3 = retrieve_size "sizeof_s3"
+  let alignmentof_s3 = retrieve_size "alignmentof_s3"
+  let offsetof_z1 = retrieve_size "offsetof_z1"
+  let offsetof_z2 = retrieve_size "offsetof_z2"
+  let sizeof_s4 = retrieve_size "sizeof_s4"
+  let alignmentof_s4 = retrieve_size "alignmentof_s4"
+  let offsetof_z3 = retrieve_size "offsetof_z3"
+  let offsetof_z4 = retrieve_size "offsetof_z4"
 
   (*
     Test that struct layout retrieved from C correctly accounts for missing
@@ -480,9 +489,72 @@ struct
       assert_equal offsetof_y2
         (offsetof M.y2);
     end
+
+  (* Test that we can retrieve information about multiple structs with
+     dependencies between them. *)
+  let test_struct_dependencies _ =
+    begin
+      assert_equal sizeof_s3
+        (sizeof M.s3);
+
+      assert_equal alignmentof_s3
+        (alignment M.s3);
+
+      assert_equal offsetof_z1
+        (offsetof M.z1);
+
+      assert_equal offsetof_z2
+        (offsetof M.z2);
+
+      assert_equal sizeof_s4
+        (sizeof M.s4);
+
+      assert_equal alignmentof_s4
+        (alignment M.s4);
+
+      assert_equal offsetof_z3
+        (offsetof M.z3);
+
+      assert_equal offsetof_z4
+        (offsetof M.z4);
+    end
+
+
+  module Build_call_tests
+      (F : Cstubs.FOREIGN with type 'a fn = 'a) =
+  struct
+    module F = Functions.Common(F)
+    open F
+    open M
+
+    let callback p = !@(p |-> x1) + !@(p |-> x4)
+
+    (* Call a function passing two structs, one of which contains a function
+       pointer which accepts an argument to the other.
+
+       This is mostly testing that we can support complex dependencies together
+       with retrieved layout.
+    *)
+    let test_struct_dependencies _ =
+      let v5 = make s5 in
+      let v1 = make s1 in
+      begin
+        setf v1 x1 10;
+        setf v1 x4 20;
+        setf v5 w1 callback;
+        assert_equal 30
+          (call_s5 (addr v1) (addr v5))
+          ~printer:string_of_int;
+      end
+  end
+
 end
 
 module Struct_stubs_tests = Build_struct_stub_tests(Generated_struct_bindings)
+module Combined_foreign_tests =
+  Struct_stubs_tests.Build_call_tests(Tests_common.Foreign_binder)
+module Combined_stub_tests =
+  Struct_stubs_tests.Build_call_tests(Generated_bindings)
 
 
 let suite = "Struct tests" >:::
@@ -497,6 +569,12 @@ let suite = "Struct tests" >:::
 
    "returning struct (stubs)"
    >:: Stub_tests.test_returning_struct;
+
+   "struct dependencies (foreign)"
+   >:: Combined_foreign_tests.test_struct_dependencies;
+
+   "struct dependencies (stubs)"
+   >:: Combined_stub_tests.test_struct_dependencies;
 
    "incomplete struct members rejected"
    >:: test_incomplete_struct_members;
@@ -536,6 +614,9 @@ let suite = "Struct tests" >:::
 
    "test layout of structs with reordered fields"
    >:: Struct_stubs_tests.test_reordered_fields;
+
+   "test retrieving information about structs with dependencies"
+   >:: Struct_stubs_tests.test_struct_dependencies;
   ]
 
 

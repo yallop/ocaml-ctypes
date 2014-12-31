@@ -33,7 +33,7 @@ distclean: clean
 	rm -f $(GENERATED)
 
 # ctypes subproject
-ctypes.public = static primitives unsigned signed structs ctypes posixTypes
+ctypes.public = static primitives unsigned signed structs ctypes posixTypes ctypes_types
 ctypes.dir = src/ctypes
 ctypes.extra_mls = ctypes_primitives.ml
 ctypes.deps = str bigarray bytes
@@ -47,7 +47,7 @@ ctypes: PROJECT=ctypes
 ctypes: $(ctypes.dir)/$(ctypes.extra_mls) $$(LIB_TARGETS)
 
 # cstubs subproject
-cstubs.public = cstubs_internals cstubs cstubs_inverted cstubs_structs
+cstubs.public = cstubs_internals cstubs cstubs_inverted
 cstubs.dir = src/cstubs
 cstubs.subproject_deps = ctypes
 cstubs.deps = str bytes
