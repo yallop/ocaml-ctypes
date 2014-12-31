@@ -44,7 +44,7 @@ struct
   let _true = constant "true" bool
   let _false = constant "false" bool
 
-  let i32_inverted = Ctypes.view Ctypes.int32_t
+  let i32_inverted = view int32_t
       ~read:Int32.neg ~write:Int32.neg
   let neg_INT16_MAX = constant "INT16_MAX" i32_inverted
   let neg_INT16_MIN = constant "INT16_MIN" i32_inverted

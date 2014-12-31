@@ -15,10 +15,11 @@ let testlib = Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW]
 module Constants = Types.Struct_stubs(Generated_struct_bindings)
 
 
+let constant name typ =
+  Foreign.foreign ~from:testlib ("retrieve_"^ name) (void @-> returning typ) ()
+
+
 let test_retrieve_constants _ =
-  let constant name typ =
-    Foreign.foreign ~from:testlib ("retrieve_"^ name) (void @-> returning typ) ()
-  in
   begin
     assert_equal Constants._LONG_MIN (constant "LONG_MIN" long);
     assert_equal Constants._SCHAR_MIN (constant "SCHAR_MIN" Ctypes.schar);
@@ -54,9 +55,26 @@ let test_retrieve_constants _ =
   end
 
 
+let test_retrieve_views _ =
+  begin
+    assert_equal
+      Constants.neg_INT16_MAX
+      (Int32.(neg (of_int (constant "INT16_MAX" Ctypes.int16_t))))
+    ;
+      
+    assert_equal
+      Constants.neg_INT16_MIN
+      (Int32.(neg (of_int (constant "INT16_MIN" Ctypes.int16_t))))
+    ;
+  end
+
+
 let suite = "Constant tests" >:::
   ["retrieving values of various integer types"
    >:: test_retrieve_constants;
+
+   "retrieving values of view type"
+   >:: test_retrieve_views;
   ]
 
 
