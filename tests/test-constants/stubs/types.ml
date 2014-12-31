@@ -48,4 +48,9 @@ struct
       ~read:Int32.neg ~write:Int32.neg
   let neg_INT16_MAX = constant "INT16_MAX" i32_inverted
   let neg_INT16_MIN = constant "INT16_MIN" i32_inverted
+
+  let _A = constant "A" int
+  let _B = constant "B" int
+  let _C = constant "C" int
+  let _D = constant "D" int
 end

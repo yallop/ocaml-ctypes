@@ -69,12 +69,23 @@ let test_retrieve_views _ =
   end
 
 
+let test_retrieve_enums _ =
+  begin
+    assert_equal
+      [0; 1; 10; 11]
+      Constants.([_A; _B; _C; _D])
+  end
+
+
 let suite = "Constant tests" >:::
   ["retrieving values of various integer types"
    >:: test_retrieve_constants;
 
    "retrieving values of view type"
    >:: test_retrieve_views;
+
+   "retrieving enumeration constants"
+   >:: test_retrieve_enums;
   ]
 
 
