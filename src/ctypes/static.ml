@@ -231,3 +231,16 @@ let union utag = Union { utag; uspec = None; ufields = [] }
 let offsetof { foffset } = foffset
 let field_type { ftype } = ftype
 let field_name { fname } = fname
+
+(* This corresponds to the enum in ctypes_primitives.h *)
+type arithmetic =
+    Int8
+  | Int16
+  | Int32
+  | Int64
+  | Uint8
+  | Uint16
+  | Uint32
+  | Uint64
+  | Float
+  | Double
