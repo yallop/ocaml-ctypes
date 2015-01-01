@@ -11,6 +11,8 @@ sig
 
   type 'a const
   val constant : string -> 'a typ -> 'a const
+
+  val enum : string -> ?unexpected:(int64 -> 'a) -> ('a * int64 const) list -> 'a typ
 end
 
 module type BINDINGS = functor (F : TYPE) -> sig end

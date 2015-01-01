@@ -13,6 +13,8 @@ sig
 
   type 'a const
   val constant : string -> 'a typ -> 'a const
+
+  val enum : string -> ?unexpected:(int64 -> 'a) -> ('a * int64 const) list -> 'a typ
 end
 
 module type BINDINGS = functor (F : TYPE) -> sig end
@@ -32,6 +34,7 @@ let cprologue = [
   "";
   "#include <stdio.h>";
   "#include <stddef.h>";
+  "#include \"ctypes_cstubs_internals.h\"";
   "";
   "int main(void)";
   "{";
@@ -203,16 +206,43 @@ let write_consts fmt consts =
     ["  | s, _ -> failwith (\"unmatched constant: \"^ s)"] 
     
 
-let write_ml fmt fields structures consts =
+let write_enums fmt enums =
+  let case name =
+    printf1 ~fmt
+      (Format.sprintf
+         "  | %S -> \n    Cstubs_internals.build_enum_type %S Static.%%s ?unexpected alist\n"
+         name
+         name)
+      (fun fmt ->
+         Format.fprintf fmt
+           "ctypes_arithmetic_type_name(CTYPES_CLASSIFY_ARITHMETIC_TYPE(enum %s))"
+           name)
+  in
+  cases fmt enums
+    ["";
+     "let enum (type a) name ?unexpected (alist : (a * int64) list) =";
+     "  match name with"]
+    ~case
+    ["  | s ->";
+     "    failwith (\"unmatched enum: \"^ s)"]
+
+
+let write_ml fmt fields structures consts enums =
   List.iter (puts ~fmt) mlprologue;
   write_field fmt fields;
   write_seal fmt structures;
-  write_consts fmt consts
+  write_consts fmt consts;
+  write_enums fmt enums
 
 let gen_c () =
-  let fields = ref [] and structures = ref [] and consts = ref [] in
-  let finally fmt = write_c fmt (fun fmt -> write_ml fmt !fields !structures !consts) in
-  let m = 
+  let fields = ref []
+  and structures = ref []
+  and consts = ref []
+  and enums = ref []
+  in
+  let finally fmt = write_c fmt (fun fmt ->
+                    write_ml fmt !fields !structures !consts !enums) in
+  let m =
     (module struct
       include Ctypes
       let field (type s) (s : (_, s) structured typ) fname ftype =
@@ -234,6 +264,14 @@ let gen_c () =
           ()
       type _ const = unit
       let constant name ty  = consts := (name, Static.BoxedType ty) :: !consts
+      let enum name ?unexpected alist =
+        let () = enums := name :: !enums in
+        let format_typ k fmt = Format.fprintf fmt "enum %s%t" name k in
+        (* a dummy value of type 'a typ, mostly unusable *)
+        view void
+          ~format_typ
+          ~read:(fun _ -> assert false)
+          ~write:(fun _ -> assert false)
      end : TYPE)
   in (m, finally)
 

@@ -84,3 +84,6 @@ type 'a prim = 'a Primitives.prim =
 | Double : float prim
 | Complex32 : Complex.t prim
 | Complex64 : Complex.t prim
+
+val build_enum_type :
+  string -> Static.arithmetic -> ?unexpected:(int64 -> 'a) -> ('a * int64) list -> 'a typ

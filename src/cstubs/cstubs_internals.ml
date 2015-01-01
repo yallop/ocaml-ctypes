@@ -24,3 +24,61 @@ include Primitives
 let make_ptr reftyp raw_ptr = CPointer (Ctypes_ptr.Fat.make ~reftyp raw_ptr)
 
 let cptr (CPointer p) = p
+
+let mkView :
+  type a b. string -> a typ -> unexpected:(a -> b) -> (b * a) list -> b typ =
+  fun name typ ~unexpected alist ->
+    let rlist = List.map (fun (l, r) -> (r, l)) alist in 
+    let write k = List.assoc k alist
+    and read k = try List.assoc k rlist with Not_found -> unexpected k
+    and format_typ k fmt = Format.fprintf fmt "enum %s%t" name k in
+    view typ ~format_typ ~read ~write
+
+let map_assocv f = List.map (fun (k, v) -> (k, f v))
+
+let int8_of_int64 = Int64.to_int
+let int64_of_int8 = Int64.of_int
+let int16_of_int64 = Int64.to_int
+let int64_of_int16 = Int64.of_int
+let int32_of_int64 = Int64.to_int32
+let int64_of_int32 = Int64.of_int32
+let int64_of_int64 x = x
+(* For now we use conversion via strings: there's certainly room for
+   improvement.  The conversion from int64_t to uint8_t isn't safe in general,
+   of course, so we don't have it available.  However, we can be confident
+   that conversion will work in this particular case, since we know that the
+   underlying type is actually uint8_t, so the value can certainly be
+   represented.
+
+   In mitigation, these conversions are performed once during "startup", not
+   each time we read and write enum values.  *)
+let uint8_of_int64 x = Unsigned.UInt8.of_string (Int64.to_string x)
+let int64_of_uint8 x = Int64.of_int (Unsigned.UInt8.to_int x)
+let uint16_of_int64 x = Unsigned.UInt16.of_string (Int64.to_string x)
+let int64_of_uint16 x = Int64.of_int (Unsigned.UInt16.to_int x)
+let uint32_of_int64 x = Unsigned.UInt32.of_string (Int64.to_string x)
+let int64_of_uint32 x = Int64.of_string (Unsigned.UInt32.to_string x)
+let uint64_of_int64 = Unsigned.UInt64.of_int64
+let int64_of_uint64 = Unsigned.UInt64.to_int64
+
+let build_enum_type name underlying ?unexpected alist =
+  let build_view t coerce uncoerce =
+    let unexpected = match unexpected with
+        Some u -> fun x -> u (uncoerce x)
+      | None   -> fun x ->
+        Printf.ksprintf failwith "Unexpected enum value for %s: %Ld"
+          name (uncoerce x)
+    in
+    mkView name t ~unexpected (map_assocv coerce alist) in
+  match underlying with
+    Static.Int8 -> build_view Ctypes.int8_t int8_of_int64 int64_of_int8
+  | Static.Int16 -> build_view Ctypes.int16_t int16_of_int64 int64_of_int16
+  | Static.Int32 -> build_view Ctypes.int32_t int32_of_int64 int64_of_int32
+  | Static.Int64 -> build_view Ctypes.int64_t int64_of_int64 int64_of_int64
+  | Static.Uint8 -> build_view Ctypes.uint8_t uint8_of_int64 int64_of_uint8
+  | Static.Uint16 -> build_view Ctypes.uint16_t uint16_of_int64 int64_of_uint16
+  | Static.Uint32 -> build_view Ctypes.uint32_t uint32_of_int64 int64_of_uint32
+  | Static.Uint64 -> build_view Ctypes.uint64_t uint64_of_int64 int64_of_uint64
+  | Static.Float | Static.Double ->
+    Printf.ksprintf failwith
+      "Enum type detected as floating type: %s" name

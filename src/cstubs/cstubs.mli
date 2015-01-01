@@ -12,6 +12,7 @@ sig
   module type TYPE =
   sig
     include Ctypes_types.TYPE
+
     type 'a const
     val constant : string -> 'a typ -> 'a const
     (** [constant name typ] retrieves the value of the compile-time constant
@@ -27,6 +28,8 @@ sig
         compiler.  For example, gcc will say
 
            warning: overflow in implicit constant conversion *)
+
+    val enum : string -> ?unexpected:(int64 -> 'a) -> ('a * int64 const) list -> 'a typ
   end
 
   module type BINDINGS = functor (F : TYPE) -> sig end
