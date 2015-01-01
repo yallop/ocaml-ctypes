@@ -188,6 +188,68 @@ tests/test-higher_order/generated_stubs.c: $(BUILDDIR)/test-higher_order-stub-ge
 tests/test-higher_order/generated_bindings.ml: $(BUILDDIR)/test-higher_order-stub-generator.native
 	$< --ml-file $@
 
+test-enums-struct-stubs.dir  = tests/test-enums/struct-stubs
+test-enums-struct-stubs.threads = yes
+test-enums-struct-stubs.subproject_deps = ctypes cstubs \
+   ctypes-foreign-base ctypes-foreign-unthreaded tests-common
+test-enums-struct-stubs: PROJECT=test-enums-struct-stubs
+test-enums-struct-stubs: $$(LIB_TARGETS)
+
+test-enums-stubs.dir  = tests/test-enums/stubs
+test-enums-stubs.threads = yes
+test-enums-stubs.extra_mls = generated_struct_bindings.ml
+test-enums-stubs.subproject_deps = ctypes cstubs \
+   test-enums-struct-stubs \
+   test-enums-struct-stubs-generator \
+   ctypes-foreign-base ctypes-foreign-unthreaded tests-common
+test-enums-stubs: PROJECT=test-enums-stubs
+test-enums-stubs: $$(LIB_TARGETS)
+
+test-enums-stub-generator.dir = tests/test-enums/stub-generator
+test-enums-stub-generator.threads = yes
+test-enums-stub-generator.subproject_deps = ctypes cstubs \
+     test-enums-struct-stubs \
+     ctypes-foreign-base ctypes-foreign-unthreaded test-enums-stubs tests-common
+test-enums-stub-generator.deps = str bigarray bytes
+test-enums-stub-generator: PROJECT=test-enums-stub-generator
+test-enums-stub-generator: $$(NATIVE_TARGET)
+
+test-enums-struct-stub-generator.dir = tests/test-enums/struct-stub-generator
+test-enums-struct-stub-generator.threads = yes
+test-enums-struct-stub-generator.subproject_deps = ctypes cstubs \
+     ctypes-foreign-base ctypes-foreign-unthreaded test-enums-struct-stubs tests-common
+test-enums-struct-stub-generator.deps = str bigarray bytes
+test-enums-struct-stub-generator: PROJECT=test-enums-struct-stub-generator
+test-enums-struct-stub-generator: $$(NATIVE_TARGET)
+
+test-enums.dir = tests/test-enums
+test-enums.threads = yes
+test-enums.deps = str bigarray oUnit bytes
+test-enums.subproject_deps = ctypes ctypes-foreign-base \
+  ctypes-foreign-unthreaded cstubs test-enums-struct-stubs test-enums-stubs tests-common
+test-enums.link_flags = -L$(BUILDDIR)/clib -ltest_functions
+test-enums: PROJECT=test-enums
+test-enums: $$(NATIVE_TARGET)
+
+test-enums-structs-generated: \
+  tests/test-enums/stubs/generated_struct_bindings.ml \
+  $(BUILDDIR)/tests/test-enums/generated_struct_stubs.c
+
+test-enums-generated: \
+  tests/test-enums/generated_bindings.ml \
+  tests/test-enums/generated_stubs.c \
+
+tests/test-enums/generated_stubs.c: $(BUILDDIR)/test-enums-stub-generator.native
+	$< --c-file $@
+tests/test-enums/generated_bindings.ml: $(BUILDDIR)/test-enums-stub-generator.native
+	$< --ml-file $@
+tests/test-enums/stubs/generated_struct_bindings.ml: $(BUILDDIR)/test-enums-ml-struct-stub-generator.native
+	$< > $@
+$(BUILDDIR)/test-enums-ml-struct-stub-generator.native: $(BUILDDIR)/tests/test-enums/generated_struct_stubs.c
+	$(CC) -I `$(OCAMLFIND) ocamlc -where | sed 's|\r$$||'` $(CFLAGS) $(LDFLAGS) $(WINLDFLAGS) -o $@ $^
+$(BUILDDIR)/tests/test-enums/generated_struct_stubs.c: $(BUILDDIR)/test-enums-struct-stub-generator.native
+	$< --c-struct-file $@
+
 test-structs-stubs.dir  = tests/test-structs/stubs
 test-structs-stubs.threads = yes
 test-structs-stubs.subproject_deps = ctypes cstubs \
@@ -786,6 +848,7 @@ TESTS += test-variadic-stubs test-variadic-stub-generator test-variadic-generate
 TESTS += test-builtins-stubs test-builtins-stub-generator test-builtins-generated test-builtins
 TESTS += test-macros-stubs test-macros-stub-generator test-macros-generated test-macros
 TESTS += test-higher_order-stubs test-higher_order-stub-generator test-higher_order-generated test-higher_order
+TESTS += test-enums-struct-stubs test-enums-struct-stub-generator test-enums-structs-generated test-enums-stubs test-enums-stub-generator test-enums-generated test-enums
 TESTS += test-structs-stubs test-structs-stub-generator test-structs-generated test-structs
 TESTS += test-constants-stubs test-constants-stub-generator test-constants-generated test-constants
 TESTS += test-finalisers
