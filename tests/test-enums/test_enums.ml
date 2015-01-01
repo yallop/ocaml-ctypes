@@ -53,6 +53,18 @@ struct
       assert_equal [] (as_list None);
     end
 
+  let test_enum_arrays _ =
+    let module Array = CArray in
+    let a = Array.make bears 4 in
+    begin
+      a.(0) <- `Edward;
+      a.(1) <- `Winnie;
+      a.(2) <- `Paddington;
+      a.(3) <- `Edward;
+      assert_equal [`Edward; `Winnie; `Paddington; `Edward]
+        (Array.to_list a)
+    end
+
   module Build_call_tests
       (F : Cstubs.FOREIGN with type 'a fn = 'a) =
   struct
@@ -101,6 +113,9 @@ let suite = "Enum tests" >:::
 
     "enums as struct members"
     >:: Enum_stubs_tests.test_enum_struct_members;
+
+    "arrays of enums"
+    >:: Enum_stubs_tests.test_enum_arrays;
   ]
 
 

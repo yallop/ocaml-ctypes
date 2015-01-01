@@ -204,6 +204,7 @@ int call_s5(struct s1 *, struct s5 *);
 enum letter { A, B, C = 10, D };
 
 enum fruit { Orange, Apple, Banana, Pear };
+enum bears { Edward, Winnie, Paddington };
 enum signed_enum { minus_one = -1, plus_one = 1 };
 
 enum fruit next_fruit(enum fruit);

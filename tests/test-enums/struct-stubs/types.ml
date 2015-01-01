@@ -37,4 +37,15 @@ struct
   let frt = field fruit_cell "frt" fruit
   let next = field fruit_cell "next" (ptr_opt fruit_cell)
   let () = seal fruit_cell
+
+
+  let edward     = constant "Edward"     int64_t
+  let winnie     = constant "Winnie"     int64_t
+  let paddington = constant "Paddington" int64_t
+
+  let bears : [`Edward|`Winnie|`Paddington] typ = enum "bears" [
+      `Edward     , edward     ;
+      `Winnie     , winnie     ;
+      `Paddington , paddington ;
+    ]
 end
