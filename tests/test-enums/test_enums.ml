@@ -17,6 +17,42 @@ struct
   module M = Types.Struct_stubs(S)
   open M
 
+  let test_enum_struct_members _ =
+    let reverse cell =
+      let rec loop prev cell =
+        match cell with
+          None -> prev
+        | Some c ->
+          let n = getf !@c next in
+          let () = setf !@c next prev in
+          loop cell n
+      in loop None cell
+    in
+    let as_list cell =
+      let rec loop l = function
+          None -> List.rev l
+        | Some c ->
+          loop (getf !@c frt :: l) (getf !@c next)
+      in loop [] cell
+    in
+    let rec of_list l =
+      match l with
+        [] -> None
+      | f :: fs ->
+        let c = make fruit_cell in
+        let n = of_list fs in
+        let () = setf c frt f in
+        let () = setf c next n in
+        Some (addr c)
+    in
+    begin
+      let open Types in
+      let l = of_list [Apple; Apple; Pear; Banana] in
+      assert_equal [Apple; Apple; Pear; Banana] (as_list l);
+      assert_equal [Banana; Pear; Apple; Apple] (as_list (reverse l));
+      assert_equal [] (as_list None);
+    end
+
   module Build_call_tests
       (F : Cstubs.FOREIGN with type 'a fn = 'a) =
   struct
@@ -62,6 +98,9 @@ let suite = "Enum tests" >:::
 
     "enums with default values"
     >:: Combined_stub_tests.test_default_enums;
+
+    "enums as struct members"
+    >:: Enum_stubs_tests.test_enum_struct_members;
   ]
 
 

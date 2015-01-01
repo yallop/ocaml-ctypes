@@ -210,4 +210,9 @@ enum fruit next_fruit(enum fruit);
 enum signed_enum classify_integer(int);
 enum signed_enum out_of_range(void);
 
+struct fruit_cell {
+  enum fruit frt;
+  struct fruit_cell *next;
+};
+
 #endif /* TEST_FUNCTIONS_H */

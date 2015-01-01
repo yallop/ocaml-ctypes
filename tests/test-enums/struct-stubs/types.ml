@@ -33,5 +33,8 @@ struct
       1 , plus_one  ;
     ]
 
-
+  let fruit_cell : [`fruit_cell] structure typ = structure "fruit_cell"
+  let frt = field fruit_cell "frt" fruit
+  let next = field fruit_cell "next" (ptr_opt fruit_cell)
+  let () = seal fruit_cell
 end
