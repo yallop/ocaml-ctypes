@@ -14,6 +14,19 @@ sig
     include Ctypes_types.TYPE
     type 'a const
     val constant : string -> 'a typ -> 'a const
+    (** [constant name typ] retrieves the value of the compile-time constant
+        [name] of type [typ].  It can be used to retrieve enum constants,
+        #defined values and other integer constant expressions.
+
+        The type [typ] must be either an integer type such as [bool], [char],
+        [int], [uint8], etc., or a view (or perhaps multiple views) where the
+        underlying type is an integer type.
+
+        When the value of the constant cannot be represented in the type there
+        will typically be a diagnostic from either the C compiler or the OCaml
+        compiler.  For example, gcc will say
+
+           warning: overflow in implicit constant conversion *)
   end
 
   module type BINDINGS = functor (F : TYPE) -> sig end
