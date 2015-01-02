@@ -7,7 +7,15 @@
 
 open Ctypes
 
-module type BINDINGS = functor (F : Ctypes_types.TYPE) -> sig end
+module type TYPE =
+sig
+  include Ctypes_types.TYPE
+
+  type 'a const
+  val constant : string -> 'a typ -> 'a const
+end
+
+module type BINDINGS = functor (F : TYPE) -> sig end
 
 let cstring s =
   (* Format a string for output as a C string literal. *)
@@ -114,64 +122,119 @@ let write_seal fmt specs =
      "  | _ ->";
      "    raise (Unsupported \"Sealing a non-structured type\")"]
 
-let write_ml fmt fields structures =
+let primitive_format_string : type a. a Primitives.prim -> string =
+  fun p ->
+    let open Primitives in
+    let sprintf = Printf.sprintf in
+    let fail () =
+      Printf.kprintf failwith "Cannot retrieve constants of type %s"
+        (Ctypes_primitives.name p)
+    in
+    match p, Ctypes_primitives.format_string p with
+    | _, None -> fail ()
+    | Char, Some fmt -> sprintf "Char.chr (((%s) + 256) mod 256)" fmt
+    | Schar, Some fmt -> fmt
+    | Uchar, Some fmt -> sprintf "Unsigned.UChar.of_string \"%s\"" fmt
+    | Bool, Some fmt -> sprintf "((%s) <> 0)" fmt
+    | Short, Some fmt -> fmt
+    | Int, Some fmt -> fmt
+    | Long, Some fmt -> sprintf "Signed.Long.of_string \"%s\"" fmt
+    | Llong, Some fmt -> sprintf "Signed.LLong.of_string \"%s\"" fmt
+    | Ushort, Some fmt -> sprintf "Unsigned.UShort.of_string \"%s\"" fmt
+    | Uint, Some fmt -> sprintf "Unsigned.UInt.of_string \"%s\"" fmt
+    | Ulong, Some fmt -> sprintf "Unsigned.ULong.of_string \"%s\"" fmt
+    | Ullong, Some fmt -> sprintf "Unsigned.ULLong.of_string \"%s\"" fmt
+    | Size_t, Some fmt -> sprintf "Unsigned.Size_t.of_string \"%s\"" fmt
+    | Int8_t, Some fmt -> fmt
+    | Int16_t, Some fmt -> fmt
+    | Int32_t, Some fmt -> fmt ^"l"
+    | Int64_t, Some fmt -> fmt ^"L"
+    | Uint8_t, Some fmt -> sprintf "Unsigned.UInt8.of_string \"%s\"" fmt
+    | Uint16_t, Some fmt -> sprintf "Unsigned.UInt16.of_string \"%s\"" fmt
+    | Uint32_t, Some fmt -> sprintf "Unsigned.UInt32.of_string \"%s\"" fmt
+    | Uint64_t, Some fmt -> sprintf "Unsigned.UInt64.of_string \"%s\"" fmt
+    | Camlint, Some fmt -> fmt
+    | Nativeint, Some fmt -> fmt ^"n"
+    (* Integer constant expressions cannot have non-integer type *)
+    | Complex32, _ -> fail ()
+    | Complex64, _ -> fail ()
+    | Float, _ -> fail ()
+    | Double, _ -> fail ()
+
+let rec ml_pat_and_exp_of_typ : type a. a typ -> string * string =
+  fun ty -> 
+    match ty with
+    | Static.View { Static.ty } ->
+      let p, e = ml_pat_and_exp_of_typ ty in
+      let x = Cstubs_c_language.fresh_var ~prefix:"read" () in
+      let p' = Printf.sprintf "Static.View { Static.read = %s; ty = %s }" x p
+      and e' = Printf.sprintf "(%s (%s))" x e in
+      (p', e')
+    | Static.Primitive p ->
+      let pat = 
+        (Common.asprintf "Static.Primitive %a"
+           Ctypes_path.format_path
+           (Cstubs_public_name.constructor_cident_of_prim p))
+      and exp = primitive_format_string p in
+      (pat, exp)
+    | _ -> failwith "constant of non-primitive"
+
+let write_consts fmt consts =
+  let case =
+    function (name, Static.BoxedType ty) ->
+      let p, e = ml_pat_and_exp_of_typ ty in
+      Format.fprintf fmt "{@[<v 2>@\n";
+      Format.fprintf fmt "enum { check_%s_const = (int)%s };@\n" name name;
+      (* Since printf is variadic we can't rely on implicit conversions.
+         We'll use assignment rather than casts to coerce to the correct type
+         because casts typically result in silent truncation whereas narrowing
+         assignments typically trigger warnings even on default compiler
+         settings. *)
+      Format.fprintf fmt "%a = (%s);@\n" (Ctypes.format_typ ~name:"v") ty name;
+      printf1 ~fmt
+        (Common.asprintf "  | %S, %s ->@\n    %s\n" name p e)
+        (fun fmt -> Format.fprintf fmt "v");
+      Format.fprintf fmt "@]@\n}@\n"
+  in
+  cases fmt consts
+    ["type 'a const = 'a";
+     "let constant (type t) name (t : t typ) : t = match name, t with"]
+    ~case
+    ["  | s, _ -> failwith (\"unmatched constant: \"^ s)"] 
+    
+
+let write_ml fmt fields structures consts =
   List.iter (puts ~fmt) mlprologue;
   write_field fmt fields;
-  write_seal fmt structures
+  write_seal fmt structures;
+  write_consts fmt consts
 
 let gen_c () =
-  let fields = ref [] and structures = ref [] in
-  let finally fmt = write_c fmt (fun fmt -> write_ml fmt !fields !structures) in
+  let fields = ref [] and structures = ref [] and consts = ref [] in
+  let finally fmt = write_c fmt (fun fmt -> write_ml fmt !fields !structures !consts) in
   let m = 
     (module struct
-      type _ typ = [`Struct of string | `Union of string | `Other]
-      type (_, _) field = unit
-      let structure tag = `Struct tag
-      let union tag = `Union tag
-      let field (s : _ typ) name _ = fields := (s, name) :: !fields
-      let seal (structure : _ typ) = structures := structure :: !structures
-      let abstract ~name ~size ~alignment = `Other
-      let view ?format_typ ?format ~read ~write _ = `Other
-      let typedef _ _ = `Other
-      let typ_of_bigarray_kind _ = `Other
-      let bigarray _ _ _ = `Other
-      let array _ _ = `Other
-      let ocaml_bytes = `Other
-      let ocaml_string = `Other
-      let string_opt = `Other
-      let string = `Other
-      let ptr_opt _ = `Other
-      let ptr _ = `Other
-      let complex64 = `Other
-      let complex32 = `Other
-      let double = `Other
-      let float = `Other
-      let ullong = `Other
-      let ulong = `Other
-      let uint = `Other
-      let ushort = `Other
-      let size_t = `Other
-      let uint64_t = `Other
-      let uint32_t = `Other
-      let uint16_t = `Other
-      let uint8_t = `Other
-      let bool = `Other
-      let uchar = `Other
-      let camlint = `Other
-      let int64_t = `Other
-      let int32_t = `Other
-      let int16_t = `Other
-      let int8_t = `Other
-      let nativeint = `Other
-      let llong = `Other
-      let long = `Other
-      let int = `Other
-      let short = `Other
-      let schar = `Other
-      let char = `Other
-      let void = `Other
-      let lift_typ _ = `Other
-     end : Ctypes_types.TYPE)
+      include Ctypes
+      let field (type s) (s : (_, s) structured typ) fname ftype =
+        let () = match s with 
+        | Static.Struct { Static.tag } ->
+          fields := (`Struct tag, fname) :: !fields
+        | Static.Union { Static.utag } ->
+          fields := (`Union utag, fname) :: !fields
+        | _ ->
+          ()
+        in { Static.ftype; foffset = -1; fname}
+      let seal (type s) (s : (_, s) structured typ) =
+        match s with
+        | Static.Struct { Static.tag } ->
+          structures := `Struct tag :: !structures
+        | Static.Union { Static.utag } ->
+          structures := `Union utag :: !structures
+        | _ ->
+          ()
+      type _ const = unit
+      let constant name ty  = consts := (name, Static.BoxedType ty) :: !consts
+     end : TYPE)
   in (m, finally)
 
 let write_c fmt (module B : BINDINGS) =

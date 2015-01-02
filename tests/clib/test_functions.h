@@ -201,4 +201,6 @@ size_t alignmentof_u1(void);
 bool bool_and(bool, bool);
 int call_s5(struct s1 *, struct s5 *);
 
+enum letter { A, B, C = 10, D };
+
 #endif /* TEST_FUNCTIONS_H */

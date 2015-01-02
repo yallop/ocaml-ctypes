@@ -229,6 +229,48 @@ $(BUILDDIR)/test-structs-ml-stub-generator.native: $(BUILDDIR)/tests/test-struct
 $(BUILDDIR)/tests/test-structs/generated_struct_stubs.c: $(BUILDDIR)/test-structs-stub-generator.native
 	$< --c-struct-file $@
 
+test-constants-stubs.dir  = tests/test-constants/stubs
+test-constants-stubs.threads = yes
+test-constants-stubs.subproject_deps = ctypes cstubs \
+   ctypes-foreign-base ctypes-foreign-unthreaded tests-common
+test-constants-stubs: PROJECT=test-constants-stubs
+test-constants-stubs: $$(LIB_TARGETS)
+
+test-constants-stub-generator.dir = tests/test-constants/stub-generator
+test-constants-stub-generator.threads = yes
+test-constants-stub-generator.subproject_deps = ctypes cstubs \
+     ctypes-foreign-base ctypes-foreign-unthreaded test-constants-stubs tests-common
+test-constants-stub-generator.deps = str bigarray bytes
+test-constants-stub-generator: PROJECT=test-constants-stub-generator
+test-constants-stub-generator: $$(NATIVE_TARGET)
+
+test-constants.dir = tests/test-constants
+test-constants.threads = yes
+test-constants.deps = str bigarray oUnit bytes
+test-constants.subproject_deps = ctypes ctypes-foreign-base \
+  ctypes-foreign-unthreaded cstubs test-constants-stubs tests-common
+test-constants.link_flags = -L$(BUILDDIR)/clib -ltest_functions
+test-constants: PROJECT=test-constants
+test-constants: $$(NATIVE_TARGET)
+
+test-constants-generated: \
+  tests/test-constants/generated_bindings.ml \
+  tests/test-constants/generated_stubs.c \
+  tests/test-constants/generated_struct_bindings.ml \
+  $(BUILDDIR)/tests/test-constants/generated_struct_stubs.c
+
+tests/test-constants/generated_stubs.c: $(BUILDDIR)/test-constants-stub-generator.native
+	$< --c-file $@
+tests/test-constants/generated_bindings.ml: $(BUILDDIR)/test-constants-stub-generator.native
+	$< --ml-file $@
+tests/test-constants/generated_struct_bindings.ml: $(BUILDDIR)/test-constants-ml-stub-generator.native
+	$< > $@
+$(BUILDDIR)/test-constants-ml-stub-generator.native: $(BUILDDIR)/tests/test-constants/generated_struct_stubs.c
+	$(CC) -I `$(OCAMLFIND) ocamlc -where | sed 's|\r$$||'` $(CFLAGS) $(LDFLAGS) $(WINLDFLAGS) -o $@ $^
+$(BUILDDIR)/tests/test-constants/generated_struct_stubs.c: $(BUILDDIR)/test-constants-stub-generator.native
+	$< --c-struct-file $@
+
+
 test-finalisers.dir = tests/test-finalisers
 test-finalisers.threads = yes
 test-finalisers.deps = str bigarray oUnit bytes
@@ -745,6 +787,7 @@ TESTS += test-builtins-stubs test-builtins-stub-generator test-builtins-generate
 TESTS += test-macros-stubs test-macros-stub-generator test-macros-generated test-macros
 TESTS += test-higher_order-stubs test-higher_order-stub-generator test-higher_order-generated test-higher_order
 TESTS += test-structs-stubs test-structs-stub-generator test-structs-generated test-structs
+TESTS += test-constants-stubs test-constants-stub-generator test-constants-generated test-constants
 TESTS += test-finalisers
 TESTS += test-cstdlib-stubs test-cstdlib-stub-generator test-cstdlib-generated test-cstdlib
 TESTS += test-sizeof

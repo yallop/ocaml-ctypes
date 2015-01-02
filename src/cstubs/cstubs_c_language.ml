@@ -11,9 +11,9 @@ open Static
 
 let fresh_var =
   let var_counter = ref 0 in
-  fun () ->
+  fun ?(prefix="x") () ->
     incr var_counter;
-    Printf.sprintf "x%d" !var_counter
+    Printf.sprintf "%s%d" prefix !var_counter
 
 type ty = Ty : _ typ -> ty
 type tfn = Fn : _ fn -> tfn
