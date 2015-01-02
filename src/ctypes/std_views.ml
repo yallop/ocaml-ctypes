@@ -24,10 +24,10 @@ let write_nullable t reftyp =
   let coerce = Coerce.coerce t Static.(ptr reftyp) in
   Memory.(function None -> from_voidp reftyp null | Some f -> coerce f)
 
-let nullable_view t reftyp =
+let nullable_view ?format_typ ?format t reftyp =
   let read = read_nullable t reftyp
-  and write = write_nullable t reftyp in
-  Static.(view ~read ~write (ptr reftyp))
+  and write = write_nullable t reftyp
+  in Static.(view ~read ~write ?format_typ ?format (ptr reftyp))
 
 let ptr_opt t = nullable_view (Static.ptr t) t
 
