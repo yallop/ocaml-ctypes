@@ -5,10 +5,14 @@
  * See the file LICENSE for details.
  *)
 
-let string_of format v = 
-  let buf = Buffer.create 100 in
-  let fmt = Format.formatter_of_buffer buf in begin
-    format fmt v;
-    Format.pp_print_flush fmt ();
-    Buffer.contents buf
-  end
+(* Backport from 4.01 *)
+let asprintf fmt =
+  let b = Buffer.create 512 in
+  let ppf = Format.formatter_of_buffer b in
+  let k ppf =
+    Format.pp_print_flush ppf ();
+    Buffer.contents b
+  in
+  Format.kfprintf k ppf fmt
+
+let string_of format v = asprintf "%a" format v
