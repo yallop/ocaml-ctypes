@@ -19,11 +19,11 @@
 #include <caml/memory.h>
 #include <caml/alloc.h>
 
-#include "type_info_stubs.h"
-#include "unsigned_stubs.h"
-#include "complex_stubs.h"
-#include "raw_pointer.h"
-#include "primitives.h"
+#include "ctypes_type_info_stubs.h"
+#include "ctypes_unsigned_stubs.h"
+#include "ctypes_complex_stubs.h"
+#include "ctypes_raw_pointer.h"
+#include "ctypes_primitives.h"
 
 #if __USE_MINGW_ANSI_STDIO && defined(__MINGW64__)
 #define REAL_ARCH_INTNAT_PRINTF_FORMAT "ll"

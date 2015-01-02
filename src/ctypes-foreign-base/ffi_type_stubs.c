@@ -13,9 +13,9 @@
 
 #include <ffi.h>
 
-#include "../ctypes/primitives.h"
-#include "../ctypes/raw_pointer.h"
-#include "../ctypes/managed_buffer_stubs.h"
+#include "../ctypes/ctypes_primitives.h"
+#include "../ctypes/ctypes_raw_pointer.h"
+#include "../ctypes/ctypes_managed_buffer_stubs.h"
 
 #if CHAR_MIN < 0
 #define ctypes_ffi_type_char ffi_type_schar

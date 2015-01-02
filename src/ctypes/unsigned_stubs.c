@@ -20,6 +20,8 @@
 #include <limits.h>
 #include <stdio.h>
 
+#include "ctypes_unsigned_stubs.h"
+
 #define Uint_custom_val(TYPE, V) (*((TYPE *) Data_custom_val(V)))
 #define TYPE(SIZE) uint ## SIZE ## _t
 #define BUF_SIZE(TYPE) ((sizeof(TYPE) * CHAR_BIT + 2) / 3 + 1)

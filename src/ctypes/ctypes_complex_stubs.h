@@ -5,8 +5,8 @@
  * See the file LICENSE for details.
  */
 
-#ifndef COMPLEX_STUBS_H
-#define COMPLEX_STUBS_H
+#ifndef CTYPES_COMPLEX_STUBS_H
+#define CTYPES_COMPLEX_STUBS_H
 
 #include <complex.h>
 #include <caml/mlvalues.h>
@@ -23,4 +23,4 @@ float complex ctypes_float_complex_val(value);
 /* ctypes_double_complex_val : Complex.t -> double complex */
 double complex ctypes_double_complex_val(value);
 
-#endif /* COMPLEX_STUBS_H */
+#endif /* CTYPES_COMPLEX_STUBS_H */
