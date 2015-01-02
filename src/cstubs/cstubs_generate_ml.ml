@@ -13,8 +13,8 @@ open Cstubs_errors
 
 type lident = string
 type ml_type = [ `Ident of path
-	       | `Appl of path * ml_type list
-	       | `Fn of ml_type * ml_type ]
+               | `Appl of path * ml_type list
+               | `Fn of ml_type * ml_type ]
 
 type ml_external_type = [ `Prim of ml_type list * ml_type ]
 
@@ -32,6 +32,7 @@ type ml_exp = [ `Ident of path
               | `MakePtr of ml_exp * ml_exp
               | `MakeStructured of ml_exp * ml_exp
               | `Appl of ml_exp * ml_exp 
+              | `Unit
               | `Fun of lident list * ml_exp ]
 
 type attributes = { float: bool; noalloc: bool }
@@ -117,6 +118,7 @@ struct
 
   let rec ml_exp appl_parens fmt (e : ml_exp) =
     match appl_parens, e with
+    | _, `Unit -> fprintf fmt "()"
     | _, `Ident x -> ident fmt x
     | _, `Project (e, l) -> fprintf fmt "%a.%a" (ml_exp ApplParens) e ident l
     | ApplParens, `Appl (f, p) -> fprintf fmt "@[(%a@;<1 2>%a)@]" (ml_exp NoApplParens) f (ml_exp ApplParens) p
@@ -355,6 +357,43 @@ let rec pattern_and_exp_of_typ :
     "Unexpected bigarray type encountered during ML code generation: %s"
     (Ctypes.string_of_typ ty)
 
+(* Build a pattern (without variables) that matches the argument *)
+let rec pattern_of_typ : type a. a typ -> ml_pat = function
+    Void -> static_con "Void" []
+  | Primitive p ->
+    let id = Cstubs_public_name.constructor_cident_of_prim ~module_name:"CI" p in
+    static_con "Primitive" [`Con (id, [])]
+  | Pointer _ ->
+    static_con "Pointer" [`Underscore]
+  | Struct _ ->
+    static_con "Struct" [`Underscore]
+  | Union _ ->
+    static_con "Union" [`Underscore]
+  | View { ty } ->
+    static_con "View"
+      [`Record [path_of_string "CI.ty", pattern_of_typ ty]]
+  | OCaml String ->
+    Static.unsupported
+      "cstubs does not support OCaml strings as global values"
+  | OCaml Bytes ->
+    Static.unsupported
+      "cstubs does not support OCaml bytes values as global values"
+  | OCaml FloatArray ->
+    Static.unsupported
+      "cstubs does not support OCaml float arrays as global values"
+  | Abstract _ as ty ->
+    internal_error
+      "Unexpected abstract type encountered during ML code generation: %s"
+      (Ctypes.string_of_typ ty)
+  | Array _ as ty ->
+    internal_error
+      "Unexpected array type encountered during ML code generation: %s"
+      (Ctypes.string_of_typ ty)
+  | Bigarray _ as ty ->
+    internal_error
+      "Unexpected bigarray type encountered during ML code generation: %s"
+      (Ctypes.string_of_typ ty)
+
 type wrapper_state = {
   pat: ml_pat;
   exp: ml_exp;
@@ -400,6 +439,16 @@ let case ~stub_name ~external_name fmt fn =
     stub_name Emit_ML.(ml_pat NoApplParens) p;
   Format.fprintf fmt "@[<hov 2>@[%a@]@]@]@." Emit_ML.(ml_exp ApplParens) e
 
+let val_case ~stub_name ~external_name fmt typ =
+  let x = fresh_var () in
+  let p = `As (pattern_of_typ typ, x) in
+  let app = `Appl (`Ident (path_of_string external_name), `Unit) in
+  let rhs = `MakePtr (`Ident (path_of_string x), app) in
+  Format.fprintf fmt "@[<hov 2>@[<h 2>|@ @[%S,@ @[%a@]@]@ ->@]@ "
+    stub_name Emit_ML.(ml_pat NoApplParens) p;
+  Format.fprintf fmt "@[<hov 2>@[%a@]@]@]@."
+    Emit_ML.(ml_exp (ApplParens)) rhs
+
 let constructor_decl : type a. string -> a fn -> Format.formatter -> unit =
   fun name fn fmt ->
     Format.fprintf fmt "@[|@ %s@ : (@[%a@])@ name@]@\n" name
@@ -413,4 +462,4 @@ let inverse_case ~register_name ~constructor name fmt fn : unit =
   Format.fprintf fmt "|@[ @[%S, %a@] -> %s %s (%a)@]@\n"
     name Emit_ML.(ml_pat NoApplParens) p register_name constructor
     Emit_ML.(ml_exp ApplParens) 
-e
+    e

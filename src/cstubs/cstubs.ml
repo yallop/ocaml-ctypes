@@ -11,6 +11,7 @@ module type FOREIGN =
 sig
   type 'a fn
   val foreign : string -> ('a -> 'b) Ctypes.fn -> ('a -> 'b) fn
+  val foreign_value : string -> 'a Ctypes.typ -> 'a Ctypes.ptr fn
 end
 
 module type FOREIGN' = FOREIGN with type 'a fn = unit
@@ -26,11 +27,14 @@ let gen_c prefix fmt : (module FOREIGN') =
      type 'a fn = unit
      let foreign cname fn =
        Cstubs_generate_c.fn ~cname ~stub_name:(var prefix cname) fmt fn
+     let foreign_value cname typ =
+       Cstubs_generate_c.value ~cname ~stub_name:(var prefix cname) fmt typ
    end)
 
 type bind = Bind : string * string * ('a -> 'b) Ctypes.fn -> bind
+type val_bind = Val_bind : string * string * 'a Ctypes.typ -> val_bind
 
-let write_foreign fmt bindings =
+let write_foreign fmt bindings val_bindings =
   Format.fprintf fmt
     "type 'a fn = 'a@\n@\n";
   Format.fprintf fmt
@@ -41,11 +45,24 @@ let write_foreign fmt bindings =
     ~f:(fun (Bind (stub_name, external_name, fn)) ->
       Cstubs_generate_ml.case ~stub_name ~external_name fmt fn);
   Format.fprintf fmt "@[<hov 2>@[|@ s,@ _@ ->@]@ ";
-  Format.fprintf fmt " @[@[Printf.fprintf@ stderr@ \"No match for %%s\" s@];";
-  Format.fprintf fmt "@ @[assert false@]@]@]@]@."
+  Format.fprintf fmt
+    " @[Printf.ksprintf@ failwith@ \"No match for %%s\" s@]@]@]@.@\n";
+  Format.fprintf fmt
+    "@\n";
+  Format.fprintf fmt
+    "let foreign_value : type a b. string -> a Ctypes.typ -> a Ctypes.ptr =@\n";
+  Format.fprintf fmt
+    "  fun name t -> match name, t with@\n@[<v>";
+  ListLabels.iter val_bindings
+    ~f:(fun (Val_bind (stub_name, external_name, typ)) ->
+      Cstubs_generate_ml.val_case ~stub_name ~external_name fmt typ);
+  Format.fprintf fmt "@[<hov 2>@[|@ s,@ _@ ->@]@ ";
+  Format.fprintf fmt
+    " @[Printf.ksprintf@ failwith@ \"No match for %%s\" s@]@]@]@.@\n"
 
 let gen_ml prefix fmt : (module FOREIGN') * (unit -> unit) =
   let bindings = ref []
+  and val_bindings = ref []
   and counter = ref 0 in
   let var prefix name = incr counter;
     Printf.sprintf "%s_%d_%s" prefix !counter name in
@@ -56,8 +73,14 @@ let gen_ml prefix fmt : (module FOREIGN') * (unit -> unit) =
        let name = var prefix cname in
        bindings := Bind (cname, name, fn) :: !bindings;
        Cstubs_generate_ml.extern ~stub_name:name ~external_name:name fmt fn
+     let foreign_value cname typ =
+       let name = var prefix cname in
+       Cstubs_generate_ml.extern ~stub_name:name ~external_name:name fmt
+         Ctypes.(void @-> returning (ptr void));
+       val_bindings := Val_bind (cname, name, typ) :: !val_bindings
    end),
-  fun () -> write_foreign fmt !bindings
+  fun () ->
+    write_foreign fmt !bindings !val_bindings
 
 let write_c fmt ~prefix (module B : BINDINGS) =
   Format.fprintf fmt

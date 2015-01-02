@@ -189,13 +189,13 @@ struct
 
   let prj ty x = prj ty ~orig:ty x
 
-  let rec inj : type a. a typ -> cexp -> ceff =
+  let rec inj : type a. a typ -> clocal -> ceff =
     fun ty x -> match ty with
     | Void -> val_unit
-    | Primitive p -> `App (prim_inj p, [`Cast (Ty (Primitive p), x)])
-    | Pointer _ -> from_ptr x
-    | Struct s -> `App (copy_bytes, [`Addr x; `Int (sizeof ty)])
-    | Union u -> `App (copy_bytes, [`Addr x; `Int (sizeof ty)])
+    | Primitive p -> `App (prim_inj p, [`Cast (Ty (Primitive p), (x :> cexp))])
+    | Pointer _ -> from_ptr (x:> cexp)
+    | Struct s -> `App (copy_bytes, [`Addr (x :> cvar); `Int (sizeof ty)])
+    | Union u -> `App (copy_bytes, [`Addr (x :> cvar); `Int (sizeof ty)])
     | Abstract _ -> report_unpassable "values of abstract type"
     | View { ty } -> inj ty x
     | Array _ -> report_unpassable "arrays"
@@ -226,8 +226,10 @@ struct
       let rec body : type a. _ -> a fn -> _ =
          fun vars -> function 
          | Returns t ->
-           (`App (fvar, (List.rev vars :> cexp list)), t) >>= fun x ->
-           (inj t x :> ccomp)
+           let x = fresh_var () in
+           let e, ty = `App (fvar, (List.rev vars :> cexp list)), t in
+           let k = fun x -> (inj t x :> ccomp)  in
+           `Let ((local x ty, e), k (local x ty))
          | Function (x, f, t) ->
            begin match prj f (local x value) with
              None -> body vars t
@@ -306,6 +308,16 @@ struct
                   `CAMLlocalN (local "locals" (array (List.length args) value),
                                local "nargs" int) >>
                     body))
+
+  let value : type a. cname:string -> stub_name:string -> a Static.typ -> cfundef =
+    fun ~cname ~stub_name typ ->
+      let (e, ty) = (`Addr (`Global { name = cname; typ = Ty typ;
+                                      references_ocaml_heap = false }), (ptr typ)) in
+      let x = fresh_var () in
+      `Function (`Fundec (stub_name, ["_", Ty value], Ty value),
+                 `Let ((local x ty, e),
+                       (inj (ptr typ) (local x ty) :> ccomp)))
+
 end
 
 let fn ~cname  ~stub_name fmt fn =
@@ -319,6 +331,10 @@ let fn ~cname  ~stub_name fmt fn =
   end
   else
     Cstubs_emit_c.cfundef fmt dec
+
+let value ~cname ~stub_name fmt typ =
+  let dec = Generate_C.value ~cname ~stub_name typ in
+  Cstubs_emit_c.cfundef fmt dec
 
 let inverse_fn ~stub_name fmt fn : unit =
   Cstubs_emit_c.cfundef fmt (Generate_C.inverse_fn ~stub_name fn)
