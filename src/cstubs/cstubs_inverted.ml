@@ -12,6 +12,7 @@ sig
   val enum : (string * int64) list -> 'a Ctypes.typ -> unit
   val structure : _ Ctypes.structure Ctypes.typ -> unit
   val union : _ Ctypes.union Ctypes.typ -> unit
+  val typedef : _ Ctypes.typ -> string -> unit
 
   val internal : string -> ('a -> 'b) Ctypes.fn -> ('a -> 'b) -> unit
 end
@@ -19,27 +20,31 @@ end
 module type BINDINGS = functor (F : INTERNAL) -> sig end
 
 type fn_info = Fn : string * (_ -> _) Ctypes.fn -> fn_info
-type ty_info = Ty : string * _ Ctypes.typ -> ty_info
 type ty = Ty : _ Ctypes.typ -> ty
+type typedef = Typedef : _ Ctypes.typ * string -> typedef
 type enum = Enum : (string * int64) list * _ Ctypes.typ -> enum
+type decl =
+    Decl_fn of fn_info
+  | Decl_ty of ty
+  | Decl_typedef of typedef
+  | Decl_enum of enum
 
-let collector () : (module INTERNAL) * (unit -> (ty list * enum list * fn_info list)) =
-  let function_names = ref [] in
-  let structures = ref [] in
-  let enums = ref [] in
-  let push x xs = xs := x :: !xs in
+let functions decls =
+  List.concat (List.map (function Decl_fn fn -> [fn] | _ -> []) decls)
+
+let collector () : (module INTERNAL) * (unit -> decl list) =
+  let decls = ref [] in
+  let push d = decls := d :: !decls in
   ((module
     struct
       type 'a fn = unit
-      let enum constants typ = push (Enum (constants, typ)) enums
-      let structure typ = push (Ty typ) structures
-      let union typ = push (Ty typ) structures
-      let internal name fn _ = push (Fn (name, fn)) function_names
+      let enum constants typ = push (Decl_enum (Enum (constants, typ)))
+      let structure typ = push (Decl_ty (Ty typ))
+      let union typ = push (Decl_ty (Ty typ))
+      let typedef typ name = push (Decl_typedef (Typedef (typ, name)))
+      let internal name fn _ = push (Decl_fn ((Fn (name, fn))))
     end),
-   (fun () -> 
-     (List.rev !structures,
-      List.rev !enums,
-      List.rev !function_names)))
+   (fun () -> List.rev !decls))
 
 let format_enum_values fmt infos =
   List.iter (fun (Fn (n, _)) -> Format.fprintf fmt "@[fn_%s,@]@ " n) infos
@@ -90,21 +95,29 @@ let write_enum_declaration fmt (Enum (constants, ty)) =
     constants;
   Format.fprintf fmt "@]@]@\n};@\n@\n"
 
+let write_typedef fmt (Typedef (ty, name)) =
+  let write_name _ fmt = Format.fprintf fmt "@ %s" name in
+  Format.fprintf fmt "@[typedef@ @[";
+  Type_printing.format_typ' ty write_name `nonarray fmt;
+  Format.fprintf fmt "@]@];@\n@\n"
+
+let write_declaration fmt = function
+    Decl_fn f -> c_declaration fmt f
+  | Decl_ty s -> write_structure_declaration fmt s
+  | Decl_typedef t -> write_typedef fmt t
+  | Decl_enum e -> write_enum_declaration fmt e
+
 let write_c fmt ~prefix (module B : BINDINGS) : unit =
   let register = prefix ^ "_register" in
-  let m, infos = collector () in
+  let m, decls = collector () in
   let module M = B((val m)) in
-  let _, _, functions = infos () in
-  gen_c fmt register functions;
+  gen_c fmt register (functions (decls ()));
   Format.fprintf fmt "@."
 
 let write_c_header fmt ~prefix (module B : BINDINGS) : unit =
-  let m, infos = collector () in
+  let m, decls = collector () in
   let module M = B((val m)) in
-  let (structures, enums, functions) = infos () in
-  List.iter (write_enum_declaration fmt) enums;
-  List.iter (write_structure_declaration fmt) structures;
-  List.iter (c_declaration fmt) functions;
+  List.iter (write_declaration fmt) (decls ());
   Format.fprintf fmt "@."
 
 let gen_ml fmt register (infos : fn_info list) : unit =
@@ -135,11 +148,10 @@ let gen_ml fmt register (infos : fn_info list) : unit =
   Format.fprintf fmt
     "| _ -> failwith (\"Linking mismatch on name: \" ^ name)@]@]@]@\n@\n";
   Format.fprintf fmt
-    "let enum _ _ = () and structure _ = () and union _ = ()@."
+    "let enum _ _ = () and structure _ = () and union _ = () and typedef _ _ = ()@."
 
 let write_ml fmt ~prefix (module B : BINDINGS) : unit =
   let register = prefix ^ "_register" in
-  let m, infos = collector () in
+  let m, decls = collector () in
   let module M = B((val m)) in
-  let _, _, functions = infos () in
-  gen_ml fmt register functions
+  gen_ml fmt register (functions (decls ()))

@@ -15,6 +15,7 @@ sig
   val enum : (string * int64) list -> 'a Ctypes.typ -> unit
   val structure : _ Ctypes.structure Ctypes.typ -> unit
   val union : _ Ctypes.union Ctypes.typ -> unit
+  val typedef : _ Ctypes.typ -> string -> unit
 
   val internal : string -> ('a -> 'b) Ctypes.fn -> ('a -> 'b) -> unit
 end
