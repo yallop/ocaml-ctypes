@@ -28,42 +28,30 @@ let mkAbstractSized : name:string -> size:int -> alignment:int -> (module Abstra
        let t = abstract ~name ~size ~alignment:a
      end : Abstract)
 
-type arithmetic =
-    Int8
-  | Int16
-  | Int32
-  | Int64
-  | Uint8
-  | Uint16
-  | Uint32
-  | Uint64
-  | Float
-  | Double
-
 let mkArithmetic = 
   let open Ctypes in function
-    Int8   -> mkAbstract int8_t
-  | Int16  -> mkAbstract int16_t
-  | Int32  -> mkAbstract int32_t
-  | Int64  -> mkAbstract int64_t
-  | Uint8  -> mkAbstract uint8_t
-  | Uint16 -> mkAbstract uint16_t
-  | Uint32 -> mkAbstract uint32_t
-  | Uint64 -> mkAbstract uint64_t
-  | Float  -> mkAbstract float
-  | Double -> mkAbstract double
+    Static.Int8   -> mkAbstract int8_t
+  | Static.Int16  -> mkAbstract int16_t
+  | Static.Int32  -> mkAbstract int32_t
+  | Static.Int64  -> mkAbstract int64_t
+  | Static.Uint8  -> mkAbstract uint8_t
+  | Static.Uint16 -> mkAbstract uint16_t
+  | Static.Uint32 -> mkAbstract uint32_t
+  | Static.Uint64 -> mkAbstract uint64_t
+  | Static.Float  -> mkAbstract float
+  | Static.Double -> mkAbstract double
 
 (* Arithmetic types *)
-external typeof_clock_t : unit -> arithmetic = "ctypes_typeof_clock_t"
-external typeof_dev_t : unit -> arithmetic = "ctypes_typeof_dev_t"
-external typeof_ino_t : unit -> arithmetic = "ctypes_typeof_ino_t"
-external typeof_mode_t : unit -> arithmetic = "ctypes_typeof_mode_t"
-external typeof_nlink_t : unit -> arithmetic = "ctypes_typeof_nlink_t"
-external typeof_off_t : unit -> arithmetic = "ctypes_typeof_off_t"
-external typeof_pid_t : unit -> arithmetic = "ctypes_typeof_pid_t"
-external typeof_ssize_t : unit -> arithmetic = "ctypes_typeof_ssize_t"
-external typeof_time_t : unit -> arithmetic = "ctypes_typeof_time_t"
-external typeof_useconds_t : unit -> arithmetic = "ctypes_typeof_useconds_t"
+external typeof_clock_t : unit -> Static.arithmetic = "ctypes_typeof_clock_t"
+external typeof_dev_t : unit -> Static.arithmetic = "ctypes_typeof_dev_t"
+external typeof_ino_t : unit -> Static.arithmetic = "ctypes_typeof_ino_t"
+external typeof_mode_t : unit -> Static.arithmetic = "ctypes_typeof_mode_t"
+external typeof_nlink_t : unit -> Static.arithmetic = "ctypes_typeof_nlink_t"
+external typeof_off_t : unit -> Static.arithmetic = "ctypes_typeof_off_t"
+external typeof_pid_t : unit -> Static.arithmetic = "ctypes_typeof_pid_t"
+external typeof_ssize_t : unit -> Static.arithmetic = "ctypes_typeof_ssize_t"
+external typeof_time_t : unit -> Static.arithmetic = "ctypes_typeof_time_t"
+external typeof_useconds_t : unit -> Static.arithmetic = "ctypes_typeof_useconds_t"
 
 module Clock = (val mkArithmetic (typeof_clock_t ()) : Abstract)
 module Dev = (val mkArithmetic (typeof_dev_t ()) : Abstract)

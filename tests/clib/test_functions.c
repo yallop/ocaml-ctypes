@@ -578,3 +578,25 @@ int call_s5(struct s1 *s1, struct s5 *s5)
 {
   return s5->w1(s1);
 }
+
+enum signed_enum classify_integer(int x)
+{
+  return (x < 0) ? minus_one : plus_one;
+}
+
+enum signed_enum out_of_range(void)
+{
+  return (enum signed_enum)2;
+}
+
+enum fruit next_fruit(enum fruit f)
+{
+  switch (f)
+  {
+  case Orange: return Apple;
+  case Apple: return Banana;
+  case Banana: return Pear;
+  case Pear: return Orange;
+  default: assert(0);
+  }
+}

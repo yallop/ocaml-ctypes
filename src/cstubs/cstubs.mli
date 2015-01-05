@@ -12,6 +12,7 @@ sig
   module type TYPE =
   sig
     include Ctypes_types.TYPE
+
     type 'a const
     val constant : string -> 'a typ -> 'a const
     (** [constant name typ] retrieves the value of the compile-time constant
@@ -27,6 +28,39 @@ sig
         compiler.  For example, gcc will say
 
            warning: overflow in implicit constant conversion *)
+
+    val enum : string -> ?unexpected:(int64 -> 'a) -> ('a * int64 const) list -> 'a typ
+    (** [enum name ?unexpected alist] builds a type representation for the
+        enum named [name].  The size and alignment are retrieved so that the
+        resulting type can be used everywhere an integer type can be used: as
+        an array element or struct member, as an argument or return value,
+        etc.
+
+        The value [alist] is an association list of OCaml values and values
+        retrieved by the [constant] function.  For example, to expose the enum
+
+          enum letters { A, B, C = 10, D }; 
+
+        you might first retrieve the values of the enumeration constants:
+
+          let a = constant "A" int64_t
+          and b = constant "B" int64_t
+          and c = constant "C" int64_t
+          and d = constant "D" int64_t
+
+        and then build the enumeration type
+
+          let letters = enum "letters" [
+             `A, a;
+             `B, b;
+             `C, c;
+             `D, d;
+          ] ~unexpected:(fun i -> `E i)
+
+        The [unexpected] function specifies the value to return in the case
+        that some unexpected value is encountered -- for example, if a
+        function with the return type 'enum letters' actually returns the
+        value [-1]. *)
   end
 
   module type BINDINGS = functor (F : TYPE) -> sig end

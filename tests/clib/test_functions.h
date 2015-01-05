@@ -203,4 +203,17 @@ int call_s5(struct s1 *, struct s5 *);
 
 enum letter { A, B, C = 10, D };
 
+enum fruit { Orange, Apple, Banana, Pear };
+enum bears { Edward, Winnie, Paddington };
+enum signed_enum { minus_one = -1, plus_one = 1 };
+
+enum fruit next_fruit(enum fruit);
+enum signed_enum classify_integer(int);
+enum signed_enum out_of_range(void);
+
+struct fruit_cell {
+  enum fruit frt;
+  struct fruit_cell *next;
+};
+
 #endif /* TEST_FUNCTIONS_H */
