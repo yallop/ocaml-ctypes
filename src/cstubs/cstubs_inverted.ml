@@ -9,24 +9,42 @@
 
 module type INTERNAL =
 sig
+  val enum : (string * int64) list -> 'a Ctypes.typ -> unit
+  val structure : _ Ctypes.structure Ctypes.typ -> unit
+  val union : _ Ctypes.union Ctypes.typ -> unit
+  val typedef : _ Ctypes.typ -> string -> unit
+
   val internal : string -> ('a -> 'b) Ctypes.fn -> ('a -> 'b) -> unit
 end
 
 module type BINDINGS = functor (F : INTERNAL) -> sig end
 
-type fn_info = Fn : string * ('a -> 'b) Ctypes.fn -> fn_info
-type ty_info = Ty : string * 'a Ctypes.typ -> ty_info
-type ty = Ty : 'a Ctypes.typ -> ty
+type fn_info = Fn : string * (_ -> _) Ctypes.fn -> fn_info
+type ty = Ty : _ Ctypes.typ -> ty
+type typedef = Typedef : _ Ctypes.typ * string -> typedef
+type enum = Enum : (string * int64) list * _ Ctypes.typ -> enum
+type decl =
+    Decl_fn of fn_info
+  | Decl_ty of ty
+  | Decl_typedef of typedef
+  | Decl_enum of enum
 
-let collector () : (module INTERNAL) * (unit -> fn_info list) =
-  let function_names = ref [] in
+let functions decls =
+  List.concat (List.map (function Decl_fn fn -> [fn] | _ -> []) decls)
+
+let collector () : (module INTERNAL) * (unit -> decl list) =
+  let decls = ref [] in
+  let push d = decls := d :: !decls in
   ((module
     struct
       type 'a fn = unit
-      let internal name fn _ =
-        function_names := Fn (name, fn) :: !function_names
+      let enum constants typ = push (Decl_enum (Enum (constants, typ)))
+      let structure typ = push (Decl_ty (Ty typ))
+      let union typ = push (Decl_ty (Ty typ))
+      let typedef typ name = push (Decl_typedef (Typedef (typ, name)))
+      let internal name fn _ = push (Decl_fn ((Fn (name, fn))))
     end),
-   fun () -> List.rev !function_names)
+   (fun () -> List.rev !decls))
 
 let format_enum_values fmt infos =
   List.iter (fun (Fn (n, _)) -> Format.fprintf fmt "@[fn_%s,@]@ " n) infos
@@ -62,17 +80,44 @@ let gen_c fmt register infos =
 let c_declaration fmt (Fn (stub_name, fn)) : unit =
   Cstubs_generate_c.inverse_fn_decl ~stub_name fmt fn
 
+let write_structure_declaration fmt (Ty ty) =
+  Format.fprintf fmt "@[%a@];@\n@\n" (fun ty -> Ctypes.format_typ ty) ty
+
+let write_enum_declaration fmt (Enum (constants, ty)) =
+  Format.fprintf fmt "@[%a@ {@\n@[<v 2>@\n" (fun ty -> Ctypes.format_typ ty) ty;
+  let last = List.length constants - 1 in
+  List.iteri
+    (fun i (name, value) -> 
+       (* Trailing commas are not allowed. *)
+       if i < last
+       then Format.fprintf fmt "@[%s@ =@ %Ld,@]@\n" name value
+       else Format.fprintf fmt "@[%s@ =@ %Ld@]@\n" name value)
+    constants;
+  Format.fprintf fmt "@]@]@\n};@\n@\n"
+
+let write_typedef fmt (Typedef (ty, name)) =
+  let write_name _ fmt = Format.fprintf fmt "@ %s" name in
+  Format.fprintf fmt "@[typedef@ @[";
+  Type_printing.format_typ' ty write_name `nonarray fmt;
+  Format.fprintf fmt "@]@];@\n@\n"
+
+let write_declaration fmt = function
+    Decl_fn f -> c_declaration fmt f
+  | Decl_ty s -> write_structure_declaration fmt s
+  | Decl_typedef t -> write_typedef fmt t
+  | Decl_enum e -> write_enum_declaration fmt e
+
 let write_c fmt ~prefix (module B : BINDINGS) : unit =
   let register = prefix ^ "_register" in
-  let m, infos = collector () in
+  let m, decls = collector () in
   let module M = B((val m)) in
-  gen_c fmt register (infos ());
+  gen_c fmt register (functions (decls ()));
   Format.fprintf fmt "@."
 
 let write_c_header fmt ~prefix (module B : BINDINGS) : unit =
-  let m, infos = collector () in
+  let m, decls = collector () in
   let module M = B((val m)) in
-  List.iter (c_declaration fmt) (infos ());
+  List.iter (write_declaration fmt) (decls ());
   Format.fprintf fmt "@."
 
 let gen_ml fmt register (infos : fn_info list) : unit =
@@ -101,10 +146,12 @@ let gen_ml fmt register (infos : fn_info list) : unit =
       Cstubs_generate_ml.inverse_case ~register_name:"register_value"
         ~constructor:(Printf.sprintf "Fn_%s" n) n fmt fn);
   Format.fprintf fmt
-    "| _ -> failwith (\"Linking mismatch on name: \" ^ name)@]@]@]@."
+    "| _ -> failwith (\"Linking mismatch on name: \" ^ name)@]@]@]@\n@\n";
+  Format.fprintf fmt
+    "let enum _ _ = () and structure _ = () and union _ = () and typedef _ _ = ()@."
 
 let write_ml fmt ~prefix (module B : BINDINGS) : unit =
   let register = prefix ^ "_register" in
-  let m, infos = collector () in
+  let m, decls = collector () in
   let module M = B((val m)) in
-  gen_ml fmt register (infos ())
+  gen_ml fmt register (functions (decls ()))
