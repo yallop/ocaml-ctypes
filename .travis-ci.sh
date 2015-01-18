@@ -18,6 +18,8 @@ install_on_osx () {
   curl -OL "http://xquartz.macosforge.org/downloads/SL/XQuartz-2.7.6.dmg"
   sudo hdiutil attach XQuartz-2.7.6.dmg
   sudo installer -verbose -pkg /Volumes/XQuartz-2.7.6/XQuartz.pkg -target /
+  brew update
+  brew install re2c
   brew install libffi
   brew install opam
   opam init
