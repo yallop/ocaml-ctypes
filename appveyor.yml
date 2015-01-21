@@ -1,30 +1,29 @@
+os: unstable
+
 platform:
     - x64
 
 environment:
     global:
-        CYG_MIRROR: http://cygwin.uib.no
-        CYG_CACHE: C:/cygwin/var/cache/setup
+        CYG_ARCH: x86
+        CYG_ROOT: C:/cygwin
     matrix:
-        -   CYG_ARCH: x86
-            CYG_ROOT: C:/cygwin
-            WODI_ARCH: 32
+        -   WODI_ARCH: 32
             MINGW_ARCH: i686
-        -   CYG_ARCH: x86_64
-            CYG_ROOT: C:/cygwin64
-            WODI_ARCH: 64
+        -   WODI_ARCH: 64
             MINGW_ARCH: x86_64
 
 init:
     - 'echo System architecture: %PLATFORM%'
 
 install:
-    - 'appveyor DownloadFile http://cygwin.com/setup-%CYG_ARCH%.exe -FileName setup.exe'
-    - 'setup.exe -qnNdO -R "%CYG_ROOT%" -s "%CYG_MIRROR%" -l "%CYG_CACHE%" -P wget  -P dos2unix -P diffutils -P cpio -P make -P patch -P mingw64-%MINGW_ARCH%-gcc-core -P mingw64-%MINGW_ARCH%-gcc-g++ >NUL'
+    - if not exist "%CYG_ROOT%" mkdir "%CYG_ROOT%"
+    - appveyor DownloadFile "http://cygwin.com/setup-%CYG_ARCH%.exe" -FileName "%CYG_ROOT%\setup.exe"
+    - '"%CYG_ROOT%\setup.exe" -qnBWNd -R "%CYG_ROOT%" -P wget  -P dos2unix -P diffutils -P cpio -P make -P patch -P mingw64-%MINGW_ARCH%-gcc-core -P mingw64-%MINGW_ARCH%-gcc-g++ >NUL'
     - '%CYG_ROOT%/bin/bash -lc "cygcheck -dc cygwin"'
     - '%CYG_ROOT%/bin/bash -lc "wget -q http://ml.ignorelist.com/wodi/8/wodi%WODI_ARCH%.tar.xz -O /tmp/wodi%WODI_ARCH%.tar.xz"'
     - '%CYG_ROOT%/bin/bash -lc "cd /tmp && rm -rf wodi%WODI_ARCH% && tar -xf wodi%WODI_ARCH%.tar.xz && bash wodi%WODI_ARCH%/install.sh"'
-    - '%CYG_ROOT%/bin/bash -lc "godi_add godi-ounit"'
+    - '%CYG_ROOT%/bin/bash -lc "godi_add godi-ounit base-libffi"'
 
 build_script:
     - '%CYG_ROOT%/bin/bash -lc "cd \"$OLDPWD\" && ./appveyor/build.sh"'
