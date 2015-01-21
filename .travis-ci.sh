@@ -18,8 +18,10 @@ install_on_osx () {
   curl -OL "http://xquartz.macosforge.org/downloads/SL/XQuartz-2.7.6.dmg"
   sudo hdiutil attach XQuartz-2.7.6.dmg
   sudo installer -verbose -pkg /Volumes/XQuartz-2.7.6/XQuartz.pkg -target /
-  brew install libffi
-  brew install opam
+  brew update
+  brew install re2c libffi objective-caml camlp4 xz gringo scons bison
+  brew upgrade boost cmake
+  brew install --build-from-source opam
   opam init
   opam switch $OCAML_VERSION
   eval `opam config env` 
