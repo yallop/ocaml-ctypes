@@ -4,9 +4,12 @@ set -ex
 type -p ocamlc
 ocamlc -version
 
-x="$(uname -m)"
+build_libffi=0
+libffi_version=3.1
+
+x="$(echo 'let () = print_int Sys.word_size ;;' | ocaml -stdin)"
 case "$x" in
-    x86_64)
+    *64*)
         build=x86_64-pc-cygwin
         host=x86_64-w64-mingw32
         MINGW_TOOL_PREFIX=x86_64-w64-mingw32-
@@ -17,6 +20,8 @@ case "$x" in
         MINGW_TOOL_PREFIX=i686-w64-mingw32-
         ;;
 esac
+
+godi_dir="$(dirname "$(godi_confdir)")"
 
 export AR=${MINGW_TOOL_PREFIX}ar.exe
 export AS=${MINGW_TOOL_PREFIX}as.exe
@@ -42,21 +47,29 @@ export WINDRES=${MINGW_TOOL_PREFIX}windres.exe
 
 # findlib is already installed
 
-# libffi:  we need a static version and only a static version
-(
-  rm -rf /usr/local
-  mkdir -p /usr/local/include
-  wget ftp://sourceware.org/pub/libffi/libffi-3.1.tar.gz
-  rm -rf libffi-3.1
-  tar xfvz libffi-3.1.tar.gz
-  cd libffi-3.1
-  (./configure --build="$build" --host="$host" --prefix /usr/local --disable-shared --enable-static </dev/null && make </dev/null && make install </dev/null) || cat config.log
-  mkdir -p /usr/local/include/
-  ln -s -t /usr/local/include/ /usr/local/lib/libffi-3.1/include/*
-)
 
-export LIBFFI_CFLAGS="-I/usr/local/include"
-export LIBFFI_LIBS="-L/usr/local/lib -lffi"
+if [ $build_libffi -ne 0 ]; then
+    # libffi:  we need a static version and only a static version
+    (
+        rm -rf /usr/local
+        mkdir -p /usr/local/include
+        wget ftp://sourceware.org/pub/libffi/libffi-${libffi_version}.tar.gz
+        rm -rf libffi-${libffi_version}
+        tar xfvz libffi-${libffi_version}.tar.gz
+        cd libffi-${libffi_version}
+        (./configure --build="$build" --host="$host" --prefix /usr/local --disable-shared --enable-static </dev/null && make </dev/null && make install </dev/null) || cat config.log
+        mkdir -p /usr/local/include/
+        ln -s -t /usr/local/include/ /usr/local/lib/libffi-${libffi_version}/include/*
+    )
+
+    export LIBFFI_CFLAGS="-I/usr/local/include"
+    export LIBFFI_LIBS="-L/usr/local/lib -lffi"
+
+else
+    export LIBFFI_CFLAGS="-I${godi_dir}/include"
+    export LIBFFI_LIBS="-L${godi_dir}/lib -lffi"
+    export PKG_CONFIG_LIBDIR=${godi_dir}/lib/pkgconfig
+fi
 
 touch setup.data
 make distclean || true
