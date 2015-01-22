@@ -22,6 +22,7 @@ enum dl_flags_caml {
   _RTLD_LAZY,
   _RTLD_NOW,
   _RTLD_GLOBAL,
+  _RTLD_LOCAL,
 #ifdef RTLD_NODELETE
   _RTLD_NODELETE,
 #endif /* RTLD_NODELETE */
@@ -52,6 +53,7 @@ value ctypes_resolve_dl_flag(value flag)
     case _RTLD_LAZY:     rv = RTLD_LAZY;     break;
     case _RTLD_NOW:      rv = RTLD_NOW;      break;
     case _RTLD_GLOBAL:   rv = RTLD_GLOBAL;   break;
+    case _RTLD_LOCAL:    rv = RTLD_LOCAL;    break;
 #ifdef RTLD_NODELETE
     case _RTLD_NODELETE: rv = RTLD_NODELETE; break;
 #endif /* RTLD_NODELETE */
