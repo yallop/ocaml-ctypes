@@ -118,8 +118,7 @@ let search_header header =
   loop search_paths
 
 let compile (opt, lib) stub_file =
-  ksprintf
-    Sys.command
+  Commands.command_succeeds
     "%s -custom %s %s %s %s > %s 2>&1"
     !ocamlc
     (String.concat " " (List.map (sprintf "-ccopt %s") opt))
@@ -127,7 +126,6 @@ let compile (opt, lib) stub_file =
     (Filename.quote !caml_file)
     (String.concat " " (List.map (sprintf "-cclib %s") lib))
     (Filename.quote !log_file)
-  = 0
 
 let safe_remove file_name =
   try
@@ -172,7 +170,7 @@ let test_feature name test =
 let split = Str.(split (regexp " +"))
 
 let brew_libffi_version flags =
-  if ksprintf Sys.command "brew ls libffi --versions | awk '{print $NF}' > %s 2>&1" !log_file = 0 then begin
+  if Commands.command_succeeds "brew ls libffi --versions | awk '{print $NF}' > %s 2>&1" !log_file then begin
     let ic = open_in !log_file in
     let line = input_line ic in
     close_in ic;
@@ -187,10 +185,12 @@ let brew_libffi_version flags =
 let pkg_config choose flags =
   let cmd () =
     match choose with 
-    |`Default -> ksprintf Sys.command "pkg-config %s > %s 2>&1" flags !log_file
-    |`Homebrew ver -> ksprintf Sys.command "env PKG_CONFIG_PATH=%s/Cellar/libffi/%s/lib/pkgconfig %s/bin/pkg-config %s > %s 2>&1" !homebrew_prefix ver !homebrew_prefix flags !log_file
+    |`Default -> Commands.command_succeeds "pkg-config %s > %s 2>&1" flags !log_file
+    |`Homebrew ver -> Commands.command_succeeds
+                        "env PKG_CONFIG_PATH=%s/Cellar/libffi/%s/lib/pkgconfig %s/bin/pkg-config %s > %s 2>&1"
+                        !homebrew_prefix ver !homebrew_prefix flags !log_file
   in
-  if cmd () = 0 then begin
+  if cmd () then begin
     let ic = open_in !log_file in
     let line = input_line ic in
     close_in ic;
@@ -237,8 +237,7 @@ let lib_flags env_var_prefix fallback =
               (opt, lib)
 
 let get_homebrew_prefix log_file =
-  let cmd () = ksprintf Sys.command "brew --prefix > %s" log_file in
-  if cmd () = 0 then begin
+  if Commands.command_succeeds "brew --prefix > %s" log_file then begin
     let ic = open_in log_file in
     let line = input_line ic in
     close_in ic;
@@ -271,12 +270,12 @@ let have_pkg_config is_homebrew homebrew_prefix log_file =
     homebrew_prefix := get_homebrew_prefix log_file;
     test_feature "pkg-config"
       (fun () ->
-         ksprintf Sys.command "%s/bin/pkg-config --version > %s 2>&1" !homebrew_prefix log_file = 0)
+         Commands.command_succeeds "%s/bin/pkg-config --version > %s 2>&1" !homebrew_prefix log_file)
   end
   else
     test_feature "pkg-config"
       (fun () ->
-         ksprintf Sys.command "pkg-config --version > %s 2>&1" log_file = 0)
+         Commands.command_succeeds "pkg-config --version > %s 2>&1" log_file)
 
 let args = [
   "-ocamlc", Arg.Set_string ocamlc, "<path> ocamlc";
@@ -314,7 +313,7 @@ let () =
   is_homebrew :=
     test_feature "brew"
       (fun () ->
-         ksprintf Sys.command "brew info libffi > %s 2>&1" !log_file = 0);
+         Commands.command_succeeds "brew info libffi > %s 2>&1" !log_file);
 
   let have_pkg_config = have_pkg_config !is_homebrew homebrew_prefix !log_file in
 
