@@ -164,12 +164,12 @@ let test_code args stub_code =
 
 let test_feature name test =
   begin
-    printf "testing for %s:%!" name;
+    fprintf stderr "testing for %s:%!" name;
     if test () then begin
-      printf " %s available\n%!" (String.make (34 - String.length name) '.');
+      fprintf stderr " %s available\n%!" (String.make (34 - String.length name) '.');
       true
     end else begin
-      printf " %s unavailable\n%!" (String.make (34 - String.length name) '.');
+      fprintf stderr " %s unavailable\n%!" (String.make (34 - String.length name) '.');
       false
     end
   end
@@ -309,7 +309,7 @@ let () =
     )
   in
   if not have_pkg_config then
-    printf "Warning: the 'pkg-config' command is not available."
+    fprintf stderr "Warning: the 'pkg-config' command is not available."
   ;
 
   let test_libffi () =
@@ -331,7 +331,7 @@ let () =
   in
 
   if not (test_feature "libffi" test_libffi) then begin
-    printf "
+    fprintf stderr "
 The following required C libraries are missing: libffi.
 Please install them and retry. If they are installed in a non-standard location
 or need special flags, set the environment variables <LIB>_CFLAGS and <LIB>_LIBS
