@@ -162,39 +162,16 @@ let test_code args stub_code =
     cleanup ();
     raise exn
 
-let config = open_out "src/ctypes_config.h"
-let config_ml = open_out "src/ctypes_config.ml"
-
-let () =
-  fprintf config "\
-#ifndef __CTYPES_CONFIG_H
-#define __CTYPES_CONFIG_H
-"
-
 let not_available = ref []
 
-let test_feature ?(do_check = true) name macro test =
-  if do_check then begin
+let test_feature name test =
+  begin
     printf "testing for %s:%!" name;
     if test () then begin
-      if macro <> "" then begin
-        fprintf config "#define %s\n" macro;
-        fprintf config_ml "#let %s = true\n" macro
-      end;
       printf " %s available\n%!" (String.make (34 - String.length name) '.')
     end else begin
-      if macro <> "" then begin
-        fprintf config "//#define %s\n" macro;
-        fprintf config_ml "#let %s = false\n" macro
-      end;
       printf " %s unavailable\n%!" (String.make (34 - String.length name) '.');
       not_available := name :: !not_available
-    end
-  end else begin
-    printf "not checking for %s\n%!" name;
-    if macro <> "" then begin
-      fprintf config "//#define %s\n" macro;
-      fprintf config_ml "#let %s = false\n" macro
     end
   end
 
@@ -316,8 +293,6 @@ let () =
 
   (* Cleanup things on exit. *)
   at_exit (fun () ->
-             (try close_out config with _ -> ());
-             (try close_out config_ml with _ -> ());
              safe_remove !log_file;
              safe_remove !exec_name;
              safe_remove !caml_file;
@@ -327,7 +302,7 @@ let () =
   let setup_data = ref [] in
 
   (* Test for MacOS X Homebrew. *)
-  test_feature "brew" ""
+  test_feature "brew"
     (fun () ->
        ksprintf Sys.command "brew info libffi > %s 2>&1" !log_file = 0);
 
@@ -351,11 +326,11 @@ let () =
   (match !is_homebrew with
   |true -> (* Look in `brew for the right pkg-config *)
     homebrew_prefix := get_homebrew_prefix ();
-    test_feature "pkg-config" ""
+    test_feature "pkg-config"
       (fun () ->
          ksprintf Sys.command "%s/bin/pkg-config --version > %s 2>&1" !homebrew_prefix !log_file = 0);
   |false ->
-    test_feature "pkg-config" ""
+    test_feature "pkg-config"
       (fun () ->
          ksprintf Sys.command "pkg-config --version > %s 2>&1" !log_file = 0);
   );
@@ -381,7 +356,7 @@ let () =
     test_code (opt, lib) libffi_code
   in
 
-  test_feature "libffi" "" test_libffi;
+  test_feature "libffi" test_libffi;
 
   if !not_available <> [] then begin
     if not have_pkg_config then
@@ -401,12 +376,10 @@ export LIBFFI_LIBS=-L/opt/local/lib
     exit 1
   end;
 
-  fprintf config "#endif\n";
-
   (match is_win with
    | true -> setup_data := ("as_needed_flags", []) :: !setup_data;
    | false ->
-     test_feature "no_as_needed" ""
+     test_feature "no_as_needed"
        (fun () ->
          ksprintf Sys.command "
          touch as_needed_test.ml;
@@ -467,6 +440,3 @@ export LIBFFI_LIBS=-L/opt/local/lib
     (fun str -> output_string oc str; output_char oc '\n')
     (List.rev setup_data_lines);
   close_out oc;
-
-  close_out config;
-  close_out config_ml
