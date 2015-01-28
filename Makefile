@@ -141,7 +141,7 @@ src/ctypes-foreign-base/libffi_abi.ml: $(BUILDDIR)/libffi-abigen.native
 
 setup.data: src/discover/commands.mli src/discover/commands.ml src/discover/discover.ml
 	@ocamlfind ocamlc -o discover -package str,bytes -linkpkg $^ -I src/discover
-	./discover -ocamlc "$(OCAMLFIND) ocamlc"
+	./discover -ocamlc "$(OCAMLFIND) ocamlc" > $@ || (rm $@ && false)
 	./src/discover/determine_as_needed_flags.sh >> $@
 
 # dependencies
