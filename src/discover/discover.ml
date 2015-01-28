@@ -69,12 +69,12 @@ export LIBFFI_LIBS=-L/opt/local/lib
    | Test codes                                                      |
    +-----------------------------------------------------------------+ *)
 
-let caml_code = "
+let libffi_caml_code = "
 external test : unit -> unit = \"ffi_test\"
 let () = test ()
 "
 
-let libffi_code = "
+let libffi_stub_code = "
 #include <caml/mlvalues.h>
 #include <ffi.h>
 
@@ -98,8 +98,6 @@ let ffi_dir = ref ""
 let is_homebrew = ref false
 let homebrew_prefix = ref "/usr/local"
 
-let caml_file = ref ""
-
 (* Search for a header file in standard directories. *)
 let search_header header =
   let rec loop = function
@@ -117,22 +115,31 @@ let silent_remove filename =
   try Sys.remove filename
   with exn -> ()
 
-let test_code (opt, lib) stub_code =
+let test_code opt lib stub_code caml_code =
   let open Commands in
-  let filename = Filename.temp_file "ctypes_libffi" ".c" in
-  with_open_output_file ~filename begin fun oc ->
-    let cleanup () = 
-      silent_remove (Filename.(chop_extension (basename filename)) ^ !ext_obj)
-    in
-    unwind_protect ~cleanup (fun () ->
-         output_string oc stub_code;
-         Commands.command_succeeds
-           "%s -custom %s %s %s %s 1>&2"
-           !ocamlc
-           (String.concat " " (List.map (sprintf "-ccopt %s") opt))
-           (Filename.quote filename)
-           (Filename.quote !caml_file)
-           (String.concat " " (List.map (sprintf "-cclib %s") lib))) ()
+  let stem f = Filename.(chop_extension (basename f)) in
+  let stub_filename = Filename.temp_file "ctypes_libffi" ".c" in
+  let caml_filename = Filename.temp_file "ctypes_libffi" ".ml" in
+  with_open_output_file ~filename:stub_filename begin fun stubfd ->
+    with_open_output_file ~filename:caml_filename begin fun camlfd ->
+      unwind_protect (fun () ->
+          output_string stubfd stub_code;
+          output_string camlfd caml_code;
+          Commands.command_succeeds
+            "%s -custom %s %s %s %s 1>&2"
+            !ocamlc
+            (String.concat " " (List.map (sprintf "-ccopt %s") opt))
+            (Filename.quote stub_filename)
+            (Filename.quote caml_filename)
+            (String.concat " " (List.map (sprintf "-cclib %s") lib))) ()
+        ~cleanup:begin fun () ->
+          let caml_stem = stem caml_filename in
+          silent_remove (stem stub_filename ^ !ext_obj);
+          silent_remove !exec_name;
+          silent_remove (caml_stem ^ ".cmi");
+          silent_remove (caml_stem ^ ".cmo");
+        end
+    end
   end
 
 let test_feature name test =
@@ -213,7 +220,7 @@ let test_libffi setup_data have_pkg_config =
       | None    , None    , opt, lib -> opt, lib
   in
   setup_data := ("libffi_opt", opt) :: ("libffi_lib", lib) :: !setup_data;
-  test_code (opt, lib) libffi_code
+  test_code opt lib libffi_stub_code libffi_caml_code
 
 (* Test for pkg-config. If we are on MacOS X, we need the latest pkg-config
  * from Homebrew *)
@@ -243,19 +250,6 @@ let args = [
 
 let () =
   Arg.parse args ignore "check for external C libraries and available features\noptions are:";
-
-  (* Put the caml code into a temporary file. *)
-  let file, oc = Filename.open_temp_file "ffi_caml" ".ml" in
-  caml_file := file;
-  output_string oc caml_code;
-  close_out oc;
-
-  (* Cleanup things on exit. *)
-  at_exit (fun () ->
-             silent_remove !exec_name;
-             silent_remove !caml_file;
-             silent_remove (Filename.chop_extension !caml_file ^ ".cmi");
-             silent_remove (Filename.chop_extension !caml_file ^ ".cmo"));
 
   (* Test for MacOS X Homebrew. *)
   is_homebrew :=
