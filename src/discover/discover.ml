@@ -98,7 +98,6 @@ let ffi_dir = ref ""
 let is_homebrew = ref false
 let homebrew_prefix = ref "/usr/local"
 
-let log_file = ref ""
 let caml_file = ref ""
 
 (* Search for a header file in standard directories. *)
@@ -128,13 +127,12 @@ let test_code (opt, lib) stub_code =
     unwind_protect ~cleanup (fun () ->
          output_string oc stub_code;
          Commands.command_succeeds
-           "%s -custom %s %s %s %s > %s 2>&1"
+           "%s -custom %s %s %s %s 1>&2"
            !ocamlc
            (String.concat " " (List.map (sprintf "-ccopt %s") opt))
            (Filename.quote filename)
            (Filename.quote !caml_file)
-           (String.concat " " (List.map (sprintf "-cclib %s") lib))
-           (Filename.quote !log_file)) ()
+           (String.concat " " (List.map (sprintf "-cclib %s") lib))) ()
   end
 
 let test_feature name test =
@@ -156,9 +154,9 @@ let test_feature name test =
 let split = Str.(split (regexp " +"))
 
 let brew_libffi_version flags =
-  match Commands.command "brew ls libffi --versions | awk '{print $NF}' > %s 2>&1" !log_file with
-    { Commands.status } when status <> 0 ->
-    raise Exit
+  match Commands.command "brew ls libffi --versions | awk '{print $NF}'" with
+    { Commands.status; stderr } when status <> 0 ->
+    ksprintf failwith "brew ls libffi failed: %s" stderr
   | { Commands.stdout = "" } ->
     failwith "You need to 'brew install libffi' to get a suitably up-to-date version"
   | { Commands.stdout } ->
@@ -168,10 +166,10 @@ let pkg_config flags =
   let output =
     if !is_homebrew then
       Commands.command
-        "env PKG_CONFIG_PATH=%s/Cellar/libffi/%s/lib/pkgconfig %s/bin/pkg-config %s > %s 2>&1"
-        !homebrew_prefix (brew_libffi_version ()) !homebrew_prefix flags !log_file
+        "env PKG_CONFIG_PATH=%s/Cellar/libffi/%s/lib/pkgconfig %s/bin/pkg-config %s"
+        !homebrew_prefix (brew_libffi_version ()) !homebrew_prefix flags
     else
-      Commands.command "pkg-config %s > %s 2>&1" flags !log_file
+      Commands.command "pkg-config %s" flags
   in
   match output with
     { Commands.status } when status <> 0 -> None
@@ -183,8 +181,8 @@ let pkg_config_flags name =
     Some opt, Some lib -> Some (opt, lib)
   | _ -> None
 
-let get_homebrew_prefix log_file =
-  match Commands.command "brew --prefix > %s" log_file with
+let get_homebrew_prefix () =
+  match Commands.command "brew --prefix" with
     { Commands.status } when status <> 0 -> raise Exit
   | { Commands.stdout } -> String.trim stdout
 
@@ -219,18 +217,18 @@ let test_libffi setup_data have_pkg_config =
 
 (* Test for pkg-config. If we are on MacOS X, we need the latest pkg-config
  * from Homebrew *)
-let have_pkg_config is_homebrew homebrew_prefix log_file =
+let have_pkg_config is_homebrew homebrew_prefix =
   if is_homebrew then begin
     (* Look in `brew for the right pkg-config *)
-    homebrew_prefix := get_homebrew_prefix log_file;
+    homebrew_prefix := get_homebrew_prefix ();
     test_feature "pkg-config"
       (fun () ->
-         Commands.command_succeeds "%s/bin/pkg-config --version > %s 2>&1" !homebrew_prefix log_file)
+         Commands.command_succeeds "%s/bin/pkg-config --version" !homebrew_prefix)
   end
   else
     test_feature "pkg-config"
       (fun () ->
-         Commands.command_succeeds "pkg-config --version > %s 2>&1" log_file)
+         Commands.command_succeeds "pkg-config --version")
 
 let args = [
   "-ocamlc", Arg.Set_string ocamlc, "<path> ocamlc";
@@ -252,11 +250,8 @@ let () =
   output_string oc caml_code;
   close_out oc;
 
-  log_file := Filename.temp_file "ffi_output" ".log";
-
   (* Cleanup things on exit. *)
   at_exit (fun () ->
-             silent_remove !log_file;
              silent_remove !exec_name;
              silent_remove !caml_file;
              silent_remove (Filename.chop_extension !caml_file ^ ".cmi");
@@ -266,9 +261,9 @@ let () =
   is_homebrew :=
     test_feature "brew"
       (fun () ->
-         Commands.command_succeeds "brew info libffi > %s 2>&1" !log_file);
+         Commands.command_succeeds "brew info libffi");
 
-  let have_pkg_config = have_pkg_config !is_homebrew homebrew_prefix !log_file in
+  let have_pkg_config = have_pkg_config !is_homebrew homebrew_prefix in
 
   let setup_data = ref [] in
   let have_libffi = test_feature "libffi"
