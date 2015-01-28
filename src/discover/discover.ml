@@ -169,25 +169,20 @@ let brew_libffi_version flags =
   end else
     raise Exit
 
-let pkg_config choose flags =
-  let cmd () =
-    match choose with 
-    |`Default -> Commands.command "pkg-config %s > %s 2>&1" flags !log_file
-    |`Homebrew ver -> Commands.command
-                        "env PKG_CONFIG_PATH=%s/Cellar/libffi/%s/lib/pkgconfig %s/bin/pkg-config %s > %s 2>&1"
-                        !homebrew_prefix ver !homebrew_prefix flags !log_file
+let pkg_config flags =
+  let output =
+    if !is_homebrew then
+      Commands.command
+        "env PKG_CONFIG_PATH=%s/Cellar/libffi/%s/lib/pkgconfig %s/bin/pkg-config %s > %s 2>&1"
+        !homebrew_prefix (brew_libffi_version ()) !homebrew_prefix flags !log_file
+    else
+      Commands.command "pkg-config %s > %s 2>&1" flags !log_file
   in
-  match cmd () with
+  match output with
     { Commands.status } when status <> 0 -> raise Exit
   | { Commands.stdout } -> split stdout
 
 let pkg_config_flags name =
-  let pkg_config =
-    if !is_homebrew then
-      pkg_config (`Homebrew (brew_libffi_version ()))
-    else
-      pkg_config `Default
-  in
   try
     (* Get compile flags. *)
     let opt = ksprintf pkg_config "--cflags %s" name in
