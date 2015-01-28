@@ -35,7 +35,7 @@ open Printf
    LIBRARY_PATH.
 *)
 
-let default_search_paths =
+let search_paths =
   List.map (fun dir -> (dir ^ "/include", dir ^ "/lib")) [
     "/usr";
     "/usr/local";
@@ -65,20 +65,6 @@ export LIBFFI_CFLAGS=-I/opt/local/include
 export LIBFFI_LIBS=-L/opt/local/lib
 
 "
-
-let search_paths =
-  let get var f =
-    try
-      List.map f (split_path (Sys.getenv var))
-    with Not_found ->
-      []
-  in
-  List.flatten [
-    get "C_INCLUDE_PATH" (fun dir -> (dir, dir // ".." // "lib"));
-    get "LIBRARY_PATH" (fun dir -> (dir // ".." // "include", dir));
-    default_search_paths;
-  ]
-
 (* +-----------------------------------------------------------------+
    | Test codes                                                      |
    +-----------------------------------------------------------------+ *)
