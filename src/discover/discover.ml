@@ -245,17 +245,60 @@ let lib_flags env_var_prefix fallback =
           | None, None ->
               (opt, lib)
 
+let get_homebrew_prefix log_file =
+  let cmd () = ksprintf Sys.command "brew --prefix > %s" log_file in
+  if cmd () = 0 then begin
+    let ic = open_in log_file in
+    let line = input_line ic in
+    close_in ic;
+    line
+  end else
+    raise Exit
+
+let test_libffi setup_data have_pkg_config =
+  let opt, lib =
+    lib_flags "LIBFFI"
+      (fun () ->
+        match if have_pkg_config then pkg_config_flags "libffi" else None with
+          | Some (opt, lib) ->
+              (opt, lib)
+          | None ->
+              match search_header "ffi.h" with
+                | Some (dir_i, dir_l) ->
+                    (["-I" ^ dir_i], ["-L" ^ dir_l; "-lffi"])
+                | None ->
+                    ([], ["-lffi"]))
+  in
+  setup_data := ("libffi_opt", opt) :: ("libffi_lib", lib) :: !setup_data;
+  test_code (opt, lib) libffi_code
+
+(* Test for pkg-config. If we are on MacOS X, we need the latest pkg-config
+ * from Homebrew *)
+let have_pkg_config is_homebrew homebrew_prefix log_file =
+  if is_homebrew then begin
+    (* Look in `brew for the right pkg-config *)
+    homebrew_prefix := get_homebrew_prefix log_file;
+    test_feature "pkg-config"
+      (fun () ->
+         ksprintf Sys.command "%s/bin/pkg-config --version > %s 2>&1" !homebrew_prefix log_file = 0)
+  end
+  else
+    test_feature "pkg-config"
+      (fun () ->
+         ksprintf Sys.command "pkg-config --version > %s 2>&1" log_file = 0)
+
+let args = [
+  "-ocamlc", Arg.Set_string ocamlc, "<path> ocamlc";
+  "-ext-obj", Arg.Set_string ext_obj, "<ext> C object files extension";
+  "-exec-name", Arg.Set_string exec_name, "<name> name of the executable produced by ocamlc";
+  "-ccomp-type", Arg.Set_string ccomp_type, "<ccomp-type> C compiler type";
+]
+
 (* +-----------------------------------------------------------------+
    | Entry point                                                     |
    +-----------------------------------------------------------------+ *)
 
 let () =
-  let args = [
-    "-ocamlc", Arg.Set_string ocamlc, "<path> ocamlc";
-    "-ext-obj", Arg.Set_string ext_obj, "<ext> C object files extension";
-    "-exec-name", Arg.Set_string exec_name, "<name> name of the executable produced by ocamlc";
-    "-ccomp-type", Arg.Set_string ccomp_type, "<ccomp-type> C compiler type";
-  ] in
   Arg.parse args ignore "check for external C libraries and available features\noptions are:";
 
   (* Put the caml code into a temporary file. *)
@@ -282,55 +325,13 @@ let () =
       (fun () ->
          ksprintf Sys.command "brew info libffi > %s 2>&1" !log_file = 0);
 
-  let get_homebrew_prefix () =
-    let cmd () = ksprintf Sys.command "brew --prefix > %s" !log_file in
-    if cmd () = 0 then begin
-      let ic = open_in !log_file in
-      let line = input_line ic in
-      close_in ic;
-      line
-    end else
-      raise Exit
-  in
+  let have_pkg_config = have_pkg_config !is_homebrew homebrew_prefix !log_file in
 
-  (* Test for pkg-config. If we are on MacOS X, we need the latest pkg-config
-   * from Homebrew *)
-  let have_pkg_config =
-    (match !is_homebrew with
-     | true -> (* Look in `brew for the right pkg-config *)
-       homebrew_prefix := get_homebrew_prefix ();
-       test_feature "pkg-config"
-         (fun () ->
-            ksprintf Sys.command "%s/bin/pkg-config --version > %s 2>&1" !homebrew_prefix !log_file = 0);
-     | false ->
-       test_feature "pkg-config"
-         (fun () ->
-            ksprintf Sys.command "pkg-config --version > %s 2>&1" !log_file = 0);
-    )
-  in
   if not have_pkg_config then
     fprintf stderr "Warning: the 'pkg-config' command is not available."
   ;
 
-  let test_libffi () =
-    let opt, lib =
-      lib_flags "LIBFFI"
-        (fun () ->
-          match if have_pkg_config then pkg_config_flags "libffi" else None with
-            | Some (opt, lib) ->
-                (opt, lib)
-            | None ->
-                match search_header "ffi.h" with
-                  | Some (dir_i, dir_l) ->
-                      (["-I" ^ dir_i], ["-L" ^ dir_l; "-lffi"])
-                  | None ->
-                      ([], ["-lffi"]))
-    in
-    setup_data := ("libffi_opt", opt) :: ("libffi_lib", lib) :: !setup_data;
-    test_code (opt, lib) libffi_code
-  in
-
-  if not (test_feature "libffi" test_libffi) then begin
+  if not (test_feature "libffi" (fun () -> test_libffi setup_data have_pkg_config)) then begin
     fprintf stderr "
 The following required C libraries are missing: libffi.
 Please install them and retry. If they are installed in a non-standard location
