@@ -1,6 +1,4 @@
-(* Lightweight thread library for Objective Caml
- * http://www.ocsigen.org/lwt
- * Program discover
+(* Copyright (C) 2015 Jeremy Yallop
  * Copyright (C) 2012 Anil Madhavapeddy
  * Copyright (C) 2010 Jérémie Dimino
  *
@@ -117,39 +115,28 @@ let search_header header =
   in
   loop search_paths
 
-let compile (opt, lib) stub_file =
-  Commands.command_succeeds
-    "%s -custom %s %s %s %s > %s 2>&1"
-    !ocamlc
-    (String.concat " " (List.map (sprintf "-ccopt %s") opt))
-    (Filename.quote stub_file)
-    (Filename.quote !caml_file)
-    (String.concat " " (List.map (sprintf "-cclib %s") lib))
-    (Filename.quote !log_file)
+let silent_remove filename =
+  try Sys.remove filename
+  with exn -> ()
 
-let safe_remove file_name =
-  try
-    Sys.remove file_name
-  with exn ->
-    ()
-
-let test_code args stub_code =
-  let stub_file, oc = Filename.open_temp_file "ffi_stub" ".c" in
-  let cleanup () =
-    safe_remove stub_file;
-    safe_remove (Filename.chop_extension (Filename.basename stub_file) ^ !ext_obj)
-  in
-  try
-    output_string oc stub_code;
-    flush oc;
-    close_out oc;
-    let result = compile args stub_file in
-    cleanup ();
-    result
-  with exn ->
-    (try close_out oc with _ -> ());
-    cleanup ();
-    raise exn
+let test_code (opt, lib) stub_code =
+  let open Commands in
+  let filename = Filename.temp_file "ctypes_libffi" ".c" in
+  with_open_output_file ~filename begin fun oc ->
+    let cleanup () = 
+      silent_remove (Filename.(chop_extension (basename filename)) ^ !ext_obj)
+    in
+    unwind_protect ~cleanup (fun () ->
+         output_string oc stub_code;
+         Commands.command_succeeds
+           "%s -custom %s %s %s %s > %s 2>&1"
+           !ocamlc
+           (String.concat " " (List.map (sprintf "-ccopt %s") opt))
+           (Filename.quote filename)
+           (Filename.quote !caml_file)
+           (String.concat " " (List.map (sprintf "-cclib %s") lib))
+           (Filename.quote !log_file)) ()
+  end
 
 let test_feature name test =
   begin
@@ -293,11 +280,11 @@ let () =
 
   (* Cleanup things on exit. *)
   at_exit (fun () ->
-             safe_remove !log_file;
-             safe_remove !exec_name;
-             safe_remove !caml_file;
-             safe_remove (Filename.chop_extension !caml_file ^ ".cmi");
-             safe_remove (Filename.chop_extension !caml_file ^ ".cmo"));
+             silent_remove !log_file;
+             silent_remove !exec_name;
+             silent_remove !caml_file;
+             silent_remove (Filename.chop_extension !caml_file ^ ".cmi");
+             silent_remove (Filename.chop_extension !caml_file ^ ".cmo"));
 
   let setup_data = ref [] in
 
