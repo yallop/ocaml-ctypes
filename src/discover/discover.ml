@@ -157,17 +157,13 @@ let test_feature name test =
 let split = Str.(split (regexp " +"))
 
 let brew_libffi_version flags =
-  if Commands.command_succeeds "brew ls libffi --versions | awk '{print $NF}' > %s 2>&1" !log_file then begin
-    let ic = open_in !log_file in
-    let line = input_line ic in
-    close_in ic;
-    if line = "" then begin
-      print_endline "You need to 'brew install libffi' to get a suitably up-to-date version";
-      exit 1
-    end;
-    line
-  end else
+  match Commands.command "brew ls libffi --versions | awk '{print $NF}' > %s 2>&1" !log_file with
+    { Commands.status } when status <> 0 ->
     raise Exit
+  | { Commands.stdout = "" } ->
+    failwith "You need to 'brew install libffi' to get a suitably up-to-date version"
+  | { Commands.stdout } ->
+    String.trim stdout
 
 let pkg_config flags =
   let output =
