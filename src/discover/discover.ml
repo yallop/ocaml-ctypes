@@ -162,16 +162,15 @@ let test_code args stub_code =
     cleanup ();
     raise exn
 
-let not_available = ref []
-
 let test_feature name test =
   begin
     printf "testing for %s:%!" name;
     if test () then begin
-      printf " %s available\n%!" (String.make (34 - String.length name) '.')
+      printf " %s available\n%!" (String.make (34 - String.length name) '.');
+      true
     end else begin
       printf " %s unavailable\n%!" (String.make (34 - String.length name) '.');
-      not_available := name :: !not_available
+      false
     end
   end
 
@@ -302,13 +301,10 @@ let () =
   let setup_data = ref [] in
 
   (* Test for MacOS X Homebrew. *)
-  test_feature "brew"
-    (fun () ->
-       ksprintf Sys.command "brew info libffi > %s 2>&1" !log_file = 0);
-
-  (* Not having Homebrew is not fatal. *)
-  is_homebrew := !not_available = [];
-  not_available := [];
+  is_homebrew :=
+    test_feature "brew"
+      (fun () ->
+         ksprintf Sys.command "brew info libffi > %s 2>&1" !log_file = 0);
 
   let get_homebrew_prefix () =
     let cmd () = ksprintf Sys.command "brew --prefix > %s" !log_file in
@@ -323,20 +319,22 @@ let () =
 
   (* Test for pkg-config. If we are on MacOS X, we need the latest pkg-config
    * from Homebrew *)
-  (match !is_homebrew with
-  |true -> (* Look in `brew for the right pkg-config *)
-    homebrew_prefix := get_homebrew_prefix ();
-    test_feature "pkg-config"
-      (fun () ->
-         ksprintf Sys.command "%s/bin/pkg-config --version > %s 2>&1" !homebrew_prefix !log_file = 0);
-  |false ->
-    test_feature "pkg-config"
-      (fun () ->
-         ksprintf Sys.command "pkg-config --version > %s 2>&1" !log_file = 0);
-  );
-  (* Not having pkg-config is not fatal. *)
-  let have_pkg_config = !not_available = [] in
-  not_available := [];
+  let have_pkg_config =
+    (match !is_homebrew with
+     | true -> (* Look in `brew for the right pkg-config *)
+       homebrew_prefix := get_homebrew_prefix ();
+       test_feature "pkg-config"
+         (fun () ->
+            ksprintf Sys.command "%s/bin/pkg-config --version > %s 2>&1" !homebrew_prefix !log_file = 0);
+     | false ->
+       test_feature "pkg-config"
+         (fun () ->
+            ksprintf Sys.command "pkg-config --version > %s 2>&1" !log_file = 0);
+    )
+  in
+  if not have_pkg_config then
+    printf "Warning: the 'pkg-config' command is not available."
+  ;
 
   let test_libffi () =
     let opt, lib =
@@ -356,13 +354,9 @@ let () =
     test_code (opt, lib) libffi_code
   in
 
-  test_feature "libffi" test_libffi;
-
-  if !not_available <> [] then begin
-    if not have_pkg_config then
-      printf "Warning: the 'pkg-config' command is not available.";
+  if not (test_feature "libffi" test_libffi) then begin
     printf "
-The following required C libraries are missing: %s.
+The following required C libraries are missing: libffi.
 Please install them and retry. If they are installed in a non-standard location
 or need special flags, set the environment variables <LIB>_CFLAGS and <LIB>_LIBS
 accordingly and retry.
@@ -372,14 +366,14 @@ For example, if libffi is installed in /opt/local, you can type:
 export LIBFFI_CFLAGS=-I/opt/local/include
 export LIBFFI_LIBS=-L/opt/local/lib
 
-" (String.concat ", " !not_available);
+" ;
     exit 1
   end;
 
   (match is_win with
    | true -> setup_data := ("as_needed_flags", []) :: !setup_data;
    | false ->
-     test_feature "no_as_needed"
+     if test_feature "no_as_needed" 
        (fun () ->
          ksprintf Sys.command "
          touch as_needed_test.ml;
@@ -387,14 +381,11 @@ export LIBFFI_LIBS=-L/opt/local/lib
          EXIT=$?;
          rm as_needed_test.*;
          exit $EXIT"
-        !log_file = 0);
-
-     if !not_available = [] then
+        !log_file = 0) then
        setup_data := ("as_needed_flags", ["-Wl,--no-as-needed"]) :: !setup_data
      else
        setup_data := ("as_needed_flags", []) :: !setup_data;
   );
-  not_available := [];
 
   (* Our setup.data keys. *)
   let setup_data_keys = [
