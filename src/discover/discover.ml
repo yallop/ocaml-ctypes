@@ -202,41 +202,36 @@ let pkg_config_flags name =
   with Exit ->
     None
 
-let lib_flags env_var_prefix fallback =
-  let get var = try Some (split (Sys.getenv var)) with Not_found -> None in
-  match get (env_var_prefix ^ "_CFLAGS"), get (env_var_prefix ^ "_LIBS") with
-    | Some opt, Some lib ->
-        (opt, lib)
-    | x ->
-        let opt, lib = fallback () in
-        match x with
-          | Some opt, Some lib ->
-              assert false
-          | Some opt, None ->
-              (opt, lib)
-          | None, Some lib ->
-              (opt, lib)
-          | None, None ->
-              (opt, lib)
-
 let get_homebrew_prefix log_file =
   match Commands.command "brew --prefix > %s" log_file with
     { Commands.status } when status <> 0 -> raise Exit
   | { Commands.stdout } -> String.trim stdout
 
+let search_libffi_header () =
+  match search_header "ffi.h" with
+  | Some (dir_i, dir_l) ->
+    (["-I" ^ dir_i], ["-L" ^ dir_l; "-lffi"])
+  | None ->
+    ([], ["-lffi"])
+
 let test_libffi setup_data have_pkg_config =
+  let get var = try Some (split (Sys.getenv var)) with Not_found -> None in
   let opt, lib =
-    lib_flags "LIBFFI"
-      (fun () ->
-        match if have_pkg_config then pkg_config_flags "libffi" else None with
-          | Some (opt, lib) ->
-              (opt, lib)
-          | None ->
-              match search_header "ffi.h" with
-                | Some (dir_i, dir_l) ->
-                    (["-I" ^ dir_i], ["-L" ^ dir_l; "-lffi"])
-                | None ->
-                    ([], ["-lffi"]))
+    match get "LIBFFI_CFLAGS", get "LBIFFI_LIBS" with
+    | Some opt, Some lib -> (opt, lib)
+    | envopt, envlib ->
+      let opt, lib =
+        if not have_pkg_config then
+          search_libffi_header ()
+        else match pkg_config_flags "libffi" with
+          | Some (pkgopt, pkglib) -> (pkgopt, pkglib)
+          | None -> search_libffi_header ()
+      in
+      match envopt, envlib, opt, lib with
+      | Some opt, Some lib, _  , _
+      | Some opt, None    , _  , lib
+      | None    , Some lib, opt, _
+      | None    , None    , opt, lib -> opt, lib
   in
   setup_data := ("libffi_opt", opt) :: ("libffi_lib", lib) :: !setup_data;
   test_code (opt, lib) libffi_code
