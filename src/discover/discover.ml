@@ -35,8 +35,6 @@ open Printf
    LIBRARY_PATH.
 *)
 
-let ( // ) = Filename.concat
-
 let default_search_paths =
   List.map (fun dir -> (dir ^ "/include", dir ^ "/lib")) [
     "/usr";
@@ -52,6 +50,21 @@ let is_win = Sys.os_type = "Win32"
 let path_sep = if is_win then ";" else ":"
 
 let split_path = Str.(split (regexp (path_sep ^ "+")))
+
+let ( // ) = Filename.concat
+
+let advice = "
+The following required C libraries are missing: libffi.
+Please install them and retry. If they are installed in a non-standard location
+or need special flags, set the environment variables <LIB>_CFLAGS and <LIB>_LIBS
+accordingly and retry.
+
+For example, if libffi is installed in /opt/local, you can type:
+
+export LIBFFI_CFLAGS=-I/opt/local/include
+export LIBFFI_LIBS=-L/opt/local/lib
+
+"
 
 let search_paths =
   let get var f =
@@ -263,8 +276,6 @@ let () =
              silent_remove (Filename.chop_extension !caml_file ^ ".cmi");
              silent_remove (Filename.chop_extension !caml_file ^ ".cmo"));
 
-  let setup_data = ref [] in
-
   (* Test for MacOS X Homebrew. *)
   is_homebrew :=
     test_feature "brew"
@@ -273,25 +284,15 @@ let () =
 
   let have_pkg_config = have_pkg_config !is_homebrew homebrew_prefix !log_file in
 
+  let setup_data = ref [] in
+  let have_libffi = test_feature "libffi"
+      (fun () -> test_libffi setup_data have_pkg_config) in
+
   if not have_pkg_config then
-    fprintf stderr "Warning: the 'pkg-config' command is not available."
-  ;
+    fprintf stderr "Warning: the 'pkg-config' command is not available.";
 
-  if not (test_feature "libffi" (fun () -> test_libffi setup_data have_pkg_config)) then begin
-    fprintf stderr "
-The following required C libraries are missing: libffi.
-Please install them and retry. If they are installed in a non-standard location
-or need special flags, set the environment variables <LIB>_CFLAGS and <LIB>_LIBS
-accordingly and retry.
-
-For example, if libffi is installed in /opt/local, you can type:
-
-export LIBFFI_CFLAGS=-I/opt/local/include
-export LIBFFI_LIBS=-L/opt/local/lib
-
-" ;
-    exit 1
-  end;
+  if not have_libffi then
+    (prerr_endline advice; exit 1);
 
   ListLabels.iter !setup_data
     ~f:(fun (name, args) ->
