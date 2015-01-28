@@ -185,18 +185,14 @@ let brew_libffi_version flags =
 let pkg_config choose flags =
   let cmd () =
     match choose with 
-    |`Default -> Commands.command_succeeds "pkg-config %s > %s 2>&1" flags !log_file
-    |`Homebrew ver -> Commands.command_succeeds
+    |`Default -> Commands.command "pkg-config %s > %s 2>&1" flags !log_file
+    |`Homebrew ver -> Commands.command
                         "env PKG_CONFIG_PATH=%s/Cellar/libffi/%s/lib/pkgconfig %s/bin/pkg-config %s > %s 2>&1"
                         !homebrew_prefix ver !homebrew_prefix flags !log_file
   in
-  if cmd () then begin
-    let ic = open_in !log_file in
-    let line = input_line ic in
-    close_in ic;
-    split line
-  end else
-    raise Exit
+  match cmd () with
+    { Commands.status } when status <> 0 -> raise Exit
+  | { Commands.stdout } -> split stdout
 
 let pkg_config_flags name =
   let pkg_config =
@@ -237,13 +233,9 @@ let lib_flags env_var_prefix fallback =
               (opt, lib)
 
 let get_homebrew_prefix log_file =
-  if Commands.command_succeeds "brew --prefix > %s" log_file then begin
-    let ic = open_in log_file in
-    let line = input_line ic in
-    close_in ic;
-    line
-  end else
-    raise Exit
+  match Commands.command "brew --prefix > %s" log_file with
+    { Commands.status } when status <> 0 -> raise Exit
+  | { Commands.stdout } -> String.trim stdout
 
 let test_libffi setup_data have_pkg_config =
   let opt, lib =
