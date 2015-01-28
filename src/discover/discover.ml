@@ -53,6 +53,9 @@ let split_path = Str.(split (regexp (path_sep ^ "+")))
 
 let ( // ) = Filename.concat
 
+(** See the comment in commands.ml *)
+let unixify = Str.(global_replace (regexp "\\") "/")
+
 let advice = "
 The following required C libraries are missing: libffi.
 Please install them and retry. If they are installed in a non-standard location
@@ -118,8 +121,8 @@ let silent_remove filename =
 let test_code opt lib stub_code caml_code =
   let open Commands in
   let stem f = Filename.(chop_extension (basename f)) in
-  let stub_filename = Filename.temp_file "ctypes_libffi" ".c" in
-  let caml_filename = Filename.temp_file "ctypes_libffi" ".ml" in
+  let stub_filename = unixify (Filename.temp_file "ctypes_libffi" ".c") in
+  let caml_filename = unixify (Filename.temp_file "ctypes_libffi" ".ml") in
   with_open_output_file ~filename:stub_filename begin fun stubfd ->
     with_open_output_file ~filename:caml_filename begin fun camlfd ->
       unwind_protect (fun () ->
@@ -129,12 +132,12 @@ let test_code opt lib stub_code caml_code =
             "%s -custom %s %s %s %s 1>&2"
             !ocamlc
             (String.concat " " (List.map (sprintf "-ccopt %s") opt))
-            (Filename.quote stub_filename)
-            (Filename.quote caml_filename)
+            (unixify (Filename.quote stub_filename))
+            (unixify (Filename.quote caml_filename))
             (String.concat " " (List.map (sprintf "-cclib %s") lib))) ()
         ~cleanup:begin fun () ->
-          let caml_stem = stem caml_filename in
-          silent_remove (stem stub_filename ^ !ext_obj);
+          let caml_stem = unixify (stem caml_filename) in
+          silent_remove (unixify (stem stub_filename ^ !ext_obj));
           silent_remove !exec_name;
           silent_remove (caml_stem ^ ".cmi");
           silent_remove (caml_stem ^ ".cmo");

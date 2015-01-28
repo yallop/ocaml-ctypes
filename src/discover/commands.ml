@@ -39,15 +39,23 @@ type command_output = {
   stderr: string;
 }
 
+let temp_dir = "."
+
+(* The use of [unixify] below is not ideal: it's a workaround for the Windows
+   build, which uses a mixture of Windows- and Unix-style paths due to using MinGW
+   to compile OCaml and Bash for the shell.
+*)
+let unixify = Str.(global_replace (regexp "\\\\") "/")
+
 let shell_command_results command =
-  let stdout_filename = Filename.temp_file "ctypes_config" ".stdout" in
-  let stderr_filename = Filename.temp_file "ctypes_config" ".stderr" in
+  let stdout_filename = Filename.temp_file ~temp_dir "ctypes_config" ".stdout" in
+  let stderr_filename = Filename.temp_file ~temp_dir "ctypes_config" ".stderr" in
   unwind_protect
     (fun () ->
        let full_command =
          Printf.sprintf "(%s) > %s 2> %s" command 
-           (Filename.quote stdout_filename)
-           (Filename.quote stderr_filename)
+           (unixify stdout_filename)
+           (unixify stderr_filename)
        in
        let status = Sys.command full_command in
        let stdout = file_contents stdout_filename in
