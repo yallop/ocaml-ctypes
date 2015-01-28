@@ -180,16 +180,8 @@ let pkg_config flags =
 
 let pkg_config_flags name =
   try
-    (* Get compile flags. *)
-    let opt = ksprintf pkg_config "--cflags %s" name in
-    (* Get linking flags. *)
-    let lib =
-      if !ccomp_type = "msvc" then
-        ksprintf pkg_config "--libs-only-L %s" name @ ksprintf pkg_config "--libs-only-l --msvc-syntax %s" name
-      else
-        ksprintf pkg_config "--libs %s" name
-    in
-    Some (opt, lib)
+    Some (ksprintf pkg_config "--cflags %s" name,
+          ksprintf pkg_config "--libs %s" name)
   with Exit ->
     None
 
