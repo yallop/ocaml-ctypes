@@ -175,15 +175,14 @@ let pkg_config flags =
       Commands.command "pkg-config %s > %s 2>&1" flags !log_file
   in
   match output with
-    { Commands.status } when status <> 0 -> raise Exit
-  | { Commands.stdout } -> split stdout
+    { Commands.status } when status <> 0 -> None
+  | { Commands.stdout } -> Some (split (String.trim stdout))
 
 let pkg_config_flags name =
-  try
-    Some (ksprintf pkg_config "--cflags %s" name,
-          ksprintf pkg_config "--libs %s" name)
-  with Exit ->
-    None
+  match (ksprintf pkg_config "--cflags %s" name,
+         ksprintf pkg_config "--libs %s" name) with
+    Some opt, Some lib -> Some (opt, lib)
+  | _ -> None
 
 let get_homebrew_prefix log_file =
   match Commands.command "brew --prefix > %s" log_file with
