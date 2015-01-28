@@ -329,12 +329,6 @@ export LIBFFI_LIBS=-L/opt/local/lib
     exit 1
   end;
 
-  (* Add flags to setup.data *)
-  let setup_data_lines =
-    List.fold_left
-      (fun lines (name, args) ->
-         sprintf "%s=%s" name (String.concat " " args) :: lines)
-      [] !setup_data
-  in
-  List.iter (Printf.printf "%s\n") setup_data_lines
-
+  ListLabels.iter !setup_data
+    ~f:(fun (name, args) ->
+        Printf.printf "%s=%s\n" name (String.concat " " args))
