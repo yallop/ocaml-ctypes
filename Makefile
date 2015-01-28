@@ -139,8 +139,9 @@ src/ctypes/ctypes_primitives.ml: $(BUILDDIR)/configure.native
 src/ctypes-foreign-base/libffi_abi.ml: $(BUILDDIR)/libffi-abigen.native
 	$< > $@
 
-setup.data: src/discover/discover.ml
-	ocaml $^ -ocamlc "$(OCAMLFIND) ocamlc"
+setup.data: src/discover/commands.mli src/discover/commands.ml src/discover/discover.ml
+	@ocamlfind ocamlc -o discover -package str,bytes -linkpkg $^ -I src/discover
+	./discover -ocamlc "$(OCAMLFIND) ocamlc"
 
 # dependencies
 depend: configure
