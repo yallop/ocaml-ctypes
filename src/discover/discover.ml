@@ -51,18 +51,9 @@ let default_search_paths =
 
 let is_win = Sys.os_type = "Win32"
 
-let path_sep = if is_win then ';' else ':'
+let path_sep = if is_win then ";" else ":"
 
-let split_path str =
-  let len = String.length str in
-  let rec aux i =
-    if i >= len then
-      []
-    else
-      let j = try String.index_from str i path_sep with Not_found -> len in
-      String.sub str i (j - i) :: aux (j + 1)
-  in
-  aux 0
+let split_path = Str.(split (regexp (path_sep ^ "+")))
 
 let search_paths =
   let get var f =
