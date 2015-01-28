@@ -249,12 +249,6 @@ let lib_flags env_var_prefix fallback =
    | Entry point                                                     |
    +-----------------------------------------------------------------+ *)
 
-let arg_bool r =
-  Arg.Symbol (["true"; "false"],
-              function
-                | "true" -> r := true
-                | "false" -> r := false
-                | _ -> assert false)
 let () =
   let args = [
     "-ocamlc", Arg.Set_string ocamlc, "<path> ocamlc";
@@ -352,28 +346,10 @@ export LIBFFI_LIBS=-L/opt/local/lib
     exit 1
   end;
 
-  (match is_win with
-   | true -> setup_data := ("as_needed_flags", []) :: !setup_data;
-   | false ->
-     if test_feature "no_as_needed" 
-       (fun () ->
-         ksprintf Sys.command "
-         touch as_needed_test.ml;
-         ocamlopt -shared -cclib -Wl,--no-as-needed as_needed_test.ml -o as_needed_test.cmxs > %s 2>&1;
-         EXIT=$?;
-         rm as_needed_test.*;
-         exit $EXIT"
-        !log_file = 0) then
-       setup_data := ("as_needed_flags", ["-Wl,--no-as-needed"]) :: !setup_data
-     else
-       setup_data := ("as_needed_flags", []) :: !setup_data;
-  );
-
   (* Our setup.data keys. *)
   let setup_data_keys = [
     "libffi_opt";
     "libffi_lib";
-    "as_needed_flags";
   ] in
 
   (* Load setup.data *)
