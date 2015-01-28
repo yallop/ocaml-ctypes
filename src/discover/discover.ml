@@ -178,25 +178,7 @@ let test_feature name test =
    | pkg-config                                                      |
    +-----------------------------------------------------------------+ *)
 
-let split str =
-  let rec skip_spaces i =
-    if i = String.length str then
-      []
-    else
-      if str.[i] = ' ' then
-        skip_spaces (i + 1)
-      else
-        extract i (i + 1)
-  and extract i j =
-    if j = String.length str then
-      [String.sub str i (j - i)]
-    else
-      if str.[j] = ' ' then
-        String.sub str i (j - i) :: skip_spaces (j + 1)
-      else
-        extract i (j + 1)
-  in
-  skip_spaces 0
+let split = Str.(split (regexp " +"))
 
 let brew_libffi_version flags =
   if ksprintf Sys.command "brew ls libffi --versions | awk '{print $NF}' > %s 2>&1" !log_file = 0 then begin
