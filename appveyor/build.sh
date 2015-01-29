@@ -71,9 +71,9 @@ else
     export PKG_CONFIG_LIBDIR=${godi_dir}/lib/pkgconfig
 fi
 
-touch setup.data
+touch libffi.config
 make distclean || true
-rm -f setup.data
+rm -f libffi.config
 make all
 make date date-stubs date-stub-generator date-cmd-build date-cmd
 ./_build/date-cmd.native

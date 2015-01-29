@@ -1,5 +1,6 @@
 _build
-setup.data
+libffi.config
+asneeded.config
 src/ctypes/ctypes_primitives.ml
 src/ctypes_config.h
 src/ctypes_config.ml

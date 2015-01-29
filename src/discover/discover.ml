@@ -56,18 +56,6 @@ let ( // ) = Filename.concat
 (** See the comment in commands.ml *)
 let unixify = Str.(global_replace (regexp "\\") "/")
 
-let advice = "
-The following required C libraries are missing: libffi.
-Please install them and retry. If they are installed in a non-standard location
-or need special flags, set the environment variables <LIB>_CFLAGS and <LIB>_LIBS
-accordingly and retry.
-
-For example, if libffi is installed in /opt/local, you can type:
-
-export LIBFFI_CFLAGS=-I/opt/local/include
-export LIBFFI_LIBS=-L/opt/local/lib
-
-"
 (* +-----------------------------------------------------------------+
    | Test codes                                                      |
    +-----------------------------------------------------------------+ *)
@@ -223,7 +211,9 @@ let test_libffi setup_data have_pkg_config =
       | None    , None    , opt, lib -> opt, lib
   in
   setup_data := ("libffi_opt", opt) :: ("libffi_lib", lib) :: !setup_data;
-  test_code opt lib libffi_stub_code libffi_caml_code
+  let libffi_available = test_code opt lib libffi_stub_code libffi_caml_code in
+  setup_data := ("libffi_available", [string_of_bool libffi_available]) :: !setup_data;
+  libffi_available
 
 (* Test for pkg-config. If we are on MacOS X, we need the latest pkg-config
  * from Homebrew *)
@@ -267,10 +257,10 @@ let () =
       (fun () -> test_libffi setup_data have_pkg_config) in
 
   if not have_pkg_config then
-    fprintf stderr "Warning: the 'pkg-config' command is not available.";
+    fprintf stderr "Warning: the 'pkg-config' command is not available.\n";
 
   if not have_libffi then
-    (prerr_endline advice; exit 1);
+    fprintf stderr "Warning: libffi is not available.\n";
 
   ListLabels.iter !setup_data
     ~f:(fun (name, args) ->

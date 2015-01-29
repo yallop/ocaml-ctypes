@@ -7,8 +7,16 @@ OCAMLDEP=$(OCAMLFIND) ocamldep
 OCAMLMKLIB=$(OCAMLFIND) ocamlmklib
 VPATH=src examples
 BUILDDIR=_build
-PROJECTS=configure libffi-abigen configured ctypes cstubs ctypes-foreign-base ctypes-foreign-threaded ctypes-foreign-unthreaded ctypes-top
-GENERATED=src/ctypes_config.h src/ctypes_config.ml setup.data src/ctypes/ctypes_primitives.ml src/ctypes-foreign-base/dl.ml src/ctypes-foreign-base/dl_stubs.c
+BASE_PROJECTS=configure libffi-abigen configured ctypes ctypes-top
+FOREIGN_PROJECTS=test-libffi ctypes-foreign-base ctypes-foreign-threaded ctypes-foreign-unthreaded
+STUB_PROJECTS=cstubs
+PROJECTS=$(BASE_PROJECTS) $(FOREIGN_PROJECTS) $(STUB_PROJECTS)
+GENERATED=src/ctypes/ctypes_primitives.ml	\
+          src/ctypes-foreign-base/libffi_abi.ml \
+          src/ctypes-foreign-base/dl.ml		\
+          src/ctypes-foreign-base/dl_stubs.c	\
+          libffi.config				\
+          asneeded.config 
 OCAML_FFI_INCOPTS=$(libffi_opt)
 export CFLAGS DEBUG
 
@@ -22,14 +30,14 @@ OS_ALT_SUFFIX=.unix
 endif
 
 # public targets
-all: setup.data build
+all: libffi.config $(PROJECTS)
 
-build: $(PROJECTS)
+ctypes-base: $(BASE_PROJECTS)
+ctypes-foreign: ctypes-base $(FOREIGN_PROJECTS)
+ctypes-stubs: ctypes-base $(STUB_PROJECTS)
 
 clean:
 	rm -fr _build
-
-distclean: clean
 	rm -f $(GENERATED)
 
 # ctypes subproject
@@ -139,9 +147,11 @@ src/ctypes/ctypes_primitives.ml: $(BUILDDIR)/configure.native
 src/ctypes-foreign-base/libffi_abi.ml: $(BUILDDIR)/libffi-abigen.native
 	$< > $@
 
-setup.data: src/discover/commands.mli src/discover/commands.ml src/discover/discover.ml
+libffi.config: src/discover/commands.mli src/discover/commands.ml src/discover/discover.ml
 	@ocamlfind ocamlc -o discover -package str,bytes -linkpkg $^ -I src/discover
 	./discover -ocamlc "$(OCAMLFIND) ocamlc" > $@ || (rm $@ && false)
+
+asneeded.config:
 	./src/discover/determine_as_needed_flags.sh >> $@
 
 # dependencies
@@ -157,7 +167,7 @@ META-install:
 install-%: PROJECT=$*
 install-%:
 	$(if $(filter yes,$($(PROJECT).install)),\
-		$(OCAMLFIND) install -add ctypes $^ \
+		$(OCAMLFIND) install -add ctypes -optional $^ \
                    $(LIB_TARGETS) $(LIB_TARGET_EXTRAS) \
                    $(INSTALL_MLIS) $(INSTALL_CMIS) \
                    $(INSTALL_HEADERS) \
@@ -168,8 +178,24 @@ install: META-install $(PROJECTS:%=install-%)
 uninstall:
 	$(OCAMLFIND) remove ctypes
 
-.PHONY: depend distclean clean build configure all install $(PROJECTS)
+.PHONY: depend clean configure all install $(PROJECTS)
 
 include .depend Makefile.rules Makefile.examples Makefile.tests
--include setup.data
+-include libffi.config
+-include asneeded.config
 
+ifeq ($(libffi_available),false)
+test-libffi:
+	@echo "The following required C libraries are missing: libffi."
+	@echo "Please install them and retry. If they are installed in a non-standard location"
+	@echo "or need special flags, set the environment variables <LIB>_CFLAGS and <LIB>_LIBS"
+	@echo "accordingly and retry."
+	@echo
+	@echo " For example, if libffi is installed in /opt/local, you can type:"
+	@echo
+	@echo "   export LIBFFI_CFLAGS=-I/opt/local/include"
+	@echo "   export LIBFFI_LIBS=-L/opt/local/lib"
+	@exit 1
+else:
+test-libffi:
+endif
