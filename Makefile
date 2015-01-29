@@ -7,7 +7,10 @@ OCAMLDEP=$(OCAMLFIND) ocamldep
 OCAMLMKLIB=$(OCAMLFIND) ocamlmklib
 VPATH=src examples
 BUILDDIR=_build
-PROJECTS=configure libffi-abigen configured ctypes cstubs ctypes-foreign-base ctypes-foreign-threaded ctypes-foreign-unthreaded ctypes-top
+BASE_PROJECTS=configure libffi-abigen configured ctypes ctypes-top
+FOREIGN_PROJECTS=ctypes-foreign-base ctypes-foreign-threaded ctypes-foreign-unthreaded
+STUB_PROJECTS=cstubs
+PROJECTS=$(BASE_PROJECTS) $(FOREIGN_PROJECTS) $(STUB_PROJECTS)
 GENERATED=src/ctypes_config.h src/ctypes_config.ml setup.data src/ctypes/ctypes_primitives.ml src/ctypes-foreign-base/dl.ml src/ctypes-foreign-base/dl_stubs.c
 OCAML_FFI_INCOPTS=$(libffi_opt)
 export CFLAGS DEBUG
@@ -22,9 +25,11 @@ OS_ALT_SUFFIX=.unix
 endif
 
 # public targets
-all: setup.data build
+all: setup.data $(PROJECTS)
 
-build: $(PROJECTS)
+ctypes-base: $(BASE_PROJECTS)
+ctypes-foreign: ctypes-base $(FOREIGN_PROJECTS)
+ctypes-stubs: ctypes-base $(STUB_PROJECTS)
 
 clean:
 	rm -fr _build
@@ -168,7 +173,7 @@ install: META-install $(PROJECTS:%=install-%)
 uninstall:
 	$(OCAMLFIND) remove ctypes
 
-.PHONY: depend distclean clean build configure all install $(PROJECTS)
+.PHONY: depend distclean clean configure all install $(PROJECTS)
 
 include .depend Makefile.rules Makefile.examples Makefile.tests
 -include setup.data
