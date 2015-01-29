@@ -1,6 +1,4 @@
-(* Lightweight thread library for Objective Caml
- * http://www.ocsigen.org/lwt
- * Program discover
+(* Copyright (C) 2015 Jeremy Yallop
  * Copyright (C) 2012 Anil Madhavapeddy
  * Copyright (C) 2010 Jérémie Dimino
  *
@@ -37,9 +35,7 @@ open Printf
    LIBRARY_PATH.
 *)
 
-let ( // ) = Filename.concat
-
-let default_search_paths =
+let search_paths =
   List.map (fun dir -> (dir ^ "/include", dir ^ "/lib")) [
     "/usr";
     "/usr/local";
@@ -51,42 +47,37 @@ let default_search_paths =
 
 let is_win = Sys.os_type = "Win32"
 
-let path_sep = if is_win then ';' else ':'
+let path_sep = if is_win then ";" else ":"
 
-let split_path str =
-  let len = String.length str in
-  let rec aux i =
-    if i >= len then
-      []
-    else
-      let j = try String.index_from str i path_sep with Not_found -> len in
-      String.sub str i (j - i) :: aux (j + 1)
-  in
-  aux 0
+let split_path = Str.(split (regexp (path_sep ^ "+")))
 
-let search_paths =
-  let get var f =
-    try
-      List.map f (split_path (Sys.getenv var))
-    with Not_found ->
-      []
-  in
-  List.flatten [
-    get "C_INCLUDE_PATH" (fun dir -> (dir, dir // ".." // "lib"));
-    get "LIBRARY_PATH" (fun dir -> (dir // ".." // "include", dir));
-    default_search_paths;
-  ]
+let ( // ) = Filename.concat
 
+(** See the comment in commands.ml *)
+let unixify = Str.(global_replace (regexp "\\") "/")
+
+let advice = "
+The following required C libraries are missing: libffi.
+Please install them and retry. If they are installed in a non-standard location
+or need special flags, set the environment variables <LIB>_CFLAGS and <LIB>_LIBS
+accordingly and retry.
+
+For example, if libffi is installed in /opt/local, you can type:
+
+export LIBFFI_CFLAGS=-I/opt/local/include
+export LIBFFI_LIBS=-L/opt/local/lib
+
+"
 (* +-----------------------------------------------------------------+
    | Test codes                                                      |
    +-----------------------------------------------------------------+ *)
 
-let caml_code = "
+let libffi_caml_code = "
 external test : unit -> unit = \"ffi_test\"
 let () = test ()
 "
 
-let libffi_code = "
+let libffi_stub_code = "
 #include <caml/mlvalues.h>
 #include <ffi.h>
 
@@ -110,9 +101,6 @@ let ffi_dir = ref ""
 let is_homebrew = ref false
 let homebrew_prefix = ref "/usr/local"
 
-let log_file = ref ""
-let caml_file = ref ""
-
 (* Search for a header file in standard directories. *)
 let search_header header =
   let rec loop = function
@@ -126,75 +114,46 @@ let search_header header =
   in
   loop search_paths
 
-let compile (opt, lib) stub_file =
-  ksprintf
-    Sys.command
-    "%s -custom %s %s %s %s > %s 2>&1"
-    !ocamlc
-    (String.concat " " (List.map (sprintf "-ccopt %s") opt))
-    (Filename.quote stub_file)
-    (Filename.quote !caml_file)
-    (String.concat " " (List.map (sprintf "-cclib %s") lib))
-    (Filename.quote !log_file)
-  = 0
+let silent_remove filename =
+  try Sys.remove filename
+  with exn -> ()
 
-let safe_remove file_name =
-  try
-    Sys.remove file_name
-  with exn ->
-    ()
-
-let test_code args stub_code =
-  let stub_file, oc = Filename.open_temp_file "ffi_stub" ".c" in
-  let cleanup () =
-    safe_remove stub_file;
-    safe_remove (Filename.chop_extension (Filename.basename stub_file) ^ !ext_obj)
-  in
-  try
-    output_string oc stub_code;
-    flush oc;
-    close_out oc;
-    let result = compile args stub_file in
-    cleanup ();
-    result
-  with exn ->
-    (try close_out oc with _ -> ());
-    cleanup ();
-    raise exn
-
-let config = open_out "src/ctypes_config.h"
-let config_ml = open_out "src/ctypes_config.ml"
-
-let () =
-  fprintf config "\
-#ifndef __CTYPES_CONFIG_H
-#define __CTYPES_CONFIG_H
-"
-
-let not_available = ref []
-
-let test_feature ?(do_check = true) name macro test =
-  if do_check then begin
-    printf "testing for %s:%!" name;
-    if test () then begin
-      if macro <> "" then begin
-        fprintf config "#define %s\n" macro;
-        fprintf config_ml "#let %s = true\n" macro
-      end;
-      printf " %s available\n%!" (String.make (34 - String.length name) '.')
-    end else begin
-      if macro <> "" then begin
-        fprintf config "//#define %s\n" macro;
-        fprintf config_ml "#let %s = false\n" macro
-      end;
-      printf " %s unavailable\n%!" (String.make (34 - String.length name) '.');
-      not_available := name :: !not_available
+let test_code opt lib stub_code caml_code =
+  let open Commands in
+  let stem f = Filename.(chop_extension (basename f)) in
+  let stub_filename = unixify (Filename.temp_file "ctypes_libffi" ".c") in
+  let caml_filename = unixify (Filename.temp_file "ctypes_libffi" ".ml") in
+  with_open_output_file ~filename:stub_filename begin fun stubfd ->
+    with_open_output_file ~filename:caml_filename begin fun camlfd ->
+      unwind_protect (fun () ->
+          output_string stubfd stub_code;
+          output_string camlfd caml_code;
+          Commands.command_succeeds
+            "%s -custom %s %s %s %s 1>&2"
+            !ocamlc
+            (String.concat " " (List.map (sprintf "-ccopt %s") opt))
+            (unixify (Filename.quote stub_filename))
+            (unixify (Filename.quote caml_filename))
+            (String.concat " " (List.map (sprintf "-cclib %s") lib))) ()
+        ~cleanup:begin fun () ->
+          let caml_stem = unixify (stem caml_filename) in
+          silent_remove (unixify (stem stub_filename ^ !ext_obj));
+          silent_remove !exec_name;
+          silent_remove (caml_stem ^ ".cmi");
+          silent_remove (caml_stem ^ ".cmo");
+        end
     end
-  end else begin
-    printf "not checking for %s\n%!" name;
-    if macro <> "" then begin
-      fprintf config "//#define %s\n" macro;
-      fprintf config_ml "#let %s = false\n" macro
+  end
+
+let test_feature name test =
+  begin
+    fprintf stderr "testing for %s:%!" name;
+    if test () then begin
+      fprintf stderr " %s available\n%!" (String.make (34 - String.length name) '.');
+      true
+    end else begin
+      fprintf stderr " %s unavailable\n%!" (String.make (34 - String.length name) '.');
+      false
     end
   end
 
@@ -202,271 +161,117 @@ let test_feature ?(do_check = true) name macro test =
    | pkg-config                                                      |
    +-----------------------------------------------------------------+ *)
 
-let split str =
-  let rec skip_spaces i =
-    if i = String.length str then
-      []
-    else
-      if str.[i] = ' ' then
-        skip_spaces (i + 1)
-      else
-        extract i (i + 1)
-  and extract i j =
-    if j = String.length str then
-      [String.sub str i (j - i)]
-    else
-      if str.[j] = ' ' then
-        String.sub str i (j - i) :: skip_spaces (j + 1)
-      else
-        extract i (j + 1)
-  in
-  skip_spaces 0
+let split = Str.(split (regexp " +"))
 
 let brew_libffi_version flags =
-  if ksprintf Sys.command "brew ls libffi --versions | awk '{print $NF}' > %s 2>&1" !log_file = 0 then begin
-    let ic = open_in !log_file in
-    let line = input_line ic in
-    close_in ic;
-    if line = "" then begin
-      print_endline "You need to 'brew install libffi' to get a suitably up-to-date version";
-      exit 1
-    end;
-    line
-  end else
-    raise Exit
+  match Commands.command "brew ls libffi --versions | awk '{print $NF}'" with
+    { Commands.status; stderr } when status <> 0 ->
+    ksprintf failwith "brew ls libffi failed: %s" stderr
+  | { Commands.stdout = "" } ->
+    failwith "You need to 'brew install libffi' to get a suitably up-to-date version"
+  | { Commands.stdout } ->
+    String.trim stdout
 
-let pkg_config choose flags =
-  let cmd () =
-    match choose with 
-    |`Default -> ksprintf Sys.command "pkg-config %s > %s 2>&1" flags !log_file
-    |`Homebrew ver -> ksprintf Sys.command "env PKG_CONFIG_PATH=%s/Cellar/libffi/%s/lib/pkgconfig %s/bin/pkg-config %s > %s 2>&1" !homebrew_prefix ver !homebrew_prefix flags !log_file
+let pkg_config flags =
+  let output =
+    if !is_homebrew then
+      Commands.command
+        "env PKG_CONFIG_PATH=%s/Cellar/libffi/%s/lib/pkgconfig %s/bin/pkg-config %s"
+        !homebrew_prefix (brew_libffi_version ()) !homebrew_prefix flags
+    else
+      Commands.command "pkg-config %s" flags
   in
-  if cmd () = 0 then begin
-    let ic = open_in !log_file in
-    let line = input_line ic in
-    close_in ic;
-    split line
-  end else
-    raise Exit
+  match output with
+    { Commands.status } when status <> 0 -> None
+  | { Commands.stdout } -> Some (split (String.trim stdout))
 
 let pkg_config_flags name =
-  let pkg_config =
-    if !is_homebrew then
-      pkg_config (`Homebrew (brew_libffi_version ()))
-    else
-      pkg_config `Default
-  in
-  try
-    (* Get compile flags. *)
-    let opt = ksprintf pkg_config "--cflags %s" name in
-    (* Get linking flags. *)
-    let lib =
-      if !ccomp_type = "msvc" then
-        ksprintf pkg_config "--libs-only-L %s" name @ ksprintf pkg_config "--libs-only-l --msvc-syntax %s" name
-      else
-        ksprintf pkg_config "--libs %s" name
-    in
-    Some (opt, lib)
-  with Exit ->
-    None
+  match (ksprintf pkg_config "--cflags %s" name,
+         ksprintf pkg_config "--libs %s" name) with
+    Some opt, Some lib -> Some (opt, lib)
+  | _ -> None
 
-let lib_flags env_var_prefix fallback =
+let get_homebrew_prefix () =
+  match Commands.command "brew --prefix" with
+    { Commands.status } when status <> 0 -> raise Exit
+  | { Commands.stdout } -> String.trim stdout
+
+let search_libffi_header () =
+  match search_header "ffi.h" with
+  | Some (dir_i, dir_l) ->
+    (["-I" ^ dir_i], ["-L" ^ dir_l; "-lffi"])
+  | None ->
+    ([], ["-lffi"])
+
+let test_libffi setup_data have_pkg_config =
   let get var = try Some (split (Sys.getenv var)) with Not_found -> None in
-  match get (env_var_prefix ^ "_CFLAGS"), get (env_var_prefix ^ "_LIBS") with
-    | Some opt, Some lib ->
-        (opt, lib)
-    | x ->
-        let opt, lib = fallback () in
-        match x with
-          | Some opt, Some lib ->
-              assert false
-          | Some opt, None ->
-              (opt, lib)
-          | None, Some lib ->
-              (opt, lib)
-          | None, None ->
-              (opt, lib)
+  let opt, lib =
+    match get "LIBFFI_CFLAGS", get "LBIFFI_LIBS" with
+    | Some opt, Some lib -> (opt, lib)
+    | envopt, envlib ->
+      let opt, lib =
+        if not have_pkg_config then
+          search_libffi_header ()
+        else match pkg_config_flags "libffi" with
+          | Some (pkgopt, pkglib) -> (pkgopt, pkglib)
+          | None -> search_libffi_header ()
+      in
+      match envopt, envlib, opt, lib with
+      | Some opt, Some lib, _  , _
+      | Some opt, None    , _  , lib
+      | None    , Some lib, opt, _
+      | None    , None    , opt, lib -> opt, lib
+  in
+  setup_data := ("libffi_opt", opt) :: ("libffi_lib", lib) :: !setup_data;
+  test_code opt lib libffi_stub_code libffi_caml_code
+
+(* Test for pkg-config. If we are on MacOS X, we need the latest pkg-config
+ * from Homebrew *)
+let have_pkg_config is_homebrew homebrew_prefix =
+  if is_homebrew then begin
+    (* Look in `brew for the right pkg-config *)
+    homebrew_prefix := get_homebrew_prefix ();
+    test_feature "pkg-config"
+      (fun () ->
+         Commands.command_succeeds "%s/bin/pkg-config --version" !homebrew_prefix)
+  end
+  else
+    test_feature "pkg-config"
+      (fun () ->
+         Commands.command_succeeds "pkg-config --version")
+
+let args = [
+  "-ocamlc", Arg.Set_string ocamlc, "<path> ocamlc";
+  "-ext-obj", Arg.Set_string ext_obj, "<ext> C object files extension";
+  "-exec-name", Arg.Set_string exec_name, "<name> name of the executable produced by ocamlc";
+  "-ccomp-type", Arg.Set_string ccomp_type, "<ccomp-type> C compiler type";
+]
 
 (* +-----------------------------------------------------------------+
    | Entry point                                                     |
    +-----------------------------------------------------------------+ *)
 
-let arg_bool r =
-  Arg.Symbol (["true"; "false"],
-              function
-                | "true" -> r := true
-                | "false" -> r := false
-                | _ -> assert false)
 let () =
-  let args = [
-    "-ocamlc", Arg.Set_string ocamlc, "<path> ocamlc";
-    "-ext-obj", Arg.Set_string ext_obj, "<ext> C object files extension";
-    "-exec-name", Arg.Set_string exec_name, "<name> name of the executable produced by ocamlc";
-    "-ccomp-type", Arg.Set_string ccomp_type, "<ccomp-type> C compiler type";
-  ] in
   Arg.parse args ignore "check for external C libraries and available features\noptions are:";
 
-  (* Put the caml code into a temporary file. *)
-  let file, oc = Filename.open_temp_file "ffi_caml" ".ml" in
-  caml_file := file;
-  output_string oc caml_code;
-  close_out oc;
+  (* Test for MacOS X Homebrew. *)
+  is_homebrew :=
+    test_feature "brew"
+      (fun () ->
+         Commands.command_succeeds "brew info libffi");
 
-  log_file := Filename.temp_file "ffi_output" ".log";
-
-  (* Cleanup things on exit. *)
-  at_exit (fun () ->
-             (try close_out config with _ -> ());
-             (try close_out config_ml with _ -> ());
-             safe_remove !log_file;
-             safe_remove !exec_name;
-             safe_remove !caml_file;
-             safe_remove (Filename.chop_extension !caml_file ^ ".cmi");
-             safe_remove (Filename.chop_extension !caml_file ^ ".cmo"));
+  let have_pkg_config = have_pkg_config !is_homebrew homebrew_prefix in
 
   let setup_data = ref [] in
+  let have_libffi = test_feature "libffi"
+      (fun () -> test_libffi setup_data have_pkg_config) in
 
-  (* Test for MacOS X Homebrew. *)
-  test_feature "brew" ""
-    (fun () ->
-       ksprintf Sys.command "brew info libffi > %s 2>&1" !log_file = 0);
+  if not have_pkg_config then
+    fprintf stderr "Warning: the 'pkg-config' command is not available.";
 
-  (* Not having Homebrew is not fatal. *)
-  is_homebrew := !not_available = [];
-  not_available := [];
+  if not have_libffi then
+    (prerr_endline advice; exit 1);
 
-  let get_homebrew_prefix () =
-    let cmd () = ksprintf Sys.command "brew --prefix > %s" !log_file in
-    if cmd () = 0 then begin
-      let ic = open_in !log_file in
-      let line = input_line ic in
-      close_in ic;
-      line
-    end else
-      raise Exit
-  in
-
-  (* Test for pkg-config. If we are on MacOS X, we need the latest pkg-config
-   * from Homebrew *)
-  (match !is_homebrew with
-  |true -> (* Look in `brew for the right pkg-config *)
-    homebrew_prefix := get_homebrew_prefix ();
-    test_feature "pkg-config" ""
-      (fun () ->
-         ksprintf Sys.command "%s/bin/pkg-config --version > %s 2>&1" !homebrew_prefix !log_file = 0);
-  |false ->
-    test_feature "pkg-config" ""
-      (fun () ->
-         ksprintf Sys.command "pkg-config --version > %s 2>&1" !log_file = 0);
-  );
-  (* Not having pkg-config is not fatal. *)
-  let have_pkg_config = !not_available = [] in
-  not_available := [];
-
-  let test_libffi () =
-    let opt, lib =
-      lib_flags "LIBFFI"
-        (fun () ->
-          match if have_pkg_config then pkg_config_flags "libffi" else None with
-            | Some (opt, lib) ->
-                (opt, lib)
-            | None ->
-                match search_header "ffi.h" with
-                  | Some (dir_i, dir_l) ->
-                      (["-I" ^ dir_i], ["-L" ^ dir_l; "-lffi"])
-                  | None ->
-                      ([], ["-lffi"]))
-    in
-    setup_data := ("libffi_opt", opt) :: ("libffi_lib", lib) :: !setup_data;
-    test_code (opt, lib) libffi_code
-  in
-
-  test_feature "libffi" "" test_libffi;
-
-  if !not_available <> [] then begin
-    if not have_pkg_config then
-      printf "Warning: the 'pkg-config' command is not available.";
-    printf "
-The following required C libraries are missing: %s.
-Please install them and retry. If they are installed in a non-standard location
-or need special flags, set the environment variables <LIB>_CFLAGS and <LIB>_LIBS
-accordingly and retry.
-
-For example, if libffi is installed in /opt/local, you can type:
-
-export LIBFFI_CFLAGS=-I/opt/local/include
-export LIBFFI_LIBS=-L/opt/local/lib
-
-" (String.concat ", " !not_available);
-    exit 1
-  end;
-
-  fprintf config "#endif\n";
-
-  (match is_win with
-   | true -> setup_data := ("as_needed_flags", []) :: !setup_data;
-   | false ->
-     test_feature "no_as_needed" ""
-       (fun () ->
-         ksprintf Sys.command "
-         touch as_needed_test.ml;
-         ocamlopt -shared -cclib -Wl,--no-as-needed as_needed_test.ml -o as_needed_test.cmxs > %s 2>&1;
-         EXIT=$?;
-         rm as_needed_test.*;
-         exit $EXIT"
-        !log_file = 0);
-
-     if !not_available = [] then
-       setup_data := ("as_needed_flags", ["-Wl,--no-as-needed"]) :: !setup_data
-     else
-       setup_data := ("as_needed_flags", []) :: !setup_data;
-  );
-  not_available := [];
-
-  (* Our setup.data keys. *)
-  let setup_data_keys = [
-    "libffi_opt";
-    "libffi_lib";
-    "as_needed_flags";
-  ] in
-
-  (* Load setup.data *)
-  let setup_data_lines =
-    match try Some (open_in "setup.data") with Sys_error _ -> None with
-      | Some ic ->
-          let rec aux acc =
-            match try Some (input_line ic) with End_of_file -> None with
-              | None ->
-                  close_in ic;
-                  acc
-              | Some line ->
-                  match try Some(String.index line '=') with Not_found -> None with
-                    | Some idx ->
-                        let key = String.sub line 0 idx in
-                        if List.mem key setup_data_keys then
-                          aux acc
-                        else
-                          aux (line :: acc)
-                    | None ->
-                        aux (line :: acc)
-          in
-          aux []
-      | None ->
-          []
-  in
-
-  (* Add flags to setup.data *)
-  let setup_data_lines =
-    List.fold_left
-      (fun lines (name, args) ->
-         sprintf "%s=%s" name (String.concat " " args) :: lines)
-      setup_data_lines !setup_data
-  in
-  let oc = open_out "setup.data" in
-  List.iter
-    (fun str -> output_string oc str; output_char oc '\n')
-    (List.rev setup_data_lines);
-  close_out oc;
-
-  close_out config;
-  close_out config_ml
+  ListLabels.iter !setup_data
+    ~f:(fun (name, args) ->
+        Printf.printf "%s=%s\n" name (String.concat " " args))
