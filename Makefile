@@ -167,7 +167,7 @@ META-install:
 install-%: PROJECT=$*
 install-%:
 	$(if $(filter yes,$($(PROJECT).install)),\
-		$(OCAMLFIND) install -add ctypes $^ \
+		$(OCAMLFIND) install -add ctypes -optional $^ \
                    $(LIB_TARGETS) $(LIB_TARGET_EXTRAS) \
                    $(INSTALL_MLIS) $(INSTALL_CMIS) \
                    $(INSTALL_HEADERS) \
