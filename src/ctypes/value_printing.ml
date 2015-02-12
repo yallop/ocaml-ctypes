@@ -6,7 +6,7 @@
  *)
 
 open Static
-open Memory
+open Ctypes_memory
 
 let rec format : type a. a typ -> Format.formatter -> a -> unit
   = fun typ fmt v -> match typ with

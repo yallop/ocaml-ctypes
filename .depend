@@ -13,18 +13,18 @@ _build/src/ctypes/posixTypes.cmi : _build/src/ctypes/unsigned.cmi _build/src/cty
 _build/src/ctypes/ctypes_common.cmo :
 _build/src/ctypes/ctypes_common.cmx :
 _build/src/ctypes/std_view_stubs.cmo : _build/src/ctypes/static.cmi \
-    _build/src/ctypes/memory_stubs.cmo _build/src/ctypes/ctypes_ptr.cmo
+    _build/src/ctypes/ctypes_memory_stubs.cmo _build/src/ctypes/ctypes_ptr.cmo
 _build/src/ctypes/std_view_stubs.cmx : _build/src/ctypes/static.cmx \
-    _build/src/ctypes/memory_stubs.cmx _build/src/ctypes/ctypes_ptr.cmx
-_build/src/ctypes/memory_stubs.cmo : _build/src/ctypes/primitives.cmi \
+    _build/src/ctypes/ctypes_memory_stubs.cmx _build/src/ctypes/ctypes_ptr.cmx
+_build/src/ctypes/ctypes_memory_stubs.cmo : _build/src/ctypes/primitives.cmi \
     _build/src/ctypes/ctypes_ptr.cmo
-_build/src/ctypes/memory_stubs.cmx : _build/src/ctypes/primitives.cmx \
+_build/src/ctypes/ctypes_memory_stubs.cmx : _build/src/ctypes/primitives.cmx \
     _build/src/ctypes/ctypes_ptr.cmx
 _build/src/ctypes/std_views.cmo : _build/src/ctypes/std_view_stubs.cmo \
-    _build/src/ctypes/static.cmi _build/src/ctypes/memory_stubs.cmo _build/src/ctypes/ctypes_memory.cmo \
+    _build/src/ctypes/static.cmi _build/src/ctypes/ctypes_memory_stubs.cmo _build/src/ctypes/ctypes_memory.cmo \
     _build/src/ctypes/ctypes_ptr.cmo _build/src/ctypes/ctypes_coerce.cmi
 _build/src/ctypes/std_views.cmx : _build/src/ctypes/std_view_stubs.cmx \
-    _build/src/ctypes/static.cmx _build/src/ctypes/memory_stubs.cmx _build/src/ctypes/ctypes_memory.cmx \
+    _build/src/ctypes/static.cmx _build/src/ctypes/ctypes_memory_stubs.cmx _build/src/ctypes/ctypes_memory.cmx \
     _build/src/ctypes/ctypes_ptr.cmx _build/src/ctypes/ctypes_coerce.cmx
 _build/src/ctypes/posixTypes.cmo : _build/src/ctypes/unsigned.cmi _build/src/ctypes/ctypes.cmi \
     _build/src/ctypes/posixTypes.cmi
@@ -52,9 +52,9 @@ _build/src/ctypes/static.cmo : _build/src/ctypes/primitives.cmi _build/src/ctype
 _build/src/ctypes/static.cmx : _build/src/ctypes/primitives.cmx _build/src/ctypes/ctypes_ptr.cmx \
     _build/src/ctypes/ctypes_primitives.cmx _build/src/ctypes/ctypes_bigarray.cmx \
     _build/src/ctypes/static.cmi
-_build/src/ctypes/ctypes_memory.cmo : _build/src/ctypes/static.cmi _build/src/ctypes/memory_stubs.cmo \
+_build/src/ctypes/ctypes_memory.cmo : _build/src/ctypes/static.cmi _build/src/ctypes/ctypes_memory_stubs.cmo \
     _build/src/ctypes/ctypes_ptr.cmo _build/src/ctypes/ctypes_bigarray.cmi
-_build/src/ctypes/ctypes_memory.cmx : _build/src/ctypes/static.cmx _build/src/ctypes/memory_stubs.cmx \
+_build/src/ctypes/ctypes_memory.cmx : _build/src/ctypes/static.cmx _build/src/ctypes/ctypes_memory_stubs.cmx \
     _build/src/ctypes/ctypes_ptr.cmx _build/src/ctypes/ctypes_bigarray.cmx
 _build/src/ctypes/ctypes_bigarray.cmo : _build/src/ctypes/primitives.cmi \
     _build/src/ctypes/ctypes_ptr.cmo _build/src/ctypes/ctypes_primitives.cmo \
@@ -206,11 +206,11 @@ _build/src/cstubs/cstubs_c_language.cmx : _build/src/ctypes/static.cmx \
     _build/src/ctypes/ctypes.cmx _build/src/cstubs/cstubs_errors.cmx
 _build/src/cstubs/cstubs_structs.cmi : _build/src/ctypes/ctypes.cmi
 _build/src/cstubs/cstubs_internals.cmo : _build/src/ctypes/static.cmi \
-    _build/src/ctypes/primitives.cmi _build/src/ctypes/memory_stubs.cmo \
+    _build/src/ctypes/primitives.cmi _build/src/ctypes/ctypes_memory_stubs.cmo \
     _build/src/ctypes/ctypes_ptr.cmo _build/src/ctypes/ctypes.cmi \
     _build/src/cstubs/cstubs_internals.cmi
 _build/src/cstubs/cstubs_internals.cmx : _build/src/ctypes/static.cmx \
-    _build/src/ctypes/primitives.cmx _build/src/ctypes/memory_stubs.cmx \
+    _build/src/ctypes/primitives.cmx _build/src/ctypes/ctypes_memory_stubs.cmx \
     _build/src/ctypes/ctypes_ptr.cmx _build/src/ctypes/ctypes.cmx \
     _build/src/cstubs/cstubs_internals.cmi
 _build/src/cstubs/cstubs.cmo : _build/src/ctypes/ctypes.cmi \
@@ -236,7 +236,7 @@ _build/src/cstubs/cstubs_analysis.cmi : _build/src/ctypes/static.cmi
 _build/src/cstubs/cstubs_generate_ml.cmi : _build/src/ctypes/ctypes.cmi
 _build/src/cstubs/cstubs_internals.cmi : _build/src/ctypes/unsigned.cmi \
     _build/src/ctypes/static.cmi _build/src/ctypes/signed.cmi _build/src/ctypes/primitives.cmi \
-    _build/src/ctypes/memory_stubs.cmo _build/src/ctypes/ctypes_ptr.cmo \
+    _build/src/ctypes/ctypes_memory_stubs.cmo _build/src/ctypes/ctypes_ptr.cmo \
     _build/src/ctypes/ctypes_bigarray.cmi _build/src/ctypes/ctypes.cmi
 _build/src/cstubs/cstubs_inverted.cmo : _build/src/ctypes/ctypes.cmi \
     _build/src/cstubs/cstubs_generate_ml.cmi _build/src/cstubs/cstubs_generate_c.cmi \

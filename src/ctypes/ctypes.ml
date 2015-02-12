@@ -11,7 +11,7 @@ include Structs_computed
 
 include Type_printing
 
-include Memory
+include Ctypes_memory
 
 include Std_views
 

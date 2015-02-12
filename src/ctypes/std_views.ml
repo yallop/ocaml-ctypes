@@ -18,11 +18,11 @@ let string = Static.(view (ptr char))
 
 let read_nullable t reftyp =
   let coerce = Ctypes_coerce.coerce Static.(ptr reftyp) t in
-  fun p -> Memory.(if to_voidp p = null then None else Some (coerce p))
+  fun p -> Ctypes_memory.(if to_voidp p = null then None else Some (coerce p))
 
 let write_nullable t reftyp =
   let coerce = Ctypes_coerce.coerce t Static.(ptr reftyp) in
-  Memory.(function None -> from_voidp reftyp null | Some f -> coerce f)
+  Ctypes_memory.(function None -> from_voidp reftyp null | Some f -> coerce f)
 
 let nullable_view ?format_typ ?format t reftyp =
   let read = read_nullable t reftyp
