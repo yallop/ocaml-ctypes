@@ -1,5 +1,5 @@
 _build/src/ctypes/unsigned.cmi :
-_build/src/ctypes/ctypes.cmo : _build/src/ctypes/value_printing.cmo \
+_build/src/ctypes/ctypes.cmo : _build/src/ctypes/ctypes_value_printing.cmo \
     _build/src/ctypes/ctypes_type_printing.cmi _build/src/ctypes/structs_computed.cmi \
     _build/src/ctypes/std_views.cmo _build/src/ctypes/static.cmi _build/src/ctypes/ctypes_memory.cmo \
     _build/src/ctypes/ctypes_coerce.cmi _build/src/ctypes/ctypes.cmi
@@ -70,10 +70,10 @@ _build/src/ctypes/ctypes_primitives.cmo : _build/src/ctypes/primitives.cmi
 _build/src/ctypes/ctypes_primitives.cmx : _build/src/ctypes/primitives.cmx
 _build/src/ctypes/unsigned.cmo : _build/src/ctypes/unsigned.cmi
 _build/src/ctypes/unsigned.cmx : _build/src/ctypes/unsigned.cmi
-_build/src/ctypes/value_printing.cmo : _build/src/ctypes/value_printing_stubs.cmo \
+_build/src/ctypes/ctypes_value_printing.cmo : _build/src/ctypes/value_printing_stubs.cmo \
     _build/src/ctypes/ctypes_type_printing.cmi _build/src/ctypes/static.cmi _build/src/ctypes/ctypes_memory.cmo \
     _build/src/ctypes/ctypes_ptr.cmo _build/src/ctypes/ctypes_common.cmo
-_build/src/ctypes/value_printing.cmx : _build/src/ctypes/value_printing_stubs.cmx \
+_build/src/ctypes/ctypes_value_printing.cmx : _build/src/ctypes/value_printing_stubs.cmx \
     _build/src/ctypes/ctypes_type_printing.cmx _build/src/ctypes/static.cmx _build/src/ctypes/ctypes_memory.cmx \
     _build/src/ctypes/ctypes_ptr.cmx _build/src/ctypes/ctypes_common.cmx
 _build/src/ctypes/static.cmi : _build/src/ctypes/unsigned.cmi _build/src/ctypes/signed.cmi \

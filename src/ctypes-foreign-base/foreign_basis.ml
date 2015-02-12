@@ -15,7 +15,7 @@ struct
   exception CallToExpiredClosure = Ffi_stubs.CallToExpiredClosure
 
   let format_function_pointer fn k fmt =
-    Type_printing.format_fn' fn
+    Ctypes_type_printing.format_fn' fn
       (fun fmt -> Format.fprintf fmt "(*%t)" k) fmt
 
   let funptr ?(abi=Libffi_abi.default_abi) ?name ?(check_errno=false)

@@ -98,7 +98,7 @@ let write_enum_declaration fmt (Enum (constants, ty)) =
 let write_typedef fmt (Typedef (ty, name)) =
   let write_name _ fmt = Format.fprintf fmt "@ %s" name in
   Format.fprintf fmt "@[typedef@ @[";
-  Type_printing.format_typ' ty write_name `nonarray fmt;
+  Ctypes_type_printing.format_typ' ty write_name `nonarray fmt;
   Format.fprintf fmt "@]@];@\n@\n"
 
 let write_declaration fmt = function

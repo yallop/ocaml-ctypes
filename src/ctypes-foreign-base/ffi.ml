@@ -49,7 +49,7 @@ struct
     | Primitive p as prim                 -> let ffitype = Ffi_stubs.primitive_ffitype p in
                                              if ffitype = Ctypes_ptr.Raw.null
                                              then report_unpassable
-                                               (Type_printing.string_of_typ prim)
+                                               (Ctypes_type_printing.string_of_typ prim)
                                              else ArgType ffitype
     | Pointer _                           -> ArgType (Ffi_stubs.pointer_ffitype ())
     | OCaml _                             -> ArgType (Ffi_stubs.pointer_ffitype ())
