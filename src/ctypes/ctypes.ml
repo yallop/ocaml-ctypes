@@ -15,7 +15,7 @@ include Ctypes_memory
 
 include Std_views
 
-include Value_printing
+include Ctypes_value_printing
 
 include Ctypes_coerce
 
