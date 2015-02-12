@@ -20,7 +20,7 @@ end
 module Make(Closure_properties : CLOSURE_PROPERTIES) =
 struct
 
-  open Static
+  open Ctypes_static
   open Libffi_abi
 
   (* Register the closure lookup function with C. *)

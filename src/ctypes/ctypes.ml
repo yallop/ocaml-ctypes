@@ -5,7 +5,7 @@
  * See the file LICENSE for details.
  *)
 
-include Static
+include Ctypes_static
 
 include Ctypes_structs_computed
 

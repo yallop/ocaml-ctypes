@@ -5,7 +5,7 @@
  * See the file LICENSE for details.
  *)
 
-open Static
+open Ctypes_static
 
 module Stubs = Ctypes_memory_stubs
 module Raw = Ctypes_ptr.Raw

@@ -7,6 +7,6 @@
 
 exception Uncoercible
 
-val coerce : 'a Static.typ -> 'b Static.typ -> 'a -> 'b
+val coerce : 'a Ctypes_static.typ -> 'b Ctypes_static.typ -> 'a -> 'b
 
-val coerce_fn : 'a Static.fn -> 'b Static.fn -> 'a -> 'b
+val coerce_fn : 'a Ctypes_static.fn -> 'b Ctypes_static.fn -> 'a -> 'b

@@ -9,4 +9,4 @@
     requirements of the constituent field types. *)
 
 include Structs.S
-  with type ('a, 's) field := ('a, 's) Static.field
+  with type ('a, 's) field := ('a, 's) Ctypes_static.field

@@ -7,7 +7,7 @@
 
 (* ML stub generation *)
 
-open Static
+open Ctypes_static
 open Ctypes_path
 open Cstubs_errors
 
@@ -213,11 +213,11 @@ let rec ml_typ_of_return_typ : type a. a typ -> ml_type =
     "Unexpected array type in the return type: %s" (Ctypes.string_of_typ a)
   | Bigarray _ as a -> internal_error
     "Unexpected bigarray type in the return type: %s" (Ctypes.string_of_typ a)
-  | OCaml String -> Static.unsupported
+  | OCaml String -> Ctypes_static.unsupported
     "cstubs does not support OCaml strings as return values"
-  | OCaml Bytes -> Static.unsupported
+  | OCaml Bytes -> Ctypes_static.unsupported
     "cstubs does not support OCaml bytes values as return values"
-  | OCaml FloatArray -> Static.unsupported
+  | OCaml FloatArray -> Ctypes_static.unsupported
     "cstubs does not support OCaml float arrays as return values"
 
 let rec ml_typ_of_arg_typ : type a. a typ -> ml_type = function
@@ -340,11 +340,11 @@ let rec pattern_and_exp_of_typ :
     | In, String -> (static_con "OCaml" [static_con "String" []], None)
     | In, Bytes -> (static_con "OCaml" [static_con "Bytes" []], None)
     | In, FloatArray -> (static_con "OCaml" [static_con "FloatArray" []], None)
-    | Out, String -> Static.unsupported
+    | Out, String -> Ctypes_static.unsupported
       "cstubs does not support OCaml strings as return values"
-    | Out, Bytes -> Static.unsupported
+    | Out, Bytes -> Ctypes_static.unsupported
       "cstubs does not support OCaml bytes values as return values"
-    | Out, FloatArray -> Static.unsupported
+    | Out, FloatArray -> Ctypes_static.unsupported
       "cstubs does not support OCaml float arrays as return values"
     end
   | Abstract _ as ty -> internal_error
@@ -373,13 +373,13 @@ let rec pattern_of_typ : type a. a typ -> ml_pat = function
     static_con "View"
       [`Record [path_of_string "CI.ty", pattern_of_typ ty]]
   | OCaml String ->
-    Static.unsupported
+    Ctypes_static.unsupported
       "cstubs does not support OCaml strings as global values"
   | OCaml Bytes ->
-    Static.unsupported
+    Ctypes_static.unsupported
       "cstubs does not support OCaml bytes values as global values"
   | OCaml FloatArray ->
-    Static.unsupported
+    Ctypes_static.unsupported
       "cstubs does not support OCaml float arrays as global values"
   | Abstract _ as ty ->
     internal_error

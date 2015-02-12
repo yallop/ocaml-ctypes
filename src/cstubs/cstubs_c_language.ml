@@ -7,7 +7,7 @@
 
 (* C code representation. *)
 
-open Static
+open Ctypes_static
 
 let fresh_var =
   let var_counter = ref 0 in
@@ -62,8 +62,8 @@ let rec return_type : type a. a fn -> ty = function
 
 let args : type a. a fn -> (string * ty) list = fun fn ->
   let rec loop : type a. a Ctypes.fn -> (string * ty) list = function
-    | Static.Function (ty, fn) -> (fresh_var (), Ty ty) :: loop fn
-    | Static.Returns _ -> []
+    | Ctypes_static.Function (ty, fn) -> (fresh_var (), Ty ty) :: loop fn
+    | Ctypes_static.Returns _ -> []
   in loop fn
 
 module Type_C =

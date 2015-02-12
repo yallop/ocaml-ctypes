@@ -7,7 +7,7 @@
 
 (* Coercions *)
 
-open Static
+open Ctypes_static
 
 exception Uncoercible
 

@@ -7,7 +7,7 @@
 
 (* Publicly visible names for type values *)
 
-open Static
+open Ctypes_static
 open Ctypes_path
 
 let ident_of_ml_prim : type a. a Primitives.ml_prim -> path =

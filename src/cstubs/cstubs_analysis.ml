@@ -7,7 +7,7 @@
 
 (* Analysis for stub generation *)
 
-open Static
+open Ctypes_static
 
 let is_float_primitive : type a. a typ -> bool =
   let open Primitives in function

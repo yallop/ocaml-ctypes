@@ -5,7 +5,7 @@
  * See the file LICENSE for details.
  *)
 
-open Static
+open Ctypes_static
 
 (* The format context affects the formatting of pointer, struct and union
    types.  There are three printing contexts: *)
@@ -25,7 +25,7 @@ type format_context = [
 
 val format_name : ?name:string -> Format.formatter -> unit
 
-val format_typ' : 'a Static.typ -> (format_context -> Format.formatter -> unit) ->
+val format_typ' : 'a Ctypes_static.typ -> (format_context -> Format.formatter -> unit) ->
   format_context -> Format.formatter -> unit
 
 val format_typ : ?name:string -> Format.formatter -> 'a typ -> unit

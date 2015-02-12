@@ -41,8 +41,8 @@ let format_union fmt v =
   Ctypes.(format (reference_type (addr v)) fmt v)
 let format_array fmt v =
   Ctypes.(format CArray.(array (length v) (reference_type (start v))) fmt v)
-let format_ocaml fmt (Static.OCamlRef (_, _, ty) as v) =
-  Ctypes.format (Static.OCaml ty) fmt v
+let format_ocaml fmt (Ctypes_static.OCamlRef (_, _, ty) as v) =
+  Ctypes.format (Ctypes_static.OCaml ty) fmt v
 let format_clock_t fmt v =
   Ctypes.format PosixTypes.clock_t fmt v
 let format_dev_t fmt v =

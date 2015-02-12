@@ -13,12 +13,12 @@ type managed_buffer = Ctypes_memory_stubs.managed_buffer
 type 'a fatptr = 'a Ctypes.typ Ctypes_ptr.Fat.t
 
 let make_structured reftyp buf =
-  let open Static in
+  let open Ctypes_static in
   let managed = Obj.repr buf in
   let raw_ptr = Ctypes_memory_stubs.block_address buf in
   { structured = CPointer (Ctypes_ptr.Fat.make ~managed ~reftyp raw_ptr) }
 
-include Static
+include Ctypes_static
 include Primitives
 
 let make_ptr reftyp raw_ptr = CPointer (Ctypes_ptr.Fat.make ~reftyp raw_ptr)
@@ -71,14 +71,14 @@ let build_enum_type name underlying ?unexpected alist =
     in
     mkView name t ~unexpected (map_assocv coerce alist) in
   match underlying with
-    Static.Int8 -> build_view Ctypes.int8_t int8_of_int64 int64_of_int8
-  | Static.Int16 -> build_view Ctypes.int16_t int16_of_int64 int64_of_int16
-  | Static.Int32 -> build_view Ctypes.int32_t int32_of_int64 int64_of_int32
-  | Static.Int64 -> build_view Ctypes.int64_t int64_of_int64 int64_of_int64
-  | Static.Uint8 -> build_view Ctypes.uint8_t uint8_of_int64 int64_of_uint8
-  | Static.Uint16 -> build_view Ctypes.uint16_t uint16_of_int64 int64_of_uint16
-  | Static.Uint32 -> build_view Ctypes.uint32_t uint32_of_int64 int64_of_uint32
-  | Static.Uint64 -> build_view Ctypes.uint64_t uint64_of_int64 int64_of_uint64
-  | Static.Float | Static.Double ->
+    Ctypes_static.Int8 -> build_view Ctypes.int8_t int8_of_int64 int64_of_int8
+  | Ctypes_static.Int16 -> build_view Ctypes.int16_t int16_of_int64 int64_of_int16
+  | Ctypes_static.Int32 -> build_view Ctypes.int32_t int32_of_int64 int64_of_int32
+  | Ctypes_static.Int64 -> build_view Ctypes.int64_t int64_of_int64 int64_of_int64
+  | Ctypes_static.Uint8 -> build_view Ctypes.uint8_t uint8_of_int64 int64_of_uint8
+  | Ctypes_static.Uint16 -> build_view Ctypes.uint16_t uint16_of_int64 int64_of_uint16
+  | Ctypes_static.Uint32 -> build_view Ctypes.uint32_t uint32_of_int64 int64_of_uint32
+  | Ctypes_static.Uint64 -> build_view Ctypes.uint64_t uint64_of_int64 int64_of_uint64
+  | Ctypes_static.Float | Ctypes_static.Double ->
     Printf.ksprintf failwith
       "Enum type detected as floating type: %s" name

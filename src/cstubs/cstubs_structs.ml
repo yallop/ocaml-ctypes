@@ -46,7 +46,7 @@ let cepilogue = [
 let mlprologue = [
   "include Ctypes";
   "let lift x = x";
-  "open Static";
+  "open Ctypes_static";
 ]
 
 (* [puts fmt s] writes the call [puts(s);] on [fmt]. *)
@@ -167,15 +167,15 @@ let primitive_format_string : type a. a Primitives.prim -> string =
 let rec ml_pat_and_exp_of_typ : type a. a typ -> string * string =
   fun ty -> 
     match ty with
-    | Static.View { Static.ty } ->
+    | Ctypes_static.View { Ctypes_static.ty } ->
       let p, e = ml_pat_and_exp_of_typ ty in
       let x = Cstubs_c_language.fresh_var ~prefix:"read" () in
-      let p' = Printf.sprintf "Static.View { Static.read = %s; ty = %s }" x p
+      let p' = Printf.sprintf "Ctypes_static.View { Ctypes_static.read = %s; ty = %s }" x p
       and e' = Printf.sprintf "(%s (%s))" x e in
       (p', e')
-    | Static.Primitive p ->
+    | Ctypes_static.Primitive p ->
       let pat = 
-        (Ctypes_common.asprintf "Static.Primitive %a"
+        (Ctypes_common.asprintf "Ctypes_static.Primitive %a"
            Ctypes_path.format_path
            (Cstubs_public_name.constructor_cident_of_prim p))
       and exp = primitive_format_string p in
@@ -184,7 +184,7 @@ let rec ml_pat_and_exp_of_typ : type a. a typ -> string * string =
 
 let write_consts fmt consts =
   let case =
-    function (name, Static.BoxedType ty) ->
+    function (name, Ctypes_static.BoxedType ty) ->
       let p, e = ml_pat_and_exp_of_typ ty in
       Format.fprintf fmt "{@[<v 2>@\n";
       Format.fprintf fmt "enum { check_%s_const = (int)%s };@\n" name name;
@@ -210,7 +210,7 @@ let write_enums fmt enums =
   let case name =
     printf1 ~fmt
       (Format.sprintf
-         "  | %S -> \n    Cstubs_internals.build_enum_type %S Static.%%s ?unexpected alist\n"
+         "  | %S -> \n    Cstubs_internals.build_enum_type %S Ctypes_static.%%s ?unexpected alist\n"
          name
          name)
       (fun fmt ->
@@ -247,23 +247,23 @@ let gen_c () =
       include Ctypes
       let field (type s) (s : (_, s) structured typ) fname ftype =
         let () = match s with 
-        | Static.Struct { Static.tag } ->
+        | Ctypes_static.Struct { Ctypes_static.tag } ->
           fields := (`Struct tag, fname) :: !fields
-        | Static.Union { Static.utag } ->
+        | Ctypes_static.Union { Ctypes_static.utag } ->
           fields := (`Union utag, fname) :: !fields
         | _ ->
           ()
-        in { Static.ftype; foffset = -1; fname}
+        in { Ctypes_static.ftype; foffset = -1; fname}
       let seal (type s) (s : (_, s) structured typ) =
         match s with
-        | Static.Struct { Static.tag } ->
+        | Ctypes_static.Struct { Ctypes_static.tag } ->
           structures := `Struct tag :: !structures
-        | Static.Union { Static.utag } ->
+        | Ctypes_static.Union { Ctypes_static.utag } ->
           structures := `Union utag :: !structures
         | _ ->
           ()
       type _ const = unit
-      let constant name ty  = consts := (name, Static.BoxedType ty) :: !consts
+      let constant name ty  = consts := (name, Ctypes_static.BoxedType ty) :: !consts
       let enum name ?unexpected alist =
         let () = enums := name :: !enums in
         let format_typ k fmt = Format.fprintf fmt "enum %s%t" name k in

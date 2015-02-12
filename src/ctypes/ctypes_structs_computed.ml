@@ -5,7 +5,7 @@
  * See the file LICENSE for details.
  *)
 
-open Static
+open Ctypes_static
 
 let max_field_alignment fields =
   List.fold_left

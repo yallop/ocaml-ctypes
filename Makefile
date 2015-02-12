@@ -41,7 +41,7 @@ clean:
 	rm -f $(GENERATED)
 
 # ctypes subproject
-ctypes.public = static primitives unsigned signed structs ctypes posixTypes ctypes_types
+ctypes.public = ctypes_static primitives unsigned signed structs ctypes posixTypes ctypes_types
 ctypes.dir = src/ctypes
 ctypes.extra_mls = ctypes_primitives.ml
 ctypes.deps = str bigarray bytes

@@ -152,11 +152,11 @@ sig
   (** {4:pointer_types Pointer types} *)
 
   (** {4 C-compatible pointers} *)
-  val ptr : 'a typ -> 'a Static.ptr typ
+  val ptr : 'a typ -> 'a Ctypes_static.ptr typ
   (** Construct a pointer type from an existing type (called the {i reference
       type}).  *)
 
-  val ptr_opt : 'a typ -> 'a Static.ptr option typ
+  val ptr_opt : 'a typ -> 'a Ctypes_static.ptr option typ
   (** Construct a pointer type from an existing type (called the {i reference
       type}).  This behaves like {!ptr}, except that null pointers appear in OCaml
       as [None]. *)
@@ -178,16 +178,16 @@ sig
   *)
 
   (** {4 OCaml pointers} *)
-  val ocaml_string : string Static.ocaml typ
+  val ocaml_string : string Ctypes_static.ocaml typ
   (** Value representing the directly mapped storage of an OCaml string. *)
 
-  val ocaml_bytes : Bytes.t Static.ocaml typ
+  val ocaml_bytes : Bytes.t Ctypes_static.ocaml typ
   (** Value representing the directly mapped storage of an OCaml byte array. *)
 
   (** {3 Array types} *)
   (** {4 C array types} *)
 
-  val array : int -> 'a typ -> 'a Static.carray typ
+  val array : int -> 'a typ -> 'a Ctypes_static.carray typ
   (** Construct a sized array type from a length and an existing type (called
       the {i element type}). *)
 
@@ -198,7 +198,7 @@ sig
       ba_repr: 'b;
       dims: 'dims;
       bigarray: 'bigarray;
-      carray: _ > Static.bigarray_class ->
+      carray: _ > Ctypes_static.bigarray_class ->
      'dims -> ('a, 'b) Bigarray.kind -> 'bigarray typ
   (** Construct a sized bigarray type representation from a bigarray class, the
       dimensions, and the {!Bigarray.kind}. *)
@@ -210,7 +210,7 @@ sig
   (** {3 Struct and union types} *)
   type ('a, 't) field
 
-  val structure : string -> 's Static.structure typ
+  val structure : string -> 's Ctypes_static.structure typ
   (** Construct a new structure type.  The type value returned is incomplete and
       can be updated using {!field} until it is passed to {!seal}, at which point
       the set of fields is fixed.
@@ -225,12 +225,12 @@ sig
       [let tagname : tagname structure typ = structure "tagname"]
   *)
 
-  val union : string -> 's Static.union typ
+  val union : string -> 's Ctypes_static.union typ
   (** Construct a new union type.  This behaves analogously to {!structure};
       fields are added with {!field}. *)
 
   val field : 't typ -> string -> 'a typ ->
-    ('a, (('s, [<`Struct | `Union]) Static.structured as 't)) field
+    ('a, (('s, [<`Struct | `Union]) Ctypes_static.structured as 't)) field
   (** [field ty label ty'] adds a field of type [ty'] with label [label] to the
       structure or union type [ty] and returns a field value that can be used to
       read and write the field in structure or union instances (e.g. using
@@ -239,7 +239,7 @@ sig
       Attempting to add a field to a union type that has been sealed with [seal]
       is an error, and will raise {!ModifyingSealedType}. *)
 
-  val seal : (_, [< `Struct | `Union]) Static.structured typ -> unit
+  val seal : (_, [< `Struct | `Union]) Ctypes_static.structured typ -> unit
   (** [seal t] completes the struct or union type [t] so that no further fields
       can be added.  Struct and union types must be sealed before they can be used
       in a way that involves their size or alignment; see the documentation for
@@ -284,12 +284,12 @@ sig
   *)
 
   (** {3 Abstract types} *)
-  val abstract : name:string -> size:int -> alignment:int -> 'a Static.abstract typ
+  val abstract : name:string -> size:int -> alignment:int -> 'a Ctypes_static.abstract typ
   (** Create an abstract type specification from the size and alignment
       requirements for the type. *)
 
   (** {3 Injection of concrete types} *)
-  val lift_typ : 'a Static.typ -> 'a typ
+  val lift_typ : 'a Ctypes_static.typ -> 'a typ
   (** [lift_typ t] turns a concrete type representation into an abstract type
       representation.
 
@@ -304,11 +304,11 @@ end
 (** Abstract interface to C function type descriptions *)
 module type FUNCTION =
 sig
-  open Static
+  open Ctypes_static
 
   (** {3 Function types} *)
 
-  type 'a fn = 'a Static.fn
+  type 'a fn = 'a Ctypes_static.fn
   (** The type of values representing C function types.  A value of type [t fn]
       can be used to bind to C functions and to describe type of OCaml functions
       passed to C. *)

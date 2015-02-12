@@ -5,7 +5,7 @@
  * See the file LICENSE for details.
  *)
 
-open Static
+open Ctypes_static
 open Ctypes_memory
 
 let rec format : type a. a typ -> Format.formatter -> a -> unit

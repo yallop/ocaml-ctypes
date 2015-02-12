@@ -5,7 +5,7 @@
  * See the file LICENSE for details.
  *)
 
-open Static
+open Ctypes_static
 
 (* See type_printing.mli for the documentation of [format context]. *)
 type format_context = [ `toplevel | `array | `nonarray ]

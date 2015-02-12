@@ -7,7 +7,7 @@
 
 (* C pretty printing. *)
 
-open Static
+open Ctypes_static
 open Cstubs_c_language
 open Format
 
