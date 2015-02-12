@@ -13,7 +13,7 @@ open Signed
 open Unsigned
 
 type voidp = Ctypes_ptr.voidp
-type managed_buffer = Memory_stubs.managed_buffer
+type managed_buffer = Ctypes_memory_stubs.managed_buffer
 type 'a fatptr = 'a typ Ctypes_ptr.Fat.t
 
 val make_structured :

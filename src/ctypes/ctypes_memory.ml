@@ -7,7 +7,7 @@
 
 open Static
 
-module Stubs = Memory_stubs
+module Stubs = Ctypes_memory_stubs
 module Raw = Ctypes_ptr.Raw
 module Fat = Ctypes_ptr.Fat
 

@@ -9,13 +9,13 @@
    interface and subject to change. *)
 
 type voidp = Ctypes_ptr.voidp
-type managed_buffer = Memory_stubs.managed_buffer
+type managed_buffer = Ctypes_memory_stubs.managed_buffer
 type 'a fatptr = 'a Ctypes.typ Ctypes_ptr.Fat.t
 
 let make_structured reftyp buf =
   let open Static in
   let managed = Obj.repr buf in
-  let raw_ptr = Memory_stubs.block_address buf in
+  let raw_ptr = Ctypes_memory_stubs.block_address buf in
   { structured = CPointer (Ctypes_ptr.Fat.make ~managed ~reftyp raw_ptr) }
 
 include Static
