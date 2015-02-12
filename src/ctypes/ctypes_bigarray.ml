@@ -5,7 +5,7 @@
  * See the file LICENSE for details.
  *)
 
-open Bigarray_stubs
+open Ctypes_bigarray_stubs
 
 let prim_of_kind : type a. a kind -> a Primitives.prim
   = let open Primitives in function
@@ -134,10 +134,10 @@ let type_expression : type a b. (a, b) t -> _ =
 
 let prim_of_kind k = prim_of_kind (kind k)
 
-let unsafe_address b = Bigarray_stubs.address b
+let unsafe_address b = Ctypes_bigarray_stubs.address b
 
 let view : type a b. (a, b) t -> _ Ctypes_ptr.Fat.t -> b =
-  let open Bigarray_stubs in
+  let open Ctypes_bigarray_stubs in
   fun (dims, kind) ptr -> let ba : b = match dims with
   | DimsGen ds -> view kind ds ptr
   | Dims1 d -> view1 kind [| d |] ptr
