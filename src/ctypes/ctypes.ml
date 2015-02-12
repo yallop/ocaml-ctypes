@@ -17,7 +17,7 @@ include Std_views
 
 include Value_printing
 
-include Coerce
+include Ctypes_coerce
 
 let ( *:* ) s t = field s "<unknown>" t
 

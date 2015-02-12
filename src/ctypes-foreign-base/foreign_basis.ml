@@ -41,7 +41,7 @@ struct
   let foreign ?(abi=Libffi_abi.default_abi) ?from ?(stub=false)
       ?(check_errno=false) ?(release_runtime_lock=false) symbol typ =
     try
-      let coerce = Coerce.coerce (ptr void)
+      let coerce = Ctypes_coerce.coerce (ptr void)
         (funptr ~abi ~name:symbol ~check_errno ~runtime_lock:release_runtime_lock typ) in
       coerce (ptr_of_raw_ptr (dlsym ?handle:from ~symbol))
     with 

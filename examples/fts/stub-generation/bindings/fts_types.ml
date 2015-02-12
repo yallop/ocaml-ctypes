@@ -116,7 +116,7 @@ struct
     = fun t -> getf !@t fts_path
 
   let name : t -> string
-    = fun t -> Coerce.coerce (ptr char) string (t |-> fts_name)
+    = fun t -> Ctypes_coerce.coerce (ptr char) string (t |-> fts_name)
 
   let level : t -> int
     = fun t -> getf !@t fts_level
