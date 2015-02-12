@@ -169,8 +169,8 @@ _build/src/ctypes-top/ctypes_printers.cmo : _build/src/ctypes/unsigned.cmi \
 _build/src/ctypes-top/ctypes_printers.cmx : _build/src/ctypes/unsigned.cmx \
     _build/src/ctypes/ctypes_static.cmx _build/src/ctypes/signed.cmx _build/src/ctypes/posixTypes.cmx \
     _build/src/ctypes/ctypes.cmx _build/src/ctypes-top/ctypes_printers.cmi
-_build/src/ctypes-top/install_printers.cmo :
-_build/src/ctypes-top/install_printers.cmx :
+_build/src/ctypes-top/install_ctypes_printers.cmo :
+_build/src/ctypes-top/install_ctypes_printers.cmx :
 _build/src/ctypes-top/ctypes_printers.cmi : _build/src/ctypes/unsigned.cmi \
     _build/src/ctypes/signed.cmi _build/src/ctypes/posixTypes.cmi _build/src/ctypes/ctypes.cmi
 _build/src/cstubs/cstubs_inverted.cmi : _build/src/ctypes/ctypes.cmi
