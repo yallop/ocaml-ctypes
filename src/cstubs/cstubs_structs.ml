@@ -175,7 +175,7 @@ let rec ml_pat_and_exp_of_typ : type a. a typ -> string * string =
       (p', e')
     | Static.Primitive p ->
       let pat = 
-        (Common.asprintf "Static.Primitive %a"
+        (Ctypes_common.asprintf "Static.Primitive %a"
            Ctypes_path.format_path
            (Cstubs_public_name.constructor_cident_of_prim p))
       and exp = primitive_format_string p in
@@ -195,7 +195,7 @@ let write_consts fmt consts =
          settings. *)
       Format.fprintf fmt "%a = (%s);@\n" (Ctypes.format_typ ~name:"v") ty name;
       printf1 ~fmt
-        (Common.asprintf "  | %S, %s ->@\n    %s\n" name p e)
+        (Ctypes_common.asprintf "  | %S, %s ->@\n    %s\n" name p e)
         (fun fmt -> Format.fprintf fmt "v");
       Format.fprintf fmt "@]@\n}@\n"
   in

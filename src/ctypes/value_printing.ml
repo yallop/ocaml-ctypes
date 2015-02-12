@@ -83,4 +83,4 @@ and format_ptr : type a. Format.formatter -> a ptr -> unit
   = fun fmt (CPointer p) ->
     Format.fprintf fmt "%s" (Value_printing_stubs.string_of_pointer p)
 
-let string_of typ v = Common.string_of (format typ) v
+let string_of typ v = Ctypes_common.string_of (format typ) v

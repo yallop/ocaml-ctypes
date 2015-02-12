@@ -114,5 +114,5 @@ let format_fn : ?name:string -> Format.formatter -> 'a fn -> unit
     format_fn' fn (format_name ?name) fmt;
     Format.fprintf fmt "@]"
 
-let string_of_typ ?name ty = Common.string_of (format_typ ?name) ty
-let string_of_fn ?name fn = Common.string_of (format_fn ?name) fn
+let string_of_typ ?name ty = Ctypes_common.string_of (format_typ ?name) ty
+let string_of_fn ?name fn = Ctypes_common.string_of (format_fn ?name) fn
