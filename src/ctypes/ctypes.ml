@@ -7,7 +7,7 @@
 
 include Static
 
-include Structs_computed
+include Ctypes_structs_computed
 
 include Ctypes_type_printing
 
