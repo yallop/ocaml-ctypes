@@ -8,5 +8,5 @@
 (** Structs and unions whose layouts are computed from the sizes and alignment
     requirements of the constituent field types. *)
 
-include Structs.S
+include Ctypes_structs.S
   with type ('a, 's) field := ('a, 's) Ctypes_static.field
