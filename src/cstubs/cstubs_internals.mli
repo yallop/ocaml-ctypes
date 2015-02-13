@@ -13,7 +13,7 @@ open Signed
 open Unsigned
 
 type voidp = Ctypes_ptr.voidp
-type managed_buffer = Memory_stubs.managed_buffer
+type managed_buffer = Ctypes_memory_stubs.managed_buffer
 type 'a fatptr = 'a typ Ctypes_ptr.Fat.t
 
 val make_structured :
@@ -23,28 +23,28 @@ val make_ptr : 'a typ -> voidp -> 'a ptr
 
 val cptr : 'a ptr -> 'a typ Ctypes_ptr.Fat.t
 
-type 'a ocaml_type = 'a Static.ocaml_type =
+type 'a ocaml_type = 'a Ctypes_static.ocaml_type =
   String     : string ocaml_type
 | Bytes      : Bytes.t ocaml_type
 | FloatArray : float array ocaml_type
 
-type 'a typ = 'a Static.typ =
+type 'a typ = 'a Ctypes_static.typ =
     Void            :                              unit typ
-  | Primitive       : 'a Primitives.prim        -> 'a typ
+  | Primitive       : 'a Ctypes_primitive_types.prim        -> 'a typ
   | Pointer         : 'a typ                    -> 'a ptr typ
-  | Struct          : 'a Static.structure_type  -> 'a Static.structure typ
-  | Union           : 'a Static.union_type      -> 'a Static.union typ
-  | Abstract        : Static.abstract_type      -> 'a Static.abstract typ
+  | Struct          : 'a Ctypes_static.structure_type  -> 'a Ctypes_static.structure typ
+  | Union           : 'a Ctypes_static.union_type      -> 'a Ctypes_static.union typ
+  | Abstract        : Ctypes_static.abstract_type      -> 'a Ctypes_static.abstract typ
   | View            : ('a, 'b) view             -> 'a typ
-  | Array           : 'a typ * int              -> 'a Static.carray typ
+  | Array           : 'a typ * int              -> 'a Ctypes_static.carray typ
   | Bigarray        : (_, 'a) Ctypes_bigarray.t -> 'a typ
   | OCaml           : 'a ocaml_type             -> 'a ocaml typ
-and ('a, 'b) pointer = ('a, 'b) Static.pointer =
+and ('a, 'b) pointer = ('a, 'b) Ctypes_static.pointer =
   CPointer : 'a typ Ctypes_ptr.Fat.t -> ('a, [`C]) pointer
 | OCamlRef : int * 'a * 'a ocaml_type -> ('a, [`OCaml]) pointer
 and 'a ptr = ('a, [`C]) pointer
 and 'a ocaml = ('a, [`OCaml]) pointer
-and ('a, 'b) view = ('a, 'b) Static.view = {
+and ('a, 'b) view = ('a, 'b) Ctypes_static.view = {
   read : 'b -> 'a;
   write : 'a -> 'b;
   format_typ: ((Format.formatter -> unit) -> Format.formatter -> unit) option;
@@ -52,11 +52,11 @@ and ('a, 'b) view = ('a, 'b) Static.view = {
   ty: 'b typ;
 }
 
-type 'a fn = 'a Static.fn =
+type 'a fn = 'a Ctypes_static.fn =
   | Returns  : 'a typ   -> 'a fn
   | Function : 'a typ * 'b fn  -> ('a -> 'b) fn
 
-type 'a prim = 'a Primitives.prim =
+type 'a prim = 'a Ctypes_primitive_types.prim =
   Char : char prim
 | Schar : int prim
 | Uchar : uchar prim
@@ -86,4 +86,4 @@ type 'a prim = 'a Primitives.prim =
 | Complex64 : Complex.t prim
 
 val build_enum_type :
-  string -> Static.arithmetic -> ?unexpected:(int64 -> 'a) -> ('a * int64) list -> 'a typ
+  string -> Ctypes_static.arithmetic -> ?unexpected:(int64 -> 'a) -> ('a * int64) list -> 'a typ

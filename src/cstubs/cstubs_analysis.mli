@@ -7,5 +7,5 @@
 
 (* Analysis for stub generation *)
 
-val float : 'a Static.fn -> bool
-val may_allocate : 'a Static.fn -> bool
+val float : 'a Ctypes_static.fn -> bool
+val may_allocate : 'a Ctypes_static.fn -> bool

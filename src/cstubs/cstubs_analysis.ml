@@ -7,10 +7,10 @@
 
 (* Analysis for stub generation *)
 
-open Static
+open Ctypes_static
 
 let is_float_primitive : type a. a typ -> bool =
-  let open Primitives in function
+  let open Ctypes_primitive_types in function
   | Primitive Float -> true
   | Primitive Double -> true
   | _ -> false
@@ -56,8 +56,8 @@ type _ alloc =
 
 type 'a allocation = [ `Noalloc of 'a noalloc | `Alloc of 'a alloc ]
 
-let primitive_allocation : type a. a Primitives.prim -> a allocation =
- let open Primitives in function
+let primitive_allocation : type a. a Ctypes_primitive_types.prim -> a allocation =
+ let open Ctypes_primitive_types in function
  | Char -> `Noalloc Noalloc_char
  | Bool -> `Noalloc Noalloc_bool
  | Schar -> `Noalloc Noalloc_int

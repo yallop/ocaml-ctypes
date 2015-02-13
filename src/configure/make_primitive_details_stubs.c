@@ -104,7 +104,7 @@ void print_format_string(struct details *d)
 
 value ctypes_make_primitives(value _unit)
 {
-  printf("open Primitives\n");
+  printf("open Ctypes_primitive_types\n");
   generate_function("sizeof", "int", print_size);
   generate_function("alignment", "int", print_alignment);
   generate_function("name", "string", print_name);

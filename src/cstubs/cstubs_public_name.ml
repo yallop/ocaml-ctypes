@@ -7,11 +7,11 @@
 
 (* Publicly visible names for type values *)
 
-open Static
+open Ctypes_static
 open Ctypes_path
 
-let ident_of_ml_prim : type a. a Primitives.ml_prim -> path =
-  let open Primitives in function
+let ident_of_ml_prim : type a. a Ctypes_primitive_types.ml_prim -> path =
+  let open Ctypes_primitive_types in function
    | ML_char -> path_of_string "char"
    | ML_bool -> path_of_string "bool"
    | ML_complex -> path_of_string "Complex.t"
@@ -33,8 +33,8 @@ let ident_of_ml_prim : type a. a Primitives.ml_prim -> path =
    | ML_ulong -> path_of_string "Unsigned.ulong"
    | ML_ushort -> path_of_string "Unsigned.ushort"
 
-let constructor_ident_of_prim : type a. a Primitives.prim -> path =
-  let open Primitives in function
+let constructor_ident_of_prim : type a. a Ctypes_primitive_types.prim -> path =
+  let open Ctypes_primitive_types in function
    | Char -> path_of_string "Ctypes.char"
    | Schar -> path_of_string "Ctypes.schar"
    | Uchar -> path_of_string "Ctypes.uchar"
@@ -64,11 +64,11 @@ let constructor_ident_of_prim : type a. a Primitives.prim -> path =
    | Complex64 -> path_of_string "Ctypes.complex64"
 
 let constructor_cident_of_prim :
-  type a. ?module_name:string -> a Primitives.prim -> path =
+  type a. ?module_name:string -> a Ctypes_primitive_types.prim -> path =
   fun ?(module_name="Cstubs_internals") ->
     let path ident =
       path_of_string (Printf.sprintf "%s.%s" module_name ident)
-    in Primitives.(function
+    in Ctypes_primitive_types.(function
     | Char -> path "Char"
     | Schar -> path "Schar"
     | Uchar -> path "Uchar"

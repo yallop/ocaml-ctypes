@@ -8,9 +8,9 @@
 (* Stubs for standard views. *)
 
 (* Convert a C string to an OCaml string *)
-external string_of_cstring : char Static.typ Ctypes_ptr.Fat.t -> string
+external string_of_cstring : char Ctypes_static.typ Ctypes_ptr.Fat.t -> string
   = "ctypes_string_of_cstring"
 
 (* Convert an OCaml string to a C string *)
-external cstring_of_string : string -> Memory_stubs.managed_buffer
+external cstring_of_string : string -> Ctypes_memory_stubs.managed_buffer
   = "ctypes_cstring_of_string"

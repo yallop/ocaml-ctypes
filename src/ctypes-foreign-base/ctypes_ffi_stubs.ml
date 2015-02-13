@@ -13,7 +13,7 @@ open Ctypes_ptr
 type 'a ffitype = voidp
 type struct_ffitype
 
-external primitive_ffitype : 'a Primitives.prim -> 'a ffitype
+external primitive_ffitype : 'a Ctypes_primitive_types.prim -> 'a ffitype
  = "ctypes_primitive_ffitype"
 
 external pointer_ffitype : unit -> voidp ffitype
@@ -55,7 +55,7 @@ external prep_callspec : callspec -> int -> _ ffitype -> unit
 (* Call the function specified by `callspec' at the given address.
    The callback functions write the arguments to the buffer and read
    the return value. *)
-external call : string -> unit Static.typ Fat.t -> callspec ->
+external call : string -> unit Ctypes_static.typ Fat.t -> callspec ->
   (voidp -> (Obj.t * int) array -> unit) -> (voidp -> 'a) -> 'a
   = "ctypes_call"
 

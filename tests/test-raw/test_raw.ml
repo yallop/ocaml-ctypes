@@ -6,8 +6,8 @@
  *)
 
 open OUnit2
-open Memory_stubs
-open Std_view_stubs
+open Ctypes_memory_stubs
+open Ctypes_std_view_stubs
 
 (* Tests for the low-level module on which the public high-level
    interface is based.  
@@ -19,8 +19,8 @@ open Std_view_stubs
         double fabs(double)
 *)
 let test_fabs _ =
-  Ffi_stubs.(
-    let double_ffitype = primitive_ffitype Primitives.Double in
+  Ctypes_ffi_stubs.(
+    let double_ffitype = primitive_ffitype Ctypes_primitive_types.Double in
     let callspec = allocate_callspec
       ~check_errno:false
       ~runtime_lock:false
@@ -30,14 +30,14 @@ let test_fabs _ =
       double_ffitype in
     
     let dlfabs = Dl.dlsym "fabs" in
-    let dlfabs_fat = Ctypes_ptr.Fat.make ~reftyp:Static.Void dlfabs in
+    let dlfabs_fat = Ctypes_ptr.Fat.make ~reftyp:Ctypes_static.Void dlfabs in
     
     let fabs x =
       call "fabs" dlfabs_fat callspec
         (fun p _values ->
-          write Primitives.Double x
-            Ctypes_ptr.(Fat.make ~reftyp:Static.Void (Raw.(add p (of_int arg_1_offset)))))
-        (fun p -> read Primitives.Double (Ctypes_ptr.Fat.make ~reftyp:Static.Void p))
+          write Ctypes_primitive_types.Double x
+            Ctypes_ptr.(Fat.make ~reftyp:Ctypes_static.Void (Raw.(add p (of_int arg_1_offset)))))
+        (fun p -> read Ctypes_primitive_types.Double (Ctypes_ptr.Fat.make ~reftyp:Ctypes_static.Void p))
     in
 
     assert_equal 2.0 (fabs (-2.0)) ~printer:string_of_float;
@@ -51,8 +51,8 @@ let test_fabs _ =
         double pow(double, double)
 *)
 let test_pow _ =
-  Ffi_stubs.(
-    let double_ffitype = primitive_ffitype Primitives.Double in
+  Ctypes_ffi_stubs.(
+    let double_ffitype = primitive_ffitype Ctypes_primitive_types.Double in
     let callspec = allocate_callspec
       ~check_errno:false
       ~runtime_lock:false
@@ -63,16 +63,16 @@ let test_pow _ =
       double_ffitype in
     
     let dlpow = Dl.dlsym "pow" in
-    let dlpow_fat = Ctypes_ptr.Fat.make ~reftyp:Static.Void dlpow in
+    let dlpow_fat = Ctypes_ptr.Fat.make ~reftyp:Ctypes_static.Void dlpow in
     
     let pow x y =
       call "pow" dlpow_fat callspec
         (fun buffer _values ->
-          write Primitives.Double x
-            Ctypes_ptr.(Fat.make ~reftyp:Static.Void (Raw.(add buffer (of_int arg_1_offset))));
-          write Primitives.Double y
-            Ctypes_ptr.(Fat.make ~reftyp:Static.Void (Raw.(add buffer (of_int arg_2_offset)))))
-        (fun p -> read Primitives.Double (Ctypes_ptr.Fat.make ~reftyp:Static.Void p))
+          write Ctypes_primitive_types.Double x
+            Ctypes_ptr.(Fat.make ~reftyp:Ctypes_static.Void (Raw.(add buffer (of_int arg_1_offset))));
+          write Ctypes_primitive_types.Double y
+            Ctypes_ptr.(Fat.make ~reftyp:Ctypes_static.Void (Raw.(add buffer (of_int arg_2_offset)))))
+        (fun p -> read Ctypes_primitive_types.Double (Ctypes_ptr.Fat.make ~reftyp:Ctypes_static.Void p))
     in
 
     assert_equal 8.0 (pow 2.0 3.0);

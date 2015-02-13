@@ -15,7 +15,7 @@
 
 (** {4:pointer_types Pointer types} *)
 
-type ('a, 'b) pointer = ('a, 'b) Static.pointer
+type ('a, 'b) pointer = ('a, 'b) Ctypes_static.pointer
 (** The type of pointer values. A value of type [('a, [`C]) pointer] contains
     a C-compatible pointer, and a value of type [('a, [`OCaml]) pointer]
     contains a pointer to a value that can be moved by OCaml runtime. *)
@@ -26,7 +26,7 @@ type 'a ptr = ('a, [`C]) pointer
 (** The type of C-compatible pointer values.  A value of type [t ptr] can be
     used to read and write values of type [t] at particular addresses. *)
 
-type 'a ocaml = 'a Static.ocaml
+type 'a ocaml = 'a Ctypes_static.ocaml
 (** The type of pointer values pointing directly into OCaml values.
     {b Pointers of this type should never be captured by external code}.
     In particular, functions accepting ['a ocaml] pointers must not invoke
@@ -34,13 +34,13 @@ type 'a ocaml = 'a Static.ocaml
 
 (** {4 C array types} *)
 
-type 'a carray = 'a Static.carray
+type 'a carray = 'a Ctypes_static.carray
 (** The type of C array values.  A value of type [t carray] can be used to read
     and write array objects in C-managed storage. *)
 
 (** {4 Bigarray types} *)
 
-type 'a bigarray_class = 'a Static.bigarray_class
+type 'a bigarray_class = 'a Ctypes_static.bigarray_class
 (** The type of Bigarray classes.  There are four instances, one for each of
     the Bigarray submodules. *)
 
@@ -78,7 +78,7 @@ val array3 :
 
 (** {3 Struct and union types} *)
 
-type ('a, 'kind) structured = ('a, 'kind) Static.structured
+type ('a, 'kind) structured = ('a, 'kind) Ctypes_static.structured
 (** The base type of values representing C struct and union types.  The
     ['kind] parameter is a polymorphic variant type indicating whether the type
     represents a struct ([`Struct]) or a union ([`Union]). *)
@@ -89,12 +89,12 @@ type 'a structure = ('a, [`Struct]) structured
 type 'a union = ('a, [`Union]) structured
 (** The type of values representing C union types. *)
 
-type ('a, 't) field = ('a, 't) Static.field
+type ('a, 't) field = ('a, 't) Ctypes_static.field
 (** The type of values representing C struct or union members (called "fields"
     here).  A value of type [(a, s) field] represents a field of type [a] in a
     struct or union of type [s]. *)
 
-type 'a abstract = 'a Static.abstract
+type 'a abstract = 'a Ctypes_static.abstract
 (** The type of abstract values.  The purpose of the [abstract] type is to
     represent values whose type varies from platform to platform.
 
@@ -111,7 +111,7 @@ type 'a abstract = 'a Static.abstract
     are passed and returned by value.) *)
 
 include Ctypes_types.TYPE
- with type 'a typ = 'a Static.typ
+ with type 'a typ = 'a Ctypes_static.typ
   and type ('a, 's) field := ('a, 's) field
 include Ctypes_types.FUNCTION
 

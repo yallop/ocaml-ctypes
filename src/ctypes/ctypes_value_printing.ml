@@ -5,20 +5,20 @@
  * See the file LICENSE for details.
  *)
 
-open Static
-open Memory
+open Ctypes_static
+open Ctypes_memory
 
 let rec format : type a. a typ -> Format.formatter -> a -> unit
   = fun typ fmt v -> match typ with
     Void -> Format.pp_print_string fmt ""
   | Primitive p ->
-    Format.pp_print_string fmt (Value_printing_stubs.string_of_prim p v)
+    Format.pp_print_string fmt (Ctypes_value_printing_stubs.string_of_prim p v)
   | Pointer _ -> format_ptr fmt v
   | Struct _ -> format_structured fmt v
   | Union _ -> format_structured fmt v
   | Array (a, n) -> format_array fmt v
   | Bigarray ba -> Format.fprintf fmt "<bigarray %a>"
-    (fun fmt -> Type_printing.format_typ fmt) typ
+    (fun fmt -> Ctypes_type_printing.format_typ fmt) typ
   | Abstract _ -> format_structured fmt v
   | OCaml _ -> format_ocaml fmt v
   | View {write; ty; format=f} ->
@@ -81,6 +81,6 @@ and format_fields : type a b. string -> (a, b) structured boxed_field list ->
       fields
 and format_ptr : type a. Format.formatter -> a ptr -> unit
   = fun fmt (CPointer p) ->
-    Format.fprintf fmt "%s" (Value_printing_stubs.string_of_pointer p)
+    Format.fprintf fmt "%s" (Ctypes_value_printing_stubs.string_of_pointer p)
 
-let string_of typ v = Common.string_of (format typ) v
+let string_of typ v = Ctypes_common.string_of (format typ) v

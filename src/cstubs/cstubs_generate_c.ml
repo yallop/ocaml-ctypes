@@ -7,7 +7,7 @@
 
 (* C stub generation *)
 
-open Static
+open Ctypes_static
 open Cstubs_c_language
 
 let max_byte_args = 5
@@ -59,8 +59,8 @@ struct
 
   let (>>) c1 c2 = (c1, Void) >>= fun _ -> c2
 
-  let prim_prj : type a. a Primitives.prim -> _ =
-    let open Primitives in function
+  let prim_prj : type a. a Ctypes_primitive_types.prim -> _ =
+    let open Ctypes_primitive_types in function
     | Char -> reader "Int_val" (value @-> returning int)
     | Schar -> reader "Int_val" (value @-> returning int)
     | Uchar -> reader "Uint8_val" (value @-> returning uint8_t)
@@ -89,8 +89,8 @@ struct
     | Complex32 -> reader "ctypes_float_complex_val" (value @-> returning complex32)
     | Complex64 -> reader "ctypes_double_complex_val" (value @-> returning complex64)
 
-  let prim_inj : type a. a Primitives.prim -> _ =
-    let open Primitives in function
+  let prim_inj : type a. a Ctypes_primitive_types.prim -> _ =
+    let open Ctypes_primitive_types in function
     | Char -> immediater "Val_int" (int @-> returning value)
     | Schar -> immediater "Val_int" (int @-> returning value)
     | Uchar -> conser "ctypes_copy_uint8" (uint8_t @-> returning value)
@@ -206,9 +206,9 @@ struct
   | Returns  : 'a typ   -> 'a fn
   | Function : string * 'a typ * 'b fn  -> ('a -> 'b) fn
 
-  let rec name_params : type a. a Static.fn -> a fn = function
-    | Static.Returns t -> Returns t
-    | Static.Function (f, t) -> Function (fresh_var (), f, name_params t)
+  let rec name_params : type a. a Ctypes_static.fn -> a fn = function
+    | Ctypes_static.Returns t -> Returns t
+    | Ctypes_static.Function (f, t) -> Function (fresh_var (), f, name_params t)
 
   let rec value_params : type a. a fn -> (string * ty) list = function
     | Returns t -> []
@@ -217,7 +217,7 @@ struct
   let fundec : type a. string -> a Ctypes.fn -> cfundec =
     fun name fn -> `Fundec (name, args fn, return_type fn)
 
-  let fn : type a. cname:string -> stub_name:string -> a Static.fn -> cfundef =
+  let fn : type a. cname:string -> stub_name:string -> a Ctypes_static.fn -> cfundef =
     fun ~cname ~stub_name f ->
       let fvar = { fname = cname;
                    allocates = false;
@@ -242,7 +242,7 @@ struct
       `Function (`Fundec (stub_name, value_params f', Ty value),
                  body [] f')
 
-  let byte_fn : type a. string -> a Static.fn -> int -> cfundef =
+  let byte_fn : type a. string -> a Ctypes_static.fn -> int -> cfundef =
     fun fname fn nargs ->
       let argv = ("argv", Ty (ptr value)) in
       let argc = ("argc", Ty int) in
@@ -309,7 +309,7 @@ struct
                                local "nargs" int) >>
                     body))
 
-  let value : type a. cname:string -> stub_name:string -> a Static.typ -> cfundef =
+  let value : type a. cname:string -> stub_name:string -> a Ctypes_static.typ -> cfundef =
     fun ~cname ~stub_name typ ->
       let (e, ty) = (`Addr (`Global { name = cname; typ = Ty typ;
                                       references_ocaml_heap = false }), (ptr typ)) in

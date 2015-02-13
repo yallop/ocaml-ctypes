@@ -5,19 +5,19 @@
  * See the file LICENSE for details.
  *)
 
-include Static
+include Ctypes_static
 
-include Structs_computed
+include Ctypes_structs_computed
 
-include Type_printing
+include Ctypes_type_printing
 
-include Memory
+include Ctypes_memory
 
-include Std_views
+include Ctypes_std_views
 
-include Value_printing
+include Ctypes_value_printing
 
-include Coerce
+include Ctypes_coerce
 
 let ( *:* ) s t = field s "<unknown>" t
 

@@ -19,7 +19,7 @@ end
 
 module Make(Closure_properties : CLOSURE_PROPERTIES) :
 sig
-  open Static
+  open Ctypes_static
   open Libffi_abi
 
   (** Dynamic function calls based on libffi *)

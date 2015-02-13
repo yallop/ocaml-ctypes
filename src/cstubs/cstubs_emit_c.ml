@@ -7,7 +7,7 @@
 
 (* C pretty printing. *)
 
-open Static
+open Ctypes_static
 open Cstubs_c_language
 open Format
 
@@ -106,7 +106,7 @@ let rec ccomp fmt : ccomp -> unit = function
 
 let format_parameter_list parameters k fmt =
   let format_arg fmt (name, Ty t) =
-      Type_printing.format_typ ~name fmt t
+      Ctypes_type_printing.format_typ ~name fmt t
   in
   match parameters with
   | [] ->
@@ -119,9 +119,9 @@ let format_parameter_list parameters k fmt =
 
 let cfundec : Format.formatter -> cfundec -> unit =
   fun fmt (`Fundec (name, args, Ty return)) ->
-    Type_printing.format_typ' return
+    Ctypes_type_printing.format_typ' return
       (fun context fmt ->
-        format_parameter_list args (Type_printing.format_name ~name) fmt)
+        format_parameter_list args (Ctypes_type_printing.format_name ~name) fmt)
       `nonarray fmt
 
 let cfundef fmt (`Function (dec, body) : cfundef) =

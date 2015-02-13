@@ -8,7 +8,7 @@
 (* Stubs for formatting C values. *)
 
 (* Return a string representation of a C value *)
-external string_of_prim : 'a Primitives.prim -> 'a -> string
+external string_of_prim : 'a Ctypes_primitive_types.prim -> 'a -> string
   = "ctypes_string_of_prim"
 
 external string_of_pointer : _ Ctypes_ptr.Fat.t -> string
