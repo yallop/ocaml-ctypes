@@ -113,14 +113,14 @@ struct
     let ArgType ctype = arg_type ty in
     Ctypes_ffi_stubs.prep_callspec callspec (abi_code abi) ctype
 
-  let rec box_function : type a. abi -> a fn -> Ctypes_ffi_stubs.callspec -> a WeakRef.t ->
+  let rec box_function : type a. abi -> a fn -> Ctypes_ffi_stubs.callspec -> a Ctypes_weak_ref.t ->
       Ctypes_ffi_stubs.boxedfn
     = fun abi fn callspec -> match fn with
       | Returns ty ->
         let () = prep_callspec callspec abi ty in
         let write_rv = Ctypes_memory.write ty in
         fun f ->
-          let w = write_rv (WeakRef.get f) in
+          let w = write_rv (Ctypes_weak_ref.get f) in
           Ctypes_ffi_stubs.Done ((fun p -> w (Ctypes_ptr.Fat.make ~reftyp:Void p)),
                           callspec)
       | Function (p, f) ->
@@ -129,11 +129,11 @@ struct
         let read = Ctypes_memory.build p in
         fun f -> Ctypes_ffi_stubs.Fn (fun buf ->
           let f' =
-            try WeakRef.get f (read (Ctypes_ptr.Fat.make ~reftyp:Void buf))
-            with WeakRef.EmptyWeakReference ->
+            try Ctypes_weak_ref.get f (read (Ctypes_ptr.Fat.make ~reftyp:Void buf))
+            with Ctypes_weak_ref.EmptyWeakReference ->
               raise Ctypes_ffi_stubs.CallToExpiredClosure
           in
-          let v = box (WeakRef.make f') in
+          let v = box (Ctypes_weak_ref.make f') in
           let () = Gc.finalise (fun _ -> ignore (f'); ()) v in
           v)
 
@@ -190,7 +190,7 @@ struct
     in
     let cs = box_function abi fn cs' in
     fun f ->
-      let boxed = cs (WeakRef.make f) in
+      let boxed = cs (Ctypes_weak_ref.make f) in
       let id = Closure_properties.record (Obj.repr f) (Obj.repr boxed) in
       ptr_of_rawptr (Ctypes_ffi_stubs.make_function_pointer cs' id)
 end
