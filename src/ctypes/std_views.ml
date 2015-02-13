@@ -6,10 +6,10 @@
  *)
 
 let string_of_char_ptr (Ctypes_static.CPointer p) =
-  Std_view_stubs.string_of_cstring p
+  Ctypes_std_view_stubs.string_of_cstring p
 
 let char_ptr_of_string s =
-  let managed = Std_view_stubs.cstring_of_string s in
+  let managed = Ctypes_std_view_stubs.cstring_of_string s in
   Ctypes_static.CPointer (Ctypes_ptr.Fat.make ~managed ~reftyp:Ctypes_static.char
                      (Ctypes_memory_stubs.block_address managed))
 

@@ -7,7 +7,7 @@
 
 open OUnit2
 open Ctypes_memory_stubs
-open Std_view_stubs
+open Ctypes_std_view_stubs
 
 (* Tests for the low-level module on which the public high-level
    interface is based.  
