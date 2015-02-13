@@ -103,7 +103,7 @@ _build/src/ctypes/ctypes_type_printing.cmx : _build/src/ctypes/ctypes_static.cmx
     _build/src/ctypes/ctypes_primitives.cmx _build/src/ctypes/ctypes_bigarray.cmx \
     _build/src/ctypes/ctypes_common.cmx _build/src/ctypes/ctypes_type_printing.cmi
 _build/src/ctypes-foreign-base/weakRef.cmi :
-_build/src/ctypes-foreign-base/closure_properties.cmi :
+_build/src/ctypes-foreign-base/ctypes_closure_properties.cmi :
 _build/src/ctypes-foreign-base/dl.cmo : _build/src/ctypes/ctypes_ptr.cmo \
     _build/src/ctypes-foreign-base/dl.cmi
 _build/src/ctypes-foreign-base/dl.cmx : _build/src/ctypes/ctypes_ptr.cmx \
@@ -146,17 +146,17 @@ _build/src/ctypes-foreign-base/ctypes_ffi_stubs.cmo : _build/src/ctypes/ctypes_s
     _build/src/ctypes/primitives.cmi _build/src/ctypes/ctypes_ptr.cmo
 _build/src/ctypes-foreign-base/ctypes_ffi_stubs.cmx : _build/src/ctypes/ctypes_static.cmx \
     _build/src/ctypes/primitives.cmx _build/src/ctypes/ctypes_ptr.cmx
-_build/src/ctypes-foreign-base/closure_properties.cmo : \
-    _build/src/ctypes-foreign-base/closure_properties.cmi
-_build/src/ctypes-foreign-base/closure_properties.cmx : \
-    _build/src/ctypes-foreign-base/closure_properties.cmi
+_build/src/ctypes-foreign-base/ctypes_closure_properties.cmo : \
+    _build/src/ctypes-foreign-base/ctypes_closure_properties.cmi
+_build/src/ctypes-foreign-base/ctypes_closure_properties.cmx : \
+    _build/src/ctypes-foreign-base/ctypes_closure_properties.cmi
 _build/src/ctypes-foreign-threaded/foreign.cmo : \
     _build/src/ctypes-foreign-base/ctypes_foreign_basis.cmo \
-    _build/src/ctypes-foreign-base/closure_properties.cmi \
+    _build/src/ctypes-foreign-base/ctypes_closure_properties.cmi \
     _build/src/ctypes-foreign-threaded/foreign.cmi
 _build/src/ctypes-foreign-threaded/foreign.cmx : \
     _build/src/ctypes-foreign-base/ctypes_foreign_basis.cmx \
-    _build/src/ctypes-foreign-base/closure_properties.cmx \
+    _build/src/ctypes-foreign-base/ctypes_closure_properties.cmx \
     _build/src/ctypes-foreign-threaded/foreign.cmi
 _build/src/ctypes-foreign-threaded/foreign.cmi : \
     _build/src/ctypes-foreign-base/libffi_abi.cmi _build/src/ctypes-foreign-base/dl.cmi \
@@ -257,12 +257,12 @@ _build/src/ctypes-foreign-unthreaded/ctypes_gc_mutex.cmx :
 _build/src/ctypes-foreign-unthreaded/foreign.cmo : \
     _build/src/ctypes-foreign-unthreaded/ctypes_gc_mutex.cmo \
     _build/src/ctypes-foreign-base/ctypes_foreign_basis.cmo \
-    _build/src/ctypes-foreign-base/closure_properties.cmi \
+    _build/src/ctypes-foreign-base/ctypes_closure_properties.cmi \
     _build/src/ctypes-foreign-unthreaded/foreign.cmi
 _build/src/ctypes-foreign-unthreaded/foreign.cmx : \
     _build/src/ctypes-foreign-unthreaded/ctypes_gc_mutex.cmx \
     _build/src/ctypes-foreign-base/ctypes_foreign_basis.cmx \
-    _build/src/ctypes-foreign-base/closure_properties.cmx \
+    _build/src/ctypes-foreign-base/ctypes_closure_properties.cmx \
     _build/src/ctypes-foreign-unthreaded/foreign.cmi
 _build/src/ctypes-foreign-unthreaded/foreign.cmi : \
     _build/src/ctypes-foreign-base/libffi_abi.cmi _build/src/ctypes-foreign-base/dl.cmi \
