@@ -1,12 +1,18 @@
 ## ctypes 0.4
 
-Thanks to A. Hauptmann (@fdopen), David Sheets (@dsheets), Maverick Woo (@maverickwoo), Peter Zotov (@whitequark), David Kaloper (@pqwy), Ramkumar Ramachandra (@artagnon), Thomas Braibant (@braibant) and Edwin Török (@edwintorok) for contributions to this release.
+Thanks to A. Hauptmann (@fdopen), David Sheets (@dsheets), Maverick Woo (@maverickwoo), Peter Zotov (@whitequark), David Kaloper (@pqwy), Ramkumar Ramachandra (@artagnon), Thomas Braibant (@braibant), Hugo Heuzard (@hhugo) and Edwin Török (@edwintorok) for contributions to this release.
 
 ### Major features
 
 #### Support for the C99 bool type
 
 #### Typedef support
+
+#### Enum support
+
+#### Support for accessing C globals with foreign_value in generated stubs
+
+#### Support for retrieving #define and enum constants from C
 
 #### Windows support
 
@@ -38,6 +44,9 @@ See the [relevant section of the FAQ][strings_faq].
 * findlib package naming: ctypes.foreign-base ~> ctypes.foreign.base &c.
 * Make it possible to print a field name
 * Better exception handling when using RTLD_NOLOAD
+* RTLD_LOCAL support
+* Changed the #include path to $(ocamlfind query ctypes)
+* Renamed some internal modules to avoid name clashes
 
 ## ctypes 0.3.4
 
