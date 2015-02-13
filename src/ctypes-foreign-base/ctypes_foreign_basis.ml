@@ -12,7 +12,7 @@ struct
 
   module Ffi = Ffi.Make(Closure_properties)
 
-  exception CallToExpiredClosure = Ffi_stubs.CallToExpiredClosure
+  exception CallToExpiredClosure = Ctypes_ffi_stubs.CallToExpiredClosure
 
   let format_function_pointer fn k fmt =
     Ctypes_type_printing.format_fn' fn

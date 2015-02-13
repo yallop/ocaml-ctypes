@@ -19,7 +19,7 @@ open Std_view_stubs
         double fabs(double)
 *)
 let test_fabs _ =
-  Ffi_stubs.(
+  Ctypes_ffi_stubs.(
     let double_ffitype = primitive_ffitype Primitives.Double in
     let callspec = allocate_callspec
       ~check_errno:false
@@ -51,7 +51,7 @@ let test_fabs _ =
         double pow(double, double)
 *)
 let test_pow _ =
-  Ffi_stubs.(
+  Ctypes_ffi_stubs.(
     let double_ffitype = primitive_ffitype Primitives.Double in
     let callspec = allocate_callspec
       ~check_errno:false
