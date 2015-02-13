@@ -18,8 +18,8 @@ type (_, _) coercion =
   | Coercion : ('a -> 'b) -> ('a, 'b) coercion
 
 let ml_prim_coercion :
-  type a b. a Primitives.ml_prim -> b Primitives.ml_prim -> (a, b) coercion =
-  let open Primitives in
+  type a b. a Ctypes_primitive_types.ml_prim -> b Ctypes_primitive_types.ml_prim -> (a, b) coercion =
+  let open Ctypes_primitive_types in
   fun l r -> match l, r with
   | ML_char, ML_char -> Id
   | ML_complex, ML_complex -> Id
@@ -47,7 +47,7 @@ let rec coercion : type a b. a typ -> b typ -> (a, b) coercion =
   fun atyp btyp -> match atyp, btyp with
   | _, Void -> Coercion ignore
   | Primitive l, Primitive r ->
-    Primitives.(ml_prim_coercion (ml_prim l) (ml_prim r))
+    Ctypes_primitive_types.(ml_prim_coercion (ml_prim l) (ml_prim r))
   | View av, b ->
     begin match coercion av.ty b with
     | Id -> Coercion av.write

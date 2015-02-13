@@ -16,9 +16,9 @@ _build/src/ctypes/ctypes_std_view_stubs.cmo : _build/src/ctypes/ctypes_static.cm
     _build/src/ctypes/ctypes_memory_stubs.cmo _build/src/ctypes/ctypes_ptr.cmo
 _build/src/ctypes/ctypes_std_view_stubs.cmx : _build/src/ctypes/ctypes_static.cmx \
     _build/src/ctypes/ctypes_memory_stubs.cmx _build/src/ctypes/ctypes_ptr.cmx
-_build/src/ctypes/ctypes_memory_stubs.cmo : _build/src/ctypes/primitives.cmi \
+_build/src/ctypes/ctypes_memory_stubs.cmo : _build/src/ctypes/ctypes_primitive_types.cmi \
     _build/src/ctypes/ctypes_ptr.cmo
-_build/src/ctypes/ctypes_memory_stubs.cmx : _build/src/ctypes/primitives.cmx \
+_build/src/ctypes/ctypes_memory_stubs.cmx : _build/src/ctypes/ctypes_primitive_types.cmx \
     _build/src/ctypes/ctypes_memory_stubs.cmx _build/src/ctypes/ctypes_ptr.cmx
 _build/src/ctypes/ctypes_memory_stubs.cmo : _build/src/ctypes/ctypes_primitive_types.cmi \
     _build/src/ctypes/ctypes_ptr.cmo

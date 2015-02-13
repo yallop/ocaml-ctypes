@@ -13,7 +13,7 @@ open Ctypes_ptr
 type 'a ffitype = voidp
 type struct_ffitype
 
-external primitive_ffitype : 'a Primitives.prim -> 'a ffitype
+external primitive_ffitype : 'a Ctypes_primitive_types.prim -> 'a ffitype
  = "ctypes_primitive_ffitype"
 
 external pointer_ffitype : unit -> voidp ffitype

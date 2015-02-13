@@ -7,8 +7,8 @@
 
 open Ctypes_bigarray_stubs
 
-let prim_of_kind : type a. a kind -> a Primitives.prim
-  = let open Primitives in function
+let prim_of_kind : type a. a kind -> a Ctypes_primitive_types.prim
+  = let open Ctypes_primitive_types in function
     Kind_float32 -> Float
   | Kind_float64 -> Double
   | Kind_int8_signed -> Int8_t

@@ -125,9 +125,9 @@ let write_seal fmt specs =
      "  | _ ->";
      "    raise (Unsupported \"Sealing a non-structured type\")"]
 
-let primitive_format_string : type a. a Primitives.prim -> string =
+let primitive_format_string : type a. a Ctypes_primitive_types.prim -> string =
   fun p ->
-    let open Primitives in
+    let open Ctypes_primitive_types in
     let sprintf = Printf.sprintf in
     let fail () =
       Printf.kprintf failwith "Cannot retrieve constants of type %s"

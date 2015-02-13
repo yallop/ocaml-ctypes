@@ -30,7 +30,7 @@ type 'a ocaml_type = 'a Ctypes_static.ocaml_type =
 
 type 'a typ = 'a Ctypes_static.typ =
     Void            :                              unit typ
-  | Primitive       : 'a Primitives.prim        -> 'a typ
+  | Primitive       : 'a Ctypes_primitive_types.prim        -> 'a typ
   | Pointer         : 'a typ                    -> 'a ptr typ
   | Struct          : 'a Ctypes_static.structure_type  -> 'a Ctypes_static.structure typ
   | Union           : 'a Ctypes_static.union_type      -> 'a Ctypes_static.union typ
@@ -56,7 +56,7 @@ type 'a fn = 'a Ctypes_static.fn =
   | Returns  : 'a typ   -> 'a fn
   | Function : 'a typ * 'b fn  -> ('a -> 'b) fn
 
-type 'a prim = 'a Primitives.prim =
+type 'a prim = 'a Ctypes_primitive_types.prim =
   Char : char prim
 | Schar : int prim
 | Uchar : uchar prim

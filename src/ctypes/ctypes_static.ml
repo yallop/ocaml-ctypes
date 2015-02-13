@@ -34,7 +34,7 @@ type _ ocaml_type =
 
 type _ typ =
     Void            :                       unit typ
-  | Primitive       : 'a Primitives.prim -> 'a typ
+  | Primitive       : 'a Ctypes_primitive_types.prim -> 'a typ
   | Pointer         : 'a typ             -> 'a ptr typ
   | Struct          : 'a structure_type  -> 'a structure typ
   | Union           : 'a union_type      -> 'a union typ
@@ -158,33 +158,33 @@ let rec passable : type a. a typ -> bool = function
   | View { ty }                    -> passable ty
 
 let void = Void
-let char = Primitive Primitives.Char
-let schar = Primitive Primitives.Schar
-let float = Primitive Primitives.Float
-let double = Primitive Primitives.Double
-let complex32 = Primitive Primitives.Complex32
-let complex64 = Primitive Primitives.Complex64
-let short = Primitive Primitives.Short
-let int = Primitive Primitives.Int
-let long = Primitive Primitives.Long
-let llong = Primitive Primitives.Llong
-let nativeint = Primitive Primitives.Nativeint
-let int8_t = Primitive Primitives.Int8_t
-let int16_t = Primitive Primitives.Int16_t
-let int32_t = Primitive Primitives.Int32_t
-let int64_t = Primitive Primitives.Int64_t
-let camlint = Primitive Primitives.Camlint
-let uchar = Primitive Primitives.Uchar
-let bool = Primitive Primitives.Bool
-let uint8_t = Primitive Primitives.Uint8_t
-let uint16_t = Primitive Primitives.Uint16_t
-let uint32_t = Primitive Primitives.Uint32_t
-let uint64_t = Primitive Primitives.Uint64_t
-let size_t = Primitive Primitives.Size_t
-let ushort = Primitive Primitives.Ushort
-let uint = Primitive Primitives.Uint
-let ulong = Primitive Primitives.Ulong
-let ullong = Primitive Primitives.Ullong
+let char = Primitive Ctypes_primitive_types.Char
+let schar = Primitive Ctypes_primitive_types.Schar
+let float = Primitive Ctypes_primitive_types.Float
+let double = Primitive Ctypes_primitive_types.Double
+let complex32 = Primitive Ctypes_primitive_types.Complex32
+let complex64 = Primitive Ctypes_primitive_types.Complex64
+let short = Primitive Ctypes_primitive_types.Short
+let int = Primitive Ctypes_primitive_types.Int
+let long = Primitive Ctypes_primitive_types.Long
+let llong = Primitive Ctypes_primitive_types.Llong
+let nativeint = Primitive Ctypes_primitive_types.Nativeint
+let int8_t = Primitive Ctypes_primitive_types.Int8_t
+let int16_t = Primitive Ctypes_primitive_types.Int16_t
+let int32_t = Primitive Ctypes_primitive_types.Int32_t
+let int64_t = Primitive Ctypes_primitive_types.Int64_t
+let camlint = Primitive Ctypes_primitive_types.Camlint
+let uchar = Primitive Ctypes_primitive_types.Uchar
+let bool = Primitive Ctypes_primitive_types.Bool
+let uint8_t = Primitive Ctypes_primitive_types.Uint8_t
+let uint16_t = Primitive Ctypes_primitive_types.Uint16_t
+let uint32_t = Primitive Ctypes_primitive_types.Uint32_t
+let uint64_t = Primitive Ctypes_primitive_types.Uint64_t
+let size_t = Primitive Ctypes_primitive_types.Size_t
+let ushort = Primitive Ctypes_primitive_types.Ushort
+let uint = Primitive Ctypes_primitive_types.Uint
+let ulong = Primitive Ctypes_primitive_types.Ulong
+let ullong = Primitive Ctypes_primitive_types.Ullong
 let array i t = Array (t, i)
 let ocaml_string = OCaml String
 let ocaml_bytes = OCaml Bytes

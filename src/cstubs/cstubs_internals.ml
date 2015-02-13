@@ -19,7 +19,7 @@ let make_structured reftyp buf =
   { structured = CPointer (Ctypes_ptr.Fat.make ~managed ~reftyp raw_ptr) }
 
 include Ctypes_static
-include Primitives
+include Ctypes_primitive_types
 
 let make_ptr reftyp raw_ptr = CPointer (Ctypes_ptr.Fat.make ~reftyp raw_ptr)
 

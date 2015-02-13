@@ -22,11 +22,11 @@ external block_address : managed_buffer -> voidp
   = "ctypes_block_address"
 
 (* Read a C value from a block of memory *)
-external read : 'a Primitives.prim -> _ Fat.t -> 'a
+external read : 'a Ctypes_primitive_types.prim -> _ Fat.t -> 'a
   = "ctypes_read"
 
 (* Write a C value to a block of memory *)
-external write : 'a Primitives.prim -> 'a -> _ Fat.t -> unit
+external write : 'a Ctypes_primitive_types.prim -> 'a -> _ Fat.t -> unit
   = "ctypes_write"
 
 module Pointer =

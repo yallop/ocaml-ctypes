@@ -145,7 +145,7 @@ struct
     in function
     | OCaml String     -> ocaml_arg 1
     | OCaml Bytes      -> ocaml_arg 1
-    | OCaml FloatArray -> ocaml_arg (Ctypes_primitives.sizeof Primitives.Double)
+    | OCaml FloatArray -> ocaml_arg (Ctypes_primitives.sizeof Ctypes_primitive_types.Double)
     | ty -> (fun ~offset ~idx v dst mov -> Ctypes_memory.write ty v
       (Ctypes_ptr.Fat.(add_bytes (make ~reftyp:Void dst) offset)))
 

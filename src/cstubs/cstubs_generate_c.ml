@@ -59,8 +59,8 @@ struct
 
   let (>>) c1 c2 = (c1, Void) >>= fun _ -> c2
 
-  let prim_prj : type a. a Primitives.prim -> _ =
-    let open Primitives in function
+  let prim_prj : type a. a Ctypes_primitive_types.prim -> _ =
+    let open Ctypes_primitive_types in function
     | Char -> reader "Int_val" (value @-> returning int)
     | Schar -> reader "Int_val" (value @-> returning int)
     | Uchar -> reader "Uint8_val" (value @-> returning uint8_t)
@@ -89,8 +89,8 @@ struct
     | Complex32 -> reader "ctypes_float_complex_val" (value @-> returning complex32)
     | Complex64 -> reader "ctypes_double_complex_val" (value @-> returning complex64)
 
-  let prim_inj : type a. a Primitives.prim -> _ =
-    let open Primitives in function
+  let prim_inj : type a. a Ctypes_primitive_types.prim -> _ =
+    let open Ctypes_primitive_types in function
     | Char -> immediater "Val_int" (int @-> returning value)
     | Schar -> immediater "Val_int" (int @-> returning value)
     | Uchar -> conser "ctypes_copy_uint8" (uint8_t @-> returning value)

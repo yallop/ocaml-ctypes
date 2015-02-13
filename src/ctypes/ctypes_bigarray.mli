@@ -29,7 +29,7 @@ val bigarray3 : int -> int -> int -> ('a, 'b) Bigarray.kind ->
   ('a, ('a, 'b, Bigarray.c_layout) Bigarray.Array3.t) t
 (** Create a {!t} value for the {!Bigarray.Array3.t} type. *)
 
-val prim_of_kind : ('a, _) Bigarray.kind -> 'a Primitives.prim
+val prim_of_kind : ('a, _) Bigarray.kind -> 'a Ctypes_primitive_types.prim
 (** Create a {!Ctypes_ptr.Types.ctype} for a {!Bigarray.kind}. *)
 
 (** {3 Type eliminators *)
@@ -40,7 +40,7 @@ val sizeof : (_, _) t -> int
 val alignment : (_, _) t -> int
 (** Compute the alignment of a bigarray type. *)
 
-val element_type : ('a, _) t -> 'a Primitives.prim
+val element_type : ('a, _) t -> 'a Ctypes_primitive_types.prim
 (** Compute the element type of a bigarray type. *)
 
 val dimensions : (_, _) t -> int array

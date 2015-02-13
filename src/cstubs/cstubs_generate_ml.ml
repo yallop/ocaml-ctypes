@@ -203,7 +203,7 @@ let float_array = `Appl (path_of_string "array",
 let rec ml_typ_of_return_typ : type a. a typ -> ml_type =
   function
   | Void -> `Ident (path_of_string "unit")
-  | Primitive p -> `Ident (Cstubs_public_name.ident_of_ml_prim (Primitives.ml_prim p))
+  | Primitive p -> `Ident (Cstubs_public_name.ident_of_ml_prim (Ctypes_primitive_types.ml_prim p))
   | Struct _    -> managed_buffer
   | Union _     -> managed_buffer
   | Abstract _  -> managed_buffer
@@ -222,7 +222,7 @@ let rec ml_typ_of_return_typ : type a. a typ -> ml_type =
 
 let rec ml_typ_of_arg_typ : type a. a typ -> ml_type = function
   | Void -> `Ident (path_of_string "unit")
-  | Primitive p -> `Ident (Cstubs_public_name.ident_of_ml_prim (Primitives.ml_prim p))
+  | Primitive p -> `Ident (Cstubs_public_name.ident_of_ml_prim (Ctypes_primitive_types.ml_prim p))
   | Pointer _   -> fatptr
   | Struct _    -> fatptr
   | Union _     -> fatptr

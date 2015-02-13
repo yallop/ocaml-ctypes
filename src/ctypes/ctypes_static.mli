@@ -28,7 +28,7 @@ type 'a structspec =
 
 type _ typ =
     Void            :                       unit typ
-  | Primitive       : 'a Primitives.prim -> 'a typ
+  | Primitive       : 'a Ctypes_primitive_types.prim -> 'a typ
   | Pointer         : 'a typ             -> 'a ptr typ
   | Struct          : 'a structure_type  -> 'a structure typ
   | Union           : 'a union_type      -> 'a union typ

@@ -20,7 +20,7 @@ open Ctypes_std_view_stubs
 *)
 let test_fabs _ =
   Ctypes_ffi_stubs.(
-    let double_ffitype = primitive_ffitype Primitives.Double in
+    let double_ffitype = primitive_ffitype Ctypes_primitive_types.Double in
     let callspec = allocate_callspec
       ~check_errno:false
       ~runtime_lock:false
@@ -35,9 +35,9 @@ let test_fabs _ =
     let fabs x =
       call "fabs" dlfabs_fat callspec
         (fun p _values ->
-          write Primitives.Double x
+          write Ctypes_primitive_types.Double x
             Ctypes_ptr.(Fat.make ~reftyp:Ctypes_static.Void (Raw.(add p (of_int arg_1_offset)))))
-        (fun p -> read Primitives.Double (Ctypes_ptr.Fat.make ~reftyp:Ctypes_static.Void p))
+        (fun p -> read Ctypes_primitive_types.Double (Ctypes_ptr.Fat.make ~reftyp:Ctypes_static.Void p))
     in
 
     assert_equal 2.0 (fabs (-2.0)) ~printer:string_of_float;
@@ -52,7 +52,7 @@ let test_fabs _ =
 *)
 let test_pow _ =
   Ctypes_ffi_stubs.(
-    let double_ffitype = primitive_ffitype Primitives.Double in
+    let double_ffitype = primitive_ffitype Ctypes_primitive_types.Double in
     let callspec = allocate_callspec
       ~check_errno:false
       ~runtime_lock:false
@@ -68,11 +68,11 @@ let test_pow _ =
     let pow x y =
       call "pow" dlpow_fat callspec
         (fun buffer _values ->
-          write Primitives.Double x
+          write Ctypes_primitive_types.Double x
             Ctypes_ptr.(Fat.make ~reftyp:Ctypes_static.Void (Raw.(add buffer (of_int arg_1_offset))));
-          write Primitives.Double y
+          write Ctypes_primitive_types.Double y
             Ctypes_ptr.(Fat.make ~reftyp:Ctypes_static.Void (Raw.(add buffer (of_int arg_2_offset)))))
-        (fun p -> read Primitives.Double (Ctypes_ptr.Fat.make ~reftyp:Ctypes_static.Void p))
+        (fun p -> read Ctypes_primitive_types.Double (Ctypes_ptr.Fat.make ~reftyp:Ctypes_static.Void p))
     in
 
     assert_equal 8.0 (pow 2.0 3.0);
