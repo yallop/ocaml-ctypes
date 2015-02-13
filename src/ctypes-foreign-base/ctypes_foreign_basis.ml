@@ -5,12 +5,12 @@
  * See the file LICENSE for details.
  *)
 
-module Make(Closure_properties : Ffi.CLOSURE_PROPERTIES) =
+module Make(Closure_properties : Ctypes_ffi.CLOSURE_PROPERTIES) =
 struct
   open Dl
   open Ctypes
 
-  module Ffi = Ffi.Make(Closure_properties)
+  module Ffi = Ctypes_ffi.Make(Closure_properties)
 
   exception CallToExpiredClosure = Ctypes_ffi_stubs.CallToExpiredClosure
 
