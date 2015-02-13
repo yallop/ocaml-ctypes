@@ -30,7 +30,7 @@ struct
 
   let funptr_opt ?abi fn =
     let format_typ = format_function_pointer fn in
-    Std_views.nullable_view ~format_typ (funptr ?abi fn) void
+    Ctypes_std_views.nullable_view ~format_typ (funptr ?abi fn) void
 
   let ptr_of_raw_ptr p = 
     Ctypes.ptr_of_raw_address (Ctypes_ptr.Raw.to_nativeint p)

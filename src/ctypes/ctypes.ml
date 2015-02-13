@@ -13,7 +13,7 @@ include Ctypes_type_printing
 
 include Ctypes_memory
 
-include Std_views
+include Ctypes_std_views
 
 include Ctypes_value_printing
 
