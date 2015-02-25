@@ -14,12 +14,16 @@ sig
   val union : _ Ctypes.union Ctypes.typ -> unit
   val typedef : _ Ctypes.typ -> string -> unit
 
-  val internal : string -> ('a -> 'b) Ctypes.fn -> ('a -> 'b) -> unit
+  val internal : ?runtime_lock:bool -> string -> ('a -> 'b) Ctypes.fn -> ('a -> 'b) -> unit
 end
 
 module type BINDINGS = functor (F : INTERNAL) -> sig end
 
-type fn_info = Fn : string * (_ -> _) Ctypes.fn -> fn_info
+type fn_meta = {
+  fn_runtime_lock : bool;
+  fn_name         : string;
+}
+type fn_info = Fn : fn_meta * (_ -> _) Ctypes.fn -> fn_info
 type ty = Ty : _ Ctypes.typ -> ty
 type typedef = Typedef : _ Ctypes.typ * string -> typedef
 type enum = Enum : (string * int64) list * _ Ctypes.typ -> enum
@@ -42,12 +46,14 @@ let collector () : (module INTERNAL) * (unit -> decl list) =
       let structure typ = push (Decl_ty (Ty typ))
       let union typ = push (Decl_ty (Ty typ))
       let typedef typ name = push (Decl_typedef (Typedef (typ, name)))
-      let internal name fn _ = push (Decl_fn ((Fn (name, fn))))
+      let internal ?(runtime_lock=false) name fn _ =
+        let meta = { fn_runtime_lock = runtime_lock; fn_name = name } in
+        push (Decl_fn ((Fn (meta, fn))))
     end),
    (fun () -> List.rev !decls))
 
 let format_enum_values fmt infos =
-  List.iter (fun (Fn (n, _)) -> Format.fprintf fmt "@[fn_%s,@]@ " n) infos
+  List.iter (fun (Fn ({fn_name}, _)) -> Format.fprintf fmt "@[fn_%s,@]@ " fn_name) infos
 
 let c_prologue fmt register infos =
   Format.fprintf fmt "#include <caml/memory.h>@\n";
@@ -68,8 +74,8 @@ value %s(value i, value v)
   CAMLreturn (Val_unit);
 }@\n" register
 
-let c_function fmt (Fn (stub_name, fn)) : unit =
-  Cstubs_generate_c.inverse_fn ~stub_name fmt fn
+let c_function fmt (Fn ({fn_name; fn_runtime_lock}, fn)) : unit =
+  Cstubs_generate_c.inverse_fn ~stub_name:fn_name ~runtime_lock:fn_runtime_lock fmt fn
 
 let gen_c fmt register infos =
   begin
@@ -77,8 +83,8 @@ let gen_c fmt register infos =
     List.iter (c_function fmt) infos
   end
 
-let c_declaration fmt (Fn (stub_name, fn)) : unit =
-  Cstubs_generate_c.inverse_fn_decl ~stub_name fmt fn
+let c_declaration fmt (Fn ({fn_name; fn_runtime_lock}, fn)) : unit =
+  Cstubs_generate_c.inverse_fn_decl ~stub_name:fn_name fmt fn
 
 let write_structure_declaration fmt (Ty ty) =
   Format.fprintf fmt "@[%a@];@\n@\n" (fun ty -> Ctypes.format_typ ty) ty
@@ -87,7 +93,7 @@ let write_enum_declaration fmt (Enum (constants, ty)) =
   Format.fprintf fmt "@[%a@ {@\n@[<v 2>@\n" (fun ty -> Ctypes.format_typ ty) ty;
   let last = List.length constants - 1 in
   List.iteri
-    (fun i (name, value) -> 
+    (fun i (name, value) ->
        (* Trailing commas are not allowed. *)
        if i < last
        then Format.fprintf fmt "@[%s@ =@ %Ld,@]@\n" name value
@@ -121,15 +127,15 @@ let write_c_header fmt ~prefix (module B : BINDINGS) : unit =
   Format.fprintf fmt "@."
 
 let gen_ml fmt register (infos : fn_info list) : unit =
-  Format.fprintf fmt 
+  Format.fprintf fmt
     "type 'a fn = 'a@\n@\n";
   Format.fprintf fmt
     "module CI = Cstubs_internals@\n@\n";
-  Format.fprintf fmt 
+  Format.fprintf fmt
     "type 'a name = @\n";
   ListLabels.iter infos
-    ~f:(fun (Fn (n, fn)) ->
-      Cstubs_generate_ml.constructor_decl (Printf.sprintf "Fn_%s" n) fn fmt);
+    ~f:(fun (Fn ({fn_name}, fn)) ->
+      Cstubs_generate_ml.constructor_decl (Printf.sprintf "Fn_%s" fn_name) fn fmt);
   Format.fprintf fmt
     "@\n";
   Format.fprintf fmt
@@ -138,13 +144,13 @@ let gen_ml fmt register (infos : fn_info list) : unit =
   Format.fprintf fmt
     "@[<h>let internal : ";
   Format.fprintf fmt
-    "@[type a b.@ @[string -> (a -> b) Ctypes.fn -> (a -> b) -> unit@]@]@ =@\n";
+    "@[type a b.@ @[?runtime_lock:bool -> string -> (a -> b) Ctypes.fn -> (a -> b) -> unit@]@]@ =@\n";
   Format.fprintf fmt
-    "fun name fn f -> match name, fn with@\n@[";
+    "fun ?runtime_lock name fn f -> match name, fn with@\n@[";
   ListLabels.iter infos
-    ~f:(fun (Fn (n, fn)) ->
+    ~f:(fun (Fn ({fn_name}, fn)) ->
       Cstubs_generate_ml.inverse_case ~register_name:"register_value"
-        ~constructor:(Printf.sprintf "Fn_%s" n) n fmt fn);
+        ~constructor:(Printf.sprintf "Fn_%s" fn_name) fn_name fmt fn);
   Format.fprintf fmt
     "| _ -> failwith (\"Linking mismatch on name: \" ^ name)@]@]@]@\n@\n";
   Format.fprintf fmt

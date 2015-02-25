@@ -36,7 +36,7 @@ struct
    fun (e, ty) k ->
      let x = fresh_var () in
      match e with
-       (* let x = v in e ~> e[x:=v] *) 
+       (* let x = v in e ~> e[x:=v] *)
      | #cexp as v ->
        k v
      | #ceff as e ->
@@ -139,6 +139,12 @@ struct
                           (ptr void @-> returning value),
                    [x])
 
+  let acquire_runtime_system : ccomp =
+    `App (conser "caml_acquire_runtime_system" (ptr void @-> returning void), [])
+
+  let release_runtime_system : ccomp =
+    `App (conser "caml_release_runtime_system" (ptr void @-> returning void), [])
+
   let val_unit : ceff = `Global { name = "Val_unit";
                                   references_ocaml_heap = true;
                                   typ = Ty value }
@@ -176,7 +182,7 @@ struct
     | Struct s ->
       Some ((of_fatptr x, ptr void) >>= fun y ->
             `Deref (`Cast (Ty (ptr orig), y)))
-    | Union u -> 
+    | Union u ->
       Some ((of_fatptr x, ptr void) >>= fun y ->
             `Deref (`Cast (Ty (ptr orig), y)))
     | Abstract _ -> report_unpassable "values of abstract type"
@@ -224,7 +230,7 @@ struct
                    reads_ocaml_heap = false;
                    fn = Fn f; } in
       let rec body : type a. _ -> a fn -> _ =
-         fun vars -> function 
+         fun vars -> function
          | Returns t ->
            let x = fresh_var () in
            let e, ty = `App (fvar, (List.rev vars :> cexp list)), t in
@@ -233,7 +239,7 @@ struct
          | Function (x, f, t) ->
            begin match prj f (local x value) with
              None -> body vars t
-           | Some projected -> 
+           | Some projected ->
              (projected, f) >>= fun x' ->
              body (x' :: vars) t
            end
@@ -260,7 +266,7 @@ struct
       `Function (`Fundec (bytename, [argv; argc], Ty value),
                  build_call nargs)
 
-  let inverse_fn ~stub_name f =
+  let inverse_fn ~stub_name ~runtime_lock f =
     let `Fundec (_, args, Ty rtyp) as dec = fundec stub_name f in
     let idx = local (Printf.sprintf "fn_%s" stub_name) int in
     let project typ e =
@@ -268,18 +274,24 @@ struct
         None -> (e :> ccomp)
       | Some e -> e
     in
+    let wrap_if cond (lft:ccomp) (rgt:ccomp) =
+      if cond then lft >> rgt else rgt
+    in
     let call =
       (* f := functions[fn_name];
          x := caml_callbackN(f, nargs, locals);
          y := T_val(x);
-         CAMLreturnT(T, y);    *)
+         CAMLdrop();
+         y *)
       (`Index (functions, idx), value) >>= fun f ->
       (`App (caml_callbackN, [f;
                               local "nargs" int;
                               local "locals" (ptr value)]),
        value) >>= fun x ->
-      (project rtyp x, rtyp) >>= fun y -> 
-      `CAMLreturnT (Ty rtyp, y)
+      (project rtyp x, rtyp) >>= fun y ->
+      (`CAMLdrop, void) >>= fun _ ->
+      wrap_if runtime_lock release_runtime_system
+      (y :> ccomp)
     in
     let body =
       (* locals[0] = Val_T0(x0);
@@ -304,10 +316,11 @@ struct
     `Function
       (dec,
        `LetConst (local "nargs" int, `Int (List.length args),
+                  wrap_if runtime_lock acquire_runtime_system (
                   `CAMLparam0 >>
                   `CAMLlocalN (local "locals" (array (List.length args) value),
                                local "nargs" int) >>
-                    body))
+                    body)))
 
   let value : type a. cname:string -> stub_name:string -> a Ctypes_static.typ -> cfundef =
     fun ~cname ~stub_name typ ->
@@ -320,7 +333,7 @@ struct
 
 end
 
-let fn ~cname  ~stub_name fmt fn =
+let fn ~cname ~stub_name fmt fn =
   let `Function (`Fundec (f, xs, _), _) as dec
       = Generate_C.fn ~stub_name ~cname fn
   in
@@ -336,8 +349,8 @@ let value ~cname ~stub_name fmt typ =
   let dec = Generate_C.value ~cname ~stub_name typ in
   Cstubs_emit_c.cfundef fmt dec
 
-let inverse_fn ~stub_name fmt fn : unit =
-  Cstubs_emit_c.cfundef fmt (Generate_C.inverse_fn ~stub_name fn)
+let inverse_fn ~stub_name ~runtime_lock fmt fn : unit =
+  Cstubs_emit_c.cfundef fmt (Generate_C.inverse_fn ~stub_name ~runtime_lock fn)
 
 let inverse_fn_decl ~stub_name fmt fn =
   Format.fprintf fmt "@[%a@];@\n"
