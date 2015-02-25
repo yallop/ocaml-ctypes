@@ -40,7 +40,8 @@ type cexp = [ cconst
             | `Addr of cvar ]
 type clvalue = [ clocal | `Index of clvalue * cexp ]
 type camlop = [ `CAMLparam0
-              | `CAMLlocalN of cexp * cexp ]
+              | `CAMLlocalN of cexp * cexp
+              | `CAMLdrop ]
 type ceff = [ cexp
             | camlop
             | `Global of cglobal
@@ -77,7 +78,8 @@ struct
 
   let camlop : camlop -> ty = function
     | `CAMLparam0
-    | `CAMLlocalN _ -> Ty Void
+    | `CAMLlocalN _
+    | `CAMLdrop -> Ty Void
 
   let rec ceff : ceff -> ty = function
     | #cexp as e -> cexp e
