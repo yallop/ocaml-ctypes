@@ -78,6 +78,9 @@ let rec ceff fmt : ceff -> unit = function
   | `Deref e -> fprintf fmt "@[*@[%a@]@]" cexp e
   | `Assign (lv, e) ->
     fprintf fmt "@[@[%a@]@;=@;@[%a@]@]" clvalue lv ceff e
+  | `Inline i ->
+    fprintf fmt "@[%s@]" i
+
 
 let rec ccomp fmt : ccomp -> unit = function
   | #cexp as e -> fprintf fmt "@[<2>return@;@[%a@]@];" cexp e

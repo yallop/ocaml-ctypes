@@ -48,12 +48,15 @@ type ceff = [ cexp
             | `App of cfunction * cexp list
             | `Index of ceff * cexp
             | `Deref of cexp
-            | `Assign of clvalue * ceff ]
+            | `Assign of clvalue * ceff
+            | `Inline of string
+            ]
 type cbind = clocal * ceff
 type ccomp = [ ceff
              | `LetConst of clocal * cconst * ccomp
              | `CAMLreturnT of ty * cexp
-             | `Let of cbind * ccomp ]
+             | `Let of cbind * ccomp
+             ]
 type cfundec = [ `Fundec of string * (string * ty) list * ty ]
 type cfundef = [ `Function of cfundec * ccomp ]
 

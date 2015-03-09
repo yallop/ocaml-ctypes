@@ -5,8 +5,7 @@
  * See the file LICENSE for details.
  *)
 
-(* C stub customization options. These options are documented in
-   [Cstubs_inverted]. *)
+(* C stub customization options. *)
 type inverted_stubs_options =
   {
     (* will wrap [caml_release_runtime_system] and
@@ -16,6 +15,12 @@ type inverted_stubs_options =
     (* will wrap each function call with [caml_c_thread_register] and
        [caml_c_thread_unregister]. *)
     c_thread_register: bool;
+
+    (* Arbitrary C code to be inserted before/after the
+       function. Typically, can be used to insert mutex
+       acquire/release. *)
+    prelude: string option;
+    epilogue: string option;
   }
 
 (* C stub generation *)

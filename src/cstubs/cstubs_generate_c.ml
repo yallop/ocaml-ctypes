@@ -29,6 +29,13 @@ type inverted_stubs_options =
     (* will wrap each function call with [caml_c_thread_register] and
        [caml_c_thread_unregister]. *)
     c_thread_register: bool;
+
+    (* Arbitrary C code to be inserted before/after the
+       function. Typically, can be used to insert mutex
+       acquire/release. *)
+    prelude: string option;
+    epilogue: string option;
+
   }
 
 let value = abstract ~name:"value" ~size:0 ~alignment:0
@@ -296,6 +303,11 @@ struct
     let wrap_if cond (lft:ccomp) (rgt:ccomp) =
       if cond then lft >> rgt else rgt
     in
+    let wrap_inline (opt: string option) c =
+      match opt with
+      | None -> c
+      | Some i -> `Inline i >> c
+    in
     let call =
       (* f := functions[fn_name];
          x := caml_callbackN(f, nargs, locals);
@@ -311,6 +323,7 @@ struct
       (`CAMLdrop, void) >>= fun _ ->
       wrap_if options.runtime_lock release_runtime_system (
       wrap_if options.c_thread_register c_thread_unregister (
+      wrap_inline options.epilogue
       (y :> ccomp)))
     in
     let body =
@@ -336,6 +349,7 @@ struct
     `Function
       (dec,
        `LetConst (local "nargs" int, `Int (List.length args),
+                  wrap_inline options.prelude @@
                   wrap_if options.c_thread_register c_thread_register (
                   wrap_if options.runtime_lock acquire_runtime_system (
                         `CAMLparam0 >>
