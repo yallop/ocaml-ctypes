@@ -14,13 +14,14 @@ sig
   val union : _ Ctypes.union Ctypes.typ -> unit
   val typedef : _ Ctypes.typ -> string -> unit
 
-  val internal : ?runtime_lock:bool -> string -> ('a -> 'b) Ctypes.fn -> ('a -> 'b) -> unit
+  val internal : ?runtime_lock:bool -> ?c_thread_register:bool -> string -> ('a -> 'b) Ctypes.fn -> ('a -> 'b) -> unit
 end
 
 module type BINDINGS = functor (F : INTERNAL) -> sig end
 
 type fn_meta = {
   fn_runtime_lock : bool;
+  fn_c_thread_register: bool;
   fn_name         : string;
 }
 type fn_info = Fn : fn_meta * (_ -> _) Ctypes.fn -> fn_info
@@ -46,8 +47,10 @@ let collector () : (module INTERNAL) * (unit -> decl list) =
       let structure typ = push (Decl_ty (Ty typ))
       let union typ = push (Decl_ty (Ty typ))
       let typedef typ name = push (Decl_typedef (Typedef (typ, name)))
-      let internal ?(runtime_lock=false) name fn _ =
-        let meta = { fn_runtime_lock = runtime_lock; fn_name = name } in
+      let internal ?(runtime_lock=false) ?(c_thread_register=false) name fn _ =
+        let meta = { fn_runtime_lock = runtime_lock;
+                     fn_c_thread_register = c_thread_register;
+                     fn_name = name } in
         push (Decl_fn ((Fn (meta, fn))))
     end),
    (fun () -> List.rev !decls))
@@ -74,8 +77,14 @@ value %s(value i, value v)
   CAMLreturn (Val_unit);
 }@\n" register
 
-let c_function fmt (Fn ({fn_name; fn_runtime_lock}, fn)) : unit =
-  Cstubs_generate_c.inverse_fn ~stub_name:fn_name ~runtime_lock:fn_runtime_lock fmt fn
+let c_function fmt (Fn ({fn_name; fn_runtime_lock; fn_c_thread_register}, fn)) : unit =
+  let options = Cstubs_generate_c.{
+      runtime_lock = fn_runtime_lock;
+      c_thread_register = fn_c_thread_register
+    } in
+  Cstubs_generate_c.inverse_fn
+    ~stub_name:fn_name
+    ~options fmt fn
 
 let gen_c fmt register infos =
   begin

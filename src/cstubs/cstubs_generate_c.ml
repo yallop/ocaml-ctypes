@@ -18,6 +18,19 @@ let max_byte_args = 5
 let (@->) f t = Function (f, t)
 let returning t = Returns t
 
+(* C stub customization options. These options are documented in
+   [Cstubs_inverted]. *)
+type inverted_stubs_options =
+  {
+    (* will wrap [caml_release_runtime_system] and
+       [caml_acquire_runtime_system] around callbacks.*)
+    runtime_lock: bool;
+
+    (* will wrap each function call with [caml_c_thread_register] and
+       [caml_c_thread_unregister]. *)
+    c_thread_register: bool;
+  }
+
 let value = abstract ~name:"value" ~size:0 ~alignment:0
 
 module Generate_C =
@@ -145,6 +158,12 @@ struct
   let release_runtime_system : ccomp =
     `App (conser "caml_release_runtime_system" (ptr void @-> returning void), [])
 
+  let c_thread_register : ccomp =
+    `App (conser "caml_c_thread_register" (ptr void @-> returning void), [])
+
+  let c_thread_unregister : ccomp =
+    `App (conser "caml_c_thread_unregister" (ptr void @-> returning void), [])
+
   let val_unit : ceff = `Global { name = "Val_unit";
                                   references_ocaml_heap = true;
                                   typ = Ty value }
@@ -266,7 +285,7 @@ struct
       `Function (`Fundec (bytename, [argv; argc], Ty value),
                  build_call nargs)
 
-  let inverse_fn ~stub_name ~runtime_lock f =
+  let inverse_fn ~stub_name ~options f =
     let `Fundec (_, args, Ty rtyp) as dec = fundec stub_name f in
     let idx = local (Printf.sprintf "fn_%s" stub_name) int in
     let project typ e =
@@ -290,8 +309,9 @@ struct
        value) >>= fun x ->
       (project rtyp x, rtyp) >>= fun y ->
       (`CAMLdrop, void) >>= fun _ ->
-      wrap_if runtime_lock release_runtime_system
-      (y :> ccomp)
+      wrap_if options.runtime_lock release_runtime_system (
+      wrap_if options.c_thread_register c_thread_unregister (
+      (y :> ccomp)))
     in
     let body =
       (* locals[0] = Val_T0(x0);
@@ -316,11 +336,13 @@ struct
     `Function
       (dec,
        `LetConst (local "nargs" int, `Int (List.length args),
-                  wrap_if runtime_lock acquire_runtime_system (
-                  `CAMLparam0 >>
-                  `CAMLlocalN (local "locals" (array (List.length args) value),
-                               local "nargs" int) >>
-                    body)))
+                  wrap_if options.c_thread_register c_thread_register (
+                  wrap_if options.runtime_lock acquire_runtime_system (
+                        `CAMLparam0 >>
+                        `CAMLlocalN (local "locals" (array (List.length args) value),
+                                     local "nargs" int) >>
+                        body)
+                  )))
 
   let value : type a. cname:string -> stub_name:string -> a Ctypes_static.typ -> cfundef =
     fun ~cname ~stub_name typ ->
@@ -349,8 +371,8 @@ let value ~cname ~stub_name fmt typ =
   let dec = Generate_C.value ~cname ~stub_name typ in
   Cstubs_emit_c.cfundef fmt dec
 
-let inverse_fn ~stub_name ~runtime_lock fmt fn : unit =
-  Cstubs_emit_c.cfundef fmt (Generate_C.inverse_fn ~stub_name ~runtime_lock fn)
+let inverse_fn ~stub_name ~options fmt fn : unit =
+  Cstubs_emit_c.cfundef fmt (Generate_C.inverse_fn ~stub_name ~options fn)
 
 let inverse_fn_decl ~stub_name fmt fn =
   Format.fprintf fmt "@[%a@];@\n"

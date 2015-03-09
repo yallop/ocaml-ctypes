@@ -5,6 +5,19 @@
  * See the file LICENSE for details.
  *)
 
+(* C stub customization options. These options are documented in
+   [Cstubs_inverted]. *)
+type inverted_stubs_options =
+  {
+    (* will wrap [caml_release_runtime_system] and
+       [caml_acquire_runtime_system] around callbacks.*)
+    runtime_lock: bool;
+
+    (* will wrap each function call with [caml_c_thread_register] and
+       [caml_c_thread_unregister]. *)
+    c_thread_register: bool;
+  }
+
 (* C stub generation *)
 
 val fn : cname:string -> stub_name:string ->
@@ -13,8 +26,8 @@ val fn : cname:string -> stub_name:string ->
 val value : cname:string -> stub_name:string -> Format.formatter ->
          'a Ctypes.typ -> unit
 
-val inverse_fn : stub_name:string -> runtime_lock:bool ->
-         Format.formatter -> 'a Ctypes.fn -> unit
+val inverse_fn : stub_name:string -> options:inverted_stubs_options ->
+  Format.formatter -> 'a Ctypes.fn -> unit
 
 val inverse_fn_decl : stub_name:string -> Format.formatter ->
          'a Ctypes.fn -> unit
