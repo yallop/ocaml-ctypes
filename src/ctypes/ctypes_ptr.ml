@@ -32,6 +32,9 @@ struct
   let of_nativeint x = x
   let to_nativeint x = x
 
+  let of_int64 = Int64.to_nativeint
+  let to_int64  = Int64.of_nativeint
+
   let null = zero
 end
 

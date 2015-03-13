@@ -31,6 +31,12 @@ module type S = sig
 
   val to_nativeint : t -> nativeint
   (** Convert the given signed integer to a nativeint value. *)
+
+  val of_int64 : int64 -> t
+  (** Convert the given int64 value to a signed integer. *)
+
+  val to_int64 : t -> int64
+  (** Convert the given signed integer to an int64 value. *)
 end
 (** Signed integer operations *)
 
