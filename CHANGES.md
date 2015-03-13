@@ -4,37 +4,35 @@ Thanks to A. Hauptmann (@fdopen), David Sheets (@dsheets), Maverick Woo (@maveri
 
 ### Major features
 
-#### Support for the C99 bool type
+* Support for the C99 bool type
 
-#### Typedef support
+* Typedef support
 
-#### Enum support
+* Enum support
 
-#### Support for accessing C globals with foreign_value in generated stubs
+* Support for accessing C globals with foreign_value in generated stubs
 
-#### Support for retrieving #define and enum constants from C
+* Support for retrieving #define and enum constants from C
 
-#### Windows support
+* Windows support
 
-There is now support for Windows (32-bit and 64-bit, using MinGW) and automatic building and testing on Windows using [Appveyor][appveyor-builds]. 
+  There is now support for Windows (32-bit and 64-bit, using MinGW) and automatic building and testing on Windows using [Appveyor][appveyor-builds]. 
 
-[appveyor-builds]: https://ci.appveyor.com/project/yallop/ocaml-ctypes/branch/master
+* Support for releasing the runtime lock in C calls
 
-#### Support for releasing the runtime lock in C calls
+  The new `release_runtime_lock` argument to `Foreign.foreign` indicates whether the OCaml runtime lock should be released during the call to the bound C function, allowing other threads to run.
 
-The new `release_runtime_lock` argument to `Foreign.foreign` indicates whether the OCaml runtime lock should be released during the call to the bound C function, allowing other threads to run.
+* Support for acquiring the runtime lock in callbacks
 
-#### Support for acquiring the runtime lock in callbacks
+  There is a  new `runtime_lock` argument to `Foreign.funptr`.  Setting `runtime_lock` to `true` indicates that the OCaml runtime lock should be acquired during calls from C to OCaml and released during calls through function pointers from OCaml to C.
 
-There is a  new `runtime_lock` argument to `Foreign.funptr`.  Setting `runtime_lock` to `true` indicates that the OCaml runtime lock should be acquired during calls from C to OCaml and released during calls through function pointers from OCaml to C.
+* Support for passing 'bytes' values directly to C
 
-#### Support for passing 'bytes' values directly to C
+  See the [relevant section of the FAQ][strings_faq].
 
-See the [relevant section of the FAQ][strings_faq].
+* Add support for custom printers in views.
 
-#### Add support for custom printers in views.
-
-#### Optionally obtain struct and union layout from C
+* Optionally obtain struct and union layout from C
 
 #### Other changes
 * string_opt wraps char *, not void *.
@@ -47,6 +45,8 @@ See the [relevant section of the FAQ][strings_faq].
 * RTLD_LOCAL support
 * Changed the #include path to $(ocamlfind query ctypes)
 * Renamed some internal modules to avoid name clashes
+
+[appveyor-builds]: https://ci.appveyor.com/project/yallop/ocaml-ctypes/branch/master
 
 ## ctypes 0.3.4
 
