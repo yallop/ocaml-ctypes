@@ -15,6 +15,8 @@ module type S = sig
   val shift_right_logical : t -> int -> t
   val of_nativeint : nativeint -> t
   val to_nativeint : t -> nativeint
+  val of_int64 : int64 -> t
+  val to_int64 : t -> int64
 end
 
 module type Basics = sig
@@ -55,6 +57,8 @@ struct
   module Infix = MakeInfix(Int32)
   let of_nativeint = Nativeint.to_int32
   let to_nativeint = Nativeint.of_int32
+  let of_int64 = Int64.to_int32
+  let to_int64 = Int64.of_int32
 end
 
 module Int64 = 
