@@ -64,3 +64,8 @@ case "$OCAML_VERSION" in
     echo "Mirage not installable, so not testing Xen build."
   fi ;;
 esac
+
+echo 'threaded cmi md5'
+md5sum ./_build/src/ctypes-foreign-threaded/foreign.cmi
+echo 'unthreaded cmi md5'
+md5sum ./_build/src/ctypes-foreign-unthreaded/foreign.cmi
