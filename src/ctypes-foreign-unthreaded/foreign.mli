@@ -71,7 +71,10 @@ val funptr :
     passed using {!Ctypes.ocaml_string} and {!Ctypes.ocaml_bytes}, and must
     not call back into OCaml.  If the function pointer is used to call into
     OCaml from C then the [?runtime_lock] argument indicates whether the lock
-    should be acquired and held during the call. *)
+    should be acquired and held during the call.
+
+    @raise Dl.DL_error if [name] is not found in [?from] and [?stub] is
+    [false]. *)
 
 val funptr_opt :
   ?abi:Libffi_abi.abi ->
