@@ -85,7 +85,9 @@ value %s(value i, value v)
 }@\n" register
 
 let c_function fmt (Fn (meta, fn)) : unit =
-  let options = Cstubs_generate_c.{
+  let options =
+    let open Cstubs_generate_c in
+    {
       runtime_lock = meta.fn_runtime_lock;
       c_thread_register = meta.fn_c_thread_register;
       prelude = meta.fn_prelude;
