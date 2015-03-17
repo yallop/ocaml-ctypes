@@ -39,7 +39,7 @@ sig
         The value [alist] is an association list of OCaml values and values
         retrieved by the [constant] function.  For example, to expose the enum
 
-          enum letters { A, B, C = 10, D }; 
+          enum letters \{ A, B, C = 10, D \}; 
 
         you might first retrieve the values of the enumeration constants:
 
