@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link rel="previous" href="Ctypes_types.html">
+<link rel="next" href="Dl.html">
+<link rel="Up" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Index of module types" rel=Appendix href="index_module_types.html">
+<link title="Ctypes_static" rel="Chapter" href="Ctypes_static.html">
+<link title="Ctypes_primitive_types" rel="Chapter" href="Ctypes_primitive_types.html">
+<link title="Unsigned" rel="Chapter" href="Unsigned.html">
+<link title="Signed" rel="Chapter" href="Signed.html">
+<link title="Ctypes_structs" rel="Chapter" href="Ctypes_structs.html">
+<link title="Ctypes" rel="Chapter" href="Ctypes.html">
+<link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
+<link title="Ctypes_types" rel="Chapter" href="Ctypes_types.html">
+<link title="Ctypes_printers" rel="Chapter" href="Ctypes_printers.html">
+<link title="Dl" rel="Chapter" href="Dl.html">
+<link title="Libffi_abi" rel="Chapter" href="Libffi_abi.html">
+<link title="Foreign" rel="Chapter" href="Foreign.html">
+<link title="Cstubs_internals" rel="Chapter" href="Cstubs_internals.html">
+<link title="Cstubs_structs" rel="Chapter" href="Cstubs_structs.html">
+<link title="Cstubs" rel="Chapter" href="Cstubs.html">
+<link title="Cstubs_inverted" rel="Chapter" href="Cstubs_inverted.html"><title>Ctypes_printers</title>
+</head>
+<body>
+<div class="navbar"><a class="pre" href="Ctypes_types.html" title="Ctypes_types">Previous</a>
+&nbsp;<a class="up" href="index.html" title="Index">Up</a>
+&nbsp;<a class="post" href="Dl.html" title="Dl">Next</a>
+</div>
+<h1>Module <a href="type_Ctypes_printers.html">Ctypes_printers</a></h1>
+
+<pre><span class="keyword">module</span> Ctypes_printers: <code class="code">sig</code> <a href="Ctypes_printers.html">..</a> <code class="code">end</code></pre><hr width="100%">
+
+<pre><span id="VALformat_typ"><span class="keyword">val</span> format_typ</span> : <code class="type">Format.formatter -> 'a Ctypes.typ -> unit</code></pre>
+<pre><span id="VALformat_fn"><span class="keyword">val</span> format_fn</span> : <code class="type">Format.formatter -> 'a Ctypes.fn -> unit</code></pre>
+<pre><span id="VALformat_long"><span class="keyword">val</span> format_long</span> : <code class="type">Format.formatter -> Signed.Long.t -> unit</code></pre>
+<pre><span id="VALformat_llong"><span class="keyword">val</span> format_llong</span> : <code class="type">Format.formatter -> Signed.LLong.t -> unit</code></pre>
+<pre><span id="VALformat_uchar"><span class="keyword">val</span> format_uchar</span> : <code class="type">Format.formatter -> Unsigned.UChar.t -> unit</code></pre>
+<pre><span id="VALformat_uint8"><span class="keyword">val</span> format_uint8</span> : <code class="type">Format.formatter -> Unsigned.UInt8.t -> unit</code></pre>
+<pre><span id="VALformat_uint16"><span class="keyword">val</span> format_uint16</span> : <code class="type">Format.formatter -> Unsigned.UInt16.t -> unit</code></pre>
+<pre><span id="VALformat_uint32"><span class="keyword">val</span> format_uint32</span> : <code class="type">Format.formatter -> Unsigned.UInt32.t -> unit</code></pre>
+<pre><span id="VALformat_uint64"><span class="keyword">val</span> format_uint64</span> : <code class="type">Format.formatter -> Unsigned.UInt64.t -> unit</code></pre>
+<pre><span id="VALformat_ushort"><span class="keyword">val</span> format_ushort</span> : <code class="type">Format.formatter -> Unsigned.UShort.t -> unit</code></pre>
+<pre><span id="VALformat_uint"><span class="keyword">val</span> format_uint</span> : <code class="type">Format.formatter -> Unsigned.UInt.t -> unit</code></pre>
+<pre><span id="VALformat_ulong"><span class="keyword">val</span> format_ulong</span> : <code class="type">Format.formatter -> Unsigned.ULong.t -> unit</code></pre>
+<pre><span id="VALformat_ullong"><span class="keyword">val</span> format_ullong</span> : <code class="type">Format.formatter -> Unsigned.ULLong.t -> unit</code></pre>
+<pre><span id="VALformat_pointer"><span class="keyword">val</span> format_pointer</span> : <code class="type">Format.formatter -> 'a <a href="Ctypes.html#TYPEptr">Ctypes.ptr</a> -> unit</code></pre>
+<pre><span id="VALformat_struct"><span class="keyword">val</span> format_struct</span> : <code class="type">Format.formatter -> ('a, 'b) <a href="Ctypes.html#TYPEstructured">Ctypes.structured</a> -> unit</code></pre>
+<pre><span id="VALformat_union"><span class="keyword">val</span> format_union</span> : <code class="type">Format.formatter -> ('a, 'b) <a href="Ctypes.html#TYPEstructured">Ctypes.structured</a> -> unit</code></pre>
+<pre><span id="VALformat_array"><span class="keyword">val</span> format_array</span> : <code class="type">Format.formatter -> 'a <a href="Ctypes.CArray.html#TYPEt">Ctypes.CArray.t</a> -> unit</code></pre>
+<pre><span id="VALformat_ocaml"><span class="keyword">val</span> format_ocaml</span> : <code class="type">Format.formatter -> 'a <a href="Ctypes.html#TYPEocaml">Ctypes.ocaml</a> -> unit</code></pre>
+<pre><span id="VALformat_clock_t"><span class="keyword">val</span> format_clock_t</span> : <code class="type">Format.formatter -> <a href="PosixTypes.html#TYPEclock_t">PosixTypes.clock_t</a> -> unit</code></pre>
+<pre><span id="VALformat_dev_t"><span class="keyword">val</span> format_dev_t</span> : <code class="type">Format.formatter -> <a href="PosixTypes.html#TYPEdev_t">PosixTypes.dev_t</a> -> unit</code></pre>
+<pre><span id="VALformat_ino_t"><span class="keyword">val</span> format_ino_t</span> : <code class="type">Format.formatter -> <a href="PosixTypes.html#TYPEino_t">PosixTypes.ino_t</a> -> unit</code></pre>
+<pre><span id="VALformat_mode_t"><span class="keyword">val</span> format_mode_t</span> : <code class="type">Format.formatter -> <a href="PosixTypes.html#TYPEmode_t">PosixTypes.mode_t</a> -> unit</code></pre>
+<pre><span id="VALformat_nlink_t"><span class="keyword">val</span> format_nlink_t</span> : <code class="type">Format.formatter -> <a href="PosixTypes.html#TYPEnlink_t">PosixTypes.nlink_t</a> -> unit</code></pre>
+<pre><span id="VALformat_off_t"><span class="keyword">val</span> format_off_t</span> : <code class="type">Format.formatter -> <a href="PosixTypes.html#TYPEoff_t">PosixTypes.off_t</a> -> unit</code></pre>
+<pre><span id="VALformat_pid_t"><span class="keyword">val</span> format_pid_t</span> : <code class="type">Format.formatter -> <a href="PosixTypes.html#TYPEpid_t">PosixTypes.pid_t</a> -> unit</code></pre>
+<pre><span id="VALformat_size_t"><span class="keyword">val</span> format_size_t</span> : <code class="type">Format.formatter -> <a href="PosixTypes.html#TYPEsize_t">PosixTypes.size_t</a> -> unit</code></pre>
+<pre><span id="VALformat_ssize_t"><span class="keyword">val</span> format_ssize_t</span> : <code class="type">Format.formatter -> <a href="PosixTypes.html#TYPEssize_t">PosixTypes.ssize_t</a> -> unit</code></pre>
+<pre><span id="VALformat_time_t"><span class="keyword">val</span> format_time_t</span> : <code class="type">Format.formatter -> <a href="PosixTypes.html#TYPEtime_t">PosixTypes.time_t</a> -> unit</code></pre>
+<pre><span id="VALformat_useconds_t"><span class="keyword">val</span> format_useconds_t</span> : <code class="type">Format.formatter -> <a href="PosixTypes.html#TYPEuseconds_t">PosixTypes.useconds_t</a> -> unit</code></pre></body></html>

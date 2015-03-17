@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="style.css" type="text/css">
 <meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
 <link rel="Start" href="index.html">
-<link rel="previous" href="Dl.html">
+<link rel="previous" href="Cstubs_structs.html">
 <link rel="next" href="Cstubs_inverted.html">
 <link rel="Up" href="index.html">
 <link title="Index of types" rel=Appendix href="index_types.html">
@@ -12,18 +12,25 @@
 <link title="Index of values" rel=Appendix href="index_values.html">
 <link title="Index of modules" rel=Appendix href="index_modules.html">
 <link title="Index of module types" rel=Appendix href="index_module_types.html">
-<link title="Libffi_abi" rel="Chapter" href="Libffi_abi.html">
-<link title="Dl" rel="Chapter" href="Dl.html">
-<link title="Cstubs" rel="Chapter" href="Cstubs.html">
-<link title="Cstubs_inverted" rel="Chapter" href="Cstubs_inverted.html">
-<link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
-<link title="Signed" rel="Chapter" href="Signed.html">
+<link title="Ctypes_static" rel="Chapter" href="Ctypes_static.html">
+<link title="Ctypes_primitive_types" rel="Chapter" href="Ctypes_primitive_types.html">
 <link title="Unsigned" rel="Chapter" href="Unsigned.html">
+<link title="Signed" rel="Chapter" href="Signed.html">
+<link title="Ctypes_structs" rel="Chapter" href="Ctypes_structs.html">
 <link title="Ctypes" rel="Chapter" href="Ctypes.html">
-<link title="Foreign" rel="Chapter" href="Foreign.html"><title>Cstubs</title>
+<link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
+<link title="Ctypes_types" rel="Chapter" href="Ctypes_types.html">
+<link title="Ctypes_printers" rel="Chapter" href="Ctypes_printers.html">
+<link title="Dl" rel="Chapter" href="Dl.html">
+<link title="Libffi_abi" rel="Chapter" href="Libffi_abi.html">
+<link title="Foreign" rel="Chapter" href="Foreign.html">
+<link title="Cstubs_internals" rel="Chapter" href="Cstubs_internals.html">
+<link title="Cstubs_structs" rel="Chapter" href="Cstubs_structs.html">
+<link title="Cstubs" rel="Chapter" href="Cstubs.html">
+<link title="Cstubs_inverted" rel="Chapter" href="Cstubs_inverted.html"><title>Cstubs</title>
 </head>
 <body>
-<div class="navbar"><a class="pre" href="Dl.html" title="Dl">Previous</a>
+<div class="navbar"><a class="pre" href="Cstubs_structs.html" title="Cstubs_structs">Previous</a>
 &nbsp;<a class="up" href="index.html" title="Index">Up</a>
 &nbsp;<a class="post" href="Cstubs_inverted.html" title="Cstubs_inverted">Next</a>
 </div>
@@ -34,6 +41,7 @@ Operations for generating C bindings stubs.<br>
 </div>
 <hr width="100%">
 
+<pre><span class="keyword">module</span> <a href="Cstubs.Types.html">Types</a>: <code class="code">sig</code> <a href="Cstubs.Types.html">..</a> <code class="code">end</code></pre>
 <pre><span class="keyword">module type</span> <a href="Cstubs.FOREIGN.html">FOREIGN</a> = <code class="code">sig</code> <a href="Cstubs.FOREIGN.html">..</a> <code class="code">end</code></pre>
 <pre><span class="keyword">module type</span> <a href="Cstubs.BINDINGS.html">BINDINGS</a> = <code class="code">functor (</code><code class="code">F</code><code class="code"> : </code><code class="type"><a href="Cstubs.FOREIGN.html">FOREIGN</a></code><code class="type">  with type 'a fn = unit</code><code class="code">) -&gt; </code><code class="code">sig</code> <a href="Cstubs.BINDINGS.html">..</a> <code class="code">end</code></pre>
 <pre><span id="VALwrite_c"><span class="keyword">val</span> write_c</span> : <code class="type">Format.formatter -> prefix:string -> (module Cstubs.BINDINGS) -> unit</code></pre><div class="info ">

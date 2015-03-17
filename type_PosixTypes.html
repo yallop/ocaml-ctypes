@@ -7,26 +7,27 @@
 <link title="Index of values" rel=Appendix href="index_values.html">
 <link title="Index of modules" rel=Appendix href="index_modules.html">
 <link title="Index of module types" rel=Appendix href="index_module_types.html">
-<link title="Libffi_abi" rel="Chapter" href="Libffi_abi.html">
-<link title="Dl" rel="Chapter" href="Dl.html">
-<link title="Cstubs" rel="Chapter" href="Cstubs.html">
-<link title="Cstubs_inverted" rel="Chapter" href="Cstubs_inverted.html">
-<link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
-<link title="Signed" rel="Chapter" href="Signed.html">
+<link title="Ctypes_static" rel="Chapter" href="Ctypes_static.html">
+<link title="Ctypes_primitive_types" rel="Chapter" href="Ctypes_primitive_types.html">
 <link title="Unsigned" rel="Chapter" href="Unsigned.html">
+<link title="Signed" rel="Chapter" href="Signed.html">
+<link title="Ctypes_structs" rel="Chapter" href="Ctypes_structs.html">
 <link title="Ctypes" rel="Chapter" href="Ctypes.html">
-<link title="Foreign" rel="Chapter" href="Foreign.html"><title>PosixTypes</title>
+<link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
+<link title="Ctypes_types" rel="Chapter" href="Ctypes_types.html">
+<link title="Ctypes_printers" rel="Chapter" href="Ctypes_printers.html">
+<link title="Dl" rel="Chapter" href="Dl.html">
+<link title="Libffi_abi" rel="Chapter" href="Libffi_abi.html">
+<link title="Foreign" rel="Chapter" href="Foreign.html">
+<link title="Cstubs_internals" rel="Chapter" href="Cstubs_internals.html">
+<link title="Cstubs_structs" rel="Chapter" href="Cstubs_structs.html">
+<link title="Cstubs" rel="Chapter" href="Cstubs.html">
+<link title="Cstubs_inverted" rel="Chapter" href="Cstubs_inverted.html"><title>PosixTypes</title>
 </head>
 <body>
 <code class="code"><span class="keyword">sig</span><br>
-&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;blkcnt_t<br>
-&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;blksize_t<br>
 &nbsp;&nbsp;<span class="keyword">type</span>&nbsp;clock_t<br>
 &nbsp;&nbsp;<span class="keyword">type</span>&nbsp;dev_t<br>
-&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;fsblkcnt_t<br>
-&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;fsfilcnt_t<br>
-&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;gid_t<br>
-&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;id_t<br>
 &nbsp;&nbsp;<span class="keyword">type</span>&nbsp;ino_t<br>
 &nbsp;&nbsp;<span class="keyword">type</span>&nbsp;mode_t<br>
 &nbsp;&nbsp;<span class="keyword">type</span>&nbsp;nlink_t<br>
@@ -34,18 +35,10 @@
 &nbsp;&nbsp;<span class="keyword">type</span>&nbsp;pid_t<br>
 &nbsp;&nbsp;<span class="keyword">type</span>&nbsp;size_t&nbsp;=&nbsp;<span class="constructor">Unsigned</span>.size_t<br>
 &nbsp;&nbsp;<span class="keyword">type</span>&nbsp;ssize_t<br>
-&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;suseconds_t<br>
 &nbsp;&nbsp;<span class="keyword">type</span>&nbsp;time_t<br>
-&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;uid_t<br>
 &nbsp;&nbsp;<span class="keyword">type</span>&nbsp;useconds_t<br>
-&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;blkcnt_t&nbsp;:&nbsp;<span class="constructor">PosixTypes</span>.blkcnt_t&nbsp;<span class="constructor">Ctypes</span>.typ<br>
-&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;blksize_t&nbsp;:&nbsp;<span class="constructor">PosixTypes</span>.blksize_t&nbsp;<span class="constructor">Ctypes</span>.typ<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;clock_t&nbsp;:&nbsp;<span class="constructor">PosixTypes</span>.clock_t&nbsp;<span class="constructor">Ctypes</span>.typ<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;dev_t&nbsp;:&nbsp;<span class="constructor">PosixTypes</span>.dev_t&nbsp;<span class="constructor">Ctypes</span>.typ<br>
-&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;fsblkcnt_t&nbsp;:&nbsp;<span class="constructor">PosixTypes</span>.fsblkcnt_t&nbsp;<span class="constructor">Ctypes</span>.typ<br>
-&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;fsfilcnt_t&nbsp;:&nbsp;<span class="constructor">PosixTypes</span>.fsfilcnt_t&nbsp;<span class="constructor">Ctypes</span>.typ<br>
-&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;gid_t&nbsp;:&nbsp;<span class="constructor">PosixTypes</span>.gid_t&nbsp;<span class="constructor">Ctypes</span>.typ<br>
-&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;id_t&nbsp;:&nbsp;<span class="constructor">PosixTypes</span>.id_t&nbsp;<span class="constructor">Ctypes</span>.typ<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;ino_t&nbsp;:&nbsp;<span class="constructor">PosixTypes</span>.ino_t&nbsp;<span class="constructor">Ctypes</span>.typ<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;mode_t&nbsp;:&nbsp;<span class="constructor">PosixTypes</span>.mode_t&nbsp;<span class="constructor">Ctypes</span>.typ<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;nlink_t&nbsp;:&nbsp;<span class="constructor">PosixTypes</span>.nlink_t&nbsp;<span class="constructor">Ctypes</span>.typ<br>
@@ -53,32 +46,8 @@
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;pid_t&nbsp;:&nbsp;<span class="constructor">PosixTypes</span>.pid_t&nbsp;<span class="constructor">Ctypes</span>.typ<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;size_t&nbsp;:&nbsp;<span class="constructor">PosixTypes</span>.size_t&nbsp;<span class="constructor">Ctypes</span>.typ<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;ssize_t&nbsp;:&nbsp;<span class="constructor">PosixTypes</span>.ssize_t&nbsp;<span class="constructor">Ctypes</span>.typ<br>
-&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;suseconds_t&nbsp;:&nbsp;<span class="constructor">PosixTypes</span>.suseconds_t&nbsp;<span class="constructor">Ctypes</span>.typ<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;time_t&nbsp;:&nbsp;<span class="constructor">PosixTypes</span>.time_t&nbsp;<span class="constructor">Ctypes</span>.typ<br>
-&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;uid_t&nbsp;:&nbsp;<span class="constructor">PosixTypes</span>.uid_t&nbsp;<span class="constructor">Ctypes</span>.typ<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;useconds_t&nbsp;:&nbsp;<span class="constructor">PosixTypes</span>.useconds_t&nbsp;<span class="constructor">Ctypes</span>.typ<br>
-&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;key_t<br>
-&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;pthread_t<br>
-&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;pthread_attr_t<br>
-&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;pthread_cond_t<br>
-&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;pthread_condattr_t<br>
-&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;pthread_key_t<br>
-&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;pthread_mutex_t<br>
-&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;pthread_mutexattr_t<br>
-&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;pthread_once_t<br>
-&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;pthread_rwlock_t<br>
-&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;pthread_rwlockattr_t<br>
 &nbsp;&nbsp;<span class="keyword">type</span>&nbsp;sigset_t<br>
-&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;key_t&nbsp;:&nbsp;<span class="constructor">PosixTypes</span>.key_t&nbsp;<span class="constructor">Ctypes</span>.typ<br>
-&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;pthread_t&nbsp;:&nbsp;<span class="constructor">PosixTypes</span>.pthread_t&nbsp;<span class="constructor">Ctypes</span>.typ<br>
-&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;pthread_attr_t&nbsp;:&nbsp;<span class="constructor">PosixTypes</span>.pthread_attr_t&nbsp;<span class="constructor">Ctypes</span>.typ<br>
-&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;pthread_cond_t&nbsp;:&nbsp;<span class="constructor">PosixTypes</span>.pthread_cond_t&nbsp;<span class="constructor">Ctypes</span>.typ<br>
-&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;pthread_condattr_t&nbsp;:&nbsp;<span class="constructor">PosixTypes</span>.pthread_condattr_t&nbsp;<span class="constructor">Ctypes</span>.typ<br>
-&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;pthread_key_t&nbsp;:&nbsp;<span class="constructor">PosixTypes</span>.pthread_key_t&nbsp;<span class="constructor">Ctypes</span>.typ<br>
-&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;pthread_mutex_t&nbsp;:&nbsp;<span class="constructor">PosixTypes</span>.pthread_mutex_t&nbsp;<span class="constructor">Ctypes</span>.typ<br>
-&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;pthread_mutexattr_t&nbsp;:&nbsp;<span class="constructor">PosixTypes</span>.pthread_mutexattr_t&nbsp;<span class="constructor">Ctypes</span>.typ<br>
-&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;pthread_once_t&nbsp;:&nbsp;<span class="constructor">PosixTypes</span>.pthread_once_t&nbsp;<span class="constructor">Ctypes</span>.typ<br>
-&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;pthread_rwlock_t&nbsp;:&nbsp;<span class="constructor">PosixTypes</span>.pthread_rwlock_t&nbsp;<span class="constructor">Ctypes</span>.typ<br>
-&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;pthread_rwlockattr_t&nbsp;:&nbsp;<span class="constructor">PosixTypes</span>.pthread_rwlockattr_t&nbsp;<span class="constructor">Ctypes</span>.typ<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;sigset_t&nbsp;:&nbsp;<span class="constructor">PosixTypes</span>.sigset_t&nbsp;<span class="constructor">Ctypes</span>.typ<br>
 <span class="keyword">end</span></code></body></html>

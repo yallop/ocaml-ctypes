@@ -11,15 +11,22 @@
 <link title="Index of values" rel=Appendix href="index_values.html">
 <link title="Index of modules" rel=Appendix href="index_modules.html">
 <link title="Index of module types" rel=Appendix href="index_module_types.html">
-<link title="Libffi_abi" rel="Chapter" href="Libffi_abi.html">
-<link title="Dl" rel="Chapter" href="Dl.html">
-<link title="Cstubs" rel="Chapter" href="Cstubs.html">
-<link title="Cstubs_inverted" rel="Chapter" href="Cstubs_inverted.html">
-<link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
-<link title="Signed" rel="Chapter" href="Signed.html">
+<link title="Ctypes_static" rel="Chapter" href="Ctypes_static.html">
+<link title="Ctypes_primitive_types" rel="Chapter" href="Ctypes_primitive_types.html">
 <link title="Unsigned" rel="Chapter" href="Unsigned.html">
+<link title="Signed" rel="Chapter" href="Signed.html">
+<link title="Ctypes_structs" rel="Chapter" href="Ctypes_structs.html">
 <link title="Ctypes" rel="Chapter" href="Ctypes.html">
-<link title="Foreign" rel="Chapter" href="Foreign.html"><title>Cstubs_inverted.INTERNAL</title>
+<link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
+<link title="Ctypes_types" rel="Chapter" href="Ctypes_types.html">
+<link title="Ctypes_printers" rel="Chapter" href="Ctypes_printers.html">
+<link title="Dl" rel="Chapter" href="Dl.html">
+<link title="Libffi_abi" rel="Chapter" href="Libffi_abi.html">
+<link title="Foreign" rel="Chapter" href="Foreign.html">
+<link title="Cstubs_internals" rel="Chapter" href="Cstubs_internals.html">
+<link title="Cstubs_structs" rel="Chapter" href="Cstubs_structs.html">
+<link title="Cstubs" rel="Chapter" href="Cstubs.html">
+<link title="Cstubs_inverted" rel="Chapter" href="Cstubs_inverted.html"><title>Cstubs_inverted.INTERNAL</title>
 </head>
 <body>
 <div class="navbar">&nbsp;<a class="up" href="Cstubs_inverted.html" title="Cstubs_inverted">Up</a>
@@ -29,4 +36,8 @@
 
 <pre><span class="keyword">module type</span> INTERNAL = <code class="code">sig</code> <a href="Cstubs_inverted.INTERNAL.html">..</a> <code class="code">end</code></pre><hr width="100%">
 
-<pre><span id="VALinternal"><span class="keyword">val</span> internal</span> : <code class="type">string -> ('a -> 'b) <a href="Ctypes.html#TYPEfn">Ctypes.fn</a> -> ('a -> 'b) -> unit</code></pre></body></html>
+<pre><span id="VALenum"><span class="keyword">val</span> enum</span> : <code class="type">(string * int64) list -> 'a Ctypes.typ -> unit</code></pre>
+<pre><span id="VALstructure"><span class="keyword">val</span> structure</span> : <code class="type">'a <a href="Ctypes.html#TYPEstructure">Ctypes.structure</a> Ctypes.typ -> unit</code></pre>
+<pre><span id="VALunion"><span class="keyword">val</span> union</span> : <code class="type">'a <a href="Ctypes.html#TYPEunion">Ctypes.union</a> Ctypes.typ -> unit</code></pre>
+<pre><span id="VALtypedef"><span class="keyword">val</span> typedef</span> : <code class="type">'a Ctypes.typ -> string -> unit</code></pre>
+<pre><span id="VALinternal"><span class="keyword">val</span> internal</span> : <code class="type">string -> ('a -> 'b) Ctypes.fn -> ('a -> 'b) -> unit</code></pre></body></html>

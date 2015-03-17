@@ -1,0 +1,80 @@
+<html><head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Index of module types" rel=Appendix href="index_module_types.html">
+<link title="Ctypes_static" rel="Chapter" href="Ctypes_static.html">
+<link title="Ctypes_primitive_types" rel="Chapter" href="Ctypes_primitive_types.html">
+<link title="Unsigned" rel="Chapter" href="Unsigned.html">
+<link title="Signed" rel="Chapter" href="Signed.html">
+<link title="Ctypes_structs" rel="Chapter" href="Ctypes_structs.html">
+<link title="Ctypes" rel="Chapter" href="Ctypes.html">
+<link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
+<link title="Ctypes_types" rel="Chapter" href="Ctypes_types.html">
+<link title="Ctypes_printers" rel="Chapter" href="Ctypes_printers.html">
+<link title="Dl" rel="Chapter" href="Dl.html">
+<link title="Libffi_abi" rel="Chapter" href="Libffi_abi.html">
+<link title="Foreign" rel="Chapter" href="Foreign.html">
+<link title="Cstubs_internals" rel="Chapter" href="Cstubs_internals.html">
+<link title="Cstubs_structs" rel="Chapter" href="Cstubs_structs.html">
+<link title="Cstubs" rel="Chapter" href="Cstubs.html">
+<link title="Cstubs_inverted" rel="Chapter" href="Cstubs_inverted.html"><title>Ctypes_primitive_types</title>
+</head>
+<body>
+<code class="code"><span class="keyword">sig</span><br>
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;_&nbsp;prim&nbsp;=<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Char</span>&nbsp;:&nbsp;char&nbsp;<span class="constructor">Ctypes_primitive_types</span>.prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Schar</span>&nbsp;:&nbsp;int&nbsp;<span class="constructor">Ctypes_primitive_types</span>.prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Uchar</span>&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.uchar&nbsp;<span class="constructor">Ctypes_primitive_types</span>.prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Bool</span>&nbsp;:&nbsp;bool&nbsp;<span class="constructor">Ctypes_primitive_types</span>.prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Short</span>&nbsp;:&nbsp;int&nbsp;<span class="constructor">Ctypes_primitive_types</span>.prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Int</span>&nbsp;:&nbsp;int&nbsp;<span class="constructor">Ctypes_primitive_types</span>.prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Long</span>&nbsp;:&nbsp;<span class="constructor">Signed</span>.long&nbsp;<span class="constructor">Ctypes_primitive_types</span>.prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Llong</span>&nbsp;:&nbsp;<span class="constructor">Signed</span>.llong&nbsp;<span class="constructor">Ctypes_primitive_types</span>.prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Ushort</span>&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.ushort&nbsp;<span class="constructor">Ctypes_primitive_types</span>.prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Uint</span>&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.uint&nbsp;<span class="constructor">Ctypes_primitive_types</span>.prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Ulong</span>&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.ulong&nbsp;<span class="constructor">Ctypes_primitive_types</span>.prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Ullong</span>&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.ullong&nbsp;<span class="constructor">Ctypes_primitive_types</span>.prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Size_t</span>&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.size_t&nbsp;<span class="constructor">Ctypes_primitive_types</span>.prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Int8_t</span>&nbsp;:&nbsp;int&nbsp;<span class="constructor">Ctypes_primitive_types</span>.prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Int16_t</span>&nbsp;:&nbsp;int&nbsp;<span class="constructor">Ctypes_primitive_types</span>.prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Int32_t</span>&nbsp;:&nbsp;int32&nbsp;<span class="constructor">Ctypes_primitive_types</span>.prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Int64_t</span>&nbsp;:&nbsp;int64&nbsp;<span class="constructor">Ctypes_primitive_types</span>.prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Uint8_t</span>&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.uint8&nbsp;<span class="constructor">Ctypes_primitive_types</span>.prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Uint16_t</span>&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.uint16&nbsp;<span class="constructor">Ctypes_primitive_types</span>.prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Uint32_t</span>&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.uint32&nbsp;<span class="constructor">Ctypes_primitive_types</span>.prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Uint64_t</span>&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.uint64&nbsp;<span class="constructor">Ctypes_primitive_types</span>.prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Camlint</span>&nbsp;:&nbsp;int&nbsp;<span class="constructor">Ctypes_primitive_types</span>.prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Nativeint</span>&nbsp;:&nbsp;nativeint&nbsp;<span class="constructor">Ctypes_primitive_types</span>.prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Float</span>&nbsp;:&nbsp;float&nbsp;<span class="constructor">Ctypes_primitive_types</span>.prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Double</span>&nbsp;:&nbsp;float&nbsp;<span class="constructor">Ctypes_primitive_types</span>.prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Complex32</span>&nbsp;:&nbsp;<span class="constructor">Complex</span>.t&nbsp;<span class="constructor">Ctypes_primitive_types</span>.prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Complex64</span>&nbsp;:&nbsp;<span class="constructor">Complex</span>.t&nbsp;<span class="constructor">Ctypes_primitive_types</span>.prim<br>
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;_&nbsp;ml_prim&nbsp;=<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">ML_char</span>&nbsp;:&nbsp;char&nbsp;<span class="constructor">Ctypes_primitive_types</span>.ml_prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">ML_complex</span>&nbsp;:&nbsp;<span class="constructor">Complex</span>.t&nbsp;<span class="constructor">Ctypes_primitive_types</span>.ml_prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">ML_float</span>&nbsp;:&nbsp;float&nbsp;<span class="constructor">Ctypes_primitive_types</span>.ml_prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">ML_int</span>&nbsp;:&nbsp;int&nbsp;<span class="constructor">Ctypes_primitive_types</span>.ml_prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">ML_int32</span>&nbsp;:&nbsp;int32&nbsp;<span class="constructor">Ctypes_primitive_types</span>.ml_prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">ML_int64</span>&nbsp;:&nbsp;int64&nbsp;<span class="constructor">Ctypes_primitive_types</span>.ml_prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">ML_llong</span>&nbsp;:&nbsp;<span class="constructor">Signed</span>.llong&nbsp;<span class="constructor">Ctypes_primitive_types</span>.ml_prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">ML_long</span>&nbsp;:&nbsp;<span class="constructor">Signed</span>.long&nbsp;<span class="constructor">Ctypes_primitive_types</span>.ml_prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">ML_nativeint</span>&nbsp;:&nbsp;nativeint&nbsp;<span class="constructor">Ctypes_primitive_types</span>.ml_prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">ML_size_t</span>&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.size_t&nbsp;<span class="constructor">Ctypes_primitive_types</span>.ml_prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">ML_uchar</span>&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.uchar&nbsp;<span class="constructor">Ctypes_primitive_types</span>.ml_prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">ML_bool</span>&nbsp;:&nbsp;bool&nbsp;<span class="constructor">Ctypes_primitive_types</span>.ml_prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">ML_uint</span>&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.uint&nbsp;<span class="constructor">Ctypes_primitive_types</span>.ml_prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">ML_uint16</span>&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.uint16&nbsp;<span class="constructor">Ctypes_primitive_types</span>.ml_prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">ML_uint32</span>&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.uint32&nbsp;<span class="constructor">Ctypes_primitive_types</span>.ml_prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">ML_uint64</span>&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.uint64&nbsp;<span class="constructor">Ctypes_primitive_types</span>.ml_prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">ML_uint8</span>&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.uint8&nbsp;<span class="constructor">Ctypes_primitive_types</span>.ml_prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">ML_ullong</span>&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.ullong&nbsp;<span class="constructor">Ctypes_primitive_types</span>.ml_prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">ML_ulong</span>&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.ulong&nbsp;<span class="constructor">Ctypes_primitive_types</span>.ml_prim<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">ML_ushort</span>&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.ushort&nbsp;<span class="constructor">Ctypes_primitive_types</span>.ml_prim<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;ml_prim&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_primitive_types</span>.prim&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_primitive_types</span>.ml_prim<br>
+<span class="keyword">end</span></code></body></html>

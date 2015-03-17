@@ -1,0 +1,594 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link rel="next" href="Ctypes_primitive_types.html">
+<link rel="Up" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Index of module types" rel=Appendix href="index_module_types.html">
+<link title="Ctypes_static" rel="Chapter" href="Ctypes_static.html">
+<link title="Ctypes_primitive_types" rel="Chapter" href="Ctypes_primitive_types.html">
+<link title="Unsigned" rel="Chapter" href="Unsigned.html">
+<link title="Signed" rel="Chapter" href="Signed.html">
+<link title="Ctypes_structs" rel="Chapter" href="Ctypes_structs.html">
+<link title="Ctypes" rel="Chapter" href="Ctypes.html">
+<link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
+<link title="Ctypes_types" rel="Chapter" href="Ctypes_types.html">
+<link title="Ctypes_printers" rel="Chapter" href="Ctypes_printers.html">
+<link title="Dl" rel="Chapter" href="Dl.html">
+<link title="Libffi_abi" rel="Chapter" href="Libffi_abi.html">
+<link title="Foreign" rel="Chapter" href="Foreign.html">
+<link title="Cstubs_internals" rel="Chapter" href="Cstubs_internals.html">
+<link title="Cstubs_structs" rel="Chapter" href="Cstubs_structs.html">
+<link title="Cstubs" rel="Chapter" href="Cstubs.html">
+<link title="Cstubs_inverted" rel="Chapter" href="Cstubs_inverted.html"><title>Ctypes_static</title>
+</head>
+<body>
+<div class="navbar">&nbsp;<a class="up" href="index.html" title="Index">Up</a>
+&nbsp;<a class="post" href="Ctypes_primitive_types.html" title="Ctypes_primitive_types">Next</a>
+</div>
+<h1>Module <a href="type_Ctypes_static.html">Ctypes_static</a></h1>
+
+<pre><span class="keyword">module</span> Ctypes_static: <code class="code">sig</code> <a href="Ctypes_static.html">..</a> <code class="code">end</code></pre><hr width="100%">
+
+<pre><code><span id="TYPEabstract_type"><span class="keyword">type</span> <code class="type"></code>abstract_type</span> = {</code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTabstract_type.aname">aname</span>&nbsp;: <code class="type">string</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTabstract_type.asize">asize</span>&nbsp;: <code class="type">int</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTabstract_type.aalignment">aalignment</span>&nbsp;: <code class="type">int</code>;</code></td>
+
+</tr></table>
+}
+
+
+
+<pre><code><span id="TYPEocaml_type"><span class="keyword">type</span> <code class="type">'_</code> ocaml_type</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTocaml_type.String"><span class="constructor">String</span></span> <span class="keyword">:</span> <code class="type">string <a href="Ctypes_static.html#TYPEocaml_type">ocaml_type</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTocaml_type.Bytes"><span class="constructor">Bytes</span></span> <span class="keyword">:</span> <code class="type">Bytes.t <a href="Ctypes_static.html#TYPEocaml_type">ocaml_type</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTocaml_type.FloatArray"><span class="constructor">FloatArray</span></span> <span class="keyword">:</span> <code class="type">float array <a href="Ctypes_static.html#TYPEocaml_type">ocaml_type</a></code></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEincomplete_size"><span class="keyword">type</span> <code class="type"></code>incomplete_size</span> = {</code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span class="keyword">mutable&nbsp;</span><span id="TYPEELTincomplete_size.isize">isize</span>&nbsp;: <code class="type">int</code>;</code></td>
+
+</tr></table>
+}
+
+
+
+<pre><code><span id="TYPEstructured_spec"><span class="keyword">type</span> <code class="type"></code>structured_spec</span> = {</code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTstructured_spec.size">size</span>&nbsp;: <code class="type">int</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTstructured_spec.align">align</span>&nbsp;: <code class="type">int</code>;</code></td>
+
+</tr></table>
+}
+
+
+
+<pre><code><span id="TYPEstructspec"><span class="keyword">type</span> <code class="type">'a</code> structspec</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTstructspec.Incomplete"><span class="constructor">Incomplete</span></span> <span class="keyword">of</span> <code class="type"><a href="Ctypes_static.html#TYPEincomplete_size">incomplete_size</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTstructspec.Complete"><span class="constructor">Complete</span></span> <span class="keyword">of</span> <code class="type"><a href="Ctypes_static.html#TYPEstructured_spec">structured_spec</a></code></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEtyp"><span class="keyword">type</span> <code class="type">'_</code> typ</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTtyp.Void"><span class="constructor">Void</span></span> <span class="keyword">:</span> <code class="type">unit <a href="Ctypes_static.html#TYPEtyp">typ</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTtyp.Primitive"><span class="constructor">Primitive</span></span> <span class="keyword">:</span> <code class="type">'a <a href="Ctypes_primitive_types.html#TYPEprim">Ctypes_primitive_types.prim</a></code> <span class="keyword">-></span> <code class="type">'a <a href="Ctypes_static.html#TYPEtyp">typ</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTtyp.Pointer"><span class="constructor">Pointer</span></span> <span class="keyword">:</span> <code class="type">'a0 <a href="Ctypes_static.html#TYPEtyp">typ</a></code> <span class="keyword">-></span> <code class="type">'a0 <a href="Ctypes_static.html#TYPEptr">ptr</a> <a href="Ctypes_static.html#TYPEtyp">typ</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTtyp.Struct"><span class="constructor">Struct</span></span> <span class="keyword">:</span> <code class="type">'a1 <a href="Ctypes_static.html#TYPEstructure_type">structure_type</a></code> <span class="keyword">-></span> <code class="type">'a1 <a href="Ctypes_static.html#TYPEstructure">structure</a> <a href="Ctypes_static.html#TYPEtyp">typ</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTtyp.Union"><span class="constructor">Union</span></span> <span class="keyword">:</span> <code class="type">'a2 <a href="Ctypes_static.html#TYPEunion_type">union_type</a></code> <span class="keyword">-></span> <code class="type">'a2 <a href="Ctypes_static.html#TYPEunion">union</a> <a href="Ctypes_static.html#TYPEtyp">typ</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTtyp.Abstract"><span class="constructor">Abstract</span></span> <span class="keyword">:</span> <code class="type"><a href="Ctypes_static.html#TYPEabstract_type">abstract_type</a></code> <span class="keyword">-></span> <code class="type">'a3 <a href="Ctypes_static.html#TYPEabstract">abstract</a> <a href="Ctypes_static.html#TYPEtyp">typ</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTtyp.View"><span class="constructor">View</span></span> <span class="keyword">:</span> <code class="type">('a4, 'b) <a href="Ctypes_static.html#TYPEview">view</a></code> <span class="keyword">-></span> <code class="type">'a4 <a href="Ctypes_static.html#TYPEtyp">typ</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTtyp.Array"><span class="constructor">Array</span></span> <span class="keyword">:</span> <code class="type">'a5 <a href="Ctypes_static.html#TYPEtyp">typ</a> * int</code> <span class="keyword">-></span> <code class="type">'a5 <a href="Ctypes_static.html#TYPEcarray">carray</a> <a href="Ctypes_static.html#TYPEtyp">typ</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTtyp.Bigarray"><span class="constructor">Bigarray</span></span> <span class="keyword">:</span> <code class="type">('c, 'a6) Ctypes_bigarray.t</code> <span class="keyword">-></span> <code class="type">'a6 <a href="Ctypes_static.html#TYPEtyp">typ</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTtyp.OCaml"><span class="constructor">OCaml</span></span> <span class="keyword">:</span> <code class="type">'a7 <a href="Ctypes_static.html#TYPEocaml_type">ocaml_type</a></code> <span class="keyword">-></span> <code class="type">'a7 <a href="Ctypes_static.html#TYPEocaml">ocaml</a> <a href="Ctypes_static.html#TYPEtyp">typ</a></code></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEcarray"><span class="keyword">type</span> <code class="type">'a</code> carray</span> = {</code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcarray.astart">astart</span>&nbsp;: <code class="type">'a <a href="Ctypes_static.html#TYPEptr">ptr</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTcarray.alength">alength</span>&nbsp;: <code class="type">int</code>;</code></td>
+
+</tr></table>
+}
+
+
+
+<pre><code><span id="TYPEstructured"><span class="keyword">type</span> <code class="type">('a, 'kind)</code> structured</span> = {</code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTstructured.structured">structured</span>&nbsp;: <code class="type">('a, 'kind) <a href="Ctypes_static.html#TYPEstructured">structured</a> <a href="Ctypes_static.html#TYPEptr">ptr</a></code>;</code></td>
+
+</tr></table>
+}
+
+
+
+<pre><span id="TYPEunion"><span class="keyword">type</span> <code class="type">'a</code> union</span> = <code class="type">('a, [ `Union ]) structured</code> </pre>
+
+
+<pre><span id="TYPEstructure"><span class="keyword">type</span> <code class="type">'a</code> structure</span> = <code class="type">('a, [ `Struct ]) structured</code> </pre>
+
+
+<pre><span id="TYPEabstract"><span class="keyword">type</span> <code class="type">'a</code> abstract</span> = <code class="type">('a, [ `Abstract ]) structured</code> </pre>
+
+
+<pre><code><span id="TYPEpointer"><span class="keyword">type</span> <code class="type">('_, '_)</code> pointer</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTpointer.CPointer"><span class="constructor">CPointer</span></span> <span class="keyword">:</span> <code class="type">'a <a href="Ctypes_static.html#TYPEtyp">typ</a> Ctypes_ptr.Fat.t</code> <span class="keyword">-></span> <code class="type">('a, [ `C ]) <a href="Ctypes_static.html#TYPEpointer">pointer</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTpointer.OCamlRef"><span class="constructor">OCamlRef</span></span> <span class="keyword">:</span> <code class="type">int * 'a0 * 'a0 <a href="Ctypes_static.html#TYPEocaml_type">ocaml_type</a></code> <span class="keyword">-></span> <code class="type">('a0, [ `OCaml ]) <a href="Ctypes_static.html#TYPEpointer">pointer</a></code></code></td>
+
+</tr></table>
+
+
+
+<pre><span id="TYPEptr"><span class="keyword">type</span> <code class="type">'a</code> ptr</span> = <code class="type">('a, [ `C ]) pointer</code> </pre>
+
+
+<pre><span id="TYPEocaml"><span class="keyword">type</span> <code class="type">'a</code> ocaml</span> = <code class="type">('a, [ `OCaml ]) pointer</code> </pre>
+
+
+<pre><code><span id="TYPEview"><span class="keyword">type</span> <code class="type">('a, 'b)</code> view</span> = {</code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTview.read">read</span>&nbsp;: <code class="type">'b -> 'a</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTview.write">write</span>&nbsp;: <code class="type">'a -> 'b</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTview.format_typ">format_typ</span>&nbsp;: <code class="type">((Format.formatter -> unit) -> Format.formatter -> unit) option</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTview.format">format</span>&nbsp;: <code class="type">(Format.formatter -> 'a -> unit) option</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTview.ty">ty</span>&nbsp;: <code class="type">'b <a href="Ctypes_static.html#TYPEtyp">typ</a></code>;</code></td>
+
+</tr></table>
+}
+
+
+
+<pre><code><span id="TYPEfield"><span class="keyword">type</span> <code class="type">('a, 's)</code> field</span> = {</code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTfield.ftype">ftype</span>&nbsp;: <code class="type">'a <a href="Ctypes_static.html#TYPEtyp">typ</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTfield.foffset">foffset</span>&nbsp;: <code class="type">int</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTfield.fname">fname</span>&nbsp;: <code class="type">string</code>;</code></td>
+
+</tr></table>
+}
+
+
+
+<pre><code><span id="TYPEstructure_type"><span class="keyword">type</span> <code class="type">'a</code> structure_type</span> = {</code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTstructure_type.tag">tag</span>&nbsp;: <code class="type">string</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span class="keyword">mutable&nbsp;</span><span id="TYPEELTstructure_type.spec">spec</span>&nbsp;: <code class="type">'a <a href="Ctypes_static.html#TYPEstructspec">structspec</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span class="keyword">mutable&nbsp;</span><span id="TYPEELTstructure_type.fields">fields</span>&nbsp;: <code class="type">'a <a href="Ctypes_static.html#TYPEstructure">structure</a> <a href="Ctypes_static.html#TYPEboxed_field">boxed_field</a> list</code>;</code></td>
+
+</tr></table>
+}
+
+
+
+<pre><code><span id="TYPEunion_type"><span class="keyword">type</span> <code class="type">'a</code> union_type</span> = {</code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTunion_type.utag">utag</span>&nbsp;: <code class="type">string</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span class="keyword">mutable&nbsp;</span><span id="TYPEELTunion_type.uspec">uspec</span>&nbsp;: <code class="type"><a href="Ctypes_static.html#TYPEstructured_spec">structured_spec</a> option</code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span class="keyword">mutable&nbsp;</span><span id="TYPEELTunion_type.ufields">ufields</span>&nbsp;: <code class="type">'a <a href="Ctypes_static.html#TYPEunion">union</a> <a href="Ctypes_static.html#TYPEboxed_field">boxed_field</a> list</code>;</code></td>
+
+</tr></table>
+}
+
+
+
+<pre><code><span id="TYPEboxed_field"><span class="keyword">type</span> <code class="type">'s</code> boxed_field</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTboxed_field.BoxedField"><span class="constructor">BoxedField</span></span> <span class="keyword">:</span> <code class="type">('a, 's0) <a href="Ctypes_static.html#TYPEfield">field</a></code> <span class="keyword">-></span> <code class="type">'s0 <a href="Ctypes_static.html#TYPEboxed_field">boxed_field</a></code></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEbigarray_class"><span class="keyword">type</span> <code class="type">'_</code> bigarray_class</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbigarray_class.Genarray"><span class="constructor">Genarray</span></span> <span class="keyword">:</span> <code class="type">< ba_repr : 'b; bigarray : ('a, 'b, Bigarray.c_layout) Bigarray.Genarray.t;<br>         carray : 'a <a href="Ctypes_static.html#TYPEcarray">carray</a>; dims : int array; element : 'a ><br>       <a href="Ctypes_static.html#TYPEbigarray_class">bigarray_class</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbigarray_class.Array1"><span class="constructor">Array1</span></span> <span class="keyword">:</span> <code class="type">< ba_repr : 'b0; bigarray : ('a0, 'b0, Bigarray.c_layout) Bigarray.Array1.t;<br>         carray : 'a0 <a href="Ctypes_static.html#TYPEcarray">carray</a>; dims : int; element : 'a0 ><br>       <a href="Ctypes_static.html#TYPEbigarray_class">bigarray_class</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbigarray_class.Array2"><span class="constructor">Array2</span></span> <span class="keyword">:</span> <code class="type">< ba_repr : 'b1; bigarray : ('a1, 'b1, Bigarray.c_layout) Bigarray.Array2.t;<br>         carray : 'a1 <a href="Ctypes_static.html#TYPEcarray">carray</a> <a href="Ctypes_static.html#TYPEcarray">carray</a>; dims : int * int;<br>         element : 'a1 ><br>       <a href="Ctypes_static.html#TYPEbigarray_class">bigarray_class</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTbigarray_class.Array3"><span class="constructor">Array3</span></span> <span class="keyword">:</span> <code class="type">< ba_repr : 'b2; bigarray : ('a2, 'b2, Bigarray.c_layout) Bigarray.Array3.t;<br>         carray : 'a2 <a href="Ctypes_static.html#TYPEcarray">carray</a> <a href="Ctypes_static.html#TYPEcarray">carray</a> <a href="Ctypes_static.html#TYPEcarray">carray</a>;<br>         dims : int * int * int; element : 'a2 ><br>       <a href="Ctypes_static.html#TYPEbigarray_class">bigarray_class</a></code></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEfn"><span class="keyword">type</span> <code class="type">'_</code> fn</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTfn.Returns"><span class="constructor">Returns</span></span> <span class="keyword">:</span> <code class="type">'a <a href="Ctypes_static.html#TYPEtyp">typ</a></code> <span class="keyword">-></span> <code class="type">'a <a href="Ctypes_static.html#TYPEfn">fn</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTfn.Function"><span class="constructor">Function</span></span> <span class="keyword">:</span> <code class="type">'a0 <a href="Ctypes_static.html#TYPEtyp">typ</a> * 'b <a href="Ctypes_static.html#TYPEfn">fn</a></code> <span class="keyword">-></span> <code class="type">('a0 -> 'b) <a href="Ctypes_static.html#TYPEfn">fn</a></code></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEboxed_typ"><span class="keyword">type</span> <code class="type"></code>boxed_typ</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTboxed_typ.BoxedType"><span class="constructor">BoxedType</span></span> <span class="keyword">:</span> <code class="type">'a <a href="Ctypes_static.html#TYPEtyp">typ</a></code> <span class="keyword">-></span> <code class="type"><a href="Ctypes_static.html#TYPEboxed_typ">boxed_typ</a></code></code></td>
+
+</tr></table>
+
+
+
+<pre><span id="VALsizeof"><span class="keyword">val</span> sizeof</span> : <code class="type">'a <a href="Ctypes_static.html#TYPEtyp">typ</a> -> int</code></pre>
+<pre><span id="VALalignment"><span class="keyword">val</span> alignment</span> : <code class="type">'a <a href="Ctypes_static.html#TYPEtyp">typ</a> -> int</code></pre>
+<pre><span id="VALpassable"><span class="keyword">val</span> passable</span> : <code class="type">'a <a href="Ctypes_static.html#TYPEtyp">typ</a> -> bool</code></pre>
+<pre><span id="VALvoid"><span class="keyword">val</span> void</span> : <code class="type">unit <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VALchar"><span class="keyword">val</span> char</span> : <code class="type">char <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VALschar"><span class="keyword">val</span> schar</span> : <code class="type">int <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VALfloat"><span class="keyword">val</span> float</span> : <code class="type">float <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VALdouble"><span class="keyword">val</span> double</span> : <code class="type">float <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VALcomplex32"><span class="keyword">val</span> complex32</span> : <code class="type">Complex.t <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VALcomplex64"><span class="keyword">val</span> complex64</span> : <code class="type">Complex.t <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VALshort"><span class="keyword">val</span> short</span> : <code class="type">int <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VALint"><span class="keyword">val</span> int</span> : <code class="type">int <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VALlong"><span class="keyword">val</span> long</span> : <code class="type"><a href="Signed.html#TYPElong">Signed.long</a> <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VALllong"><span class="keyword">val</span> llong</span> : <code class="type"><a href="Signed.html#TYPEllong">Signed.llong</a> <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VALnativeint"><span class="keyword">val</span> nativeint</span> : <code class="type">nativeint <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VALint8_t"><span class="keyword">val</span> int8_t</span> : <code class="type">int <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VALint16_t"><span class="keyword">val</span> int16_t</span> : <code class="type">int <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VALint32_t"><span class="keyword">val</span> int32_t</span> : <code class="type">Signed.Int32.t <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VALint64_t"><span class="keyword">val</span> int64_t</span> : <code class="type">Signed.Int64.t <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VALcamlint"><span class="keyword">val</span> camlint</span> : <code class="type">int <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VALuchar"><span class="keyword">val</span> uchar</span> : <code class="type"><a href="Unsigned.html#TYPEuchar">Unsigned.uchar</a> <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VALbool"><span class="keyword">val</span> bool</span> : <code class="type">bool <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VALuint8_t"><span class="keyword">val</span> uint8_t</span> : <code class="type">Unsigned.UInt8.t <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VALuint16_t"><span class="keyword">val</span> uint16_t</span> : <code class="type">Unsigned.UInt16.t <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VALuint32_t"><span class="keyword">val</span> uint32_t</span> : <code class="type">Unsigned.UInt32.t <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VALuint64_t"><span class="keyword">val</span> uint64_t</span> : <code class="type">Unsigned.UInt64.t <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VALsize_t"><span class="keyword">val</span> size_t</span> : <code class="type"><a href="Unsigned.html#TYPEsize_t">Unsigned.size_t</a> <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VALushort"><span class="keyword">val</span> ushort</span> : <code class="type"><a href="Unsigned.html#TYPEushort">Unsigned.ushort</a> <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VALuint"><span class="keyword">val</span> uint</span> : <code class="type"><a href="Unsigned.html#TYPEuint">Unsigned.uint</a> <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VALulong"><span class="keyword">val</span> ulong</span> : <code class="type"><a href="Unsigned.html#TYPEulong">Unsigned.ulong</a> <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VALullong"><span class="keyword">val</span> ullong</span> : <code class="type"><a href="Unsigned.html#TYPEullong">Unsigned.ullong</a> <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VALarray"><span class="keyword">val</span> array</span> : <code class="type">int -> 'a <a href="Ctypes_static.html#TYPEtyp">typ</a> -> 'a <a href="Ctypes_static.html#TYPEcarray">carray</a> <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VALocaml_string"><span class="keyword">val</span> ocaml_string</span> : <code class="type">string <a href="Ctypes_static.html#TYPEocaml">ocaml</a> <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VALocaml_bytes"><span class="keyword">val</span> ocaml_bytes</span> : <code class="type">Bytes.t <a href="Ctypes_static.html#TYPEocaml">ocaml</a> <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VALocaml_float_array"><span class="keyword">val</span> ocaml_float_array</span> : <code class="type">float array <a href="Ctypes_static.html#TYPEocaml">ocaml</a> <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VALptr"><span class="keyword">val</span> ptr</span> : <code class="type">'a <a href="Ctypes_static.html#TYPEtyp">typ</a> -> 'a <a href="Ctypes_static.html#TYPEptr">ptr</a> <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VAL(@->)"><span class="keyword">val</span> (@-&gt;)</span> : <code class="type">'a <a href="Ctypes_static.html#TYPEtyp">typ</a> -> 'b <a href="Ctypes_static.html#TYPEfn">fn</a> -> ('a -> 'b) <a href="Ctypes_static.html#TYPEfn">fn</a></code></pre>
+<pre><span id="VALabstract"><span class="keyword">val</span> abstract</span> : <code class="type">name:string -><br>       size:int -> alignment:int -> 'a <a href="Ctypes_static.html#TYPEabstract">abstract</a> <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VALview"><span class="keyword">val</span> view</span> : <code class="type">?format_typ:((Format.formatter -> unit) -> Format.formatter -> unit) -><br>       ?format:(Format.formatter -> 'b -> unit) -><br>       read:('a -> 'b) -><br>       write:('b -> 'a) -> 'a <a href="Ctypes_static.html#TYPEtyp">typ</a> -> 'b <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VALtypedef"><span class="keyword">val</span> typedef</span> : <code class="type">'a <a href="Ctypes_static.html#TYPEtyp">typ</a> -> string -> 'a <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VALbigarray"><span class="keyword">val</span> bigarray</span> : <code class="type">< ba_repr : 'c; bigarray : 'd; carray : 'e; dims : 'b; element : 'a ><br>       <a href="Ctypes_static.html#TYPEbigarray_class">bigarray_class</a> -><br>       'b -> ('a, 'c) Bigarray.kind -> 'd <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VALreturning"><span class="keyword">val</span> returning</span> : <code class="type">'a <a href="Ctypes_static.html#TYPEtyp">typ</a> -> 'a <a href="Ctypes_static.html#TYPEfn">fn</a></code></pre>
+<pre><span id="VALstructure"><span class="keyword">val</span> structure</span> : <code class="type">string -> 'a <a href="Ctypes_static.html#TYPEstructure">structure</a> <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VALunion"><span class="keyword">val</span> union</span> : <code class="type">string -> 'a <a href="Ctypes_static.html#TYPEunion">union</a> <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VALoffsetof"><span class="keyword">val</span> offsetof</span> : <code class="type">('a, 'b) <a href="Ctypes_static.html#TYPEfield">field</a> -> int</code></pre>
+<pre><span id="VALfield_type"><span class="keyword">val</span> field_type</span> : <code class="type">('a, 'b) <a href="Ctypes_static.html#TYPEfield">field</a> -> 'a <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
+<pre><span id="VALfield_name"><span class="keyword">val</span> field_name</span> : <code class="type">('a, 'b) <a href="Ctypes_static.html#TYPEfield">field</a> -> string</code></pre>
+<pre><span id="EXCEPTIONIncompleteType"><span class="keyword">exception</span> IncompleteType</span></pre>
+
+<pre><span id="EXCEPTIONModifyingSealedType"><span class="keyword">exception</span> ModifyingSealedType</span> <span class="keyword">of</span> <code class="type">string</code></pre>
+
+<pre><span id="EXCEPTIONUnsupported"><span class="keyword">exception</span> Unsupported</span> <span class="keyword">of</span> <code class="type">string</code></pre>
+
+<pre><span id="VALunsupported"><span class="keyword">val</span> unsupported</span> : <code class="type">('a, unit, string, 'b) Pervasives.format4 -> 'a</code></pre>
+<pre><code><span id="TYPEarithmetic"><span class="keyword">type</span> <code class="type"></code>arithmetic</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTarithmetic.Int8"><span class="constructor">Int8</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTarithmetic.Int16"><span class="constructor">Int16</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTarithmetic.Int32"><span class="constructor">Int32</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTarithmetic.Int64"><span class="constructor">Int64</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTarithmetic.Uint8"><span class="constructor">Uint8</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTarithmetic.Uint16"><span class="constructor">Uint16</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTarithmetic.Uint32"><span class="constructor">Uint32</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTarithmetic.Uint64"><span class="constructor">Uint64</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTarithmetic.Float"><span class="constructor">Float</span></span></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTarithmetic.Double"><span class="constructor">Double</span></span></code></td>
+
+</tr></table>
+
+
+</body></html>

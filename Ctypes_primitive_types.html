@@ -1,0 +1,378 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link rel="previous" href="Ctypes_static.html">
+<link rel="next" href="Unsigned.html">
+<link rel="Up" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Index of module types" rel=Appendix href="index_module_types.html">
+<link title="Ctypes_static" rel="Chapter" href="Ctypes_static.html">
+<link title="Ctypes_primitive_types" rel="Chapter" href="Ctypes_primitive_types.html">
+<link title="Unsigned" rel="Chapter" href="Unsigned.html">
+<link title="Signed" rel="Chapter" href="Signed.html">
+<link title="Ctypes_structs" rel="Chapter" href="Ctypes_structs.html">
+<link title="Ctypes" rel="Chapter" href="Ctypes.html">
+<link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
+<link title="Ctypes_types" rel="Chapter" href="Ctypes_types.html">
+<link title="Ctypes_printers" rel="Chapter" href="Ctypes_printers.html">
+<link title="Dl" rel="Chapter" href="Dl.html">
+<link title="Libffi_abi" rel="Chapter" href="Libffi_abi.html">
+<link title="Foreign" rel="Chapter" href="Foreign.html">
+<link title="Cstubs_internals" rel="Chapter" href="Cstubs_internals.html">
+<link title="Cstubs_structs" rel="Chapter" href="Cstubs_structs.html">
+<link title="Cstubs" rel="Chapter" href="Cstubs.html">
+<link title="Cstubs_inverted" rel="Chapter" href="Cstubs_inverted.html"><title>Ctypes_primitive_types</title>
+</head>
+<body>
+<div class="navbar"><a class="pre" href="Ctypes_static.html" title="Ctypes_static">Previous</a>
+&nbsp;<a class="up" href="index.html" title="Index">Up</a>
+&nbsp;<a class="post" href="Unsigned.html" title="Unsigned">Next</a>
+</div>
+<h1>Module <a href="type_Ctypes_primitive_types.html">Ctypes_primitive_types</a></h1>
+
+<pre><span class="keyword">module</span> Ctypes_primitive_types: <code class="code">sig</code> <a href="Ctypes_primitive_types.html">..</a> <code class="code">end</code></pre><hr width="100%">
+
+<pre><code><span id="TYPEprim"><span class="keyword">type</span> <code class="type">'_</code> prim</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprim.Char"><span class="constructor">Char</span></span> <span class="keyword">:</span> <code class="type">char <a href="Ctypes_primitive_types.html#TYPEprim">prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprim.Schar"><span class="constructor">Schar</span></span> <span class="keyword">:</span> <code class="type">int <a href="Ctypes_primitive_types.html#TYPEprim">prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprim.Uchar"><span class="constructor">Uchar</span></span> <span class="keyword">:</span> <code class="type"><a href="Unsigned.html#TYPEuchar">Unsigned.uchar</a> <a href="Ctypes_primitive_types.html#TYPEprim">prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprim.Bool"><span class="constructor">Bool</span></span> <span class="keyword">:</span> <code class="type">bool <a href="Ctypes_primitive_types.html#TYPEprim">prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprim.Short"><span class="constructor">Short</span></span> <span class="keyword">:</span> <code class="type">int <a href="Ctypes_primitive_types.html#TYPEprim">prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprim.Int"><span class="constructor">Int</span></span> <span class="keyword">:</span> <code class="type">int <a href="Ctypes_primitive_types.html#TYPEprim">prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprim.Long"><span class="constructor">Long</span></span> <span class="keyword">:</span> <code class="type"><a href="Signed.html#TYPElong">Signed.long</a> <a href="Ctypes_primitive_types.html#TYPEprim">prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprim.Llong"><span class="constructor">Llong</span></span> <span class="keyword">:</span> <code class="type"><a href="Signed.html#TYPEllong">Signed.llong</a> <a href="Ctypes_primitive_types.html#TYPEprim">prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprim.Ushort"><span class="constructor">Ushort</span></span> <span class="keyword">:</span> <code class="type"><a href="Unsigned.html#TYPEushort">Unsigned.ushort</a> <a href="Ctypes_primitive_types.html#TYPEprim">prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprim.Uint"><span class="constructor">Uint</span></span> <span class="keyword">:</span> <code class="type"><a href="Unsigned.html#TYPEuint">Unsigned.uint</a> <a href="Ctypes_primitive_types.html#TYPEprim">prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprim.Ulong"><span class="constructor">Ulong</span></span> <span class="keyword">:</span> <code class="type"><a href="Unsigned.html#TYPEulong">Unsigned.ulong</a> <a href="Ctypes_primitive_types.html#TYPEprim">prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprim.Ullong"><span class="constructor">Ullong</span></span> <span class="keyword">:</span> <code class="type"><a href="Unsigned.html#TYPEullong">Unsigned.ullong</a> <a href="Ctypes_primitive_types.html#TYPEprim">prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprim.Size_t"><span class="constructor">Size_t</span></span> <span class="keyword">:</span> <code class="type"><a href="Unsigned.html#TYPEsize_t">Unsigned.size_t</a> <a href="Ctypes_primitive_types.html#TYPEprim">prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprim.Int8_t"><span class="constructor">Int8_t</span></span> <span class="keyword">:</span> <code class="type">int <a href="Ctypes_primitive_types.html#TYPEprim">prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprim.Int16_t"><span class="constructor">Int16_t</span></span> <span class="keyword">:</span> <code class="type">int <a href="Ctypes_primitive_types.html#TYPEprim">prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprim.Int32_t"><span class="constructor">Int32_t</span></span> <span class="keyword">:</span> <code class="type">int32 <a href="Ctypes_primitive_types.html#TYPEprim">prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprim.Int64_t"><span class="constructor">Int64_t</span></span> <span class="keyword">:</span> <code class="type">int64 <a href="Ctypes_primitive_types.html#TYPEprim">prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprim.Uint8_t"><span class="constructor">Uint8_t</span></span> <span class="keyword">:</span> <code class="type"><a href="Unsigned.html#TYPEuint8">Unsigned.uint8</a> <a href="Ctypes_primitive_types.html#TYPEprim">prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprim.Uint16_t"><span class="constructor">Uint16_t</span></span> <span class="keyword">:</span> <code class="type"><a href="Unsigned.html#TYPEuint16">Unsigned.uint16</a> <a href="Ctypes_primitive_types.html#TYPEprim">prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprim.Uint32_t"><span class="constructor">Uint32_t</span></span> <span class="keyword">:</span> <code class="type"><a href="Unsigned.html#TYPEuint32">Unsigned.uint32</a> <a href="Ctypes_primitive_types.html#TYPEprim">prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprim.Uint64_t"><span class="constructor">Uint64_t</span></span> <span class="keyword">:</span> <code class="type"><a href="Unsigned.html#TYPEuint64">Unsigned.uint64</a> <a href="Ctypes_primitive_types.html#TYPEprim">prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprim.Camlint"><span class="constructor">Camlint</span></span> <span class="keyword">:</span> <code class="type">int <a href="Ctypes_primitive_types.html#TYPEprim">prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprim.Nativeint"><span class="constructor">Nativeint</span></span> <span class="keyword">:</span> <code class="type">nativeint <a href="Ctypes_primitive_types.html#TYPEprim">prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprim.Float"><span class="constructor">Float</span></span> <span class="keyword">:</span> <code class="type">float <a href="Ctypes_primitive_types.html#TYPEprim">prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprim.Double"><span class="constructor">Double</span></span> <span class="keyword">:</span> <code class="type">float <a href="Ctypes_primitive_types.html#TYPEprim">prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprim.Complex32"><span class="constructor">Complex32</span></span> <span class="keyword">:</span> <code class="type">Complex.t <a href="Ctypes_primitive_types.html#TYPEprim">prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTprim.Complex64"><span class="constructor">Complex64</span></span> <span class="keyword">:</span> <code class="type">Complex.t <a href="Ctypes_primitive_types.html#TYPEprim">prim</a></code></code></td>
+
+</tr></table>
+
+
+
+<pre><code><span id="TYPEml_prim"><span class="keyword">type</span> <code class="type">'_</code> ml_prim</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTml_prim.ML_char"><span class="constructor">ML_char</span></span> <span class="keyword">:</span> <code class="type">char <a href="Ctypes_primitive_types.html#TYPEml_prim">ml_prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTml_prim.ML_complex"><span class="constructor">ML_complex</span></span> <span class="keyword">:</span> <code class="type">Complex.t <a href="Ctypes_primitive_types.html#TYPEml_prim">ml_prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTml_prim.ML_float"><span class="constructor">ML_float</span></span> <span class="keyword">:</span> <code class="type">float <a href="Ctypes_primitive_types.html#TYPEml_prim">ml_prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTml_prim.ML_int"><span class="constructor">ML_int</span></span> <span class="keyword">:</span> <code class="type">int <a href="Ctypes_primitive_types.html#TYPEml_prim">ml_prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTml_prim.ML_int32"><span class="constructor">ML_int32</span></span> <span class="keyword">:</span> <code class="type">int32 <a href="Ctypes_primitive_types.html#TYPEml_prim">ml_prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTml_prim.ML_int64"><span class="constructor">ML_int64</span></span> <span class="keyword">:</span> <code class="type">int64 <a href="Ctypes_primitive_types.html#TYPEml_prim">ml_prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTml_prim.ML_llong"><span class="constructor">ML_llong</span></span> <span class="keyword">:</span> <code class="type"><a href="Signed.html#TYPEllong">Signed.llong</a> <a href="Ctypes_primitive_types.html#TYPEml_prim">ml_prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTml_prim.ML_long"><span class="constructor">ML_long</span></span> <span class="keyword">:</span> <code class="type"><a href="Signed.html#TYPElong">Signed.long</a> <a href="Ctypes_primitive_types.html#TYPEml_prim">ml_prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTml_prim.ML_nativeint"><span class="constructor">ML_nativeint</span></span> <span class="keyword">:</span> <code class="type">nativeint <a href="Ctypes_primitive_types.html#TYPEml_prim">ml_prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTml_prim.ML_size_t"><span class="constructor">ML_size_t</span></span> <span class="keyword">:</span> <code class="type"><a href="Unsigned.html#TYPEsize_t">Unsigned.size_t</a> <a href="Ctypes_primitive_types.html#TYPEml_prim">ml_prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTml_prim.ML_uchar"><span class="constructor">ML_uchar</span></span> <span class="keyword">:</span> <code class="type"><a href="Unsigned.html#TYPEuchar">Unsigned.uchar</a> <a href="Ctypes_primitive_types.html#TYPEml_prim">ml_prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTml_prim.ML_bool"><span class="constructor">ML_bool</span></span> <span class="keyword">:</span> <code class="type">bool <a href="Ctypes_primitive_types.html#TYPEml_prim">ml_prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTml_prim.ML_uint"><span class="constructor">ML_uint</span></span> <span class="keyword">:</span> <code class="type"><a href="Unsigned.html#TYPEuint">Unsigned.uint</a> <a href="Ctypes_primitive_types.html#TYPEml_prim">ml_prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTml_prim.ML_uint16"><span class="constructor">ML_uint16</span></span> <span class="keyword">:</span> <code class="type"><a href="Unsigned.html#TYPEuint16">Unsigned.uint16</a> <a href="Ctypes_primitive_types.html#TYPEml_prim">ml_prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTml_prim.ML_uint32"><span class="constructor">ML_uint32</span></span> <span class="keyword">:</span> <code class="type"><a href="Unsigned.html#TYPEuint32">Unsigned.uint32</a> <a href="Ctypes_primitive_types.html#TYPEml_prim">ml_prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTml_prim.ML_uint64"><span class="constructor">ML_uint64</span></span> <span class="keyword">:</span> <code class="type"><a href="Unsigned.html#TYPEuint64">Unsigned.uint64</a> <a href="Ctypes_primitive_types.html#TYPEml_prim">ml_prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTml_prim.ML_uint8"><span class="constructor">ML_uint8</span></span> <span class="keyword">:</span> <code class="type"><a href="Unsigned.html#TYPEuint8">Unsigned.uint8</a> <a href="Ctypes_primitive_types.html#TYPEml_prim">ml_prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTml_prim.ML_ullong"><span class="constructor">ML_ullong</span></span> <span class="keyword">:</span> <code class="type"><a href="Unsigned.html#TYPEullong">Unsigned.ullong</a> <a href="Ctypes_primitive_types.html#TYPEml_prim">ml_prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTml_prim.ML_ulong"><span class="constructor">ML_ulong</span></span> <span class="keyword">:</span> <code class="type"><a href="Unsigned.html#TYPEulong">Unsigned.ulong</a> <a href="Ctypes_primitive_types.html#TYPEml_prim">ml_prim</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTml_prim.ML_ushort"><span class="constructor">ML_ushort</span></span> <span class="keyword">:</span> <code class="type"><a href="Unsigned.html#TYPEushort">Unsigned.ushort</a> <a href="Ctypes_primitive_types.html#TYPEml_prim">ml_prim</a></code></code></td>
+
+</tr></table>
+
+
+
+<pre><span id="VALml_prim"><span class="keyword">val</span> ml_prim</span> : <code class="type">'a <a href="Ctypes_primitive_types.html#TYPEprim">prim</a> -> 'a <a href="Ctypes_primitive_types.html#TYPEml_prim">ml_prim</a></code></pre></body></html>

@@ -4,27 +4,36 @@
 <link rel="stylesheet" href="style.css" type="text/css">
 <meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
 <link rel="Start" href="index.html">
-<link rel="previous" href="Ctypes.html">
+<link rel="previous" href="Libffi_abi.html">
+<link rel="next" href="Cstubs_internals.html">
 <link rel="Up" href="index.html">
 <link title="Index of types" rel=Appendix href="index_types.html">
 <link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
 <link title="Index of values" rel=Appendix href="index_values.html">
 <link title="Index of modules" rel=Appendix href="index_modules.html">
 <link title="Index of module types" rel=Appendix href="index_module_types.html">
-<link title="Libffi_abi" rel="Chapter" href="Libffi_abi.html">
-<link title="Dl" rel="Chapter" href="Dl.html">
-<link title="Cstubs" rel="Chapter" href="Cstubs.html">
-<link title="Cstubs_inverted" rel="Chapter" href="Cstubs_inverted.html">
-<link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
-<link title="Signed" rel="Chapter" href="Signed.html">
+<link title="Ctypes_static" rel="Chapter" href="Ctypes_static.html">
+<link title="Ctypes_primitive_types" rel="Chapter" href="Ctypes_primitive_types.html">
 <link title="Unsigned" rel="Chapter" href="Unsigned.html">
+<link title="Signed" rel="Chapter" href="Signed.html">
+<link title="Ctypes_structs" rel="Chapter" href="Ctypes_structs.html">
 <link title="Ctypes" rel="Chapter" href="Ctypes.html">
-<link title="Foreign" rel="Chapter" href="Foreign.html"><title>Foreign</title>
+<link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
+<link title="Ctypes_types" rel="Chapter" href="Ctypes_types.html">
+<link title="Ctypes_printers" rel="Chapter" href="Ctypes_printers.html">
+<link title="Dl" rel="Chapter" href="Dl.html">
+<link title="Libffi_abi" rel="Chapter" href="Libffi_abi.html">
+<link title="Foreign" rel="Chapter" href="Foreign.html">
+<link title="Cstubs_internals" rel="Chapter" href="Cstubs_internals.html">
+<link title="Cstubs_structs" rel="Chapter" href="Cstubs_structs.html">
+<link title="Cstubs" rel="Chapter" href="Cstubs.html">
+<link title="Cstubs_inverted" rel="Chapter" href="Cstubs_inverted.html"><title>Foreign</title>
 </head>
 <body>
-<div class="navbar"><a class="pre" href="Ctypes.html" title="Ctypes">Previous</a>
+<div class="navbar"><a class="pre" href="Libffi_abi.html" title="Libffi_abi">Previous</a>
 &nbsp;<a class="up" href="index.html" title="Index">Up</a>
-&nbsp;</div>
+&nbsp;<a class="post" href="Cstubs_internals.html" title="Cstubs_internals">Next</a>
+</div>
 <h1>Module <a href="type_Foreign.html">Foreign</a></h1>
 
 <pre><span class="keyword">module</span> Foreign: <code class="code">sig</code> <a href="Foreign.html">..</a> <code class="code">end</code></pre><div class="info module top">
@@ -32,7 +41,7 @@ High-level bindings for C functions and values<br>
 </div>
 <hr width="100%">
 
-<pre><span id="VALforeign"><span class="keyword">val</span> foreign</span> : <code class="type">?abi:<a href="Libffi_abi.html#TYPEabi">Libffi_abi.abi</a> -><br>       ?from:<a href="Dl.html#TYPElibrary">Dl.library</a> -><br>       ?stub:bool -> ?check_errno:bool -> string -> ('a -> 'b) <a href="Ctypes.html#TYPEfn">Ctypes.fn</a> -> 'a -> 'b</code></pre><div class="info ">
+<pre><span id="VALforeign"><span class="keyword">val</span> foreign</span> : <code class="type">?abi:<a href="Libffi_abi.html#TYPEabi">Libffi_abi.abi</a> -><br>       ?from:<a href="Dl.html#TYPElibrary">Dl.library</a> -><br>       ?stub:bool -><br>       ?check_errno:bool -><br>       ?release_runtime_lock:bool -> string -> ('a -> 'b) Ctypes.fn -> 'a -> 'b</code></pre><div class="info ">
 <code class="code">foreign name typ</code> exposes the C function of type <code class="code">typ</code> named by <code class="code">name</code> as
     an OCaml value.
 <p>
@@ -47,18 +56,28 @@ High-level bindings for C functions and values<br>
 <p>
 
     The value <code class="code">?check_errno</code>, which defaults to <code class="code">false</code>, indicates whether
-    <code class="code">Unix.Unix_error</code> should be raised if the C function modifies <code class="code">errno</code>.<br>
+    <code class="code">Unix.Unix_error</code> should be raised if the C function modifies <code class="code">errno</code>.
+    Please note that a function that succeeds is allowed to change errno. So
+    use this option with caution.
+<p>
+
+    The value <code class="code">?release_runtime_lock</code>, which defaults to <code class="code">false</code>, indicates
+    whether the OCaml runtime lock should be released during the call to the C
+    function, allowing other threads to run.  If the runtime lock is released
+    then the C function must not access OCaml heap objects, such as arguments
+    passed using <code class="code">Ctypes.ocaml_string</code> and <code class="code">Ctypes.ocaml_bytes</code>, and must not
+    call back into OCaml.<br>
 <b>Raises</b> <code>Dl.DL_error</code> if <code class="code">name</code> is not found in <code class="code">?from</code> and <code class="code">?stub</code> is
     <code class="code">false</code>.<br>
 </div>
 
-<pre><span id="VALforeign_value"><span class="keyword">val</span> foreign_value</span> : <code class="type">?from:<a href="Dl.html#TYPElibrary">Dl.library</a> -> string -> 'a <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a> -> 'a <a href="Ctypes.html#TYPEptr">Ctypes.ptr</a></code></pre><div class="info ">
+<pre><span id="VALforeign_value"><span class="keyword">val</span> foreign_value</span> : <code class="type">?from:<a href="Dl.html#TYPElibrary">Dl.library</a> -> string -> 'a Ctypes.typ -> 'a <a href="Ctypes.html#TYPEptr">Ctypes.ptr</a></code></pre><div class="info ">
 <code class="code">foreign_value name typ</code> exposes the C value of type <code class="code">typ</code> named by <code class="code">name</code>
     as an OCaml value.  The argument <code class="code">?from</code>, if supplied, is a library handle
     returned by <a href="Dl.html#VALdlopen"><code class="code">Dl.dlopen</code></a>.<br>
 </div>
 
-<pre><span id="VALfunptr"><span class="keyword">val</span> funptr</span> : <code class="type">?abi:<a href="Libffi_abi.html#TYPEabi">Libffi_abi.abi</a> -><br>       ?name:string -><br>       ?check_errno:bool -> ('a -> 'b) <a href="Ctypes.html#TYPEfn">Ctypes.fn</a> -> ('a -> 'b) <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre><div class="info ">
+<pre><span id="VALfunptr"><span class="keyword">val</span> funptr</span> : <code class="type">?abi:<a href="Libffi_abi.html#TYPEabi">Libffi_abi.abi</a> -><br>       ?name:string -><br>       ?check_errno:bool -><br>       ?runtime_lock:bool -> ('a -> 'b) Ctypes.fn -> ('a -> 'b) Ctypes.typ</code></pre><div class="info ">
 Construct a function pointer type from a function type.
 <p>
 
@@ -70,10 +89,22 @@ Construct a function pointer type from a function type.
 <p>
 
     The value <code class="code">?check_errno</code>, which defaults to <code class="code">false</code>, indicates whether
-    <code class="code">Unix.Unix_error</code> should be raised if the C function modifies <code class="code">errno</code>.<br>
+    <code class="code">Unix.Unix_error</code> should be raised if the C function modifies <code class="code">errno</code>.
+<p>
+
+    The value <code class="code">?runtime_lock</code>, which defaults to <code class="code">false</code>, indicates whether
+    the OCaml runtime lock should be released during the call to the C
+    function, allowing other threads to run.  If the runtime lock is released
+    then the C function must not access OCaml heap objects, such as arguments
+    passed using <code class="code">Ctypes.ocaml_string</code> and <code class="code">Ctypes.ocaml_bytes</code>, and must
+    not call back into OCaml.  If the function pointer is used to call into
+    OCaml from C then the <code class="code">?runtime_lock</code> argument indicates whether the lock
+    should be acquired and held during the call.<br>
+<b>Raises</b> <code>Dl.DL_error</code> if <code class="code">name</code> is not found in <code class="code">?from</code> and <code class="code">?stub</code> is
+    <code class="code">false</code>.<br>
 </div>
 
-<pre><span id="VALfunptr_opt"><span class="keyword">val</span> funptr_opt</span> : <code class="type">?abi:<a href="Libffi_abi.html#TYPEabi">Libffi_abi.abi</a> -> ('a -> 'b) <a href="Ctypes.html#TYPEfn">Ctypes.fn</a> -> ('a -> 'b) option <a href="Ctypes.html#TYPEtyp">Ctypes.typ</a></code></pre><div class="info ">
+<pre><span id="VALfunptr_opt"><span class="keyword">val</span> funptr_opt</span> : <code class="type">?abi:<a href="Libffi_abi.html#TYPEabi">Libffi_abi.abi</a> -> ('a -> 'b) Ctypes.fn -> ('a -> 'b) option Ctypes.typ</code></pre><div class="info ">
 Construct a function pointer type from a function type.
 <p>
 

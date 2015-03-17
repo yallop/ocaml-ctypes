@@ -1,0 +1,206 @@
+<html><head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Index of module types" rel=Appendix href="index_module_types.html">
+<link title="Ctypes_static" rel="Chapter" href="Ctypes_static.html">
+<link title="Ctypes_primitive_types" rel="Chapter" href="Ctypes_primitive_types.html">
+<link title="Unsigned" rel="Chapter" href="Unsigned.html">
+<link title="Signed" rel="Chapter" href="Signed.html">
+<link title="Ctypes_structs" rel="Chapter" href="Ctypes_structs.html">
+<link title="Ctypes" rel="Chapter" href="Ctypes.html">
+<link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
+<link title="Ctypes_types" rel="Chapter" href="Ctypes_types.html">
+<link title="Ctypes_printers" rel="Chapter" href="Ctypes_printers.html">
+<link title="Dl" rel="Chapter" href="Dl.html">
+<link title="Libffi_abi" rel="Chapter" href="Libffi_abi.html">
+<link title="Foreign" rel="Chapter" href="Foreign.html">
+<link title="Cstubs_internals" rel="Chapter" href="Cstubs_internals.html">
+<link title="Cstubs_structs" rel="Chapter" href="Cstubs_structs.html">
+<link title="Cstubs" rel="Chapter" href="Cstubs.html">
+<link title="Cstubs_inverted" rel="Chapter" href="Cstubs_inverted.html"><title>Ctypes_static</title>
+</head>
+<body>
+<code class="code"><span class="keyword">sig</span><br>
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;abstract_type&nbsp;=&nbsp;{&nbsp;aname&nbsp;:&nbsp;string;&nbsp;asize&nbsp;:&nbsp;int;&nbsp;aalignment&nbsp;:&nbsp;int;&nbsp;}<br>
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;_&nbsp;ocaml_type&nbsp;=<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">String</span>&nbsp;:&nbsp;string&nbsp;<span class="constructor">Ctypes_static</span>.ocaml_type<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Bytes</span>&nbsp;:&nbsp;<span class="constructor">Bytes</span>.t&nbsp;<span class="constructor">Ctypes_static</span>.ocaml_type<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">FloatArray</span>&nbsp;:&nbsp;float&nbsp;array&nbsp;<span class="constructor">Ctypes_static</span>.ocaml_type<br>
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;incomplete_size&nbsp;=&nbsp;{&nbsp;<span class="keyword">mutable</span>&nbsp;isize&nbsp;:&nbsp;int;&nbsp;}<br>
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;structured_spec&nbsp;=&nbsp;{&nbsp;size&nbsp;:&nbsp;int;&nbsp;align&nbsp;:&nbsp;int;&nbsp;}<br>
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;structspec&nbsp;=<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Incomplete</span>&nbsp;<span class="keyword">of</span>&nbsp;<span class="constructor">Ctypes_static</span>.incomplete_size<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Complete</span>&nbsp;<span class="keyword">of</span>&nbsp;<span class="constructor">Ctypes_static</span>.structured_spec<br>
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;_&nbsp;typ&nbsp;=<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Void</span>&nbsp;:&nbsp;unit&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Primitive</span>&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_primitive_types</span>.prim&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Pointer</span>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.typ&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.ptr&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Struct</span>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.structure_type&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.structure<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Union</span>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.union_type&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.union<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Abstract</span>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Ctypes_static</span>.abstract_type&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.abstract<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">View</span>&nbsp;:&nbsp;(<span class="keywordsign">'</span>a,&nbsp;<span class="keywordsign">'</span>b)&nbsp;<span class="constructor">Ctypes_static</span>.view&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Array</span>&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.typ&nbsp;*<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.carray&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Bigarray</span>&nbsp;:&nbsp;(<span class="keywordsign">'</span>c,&nbsp;<span class="keywordsign">'</span>a)&nbsp;<span class="constructor">Ctypes_bigarray</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">OCaml</span>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.ocaml_type&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.ocaml<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">and</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;carray&nbsp;=&nbsp;{&nbsp;astart&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.ptr;&nbsp;alength&nbsp;:&nbsp;int;&nbsp;}<br>
+&nbsp;&nbsp;<span class="keyword">and</span>&nbsp;(<span class="keywordsign">'</span>a,&nbsp;<span class="keywordsign">'</span>kind)&nbsp;structured&nbsp;=&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;structured&nbsp;:&nbsp;(<span class="keywordsign">'</span>a,&nbsp;<span class="keywordsign">'</span>kind)&nbsp;<span class="constructor">Ctypes_static</span>.structured&nbsp;<span class="constructor">Ctypes_static</span>.ptr;<br>
+&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;<span class="keyword">and</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;union&nbsp;=&nbsp;(<span class="keywordsign">'</span>a,&nbsp;[&nbsp;<span class="keywordsign">`</span><span class="constructor">Union</span>&nbsp;])&nbsp;structured<br>
+&nbsp;&nbsp;<span class="keyword">and</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;structure&nbsp;=&nbsp;(<span class="keywordsign">'</span>a,&nbsp;[&nbsp;<span class="keywordsign">`</span><span class="constructor">Struct</span>&nbsp;])&nbsp;structured<br>
+&nbsp;&nbsp;<span class="keyword">and</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;abstract&nbsp;=&nbsp;(<span class="keywordsign">'</span>a,&nbsp;[&nbsp;<span class="keywordsign">`</span><span class="constructor">Abstract</span>&nbsp;])&nbsp;structured<br>
+&nbsp;&nbsp;<span class="keyword">and</span>&nbsp;(_,&nbsp;_)&nbsp;pointer&nbsp;=<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">CPointer</span>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.typ&nbsp;<span class="constructor">Ctypes_ptr</span>.<span class="constructor">Fat</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;(<span class="keywordsign">'</span>a,&nbsp;[&nbsp;<span class="keywordsign">`</span><span class="constructor">C</span>&nbsp;])<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Ctypes_static</span>.pointer<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">OCamlRef</span>&nbsp;:&nbsp;int&nbsp;*&nbsp;<span class="keywordsign">'</span>a&nbsp;*<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.ocaml_type&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;(<span class="keywordsign">'</span>a,&nbsp;[&nbsp;<span class="keywordsign">`</span><span class="constructor">OCaml</span>&nbsp;])&nbsp;<span class="constructor">Ctypes_static</span>.pointer<br>
+&nbsp;&nbsp;<span class="keyword">and</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;ptr&nbsp;=&nbsp;(<span class="keywordsign">'</span>a,&nbsp;[&nbsp;<span class="keywordsign">`</span><span class="constructor">C</span>&nbsp;])&nbsp;pointer<br>
+&nbsp;&nbsp;<span class="keyword">and</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;ocaml&nbsp;=&nbsp;(<span class="keywordsign">'</span>a,&nbsp;[&nbsp;<span class="keywordsign">`</span><span class="constructor">OCaml</span>&nbsp;])&nbsp;pointer<br>
+&nbsp;&nbsp;<span class="keyword">and</span>&nbsp;(<span class="keywordsign">'</span>a,&nbsp;<span class="keywordsign">'</span>b)&nbsp;view&nbsp;=&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;read&nbsp;:&nbsp;<span class="keywordsign">'</span>b&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;write&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>b;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;format_typ&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((<span class="constructor">Format</span>.formatter&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit)&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Format</span>.formatter&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit)&nbsp;option;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;format&nbsp;:&nbsp;(<span class="constructor">Format</span>.formatter&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit)&nbsp;option;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ty&nbsp;:&nbsp;<span class="keywordsign">'</span>b&nbsp;<span class="constructor">Ctypes_static</span>.typ;<br>
+&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;<span class="keyword">and</span>&nbsp;(<span class="keywordsign">'</span>a,&nbsp;<span class="keywordsign">'</span>s)&nbsp;field&nbsp;=&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ftype&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.typ;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;foffset&nbsp;:&nbsp;int;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;fname&nbsp;:&nbsp;string;<br>
+&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;<span class="keyword">and</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;structure_type&nbsp;=&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;tag&nbsp;:&nbsp;string;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">mutable</span>&nbsp;spec&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.structspec;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">mutable</span>&nbsp;fields&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.structure&nbsp;<span class="constructor">Ctypes_static</span>.boxed_field&nbsp;list;<br>
+&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;<span class="keyword">and</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;union_type&nbsp;=&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;utag&nbsp;:&nbsp;string;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">mutable</span>&nbsp;uspec&nbsp;:&nbsp;<span class="constructor">Ctypes_static</span>.structured_spec&nbsp;option;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">mutable</span>&nbsp;ufields&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.union&nbsp;<span class="constructor">Ctypes_static</span>.boxed_field&nbsp;list;<br>
+&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;<span class="keyword">and</span>&nbsp;<span class="keywordsign">'</span>s&nbsp;boxed_field&nbsp;=<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">BoxedField</span>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="keywordsign">'</span>a,&nbsp;<span class="keywordsign">'</span>s)&nbsp;<span class="constructor">Ctypes_static</span>.field&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>s&nbsp;<span class="constructor">Ctypes_static</span>.boxed_field<br>
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;_&nbsp;bigarray_class&nbsp;=<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Genarray</span>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;&nbsp;ba_repr&nbsp;:&nbsp;<span class="keywordsign">'</span>b;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bigarray&nbsp;:&nbsp;(<span class="keywordsign">'</span>a,&nbsp;<span class="keywordsign">'</span>b,&nbsp;<span class="constructor">Bigarray</span>.c_layout)&nbsp;<span class="constructor">Bigarray</span>.<span class="constructor">Genarray</span>.t;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;carray&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.carray;&nbsp;dims&nbsp;:&nbsp;int&nbsp;array;&nbsp;element&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Ctypes_static</span>.bigarray_class<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Array1</span>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;&nbsp;ba_repr&nbsp;:&nbsp;<span class="keywordsign">'</span>b;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bigarray&nbsp;:&nbsp;(<span class="keywordsign">'</span>a,&nbsp;<span class="keywordsign">'</span>b,&nbsp;<span class="constructor">Bigarray</span>.c_layout)&nbsp;<span class="constructor">Bigarray</span>.<span class="constructor">Array1</span>.t;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;carray&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.carray;&nbsp;dims&nbsp;:&nbsp;int;&nbsp;element&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Ctypes_static</span>.bigarray_class<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Array2</span>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;&nbsp;ba_repr&nbsp;:&nbsp;<span class="keywordsign">'</span>b;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bigarray&nbsp;:&nbsp;(<span class="keywordsign">'</span>a,&nbsp;<span class="keywordsign">'</span>b,&nbsp;<span class="constructor">Bigarray</span>.c_layout)&nbsp;<span class="constructor">Bigarray</span>.<span class="constructor">Array2</span>.t;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;carray&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.carray&nbsp;<span class="constructor">Ctypes_static</span>.carray;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dims&nbsp;:&nbsp;int&nbsp;*&nbsp;int;&nbsp;element&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Ctypes_static</span>.bigarray_class<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Array3</span>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;&nbsp;ba_repr&nbsp;:&nbsp;<span class="keywordsign">'</span>b;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bigarray&nbsp;:&nbsp;(<span class="keywordsign">'</span>a,&nbsp;<span class="keywordsign">'</span>b,&nbsp;<span class="constructor">Bigarray</span>.c_layout)&nbsp;<span class="constructor">Bigarray</span>.<span class="constructor">Array3</span>.t;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;carray&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.carray&nbsp;<span class="constructor">Ctypes_static</span>.carray<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Ctypes_static</span>.carray;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dims&nbsp;:&nbsp;int&nbsp;*&nbsp;int&nbsp;*&nbsp;int;&nbsp;element&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Ctypes_static</span>.bigarray_class<br>
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;_&nbsp;fn&nbsp;=<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Returns</span>&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.typ&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.fn<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Function</span>&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.typ&nbsp;*<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">'</span>b&nbsp;<span class="constructor">Ctypes_static</span>.fn&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;(<span class="keywordsign">'</span>a&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>b)&nbsp;<span class="constructor">Ctypes_static</span>.fn<br>
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;boxed_typ&nbsp;=<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">BoxedType</span>&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.typ&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Ctypes_static</span>.boxed_typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;sizeof&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.typ&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;int<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;alignment&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.typ&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;int<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;passable&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.typ&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;bool<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;void&nbsp;:&nbsp;unit&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;char&nbsp;:&nbsp;char&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;schar&nbsp;:&nbsp;int&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;float&nbsp;:&nbsp;float&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;double&nbsp;:&nbsp;float&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;complex32&nbsp;:&nbsp;<span class="constructor">Complex</span>.t&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;complex64&nbsp;:&nbsp;<span class="constructor">Complex</span>.t&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;short&nbsp;:&nbsp;int&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;int&nbsp;:&nbsp;int&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;long&nbsp;:&nbsp;<span class="constructor">Signed</span>.long&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;llong&nbsp;:&nbsp;<span class="constructor">Signed</span>.llong&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;nativeint&nbsp;:&nbsp;nativeint&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;int8_t&nbsp;:&nbsp;int&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;int16_t&nbsp;:&nbsp;int&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;int32_t&nbsp;:&nbsp;<span class="constructor">Signed</span>.<span class="constructor">Int32</span>.t&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;int64_t&nbsp;:&nbsp;<span class="constructor">Signed</span>.<span class="constructor">Int64</span>.t&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;camlint&nbsp;:&nbsp;int&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;uchar&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.uchar&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;bool&nbsp;:&nbsp;bool&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;uint8_t&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.<span class="constructor">UInt8</span>.t&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;uint16_t&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.<span class="constructor">UInt16</span>.t&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;uint32_t&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.<span class="constructor">UInt32</span>.t&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;uint64_t&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.<span class="constructor">UInt64</span>.t&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;size_t&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.size_t&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;ushort&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.ushort&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;uint&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.uint&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;ulong&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.ulong&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;ullong&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.ullong&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;array&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.typ&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.carray&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;ocaml_string&nbsp;:&nbsp;string&nbsp;<span class="constructor">Ctypes_static</span>.ocaml&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;ocaml_bytes&nbsp;:&nbsp;<span class="constructor">Bytes</span>.t&nbsp;<span class="constructor">Ctypes_static</span>.ocaml&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;ocaml_float_array&nbsp;:&nbsp;float&nbsp;array&nbsp;<span class="constructor">Ctypes_static</span>.ocaml&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;ptr&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.typ&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.ptr&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;(&nbsp;@-&gt;&nbsp;)&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.typ&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">'</span>b&nbsp;<span class="constructor">Ctypes_static</span>.fn&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;(<span class="keywordsign">'</span>a&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>b)&nbsp;<span class="constructor">Ctypes_static</span>.fn<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;abstract&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;name:string&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;size:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;alignment:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.abstract&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;view&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;?format_typ:((<span class="constructor">Format</span>.formatter&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit)&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Format</span>.formatter&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit)&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;?format:(<span class="constructor">Format</span>.formatter&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>b&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit)&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;read:(<span class="keywordsign">'</span>a&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>b)&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;write:(<span class="keywordsign">'</span>b&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a)&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.typ&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>b&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;typedef&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.typ&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;string&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;bigarray&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;&nbsp;ba_repr&nbsp;:&nbsp;<span class="keywordsign">'</span>c;&nbsp;bigarray&nbsp;:&nbsp;<span class="keywordsign">'</span>d;&nbsp;carray&nbsp;:&nbsp;<span class="keywordsign">'</span>e;&nbsp;dims&nbsp;:&nbsp;<span class="keywordsign">'</span>b;&nbsp;element&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Ctypes_static</span>.bigarray_class&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">'</span>b&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;(<span class="keywordsign">'</span>a,&nbsp;<span class="keywordsign">'</span>c)&nbsp;<span class="constructor">Bigarray</span>.kind&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>d&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;returning&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.typ&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.fn<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;structure&nbsp;:&nbsp;string&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.structure&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;union&nbsp;:&nbsp;string&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.union&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;offsetof&nbsp;:&nbsp;(<span class="keywordsign">'</span>a,&nbsp;<span class="keywordsign">'</span>b)&nbsp;<span class="constructor">Ctypes_static</span>.field&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;int<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;field_type&nbsp;:&nbsp;(<span class="keywordsign">'</span>a,&nbsp;<span class="keywordsign">'</span>b)&nbsp;<span class="constructor">Ctypes_static</span>.field&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.typ<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;field_name&nbsp;:&nbsp;(<span class="keywordsign">'</span>a,&nbsp;<span class="keywordsign">'</span>b)&nbsp;<span class="constructor">Ctypes_static</span>.field&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;string<br>
+&nbsp;&nbsp;<span class="keyword">exception</span>&nbsp;<span class="constructor">IncompleteType</span><br>
+&nbsp;&nbsp;<span class="keyword">exception</span>&nbsp;<span class="constructor">ModifyingSealedType</span>&nbsp;<span class="keyword">of</span>&nbsp;string<br>
+&nbsp;&nbsp;<span class="keyword">exception</span>&nbsp;<span class="constructor">Unsupported</span>&nbsp;<span class="keyword">of</span>&nbsp;string<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;unsupported&nbsp;:&nbsp;(<span class="keywordsign">'</span>a,&nbsp;unit,&nbsp;string,&nbsp;<span class="keywordsign">'</span>b)&nbsp;<span class="constructor">Pervasives</span>.format4&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a<br>
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;arithmetic&nbsp;=<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Int8</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Int16</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Int32</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Int64</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Uint8</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Uint16</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Uint32</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Uint64</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Float</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Double</span><br>
+<span class="keyword">end</span></code></body></html>

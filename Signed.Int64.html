@@ -12,15 +12,22 @@
 <link title="Index of values" rel=Appendix href="index_values.html">
 <link title="Index of modules" rel=Appendix href="index_modules.html">
 <link title="Index of module types" rel=Appendix href="index_module_types.html">
-<link title="Libffi_abi" rel="Chapter" href="Libffi_abi.html">
-<link title="Dl" rel="Chapter" href="Dl.html">
-<link title="Cstubs" rel="Chapter" href="Cstubs.html">
-<link title="Cstubs_inverted" rel="Chapter" href="Cstubs_inverted.html">
-<link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
-<link title="Signed" rel="Chapter" href="Signed.html">
+<link title="Ctypes_static" rel="Chapter" href="Ctypes_static.html">
+<link title="Ctypes_primitive_types" rel="Chapter" href="Ctypes_primitive_types.html">
 <link title="Unsigned" rel="Chapter" href="Unsigned.html">
+<link title="Signed" rel="Chapter" href="Signed.html">
+<link title="Ctypes_structs" rel="Chapter" href="Ctypes_structs.html">
 <link title="Ctypes" rel="Chapter" href="Ctypes.html">
-<link title="Foreign" rel="Chapter" href="Foreign.html"><title>Signed.Int64</title>
+<link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
+<link title="Ctypes_types" rel="Chapter" href="Ctypes_types.html">
+<link title="Ctypes_printers" rel="Chapter" href="Ctypes_printers.html">
+<link title="Dl" rel="Chapter" href="Dl.html">
+<link title="Libffi_abi" rel="Chapter" href="Libffi_abi.html">
+<link title="Foreign" rel="Chapter" href="Foreign.html">
+<link title="Cstubs_internals" rel="Chapter" href="Cstubs_internals.html">
+<link title="Cstubs_structs" rel="Chapter" href="Cstubs_structs.html">
+<link title="Cstubs" rel="Chapter" href="Cstubs.html">
+<link title="Cstubs_inverted" rel="Chapter" href="Cstubs_inverted.html"><title>Signed.Int64</title>
 </head>
 <body>
 <div class="navbar"><a class="pre" href="Signed.Int32.html" title="Signed.Int32">Previous</a>
@@ -55,6 +62,14 @@ The smallest representable integer.<br>
 <pre><span id="VALshift_right_logical"><span class="keyword">val</span> shift_right_logical</span> : <code class="type">t -> int -> t</code></pre><div class="info ">
 <a href="Signed.S.html#VALshift_right_logical"><code class="code">Signed.S.shift_right_logical</code></a> <code class="code">x</code> <code class="code">y</code> shifts <code class="code">x</code> to the right by <code class="code">y</code> bits.  See
       <code class="code">Int32.shift_right_logical</code>.<br>
+</div>
+
+<pre><span id="VALof_nativeint"><span class="keyword">val</span> of_nativeint</span> : <code class="type">nativeint -> t</code></pre><div class="info ">
+Convert the given nativeint value to a signed integer.<br>
+</div>
+
+<pre><span id="VALto_nativeint"><span class="keyword">val</span> to_nativeint</span> : <code class="type">t -> nativeint</code></pre><div class="info ">
+Convert the given signed integer to a nativeint value.<br>
 </div>
 
 <pre><span id="VALof_int64"><span class="keyword">val</span> of_int64</span> : <code class="type">int64 -> t</code></pre><div class="info ">
