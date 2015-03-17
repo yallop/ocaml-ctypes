@@ -178,7 +178,18 @@ install: META-install $(PROJECTS:%=install-%)
 uninstall:
 	$(OCAMLFIND) remove ctypes
 
-.PHONY: depend clean configure all install $(PROJECTS)
+DOCFILES=$(foreach project,$(PROJECTS),\
+           $(foreach mli,$($(project).public),\
+            $($(project).dir)/$(mli).mli))
+DOCFLAGS=$(foreach project,$(PROJECTS),-I $(BUILDDIR)/$($(project).dir))
+# Avoid passing duplicate interfaces to ocamldoc.
+DOCFILES:=$(filter-out src/ctypes-foreign-threaded/foreign.mli,$(DOCFILES))
+
+doc:
+	ocamldoc -html $(DOCFLAGS) $(DOCFILES)
+
+
+.PHONY: depend clean configure all install doc $(PROJECTS)
 
 include .depend Makefile.rules Makefile.examples Makefile.tests
 -include libffi.config
