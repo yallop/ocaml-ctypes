@@ -194,7 +194,7 @@ let search_libffi_header () =
 let test_libffi setup_data have_pkg_config =
   let get var = try Some (split (Sys.getenv var)) with Not_found -> None in
   let opt, lib =
-    match get "LIBFFI_CFLAGS", get "LBIFFI_LIBS" with
+    match get "LIBFFI_CFLAGS", get "LIBFFI_LIBS" with
     | Some opt, Some lib -> (opt, lib)
     | envopt, envlib ->
       let opt, lib =
