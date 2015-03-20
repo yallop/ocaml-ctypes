@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -ex
 
+WODI_ARCH=$1
+
 type -p ocamlc
 ocamlc -version
 
@@ -21,7 +23,8 @@ case "$x" in
         ;;
 esac
 
-godi_dir="$(dirname "$(godi_confdir)")"
+godi_dir=/opt/wodi${WODI_ARCH}
+export PATH=$godi_dir/sbin:$godi_dir/bin:$PATH
 
 export AR=${MINGW_TOOL_PREFIX}ar.exe
 export AS=${MINGW_TOOL_PREFIX}as.exe
