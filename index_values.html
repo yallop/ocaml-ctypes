@@ -140,7 +140,8 @@ Return the absolute value of its argument.
 </td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALabstract">abstract</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
 <td><div class="info">
-Abstract types
+Create an abstract type specification from the size and alignment
+      requirements for the type.
 </div>
 </td></tr>
 <tr><td><a href="Ctypes_static.html#VALabstract">abstract</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
@@ -563,7 +564,8 @@ Return the number of elements of the given array.
 </td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALlift_typ">lift_typ</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
 <td><div class="info">
-Injection of concrete types
+<code class="code">lift_typ t</code> turns a concrete type representation into an abstract type
+      representation.
 </div>
 </td></tr>
 <tr><td><a href="Libffi_abi.html#VALlinux">linux</a> [<a href="Libffi_abi.html">Libffi_abi</a>]</td>
@@ -697,7 +699,7 @@ Value representing the directly mapped storage of an OCaml byte array.
 <td></td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALocaml_string">ocaml_string</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
 <td><div class="info">
-OCaml pointers
+Value representing the directly mapped storage of an OCaml string.
 </div>
 </td></tr>
 <tr><td><a href="Ctypes_static.html#VALocaml_string">ocaml_string</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
@@ -769,7 +771,8 @@ Predecessor.
 </td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALptr">ptr</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
 <td><div class="info">
-C-compatible pointers
+Construct a pointer type from an existing type (called the <i>reference
+      type</i>).
 </div>
 </td></tr>
 <tr><td><a href="Ctypes_static.html#VALptr">ptr</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>

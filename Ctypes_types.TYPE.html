@@ -30,7 +30,10 @@
 <link title="The void type" rel="Subsection" href="#3_Thevoidtype">
 <link title="Scalar types" rel="Subsection" href="#3_Scalartypes">
 <link title="Array types" rel="Subsection" href="#3_Arraytypes">
+<link title="Struct and union types" rel="Subsection" href="#3_Structanduniontypes">
 <link title="View types" rel="Subsection" href="#3_Viewtypes">
+<link title="Abstract types" rel="Subsection" href="#3_Abstracttypes">
+<link title="Injection of concrete types" rel="Subsection" href="#3_Injectionofconcretetypes">
 <title>Ctypes_types.TYPE</title>
 </head>
 <body>
@@ -216,10 +219,10 @@ Value representing the C99 double-precision <code class="code">double complex</c
 </div>
 <br>
 <h4 id="pointer_types">Pointer types</h4><br>
+<br>
+<h5 id="5_Ccompatiblepointers">C-compatible pointers</h5><br>
 
 <pre><span id="VALptr"><span class="keyword">val</span> ptr</span> : <code class="type">'a <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a> -> 'a <a href="Ctypes_static.html#TYPEptr">Ctypes_static.ptr</a> <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
-<h4 id="4_Ccompatiblepointers">C-compatible pointers</h4>
-<p>
 Construct a pointer type from an existing type (called the <i>reference
       type</i>).<br>
 </div>
@@ -247,10 +250,10 @@ A high-level representation of the string type.
 A high-level representation of the string type.  This behaves like <a href="Ctypes_types.TYPE.html#VALstring"><code class="code">Ctypes_types.TYPE.string</code></a>,
       except that null pointers appear in OCaml as <code class="code">None</code>.<br>
 </div>
+<br>
+<h5 id="5_OCamlpointers">OCaml pointers</h5><br>
 
 <pre><span id="VALocaml_string"><span class="keyword">val</span> ocaml_string</span> : <code class="type">string <a href="Ctypes_static.html#TYPEocaml">Ctypes_static.ocaml</a> <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
-<h4 id="4_OCamlpointers">OCaml pointers</h4>
-<p>
 Value representing the directly mapped storage of an OCaml string.<br>
 </div>
 
@@ -278,11 +281,10 @@ Construct a sized bigarray type representation from a bigarray class, the
 <code class="code">typ_of_bigarray_kind k</code> is the type corresponding to the Bigarray kind
       <code class="code">k</code>.<br>
 </div>
+<br>
+<h3 id="3_Structanduniontypes">Struct and union types</h3><br>
 
 <pre><span id="TYPEfield"><span class="keyword">type</span> <code class="type">('a, 't)</code> field</span> </pre>
-<div class="info ">
-<h3 id="3_Structanduniontypes">Struct and union types</h3><br>
-</div>
 
 
 <pre><span id="VALstructure"><span class="keyword">val</span> structure</span> : <code class="type">string -> 's <a href="Ctypes_static.html#TYPEstructure">Ctypes_static.structure</a> <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
@@ -366,17 +368,17 @@ Construct a new union type.  This behaves analogously to <a href="Ctypes_types.T
       This is useful when generating C stubs involving "anonymous" types, for
       example: <code class="code">typedef struct { int f } typedef_name;</code><br>
 </div>
+<br>
+<h3 id="3_Abstracttypes">Abstract types</h3><br>
 
 <pre><span id="VALabstract"><span class="keyword">val</span> abstract</span> : <code class="type">name:string -><br>       size:int -> alignment:int -> 'a <a href="Ctypes_static.html#TYPEabstract">Ctypes_static.abstract</a> <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
-<h3 id="3_Abstracttypes">Abstract types</h3>
-<p>
 Create an abstract type specification from the size and alignment
       requirements for the type.<br>
 </div>
+<br>
+<h3 id="3_Injectionofconcretetypes">Injection of concrete types</h3><br>
 
 <pre><span id="VALlift_typ"><span class="keyword">val</span> lift_typ</span> : <code class="type">'a <a href="Ctypes_static.html#TYPEtyp">Ctypes_static.typ</a> -> 'a <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
-<h3 id="3_Injectionofconcretetypes">Injection of concrete types</h3>
-<p>
 <code class="code">lift_typ t</code> turns a concrete type representation into an abstract type
       representation.
 <p>
