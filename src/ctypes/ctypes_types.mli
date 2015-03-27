@@ -151,7 +151,8 @@ sig
 
   (** {4:pointer_types Pointer types} *)
 
-  (** {4 C-compatible pointers} *)
+  (** {5 C-compatible pointers} *)
+
   val ptr : 'a typ -> 'a Ctypes_static.ptr typ
   (** Construct a pointer type from an existing type (called the {i reference
       type}).  *)
@@ -177,7 +178,8 @@ sig
       except that null pointers appear in OCaml as [None].
   *)
 
-  (** {4 OCaml pointers} *)
+  (** {5 OCaml pointers} *)
+
   val ocaml_string : string Ctypes_static.ocaml typ
   (** Value representing the directly mapped storage of an OCaml string. *)
 
@@ -185,6 +187,7 @@ sig
   (** Value representing the directly mapped storage of an OCaml byte array. *)
 
   (** {3 Array types} *)
+
   (** {4 C array types} *)
 
   val array : int -> 'a typ -> 'a Ctypes_static.carray typ
@@ -208,6 +211,7 @@ sig
       [k]. *)
 
   (** {3 Struct and union types} *)
+
   type ('a, 't) field
 
   val structure : string -> 's Ctypes_static.structure typ
@@ -284,11 +288,13 @@ sig
   *)
 
   (** {3 Abstract types} *)
+
   val abstract : name:string -> size:int -> alignment:int -> 'a Ctypes_static.abstract typ
   (** Create an abstract type specification from the size and alignment
       requirements for the type. *)
 
   (** {3 Injection of concrete types} *)
+
   val lift_typ : 'a Ctypes_static.typ -> 'a typ
   (** [lift_typ t] turns a concrete type representation into an abstract type
       representation.
