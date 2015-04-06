@@ -78,6 +78,9 @@ val funptr :
 
 val funptr_opt :
   ?abi:Libffi_abi.abi ->
+  ?name:string ->
+  ?check_errno:bool ->
+  ?runtime_lock:bool ->
   ('a -> 'b) Ctypes.fn ->
   ('a -> 'b) option Ctypes.typ
 (** Construct a function pointer type from a function type.
