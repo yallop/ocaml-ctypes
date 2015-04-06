@@ -1,3 +1,12 @@
+## ctypes 0.4.1
+
+Thanks to Etienne Millon (@emillon) for contributing to this release.
+
+* Fix placement of docstring titles
+* Add funptr's optional arguments to funptr_opt
+* Fix a typo in libffi detection code
+* Synchronize foreign.mli files (documentation)
+
 ## ctypes 0.4
 
 Thanks to A. Hauptmann (@fdopen), David Sheets (@dsheets), Maverick Woo (@maverickwoo), Peter Zotov (@whitequark), David Kaloper (@pqwy), Ramkumar Ramachandra (@artagnon), Thomas Braibant (@braibant), Hugo Heuzard (@hhugo) and Edwin Török (@edwintorok) for contributions to this release.
