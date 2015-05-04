@@ -98,6 +98,7 @@ struct
 end
 
 module Enum_stubs_tests = Build_enum_stub_tests(Generated_struct_bindings)
+module Enum_simple_stubs_tests = Build_enum_stub_tests(Generated_simple_struct_bindings)
 module Combined_stub_tests = Enum_stubs_tests.Build_call_tests(Generated_bindings)
 
 
@@ -117,6 +118,12 @@ let suite = "Enum tests" >:::
 
     "arrays of enums"
     >:: Enum_stubs_tests.test_enum_arrays;
+
+    "enums as struct members (simple stubs)"
+    >:: Enum_simple_stubs_tests.test_enum_struct_members;
+
+    "arrays of enums (simple stubs)"
+    >:: Enum_simple_stubs_tests.test_enum_arrays;
   ]
 
 

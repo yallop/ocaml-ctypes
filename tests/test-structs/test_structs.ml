@@ -595,6 +595,12 @@ module Combined_foreign_tests =
 module Combined_stub_tests =
   Struct_stubs_tests.Build_call_tests(Generated_bindings)
 
+module Simple_struct_stubs_tests = Build_struct_stub_tests(Generated_simple_struct_bindings)
+module Combined_foreign_tests' =
+  Simple_struct_stubs_tests.Build_call_tests(Tests_common.Foreign_binder)
+module Combined_stub_tests' =
+  Simple_struct_stubs_tests.Build_call_tests(Generated_bindings)
+
 
 let suite = "Struct tests" >:::
   ["passing struct (foreign)"
@@ -614,6 +620,12 @@ let suite = "Struct tests" >:::
 
    "struct dependencies (stubs)"
    >:: Combined_stub_tests.test_struct_dependencies;
+
+   "struct dependencies (foreign, simple struct stubs)"
+   >:: Combined_foreign_tests'.test_struct_dependencies;
+
+   "struct dependencies (stubs, simple struct stubs)"
+   >:: Combined_stub_tests'.test_struct_dependencies;
 
    "incomplete struct members rejected"
    >:: test_incomplete_struct_members;
@@ -662,6 +674,15 @@ let suite = "Struct tests" >:::
 
    "test adding fields to tagless structs"
    >:: Struct_stubs_tests.test_tagless_structs;
+
+   "test layout of structs with missing fields (simple struct stubs)"
+   >:: Simple_struct_stubs_tests.test_missing_fields;
+
+   "test layout of structs with reordered fields (simple struct stubs)"
+   >:: Simple_struct_stubs_tests.test_reordered_fields;
+
+   "test retrieving information about structs with dependencies (simple struct stubs)"
+   >:: Simple_struct_stubs_tests.test_struct_dependencies;
   ]
 
 

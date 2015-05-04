@@ -29,11 +29,15 @@ struct
   let _LLONG_MIN = constant "LLONG_MIN" llong
   let _ULLONG_MAX = constant "ULLONG_MAX" ullong
   let _INT8_MIN = constant "INT8_MIN" int8_t
-  let _INT16_MIN = constant "INT16_MIN" int16_t
+  (* TODO: simple struct stubs don't yet support multiple bindings
+     for the same name *)
+  (* let _INT16_MIN = constant "INT16_MIN" int16_t *)
   let _INT32_MIN = constant "INT32_MIN" int32_t
   let _INT64_MIN = constant "INT64_MIN" int64_t
   let _INT8_MAX = constant "INT8_MAX" int8_t
-  let _INT16_MAX = constant "INT16_MAX" int16_t
+  (* TODO: simple struct stubs don't yet support multiple bindings
+     for the same name *)
+  (* let _INT16_MAX = constant "INT16_MAX" int16_t *)
   let _INT32_MAX = constant "INT32_MAX" int32_t
   let _INT64_MAX = constant "INT64_MAX" int64_t
   let _UINT8_MAX = constant "UINT8_MAX" uint8_t
