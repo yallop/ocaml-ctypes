@@ -238,6 +238,8 @@ test-enums-structs-generated: \
 test-enums-generated: \
   tests/test-enums/generated_bindings.ml \
   tests/test-enums/generated_stubs.c \
+  tests/test-enums/generated_simple_struct_bindings.ml \
+  tests/test-enums/generated_simple_struct_stubs.c \
 
 tests/test-enums/generated_stubs.c: $(BUILDDIR)/test-enums-stub-generator.native
 	$< --c-file $@
@@ -249,6 +251,10 @@ $(BUILDDIR)/test-enums-ml-struct-stub-generator.native: $(BUILDDIR)/tests/test-e
 	$(CC) -I `$(OCAMLFIND) ocamlc -where | sed 's|\r$$||'` $(CFLAGS) $(LDFLAGS) $(WINLDFLAGS) -o $@ $^
 $(BUILDDIR)/tests/test-enums/generated_struct_stubs.c: $(BUILDDIR)/test-enums-struct-stub-generator.native
 	$< --c-struct-file $@
+tests/test-enums/generated_simple_struct_bindings.ml: $(BUILDDIR)/test-enums-stub-generator.native
+	$< --ml-simple-struct-file $@
+tests/test-enums/generated_simple_struct_stubs.c: $(BUILDDIR)/test-enums-stub-generator.native
+	$< --c-simple-struct-file $@
 
 test-structs-stubs.dir  = tests/test-structs/stubs
 test-structs-stubs.threads = yes
@@ -277,6 +283,8 @@ test-structs: $$(NATIVE_TARGET)
 test-structs-generated: \
   tests/test-structs/generated_bindings.ml \
   tests/test-structs/generated_stubs.c \
+  tests/test-structs/generated_simple_struct_bindings.ml \
+  tests/test-structs/generated_simple_struct_stubs.c \
   tests/test-structs/generated_struct_bindings.ml \
   $(BUILDDIR)/tests/test-structs/generated_struct_stubs.c
 
@@ -290,6 +298,10 @@ $(BUILDDIR)/test-structs-ml-stub-generator.native: $(BUILDDIR)/tests/test-struct
 	$(CC) -I `$(OCAMLFIND) ocamlc -where | sed 's|\r$$||'` $(CFLAGS) $(LDFLAGS) $(WINLDFLAGS) -o $@ $^
 $(BUILDDIR)/tests/test-structs/generated_struct_stubs.c: $(BUILDDIR)/test-structs-stub-generator.native
 	$< --c-struct-file $@
+tests/test-structs/generated_simple_struct_bindings.ml: $(BUILDDIR)/test-structs-stub-generator.native
+	$< --ml-simple-struct-file $@
+tests/test-structs/generated_simple_struct_stubs.c: $(BUILDDIR)/test-structs-stub-generator.native
+	$< --c-simple-struct-file $@
 
 test-constants-stubs.dir  = tests/test-constants/stubs
 test-constants-stubs.threads = yes
@@ -318,6 +330,8 @@ test-constants: $$(NATIVE_TARGET)
 test-constants-generated: \
   tests/test-constants/generated_bindings.ml \
   tests/test-constants/generated_stubs.c \
+  tests/test-constants/generated_simple_struct_bindings.ml \
+  tests/test-constants/generated_simple_struct_stubs.c \
   tests/test-constants/generated_struct_bindings.ml \
   $(BUILDDIR)/tests/test-constants/generated_struct_stubs.c
 
@@ -331,6 +345,10 @@ $(BUILDDIR)/test-constants-ml-stub-generator.native: $(BUILDDIR)/tests/test-cons
 	$(CC) -I `$(OCAMLFIND) ocamlc -where | sed 's|\r$$||'` $(CFLAGS) $(LDFLAGS) $(WINLDFLAGS) -o $@ $^
 $(BUILDDIR)/tests/test-constants/generated_struct_stubs.c: $(BUILDDIR)/test-constants-stub-generator.native
 	$< --c-struct-file $@
+tests/test-constants/generated_simple_struct_bindings.ml: $(BUILDDIR)/test-constants-stub-generator.native
+	$< --ml-simple-struct-file $@
+tests/test-constants/generated_simple_struct_stubs.c: $(BUILDDIR)/test-constants-stub-generator.native
+	$< --c-simple-struct-file $@
 
 
 test-finalisers.dir = tests/test-finalisers
@@ -440,6 +458,8 @@ test-unions: $$(NATIVE_TARGET)
 test-unions-generated: \
   tests/test-unions/generated_bindings.ml \
   tests/test-unions/generated_stubs.c \
+  tests/test-unions/generated_simple_struct_bindings.ml \
+  tests/test-unions/generated_simple_struct_stubs.c \
   tests/test-unions/generated_struct_bindings.ml \
   $(BUILDDIR)/tests/test-unions/generated_struct_stubs.c
 
@@ -453,6 +473,10 @@ $(BUILDDIR)/test-unions-ml-stub-generator.native: $(BUILDDIR)/tests/test-unions/
 	$(CC) -I `$(OCAMLFIND) ocamlc -where | sed 's|\r$$||'` $(CFLAGS) $(LDFLAGS) $(WINLDFLAGS) -o $@ $^
 $(BUILDDIR)/tests/test-unions/generated_struct_stubs.c: $(BUILDDIR)/test-unions-stub-generator.native
 	$< --c-struct-file $@
+tests/test-unions/generated_simple_struct_bindings.ml: $(BUILDDIR)/test-unions-stub-generator.native
+	$< --ml-simple-struct-file $@
+tests/test-unions/generated_simple_struct_stubs.c: $(BUILDDIR)/test-unions-stub-generator.native
+	$< --c-simple-struct-file $@
 
 test-custom_ops.dir = tests/test-custom_ops
 test-custom_ops.threads = yes

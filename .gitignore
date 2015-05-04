@@ -20,6 +20,8 @@ src/configure/gen_libffi_abi.cm*
 generated_stubs.c
 generated_bindings.ml
 generated_struct_bindings.ml
+generated_simple_struct_bindings.ml
+generated_simple_struct_stubs.c
 ncurses_generated.ml
 ncurses_stubs.c
 date_generated.ml

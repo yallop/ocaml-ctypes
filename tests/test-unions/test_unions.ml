@@ -195,6 +195,7 @@ end
 
 
 module Struct_stubs_tests = Build_struct_stub_tests(Generated_struct_bindings)
+module Simple_struct_stubs_tests = Build_struct_stub_tests(Generated_simple_struct_bindings)
 
 (* Check that the address of a union is equal to the addresses of each
    of its members.
@@ -298,8 +299,11 @@ let suite = "Union tests" >:::
    "test adding fields to tagless unions"
    >:: Struct_stubs_tests.test_tagless_unions;
 
-   (* "test layout of unions with missing fields" *)
-   (* >:: Struct_stubs_tests.test_missing_fields; *)
+   "test layout of unions with missing fields"
+   >:: Struct_stubs_tests.test_missing_fields;
+
+   "test layout of unions with missing fields (simple stubs)"
+   >:: Simple_struct_stubs_tests.test_missing_fields;
   ]
 
 
