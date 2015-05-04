@@ -150,7 +150,7 @@ let prim_prj : type a. a Ctypes_primitive_types.prim -> _ =
 
 let prim_inj : type a. a Ctypes_primitive_types.prim -> _ =
   let open Ctypes_primitive_types in function
-  | Char -> immediater "Val_int" (int @-> returning value)
+  | Char -> immediater "Ctypes_val_char" (int @-> returning value)
   | Schar -> immediater "Val_int" (int @-> returning value)
   | Uchar -> conser "ctypes_copy_uint8" (uint8_t @-> returning value)
   | Bool -> immediater "Val_bool" (bool @-> returning value)
