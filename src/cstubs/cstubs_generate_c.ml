@@ -9,14 +9,9 @@
 
 open Ctypes_static
 open Cstubs_c_language
+open Unchecked_function_types
 
 let max_byte_args = 5
-
-(* We're using an abstract type ([value]) as an argument and return type, so
-   we'll use the [Function] and [Return] constructors directly.  The smart
-   constructors [@->] and [returning] would reject the abstract type. *)
-let (@->) f t = Function (f, t)
-let returning t = Returns t
 
 module Generate_C =
 struct

@@ -118,7 +118,17 @@ let conser fname fn =
 let immediater fname fn =
   { fname; allocates = false; reads_ocaml_heap = false; fn = Fn fn }
 
+module Unchecked_function_types =
+struct
+  (* We're using an abstract type ([value]) as an argument and return type, so
+     we'll use the [Function] and [Return] constructors directly.  The smart
+     constructors [@->] and [returning] would reject the abstract type. *)
+  let (@->) f t = Function (f, t)
+  let returning t = Returns t
+end
+
 let prim_prj : type a. a Ctypes_primitive_types.prim -> _ =
+  let open Unchecked_function_types in
   let open Ctypes_primitive_types in function
   | Char -> reader "Int_val" (value @-> returning int)
   | Schar -> reader "Int_val" (value @-> returning int)
@@ -149,6 +159,7 @@ let prim_prj : type a. a Ctypes_primitive_types.prim -> _ =
   | Complex64 -> reader "ctypes_double_complex_val" (value @-> returning complex64)
 
 let prim_inj : type a. a Ctypes_primitive_types.prim -> _ =
+  let open Unchecked_function_types in
   let open Ctypes_primitive_types in function
   | Char -> immediater "Ctypes_val_char" (int @-> returning value)
   | Schar -> immediater "Val_int" (int @-> returning value)
