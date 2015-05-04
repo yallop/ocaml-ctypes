@@ -241,58 +241,351 @@ let write_ml fmt fields structures consts enums =
   write_consts fmt consts;
   write_enums fmt enums
 
-let gen_c () =
+let bindings (module B: BINDINGS)  =
   let fields = ref []
   and structures = ref []
   and consts = ref []
-  and enums = ref []
+  and enums = ref [] 
   in
-  let finally fmt = write_c fmt (fun fmt ->
-                    write_ml fmt !fields !structures !consts !enums) in
-  let m =
-    (module struct
-      include Ctypes
-      open Ctypes_static
-      let rec field' : type a s r. string -> s typ -> string -> a typ -> (a, r) field =
-        fun structname s fname ftype -> match s with 
-        | Struct { tag } ->
-          fields := (`Struct (tag, structname), fname) :: !fields;
-          { ftype; foffset = -1; fname}
-        | Union { utag } ->
-          fields := (`Union (utag, structname), fname) :: !fields;
-          { ftype; foffset = -1; fname}
-        | View { ty } -> 
-          field' structname ty fname ftype
-        | _ -> raise (Unsupported "Adding a field to non-structured type")
+  let module M =
+    B(struct
+       include Ctypes
+       open Ctypes_static
+       let rec field' : type a s r. string -> s typ -> string -> a typ -> (a, r) field =
+         fun structname s fname ftype -> match s with
+         | Struct { tag } ->
+           fields := (`Struct (tag, structname), fname) :: !fields;
+           { ftype; foffset = -1; fname}           
+         | Union { utag } ->
+           fields := (`Union (utag, structname), fname) :: !fields;
+           { ftype; foffset = -1; fname}           
+         | View { ty } -> 
+           field' structname ty fname ftype
+         | _ -> raise (Unsupported "Adding a field to non-structured type")
 
-      let field s fname ftype = field' (Ctypes.string_of_typ s) s fname ftype
+       let field s fname ftype = field' (Ctypes.string_of_typ s) s fname ftype
 
-      let rec seal' : type s. string -> s typ -> unit =
-        fun structname -> function
-        | Struct { tag } ->
-          structures := `Struct (tag, structname) :: !structures
-        | Union { utag } ->
-          structures := `Union (utag, structname) :: !structures
-        | View { ty } ->
+       let rec seal' : type s. string -> s typ -> unit =
+         fun structname -> function
+         | Struct { tag } ->
+           structures := `Struct (tag, structname) :: !structures
+         | Union { utag } ->
+           structures := `Union (utag, structname) :: !structures
+         | View { ty } ->
            seal' structname ty
-        | _ -> raise (Unsupported "Sealing a field to non-structured type")
+         | _ -> raise (Unsupported "Sealing a field to non-structured type")
 
-      let seal ty = seal' (Ctypes.string_of_typ ty) ty
+       let seal ty = seal' (Ctypes.string_of_typ ty) ty
 
-      type _ const = unit
-      let constant name ty  = consts := (name, Ctypes_static.BoxedType ty) :: !consts
-      let enum name ?unexpected alist =
-        let () = enums := name :: !enums in
-        let format_typ k fmt = Format.fprintf fmt "enum %s%t" name k in
-        (* a dummy value of type 'a typ, mostly unusable *)
-        view void
-          ~format_typ
-          ~read:(fun _ -> assert false)
-          ~write:(fun _ -> assert false)
-     end : TYPE)
-  in (m, finally)
+       type _ const = unit
+       let constant name ty  = consts := (name, Ctypes_static.BoxedType ty) :: !consts
+       let enum name ?unexpected alist =
+         let () = enums := name :: !enums in
+         let format_typ k fmt = Format.fprintf fmt "enum %s%t" name k in
+         (* a dummy value of type 'a typ, mostly unusable *)
+         view void
+           ~format_typ
+           ~read:(fun _ -> assert false)
+           ~write:(fun _ -> assert false)
+     end)
+  in
+  (!fields, !structures, !consts, !enums)
+  
+let write_c fmt (module B: BINDINGS) =
+  let (fields,structures, consts, enums) = bindings (module B) in
+  write_c fmt (fun fmt -> write_ml fmt fields structures consts enums)
 
-let write_c fmt (module B : BINDINGS) =
-  let m, finally = gen_c () in
-  let module M = B((val m)) in
-  finally fmt
+module Easy =
+struct
+  let sprintf = Format.sprintf
+
+  let c_function_name prefix =
+    Format.sprintf "ctypes_%s_constant_value" prefix
+
+  let unspace = Str.(global_replace (regexp_string " ") "_")
+
+  let field_constructor = function
+      `Struct (_, typename), fname -> sprintf "Struct_%s_offset_%s" (unspace typename) fname
+    | `Union (_, typename), fname -> sprintf "Union_%s_offset_%s" (unspace typename) fname
+  let struct_size_constructor = function
+      `Struct (_, typename) -> sprintf "Struct_%s_size" (unspace typename)
+    | `Union (_, typename) -> sprintf "Union_%s_size" (unspace typename)
+  let struct_alignment_constructor = function
+      `Struct (_, typename) -> sprintf "Struct_%s_alignment" (unspace typename)
+    | `Union (_, typename) -> sprintf "Union_%s_alignment" (unspace typename)
+  let constant_constructor (name, ty) =
+    sprintf "Constant_%s" name
+  let enum_constructor name =
+    sprintf "Enum_%s" name
+
+  let iter ~field ~structure ~constant ~enum (fields, structures, consts, enums) =
+    begin
+      List.iter field fields;
+      List.iter structure structures;
+      List.iter constant consts;
+      List.iter enum enums;
+    end
+
+  let rec constant_injector : type a. a typ -> Cstubs_c_language.cfunction =
+    let open Ctypes_static in function
+        Primitive p -> Cstubs_c_language.prim_inj p
+      | View { ty } -> constant_injector ty
+      | _ -> failwith "constant of non-primitive"
+
+  let rec constant_type_path : type a. a typ -> Ctypes_path.path =
+    let open Ctypes_static in function
+        Primitive p -> Cstubs_public_name.ident_of_ml_prim
+                         (Ctypes_primitive_types.ml_prim p)
+      | View { ty } -> constant_type_path ty
+      | _ -> failwith "constant of non-primitive"
+
+  module C =
+  struct
+    let cprologue = [
+      "#if !__USE_MINGW_ANSI_STDIO && (defined(__MINGW32__) || defined(__MINGW64__))";
+      "#define __USE_MINGW_ANSI_STDIO 1";
+      "#endif";
+      "";
+      "#include <stddef.h>";
+      "#include <caml/fail.h>";
+      "#include \"ctypes_cstubs_internals.h\"";
+      "";
+    ]
+    
+    let write_enum fmt items =
+      let pr s = Format.fprintf fmt s in
+      pr "enum@ ctypes_constant@ {@\n";
+      iter items
+        ~field:(fun f -> pr "@ @ %s,@\n" (field_constructor f))
+        ~structure:(fun f ->
+            pr "@ @ %s,@\n" (struct_size_constructor f);
+            pr "@ @ %s,@\n" (struct_alignment_constructor f))
+        ~constant:(fun f ->
+            pr "@ @ %s,@\n" (constant_constructor f))
+        ~enum:(fun f ->
+            pr "@ @ %s,@\n" (enum_constructor f));
+      pr "@ @ Constant_count@\n";
+      pr "};@\n@\n"
+
+    let typename = function
+        `Struct (_, typename) -> typename
+      | `Union (_, typename)  -> typename
+
+    let write_c fmt prefix items =
+      let pr s = Format.fprintf fmt s in
+      List.iter (pr "@[%s@]@\n") cprologue;
+      write_enum fmt items;
+      let funname = c_function_name prefix in
+      pr "value@ %s(value c)@\n" funname;
+      pr "{@\n";
+      pr "  switch(Int_val(c))@\n  {@[<2>@ ";
+      iter items
+        ~field:(fun ((ty, f) as fld) -> pr "@[<2>case %s:@ return Val_int(%a);@]@\n"
+                   (field_constructor fld)
+                   offsetof (typename ty, f))
+        ~structure:(fun s ->
+            pr "@[<2>case %s:@ return Val_int(%a);@]@\n" (struct_size_constructor s)
+              sizeof (typename s);
+            pr "@[<2>case %s:@ return Val_int(%a);@]@\n" (struct_alignment_constructor s)
+              alignmentof (typename s))
+        ~constant:(fun ((name, Ctypes_static.BoxedType ty) as f) ->
+            pr "@[<2>case %s:@ return %s(%s);@]@\n" (constant_constructor f)
+              (constant_injector ty).Cstubs_c_language.fname name)
+        ~enum:(fun e ->
+            pr "@[<2>case %s:@ return " (enum_constructor e);
+            pr " Val_int(CTYPES_CLASSIFY_ARITHMETIC_TYPE(enum %s));@]@\n" e);
+      pr "default: @[caml_invalid_argument(%S);@]@]@\n  }@\n" funname;
+      pr "}@\n@."
+  end
+
+  module ML =
+  struct
+    (*
+      external constant_value : 'a ctypes_constant -> 'a
+        = "ctypes_${prefix}_constant_value"
+    *)
+    let write_external fmt prefix =
+      let pr s = Format.fprintf fmt s in
+      pr "external constant_value : 'a ctypes_constant -> 'a@\n";
+      pr "  = \"ctypes_%s_constant_value\"@\n@\n" prefix
+
+    (*
+     type _ ctypes_constant =
+      | Enum_tag1 : Ctypes_static.arithmetic ctypes_constant
+      | Enum_tag2 : Ctypes_static.arithmetic ctypes_constant
+        ...
+      | Enum_tagn : Ctypes_static.arithmetic ctypes_constant
+      | Constant_k1 : c1 ctypes_constant
+      | Constant_k2 : c2 ctypes_constant
+      | ...
+      | Constant_kn : cn ctypes_constant
+      | Struct_field_offset : int ctypes_constant
+      | Struct_field_offset : int ctypes_constant
+      | Struct_tag_size : int ctypes_constant
+      | Struct_tag_alignment : int ctypes_constant
+      | Union_tag_size : int ctypes_constant
+      | Union_tag_alignment : int ctypes_constant
+    *)
+    let write_type fmt specs =
+      let pr s = Format.fprintf fmt s in
+      pr "type _ ctypes_constant =@\n@[";
+      iter specs
+        ~field:(fun f -> pr "@ @ | %s : int ctypes_constant@\n"
+                   (field_constructor f))
+        ~structure:(fun s ->
+            pr "@ @ | %s: int ctypes_constant@\n" (struct_size_constructor s);
+            pr "@ @ | %s: int ctypes_constant@\n" (struct_alignment_constructor s))
+        ~constant:(fun ((_, Ctypes_static.BoxedType ty) as c) ->
+            let open Cstubs_c_language in
+            pr "@ @ | %s: %a ctypes_constant@\n"
+              (constant_constructor c) 
+              Ctypes_path.format_path (constant_type_path ty))
+        ~enum:(fun e ->
+            pr "@ @ | %s: Ctypes_static.arithmetic ctypes_constant@\n"
+              (enum_constructor e));
+      pr "@]@\n"
+
+    (*
+     let field : ... =
+       fun s fname ftype -> match s, fname with
+        | Struct ({ tag = "tag_1"} as s'), "field_1" ->
+          let f = {ftype; fname; foffset = constant_value Struct_field_offset }
+           in begin s'.fields <- BoxedField f :: s'.fields; f end
+        | ...
+        | Union ({ utag = "tag_2"} as s'), "field_2" ->
+          let f = {ftype; fname; foffset = constant_value Struct_field_offset }
+           in begin s'.ufields <- BoxedField f :: s'.ufields; f end
+        | _ -> raise (Unsupported "Adding a field to non-structured type")
+    *)
+    let write_field fmt fields =
+      let pr s = Format.fprintf fmt s in
+      let write_field = function
+        | `Struct (tag, _), name as f ->
+          pr "   | Struct ({ tag = %S} as s'), %S ->@\n" tag name;
+          pr "     let f = {ftype; fname;@\n";
+          pr "              foffset = constant_value %s }@\n"
+            (field_constructor f);
+          pr "       in begin s'.fields <- BoxedField f :: s'.fields; f end@\n";
+        | `Union (tag, _), name as f ->
+          pr "   | Union ({ utag = %S} as s'), %S ->@\n" tag name;
+          pr "     let f = {ftype; fname;@\n";
+          pr "              foffset = constant_value %s }@\n"
+            (field_constructor f);
+          pr "       in begin s'.ufields <- BoxedField f :: s'.ufields; f end@\n" in
+      pr "let field : type a s. 't typ -> string -> a typ ->@\n";
+      pr "  (a, ((s, [<`Struct | `Union]) structured as 't)) field =@\n";
+      pr "  fun (type k) (s : (_, k) structured typ) fname ftype -> @\n";
+      pr " @[match s, fname with@\n";
+      List.iter write_field fields;
+      pr "   | _ -> raise (Unsupported \"Adding a field to non-structured type\")@]@\n@\n"
+
+    (*
+     let seal : ... = function
+        | Struct ({ tag = "tag"; spec = Incomplete _} as s) ->
+            s.spec <- Complete  { size = constant_value Struct_tag_size;
+                                  align = constant_value Struct_tag_alignment }
+        | ...
+        | Union ({ utag = "tag"; uspec = Incomplete _} as s) ->
+            s.uspec <- Some  { size = constant_value Union_tag_size;
+                               align = constant_value Union_tag_alignment }
+        | Struct { tag; spec = Complete _; } ->
+          raise (ModifyingSealedType tag)
+        | Union { utag; uspec = Some _; } ->
+          raise (ModifyingSealedType utag)
+        | _ ->
+          raise (Unsupported "Sealing a non-structured type")
+    *)
+    let write_seal fmt structures =
+      let pr s = Format.fprintf fmt s in
+      let case = function
+        `Struct (tag, _) as s ->
+          pr " | Struct ({ tag = %S; spec = Incomplete _} as s) ->@\n" tag;
+          pr "   s.spec <- Complete  { size = constant_value %s;@\n"
+            (struct_size_constructor s);
+          pr "                         align = constant_value %s }@\n"
+            (struct_alignment_constructor s)
+        | `Union (tag, _) as s ->
+          pr " | Union ({ utag = %S; uspec = None} as u) ->@\n" tag;
+          pr "   u.uspec <- Some { size = constant_value %s;@\n"
+            (struct_size_constructor s);
+          pr "                     align = constant_value %s }@\n"
+            (struct_alignment_constructor s)
+      in
+      pr "let seal (type t) (t : (_, t) structured typ) = match t with@\n";
+      List.iter case structures;
+      pr " | Struct { tag; spec = Complete _; } ->@\n";
+      pr "   raise (ModifyingSealedType tag)@\n";
+      pr " | Union { utag; uspec = Some _; } ->@\n";
+      pr "   raise (ModifyingSealedType utag)@\n";
+      pr " | _ ->@\n";
+      pr "   raise (Unsupported \"Sealing a non-structured type\")@\n@\n"
+
+
+    (*
+     type 'a const = 'a
+     let rec constant : ... = fun name t -> match n, t with
+      |  name, View { read; ty } ->
+          read (constant name ty)
+      | "name", Primitive s ->
+          constant_value Constant_ki
+      | _ -> failwith "constant of non-primitive"
+    *)
+    let write_constant fmt consts =
+      let pr s = Format.fprintf fmt s in
+      let open Ctypes_static in
+      let rec constant_case ((name, BoxedType ty) as t) = match ty with
+        | View { ty } -> constant_case (name, BoxedType ty)
+        | Primitive p ->
+          pr " | %S, Primitive %a -> constant_value %s@\n"
+            name Ctypes_path.format_path
+            (Cstubs_public_name.constructor_cident_of_prim p)
+            (constant_constructor t)
+        | _ -> failwith "constant of non-primitive"
+      in
+      pr "type 'a const = 'a@\n";
+      pr "let rec constant : type t. string -> t typ -> t =@\n";
+      pr "  fun name t -> match name, t with@\n";
+      pr " | name, View { read; ty } -> read (constant name ty)@\n";
+      List.iter constant_case consts;
+      pr " | c, Primitive _ -> failwith (Printf.sprintf \"unknown constant: %%s\" c)@\n";
+      pr " | _ -> failwith (\"constant of non-primitive\")";
+      pr "@\n@\n"
+
+    (*
+     let enum_type : string -> arithmetic = function
+       "tag1" -> constant_value Enum_tag1
+     | "tag2" -> constant_value Enum_tag2
+     | ...
+     | "tagn" -> constant_value Enum_tagn
+     | n -> failwithk "unexpected enum name: %s" n
+
+     let enum name ?unexpected alist ->
+        Cstubs_internals.build_enum_type (enum_type name) ?unexpected alist
+    *)
+    let write_enums fmt enums =
+      let pr s = Format.fprintf fmt s in
+      pr "let enum_type : string -> Ctypes_static.arithmetic = function@\n";
+      ListLabels.iter enums
+        ~f:(fun e -> pr " | %S -> constant_value %s@\n" e (enum_constructor e));
+      pr " | e -> failwith (Printf.sprintf \"unexpected enum name: %%s\" e)@\n@\n";
+      pr "let enum name ?unexpected alist =@\n";
+      pr "  Cstubs_internals.build_enum_type name (enum_type name) ?unexpected alist@\n"
+
+    let mlprologue = mlprologue
+
+    let write_ml fmt prefix ((fields, structures, consts, enums) as specs) =
+      List.iter (Format.fprintf fmt "@[%s@]@\n") mlprologue;
+      write_type fmt specs;
+      write_external fmt prefix;
+      write_field fmt fields;
+      write_seal fmt structures;
+      write_constant fmt consts;
+      write_enums fmt enums
+  end
+
+  let write_c fmt ~prefix b =
+    C.write_c fmt prefix (bindings b)
+
+  let write_ml fmt ~prefix b =
+    ML.write_ml fmt prefix (bindings b)
+end
