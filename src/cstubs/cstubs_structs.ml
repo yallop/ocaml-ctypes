@@ -50,22 +50,25 @@ let mlprologue = [
 ]
 
 (* [puts fmt s] writes the call [puts(s);] on [fmt]. *)
-let puts s ~fmt = Format.fprintf fmt "@[puts(@[%s);@]@]@\n"
+let puts fmt s = Format.fprintf fmt "@[puts@[(%s);@]@]@\n"
   (cstring s)
 
-(* [printf1 s v fmt] writes the call [printf(s, v);] on [fmt]. *)
-let printf1 s v ~fmt = Format.fprintf fmt "@[printf(@[%s,@ %t);@]@]@\n"
+(* [printf1 fmt s v] writes the call [printf(s, v);] on [fmt]. *)
+let printf1 fmt s v = Format.fprintf fmt "@[printf@[(%s,@ %t);@]@]@\n"
   (cstring s) v
 
-(* [printf2 s u v fmt] writes the call [printf(s, u, v);] on [fmt]. *)
-let printf2 s u v ~fmt = Format.fprintf fmt "@[printf(@[%s,@ %t,@ %t);@]@]@\n"
+(* [printf2 fmt s u v] writes the call [printf(s, u, v);] on [fmt]. *)
+let printf2 fmt s u v = Format.fprintf fmt "@[printf@[(%s,@ %t,@ %t);@]@]@\n"
   (cstring s) u v
 
-(* [offsetof t f fmt] writes the call [offsetof(t, f)] on [fmt]. *) 
-let offsetof t f ~fmt = Format.fprintf fmt "@[offsetof(@[%s,@ %s)@]@]" t f
+(* [offsetof fmt t f] writes the call [offsetof(t, f)] on [fmt]. *) 
+let offsetof fmt (t, f) = Format.fprintf fmt "@[offsetof@[(%s,@ %s)@]@]" t f
 
-(* [sizeof t fmt] writes the call [sizeof(t)] on [fmt]. *) 
-let sizeof t ~fmt = Format.fprintf fmt "@[sizeof(@[%s)@]@]" t
+(* [sizeof fmt t] writes the call [sizeof(t)] on [fmt]. *) 
+let sizeof fmt t = Format.fprintf fmt "@[sizeof@[(%s)@]@]" t
+
+let alignmentof fmt t =
+  offsetof fmt (Format.sprintf "struct { char c; %s x; }" t, "x")
 
 let write_c fmt body =
   List.iter (Format.fprintf fmt "@[%s@]@\n") cprologue;
@@ -73,22 +76,23 @@ let write_c fmt body =
   List.iter (Format.fprintf fmt "%s@\n") cepilogue
 
 let cases fmt list prologue epilogue ~case =
-  List.iter (puts ~fmt) prologue;
+  List.iter (puts fmt) prologue;
   List.iter case list;
-  List.iter (puts ~fmt) epilogue
+  List.iter (puts fmt) epilogue
 
 let write_field fmt specs =
   let case = function
   | `Struct (tag, typedef), fname ->
-    let foffset fmt = offsetof typedef fname fmt in
-    puts (Printf.sprintf "  | Struct ({ tag = %S} as s'), %S ->" tag fname) fmt;
-    printf1              "    let f = {ftype; fname; foffset = %zu} in \n" foffset fmt;
-    puts                 "    (s'.fields <- BoxedField f :: s'.fields; f)" fmt;
+    let foffset fmt = offsetof fmt (typedef, fname) in
+    puts fmt (Printf.sprintf "  | Struct ({ tag = %S} as s'), %S ->" tag fname);
+    printf1 fmt             "    let f = {ftype; fname; foffset = %zu} in \n" foffset;
+    puts fmt                "    (s'.fields <- BoxedField f :: s'.fields; f)";
   | `Union (tag, typedef), fname ->
-    let foffset fmt = offsetof typedef fname fmt in
-    puts (Printf.sprintf "  | Union ({ utag = %S} as s'), %S ->" tag fname) fmt;
-    printf1              "    let f = {ftype; fname; foffset = %zu} in \n" foffset fmt;
-    puts                 "    (s'.ufields <- BoxedField f :: s'.ufields; f)" fmt;
+    let foffset fmt = offsetof fmt (typedef, fname) in
+    puts fmt (Printf.sprintf "  | Union ({ utag = %S} as s'), %S ->" tag fname);
+    printf1 fmt             "    let f = {ftype; fname; foffset = %zu} in \n" foffset;
+    puts fmt                "    (s'.ufields <- BoxedField f :: s'.ufields; f)";
+  | _ -> raise (Unsupported "Adding a field to non-structured type")
   in
   cases fmt specs
   ["";
@@ -103,15 +107,17 @@ let write_field fmt specs =
 let write_seal fmt specs =
   let case = function
     | `Struct (tag, typedef) ->
-        let ssize fmt = sizeof ~fmt typedef
-        and salign fmt = offsetof ~fmt ("struct { char c; "^ typedef ^" x; }") "x" in
-        puts ~fmt (Printf.sprintf "  | Struct ({ tag = %S; spec = Incomplete _ } as s') ->" tag);
-        printf2 ~fmt              "    s'.spec <- Complete { size = %zu; align = %zu }\n" ssize salign;
+        let ssize fmt = sizeof fmt typedef
+        and salign fmt = alignmentof fmt typedef in
+        puts fmt (Printf.sprintf "  | Struct ({ tag = %S; spec = Incomplete _ } as s') ->" tag);
+        printf2 fmt              "    s'.spec <- Complete { size = %zu; align = %zu }\n" ssize salign;
     | `Union (tag, typedef) ->
-        let usize fmt = sizeof ~fmt typedef
-        and ualign fmt = offsetof ~fmt ("struct { char c; "^ typedef ^" x; }") "x" in
-        puts ~fmt (Printf.sprintf "  | Union ({ utag = %S; uspec = None } as s') ->" tag);
-        printf2 ~fmt              "    s'.uspec <- Some { size = %zu; align = %zu }\n" usize ualign;
+        let usize fmt = sizeof fmt typedef
+        and ualign fmt = alignmentof fmt typedef in
+        puts fmt (Printf.sprintf "  | Union ({ utag = %S; uspec = None } as s') ->" tag);
+        printf2 fmt              "    s'.uspec <- Some { size = %zu; align = %zu }\n" usize ualign;
+    | `Other -> 
+      raise (Unsupported "Sealing a non-structured type")
   in
   cases fmt specs
     ["";
@@ -195,7 +201,7 @@ let write_consts fmt consts =
          assignments typically trigger warnings even on default compiler
          settings. *)
       Format.fprintf fmt "%a = (%s);@\n" (Ctypes.format_typ ~name:"v") ty name;
-      printf1 ~fmt
+      printf1 fmt
         (Format.asprintf "  | %s, %S ->@\n    %s\n" p name e)
         (fun fmt -> Format.fprintf fmt "v");
       Format.fprintf fmt "@]@\n}@\n"
@@ -209,7 +215,7 @@ let write_consts fmt consts =
 
 let write_enums fmt enums =
   let case name =
-    printf1 ~fmt
+    printf1 fmt
       (Format.sprintf
          "  | %S -> \n    Cstubs_internals.build_enum_type %S Ctypes_static.%%s ?unexpected alist\n"
          name
@@ -229,7 +235,7 @@ let write_enums fmt enums =
 
 
 let write_ml fmt fields structures consts enums =
-  List.iter (puts ~fmt) mlprologue;
+  List.iter (puts fmt) mlprologue;
   write_field fmt fields;
   write_seal fmt structures;
   write_consts fmt consts;
