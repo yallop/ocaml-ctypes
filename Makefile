@@ -1,6 +1,7 @@
 .SECONDEXPANSION:
 
 DEBUG=false
+COVERAGE=false
 OCAML=ocaml
 OCAMLFIND=ocamlfind
 OCAMLDEP=$(OCAMLFIND) ocamldep
