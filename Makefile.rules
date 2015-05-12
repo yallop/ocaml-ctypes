@@ -22,6 +22,9 @@ ifeq ($(DEBUG),false)
 else
   OCAMLFLAGS=-g
 endif
+ifneq ($(COVERAGE),false)
+  OCAMLFIND_BISECT_FLAGS=-package bisect_ppx
+endif
 
 C_SOURCE  = $(sort $(wildcard $($(PROJECT).dir)/*.c) $(patsubst %,$($(PROJECT).dir)/%,$($(PROJECT).extra_cs)))
 ML_SOURCE = $(shell $(OCAMLDEP) -sort $(sort $(wildcard $($(PROJECT).dir)/*.ml) \
@@ -68,8 +71,8 @@ LINK_FLAGS = $(as_needed_flags) $($(PROJECT).link_flags)
 OCAML_LINK_FLAGS=$(LINK_FLAGS:%=-cclib %)
 OCAMLMKLIB_FLAGS=$($(PROJECT).link_flags)
 OCAMLFIND_PACKAGE_FLAGS=$(patsubst %,-package %,$($(PROJECT).deps)) \
-                        $(patsubst %,-thread -package threads,$(THREAD_FLAG))
-
+                        $(patsubst %,-thread -package threads,$(THREAD_FLAG)) \
+                        $(OCAMLFIND_BISECT_FLAGS)
 $(BUILDDIR)/%.cmxa: $$(NATIVE_OBJECTS)
 	$(OCAMLFIND) opt -a -linkall $(OCAMLFLAGS) $(THREAD_FLAG) $(OCAMLFIND_PACKAGE_FLAGS) $(CMXA_OPTS) -o $@ $(NATIVE_OBJECTS) $(OCAML_LINK_FLAGS)
 

@@ -1,4 +1,14 @@
+if test $COVERAGE -a $TRAVIS_OS_NAME != osx ; then
+    USE_BISECT=true;
+fi
+
 OPAM_DEPENDS="ocamlfind ounit"
+if test $USE_BISECT ; then
+    OPAM_DEPENDS="$OPAM_DEPENDS bisect_ppx ocveralls"
+    MAKE="make COVERAGE=true"
+else
+    MAKE="make"
+fi
 case "$OCAML_VERSION" in
 4.00.1) ppa=avsm/ocaml40+opam12 ;;
 4.01.0) ppa=avsm/ocaml41+opam12 ;;
@@ -42,14 +52,18 @@ opam --version
 opam --git-version
 opam install ${OPAM_DEPENDS}
 eval `opam config env`
-make
+$MAKE
 # build and run the tests
-make test
+$MAKE test
 # build and run the examples
-make examples
+$MAKE examples
 _build/date.native
 _build/date-cmd.native
 _build/fts-cmd.native examples
+
+if test $USE_BISECT ; then
+    ocveralls --send bisect*.out > coveralls.json
+fi
 
 # check Xen support builds too
 set -eu
