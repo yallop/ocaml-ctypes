@@ -74,7 +74,7 @@ enum ctypes_primitive {
 # error "No suitable OCaml type available for representing unsigned int values"
 #endif
 
-/* long is at least 16 bits. */
+/* long is at least 32 bits. */
 #if ULONG_MAX == UINT32_MAX
 #define ctypes_long_val Int32_val
 #define ctypes_ulong_val Uint32_val
@@ -89,7 +89,7 @@ enum ctypes_primitive {
 # error "No suitable OCaml type available for representing longs"
 #endif
 
-/* long long is at least 16 bits. */
+/* long long is at least 64 bits. */
 #if ULLONG_MAX == UINT64_MAX
 #define ctypes_llong_val Int64_val
 #define ctypes_ullong_val Uint64_val
