@@ -17,7 +17,10 @@ sig
   val union : _ Ctypes.union Ctypes.typ -> unit
   val typedef : _ Ctypes.typ -> string -> unit
 
-  val internal : string -> ('a -> 'b) Ctypes.fn -> ('a -> 'b) -> unit
+  val internal :
+    ?runtime_lock:bool ->
+    ?c_thread_register:bool ->
+    ?prelude:string -> ?epilogue:string -> string -> ('a -> 'b) Ctypes.fn -> ('a -> 'b) -> unit
 end
 
 module type BINDINGS = functor (F : INTERNAL) -> sig end
