@@ -56,6 +56,9 @@ let camlop fmt : camlop -> unit = function
   | `CAMLparam0 -> Format.fprintf fmt "CAMLparam0()"
   | `CAMLlocalN (e, c) -> Format.fprintf fmt "CAMLlocalN(@[%a@],@ @[%a@])"
     cexp e cexp c
+  | `CAMLdrop ->
+    Format.fprintf fmt "caml_local_roots = caml__frame;"
+    (* Format.fprintf fmt "CAMLdrop()" *) (* 4.03+ only *)
 
 let rec ceff fmt : ceff -> unit = function
   | #cexp as e -> cexp fmt e
@@ -77,9 +80,14 @@ let rec ceff fmt : ceff -> unit = function
     fprintf fmt "@[@[%a@]@;=@;@[%a@]@]" clvalue lv ceff e
 
 let rec ccomp fmt : ccomp -> unit = function
-  | #cexp as e -> fprintf fmt "@[<2>return@;@[%a@]@];" cexp e
+  | #cexp as e ->
+    fprintf fmt "@[<2>return@;@[%a@]@];" cexp e
   | #ceff as e -> fprintf fmt "@[<2>return@;@[%a@]@];" ceff e
-  | `CAMLreturnT (Ty Void, e) ->
+  | `Return (Ty Void, _) ->
+    fprintf fmt "@[return@];"
+  | `Return (Ty ty, e) ->
+    fprintf fmt "@[<2>return@;@[%a@]@];" cexp e
+  | `CAMLreturnT (Ty Void, _) ->
     fprintf fmt "@[CAMLreturn0@];"
   | `CAMLreturnT (Ty ty, e) ->
     fprintf fmt "@[<2>CAMLreturnT(@[%a@],@;@[%a@])@];"
@@ -125,5 +133,5 @@ let cfundec : Format.formatter -> cfundec -> unit =
       `nonarray fmt
 
 let cfundef fmt (`Function (dec, body) : cfundef) =
-  fprintf fmt "%a@\n{@[<v 2>@\n%a@]@\n}@\n" 
+  fprintf fmt "%a@\n{@[<v 2>@\n%a@]@\n}@\n"
     cfundec dec ccomp body

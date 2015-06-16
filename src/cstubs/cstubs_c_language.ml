@@ -40,7 +40,8 @@ type cexp = [ cconst
             | `Addr of cvar ]
 type clvalue = [ clocal | `Index of clvalue * cexp ]
 type camlop = [ `CAMLparam0
-              | `CAMLlocalN of cexp * cexp ]
+              | `CAMLlocalN of cexp * cexp
+              | `CAMLdrop ]
 type ceff = [ cexp
             | camlop
             | `Global of cglobal
@@ -52,6 +53,7 @@ type cbind = clocal * ceff
 type ccomp = [ ceff
              | `LetConst of clocal * cconst * ccomp
              | `CAMLreturnT of ty * cexp
+             | `Return of ty * cexp
              | `Let of cbind * ccomp ]
 type cfundec = [ `Fundec of string * (string * ty) list * ty ]
 type cfundef = [ `Function of cfundec * ccomp ]
@@ -77,7 +79,8 @@ struct
 
   let camlop : camlop -> ty = function
     | `CAMLparam0
-    | `CAMLlocalN _ -> Ty Void
+    | `CAMLlocalN _
+    | `CAMLdrop -> Ty Void
 
   let rec ceff : ceff -> ty = function
     | #cexp as e -> cexp e
@@ -103,4 +106,5 @@ struct
     | `Let (_, c)
     | `LetConst (_, _, c) -> ccomp c
     | `CAMLreturnT (ty, _) -> ty
+    | `Return (ty, _) -> ty
 end
