@@ -80,9 +80,14 @@ let rec ceff fmt : ceff -> unit = function
     fprintf fmt "@[@[%a@]@;=@;@[%a@]@]" clvalue lv ceff e
 
 let rec ccomp fmt : ccomp -> unit = function
-  | #cexp as e -> fprintf fmt "@[<2>return@;@[%a@]@];" cexp e
+  | #cexp as e ->
+    fprintf fmt "@[<2>return@;@[%a@]@];" cexp e
   | #ceff as e -> fprintf fmt "@[<2>return@;@[%a@]@];" ceff e
-  | `CAMLreturnT (Ty Void, e) ->
+  | `Return (Ty Void, _) ->
+    fprintf fmt "@[return@];"
+  | `Return (Ty ty, e) ->
+    fprintf fmt "@[<2>return@;@[%a@]@];" cexp e
+  | `CAMLreturnT (Ty Void, _) ->
     fprintf fmt "@[CAMLreturn0@];"
   | `CAMLreturnT (Ty ty, e) ->
     fprintf fmt "@[<2>CAMLreturnT(@[%a@],@;@[%a@])@];"

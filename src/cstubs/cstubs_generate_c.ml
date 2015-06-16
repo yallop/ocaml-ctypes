@@ -50,6 +50,9 @@ struct
      | `CAMLreturnT (Ty ty, v) ->
        (k v, ty) >>= fun e ->
        `CAMLreturnT (Type_C.cexp e, e)
+     | `Return (Ty ty, v) ->
+       (k v, ty) >>= fun e ->
+       `Return (Type_C.cexp e, e)
      | `Let (ye, c) ->
        (* let x = (let y = e1 in e2) in e3
           ~>
@@ -291,7 +294,7 @@ struct
       (project rtyp x, rtyp) >>= fun y ->
       (`CAMLdrop, void) >>= fun _ ->
       wrap_if runtime_lock release_runtime_system
-      (y :> ccomp)
+      (`Return (Ty rtyp, y))
     in
     let body =
       (* locals[0] = Val_T0(x0);
