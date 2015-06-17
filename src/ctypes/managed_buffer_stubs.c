@@ -42,7 +42,8 @@ static struct custom_operations managed_buffer_custom_ops = {
   hash_address,
   /* Managed buffers are not serializable. */
   custom_serialize_default,
-  custom_deserialize_default
+  custom_deserialize_default,
+  custom_compare_ext_default
 };
 
 /* copy_bytes : void * -> size_t -> managed_buffer */

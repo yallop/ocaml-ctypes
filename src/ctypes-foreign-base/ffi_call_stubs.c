@@ -147,7 +147,8 @@ static struct custom_operations callspec_custom_ops = {
   custom_compare_default,
   custom_hash_default,
   custom_serialize_default,
-  custom_deserialize_default
+  custom_deserialize_default,
+  custom_compare_ext_default
 };
 
 /* We store two things in the callbuffer: a "scratch" area for passing
