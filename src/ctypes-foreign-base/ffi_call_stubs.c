@@ -147,7 +147,8 @@ static struct custom_operations callspec_custom_ops = {
   custom_compare_default,
   custom_hash_default,
   custom_serialize_default,
-  custom_deserialize_default
+  custom_deserialize_default,
+  custom_compare_ext_default
 };
 
 /* We store two things in the callbuffer: a "scratch" area for passing
@@ -318,7 +319,7 @@ value ctypes_call(value fnname, value function, value callspec_,
 
   void **val_refs = alloca(sizeof(void*) * nelements);
 
-  int arg_idx;
+  unsigned arg_idx;
   for(arg_idx = 0; arg_idx < Wosize_val(callback_val_arr); arg_idx++) {
     value arg_tuple = Field(callback_val_arr, arg_idx);
     /* <4.02 initialize to 0; >=4.02 initialize to unit. */
