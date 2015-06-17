@@ -68,7 +68,7 @@ static struct details {
 void generate_function(char *name, char *type,
                        void (*cse)(struct details*))
 {
-  int i;
+  unsigned i;
   printf("let %s : type a. a prim -> %s = function\n", name, type);
   for (i = 0; i < sizeof details / sizeof *details; i++) {
     printf(" | %s -> ", details[i].constructor);
