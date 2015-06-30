@@ -14,6 +14,7 @@ let rec format : type a. a typ -> Format.formatter -> a -> unit
   | Primitive p ->
     Format.pp_print_string fmt (Ctypes_value_printing_stubs.string_of_prim p v)
   | Pointer _ -> format_ptr fmt v
+  | Funptr _ -> format_funptr fmt v
   | Struct _ -> format_structured fmt v
   | Union _ -> format_structured fmt v
   | Array (a, n) -> format_array fmt v
@@ -81,6 +82,9 @@ and format_fields : type a b. string -> (a, b) structured boxed_field list ->
       fields
 and format_ptr : type a. Format.formatter -> a ptr -> unit
   = fun fmt (CPointer p) ->
+    Format.fprintf fmt "%s" (Ctypes_value_printing_stubs.string_of_pointer p)
+and format_funptr  : type a. Format.formatter -> a static_funptr -> unit
+  = fun fmt (Static_funptr p) ->
     Format.fprintf fmt "%s" (Ctypes_value_printing_stubs.string_of_pointer p)
 
 let string_of typ v = Ctypes_common.string_of (format typ) v

@@ -30,6 +30,7 @@ type _ typ =
     Void            :                       unit typ
   | Primitive       : 'a Ctypes_primitive_types.prim -> 'a typ
   | Pointer         : 'a typ             -> 'a ptr typ
+  | Funptr          : 'a fn              -> 'a static_funptr typ
   | Struct          : 'a structure_type  -> 'a structure typ
   | Union           : 'a union_type      -> 'a union typ
   | Abstract        : abstract_type      -> 'a abstract typ
@@ -48,6 +49,7 @@ and (_, _) pointer =
 | OCamlRef : int * 'a * 'a ocaml_type -> ('a, [`OCaml]) pointer
 and 'a ptr = ('a, [`C]) pointer
 and 'a ocaml = ('a, [`OCaml]) pointer
+and 'a static_funptr = Static_funptr of 'a fn Ctypes_ptr.Fat.t
 and ('a, 'b) view = {
   read : 'b -> 'a;
   write : 'a -> 'b;
@@ -71,6 +73,9 @@ and 'a union_type = {
   mutable ufields : 'a union boxed_field list;
 }
 and 's boxed_field = BoxedField : ('a, 's) field -> 's boxed_field
+and _ fn =
+  | Returns  : 'a typ   -> 'a fn
+  | Function : 'a typ * 'b fn  -> ('a -> 'b) fn
 
 type _ bigarray_class =
   Genarray :
@@ -97,10 +102,6 @@ type _ bigarray_class =
     ba_repr: 'b;
     bigarray: ('a, 'b, Bigarray.c_layout) Bigarray.Array3.t;
     carray: 'a carray carray carray > bigarray_class
-
-type _ fn =
-  | Returns  : 'a typ   -> 'a fn
-  | Function : 'a typ * 'b fn  -> ('a -> 'b) fn
 
 type boxed_typ = BoxedType : 'a typ -> boxed_typ
 

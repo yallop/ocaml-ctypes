@@ -32,6 +32,7 @@ type 'a typ = 'a Ctypes_static.typ =
     Void            :                              unit typ
   | Primitive       : 'a Ctypes_primitive_types.prim        -> 'a typ
   | Pointer         : 'a typ                    -> 'a ptr typ
+  | Funptr          : 'a fn                     -> 'a static_funptr typ
   | Struct          : 'a Ctypes_static.structure_type  -> 'a Ctypes_static.structure typ
   | Union           : 'a Ctypes_static.union_type      -> 'a Ctypes_static.union typ
   | Abstract        : Ctypes_static.abstract_type      -> 'a Ctypes_static.abstract typ
@@ -44,6 +45,8 @@ and ('a, 'b) pointer = ('a, 'b) Ctypes_static.pointer =
 | OCamlRef : int * 'a * 'a ocaml_type -> ('a, [`OCaml]) pointer
 and 'a ptr = ('a, [`C]) pointer
 and 'a ocaml = ('a, [`OCaml]) pointer
+and 'a static_funptr = 'a Ctypes_static.static_funptr =
+  Static_funptr of 'a fn Ctypes_ptr.Fat.t
 and ('a, 'b) view = ('a, 'b) Ctypes_static.view = {
   read : 'b -> 'a;
   write : 'a -> 'b;

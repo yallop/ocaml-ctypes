@@ -49,6 +49,7 @@ type _ alloc =
 | Alloc_float : float alloc
 | Alloc_complex : Complex.t alloc
 | Alloc_pointer : (_, _) pointer alloc
+| Alloc_funptr : _ static_funptr alloc
 | Alloc_structured : (_, _) structured alloc
 | Alloc_array : _ carray alloc
 | Alloc_bigarray : (_, 'a) Ctypes_bigarray.t -> 'a alloc
@@ -90,6 +91,7 @@ let rec allocation : type a. a typ -> a allocation = function
  | Void -> `Noalloc Noalloc_unit
  | Primitive p -> primitive_allocation p
  | Pointer _ -> `Alloc Alloc_pointer
+ | Funptr _ -> `Alloc Alloc_funptr
  | Struct _ -> `Alloc Alloc_structured
  | Union _ -> `Alloc Alloc_structured
  | Abstract _ -> `Alloc Alloc_structured

@@ -53,6 +53,9 @@ let rec format_typ' : type a. a typ ->
             | `array -> fprintf fmt "(*%t)" (k `nonarray)
             | _      -> fprintf fmt "*%t" (k `nonarray))
         `nonarray fmt
+    | Funptr fn ->
+      format_fn' fn
+        (fun fmt -> Format.fprintf fmt "(*%t)" (k `nonarray)) fmt
     | Array (ty, n) ->
       format_typ' ty (fun _ fmt -> fprintf fmt "%t[%d]" (k `array) n) `nonarray
         fmt

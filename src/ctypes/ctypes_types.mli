@@ -306,7 +306,6 @@ sig
       needed. *)
 end
 
-
 (** Abstract interface to C function type descriptions *)
 module type FUNCTION =
 sig

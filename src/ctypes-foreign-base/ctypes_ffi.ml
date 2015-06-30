@@ -52,6 +52,7 @@ struct
                                                (Ctypes_type_printing.string_of_typ prim)
                                              else ArgType ffitype
     | Pointer _                           -> ArgType (Ctypes_ffi_stubs.pointer_ffitype ())
+    | Funptr _                            -> ArgType (Ctypes_ffi_stubs.pointer_ffitype ())
     | OCaml _                             -> ArgType (Ctypes_ffi_stubs.pointer_ffitype ())
     | Union _                             -> report_unpassable "unions"
     | Struct ({ spec = Complete _ } as s) -> struct_arg_type s

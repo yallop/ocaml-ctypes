@@ -29,6 +29,8 @@ let rec build : type a b. a typ -> b typ Fat.t -> a
         { structured = CPointer dst})
     | Pointer reftyp ->
       (fun buf -> CPointer (Fat.make ~reftyp (Stubs.Pointer.read buf)))
+    | Funptr fn ->
+      (fun buf -> Static_funptr (Fat.make ~reftyp:fn (Stubs.Pointer.read buf)))
     | View { read; ty } ->
       let buildty = build ty in
       (fun buf -> read (buildty buf))
@@ -49,6 +51,8 @@ let rec write : type a b. a typ -> a -> b Fat.t -> unit
     | Primitive p -> Stubs.write p
     | Pointer _ ->
       (fun (CPointer p) dst -> Stubs.Pointer.write p dst)
+    | Funptr _ ->
+      (fun (Static_funptr p) dst -> Stubs.Pointer.write p dst)
     | Struct { spec = Incomplete _ } -> raise IncompleteType
     | Struct { spec = Complete _ } as s -> write_aggregate (sizeof s)
     | Union { uspec = None } -> raise IncompleteType

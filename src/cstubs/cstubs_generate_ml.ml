@@ -208,6 +208,7 @@ let rec ml_typ_of_return_typ : type a. a typ -> ml_type =
   | Union _     -> managed_buffer
   | Abstract _  -> managed_buffer
   | Pointer _   -> voidp
+  | Funptr _    -> voidp
   | View { ty } -> ml_typ_of_return_typ ty
   | Array _    as a -> internal_error
     "Unexpected array type in the return type: %s" (Ctypes.string_of_typ a)
@@ -224,6 +225,7 @@ let rec ml_typ_of_arg_typ : type a. a typ -> ml_type = function
   | Void -> `Ident (path_of_string "unit")
   | Primitive p -> `Ident (Cstubs_public_name.ident_of_ml_prim (Ctypes_primitive_types.ml_prim p))
   | Pointer _   -> fatptr
+  | Funptr _    -> voidp
   | Struct _    -> fatptr
   | Union _     -> fatptr
   | Abstract _  -> fatptr
@@ -291,6 +293,13 @@ let rec pattern_and_exp_of_typ :
     let pat = static_con "Pointer" [`Var x] in
     begin match pol with
     | In -> (pat, Some (`Appl (`Ident (path_of_string "CI.cptr"), e)))
+    | Out -> (pat, Some (`MakePtr (`Ident (path_of_string x), e)))
+    end
+  | Funptr _ ->
+    let x = fresh_var () in
+    let pat = static_con "Static_funptr" [`Var x] in
+    begin match pol with
+    | In -> (pat, Some e)
     | Out -> (pat, Some (`MakePtr (`Ident (path_of_string x), e)))
     end
   | Struct _ ->
@@ -365,6 +374,8 @@ let rec pattern_of_typ : type a. a typ -> ml_pat = function
     static_con "Primitive" [`Con (id, [])]
   | Pointer _ ->
     static_con "Pointer" [`Underscore]
+  | Funptr _ ->
+    static_con "Static_funptr" [`Underscore]
   | Struct _ ->
     static_con "Struct" [`Underscore]
   | Union _ ->
