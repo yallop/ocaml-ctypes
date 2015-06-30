@@ -226,6 +226,7 @@ let returning v =
     raise (Unsupported "Unsupported return type")
   else
     Returns v
+let static_funptr fn = Funptr fn
 
 let structure tag =
   Struct { spec = Incomplete { isize = 0 }; tag; fields = [] }

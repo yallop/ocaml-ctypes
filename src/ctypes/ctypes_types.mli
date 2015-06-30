@@ -328,4 +328,12 @@ sig
   (** Give the return type of a C function.  Note that [returning] is intended
       to be used together with {!(@->)}; see the documentation for {!(@->)} for an
       example. *)
+
+  (** {3 Function pointer types} *)
+  type 'a static_funptr = 'a Ctypes_static.static_funptr
+  (** The type of values representing C function pointer types. *)
+
+  val static_funptr : 'a fn -> 'a Ctypes_static.static_funptr typ
+  (** Construct a function pointer type from an existing function type
+      (called the {i reference type}).  *)
 end

@@ -30,6 +30,7 @@ type ml_pat = [ `Var of string
 type ml_exp = [ `Ident of path 
               | `Project of ml_exp * path
               | `MakePtr of ml_exp * ml_exp
+              | `MakeFunPtr of ml_exp * ml_exp
               | `MakeStructured of ml_exp * ml_exp
               | `Appl of ml_exp * ml_exp 
               | `Unit
@@ -129,6 +130,12 @@ struct
     | NoApplParens, `MakePtr (t, e) ->
       fprintf fmt
         "@[<hov 2>CI.make_ptr@ %a@ %a@]" (ml_exp ApplParens) t (ml_exp ApplParens) e
+    | ApplParens, `MakeFunPtr (t, e) ->
+      fprintf fmt
+        "(@[<hov 2>CI.make_fun_ptr@ %a@ %a)@]" (ml_exp ApplParens) t (ml_exp ApplParens) e
+    | NoApplParens, `MakeFunPtr (t, e) ->
+      fprintf fmt
+        "@[<hov 2>CI.make_fun_ptr@ %a@ %a@]" (ml_exp ApplParens) t (ml_exp ApplParens) e
     | ApplParens, `MakeStructured (t, e) ->
       fprintf fmt
         "(@[<hov 2>CI.make_structured@ %a@ %a)@]" (ml_exp ApplParens) t (ml_exp ApplParens) e
@@ -194,6 +201,7 @@ let attributes : type a. a fn -> attributes =
 let managed_buffer = `Ident (path_of_string "CI.managed_buffer")
 let voidp = `Ident (path_of_string "CI.voidp")
 let fatptr = `Appl (path_of_string "CI.fatptr", [`Ident (path_of_string "_")])
+let fatfunptr = `Appl (path_of_string "CI.fatfunptr", [`Ident (path_of_string "_")])
 let string = `Ident (path_of_string "string")
 let float_array = `Appl (path_of_string "array",
                          [`Ident (path_of_string "float")])
@@ -225,7 +233,7 @@ let rec ml_typ_of_arg_typ : type a. a typ -> ml_type = function
   | Void -> `Ident (path_of_string "unit")
   | Primitive p -> `Ident (Cstubs_public_name.ident_of_ml_prim (Ctypes_primitive_types.ml_prim p))
   | Pointer _   -> fatptr
-  | Funptr _    -> voidp
+  | Funptr _    -> fatfunptr
   | Struct _    -> fatptr
   | Union _     -> fatptr
   | Abstract _  -> fatptr
@@ -297,10 +305,10 @@ let rec pattern_and_exp_of_typ :
     end
   | Funptr _ ->
     let x = fresh_var () in
-    let pat = static_con "Static_funptr" [`Var x] in
+    let pat = static_con "Funptr" [`Var x] in
     begin match pol with
-    | In -> (pat, Some e)
-    | Out -> (pat, Some (`MakePtr (`Ident (path_of_string x), e)))
+    | In -> (pat, Some (`Appl (`Ident (path_of_string "CI.fptr"), e)))
+    | Out -> (pat, Some (`MakeFunPtr (`Ident (path_of_string x), e)))
     end
   | Struct _ ->
     begin match pol with
@@ -375,7 +383,7 @@ let rec pattern_of_typ : type a. a typ -> ml_pat = function
   | Pointer _ ->
     static_con "Pointer" [`Underscore]
   | Funptr _ ->
-    static_con "Static_funptr" [`Underscore]
+    static_con "Funptr" [`Underscore]
   | Struct _ ->
     static_con "Struct" [`Underscore]
   | Union _ ->

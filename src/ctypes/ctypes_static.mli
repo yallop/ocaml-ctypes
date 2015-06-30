@@ -156,6 +156,7 @@ val bigarray : < ba_repr : 'c;
                  element : 'a > bigarray_class ->
                'b -> ('a, 'c) Bigarray.kind -> 'd typ
 val returning : 'a typ -> 'a fn
+val static_funptr : 'a fn -> 'a static_funptr typ
 val structure : string -> 'a structure typ
 val union : string -> 'a union typ
 val offsetof : ('a, 'b) field -> int
