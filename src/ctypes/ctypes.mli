@@ -113,7 +113,6 @@ type 'a abstract = 'a Ctypes_static.abstract
 include Ctypes_types.TYPE
  with type 'a typ = 'a Ctypes_static.typ
   and type ('a, 's) field := ('a, 's) field
-include Ctypes_types.FUNCTION
 
 (** {3 Operations on types} *)
 

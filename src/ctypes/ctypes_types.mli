@@ -304,14 +304,9 @@ sig
       [sizeof].  The [lift_typ] function makes it possible to use concrete
       type representations wherever such abstract type representations are
       needed. *)
-end
-
-(** Abstract interface to C function type descriptions *)
-module type FUNCTION =
-sig
-  open Ctypes_static
 
   (** {3 Function types} *)
+  (** Abstract interface to C function type descriptions *)
 
   type 'a fn = 'a Ctypes_static.fn
   (** The type of values representing C function types.  A value of type [t fn]
