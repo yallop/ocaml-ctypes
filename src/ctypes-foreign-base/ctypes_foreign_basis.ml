@@ -33,6 +33,9 @@ struct
     Ctypes_std_views.nullable_view ~format_typ
       (funptr ?abi ?name ?check_errno ?runtime_lock fn) void
 
+  let funptr_of_raw_ptr p = 
+    Ctypes.funptr_of_raw_address (Ctypes_ptr.Raw.to_nativeint p)
+
   let ptr_of_raw_ptr p = 
     Ctypes.ptr_of_raw_address (Ctypes_ptr.Raw.to_nativeint p)
 
@@ -42,9 +45,9 @@ struct
   let foreign ?(abi=Libffi_abi.default_abi) ?from ?(stub=false)
       ?(check_errno=false) ?(release_runtime_lock=false) symbol typ =
     try
-      let coerce = Ctypes_coerce.coerce (ptr void)
+      let coerce = Ctypes_coerce.coerce (static_funptr (void @-> returning void))
         (funptr ~abi ~name:symbol ~check_errno ~runtime_lock:release_runtime_lock typ) in
-      coerce (ptr_of_raw_ptr (dlsym ?handle:from ~symbol))
-    with 
+      coerce (funptr_of_raw_ptr (dlsym ?handle:from ~symbol))
+    with
     | exn -> if stub then fun _ -> raise exn else raise exn
 end
