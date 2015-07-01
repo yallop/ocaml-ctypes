@@ -25,12 +25,13 @@ sig
   (** Dynamic function calls based on libffi *)
 
   val function_of_pointer : ?name:string -> abi:abi -> check_errno:bool ->
-    release_runtime_lock:bool -> ('a -> 'b) fn -> unit ptr -> ('a -> 'b)
+    release_runtime_lock:bool -> ('a -> 'b) fn -> ('a -> 'b) static_funptr ->
+    ('a -> 'b)
   (** Build an OCaml function from a type specification and a pointer to a C
       function. *)
 
   val pointer_of_function : abi:abi -> acquire_runtime_lock:bool -> ('a -> 'b) fn ->
-    ('a -> 'b) -> unit ptr
+    ('a -> 'b) -> ('a -> 'b) static_funptr
   (** Build an C function from a type specification and an OCaml function.
 
       The C function pointer returned is callable as long as the OCaml function

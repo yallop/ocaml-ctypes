@@ -30,8 +30,9 @@ let test_fabs _ =
       double_ffitype in
     
     let dlfabs = Dl.dlsym "fabs" in
-    let dlfabs_fat = Ctypes_ptr.Fat.make ~reftyp:Ctypes_static.Void dlfabs in
-    
+    let dlfabs_fat = Ctypes_ptr.Fat.make dlfabs
+        ~reftyp:Ctypes.(double @-> returning double) in
+
     let fabs x =
       call "fabs" dlfabs_fat callspec
         (fun p _values ->
@@ -63,8 +64,9 @@ let test_pow _ =
       double_ffitype in
     
     let dlpow = Dl.dlsym "pow" in
-    let dlpow_fat = Ctypes_ptr.Fat.make ~reftyp:Ctypes_static.Void dlpow in
-    
+    let dlpow_fat = Ctypes_ptr.Fat.make dlpow
+        ~reftyp:Ctypes.(double @-> double @-> returning double) in
+
     let pow x y =
       call "pow" dlpow_fat callspec
         (fun buffer _values ->

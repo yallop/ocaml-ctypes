@@ -26,7 +26,7 @@ struct
     and write = pointer_of_function
       ~abi ~acquire_runtime_lock:runtime_lock fn
     and format_typ = format_function_pointer fn in
-    Ctypes_static.(view ~format_typ ~read ~write (ptr void))
+    Ctypes_static.(view ~format_typ ~read ~write (static_funptr fn))
 
   let funptr_opt ?abi ?name ?check_errno ?runtime_lock fn =
     let format_typ = format_function_pointer fn in

@@ -86,12 +86,13 @@ struct
           write arg_n buffer v_n)
      read_return_value
   *)
-  let rec invoke : type a. string option ->
-                           a ccallspec ->
-                           (Ctypes_ptr.voidp -> (Obj.t * int) array -> unit) list ->
-                           Ctypes_ffi_stubs.callspec ->
-                           unit typ Ctypes_ptr.Fat.t ->
-                        a
+  let rec invoke : type a b.
+    string option ->
+    a ccallspec ->
+    (Ctypes_ptr.voidp -> (Obj.t * int) array -> unit) list ->
+    Ctypes_ffi_stubs.callspec ->
+    b fn Ctypes_ptr.Fat.t ->
+    a
     = fun name -> function
       | Call (check_errno, read_return_value) ->
         let name = match name with Some name -> name | None -> "" in
@@ -177,12 +178,12 @@ struct
     let e = build_ccallspec ~abi ~check_errno fn c in
     invoke name e [] c
 
-  let ptr_of_rawptr raw_ptr =
-    CPointer (Ctypes_ptr.Fat.make ~reftyp:void raw_ptr)
+  let funptr_of_rawptr fn raw_ptr =
+    Static_funptr (Ctypes_ptr.Fat.make ~reftyp:fn raw_ptr)
 
   let function_of_pointer ?name ~abi ~check_errno ~release_runtime_lock fn =
     let f = build_function ?name ~abi ~check_errno ~release_runtime_lock fn in
-    fun (CPointer p) -> f p
+    fun (Static_funptr p) -> f p
 
   let pointer_of_function ~abi ~acquire_runtime_lock fn =
     let cs' = Ctypes_ffi_stubs.allocate_callspec
@@ -193,5 +194,5 @@ struct
     fun f ->
       let boxed = cs (Ctypes_weak_ref.make f) in
       let id = Closure_properties.record (Obj.repr f) (Obj.repr boxed) in
-      ptr_of_rawptr (Ctypes_ffi_stubs.make_function_pointer cs' id)
+      funptr_of_rawptr fn (Ctypes_ffi_stubs.make_function_pointer cs' id)
 end
