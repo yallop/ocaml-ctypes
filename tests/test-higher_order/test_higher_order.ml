@@ -107,6 +107,20 @@ struct
       call_registered_callback 3 !counter;
       assert_equal !counter 8;
     end
+
+
+  (*
+    Retrieve a function pointer from C and pass it back to C using
+    static_funptr.
+  *)
+  let test_static_funptr _ =
+    let add = returning_funptr_static 0
+    and mul = returning_funptr_static 1 in
+
+    begin
+      assert_equal 1 (higher_order_1_static add 2 3);
+      assert_equal 0 (higher_order_1_static mul 2 3);
+    end
 end
 
 
@@ -144,6 +158,12 @@ let suite = "Higher-order tests" >:::
 
    "test_zero_argument_callbacks (stubs)"
    >:: Stub_tests.test_zero_argument_callbacks;
+
+   "test_static_funptr (foreign)"
+   >:: Foreign_tests.test_static_funptr;
+
+   "test_static_funptr (stubs)"
+   >:: Stub_tests.test_static_funptr;
   ]
 
 
