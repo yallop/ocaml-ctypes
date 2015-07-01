@@ -383,7 +383,7 @@ val coerce : 'a typ -> 'b typ -> 'a -> 'b
 
     The following coercions are currently supported:
 
-     - All pointer types are intercoercible.
+     - All function and object pointer types are intercoercible.
      - Any type may be coerced to {!void}
      - There is a coercion between a {!view} and another type [t] (in either
        direction) if there is a coercion between the representation type
