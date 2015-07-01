@@ -14,23 +14,17 @@ struct
 
   exception CallToExpiredClosure = Ctypes_ffi_stubs.CallToExpiredClosure
 
-  let format_function_pointer fn k fmt =
-    Ctypes_type_printing.format_fn' fn
-      (fun fmt -> Format.fprintf fmt "(*%t)" k) fmt
-
   let funptr ?(abi=Libffi_abi.default_abi) ?name ?(check_errno=false)
       ?(runtime_lock=false) fn =
     let open Ffi in
     let read = function_of_pointer
       ~abi ~check_errno ~release_runtime_lock:runtime_lock ?name fn
     and write = pointer_of_function
-      ~abi ~acquire_runtime_lock:runtime_lock fn
-    and format_typ = format_function_pointer fn in
-    Ctypes_static.(view ~format_typ ~read ~write (static_funptr fn))
+      ~abi ~acquire_runtime_lock:runtime_lock fn in
+    Ctypes_static.(view ~read ~write (static_funptr fn))
 
   let funptr_opt ?abi ?name ?check_errno ?runtime_lock fn =
-    let format_typ = format_function_pointer fn in
-    Ctypes_std_views.nullable_funptr_view ~format_typ
+    Ctypes_std_views.nullable_funptr_view
       (funptr ?abi ?name ?check_errno ?runtime_lock fn) fn
 
   let funptr_of_raw_ptr p = 
