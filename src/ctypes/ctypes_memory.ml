@@ -150,6 +150,9 @@ let reference_type (CPointer p) = Fat.reftype p
 let ptr_of_raw_address addr =
   CPointer (Fat.make ~reftyp:Void (Raw.of_nativeint addr))
 
+let funptr_of_raw_address addr =
+  Static_funptr (Fat.make ~reftyp:(void @-> returning void) (Raw.of_nativeint addr))
+
 let raw_address_of_ptr (CPointer p) =
   (* This is unsafe by definition: if the object to which [p] refers
      is collected at this point then the returned address is invalid.

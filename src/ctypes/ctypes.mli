@@ -206,6 +206,9 @@ val reference_type : 'a ptr -> 'a typ
 val ptr_of_raw_address : nativeint -> unit ptr
 (** Convert the numeric representation of an address to a pointer *)
 
+val funptr_of_raw_address : nativeint -> (unit -> unit) Ctypes_static.static_funptr
+(** Convert the numeric representation of an address to a function pointer *)
+
 val raw_address_of_ptr : unit ptr -> nativeint
 (** [raw_address_of_ptr p] returns the numeric representation of p.
 
