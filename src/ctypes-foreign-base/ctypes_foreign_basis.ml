@@ -30,8 +30,8 @@ struct
 
   let funptr_opt ?abi ?name ?check_errno ?runtime_lock fn =
     let format_typ = format_function_pointer fn in
-    Ctypes_std_views.nullable_view ~format_typ
-      (funptr ?abi ?name ?check_errno ?runtime_lock fn) void
+    Ctypes_std_views.nullable_funptr_view ~format_typ
+      (funptr ?abi ?name ?check_errno ?runtime_lock fn) fn
 
   let funptr_of_raw_ptr p = 
     Ctypes.funptr_of_raw_address (Ctypes_ptr.Raw.to_nativeint p)
