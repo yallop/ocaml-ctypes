@@ -11,6 +11,7 @@
 type voidp = Ctypes_ptr.voidp
 type managed_buffer = Ctypes_memory_stubs.managed_buffer
 type 'a fatptr = 'a Ctypes.typ Ctypes_ptr.Fat.t
+type 'a fatfunptr = 'a Ctypes.fn Ctypes_ptr.Fat.t
 
 let make_structured reftyp buf =
   let open Ctypes_static in
@@ -22,8 +23,10 @@ include Ctypes_static
 include Ctypes_primitive_types
 
 let make_ptr reftyp raw_ptr = CPointer (Ctypes_ptr.Fat.make ~reftyp raw_ptr)
+let make_fun_ptr reftyp raw_ptr = Static_funptr (Ctypes_ptr.Fat.make ~reftyp raw_ptr)
 
 let cptr (CPointer p) = p
+let fptr (Static_funptr p) = p
 
 let mkView :
   type a b. string -> a typ -> unexpected:(a -> b) -> (b * a) list -> b typ =

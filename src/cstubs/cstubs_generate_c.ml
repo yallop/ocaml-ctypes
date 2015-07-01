@@ -182,6 +182,7 @@ struct
       let rt = return_type fn in
       Some (cast ~from:rt ~into:(Ty (Primitive p)) (`App (prj, [x])))
     | Pointer _ -> Some (of_fatptr x)
+    | Funptr _ -> Some (of_fatptr x)
     | Struct s ->
       Some ((of_fatptr x, ptr void) >>= fun y ->
             `Deref (`Cast (Ty (ptr orig), y)))
@@ -203,6 +204,7 @@ struct
     | Void -> val_unit
     | Primitive p -> `App (prim_inj p, [`Cast (Ty (Primitive p), (x :> cexp))])
     | Pointer _ -> from_ptr (x:> cexp)
+    | Funptr _ -> from_ptr (x:> cexp)
     | Struct s -> `App (copy_bytes, [`Addr (x :> cvar); `Int (sizeof ty)])
     | Union u -> `App (copy_bytes, [`Addr (x :> cvar); `Int (sizeof ty)])
     | Abstract _ -> report_unpassable "values of abstract type"

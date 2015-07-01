@@ -54,6 +54,8 @@ sig
       address is stored in [raw_ptr]. *)
   val make : ?managed:_ -> reftyp:'typ -> voidp -> 'typ t
 
+  val is_null : _ t -> bool
+
   val reftype : 'typ t -> 'typ
 
   val managed : _ t -> Obj.t option
@@ -80,6 +82,8 @@ struct
   let make ?managed ~reftyp raw = match managed with
     | None   -> { reftyp; raw; managed = None }
     | Some v -> { reftyp; raw; managed = Some (Obj.repr v) }
+
+  let is_null { raw } = Raw.(compare zero) raw = 0
 
   let reftype { reftyp } = reftyp
 

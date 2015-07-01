@@ -69,9 +69,24 @@ let rec coercion : type a b. a typ -> b typ -> (a, b) coercion =
       with Uncoercible ->
         Coercion (fun (CPointer p) -> CPointer (Ctypes_ptr.Fat.coerce p b))
     end
+  | Pointer a, Funptr b ->
+    Coercion (fun (CPointer p) -> Static_funptr (Ctypes_ptr.Fat.coerce p b))
+  | Funptr a, Pointer b ->
+    Coercion (fun (Static_funptr p) -> CPointer (Ctypes_ptr.Fat.coerce p b))
+  | Funptr a, Funptr b ->
+    begin
+      try
+        begin match fn_coercion a b with
+        | Id -> Id
+        | Coercion _ ->
+          Coercion (fun (Static_funptr p) -> Static_funptr (Ctypes_ptr.Fat.coerce p b))
+        end
+      with Uncoercible ->
+        Coercion (fun (Static_funptr p) -> Static_funptr (Ctypes_ptr.Fat.coerce p b))
+    end
   | _ -> raise Uncoercible
 
-let rec fn_coercion : type a b. a fn -> b fn -> (a, b) coercion =
+and fn_coercion : type a b. a fn -> b fn -> (a, b) coercion =
   fun afn bfn -> match afn, bfn with
   | Function (af, at), Function (bf, bt) ->
     begin match coercion bf af, fn_coercion at bt with

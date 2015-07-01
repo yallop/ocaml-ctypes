@@ -288,7 +288,7 @@ value ctypes_prep_callspec(value callspec_, value abi_, value rtype)
 
 /* Call the function specified by `callspec', passing arguments and return
    values in `buffer' */
-/* call : string -> raw_pointer -> callspec ->
+/* call : string -> _ fn Fat.t -> callspec ->
           (raw_pointer -> Obj.t array -> unit) -> (raw_pointer -> 'a) -> 'a */
 value ctypes_call(value fnname, value function, value callspec_,
                   value argwriter, value rvreader)

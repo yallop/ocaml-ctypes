@@ -113,7 +113,6 @@ type 'a abstract = 'a Ctypes_static.abstract
 include Ctypes_types.TYPE
  with type 'a typ = 'a Ctypes_static.typ
   and type ('a, 's) field := ('a, 's) field
-include Ctypes_types.FUNCTION
 
 (** {3 Operations on types} *)
 
@@ -206,6 +205,9 @@ val reference_type : 'a ptr -> 'a typ
 
 val ptr_of_raw_address : nativeint -> unit ptr
 (** Convert the numeric representation of an address to a pointer *)
+
+val funptr_of_raw_address : nativeint -> (unit -> unit) Ctypes_static.static_funptr
+(** Convert the numeric representation of an address to a function pointer *)
 
 val raw_address_of_ptr : unit ptr -> nativeint
 (** [raw_address_of_ptr p] returns the numeric representation of p.
@@ -381,7 +383,7 @@ val coerce : 'a typ -> 'b typ -> 'a -> 'b
 
     The following coercions are currently supported:
 
-     - All pointer types are intercoercible.
+     - All function and object pointer types are intercoercible.
      - Any type may be coerced to {!void}
      - There is a coercion between a {!view} and another type [t] (in either
        direction) if there is a coercion between the representation type

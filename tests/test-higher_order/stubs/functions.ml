@@ -16,6 +16,9 @@ struct
   let higher_order_1 = foreign "higher_order_1"
     (funptr (int @-> int @-> returning int) @-> int @-> int @-> returning int)
 
+  let higher_order_1_static = foreign "higher_order_1"
+    (static_funptr (int @-> int @-> returning int) @-> int @-> int @-> returning int)
+
   let higher_order_3 = foreign "higher_order_3"
     (funptr (funptr (int @-> int @-> returning int) @->
              int @-> int @-> returning int) @->
@@ -24,6 +27,9 @@ struct
 
   let returning_funptr = foreign "returning_funptr"
     (int @-> returning (funptr (int @-> int @-> returning int)))
+
+  let returning_funptr_static = foreign "returning_funptr"
+    (int @-> returning (static_funptr (int @-> int @-> returning int)))
 
   let callback_returns_funptr = foreign "callback_returns_funptr"
     (funptr (int @-> returning (funptr (int @-> returning int))) @->

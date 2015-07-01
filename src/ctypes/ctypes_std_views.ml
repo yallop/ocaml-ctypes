@@ -29,6 +29,24 @@ let nullable_view ?format_typ ?format t reftyp =
   and write = write_nullable t reftyp
   in Ctypes_static.(view ~read ~write ?format_typ ?format (ptr reftyp))
 
+let read_nullable_funptr t reftyp =
+  let coerce = Ctypes_coerce.coerce (Ctypes_static.static_funptr reftyp) t in
+  fun (Ctypes_static.Static_funptr p as ptr) ->
+    if Ctypes_ptr.Fat.is_null p
+    then None
+    else Some (coerce ptr)
+
+let write_nullable_funptr t reftyp =
+  let coerce = Ctypes_coerce.coerce t Ctypes_static.(static_funptr reftyp) in
+  function None -> Ctypes_static.Static_funptr
+                     (Ctypes_ptr.Fat.make ~reftyp Ctypes_ptr.Raw.null)
+         | Some f -> coerce f
+
+let nullable_funptr_view ?format_typ ?format t reftyp =
+  let read = read_nullable_funptr t reftyp
+  and write = write_nullable_funptr t reftyp
+  in Ctypes_static.(view ~read ~write ?format_typ ?format (static_funptr reftyp))
+
 let ptr_opt t = nullable_view (Ctypes_static.ptr t) t
 
 let string_opt = nullable_view string Ctypes_static.char

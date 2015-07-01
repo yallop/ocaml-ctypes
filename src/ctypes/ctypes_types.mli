@@ -304,15 +304,9 @@ sig
       [sizeof].  The [lift_typ] function makes it possible to use concrete
       type representations wherever such abstract type representations are
       needed. *)
-end
-
-
-(** Abstract interface to C function type descriptions *)
-module type FUNCTION =
-sig
-  open Ctypes_static
 
   (** {3 Function types} *)
+  (** Abstract interface to C function type descriptions *)
 
   type 'a fn = 'a Ctypes_static.fn
   (** The type of values representing C function types.  A value of type [t fn]
@@ -334,4 +328,12 @@ sig
   (** Give the return type of a C function.  Note that [returning] is intended
       to be used together with {!(@->)}; see the documentation for {!(@->)} for an
       example. *)
+
+  (** {3 Function pointer types} *)
+  type 'a static_funptr = 'a Ctypes_static.static_funptr
+  (** The type of values representing C function pointer types. *)
+
+  val static_funptr : 'a fn -> 'a Ctypes_static.static_funptr typ
+  (** Construct a function pointer type from an existing function type
+      (called the {i reference type}).  *)
 end
