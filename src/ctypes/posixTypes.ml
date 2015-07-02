@@ -41,6 +41,14 @@ let mkArithmetic =
   | Ctypes_static.Float  -> mkAbstract float
   | Ctypes_static.Double -> mkAbstract double
 
+let mkSigned name =
+  let open Ctypes in function
+  | Ctypes_static.Int8  -> Ctypes_std_views.signed_typedef name ~size:1
+  | Ctypes_static.Int16 -> Ctypes_std_views.signed_typedef name ~size:2
+  | Ctypes_static.Int32 -> Ctypes_std_views.signed_typedef name ~size:4
+  | Ctypes_static.Int64 -> Ctypes_std_views.signed_typedef name ~size:8
+  | _ -> assert false
+
 (* Arithmetic types *)
 external typeof_clock_t : unit -> Ctypes_static.arithmetic = "ctypes_typeof_clock_t"
 external typeof_dev_t : unit -> Ctypes_static.arithmetic = "ctypes_typeof_dev_t"
@@ -65,7 +73,7 @@ struct
   type t = Unsigned.size_t
   let t = Ctypes.size_t
 end
-module Ssize = (val mkArithmetic (typeof_ssize_t ()) : Abstract)
+module Ssize = (val mkSigned "ssize_t" (typeof_ssize_t ()))
 module Time = (val mkArithmetic (typeof_time_t ()) : Abstract)
 module Useconds = (val mkArithmetic (typeof_useconds_t ()) : Abstract)
 

@@ -20,7 +20,8 @@ type nlink_t
 type off_t
 type pid_t
 type size_t = Unsigned.size_t
-type ssize_t
+module Ssize : Signed.S
+type ssize_t = Ssize.t
 type time_t
 type useconds_t
 
