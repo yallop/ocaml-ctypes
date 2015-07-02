@@ -50,3 +50,38 @@ let nullable_funptr_view ?format_typ ?format t reftyp =
 let ptr_opt t = nullable_view (Ctypes_static.ptr t) t
 
 let string_opt = nullable_view string Ctypes_static.char
+
+module type Signed_type =
+sig
+  include Signed.S
+  val t : t Ctypes_static.typ
+end
+
+module type Unsigned_type =
+sig
+  include Unsigned.S
+  val t : t Ctypes_static.typ
+end
+
+let signed_typedef name ~size : (module Signed_type) =
+  match size with
+    4 -> (module struct include Signed.Int32
+           let t = Ctypes_static.(typedef int32_t name) end)
+  | 8 -> (module struct include Signed.Int64
+           let t = Ctypes_static.(typedef int64_t name) end)
+  | n -> Printf.kprintf failwith "size %d not supported for %s\n" n name
+
+let unsigned_typedef name ~size : (module Unsigned_type) =
+  match size with
+    4 -> (module struct include Unsigned.UInt32
+           let t = Ctypes_static.(typedef uint32_t name) end)
+  | 8 -> (module struct include Unsigned.UInt64
+           let t = Ctypes_static.(typedef uint64_t name) end)
+  | n -> Printf.kprintf failwith "size %d not supported for %s\n" n name
+
+module Intptr = (val signed_typedef "intptr_t"
+                    ~size:(Ctypes_std_view_stubs.intptr_t_size ()))
+module Uintptr = (val unsigned_typedef "uintptr_t"
+                    ~size:(Ctypes_std_view_stubs.uintptr_t_size ()))
+let intptr_t = Intptr.t
+let uintptr_t = Uintptr.t
