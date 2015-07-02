@@ -92,6 +92,10 @@ sig
   val int64_t : int64 typ
   (** Value representing a 64-bit signed integer C type. *)
 
+  module Intptr : Signed.S
+  val intptr_t : Intptr.t typ
+  (** Value representing the C type [intptr_t]. *)
+
   val camlint : int typ
   (** Value representing an integer type with the same storage requirements as
       an OCaml [int]. *)
@@ -132,6 +136,10 @@ sig
 
   val ullong : ullong typ
   (** Value representing the C type [unsigned long long]. *)
+
+  module Uintptr : Unsigned.S
+  val uintptr_t : Uintptr.t typ
+  (** Value representing the C type [uintptr_t]. *)
 
   (** {5 Floating types} *)
 

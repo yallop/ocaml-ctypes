@@ -14,3 +14,9 @@ external string_of_cstring : char Ctypes_static.typ Ctypes_ptr.Fat.t -> string
 (* Convert an OCaml string to a C string *)
 external cstring_of_string : string -> Ctypes_memory_stubs.managed_buffer
   = "ctypes_cstring_of_string"
+
+(* Size information for uintptr_t *)
+external uintptr_t_size : unit -> int = "ctypes_uintptr_t_size"
+
+(* Size information for uintptr_t *)
+external intptr_t_size : unit -> int = "ctypes_intptr_t_size"
