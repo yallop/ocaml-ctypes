@@ -85,3 +85,7 @@ module Uintptr = (val unsigned_typedef "uintptr_t"
                     ~size:(Ctypes_std_view_stubs.uintptr_t_size ()))
 let intptr_t = Intptr.t
 let uintptr_t = Uintptr.t
+
+module Ptrdiff = (val signed_typedef "ptrdiff_t"
+                     ~size:(Ctypes_std_view_stubs.ptrdiff_t_size ()))
+let ptrdiff_t = Ptrdiff.t

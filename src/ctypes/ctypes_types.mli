@@ -96,6 +96,10 @@ sig
   val intptr_t : Intptr.t typ
   (** Value representing the C type [intptr_t]. *)
 
+  module Ptrdiff : Signed.S
+  val ptrdiff_t : Ptrdiff.t typ
+  (** Value representing the C type [ptrdiff_t]. *)
+
   val camlint : int typ
   (** Value representing an integer type with the same storage requirements as
       an OCaml [int]. *)
