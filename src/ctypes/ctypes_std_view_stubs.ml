@@ -20,3 +20,6 @@ external uintptr_t_size : unit -> int = "ctypes_uintptr_t_size"
 
 (* Size information for uintptr_t *)
 external intptr_t_size : unit -> int = "ctypes_intptr_t_size"
+
+(* Size information for ptrdiff_t *)
+external ptrdiff_t_size : unit -> int = "ctypes_ptrdiff_t_size"
