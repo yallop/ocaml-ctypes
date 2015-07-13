@@ -42,4 +42,11 @@ struct
   let s5 : [`s5] structure typ = structure "s5"
   let w1 = field s5 "w1" (lift_typ (Foreign.funptr Ctypes.(ptr s1_fwd @-> returning int)))
   let () = seal s5
+
+  (* adding fields through views (typedefs) *)
+  let struct_s6 : [`s6] structure typ = structure ""
+  let s6 = typedef struct_s6 "s6"
+  let v1 = field s6 "v1" int
+  let v2 = field s6 "v2" float
+  let () = seal s6
 end

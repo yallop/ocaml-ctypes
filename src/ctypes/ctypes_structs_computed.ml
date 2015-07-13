@@ -24,7 +24,8 @@ let aligned_offset offset alignment =
     0 -> offset
   | overhang -> offset - overhang + alignment
 
-let field (type k) (structured : (_, k) structured typ) label ftype =
+let rec field : type t a. t typ -> string -> a typ -> (a, t) field =
+  fun structured label ftype ->
   match structured with
   | Struct ({ spec = Incomplete spec } as s) ->
     let foffset = aligned_offset spec.isize (alignment ftype) in
@@ -40,9 +41,12 @@ let field (type k) (structured : (_, k) structured typ) label ftype =
     field
   | Struct { tag; spec = Complete _ } -> raise (ModifyingSealedType tag)
   | Union { utag } -> raise (ModifyingSealedType utag)
+  | View { ty } ->
+     let { ftype; foffset; fname } = field ty label ftype in
+     { ftype; foffset; fname }
   | _ -> raise (Unsupported "Adding a field to non-structured type")
 
-let seal (type a) (type s) : (a, s) structured typ -> unit = function
+let rec seal : type a. a typ -> unit = function
   | Struct { fields = [] } -> raise (Unsupported "struct with no fields")
   | Struct { spec = Complete _; tag } -> raise (ModifyingSealedType tag)
   | Struct ({ spec = Incomplete { isize } } as s) ->
@@ -60,4 +64,5 @@ let seal (type a) (type s) : (a, s) structured typ -> unit = function
     and align = max_field_alignment u.ufields in
     u.uspec <- Some { align; size = aligned_offset size align }
   end
+  | View { ty } -> seal ty
   | _ -> raise (Unsupported "Sealing a non-structured type")

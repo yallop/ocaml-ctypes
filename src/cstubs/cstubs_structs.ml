@@ -79,51 +79,52 @@ let cases fmt list prologue epilogue ~case =
 
 let write_field fmt specs =
   let case = function
-  | `Struct tag, name ->
-    let foffset fmt = offsetof ("struct " ^ tag) name fmt in
-    puts (Printf.sprintf "  | Struct ({ tag = %S} as s'), %S ->" tag name) fmt;
+  | `Struct (tag, typedef), fname ->
+    let foffset fmt = offsetof typedef fname fmt in
+    puts (Printf.sprintf "  | Struct ({ tag = %S} as s'), %S ->" tag fname) fmt;
     printf1              "    let f = {ftype; fname; foffset = %zu} in \n" foffset fmt;
     puts                 "    (s'.fields <- BoxedField f :: s'.fields; f)" fmt;
-  | `Union tag, name ->
-    let foffset fmt = offsetof ("union " ^ tag) name fmt in
-    puts (Printf.sprintf "  | Union ({ utag = %S} as s'), %S ->" tag name) fmt;
+  | `Union (tag, typedef), fname ->
+    let foffset fmt = offsetof typedef fname fmt in
+    puts (Printf.sprintf "  | Union ({ utag = %S} as s'), %S ->" tag fname) fmt;
     printf1              "    let f = {ftype; fname; foffset = %zu} in \n" foffset fmt;
     puts                 "    (s'.ufields <- BoxedField f :: s'.ufields; f)" fmt;
-  | _ -> raise (Unsupported "Adding a field to non-structured type")
   in
   cases fmt specs
   ["";
-   "let field : type a s. 't typ -> string -> a typ ->";
-   "  (a, ((s, [<`Struct | `Union]) structured as 't)) field =";
-   "  fun (type k) (s : (_, k) structured typ) fname ftype -> match s, fname with";]
+   "let rec field : type t a. t typ -> string -> a typ -> (a, t) field =";
+   "  fun s fname ftype -> match s, fname with";]
   ~case
-  ["  | _ -> failwith (\"Unexpected field \"^ fname)"]
+  ["  | View { ty }, _ ->";
+   "    let { ftype; foffset; fname } = field ty fname ftype in";
+   "    { ftype; foffset; fname }";
+   "  | _ -> failwith (\"Unexpected field \"^ fname)"]
 
 let write_seal fmt specs =
   let case = function
-    | `Struct tag ->
-        let ssize fmt = sizeof ~fmt ("struct " ^ tag)
-        and salign fmt = offsetof ~fmt ("struct { char c; struct "^ tag ^" x; }") "x" in
+    | `Struct (tag, typedef) ->
+        let ssize fmt = sizeof ~fmt typedef
+        and salign fmt = offsetof ~fmt ("struct { char c; "^ typedef ^" x; }") "x" in
         puts ~fmt (Printf.sprintf "  | Struct ({ tag = %S; spec = Incomplete _ } as s') ->" tag);
         printf2 ~fmt              "    s'.spec <- Complete { size = %zu; align = %zu }\n" ssize salign;
-    | `Union tag ->
-        let usize fmt = sizeof ~fmt ("union " ^ tag)
-        and ualign fmt = offsetof ~fmt ("struct { char c; union "^ tag ^" x; }") "x" in
+    | `Union (tag, typedef) ->
+        let usize fmt = sizeof ~fmt typedef
+        and ualign fmt = offsetof ~fmt ("struct { char c; "^ typedef ^" x; }") "x" in
         puts ~fmt (Printf.sprintf "  | Union ({ utag = %S; uspec = None } as s') ->" tag);
         printf2 ~fmt              "    s'.uspec <- Some { size = %zu; align = %zu }\n" usize ualign;
-    | `Other -> 
-      raise (Unsupported "Sealing a non-structured type")
   in
   cases fmt specs
     ["";
-     "let seal (type t) (t : (_, t) structured typ) = match t with"]
+     "let rec seal : type a. a typ -> unit = function"]
     ~case
-    ["  | Struct { tag; spec = Complete _; } ->";
+    ["  | Struct { tag; spec = Complete _ } ->";
      "    raise (ModifyingSealedType tag)";
-     "  | Union { utag; uspec = Some _; } ->";
+     "  | Union { utag; uspec = Some _ } ->";
      "    raise (ModifyingSealedType utag)";
+     "  | View { ty } -> seal ty";
      "  | _ ->";
-     "    raise (Unsupported \"Sealing a non-structured type\")"]
+     "    raise (Unsupported \"Sealing a non-structured type\")";
+     ""]
 
 let primitive_format_string : type a. a Ctypes_primitive_types.prim -> string =
   fun p ->
@@ -245,23 +246,33 @@ let gen_c () =
   let m =
     (module struct
       include Ctypes
-      let field (type s) (s : (_, s) structured typ) fname ftype =
-        let () = match s with 
-        | Ctypes_static.Struct { Ctypes_static.tag } ->
-          fields := (`Struct tag, fname) :: !fields
-        | Ctypes_static.Union { Ctypes_static.utag } ->
-          fields := (`Union utag, fname) :: !fields
-        | _ ->
-          ()
-        in { Ctypes_static.ftype; foffset = -1; fname}
-      let seal (type s) (s : (_, s) structured typ) =
-        match s with
-        | Ctypes_static.Struct { Ctypes_static.tag } ->
-          structures := `Struct tag :: !structures
-        | Ctypes_static.Union { Ctypes_static.utag } ->
-          structures := `Union utag :: !structures
-        | _ ->
-          ()
+      open Ctypes_static
+      let rec field' : type a s r. string -> s typ -> string -> a typ -> (a, r) field =
+        fun structname s fname ftype -> match s with 
+        | Struct { tag } ->
+          fields := (`Struct (tag, structname), fname) :: !fields;
+          { ftype; foffset = -1; fname}
+        | Union { utag } ->
+          fields := (`Union (utag, structname), fname) :: !fields;
+          { ftype; foffset = -1; fname}
+        | View { ty } -> 
+          field' structname ty fname ftype
+        | _ -> raise (Unsupported "Adding a field to non-structured type")
+
+      let field s fname ftype = field' (Ctypes.string_of_typ s) s fname ftype
+
+      let rec seal' : type s. string -> s typ -> unit =
+        fun structname -> function
+        | Struct { tag } ->
+          structures := `Struct (tag, structname) :: !structures
+        | Union { utag } ->
+          structures := `Union (utag, structname) :: !structures
+        | View { ty } ->
+           seal' structname ty
+        | _ -> raise (Unsupported "Sealing a field to non-structured type")
+
+      let seal ty = seal' (Ctypes.string_of_typ ty) ty
+
       type _ const = unit
       let constant name ty  = consts := (name, Ctypes_static.BoxedType ty) :: !consts
       let enum name ?unexpected alist =

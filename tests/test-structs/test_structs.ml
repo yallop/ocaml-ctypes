@@ -98,6 +98,19 @@ let test_incomplete_struct_members _ =
 
 
 (*
+  Test that fields can be added to views over structs.
+*)
+let test_adding_fields_through_views _ =
+  let module M = struct
+    let struct_s = structure "struct_s"
+    let s = typedef struct_s "s"
+    let i = field s "i" int
+    let j = field s "j" float
+    let () = seal s
+  end in ()
+
+
+(*
   Test that OCaml types cannot be used as struct or union fields.
 *)
 let test_ocaml_types_rejected_as_fields _ =
@@ -442,7 +455,6 @@ struct
   let offsetof_y2 = retrieve_size "offsetof_y2"
   let offsetof_y3 = retrieve_size "offsetof_y3"
   let offsetof_y4 = retrieve_size "offsetof_y4"
-
   let sizeof_s3 = retrieve_size "sizeof_s3"
   let alignmentof_s3 = retrieve_size "alignmentof_s3"
   let offsetof_z1 = retrieve_size "offsetof_z1"
@@ -451,6 +463,10 @@ struct
   let alignmentof_s4 = retrieve_size "alignmentof_s4"
   let offsetof_z3 = retrieve_size "offsetof_z3"
   let offsetof_z4 = retrieve_size "offsetof_z4"
+  let sizeof_s6 = retrieve_size "sizeof_s6"
+  let alignmentof_s6 = retrieve_size "alignmentof_s6"
+  let offsetof_v1 = retrieve_size "offsetof_v1"
+  let offsetof_v2 = retrieve_size "offsetof_v2"
 
   (*
     Test that struct layout retrieved from C correctly accounts for missing
@@ -520,6 +536,26 @@ struct
     end
 
 
+  (* Test that we can retrieve information for structs without tags that are
+     identified through typedefs, e.g.
+         typedef struct { int x; float y; } t;
+   *)
+  let test_tagless_structs _ =
+    begin
+      assert_equal sizeof_s6
+        (sizeof M.s6);
+
+      assert_equal alignmentof_s6
+        (alignment M.s6);
+
+      assert_equal offsetof_v1
+        (offsetof M.v1);
+
+      assert_equal offsetof_v2
+        (offsetof M.v2);
+    end
+
+
   module Build_call_tests
       (F : Cstubs.FOREIGN with type 'a fn = 'a) =
   struct
@@ -579,6 +615,9 @@ let suite = "Struct tests" >:::
    "incomplete struct members rejected"
    >:: test_incomplete_struct_members;
 
+   "fields can be added to views over structs"
+   >:: test_adding_fields_through_views;
+
    "ocaml_string cannot be used as a structure field"
    >:: test_ocaml_types_rejected_as_fields;
 
@@ -617,6 +656,9 @@ let suite = "Struct tests" >:::
 
    "test retrieving information about structs with dependencies"
    >:: Struct_stubs_tests.test_struct_dependencies;
+
+   "test adding fields to tagless structs"
+   >:: Struct_stubs_tests.test_tagless_structs;
   ]
 
 
