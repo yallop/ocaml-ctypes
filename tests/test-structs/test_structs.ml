@@ -98,6 +98,19 @@ let test_incomplete_struct_members _ =
 
 
 (*
+  Test that fields can be added to views over structs.
+*)
+let test_adding_fields_through_views _ =
+  let module M = struct
+    let struct_s = structure "struct_s"
+    let s = typedef struct_s "s"
+    let i = field s "i" int
+    let j = field s "j" float
+    let () = seal s
+  end in ()
+
+
+(*
   Test that OCaml types cannot be used as struct or union fields.
 *)
 let test_ocaml_types_rejected_as_fields _ =
@@ -578,6 +591,9 @@ let suite = "Struct tests" >:::
 
    "incomplete struct members rejected"
    >:: test_incomplete_struct_members;
+
+   "fields can be added to views over structs"
+   >:: test_adding_fields_through_views;
 
    "ocaml_string cannot be used as a structure field"
    >:: test_ocaml_types_rejected_as_fields;
