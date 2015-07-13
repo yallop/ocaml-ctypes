@@ -200,9 +200,13 @@ size_t offsetof_v1(void);
 size_t offsetof_v2(void);
 
 union u1 { char x1; float x2; double x3; char x4[13]; };
+typedef union { int t1; float t2; } u2;
 
 size_t sizeof_u1(void);
 size_t alignmentof_u1(void);
+
+size_t sizeof_u2(void);
+size_t alignmentof_u2(void);
 
 bool bool_and(bool, bool);
 int call_s5(struct s1 *, struct s5 *);

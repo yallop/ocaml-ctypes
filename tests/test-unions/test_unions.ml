@@ -162,6 +162,9 @@ struct
   let sizeof_u1 = retrieve_size "sizeof_u1"
   let alignmentof_u1 = retrieve_size "alignmentof_u1"
 
+  let sizeof_u2 = retrieve_size "sizeof_u2"
+  let alignmentof_u2 = retrieve_size "alignmentof_u2"
+
   (*
     Test that union layout retrieved from C correctly accounts for missing
     fields.
@@ -173,6 +176,20 @@ struct
 
       assert_equal alignmentof_u1
         (alignment M.u1);
+    end
+
+
+  (* Test that we can retrieve information for unions without tags that are
+     identified through typedefs, e.g.
+         typedef union { int x; float y; } u;
+   *)
+  let test_tagless_unions _ =
+    begin
+      assert_equal sizeof_u2
+        (sizeof M.u2);
+
+      assert_equal alignmentof_u2
+        (alignment M.u2);
     end
 end
 
@@ -277,6 +294,9 @@ let suite = "Union tests" >:::
 
    "sealing empty union"
     >:: test_sealing_empty_union;
+
+   "test adding fields to tagless unions"
+   >:: Struct_stubs_tests.test_tagless_unions;
 
    (* "test layout of unions with missing fields" *)
    (* >:: Struct_stubs_tests.test_missing_fields; *)
