@@ -169,6 +169,7 @@ struct s2 { int y1, y2, y3, y4; };
 struct s3 { int z1; struct s3 *z2; };
 struct s4 { struct s3 z3; struct s3 *z4; };
 struct s5 { int (*w1)(struct s1 *); };
+typedef struct { int v1; float v2; } s6;
 
 size_t sizeof_s1(void);
 size_t alignmentof_s1(void);
@@ -192,6 +193,11 @@ size_t sizeof_s4(void);
 size_t alignmentof_s4(void);
 size_t offsetof_z3(void);
 size_t offsetof_z4(void);
+
+size_t sizeof_s6(void);
+size_t alignmentof_s6(void);
+size_t offsetof_v1(void);
+size_t offsetof_v2(void);
 
 union u1 { char x1; float x2; double x3; char x4[13]; };
 

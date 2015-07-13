@@ -455,7 +455,6 @@ struct
   let offsetof_y2 = retrieve_size "offsetof_y2"
   let offsetof_y3 = retrieve_size "offsetof_y3"
   let offsetof_y4 = retrieve_size "offsetof_y4"
-
   let sizeof_s3 = retrieve_size "sizeof_s3"
   let alignmentof_s3 = retrieve_size "alignmentof_s3"
   let offsetof_z1 = retrieve_size "offsetof_z1"
@@ -464,6 +463,10 @@ struct
   let alignmentof_s4 = retrieve_size "alignmentof_s4"
   let offsetof_z3 = retrieve_size "offsetof_z3"
   let offsetof_z4 = retrieve_size "offsetof_z4"
+  let sizeof_s6 = retrieve_size "sizeof_s6"
+  let alignmentof_s6 = retrieve_size "alignmentof_s6"
+  let offsetof_v1 = retrieve_size "offsetof_v1"
+  let offsetof_v2 = retrieve_size "offsetof_v2"
 
   (*
     Test that struct layout retrieved from C correctly accounts for missing
@@ -530,6 +533,26 @@ struct
 
       assert_equal offsetof_z4
         (offsetof M.z4);
+    end
+
+
+  (* Test that we can retrieve information for structs without tags that are
+     identified through typedefs, e.g.
+         typedef struct { int x; float y; } t;
+   *)
+  let test_tagless_structs _ =
+    begin
+      assert_equal sizeof_s6
+        (sizeof M.s6);
+
+      assert_equal alignmentof_s6
+        (alignment M.s6);
+
+      assert_equal offsetof_v1
+        (offsetof M.v1);
+
+      assert_equal offsetof_v2
+        (offsetof M.v2);
     end
 
 
@@ -633,6 +656,9 @@ let suite = "Struct tests" >:::
 
    "test retrieving information about structs with dependencies"
    >:: Struct_stubs_tests.test_struct_dependencies;
+
+   "test adding fields to tagless structs"
+   >:: Struct_stubs_tests.test_tagless_structs;
   ]
 
 
