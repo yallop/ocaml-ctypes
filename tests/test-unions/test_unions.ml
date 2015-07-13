@@ -221,6 +221,19 @@ let test_updating_sealed_union _ =
 
 
 (*
+  Test that fields can be added to views over unions.
+*)
+let test_adding_fields_through_views _ =
+  let module M = struct
+    let union_u = union "union_u"
+    let u = typedef union_u "u"
+    let x = field u "x" int
+    let y = field u "y" float
+    let () = seal u
+  end in ()
+
+
+(*
   Test that attempting to seal an empty union is treated as an error.
 *)
 let test_sealing_empty_union _ =
@@ -255,6 +268,12 @@ let suite = "Union tests" >:::
 
    "updating sealed union"
     >:: test_updating_sealed_union;
+
+   "sealing empty union"
+    >:: test_sealing_empty_union;
+
+   "fields can be added to views over unions"
+   >:: test_adding_fields_through_views;
 
    "sealing empty union"
     >:: test_sealing_empty_union;
