@@ -792,6 +792,15 @@ tests/test-coercions/generated_stubs.c: $(BUILDDIR)/test-coercions-stub-generato
 tests/test-coercions/generated_bindings.ml: $(BUILDDIR)/test-coercions-stub-generator.native
 	$< --ml-file $@
 
+test-roots.dir = tests/test-roots
+test-roots.threads = yes
+test-roots.deps = str bigarray oUnit bytes
+test-roots.subproject_deps = ctypes ctypes-foreign-base \
+   ctypes-foreign-unthreaded cstubs tests-common
+test-roots.link_flags = -L$(BUILDDIR)/clib -ltest_functions
+test-roots: PROJECT=test-roots
+test-roots: $$(NATIVE_TARGET)
+
 test-passing-ocaml-values-stubs.dir  = tests/test-passing-ocaml-values/stubs
 test-passing-ocaml-values-stubs.threads = yes
 test-passing-ocaml-values-stubs.subproject_deps = ctypes cstubs \
@@ -871,6 +880,7 @@ TESTS += test-callback_lifetime-stubs test-callback_lifetime-stub-generator test
 TESTS += test-stubs
 TESTS += test-bigarrays-stubs test-bigarrays-stub-generator test-bigarrays-generated test-bigarrays
 TESTS += test-coercions-stubs test-coercions-stub-generator test-coercions-generated test-coercions
+TESTS += test-roots
 TESTS += test-passing-ocaml-values-stubs test-passing-ocaml-values-stub-generator test-passing-ocaml-values-generated test-passing-ocaml-values
 TESTS += test-threads-stubs test-threads
 

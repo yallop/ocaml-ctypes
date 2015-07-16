@@ -226,4 +226,6 @@ struct fruit_cell {
   struct fruit_cell *next;
 };
 
+void save_ocaml_value(void *);
+void *retrieve_ocaml_value(void);
 #endif /* TEST_FUNCTIONS_H */

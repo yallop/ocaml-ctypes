@@ -606,3 +606,14 @@ enum fruit next_fruit(enum fruit f)
   default: assert(0);
   }
 }
+
+void *global_ocaml_value = NULL;
+
+void save_ocaml_value(void *p)
+{
+  global_ocaml_value = p;
+}
+void *retrieve_ocaml_value(void)
+{
+  return global_ocaml_value;
+}
