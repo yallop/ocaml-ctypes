@@ -67,9 +67,34 @@ let test_root_lifetime _ =
   ()
 
 
+(*
+  Test passing roots to C functions.
+*)
+let test_passing_roots _ =
+  let save =
+    foreign ~from:testlib "save_ocaml_value"
+      (ptr void @-> returning void)
+  and retrieve =
+    foreign ~from:testlib "retrieve_ocaml_value"
+      (void @-> returning (ptr void)) in
+  
+  let r = Root.create [| ( + ) 1; ( * ) 2 |] in
+
+  begin
+    save r;
+    Gc.compact ();
+    let fs : (int -> int) array = Root.get (retrieve ()) in
+    assert_equal 11 (fs.(0) 10);
+    assert_equal 20 (fs.(1) 10)
+  end
+
+
 let suite = "Root tests" >:::
   ["root lifetime"
     >:: test_root_lifetime;
+
+   "passing roots"
+    >:: test_passing_roots;
   ]
 
 
