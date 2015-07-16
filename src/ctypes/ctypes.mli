@@ -414,6 +414,23 @@ val coerce_fn : 'a fn -> 'b fn -> 'a -> 'b
     ctypes may both add new types of coercion and restrict the existing
     coercions. *)
 
+(** {2:roots Registration of OCaml values as roots} *)
+module Root :
+sig
+  val create : 'a -> unit ptr
+  (** [create v] allocates storage for the address of the OCaml value [v],
+      registers the storage as a root, and returns its address. *)
+
+  val get : unit ptr -> 'a
+  (** [get p] retrieves the OCaml value whose address is stored at [p]. *)
+
+  val set : unit ptr -> 'a -> unit
+  (** [set p v] updates the OCaml value stored as a root at [p]. *)
+
+  val release : unit ptr -> unit
+  (** [release p] unregsiters the root [p]. *)
+end
+
 (** {2 Exceptions} *)
 
 exception Unsupported of string

@@ -337,3 +337,24 @@ let ocaml_bytes_start str =
 
 let ocaml_float_array_start arr =
   OCamlRef (0, arr, FloatArray)
+
+module Root =
+struct
+  module Stubs = Ctypes_roots_stubs
+
+  (* Roots are not managed values so it's safe to call unsafe_raw_addr. *)
+  let raw_addr : unit ptr -> Raw.t =
+    fun (CPointer p) -> Fat.unsafe_raw_addr p
+
+  let create : 'a. 'a -> unit ptr =
+    fun v -> CPointer (Fat.make ~reftyp:void (Stubs.root v))
+
+  let get : 'a. unit ptr -> 'a =
+    fun p -> Stubs.get (raw_addr p)
+
+  let set : 'a. unit ptr -> 'a -> unit =
+    fun p v -> Stubs.set (raw_addr p) v
+  
+  let release : 'a. unit ptr -> unit =
+    fun p -> Stubs.release (raw_addr p)
+end
