@@ -2,7 +2,7 @@
 
 VPATH += tests
 
-CFLAGS += -I $(PWD)/src/ctypes -I $(PWD)/tests
+CFLAGS += -I $(CURDIR)/src/ctypes -I $(CURDIR)/tests
 
 # tests-common subproject
 tests-common.dir = tests/tests-common
