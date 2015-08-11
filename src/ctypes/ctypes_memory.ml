@@ -212,6 +212,11 @@ struct
       l := get a i :: !l
     done;
     !l
+
+  let iter f a =
+    for i = 0 to length a - 1 do
+      f (unsafe_get a i)
+    done
 end
 
 let make ?finalise s =

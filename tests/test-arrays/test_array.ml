@@ -94,6 +94,22 @@ let test_multidimensional_arrays _ =
 
 
 (*
+  Test the CArray.iter function
+ *)
+let test_iter _ =
+  let r = ref 0 in
+  let a = CArray.of_list int [1; 2; 3] in
+  let () = CArray.iter (fun v -> r := !r + v) a in
+  assert_equal !r 6;
+
+  let r = ref 0 in
+  let a = CArray.of_list int [] in
+  let () = CArray.iter (fun _ -> assert false) a in
+  assert_equal !r 0
+
+
+
+(*
   Test that creating an array initializes all elements appropriately.
 *)
 let test_array_initialiation _ =
@@ -203,6 +219,9 @@ module Stub_tests = Common_tests(Generated_bindings)
 let suite = "Array tests" >:::
   ["multidimensional arrays"
     >:: test_multidimensional_arrays;
+
+   "CArray.iter "
+    >:: test_iter;
 
    "array initialization"
     >:: test_array_initialiation;

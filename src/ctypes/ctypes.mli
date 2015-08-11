@@ -277,6 +277,10 @@ sig
       element of the list is the result of reading the corresponding element of
       [a]. *)
 
+  val iter : ('a -> unit) -> 'a t -> unit
+  (** [iter f a] is analogous to [Array.iter f a]: it applies [f] in turn to
+      all the elements of [a]. *)
+
   val length : 'a t -> int
   (** Return the number of elements of the given array. *)
 
