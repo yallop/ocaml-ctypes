@@ -291,6 +291,11 @@ sig
       index of each element as the first argument to [f] and the element
       itself as the second argument. *)
 
+  val fold_left : ('a -> 'b -> 'a) -> 'a -> 'b t -> 'a
+  (** [CArray.fold_left (@) x a] computes 
+         [(((x @ a.(0)) @ a.(1)) ...) @ a.(n-1)]
+       where [n] is the length of the array [a]. *)
+
   val length : 'a t -> int
   (** Return the number of elements of the given array. *)
 

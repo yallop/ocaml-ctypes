@@ -135,6 +135,19 @@ let test_mapi _ =
 
 
 (*
+  Test the CArray.fold_left function
+ *)
+let test_fold_left _ =
+  let a = CArray.of_list int [1; 2; 3] in
+  let r = CArray.fold_left (Printf.sprintf "%s%d") "." a in
+  assert_equal ".123" r;
+    
+  let a = CArray.of_list int [] in
+  let r = CArray.fold_left (fun _ -> assert false) [] a in
+  assert_equal r []
+
+
+(*
   Test that creating an array initializes all elements appropriately.
 *)
 let test_array_initialiation _ =
@@ -253,6 +266,9 @@ let suite = "Array tests" >:::
 
    "CArray.mapi "
     >:: test_mapi;
+
+   "CArray.fold_left"
+    >:: test_fold_left;
 
    "array initialization"
     >:: test_array_initialiation;

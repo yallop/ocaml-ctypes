@@ -233,6 +233,13 @@ struct
       unsafe_set r i (f i (unsafe_get a i))
     done;
     r
+
+  let fold_left f x a =
+    let r = ref x in
+    for i = 0 to length a - 1 do
+      r := f !r (unsafe_get a i)
+    done;
+    !r
 end
 
 let make ?finalise s =
