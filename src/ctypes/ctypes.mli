@@ -281,6 +281,11 @@ sig
   (** [iter f a] is analogous to [Array.iter f a]: it applies [f] in turn to
       all the elements of [a]. *)
 
+  val map : 'b typ -> ('a -> 'b) -> 'a t -> 'b t
+  (** [map t f a] is analogous to [Array.map f a]: it creates a new array with
+      element type [t] whose elements are obtained by applying [f] to the
+      elements of [a]]. *)
+
   val length : 'a t -> int
   (** Return the number of elements of the given array. *)
 

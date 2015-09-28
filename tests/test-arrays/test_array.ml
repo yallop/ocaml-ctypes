@@ -108,6 +108,18 @@ let test_iter _ =
   assert_equal !r 0
 
 
+(*
+  Test the CArray.map function
+ *)
+let test_map _ =
+  let a = CArray.of_list int [1; 2; 3] in
+  let r = CArray.map float float_of_int a in
+  assert_equal [1.0; 2.0; 3.0] (CArray.to_list r);
+    
+  let a = CArray.of_list int [] in
+  let r = CArray.map string (fun _ -> assert false) a in
+  assert_equal (CArray.length r) 0
+
 
 (*
   Test that creating an array initializes all elements appropriately.
@@ -222,6 +234,9 @@ let suite = "Array tests" >:::
 
    "CArray.iter "
     >:: test_iter;
+
+   "CArray.map "
+    >:: test_map;
 
    "array initialization"
     >:: test_array_initialiation;
