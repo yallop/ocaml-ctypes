@@ -286,6 +286,11 @@ sig
       element type [t] whose elements are obtained by applying [f] to the
       elements of [a]]. *)
 
+  val mapi : 'b typ -> (int -> 'a -> 'b) -> 'a t -> 'b t
+  (** [mapi] behaves like {!Array.mapi}, except that it also passes the
+      index of each element as the first argument to [f] and the element
+      itself as the second argument. *)
+
   val length : 'a t -> int
   (** Return the number of elements of the given array. *)
 

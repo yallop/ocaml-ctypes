@@ -122,6 +122,19 @@ let test_map _ =
 
 
 (*
+  Test the CArray.mapi function
+ *)
+let test_mapi _ =
+  let a = CArray.of_list int [1; 2; 3] in
+  let r = CArray.mapi int (+) a in
+  assert_equal [1; 3; 5] (CArray.to_list r);
+    
+  let a = CArray.of_list int [] in
+  let r = CArray.mapi string (fun _ _ -> assert false) a in
+  assert_equal (CArray.length r) 0
+
+
+(*
   Test that creating an array initializes all elements appropriately.
 *)
 let test_array_initialiation _ =
@@ -237,6 +250,9 @@ let suite = "Array tests" >:::
 
    "CArray.map "
     >:: test_map;
+
+   "CArray.mapi "
+    >:: test_mapi;
 
    "array initialization"
     >:: test_array_initialiation;

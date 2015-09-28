@@ -225,6 +225,14 @@ struct
       unsafe_set r i (f (unsafe_get a i))
     done;
     r
+
+  let mapi typ f a =
+    let l = length a in
+    let r = make typ l in
+    for i = 0 to l - 1 do
+      unsafe_set r i (f i (unsafe_get a i))
+    done;
+    r
 end
 
 let make ?finalise s =
