@@ -148,6 +148,19 @@ let test_fold_left _ =
 
 
 (*
+  Test the CArray.fold_right function
+ *)
+let test_fold_right _ =
+  let a = CArray.of_list int [1; 2; 3] in
+  let r = CArray.fold_right (Printf.sprintf "%d%s") a "." in
+  assert_equal "123." r;
+    
+  let a = CArray.of_list int [] in
+  let r = CArray.fold_right (fun _ -> assert false) a [] in
+  assert_equal r []
+
+
+(*
   Test that creating an array initializes all elements appropriately.
 *)
 let test_array_initialiation _ =
@@ -269,6 +282,9 @@ let suite = "Array tests" >:::
 
    "CArray.fold_left"
     >:: test_fold_left;
+
+   "CArray.fold_right"
+    >:: test_fold_right;
 
    "array initialization"
     >:: test_array_initialiation;

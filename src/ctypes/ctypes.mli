@@ -296,6 +296,11 @@ sig
          [(((x @ a.(0)) @ a.(1)) ...) @ a.(n-1)]
        where [n] is the length of the array [a]. *)
 
+  val fold_right : ('b -> 'a -> 'a) -> 'b t -> 'a -> 'a
+  (** [CArray.fold_right f a x] computes
+         [a.(0) @ (a.(1) @ ( ... (a.(n-1) @ x) ...))]
+       where [n] is the length of the array [a]. *)
+
   val length : 'a t -> int
   (** Return the number of elements of the given array. *)
 
