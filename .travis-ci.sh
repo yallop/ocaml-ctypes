@@ -62,7 +62,7 @@ _build/date-cmd.native
 _build/fts-cmd.native examples
 
 if test $USE_BISECT ; then
-    ocveralls --send bisect*.out > coveralls.json
+    ocveralls --send bisect*.out _build/bisect*.out > coveralls.json
 fi
 
 # check Xen support builds too
