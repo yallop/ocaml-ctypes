@@ -199,6 +199,14 @@ struct
         | None -> arr
         | Some v -> fill arr v; arr
 
+  let copy {astart = CPointer src; alength} =
+    begin
+      let reftyp = Fat.reftype src in
+      let CPointer dst as r = allocate_n reftyp alength in
+      let () = Stubs.memcpy ~dst ~src ~size:(alength * sizeof reftyp) in
+      from_ptr r alength
+    end
+
   let element_type { astart } = reference_type astart
 
   let of_list typ list =

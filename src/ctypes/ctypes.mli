@@ -317,8 +317,11 @@ sig
       used to initialise every element of the array.  The argument [?finalise],
       if present, will be called just before the memory is freed. *)
 
+  val copy : 'a t -> 'a t
+  (** [copy a] creates a fresh array with the same elements as [a]. *)
+
   val element_type : 'a t -> 'a typ
-(** Retrieve the element type of an array. *)
+  (** Retrieve the element type of an array. *)
 end
 (** Operations on C arrays. *)
 

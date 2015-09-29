@@ -159,6 +159,24 @@ let test_fold_right _ =
   let r = CArray.fold_right (fun _ -> assert false) a [] in
   assert_equal r []
 
+(*
+  Test the CArray.copy function
+ *)
+let test_copy _ =
+  let a = CArray.of_list int [1; 2; 3] in
+  let r = CArray.copy a in
+
+  begin
+    assert_equal [1; 2; 3] (CArray.to_list a);
+    assert_equal [1; 2; 3] (CArray.to_list r);
+    CArray.set r 0 10;
+    assert_equal [1; 2; 3] (CArray.to_list a);
+    assert_equal [10; 2; 3] (CArray.to_list r);
+    CArray.set a 1 20;
+    assert_equal [1; 20; 3] (CArray.to_list a);
+    assert_equal [10; 2; 3] (CArray.to_list r);
+  end
+
 
 (*
   Test that creating an array initializes all elements appropriately.
@@ -285,6 +303,9 @@ let suite = "Array tests" >:::
 
    "CArray.fold_right"
     >:: test_fold_right;
+
+   "CArray.copy"
+    >:: test_copy;
 
    "array initialization"
     >:: test_array_initialiation;
