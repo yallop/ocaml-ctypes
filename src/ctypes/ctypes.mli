@@ -320,6 +320,13 @@ sig
   val copy : 'a t -> 'a t
   (** [copy a] creates a fresh array with the same elements as [a]. *)
 
+  val sub : 'a t -> pos:int -> length:int -> 'a t
+  (** [sub a ~pos ~length] creates a fresh array of length [length] containing
+      the elements [a.(pos)] to [a.(pos + length - 1)] of [a].
+
+      Raise [Invalid_argument "CArray.sub"] if [pos] and [length] do not
+      designate a valid subarray of [a]. *)
+
   val element_type : 'a t -> 'a typ
   (** Retrieve the element type of an array. *)
 end

@@ -207,6 +207,11 @@ struct
       from_ptr r alength
     end
 
+  let sub arr ~pos ~length:len =
+  if pos < 0 || len < 0 || pos > length arr - len
+  then invalid_arg "CArray.sub"
+  else copy { astart = arr.astart +@ pos; alength = len }
+
   let element_type { astart } = reference_type astart
 
   let of_list typ list =

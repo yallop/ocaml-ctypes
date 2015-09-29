@@ -179,6 +179,39 @@ let test_copy _ =
 
 
 (*
+  Test the CArray.sub function
+ *)
+let test_sub _ =
+  let a = CArray.of_list int [1; 2; 3] in
+
+  assert_raises (Invalid_argument "CArray.sub") begin fun () ->
+    CArray.sub a ~pos:(-1) ~length:1
+  end;
+
+  assert_raises (Invalid_argument "CArray.sub") begin fun () ->
+    CArray.sub a ~pos:1 ~length:4
+  end;
+  
+  assert_raises (Invalid_argument "CArray.sub") begin fun () ->
+    CArray.sub a ~pos:1 ~length:(-1)
+  end;
+
+  let r = CArray.sub a ~pos:1 ~length:2 in 
+  assert_equal [2; 3] (CArray.to_list r);
+    
+  let r = CArray.sub a ~pos:1 ~length:0 in
+  assert_equal [] (CArray.to_list r);
+
+  let a = CArray.of_list int [1; 2; 3] in
+  let r = CArray.sub a ~pos:1 ~length:2 in
+  begin
+    CArray.set r 0 10;
+    assert_equal [1; 2; 3] (CArray.to_list a);
+    assert_equal [10; 3] (CArray.to_list r);
+  end
+
+
+(*
   Test that creating an array initializes all elements appropriately.
 *)
 let test_array_initialiation _ =
@@ -306,6 +339,9 @@ let suite = "Array tests" >:::
 
    "CArray.copy"
     >:: test_copy;
+
+   "CArray.sub"
+    >:: test_sub;
 
    "array initialization"
     >:: test_array_initialiation;
