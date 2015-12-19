@@ -1,5 +1,13 @@
 language: c
-script: bash -ex .travis-ci.sh
+sudo: required
+services:
+  - docker
+script:
+  - if [ "${ARM}z" = "truez" ]; then
+      docker run -v /usr/bin/qemu-arm-static:/usr/bin/qemu-arm-static -v $(pwd):/travis yallop/ocaml-ctypes-qemu-arm-base /travis/.travis-ci-arm.sh;
+    else
+       bash -ex .travis-ci.sh;
+    fi
 os:
   - linux
   - osx
@@ -7,7 +15,15 @@ env:
   - OCAML_VERSION=4.00.1
   - OCAML_VERSION=4.01.0
   - OCAML_VERSION=4.02.3 COVERAGE=true
+  - OCAML_VERSION=4.02.3 ARM=true
 matrix:
   exclude:
     - os: osx
       env: OCAML_VERSION=4.00.1
+    - os: osx
+      env: OCAML_VERSION=4.02.3 ARM=true
+before_install:
+  - if [ "${ARM}z" = "truez" ]; then
+      sudo apt-get update && sudo apt-get install --yes qemu-user-static;
+      docker pull yallop/ocaml-ctypes-qemu-arm-base;
+    fi
