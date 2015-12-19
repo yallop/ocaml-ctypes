@@ -1,4 +1,7 @@
 language: c
+sudo: required
+services:
+  - docker
 script: bash -ex .travis-ci.sh
 os:
   - linux
