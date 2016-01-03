@@ -18,7 +18,7 @@
 
 static void finalize_free(value v)
 {
-  free(*((void **)Data_custom_val(v)));
+  caml_stat_free(*((void **)Data_custom_val(v)));
 }
 
 static int compare_pointers(value l_, value r_)
