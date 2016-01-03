@@ -31,5 +31,6 @@ value ctypes_caml_roots_release(value p_)
 {
   value *p = CTYPES_TO_PTR(p_);
   caml_remove_generational_global_root(p);
+  caml_stat_free(p);
   return Val_unit;
 }
