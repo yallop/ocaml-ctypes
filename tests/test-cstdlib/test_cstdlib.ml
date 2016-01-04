@@ -164,23 +164,10 @@ struct
 
     let of_string : string -> char carray =
       fun s ->
-        let module Array = CArray in
-        let len = String.length s in
-        let arr = Array.make char (len + 1) in
-        for i = 0 to len - 1 do
-          arr.(i) <- s.[i];
-        done;
-        arr.(len) <- '\000';
-        arr
+        CArray.from_ptr (coerce string (ptr char) s) (String.length s)
 
-    let as_string : char ptr -> Bytes.t =
-      fun p ->
-        let len = Size_t.to_int (strlen p) in
-        let s = Bytes.create len in
-        for i = 0 to len - 1 do
-          Bytes.set s i (!@(p +@ i));
-        done;
-        s
+    let as_string : char ptr -> string =
+      coerce (ptr char) string
 
     let mkmi n s =
       let m = make mi in
