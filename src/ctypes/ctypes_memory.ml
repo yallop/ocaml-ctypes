@@ -358,3 +358,5 @@ struct
   let release : 'a. unit ptr -> unit =
     fun p -> Stubs.release (raw_addr p)
 end
+
+let is_null (CPointer p) = Fat.is_null p

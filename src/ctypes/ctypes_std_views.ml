@@ -18,7 +18,7 @@ let string = Ctypes_static.(view (ptr char))
 
 let read_nullable t reftyp =
   let coerce = Ctypes_coerce.coerce Ctypes_static.(ptr reftyp) t in
-  fun p -> Ctypes_memory.(if to_voidp p = null then None else Some (coerce p))
+  fun p -> if Ctypes_memory.is_null p then None else Some (coerce p)
 
 let write_nullable t reftyp =
   let coerce = Ctypes_coerce.coerce t Ctypes_static.(ptr reftyp) in
