@@ -136,8 +136,8 @@ static struct callspec {
 static void finalize_callspec(value v)
 {
   struct callspec *callspec = Data_custom_val(v);
-  free(callspec->args);
-  free(callspec->cif);
+  caml_stat_free(callspec->args);
+  caml_stat_free(callspec->cif);
 }
 
 
