@@ -22,6 +22,8 @@ matrix:
       env: OCAML_VERSION=4.00.1
     - os: osx
       env: OCAML_VERSION=4.02.3 ARM=true
+    - os: osx
+      env: OCAML_VERSION=4.02.3 COVERAGE=true
 before_install:
   - if [ "${ARM}z" = "truez" ]; then
       sudo apt-get update && sudo apt-get install --yes qemu-user-static;
