@@ -23,7 +23,7 @@ let rec build : type a b. a typ -> b typ Fat.t -> a
       raise IncompleteType
     | Struct { spec = Complete { size } } as reftyp ->
       (fun buf ->
-        let managed = Stubs.allocate size in
+        let managed = Stubs.allocate 1 size in
         let dst = Fat.make ~managed ~reftyp (Stubs.block_address managed) in
         let () = Stubs.memcpy ~size ~dst ~src:buf in
         { structured = CPointer dst})
@@ -122,7 +122,8 @@ let (<-@) : type a. a ptr -> a -> unit
 let from_voidp = castp
 let to_voidp p = castp Void p
 
-let allocate_n : type a. ?finalise:(a ptr -> unit) -> a typ -> count:int -> a ptr
+let allocate_n
+  : type a. ?finalise:(a ptr -> unit) -> a typ -> count:int -> a ptr
   = fun ?finalise reftyp ~count ->
     let package p =
       CPointer (Fat.make ~managed:p ~reftyp (Stubs.block_address p))
@@ -131,7 +132,7 @@ let allocate_n : type a. ?finalise:(a ptr -> unit) -> a typ -> count:int -> a pt
       | Some f -> Gc.finalise (fun p -> f (package p))
       | None -> ignore
     in
-    let p = Stubs.allocate (count * sizeof reftyp) in begin
+    let p = Stubs.allocate count (sizeof reftyp) in begin
       finalise p;
       package p
     end

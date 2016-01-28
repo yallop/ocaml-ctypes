@@ -50,7 +50,7 @@ value ctypes_cstring_of_string(value s)
   CAMLparam1(s);
   CAMLlocal1(buffer);
   int len = caml_string_length(s);
-  buffer = ctypes_allocate(Val_int(len + 1));
+  buffer = ctypes_allocate(Val_int(1), Val_int(len + 1));
   char *dst = CTYPES_TO_PTR(ctypes_block_address(buffer));
   char *ss = String_val(s);
   memcpy(dst, ss, len);
