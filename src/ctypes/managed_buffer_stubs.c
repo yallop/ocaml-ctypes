@@ -18,7 +18,7 @@
 
 static void finalize_free(value v)
 {
-  caml_stat_free(*((void **)Data_custom_val(v)));
+  free(*((void **)Data_custom_val(v)));
 }
 
 static int compare_pointers(value l_, value r_)
@@ -49,19 +49,27 @@ static struct custom_operations managed_buffer_custom_ops = {
 /* copy_bytes : void * -> size_t -> managed_buffer */
 value ctypes_copy_bytes(void *src, size_t size)
 {
-  value block = caml_alloc_custom(&managed_buffer_custom_ops, sizeof(void*), 0, 1);
-  *(void **)Data_custom_val(block) = memcpy(caml_stat_alloc(size), src, size);
-  return block;
-}
-
-/* allocate : int -> managed_buffer */
-value ctypes_allocate(value size_)
-{
-  CAMLparam1(size_);
-  int size = Int_val(size_);
+  CAMLparam0();
   CAMLlocal1(block);
   block = caml_alloc_custom(&managed_buffer_custom_ops, sizeof(void*), 0, 1);
-  void *p = caml_stat_alloc(size);
+  void *dst = malloc(size);
+  if (dst == NULL && size != 0) caml_raise_out_of_memory();
+  *(void **)Data_custom_val(block) = memcpy(dst, src, size);
+  CAMLreturn(block);
+}
+
+/* allocate : int -> int -> managed_buffer */
+value ctypes_allocate(value count_, value size_)
+{
+  CAMLparam2(count_, size_);
+  int size = Int_val(size_);
+  int count = Int_val(count_);
+  CAMLlocal1(block);
+  block = caml_alloc_custom(&managed_buffer_custom_ops, sizeof(void*), 0, 1);
+  // libc's calloc guarantees the memory is zero-filled
+  // malloc may not be used internally
+  void *p = calloc(count, size);
+  if (p == NULL && count != 0 && size != 0) caml_raise_out_of_memory();
   void **d = (void **)Data_custom_val(block);
   *d = p;
   CAMLreturn(block);

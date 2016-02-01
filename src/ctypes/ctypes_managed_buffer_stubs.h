@@ -13,8 +13,8 @@
 /* copy_bytes : void * -> size_t -> managed_buffer */
 extern value ctypes_copy_bytes(void *, size_t);
 
-/* allocate : int -> managed_buffer */
-extern value ctypes_allocate(value size);
+/* allocate : int -> int -> managed_buffer */
+extern value ctypes_allocate(value count, value size);
 
 /* block_address : managed_buffer -> immediate_pointer */
 extern value ctypes_block_address(value managed_buffer);

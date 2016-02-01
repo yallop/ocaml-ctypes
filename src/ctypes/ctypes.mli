@@ -185,14 +185,16 @@ val to_voidp : _ ptr -> unit ptr
 (** Conversion to [void *]. *)
 
 val allocate : ?finalise:('a ptr -> unit) -> 'a typ -> 'a -> 'a ptr
-(** [allocate t v] allocates a fresh value of type [t], initialises it with
-    [v] and returns its address.  The argument [?finalise], if present, will be
-    called just before the memory is freed.  *)
+(** [allocate t v] allocates a fresh value of type [t], initialises it
+    with [v] and returns its address.  The argument [?finalise], if
+    present, will be called just before the memory is freed.  *)
 
 val allocate_n : ?finalise:('a ptr -> unit) -> 'a typ -> count:int -> 'a ptr
-(** [allocate_n t ~count:n] allocates a fresh array with element type [t] and
-    length [n], and returns its address.  The argument [?finalise], if present,
-    will be called just before the memory is freed.  *)
+(** [allocate_n t ~count:n] allocates a fresh array with element type
+    [t] and length [n], and returns its address.  The argument
+    [?finalise], if present, will be called just before the memory is
+    freed.  The memory is allocated with libc's [calloc] and is
+    guaranteed to be zero-filled.  *)
 
 val ptr_compare : 'a ptr -> 'a ptr -> int
 (** If [p] and [q] are pointers to elements [i] and [j] of the same array then

@@ -121,7 +121,7 @@ value ctypes_allocate_struct_ffitype(value nargs_)
   /* Space for the struct ffi_type plus a null-terminated array of arguments */
   int size = sizeof (ffi_type) + (1 + nargs) * sizeof (ffi_type *);
   CAMLlocal1(block);
-  block = ctypes_allocate(Val_int(size));
+  block = ctypes_allocate(Val_int(1), Val_int(size));
   ffi_type *struct_type = Struct_ffitype_val(block);
   struct_type->size = 0;
   struct_type->alignment = 0;
