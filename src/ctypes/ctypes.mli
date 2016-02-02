@@ -458,5 +458,6 @@ exception IncompleteType
     cannot be used as argument or return types.
 *)
 
-exception Uncoercible
+type uncoercible_info
+exception Uncoercible of uncoercible_info
 (** An attempt was made to coerce between uncoercible types.  *)
