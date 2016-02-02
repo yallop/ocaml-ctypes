@@ -9,7 +9,30 @@
 
 open Ctypes_static
 
-exception Uncoercible
+type uncoercible_info =
+    Types : _ typ * _ typ -> uncoercible_info
+  | Functions : _ fn * _ fn -> uncoercible_info
+
+exception Uncoercible of uncoercible_info
+
+let show_uncoercible = function
+    Uncoercible (Types (l, r)) ->
+    let pr ty = Ctypes_type_printing.string_of_typ ty in
+    Some (Format.sprintf
+            "Coercion failure: %s is not coercible to %s" (pr l) (pr r))
+  | Uncoercible (Functions (l, r)) ->
+    let pr ty = Ctypes_type_printing.string_of_fn ty in
+    Some (Format.sprintf
+            "Coercion failure: %s is not coercible to %s" (pr l) (pr r))
+  | _ -> None
+
+let () = Printexc.register_printer show_uncoercible
+
+let uncoercible : 'a 'b 'c. 'a typ -> 'b typ -> 'c =
+  fun l r -> raise (Uncoercible (Types (l, r)))
+
+let uncoercible_functions : 'a 'b 'c. 'a fn -> 'b fn -> 'c =
+  fun l r -> raise (Uncoercible (Functions (l, r)))
 
 let id x = x
 
@@ -18,36 +41,39 @@ type (_, _) coercion =
   | Coercion : ('a -> 'b) -> ('a, 'b) coercion
 
 let ml_prim_coercion :
-  type a b. a Ctypes_primitive_types.ml_prim -> b Ctypes_primitive_types.ml_prim -> (a, b) coercion =
+  type a b. a Ctypes_primitive_types.ml_prim -> b Ctypes_primitive_types.ml_prim ->
+  (a, b) coercion option =
   let open Ctypes_primitive_types in
   fun l r -> match l, r with
-  | ML_char, ML_char -> Id
-  | ML_complex, ML_complex -> Id
-  | ML_float, ML_float -> Id
-  | ML_int, ML_int -> Id
-  | ML_int32, ML_int32 -> Id
-  | ML_int64, ML_int64 -> Id
-  | ML_llong, ML_llong -> Id
-  | ML_long, ML_long -> Id
-  | ML_nativeint, ML_nativeint -> Id
-  | ML_size_t, ML_size_t -> Id
-  | ML_uchar, ML_uchar -> Id
-  | ML_bool, ML_bool -> Id
-  | ML_uint, ML_uint -> Id
-  | ML_uint16, ML_uint16 -> Id
-  | ML_uint32, ML_uint32 -> Id
-  | ML_uint64, ML_uint64 -> Id
-  | ML_uint8, ML_uint8 -> Id
-  | ML_ullong, ML_ullong -> Id
-  | ML_ulong, ML_ulong -> Id
-  | ML_ushort, ML_ushort -> Id
-  | _ -> raise Uncoercible
+  | ML_char, ML_char -> Some Id
+  | ML_complex, ML_complex -> Some Id
+  | ML_float, ML_float -> Some Id
+  | ML_int, ML_int -> Some Id
+  | ML_int32, ML_int32 -> Some Id
+  | ML_int64, ML_int64 -> Some Id
+  | ML_llong, ML_llong -> Some Id
+  | ML_long, ML_long -> Some Id
+  | ML_nativeint, ML_nativeint -> Some Id
+  | ML_size_t, ML_size_t -> Some Id
+  | ML_uchar, ML_uchar -> Some Id
+  | ML_bool, ML_bool -> Some Id
+  | ML_uint, ML_uint -> Some Id
+  | ML_uint16, ML_uint16 -> Some Id
+  | ML_uint32, ML_uint32 -> Some Id
+  | ML_uint64, ML_uint64 -> Some Id
+  | ML_uint8, ML_uint8 -> Some Id
+  | ML_ullong, ML_ullong -> Some Id
+  | ML_ulong, ML_ulong -> Some Id
+  | ML_ushort, ML_ushort -> Some Id
+  | l, r -> None
 
 let rec coercion : type a b. a typ -> b typ -> (a, b) coercion =
   fun atyp btyp -> match atyp, btyp with
   | _, Void -> Coercion ignore
   | Primitive l, Primitive r ->
-    Ctypes_primitive_types.(ml_prim_coercion (ml_prim l) (ml_prim r))
+    (match Ctypes_primitive_types.(ml_prim_coercion (ml_prim l) (ml_prim r)) with
+       Some c -> c
+     | None -> uncoercible atyp btyp)
   | View av, b ->
     begin match coercion av.ty b with
     | Id -> Coercion av.write
@@ -66,7 +92,7 @@ let rec coercion : type a b. a typ -> b typ -> (a, b) coercion =
         | Coercion _ ->
           Coercion (fun (CPointer p) -> CPointer (Ctypes_ptr.Fat.coerce p b))
         end
-      with Uncoercible ->
+      with Uncoercible _ ->
         Coercion (fun (CPointer p) -> CPointer (Ctypes_ptr.Fat.coerce p b))
     end
   | Pointer a, Funptr b ->
@@ -81,10 +107,10 @@ let rec coercion : type a b. a typ -> b typ -> (a, b) coercion =
         | Coercion _ ->
           Coercion (fun (Static_funptr p) -> Static_funptr (Ctypes_ptr.Fat.coerce p b))
         end
-      with Uncoercible ->
+      with Uncoercible _ ->
         Coercion (fun (Static_funptr p) -> Static_funptr (Ctypes_ptr.Fat.coerce p b))
     end
-  | _ -> raise Uncoercible
+  | l, r -> uncoercible l r
 
 and fn_coercion : type a b. a fn -> b fn -> (a, b) coercion =
   fun afn bfn -> match afn, bfn with
@@ -99,7 +125,7 @@ and fn_coercion : type a b. a fn -> b fn -> (a, b) coercion =
       Coercion (fun g x -> h (g (f x)))
     end
   | Returns at, Returns bt -> coercion at bt
-  | _ -> raise Uncoercible
+  | l, r -> uncoercible_functions l r
 
 let coerce : type a b. a typ -> b typ -> a -> b =
   fun atyp btyp -> match coercion atyp btyp with
