@@ -594,6 +594,7 @@ module Combined_stub_tests =
 
 
 let suite = "Struct tests" >:::
+  let (>::) name f = name >: OUnitTest.TestCase (OUnitTest.Long, f) in
   ["passing struct (foreign)"
    >:: Foreign_tests.test_passing_struct;
 
