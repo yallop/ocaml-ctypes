@@ -51,6 +51,66 @@ struct
   let (asr) = shift_right
 end
 
+(* Integers less than 32 bits *)
+module IntSmall(M: sig val modulus : int end) : S =
+struct
+  module Conversions :
+  sig
+    type t = private int
+    val max_int : t
+    val min_int : t
+    val of_int : int -> t
+  end =
+  struct
+    type t = int
+    let max_int = M.modulus
+    let min_int = -(M.modulus + 1)
+    let of_int x = ((x + min_int) mod max_int) - min_int
+  end
+  include Conversions
+  let to_int (x : t) = (x :> int)
+
+  let lift1 f x = of_int (f (x : t :> int))
+  let lift2 f x y = of_int (f (x : t :> int) (y : t :> int))
+
+  module Basics : Basics with type t = Conversions.t =
+  struct
+    type t = Conversions.t
+    let add = lift2 ( + )
+    let sub = lift2 ( - )
+    let mul = lift2 ( * )
+    let div = lift2 ( / )
+    let rem = lift2 (mod)
+    let max_int = max_int
+    let logand = lift2 (land)
+    let logor = lift2 (lor)
+    let logxor = lift2 (lxor)
+    let shift_left (l : t) r = of_int (to_int l lsl r)
+    let shift_right (l : t) r = of_int (to_int l asr r)
+    let shift_right_logical l r = of_int (to_int l lsr r)
+  end
+  include (Basics : Basics with type t := t)
+  module Infix = MakeInfix(Basics)
+  let to_int64 x = Int64.of_int (to_int x)
+  let of_int64 x = of_int (Int64.to_int x)
+  let to_nativeint x = (Nativeint.of_int (to_int x))
+  let of_nativeint x = of_int (Nativeint.to_int x)
+  let minus_one = of_int (-1)
+  let abs = lift1 abs
+  let neg = lift1 (fun x -> - x)
+  let compare x y = Pervasives.compare (to_int x) (to_int y)
+  let pred = lift1 pred
+  let succ = lift1 succ
+  let lognot = lift1 lnot
+  let one = of_int 1
+  let zero = of_int 0
+  let to_string x = string_of_int (to_int x)
+  let of_string x = of_int (int_of_string x)
+end
+
+module Int8 = IntSmall(struct let modulus = 255 end)
+module Int16 = IntSmall(struct let modulus = 32767 end)
+
 module Int32 = 
 struct
   include Int32
