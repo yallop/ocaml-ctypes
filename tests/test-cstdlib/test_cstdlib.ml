@@ -297,8 +297,8 @@ let test_div _ =
 module Foreign_tests = Common_tests(Tests_common.Foreign_binder)
 module Stub_tests = Common_tests(Generated_bindings)
 
-
 let suite = "C standard library tests" >:::
+  let (>::) name f = name >: OUnitTest.TestCase (OUnitTest.Long, f) in
   ["test isX functions (foreign)"
     >:: Foreign_tests.test_isX_functions;
 
