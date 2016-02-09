@@ -65,7 +65,11 @@ end
 
 let signed_typedef name ~size : (module Signed_type) =
   match size with
-    4 -> (module struct include Signed.Int32
+    1 -> (module struct include Signed.Int
+           let t = Ctypes_static.(typedef int8_t name) end)
+  | 2 -> (module struct include Signed.Int
+           let t = Ctypes_static.(typedef int16_t name) end)
+  | 4 -> (module struct include Signed.Int32
            let t = Ctypes_static.(typedef int32_t name) end)
   | 8 -> (module struct include Signed.Int64
            let t = Ctypes_static.(typedef int64_t name) end)
