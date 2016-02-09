@@ -51,6 +51,46 @@ struct
   let (asr) = shift_right
 end
 
+module Int =
+struct
+  module Basics =
+  struct
+    type t = int
+    let add = ( + )
+    let sub = ( - )
+    let mul = ( * )
+    let div = ( / )
+    let rem = ( mod )
+    let max_int = Pervasives.max_int
+    let min_int = Pervasives.min_int
+    let logand = ( land )
+    let logor = ( lor )
+    let logxor = ( lxor )
+    let shift_left = ( lsl )
+    let shift_right = ( asr )
+    let shift_right_logical = ( lsr )
+    let of_int x = x
+    let to_int x = x
+    let of_string = int_of_string
+    let to_string = string_of_int
+    let zero = 0
+    let one = 1
+    let minus_one = -1
+    let lognot = lnot
+    let succ = Pervasives.succ
+    let pred = Pervasives.pred
+    let compare = Pervasives.compare
+  end
+  include Basics
+  module Infix = MakeInfix(Basics)
+  let to_int64 = Int64.of_int
+  let of_int64 = Int64.to_int
+  let to_nativeint = Nativeint.of_int
+  let of_nativeint = Nativeint.to_int
+  let abs = Pervasives.abs
+  let neg x = -x
+end
+
 module Int32 = 
 struct
   include Int32
