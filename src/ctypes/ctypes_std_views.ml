@@ -77,7 +77,11 @@ let signed_typedef name ~size : (module Signed_type) =
 
 let unsigned_typedef name ~size : (module Unsigned_type) =
   match size with
-    4 -> (module struct include Unsigned.UInt32
+  | 1 -> (module struct include Unsigned.UInt8
+           let t = Ctypes_static.(typedef uint8_t name) end)
+  | 2 -> (module struct include Unsigned.UInt16
+           let t = Ctypes_static.(typedef uint16_t name) end)
+  | 4 -> (module struct include Unsigned.UInt32
            let t = Ctypes_static.(typedef uint32_t name) end)
   | 8 -> (module struct include Unsigned.UInt64
            let t = Ctypes_static.(typedef uint64_t name) end)
