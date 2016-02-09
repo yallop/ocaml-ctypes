@@ -40,6 +40,9 @@ module type S = sig
 end
 (** Signed integer operations *)
 
+module Int : S with type t = int
+(** Signed integer type and operations. *)
+
 module Int32 : S with type t = int32
 (** Signed 32-bit integer type and operations. *)
 
