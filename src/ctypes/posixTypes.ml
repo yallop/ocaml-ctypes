@@ -28,7 +28,7 @@ let mkAbstractSized : name:string -> size:int -> alignment:int -> (module Abstra
        let t = abstract ~name ~size ~alignment:a
      end : Abstract)
 
-let mkArithmetic = 
+let mkArithmetic_abstract = 
   let open Ctypes in function
     Ctypes_static.Int8   -> mkAbstract int8_t
   | Ctypes_static.Int16  -> mkAbstract int16_t
@@ -49,6 +49,22 @@ let mkSigned name =
   | Ctypes_static.Int64 -> Ctypes_std_views.signed_typedef name ~size:8
   | _ -> assert false
 
+let mkUnsigned name =
+  let open Ctypes in function
+  | Ctypes_static.Uint8  -> Ctypes_std_views.unsigned_typedef name ~size:1
+  | Ctypes_static.Uint16 -> Ctypes_std_views.unsigned_typedef name ~size:2
+  | Ctypes_static.Uint32 -> Ctypes_std_views.unsigned_typedef name ~size:4
+  | Ctypes_static.Uint64 -> Ctypes_std_views.unsigned_typedef name ~size:8
+  | _ -> assert false
+
+let mkArithmetic name : _ -> (module Ctypes_std_views.Unsigned_type) =
+  let open Ctypes_static in function
+  | Uint8 | Uint16 | Uint32 | Uint64 as u ->
+    let module U = (val mkUnsigned name u) in (module U)
+  | Int8 | Int16 | Int32 | Int64 as u ->
+    let module S = (val mkSigned name u) in (module S)
+  | _ -> assert false
+
 (* Arithmetic types *)
 external typeof_clock_t : unit -> Ctypes_static.arithmetic = "ctypes_typeof_clock_t"
 external typeof_dev_t : unit -> Ctypes_static.arithmetic = "ctypes_typeof_dev_t"
@@ -61,21 +77,21 @@ external typeof_ssize_t : unit -> Ctypes_static.arithmetic = "ctypes_typeof_ssiz
 external typeof_time_t : unit -> Ctypes_static.arithmetic = "ctypes_typeof_time_t"
 external typeof_useconds_t : unit -> Ctypes_static.arithmetic = "ctypes_typeof_useconds_t"
 
-module Clock = (val mkArithmetic (typeof_clock_t ()) : Abstract)
-module Dev = (val mkArithmetic (typeof_dev_t ()) : Abstract)
-module Ino = (val mkArithmetic (typeof_ino_t ()) : Abstract)
-module Mode = (val mkArithmetic (typeof_mode_t ()) : Abstract)
-module Nlink = (val mkArithmetic (typeof_nlink_t ()) : Abstract)
-module Off = (val mkArithmetic (typeof_off_t ()) : Abstract)
-module Pid = (val mkArithmetic (typeof_pid_t ()) : Abstract)
+module Clock = (val mkArithmetic_abstract (typeof_clock_t ()) : Abstract)
+module Dev = (val mkArithmetic "dev_t" (typeof_dev_t ()))
+module Ino = (val mkArithmetic "ino_t" (typeof_ino_t ()))
+module Mode = (val mkArithmetic "mode_t" (typeof_mode_t ()))
+module Nlink = (val mkArithmetic "nlink_t" (typeof_nlink_t ()))
+module Off = (val mkSigned "off_t" (typeof_off_t ()))
+module Pid = (val mkSigned "pid_t" (typeof_pid_t ()))
 module Size = 
 struct
   type t = Unsigned.size_t
   let t = Ctypes.size_t
 end
 module Ssize = (val mkSigned "ssize_t" (typeof_ssize_t ()))
-module Time = (val mkArithmetic (typeof_time_t ()) : Abstract)
-module Useconds = (val mkArithmetic (typeof_useconds_t ()) : Abstract)
+module Time = (val mkArithmetic_abstract (typeof_time_t ()) : Abstract)
+module Useconds = (val mkArithmetic_abstract (typeof_useconds_t ()) : Abstract)
 
 type clock_t = Clock.t
 type dev_t = Dev.t

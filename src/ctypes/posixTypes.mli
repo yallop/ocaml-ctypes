@@ -12,15 +12,22 @@ open Ctypes
 (* arithmetic types from <sys/types.h> *)
 (** {2 POSIX arithmetic types} *)
 
-type clock_t
-type dev_t
-type ino_t
-type mode_t
-type nlink_t
-type off_t
-type pid_t
-type size_t = Unsigned.size_t
+module Dev : Unsigned.S
+module Ino : Unsigned.S
+module Mode : Unsigned.S
+module Nlink : Unsigned.S
+module Off : Signed.S
+module Pid : Signed.S
 module Ssize : Signed.S
+
+type clock_t
+type dev_t = Dev.t
+type ino_t = Ino.t
+type mode_t = Mode.t
+type nlink_t = Nlink.t
+type off_t = Off.t
+type pid_t = Pid.t
+type size_t = Unsigned.size_t
 type ssize_t = Ssize.t
 type time_t
 type useconds_t
