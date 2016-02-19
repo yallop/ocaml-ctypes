@@ -25,7 +25,7 @@ let test_release_runtime_lock _ =
 
 
 (*
-  Ensure that passing ~runtime_lock to funptr causes a callbacks to acquire
+  Ensure that passing ~runtime_lock to funptr causes a callback to acquire
   the runtime lock.
 *)
 let test_acquire_runtime_lock _ =
