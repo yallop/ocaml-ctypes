@@ -382,20 +382,17 @@ struct closure
 
 enum boxedfn_tags { Done, Fn };
 
-static void callback_handler(ffi_cif *cif,
-                             void *ret,
-                             void **args,
-                             void *user_data)
+/* callback_handler_with_lock must only be called while the runtime lock is
+   held. */
+static void callback_handler_with_lock(ffi_cif *cif,
+                                       void *ret,
+                                       void **args,
+                                       void *user_data)
 {
   CAMLparam0 ();
 
   CAMLlocal2(boxedfn, argptr);
   closure *closure = user_data;
-
-  if (closure->context.runtime_lock)
-  {
-    caml_acquire_runtime_system();
-  }
 
   boxedfn = retrieve_closure(closure->fnkey);
 
@@ -428,12 +425,28 @@ static void callback_handler(ffi_cif *cif,
   argptr = CTYPES_FROM_PTR(ret);
   caml_callback(Field(boxedfn, 0), argptr);
 
+  CAMLreturn0;
+}
+
+
+static void callback_handler(ffi_cif *cif,
+                             void *ret,
+                             void **args,
+                             void *user_data)
+{
+  closure *closure = user_data;
+
+  if (closure->context.runtime_lock)
+  {
+    caml_acquire_runtime_system();
+  }
+
+  callback_handler_with_lock(cif, ret, args, user_data);
+
   if (closure->context.runtime_lock)
   {
     caml_release_runtime_system();
   }
-
-  CAMLreturn0;
 }
 
 
