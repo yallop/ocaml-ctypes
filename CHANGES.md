@@ -1,3 +1,7 @@
+## ctypes 0.4.2
+
+* Fix a bug involving access to local roots while the runtime lock was not held.
+
 ## ctypes 0.4.1
 
 Thanks to Etienne Millon (@emillon) for contributing to this release.
