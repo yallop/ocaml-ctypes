@@ -37,12 +37,41 @@ let test_acquire_runtime_lock _ =
   end
 
 
+(* 
+   Acquire the runtime lock in a callback while other threads execute OCaml
+   code.
+*)
+let test_acquire_runtime_lock_parallel _ =
+  begin
+    let r = ref None in
+    let g size n =
+      for i = 0 to n do
+        r := Some (CArray.make float size ~initial:0.0);
+        Thread.yield ();
+      done
+    in
+    let f x y = let _ = Gc.compact () in !@x + !@y in
+    let threads = ref [] in
+    for i  = 0 to 10 do
+      threads := Thread.create (g 100) 10000 :: !threads;
+    done;
+    for i = 0 to 10 do
+      assert (callback_with_pointers f = 7);
+      Thread.yield ();
+    done;
+    List.iter Thread.join !threads;
+  end
+
+
 let suite = "Thread tests" >:::
   ["test_release_runtime_lock (foreign)"
    >:: test_release_runtime_lock;
 
    "test_acquire_runtime_lock (foreign)"
    >:: test_acquire_runtime_lock;
+
+   "test_acquire_runtime_lock_parallel (foreign)"
+   >:: test_acquire_runtime_lock_parallel;
   ]
 
 
