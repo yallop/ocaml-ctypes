@@ -40,11 +40,11 @@ let write_foreign fmt bindings val_bindings =
   Format.fprintf fmt
     "let foreign : type a b. string -> (a -> b) Ctypes.fn -> (a -> b) =@\n";
   Format.fprintf fmt
-    "  fun name t -> match name, t with@\n@[<v>";
+    "  fun name t -> match t, name with@\n@[<v>";
   ListLabels.iter bindings
     ~f:(fun (Bind (stub_name, external_name, fn)) ->
       Cstubs_generate_ml.case ~stub_name ~external_name fmt fn);
-  Format.fprintf fmt "@[<hov 2>@[|@ s,@ _@ ->@]@ ";
+  Format.fprintf fmt "@[<hov 2>@[|@ _,@ s@ ->@]@ ";
   Format.fprintf fmt
     " @[Printf.ksprintf@ failwith@ \"No match for %%s\" s@]@]@]@.@\n";
   Format.fprintf fmt
@@ -52,11 +52,11 @@ let write_foreign fmt bindings val_bindings =
   Format.fprintf fmt
     "let foreign_value : type a b. string -> a Ctypes.typ -> a Ctypes.ptr =@\n";
   Format.fprintf fmt
-    "  fun name t -> match name, t with@\n@[<v>";
+    "  fun name t -> match t, name with@\n@[<v>";
   ListLabels.iter val_bindings
     ~f:(fun (Val_bind (stub_name, external_name, typ)) ->
       Cstubs_generate_ml.val_case ~stub_name ~external_name fmt typ);
-  Format.fprintf fmt "@[<hov 2>@[|@ s,@ _@ ->@]@ ";
+  Format.fprintf fmt "@[<hov 2>@[|@ _,@ s@ ->@]@ ";
   Format.fprintf fmt
     " @[Printf.ksprintf@ failwith@ \"No match for %%s\" s@]@]@]@.@\n"
 

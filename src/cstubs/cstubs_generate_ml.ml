@@ -454,8 +454,8 @@ let case ~stub_name ~external_name fmt fn =
       pat, None -> pat, `Ident (path_of_string external_name)
     | pat, Some e -> pat, e
   in
-  Format.fprintf fmt "@[<hov 2>@[<h 2>|@ @[%S,@ @[%a@]@]@ ->@]@ "
-    stub_name Emit_ML.(ml_pat NoApplParens) p;
+  Format.fprintf fmt "@[<hov 2>@[<h 2>|@ @[@[%a@],@ %S@]@ ->@]@ "
+    Emit_ML.(ml_pat NoApplParens) p stub_name;
   Format.fprintf fmt "@[<hov 2>@[%a@]@]@]@." Emit_ML.(ml_exp ApplParens) e
 
 let val_case ~stub_name ~external_name fmt typ =
@@ -463,8 +463,8 @@ let val_case ~stub_name ~external_name fmt typ =
   let p = `As (pattern_of_typ typ, x) in
   let app = `Appl (`Ident (path_of_string external_name), `Unit) in
   let rhs = `MakePtr (`Ident (path_of_string x), app) in
-  Format.fprintf fmt "@[<hov 2>@[<h 2>|@ @[%S,@ @[%a@]@]@ ->@]@ "
-    stub_name Emit_ML.(ml_pat NoApplParens) p;
+  Format.fprintf fmt "@[<hov 2>@[<h 2>|@ @[@[%a@],@ %S@]@ ->@]@ "
+    Emit_ML.(ml_pat NoApplParens) p stub_name;
   Format.fprintf fmt "@[<hov 2>@[%a@]@]@]@."
     Emit_ML.(ml_exp (ApplParens)) rhs
 
