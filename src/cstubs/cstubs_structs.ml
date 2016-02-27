@@ -196,15 +196,15 @@ let write_consts fmt consts =
          settings. *)
       Format.fprintf fmt "%a = (%s);@\n" (Ctypes.format_typ ~name:"v") ty name;
       printf1 ~fmt
-        (Ctypes_common.asprintf "  | %S, %s ->@\n    %s\n" name p e)
+        (Ctypes_common.asprintf "  | %s, %S ->@\n    %s\n" p name e)
         (fun fmt -> Format.fprintf fmt "v");
       Format.fprintf fmt "@]@\n}@\n"
   in
   cases fmt consts
     ["type 'a const = 'a";
-     "let constant (type t) name (t : t typ) : t = match name, t with"]
+     "let constant (type t) name (t : t typ) : t = match t, name with"]
     ~case
-    ["  | s, _ -> failwith (\"unmatched constant: \"^ s)"] 
+    ["  | _, s -> failwith (\"unmatched constant: \"^ s)"] 
     
 
 let write_enums fmt enums =

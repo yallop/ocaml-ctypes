@@ -146,7 +146,7 @@ let gen_ml fmt register (infos : fn_info list) : unit =
   Format.fprintf fmt
     "@[type a b.@ @[?runtime_lock:bool -> string -> (a -> b) Ctypes.fn -> (a -> b) -> unit@]@]@ =@\n";
   Format.fprintf fmt
-    "fun ?runtime_lock name fn f -> match name, fn with@\n@[";
+    "fun ?runtime_lock name fn f -> match fn, name with@\n@[";
   ListLabels.iter infos
     ~f:(fun (Fn ({fn_name}, fn)) ->
       Cstubs_generate_ml.inverse_case ~register_name:"register_value"
