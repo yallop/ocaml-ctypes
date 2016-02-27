@@ -478,7 +478,7 @@ let inverse_case ~register_name ~constructor name fmt fn : unit =
       pat, None -> pat, `Ident (path_of_string "f")
     | pat, Some e -> pat, e
   in
-  Format.fprintf fmt "|@[ @[%S, %a@] -> %s %s (%a)@]@\n"
-    name Emit_ML.(ml_pat NoApplParens) p register_name constructor
+  Format.fprintf fmt "|@[ @[%a, %S@] -> %s %s (%a)@]@\n"
+    Emit_ML.(ml_pat NoApplParens) p name register_name constructor
     Emit_ML.(ml_exp ApplParens) 
     e
