@@ -19,6 +19,7 @@ remove: [
 depends: [
    "base-bytes"
    "ocamlfind" {build}
+   "conf-pkg-config" {build}
 ]
 depopts: [
    "ctypes-foreign"
