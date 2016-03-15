@@ -19,6 +19,7 @@ module Nlink : Unsigned.S
 module Off : Signed.S
 module Pid : Signed.S
 module Ssize : Signed.S
+module Time : Unsigned.S
 
 type clock_t
 type dev_t = Dev.t
@@ -29,7 +30,7 @@ type off_t = Off.t
 type pid_t = Pid.t
 type size_t = Unsigned.size_t
 type ssize_t = Ssize.t
-type time_t
+type time_t = Time.t
 type useconds_t
 
 (** {3 Values representing POSIX arithmetic types} *)

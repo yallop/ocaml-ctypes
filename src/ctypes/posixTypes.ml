@@ -84,13 +84,13 @@ module Mode = (val mkArithmetic "mode_t" (typeof_mode_t ()))
 module Nlink = (val mkArithmetic "nlink_t" (typeof_nlink_t ()))
 module Off = (val mkSigned "off_t" (typeof_off_t ()))
 module Pid = (val mkSigned "pid_t" (typeof_pid_t ()))
-module Size = 
+module Size =
 struct
   type t = Unsigned.size_t
   let t = Ctypes.size_t
 end
 module Ssize = (val mkSigned "ssize_t" (typeof_ssize_t ()))
-module Time = (val mkArithmetic_abstract (typeof_time_t ()) : Abstract)
+module Time = (val mkArithmetic "time_t" (typeof_time_t ()))
 module Useconds = (val mkArithmetic_abstract (typeof_useconds_t ()) : Abstract)
 
 type clock_t = Clock.t
