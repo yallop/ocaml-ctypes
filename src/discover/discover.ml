@@ -87,7 +87,9 @@ let os_type = ref "Unix"
 let ccomp_type = ref "cc"
 let ffi_dir = ref ""
 let is_homebrew = ref false
+let is_macports = ref false
 let homebrew_prefix = ref "/usr/local"
+let macports_prefix = ref "/opt/local"
 
 (* Search for a header file in standard directories. *)
 let search_header header =
@@ -216,8 +218,8 @@ let test_libffi setup_data have_pkg_config =
   libffi_available
 
 (* Test for pkg-config. If we are on MacOS X, we need the latest pkg-config
- * from Homebrew *)
-let have_pkg_config is_homebrew homebrew_prefix =
+ * from either Homebrew or MacPorts *)
+let have_pkg_config is_homebrew is_macports homebrew_prefix macports_prefix =
   if is_homebrew then begin
     (* Look in `brew for the right pkg-config *)
     homebrew_prefix := get_homebrew_prefix ();
@@ -225,10 +227,17 @@ let have_pkg_config is_homebrew homebrew_prefix =
       (fun () ->
          Commands.command_succeeds "%s/bin/pkg-config --version" !homebrew_prefix)
   end
-  else
+  else if is_macports then begin
+    (* Look in macports for the right pkg-config *)
+    test_feature "macports"
+      (fun () ->
+         Commands.command_succeeds "%s/bin/port version" !macports_prefix)
+  end
+  else begin
     test_feature "pkg-config"
       (fun () ->
          Commands.command_succeeds "pkg-config --version")
+end
 
 let args = [
   "-ocamlc", Arg.Set_string ocamlc, "<path> ocamlc";
@@ -248,9 +257,15 @@ let () =
   is_homebrew :=
     test_feature "brew"
       (fun () ->
-         Commands.command_succeeds "brew info libffi");
+         (Commands.command "brew ls --versions").Commands.stdout <> "");
 
-  let have_pkg_config = have_pkg_config !is_homebrew homebrew_prefix in
+  (* Test for MacOS X MacPorts. *)
+  is_macports :=
+    test_feature "MacPorts"
+      (fun () ->
+         Commands.command_succeeds "port info libffi");
+
+  let have_pkg_config = have_pkg_config !is_homebrew !is_macports homebrew_prefix macports_prefix in
 
   let setup_data = ref [] in
   let have_libffi = test_feature "libffi"
