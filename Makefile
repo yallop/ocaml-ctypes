@@ -171,6 +171,7 @@ install-%:
 		$(OCAMLFIND) install -add ctypes -optional $^ \
                    $(LIB_TARGETS) $(LIB_TARGET_EXTRAS) \
                    $(INSTALL_MLIS) $(INSTALL_CMIS) \
+                   $(INSTALL_CMTS) $(INSTALL_CMTIS) \
                    $(INSTALL_HEADERS) \
                    $(if $(filter yes,$($(PROJECT).install_native_objects)),$(NATIVE_OBJECTS)))
 

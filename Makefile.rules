@@ -64,6 +64,8 @@ LIB_TARGET_EXTRAS = $(if $(STUB_LIB),$(BUILDDIR)/lib$(PROJECT)_stubs.a) \
                     $(if $(XEN_LIB),$(BUILDDIR)/lib$(PROJECT)_stubs_xen.a) \
                     $(BUILDDIR)/$(PROJECT).a
 INSTALL_CMIS = $($(PROJECT).public:%=$(BUILDDIR)/$($(PROJECT).dir)/%.cmi)
+INSTALL_CMTIS = $($(PROJECT).public:%=$(BUILDDIR)/$($(PROJECT).dir)/%.cmti)
+INSTALL_CMTS = $($(PROJECT).public:%=$(BUILDDIR)/$($(PROJECT).dir)/%.cmt)
 INSTALL_MLIS = $($(PROJECT).public:%=$($(PROJECT).dir)/%.mli)
 INSTALL_HEADERS = $(wildcard $($(PROJECT).dir)/*.h)
 THREAD_FLAG = $(if $(filter yes,$($(PROJECT).threads)),-thread)
@@ -94,7 +96,7 @@ $(BUILDDIR)/%.cmo : %.ml
 
 $(BUILDDIR)/%.cmx : %.ml
 	@mkdir -p $(@D)
-	$(OCAMLFIND) opt -c -o $@ $(OCAMLFIND_PACKAGE_FLAGS) $(OCAMLFLAGS) $(THREAD_FLAG) $(OCAMLFIND_PACKAGE_FLAGS) $(CMX_OPTS) $(OCAMLINCLUDES) $(filter %.ml,$<)
+	$(OCAMLFIND) opt -bin-annot -c -o $@ $(OCAMLFIND_PACKAGE_FLAGS) $(OCAMLFLAGS) $(THREAD_FLAG) $(OCAMLFIND_PACKAGE_FLAGS) $(CMX_OPTS) $(OCAMLINCLUDES) $(filter %.ml,$<)
 
 $(BUILDDIR)/%.o : %.c
 	@mkdir -p $(@D)
@@ -106,7 +108,7 @@ $(BUILDDIR)/xen/%.o : %.c
 
 $(BUILDDIR)/%.cmi : %.mli
 	@mkdir -p $(@D)
-	$(OCAMLFIND) ocamlc -c -o $@ $(OCAMLFIND_PACKAGE_FLAGS) $(OCAMLFLAGS) $(OCAMLINCLUDES) $<
+	$(OCAMLFIND) ocamlc -bin-annot -c -o $@ $(OCAMLFIND_PACKAGE_FLAGS) $(OCAMLFLAGS) $(OCAMLINCLUDES) $<
 
 $(BUILDDIR)/%.native : $$(NATIVE_OBJECTS) $$(C_OBJECTS)
 	$(OCAMLFIND) opt -I $(BUILDDIR) -linkpkg $(OCAMLFLAGS) $(THREAD_FLAG) $(OCAMLFIND_PACKAGE_FLAGS) $(LOCAL_CMXAS) -o $@ $(NATIVE_OBJECTS) $(C_OBJECTS) $(OCAML_LINK_FLAGS) 
