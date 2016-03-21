@@ -68,6 +68,10 @@
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;int16_t&nbsp;:&nbsp;int&nbsp;typ<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;int32_t&nbsp;:&nbsp;int32&nbsp;typ<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;int64_t&nbsp;:&nbsp;int64&nbsp;typ<br>
+&nbsp;&nbsp;<span class="keyword">module</span>&nbsp;<span class="constructor">Intptr</span>&nbsp;:&nbsp;<span class="constructor">Signed</span>.<span class="constructor">S</span><br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;intptr_t&nbsp;:&nbsp;<span class="constructor">Intptr</span>.t&nbsp;typ<br>
+&nbsp;&nbsp;<span class="keyword">module</span>&nbsp;<span class="constructor">Ptrdiff</span>&nbsp;:&nbsp;<span class="constructor">Signed</span>.<span class="constructor">S</span><br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;ptrdiff_t&nbsp;:&nbsp;<span class="constructor">Ptrdiff</span>.t&nbsp;typ<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;camlint&nbsp;:&nbsp;int&nbsp;typ<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;uchar&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.uchar&nbsp;typ<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;bool&nbsp;:&nbsp;bool&nbsp;typ<br>
@@ -80,6 +84,8 @@
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;uint&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.uint&nbsp;typ<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;ulong&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.ulong&nbsp;typ<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;ullong&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.ullong&nbsp;typ<br>
+&nbsp;&nbsp;<span class="keyword">module</span>&nbsp;<span class="constructor">Uintptr</span>&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.<span class="constructor">S</span><br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;uintptr_t&nbsp;:&nbsp;<span class="constructor">Uintptr</span>.t&nbsp;typ<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;float&nbsp;:&nbsp;float&nbsp;typ<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;double&nbsp;:&nbsp;float&nbsp;typ<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;complex32&nbsp;:&nbsp;<span class="constructor">Complex</span>.t&nbsp;typ<br>
@@ -112,8 +118,10 @@
 &nbsp;&nbsp;&nbsp;&nbsp;name:string&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;size:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;alignment:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.abstract&nbsp;typ<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;lift_typ&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.typ&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;typ<br>
 &nbsp;&nbsp;<span class="keyword">type</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;fn&nbsp;=&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.fn<br>
-&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;(&nbsp;@-&gt;&nbsp;)&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.typ&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>b&nbsp;fn&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;(<span class="keywordsign">'</span>a&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>b)&nbsp;fn<br>
-&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;returning&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.typ&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;fn<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;(&nbsp;@-&gt;&nbsp;)&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;typ&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>b&nbsp;fn&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;(<span class="keywordsign">'</span>a&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>b)&nbsp;fn<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;returning&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;typ&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;fn<br>
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;static_funptr&nbsp;=&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.static_funptr<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;static_funptr&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;fn&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.static_funptr&nbsp;typ<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;(&nbsp;*:*&nbsp;)&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="keywordsign">'</span>s,&nbsp;[&nbsp;<span class="keywordsign">`</span><span class="constructor">Struct</span>&nbsp;])&nbsp;<span class="constructor">Ctypes</span>.structured&nbsp;typ&nbsp;<span class="keywordsign">-&gt;</span><br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">'</span>a&nbsp;typ&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;(<span class="keywordsign">'</span>a,&nbsp;(<span class="keywordsign">'</span>s,&nbsp;[&nbsp;<span class="keywordsign">`</span><span class="constructor">Struct</span>&nbsp;])&nbsp;<span class="constructor">Ctypes</span>.structured)&nbsp;<span class="constructor">Ctypes</span>.field<br>
@@ -143,6 +151,8 @@
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;ptr_compare&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes</span>.ptr&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes</span>.ptr&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;int<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;reference_type&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes</span>.ptr&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;typ<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;ptr_of_raw_address&nbsp;:&nbsp;nativeint&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit&nbsp;<span class="constructor">Ctypes</span>.ptr<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;funptr_of_raw_address&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;nativeint&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;(unit&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit)&nbsp;<span class="constructor">Ctypes_static</span>.static_funptr<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;raw_address_of_ptr&nbsp;:&nbsp;unit&nbsp;<span class="constructor">Ctypes</span>.ptr&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;nativeint<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;string_from_ptr&nbsp;:&nbsp;char&nbsp;<span class="constructor">Ctypes</span>.ptr&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;length:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;string<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;ocaml_string_start&nbsp;:&nbsp;string&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;string&nbsp;<span class="constructor">Ctypes</span>.ocaml<br>
@@ -200,8 +210,16 @@
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="keywordsign">'</span>a,&nbsp;<span class="keywordsign">'</span>b)&nbsp;<span class="constructor">Ctypes</span>.structured&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;(<span class="keywordsign">'</span>a,&nbsp;<span class="keywordsign">'</span>b)&nbsp;<span class="constructor">Ctypes</span>.structured&nbsp;<span class="constructor">Ctypes</span>.ptr<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;coerce&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;typ&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>b&nbsp;typ&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>b<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;coerce_fn&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;fn&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>b&nbsp;fn&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>b<br>
+&nbsp;&nbsp;<span class="keyword">module</span>&nbsp;<span class="constructor">Root</span>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">sig</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;create&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit&nbsp;<span class="constructor">Ctypes</span>.ptr<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;get&nbsp;:&nbsp;unit&nbsp;<span class="constructor">Ctypes</span>.ptr&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;set&nbsp;:&nbsp;unit&nbsp;<span class="constructor">Ctypes</span>.ptr&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;release&nbsp;:&nbsp;unit&nbsp;<span class="constructor">Ctypes</span>.ptr&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">end</span><br>
 &nbsp;&nbsp;<span class="keyword">exception</span>&nbsp;<span class="constructor">Unsupported</span>&nbsp;<span class="keyword">of</span>&nbsp;string<br>
 &nbsp;&nbsp;<span class="keyword">exception</span>&nbsp;<span class="constructor">ModifyingSealedType</span>&nbsp;<span class="keyword">of</span>&nbsp;string<br>
 &nbsp;&nbsp;<span class="keyword">exception</span>&nbsp;<span class="constructor">IncompleteType</span><br>
-&nbsp;&nbsp;<span class="keyword">exception</span>&nbsp;<span class="constructor">Uncoercible</span><br>
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;uncoercible_info<br>
+&nbsp;&nbsp;<span class="keyword">exception</span>&nbsp;<span class="constructor">Uncoercible</span>&nbsp;<span class="keyword">of</span>&nbsp;<span class="constructor">Ctypes</span>.uncoercible_info<br>
 <span class="keyword">end</span></code></body></html>

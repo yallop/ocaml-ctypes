@@ -26,16 +26,24 @@
 </head>
 <body>
 <code class="code"><span class="keyword">sig</span><br>
+&nbsp;&nbsp;<span class="keyword">module</span>&nbsp;<span class="constructor">Dev</span>&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.<span class="constructor">S</span><br>
+&nbsp;&nbsp;<span class="keyword">module</span>&nbsp;<span class="constructor">Ino</span>&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.<span class="constructor">S</span><br>
+&nbsp;&nbsp;<span class="keyword">module</span>&nbsp;<span class="constructor">Mode</span>&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.<span class="constructor">S</span><br>
+&nbsp;&nbsp;<span class="keyword">module</span>&nbsp;<span class="constructor">Nlink</span>&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.<span class="constructor">S</span><br>
+&nbsp;&nbsp;<span class="keyword">module</span>&nbsp;<span class="constructor">Off</span>&nbsp;:&nbsp;<span class="constructor">Signed</span>.<span class="constructor">S</span><br>
+&nbsp;&nbsp;<span class="keyword">module</span>&nbsp;<span class="constructor">Pid</span>&nbsp;:&nbsp;<span class="constructor">Signed</span>.<span class="constructor">S</span><br>
+&nbsp;&nbsp;<span class="keyword">module</span>&nbsp;<span class="constructor">Ssize</span>&nbsp;:&nbsp;<span class="constructor">Signed</span>.<span class="constructor">S</span><br>
+&nbsp;&nbsp;<span class="keyword">module</span>&nbsp;<span class="constructor">Time</span>&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.<span class="constructor">S</span><br>
 &nbsp;&nbsp;<span class="keyword">type</span>&nbsp;clock_t<br>
-&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;dev_t<br>
-&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;ino_t<br>
-&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;mode_t<br>
-&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;nlink_t<br>
-&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;off_t<br>
-&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;pid_t<br>
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;dev_t&nbsp;=&nbsp;<span class="constructor">Dev</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;ino_t&nbsp;=&nbsp;<span class="constructor">Ino</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;mode_t&nbsp;=&nbsp;<span class="constructor">Mode</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;nlink_t&nbsp;=&nbsp;<span class="constructor">Nlink</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;off_t&nbsp;=&nbsp;<span class="constructor">Off</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;pid_t&nbsp;=&nbsp;<span class="constructor">Pid</span>.t<br>
 &nbsp;&nbsp;<span class="keyword">type</span>&nbsp;size_t&nbsp;=&nbsp;<span class="constructor">Unsigned</span>.size_t<br>
-&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;ssize_t<br>
-&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;time_t<br>
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;ssize_t&nbsp;=&nbsp;<span class="constructor">Ssize</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;time_t&nbsp;=&nbsp;<span class="constructor">Time</span>.t<br>
 &nbsp;&nbsp;<span class="keyword">type</span>&nbsp;useconds_t<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;clock_t&nbsp;:&nbsp;<span class="constructor">PosixTypes</span>.clock_t&nbsp;<span class="constructor">Ctypes</span>.typ<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;dev_t&nbsp;:&nbsp;<span class="constructor">PosixTypes</span>.dev_t&nbsp;<span class="constructor">Ctypes</span>.typ<br>

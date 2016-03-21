@@ -104,7 +104,7 @@ Construct a function pointer type from a function type.
     <code class="code">false</code>.<br>
 </div>
 
-<pre><span id="VALfunptr_opt"><span class="keyword">val</span> funptr_opt</span> : <code class="type">?abi:<a href="Libffi_abi.html#TYPEabi">Libffi_abi.abi</a> -> ('a -> 'b) Ctypes.fn -> ('a -> 'b) option Ctypes.typ</code></pre><div class="info ">
+<pre><span id="VALfunptr_opt"><span class="keyword">val</span> funptr_opt</span> : <code class="type">?abi:<a href="Libffi_abi.html#TYPEabi">Libffi_abi.abi</a> -><br>       ?name:string -><br>       ?check_errno:bool -><br>       ?runtime_lock:bool -> ('a -> 'b) Ctypes.fn -> ('a -> 'b) option Ctypes.typ</code></pre><div class="info ">
 Construct a function pointer type from a function type.
 <p>
 

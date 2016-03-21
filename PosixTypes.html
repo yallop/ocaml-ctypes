@@ -47,36 +47,46 @@ Some POSIX types.<br>
 <br>
 Some POSIX types.<br>
 <br>
+Some POSIX types.<br>
+<br>
 <h2 id="2_POSIXarithmetictypes">POSIX arithmetic types</h2><br>
 
+<pre><span class="keyword">module</span> <a href="PosixTypes.Dev.html">Dev</a>: <code class="type"><a href="Unsigned.S.html">Unsigned.S</a></code><code class="type"> </code></pre>
+<pre><span class="keyword">module</span> <a href="PosixTypes.Ino.html">Ino</a>: <code class="type"><a href="Unsigned.S.html">Unsigned.S</a></code><code class="type"> </code></pre>
+<pre><span class="keyword">module</span> <a href="PosixTypes.Mode.html">Mode</a>: <code class="type"><a href="Unsigned.S.html">Unsigned.S</a></code><code class="type"> </code></pre>
+<pre><span class="keyword">module</span> <a href="PosixTypes.Nlink.html">Nlink</a>: <code class="type"><a href="Unsigned.S.html">Unsigned.S</a></code><code class="type"> </code></pre>
+<pre><span class="keyword">module</span> <a href="PosixTypes.Off.html">Off</a>: <code class="type"><a href="Signed.S.html">Signed.S</a></code><code class="type"> </code></pre>
+<pre><span class="keyword">module</span> <a href="PosixTypes.Pid.html">Pid</a>: <code class="type"><a href="Signed.S.html">Signed.S</a></code><code class="type"> </code></pre>
+<pre><span class="keyword">module</span> <a href="PosixTypes.Ssize.html">Ssize</a>: <code class="type"><a href="Signed.S.html">Signed.S</a></code><code class="type"> </code></pre>
+<pre><span class="keyword">module</span> <a href="PosixTypes.Time.html">Time</a>: <code class="type"><a href="Unsigned.S.html">Unsigned.S</a></code><code class="type"> </code></pre>
 <pre><span id="TYPEclock_t"><span class="keyword">type</span> <code class="type"></code>clock_t</span> </pre>
 
 
-<pre><span id="TYPEdev_t"><span class="keyword">type</span> <code class="type"></code>dev_t</span> </pre>
+<pre><span id="TYPEdev_t"><span class="keyword">type</span> <code class="type"></code>dev_t</span> = <code class="type">Dev.t</code> </pre>
 
 
-<pre><span id="TYPEino_t"><span class="keyword">type</span> <code class="type"></code>ino_t</span> </pre>
+<pre><span id="TYPEino_t"><span class="keyword">type</span> <code class="type"></code>ino_t</span> = <code class="type">Ino.t</code> </pre>
 
 
-<pre><span id="TYPEmode_t"><span class="keyword">type</span> <code class="type"></code>mode_t</span> </pre>
+<pre><span id="TYPEmode_t"><span class="keyword">type</span> <code class="type"></code>mode_t</span> = <code class="type">Mode.t</code> </pre>
 
 
-<pre><span id="TYPEnlink_t"><span class="keyword">type</span> <code class="type"></code>nlink_t</span> </pre>
+<pre><span id="TYPEnlink_t"><span class="keyword">type</span> <code class="type"></code>nlink_t</span> = <code class="type">Nlink.t</code> </pre>
 
 
-<pre><span id="TYPEoff_t"><span class="keyword">type</span> <code class="type"></code>off_t</span> </pre>
+<pre><span id="TYPEoff_t"><span class="keyword">type</span> <code class="type"></code>off_t</span> = <code class="type">Off.t</code> </pre>
 
 
-<pre><span id="TYPEpid_t"><span class="keyword">type</span> <code class="type"></code>pid_t</span> </pre>
+<pre><span id="TYPEpid_t"><span class="keyword">type</span> <code class="type"></code>pid_t</span> = <code class="type">Pid.t</code> </pre>
 
 
 <pre><span id="TYPEsize_t"><span class="keyword">type</span> <code class="type"></code>size_t</span> = <code class="type"><a href="Unsigned.html#TYPEsize_t">Unsigned.size_t</a></code> </pre>
 
 
-<pre><span id="TYPEssize_t"><span class="keyword">type</span> <code class="type"></code>ssize_t</span> </pre>
+<pre><span id="TYPEssize_t"><span class="keyword">type</span> <code class="type"></code>ssize_t</span> = <code class="type">Ssize.t</code> </pre>
 
 
-<pre><span id="TYPEtime_t"><span class="keyword">type</span> <code class="type"></code>time_t</span> </pre>
+<pre><span id="TYPEtime_t"><span class="keyword">type</span> <code class="type"></code>time_t</span> = <code class="type">Time.t</code> </pre>
 
 
 <pre><span id="TYPEuseconds_t"><span class="keyword">type</span> <code class="type"></code>useconds_t</span> </pre>

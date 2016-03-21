@@ -162,49 +162,56 @@
 <td align="left" valign="top" >
 <code><span class="keyword">|</span></code></td>
 <td align="left" valign="top" >
-<code><span id="TYPEELTtyp.Struct"><span class="constructor">Struct</span></span> <span class="keyword">:</span> <code class="type">'a1 <a href="Ctypes_static.html#TYPEstructure_type">structure_type</a></code> <span class="keyword">-></span> <code class="type">'a1 <a href="Ctypes_static.html#TYPEstructure">structure</a> <a href="Ctypes_static.html#TYPEtyp">typ</a></code></code></td>
+<code><span id="TYPEELTtyp.Funptr"><span class="constructor">Funptr</span></span> <span class="keyword">:</span> <code class="type">'a1 <a href="Ctypes_static.html#TYPEfn">fn</a></code> <span class="keyword">-></span> <code class="type">'a1 <a href="Ctypes_static.html#TYPEstatic_funptr">static_funptr</a> <a href="Ctypes_static.html#TYPEtyp">typ</a></code></code></td>
 
 </tr>
 <tr>
 <td align="left" valign="top" >
 <code><span class="keyword">|</span></code></td>
 <td align="left" valign="top" >
-<code><span id="TYPEELTtyp.Union"><span class="constructor">Union</span></span> <span class="keyword">:</span> <code class="type">'a2 <a href="Ctypes_static.html#TYPEunion_type">union_type</a></code> <span class="keyword">-></span> <code class="type">'a2 <a href="Ctypes_static.html#TYPEunion">union</a> <a href="Ctypes_static.html#TYPEtyp">typ</a></code></code></td>
+<code><span id="TYPEELTtyp.Struct"><span class="constructor">Struct</span></span> <span class="keyword">:</span> <code class="type">'a2 <a href="Ctypes_static.html#TYPEstructure_type">structure_type</a></code> <span class="keyword">-></span> <code class="type">'a2 <a href="Ctypes_static.html#TYPEstructure">structure</a> <a href="Ctypes_static.html#TYPEtyp">typ</a></code></code></td>
 
 </tr>
 <tr>
 <td align="left" valign="top" >
 <code><span class="keyword">|</span></code></td>
 <td align="left" valign="top" >
-<code><span id="TYPEELTtyp.Abstract"><span class="constructor">Abstract</span></span> <span class="keyword">:</span> <code class="type"><a href="Ctypes_static.html#TYPEabstract_type">abstract_type</a></code> <span class="keyword">-></span> <code class="type">'a3 <a href="Ctypes_static.html#TYPEabstract">abstract</a> <a href="Ctypes_static.html#TYPEtyp">typ</a></code></code></td>
+<code><span id="TYPEELTtyp.Union"><span class="constructor">Union</span></span> <span class="keyword">:</span> <code class="type">'a3 <a href="Ctypes_static.html#TYPEunion_type">union_type</a></code> <span class="keyword">-></span> <code class="type">'a3 <a href="Ctypes_static.html#TYPEunion">union</a> <a href="Ctypes_static.html#TYPEtyp">typ</a></code></code></td>
 
 </tr>
 <tr>
 <td align="left" valign="top" >
 <code><span class="keyword">|</span></code></td>
 <td align="left" valign="top" >
-<code><span id="TYPEELTtyp.View"><span class="constructor">View</span></span> <span class="keyword">:</span> <code class="type">('a4, 'b) <a href="Ctypes_static.html#TYPEview">view</a></code> <span class="keyword">-></span> <code class="type">'a4 <a href="Ctypes_static.html#TYPEtyp">typ</a></code></code></td>
+<code><span id="TYPEELTtyp.Abstract"><span class="constructor">Abstract</span></span> <span class="keyword">:</span> <code class="type"><a href="Ctypes_static.html#TYPEabstract_type">abstract_type</a></code> <span class="keyword">-></span> <code class="type">'a4 <a href="Ctypes_static.html#TYPEabstract">abstract</a> <a href="Ctypes_static.html#TYPEtyp">typ</a></code></code></td>
 
 </tr>
 <tr>
 <td align="left" valign="top" >
 <code><span class="keyword">|</span></code></td>
 <td align="left" valign="top" >
-<code><span id="TYPEELTtyp.Array"><span class="constructor">Array</span></span> <span class="keyword">:</span> <code class="type">'a5 <a href="Ctypes_static.html#TYPEtyp">typ</a> * int</code> <span class="keyword">-></span> <code class="type">'a5 <a href="Ctypes_static.html#TYPEcarray">carray</a> <a href="Ctypes_static.html#TYPEtyp">typ</a></code></code></td>
+<code><span id="TYPEELTtyp.View"><span class="constructor">View</span></span> <span class="keyword">:</span> <code class="type">('a5, 'b) <a href="Ctypes_static.html#TYPEview">view</a></code> <span class="keyword">-></span> <code class="type">'a5 <a href="Ctypes_static.html#TYPEtyp">typ</a></code></code></td>
 
 </tr>
 <tr>
 <td align="left" valign="top" >
 <code><span class="keyword">|</span></code></td>
 <td align="left" valign="top" >
-<code><span id="TYPEELTtyp.Bigarray"><span class="constructor">Bigarray</span></span> <span class="keyword">:</span> <code class="type">('c, 'a6) Ctypes_bigarray.t</code> <span class="keyword">-></span> <code class="type">'a6 <a href="Ctypes_static.html#TYPEtyp">typ</a></code></code></td>
+<code><span id="TYPEELTtyp.Array"><span class="constructor">Array</span></span> <span class="keyword">:</span> <code class="type">'a6 <a href="Ctypes_static.html#TYPEtyp">typ</a> * int</code> <span class="keyword">-></span> <code class="type">'a6 <a href="Ctypes_static.html#TYPEcarray">carray</a> <a href="Ctypes_static.html#TYPEtyp">typ</a></code></code></td>
 
 </tr>
 <tr>
 <td align="left" valign="top" >
 <code><span class="keyword">|</span></code></td>
 <td align="left" valign="top" >
-<code><span id="TYPEELTtyp.OCaml"><span class="constructor">OCaml</span></span> <span class="keyword">:</span> <code class="type">'a7 <a href="Ctypes_static.html#TYPEocaml_type">ocaml_type</a></code> <span class="keyword">-></span> <code class="type">'a7 <a href="Ctypes_static.html#TYPEocaml">ocaml</a> <a href="Ctypes_static.html#TYPEtyp">typ</a></code></code></td>
+<code><span id="TYPEELTtyp.Bigarray"><span class="constructor">Bigarray</span></span> <span class="keyword">:</span> <code class="type">('c, 'a7) Ctypes_bigarray.t</code> <span class="keyword">-></span> <code class="type">'a7 <a href="Ctypes_static.html#TYPEtyp">typ</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTtyp.OCaml"><span class="constructor">OCaml</span></span> <span class="keyword">:</span> <code class="type">'a8 <a href="Ctypes_static.html#TYPEocaml_type">ocaml_type</a></code> <span class="keyword">-></span> <code class="type">'a8 <a href="Ctypes_static.html#TYPEocaml">ocaml</a> <a href="Ctypes_static.html#TYPEtyp">typ</a></code></code></td>
 
 </tr></table>
 
@@ -241,13 +248,13 @@
 
 
 
-<pre><span id="TYPEunion"><span class="keyword">type</span> <code class="type">'a</code> union</span> = <code class="type">('a, [ `Union ]) structured</code> </pre>
+<pre><span id="TYPEunion"><span class="keyword">type</span> <code class="type">'a</code> union</span> = <code class="type">('a, [ `Union ]) <a href="Ctypes_static.html#TYPEstructured">structured</a></code> </pre>
 
 
-<pre><span id="TYPEstructure"><span class="keyword">type</span> <code class="type">'a</code> structure</span> = <code class="type">('a, [ `Struct ]) structured</code> </pre>
+<pre><span id="TYPEstructure"><span class="keyword">type</span> <code class="type">'a</code> structure</span> = <code class="type">('a, [ `Struct ]) <a href="Ctypes_static.html#TYPEstructured">structured</a></code> </pre>
 
 
-<pre><span id="TYPEabstract"><span class="keyword">type</span> <code class="type">'a</code> abstract</span> = <code class="type">('a, [ `Abstract ]) structured</code> </pre>
+<pre><span id="TYPEabstract"><span class="keyword">type</span> <code class="type">'a</code> abstract</span> = <code class="type">('a, [ `Abstract ]) <a href="Ctypes_static.html#TYPEstructured">structured</a></code> </pre>
 
 
 <pre><code><span id="TYPEpointer"><span class="keyword">type</span> <code class="type">('_, '_)</code> pointer</span> = </code></pre><table class="typetable">
@@ -268,10 +275,21 @@
 
 
 
-<pre><span id="TYPEptr"><span class="keyword">type</span> <code class="type">'a</code> ptr</span> = <code class="type">('a, [ `C ]) pointer</code> </pre>
+<pre><span id="TYPEptr"><span class="keyword">type</span> <code class="type">'a</code> ptr</span> = <code class="type">('a, [ `C ]) <a href="Ctypes_static.html#TYPEpointer">pointer</a></code> </pre>
 
 
-<pre><span id="TYPEocaml"><span class="keyword">type</span> <code class="type">'a</code> ocaml</span> = <code class="type">('a, [ `OCaml ]) pointer</code> </pre>
+<pre><span id="TYPEocaml"><span class="keyword">type</span> <code class="type">'a</code> ocaml</span> = <code class="type">('a, [ `OCaml ]) <a href="Ctypes_static.html#TYPEpointer">pointer</a></code> </pre>
+
+
+<pre><code><span id="TYPEstatic_funptr"><span class="keyword">type</span> <code class="type">'a</code> static_funptr</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTstatic_funptr.Static_funptr"><span class="constructor">Static_funptr</span></span> <span class="keyword">of</span> <code class="type">'a <a href="Ctypes_static.html#TYPEfn">fn</a> Ctypes_ptr.Fat.t</code></code></td>
+
+</tr></table>
+
 
 
 <pre><code><span id="TYPEview"><span class="keyword">type</span> <code class="type">('a, 'b)</code> view</span> = {</code></pre><table class="typetable">
@@ -403,6 +421,24 @@
 
 
 
+<pre><code><span id="TYPEfn"><span class="keyword">type</span> <code class="type">'_</code> fn</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTfn.Returns"><span class="constructor">Returns</span></span> <span class="keyword">:</span> <code class="type">'a <a href="Ctypes_static.html#TYPEtyp">typ</a></code> <span class="keyword">-></span> <code class="type">'a <a href="Ctypes_static.html#TYPEfn">fn</a></code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTfn.Function"><span class="constructor">Function</span></span> <span class="keyword">:</span> <code class="type">'a0 <a href="Ctypes_static.html#TYPEtyp">typ</a> * 'b <a href="Ctypes_static.html#TYPEfn">fn</a></code> <span class="keyword">-></span> <code class="type">('a0 -> 'b) <a href="Ctypes_static.html#TYPEfn">fn</a></code></code></td>
+
+</tr></table>
+
+
+
 <pre><code><span id="TYPEbigarray_class"><span class="keyword">type</span> <code class="type">'_</code> bigarray_class</span> = </code></pre><table class="typetable">
 <tr>
 <td align="left" valign="top" >
@@ -430,24 +466,6 @@
 <code><span class="keyword">|</span></code></td>
 <td align="left" valign="top" >
 <code><span id="TYPEELTbigarray_class.Array3"><span class="constructor">Array3</span></span> <span class="keyword">:</span> <code class="type">< ba_repr : 'b2; bigarray : ('a2, 'b2, Bigarray.c_layout) Bigarray.Array3.t;<br>         carray : 'a2 <a href="Ctypes_static.html#TYPEcarray">carray</a> <a href="Ctypes_static.html#TYPEcarray">carray</a> <a href="Ctypes_static.html#TYPEcarray">carray</a>;<br>         dims : int * int * int; element : 'a2 ><br>       <a href="Ctypes_static.html#TYPEbigarray_class">bigarray_class</a></code></code></td>
-
-</tr></table>
-
-
-
-<pre><code><span id="TYPEfn"><span class="keyword">type</span> <code class="type">'_</code> fn</span> = </code></pre><table class="typetable">
-<tr>
-<td align="left" valign="top" >
-<code><span class="keyword">|</span></code></td>
-<td align="left" valign="top" >
-<code><span id="TYPEELTfn.Returns"><span class="constructor">Returns</span></span> <span class="keyword">:</span> <code class="type">'a <a href="Ctypes_static.html#TYPEtyp">typ</a></code> <span class="keyword">-></span> <code class="type">'a <a href="Ctypes_static.html#TYPEfn">fn</a></code></code></td>
-
-</tr>
-<tr>
-<td align="left" valign="top" >
-<code><span class="keyword">|</span></code></td>
-<td align="left" valign="top" >
-<code><span id="TYPEELTfn.Function"><span class="constructor">Function</span></span> <span class="keyword">:</span> <code class="type">'a0 <a href="Ctypes_static.html#TYPEtyp">typ</a> * 'b <a href="Ctypes_static.html#TYPEfn">fn</a></code> <span class="keyword">-></span> <code class="type">('a0 -> 'b) <a href="Ctypes_static.html#TYPEfn">fn</a></code></code></td>
 
 </tr></table>
 
@@ -506,6 +524,7 @@
 <pre><span id="VALtypedef"><span class="keyword">val</span> typedef</span> : <code class="type">'a <a href="Ctypes_static.html#TYPEtyp">typ</a> -> string -> 'a <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
 <pre><span id="VALbigarray"><span class="keyword">val</span> bigarray</span> : <code class="type">< ba_repr : 'c; bigarray : 'd; carray : 'e; dims : 'b; element : 'a ><br>       <a href="Ctypes_static.html#TYPEbigarray_class">bigarray_class</a> -><br>       'b -> ('a, 'c) Bigarray.kind -> 'd <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
 <pre><span id="VALreturning"><span class="keyword">val</span> returning</span> : <code class="type">'a <a href="Ctypes_static.html#TYPEtyp">typ</a> -> 'a <a href="Ctypes_static.html#TYPEfn">fn</a></code></pre>
+<pre><span id="VALstatic_funptr"><span class="keyword">val</span> static_funptr</span> : <code class="type">'a <a href="Ctypes_static.html#TYPEfn">fn</a> -> 'a <a href="Ctypes_static.html#TYPEstatic_funptr">static_funptr</a> <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
 <pre><span id="VALstructure"><span class="keyword">val</span> structure</span> : <code class="type">string -> 'a <a href="Ctypes_static.html#TYPEstructure">structure</a> <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
 <pre><span id="VALunion"><span class="keyword">val</span> union</span> : <code class="type">string -> 'a <a href="Ctypes_static.html#TYPEunion">union</a> <a href="Ctypes_static.html#TYPEtyp">typ</a></code></pre>
 <pre><span id="VALoffsetof"><span class="keyword">val</span> offsetof</span> : <code class="type">('a, 'b) <a href="Ctypes_static.html#TYPEfield">field</a> -> int</code></pre>

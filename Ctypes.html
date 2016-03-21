@@ -33,6 +33,7 @@
 <link title="Operations on types" rel="Subsection" href="#3_Operationsontypes">
 <link title="Pointer values" rel="Subsection" href="#3_Pointervalues">
 <link title="Array values" rel="Subsection" href="#3_Arrayvalues">
+<link title="Array values" rel="Subsection" href="#3_Arrayvalues">
 <link title="Struct and union values" rel="Subsection" href="#3_Structandunionvalues">
 <link title="Coercions" rel="Subsection" href="#3_Coercions">
 <title>Ctypes</title>
@@ -169,8 +170,6 @@ The type of abstract values.  The purpose of the <code class="code">abstract</co
 
 
 <pre><span class="keyword">include</span> <a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a></pre>
-
-<pre><span class="keyword">include</span> <a href="Ctypes_types.FUNCTION.html">Ctypes_types.FUNCTION</a></pre>
 <br>
 <h3 id="3_Operationsontypes">Operations on types</h3><br>
 
@@ -261,15 +260,21 @@ Conversion to <code class="code">void *</code>.<br>
 </div>
 
 <pre><span id="VALallocate"><span class="keyword">val</span> allocate</span> : <code class="type">?finalise:('a <a href="Ctypes.html#TYPEptr">ptr</a> -> unit) -> 'a typ -> 'a -> 'a <a href="Ctypes.html#TYPEptr">ptr</a></code></pre><div class="info ">
-<code class="code">allocate t v</code> allocates a fresh value of type <code class="code">t</code>, initialises it with
-    <code class="code">v</code> and returns its address.  The argument <code class="code">?finalise</code>, if present, will be
-    called just before the memory is freed.<br>
+<code class="code">allocate t v</code> allocates a fresh value of type <code class="code">t</code>, initialises it
+    with <code class="code">v</code> and returns its address.  The argument <code class="code">?finalise</code>, if
+    present, will be called just before the memory is freed.  The value
+    will be automatically freed after no references to the pointer
+    remain within the calling OCaml program.<br>
 </div>
 
 <pre><span id="VALallocate_n"><span class="keyword">val</span> allocate_n</span> : <code class="type">?finalise:('a <a href="Ctypes.html#TYPEptr">ptr</a> -> unit) -> 'a typ -> count:int -> 'a <a href="Ctypes.html#TYPEptr">ptr</a></code></pre><div class="info ">
-<code class="code">allocate_n t ~count:n</code> allocates a fresh array with element type <code class="code">t</code> and
-    length <code class="code">n</code>, and returns its address.  The argument <code class="code">?finalise</code>, if present,
-    will be called just before the memory is freed.<br>
+<code class="code">allocate_n t ~count:n</code> allocates a fresh array with element type
+    <code class="code">t</code> and length <code class="code">n</code>, and returns its address.  The argument
+    <code class="code">?finalise</code>, if present, will be called just before the memory is
+    freed.  The array will be automatically freed after no references
+    to the pointer remain within the calling OCaml program.  The
+    memory is allocated with libc's <code class="code">calloc</code> and is guaranteed to be
+    zero-filled.<br>
 </div>
 
 <pre><span id="VALptr_compare"><span class="keyword">val</span> ptr_compare</span> : <code class="type">'a <a href="Ctypes.html#TYPEptr">ptr</a> -> 'a <a href="Ctypes.html#TYPEptr">ptr</a> -> int</code></pre><div class="info ">
@@ -285,6 +290,10 @@ Retrieve the reference type of a pointer.<br>
 
 <pre><span id="VALptr_of_raw_address"><span class="keyword">val</span> ptr_of_raw_address</span> : <code class="type">nativeint -> unit <a href="Ctypes.html#TYPEptr">ptr</a></code></pre><div class="info ">
 Convert the numeric representation of an address to a pointer<br>
+</div>
+
+<pre><span id="VALfunptr_of_raw_address"><span class="keyword">val</span> funptr_of_raw_address</span> : <code class="type">nativeint -> (unit -> unit) <a href="Ctypes_static.html#TYPEstatic_funptr">Ctypes_static.static_funptr</a></code></pre><div class="info ">
+Convert the numeric representation of an address to a function pointer<br>
 </div>
 
 <pre><span id="VALraw_address_of_ptr"><span class="keyword">val</span> raw_address_of_ptr</span> : <code class="type">unit <a href="Ctypes.html#TYPEptr">ptr</a> -> nativeint</code></pre><div class="info ">
@@ -315,6 +324,8 @@ Convert the numeric representation of an address to a pointer<br>
 <code class="code">ocaml_bytes_start s</code> allows to pass a pointer to the contents of an OCaml
     byte array directly to a C function.<br>
 </div>
+<br>
+<h3 id="3_Arrayvalues">Array values</h3><br>
 <br>
 <h3 id="3_Arrayvalues">Array values</h3><br>
 <br>
@@ -406,7 +417,7 @@ Allocate a fresh, uninitialised structure or union value.  The argument
     The following coercions are currently supported:
 <p>
 <ul>
-<li>All pointer types are intercoercible.</li>
+<li>All function and object pointer types are intercoercible.</li>
 <li>Any type may be coerced to <code class="code">void</code></li>
 <li>There is a coercion between a <code class="code">view</code> and another type <code class="code">t</code> (in either
        direction) if there is a coercion between the representation type
@@ -444,6 +455,10 @@ Allocate a fresh, uninitialised structure or union value.  The argument
     ctypes may both add new types of coercion and restrict the existing
     coercions.<br>
 </div>
+
+<pre><span class="keyword">module</span> <a href="Ctypes.Root.html">Root</a>: <code class="code">sig</code> <a href="Ctypes.Root.html">..</a> <code class="code">end</code></pre><div class="info">
+Registration of OCaml values as roots
+</div>
 <br>
 <h2 id="2_Exceptions">Exceptions</h2><br>
 
@@ -477,7 +492,10 @@ An attempt was made to compute the size or alignment of an incomplete
     cannot be used as argument or return types.<br>
 </div>
 
-<pre><span id="EXCEPTIONUncoercible"><span class="keyword">exception</span> Uncoercible</span></pre>
+<pre><span id="TYPEuncoercible_info"><span class="keyword">type</span> <code class="type"></code>uncoercible_info</span> </pre>
+
+
+<pre><span id="EXCEPTIONUncoercible"><span class="keyword">exception</span> Uncoercible</span> <span class="keyword">of</span> <code class="type"><a href="Ctypes.html#TYPEuncoercible_info">uncoercible_info</a></code></pre>
 <div class="info ">
 An attempt was made to coerce between uncoercible types.<br>
 </div>

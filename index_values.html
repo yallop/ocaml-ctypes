@@ -81,7 +81,7 @@ Division.
 <code class="code">p &lt;-@ v</code> writes the value <code class="code">v</code> to the address <code class="code">p</code>.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_types.FUNCTION.html#VAL(@->)">(@-&gt;)</a> [<a href="Ctypes_types.FUNCTION.html">Ctypes_types.FUNCTION</a>]</td>
+<tr><td><a href="Ctypes_types.TYPE.html#VAL(@->)">(@-&gt;)</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
 <td><div class="info">
 Construct a function type from a type and an existing function type.
 </div>
@@ -167,14 +167,14 @@ Addition.
 <td></td></tr>
 <tr><td><a href="Ctypes.html#VALallocate">allocate</a> [<a href="Ctypes.html">Ctypes</a>]</td>
 <td><div class="info">
-<code class="code">allocate t v</code> allocates a fresh value of type <code class="code">t</code>, initialises it with
-    <code class="code">v</code> and returns its address.
+<code class="code">allocate t v</code> allocates a fresh value of type <code class="code">t</code>, initialises it
+    with <code class="code">v</code> and returns its address.
 </div>
 </td></tr>
 <tr><td><a href="Ctypes.html#VALallocate_n">allocate_n</a> [<a href="Ctypes.html">Ctypes</a>]</td>
 <td><div class="info">
-<code class="code">allocate_n t ~count:n</code> allocates a fresh array with element type <code class="code">t</code> and
-    length <code class="code">n</code>, and returns its address.
+<code class="code">allocate_n t ~count:n</code> allocates a fresh array with element type
+    <code class="code">t</code> and length <code class="code">n</code>, and returns its address.
 </div>
 </td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALarray">array</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
@@ -301,6 +301,12 @@ Value representing the C99 double-precision <code class="code">double complex</c
 <td></td></tr>
 <tr><td><a href="Cstubs_internals.html#VALcptr">cptr</a> [<a href="Cstubs_internals.html">Cstubs_internals</a>]</td>
 <td></td></tr>
+<tr><td><a href="Ctypes.Root.html#VALcreate">create</a> [<a href="Ctypes.Root.html">Ctypes.Root</a>]</td>
+<td><div class="info">
+<code class="code">create v</code> allocates storage for the address of the OCaml value <code class="code">v</code>,
+      registers the storage as a root, and returns its address.
+</div>
+</td></tr>
 <tr><td align="left"><br>D</td></tr>
 <tr><td><a href="Libffi_abi.html#VALdarwin">darwin</a> [<a href="Libffi_abi.html">Libffi_abi</a>]</td>
 <td></td></tr>
@@ -476,6 +482,8 @@ Pretty-print a C representation of the type to the specified formatter.
 <td></td></tr>
 <tr><td><a href="Ctypes_printers.html#VALformat_ushort">format_ushort</a> [<a href="Ctypes_printers.html">Ctypes_printers</a>]</td>
 <td></td></tr>
+<tr><td><a href="Cstubs_internals.html#VALfptr">fptr</a> [<a href="Cstubs_internals.html">Cstubs_internals</a>]</td>
+<td></td></tr>
 <tr><td><a href="Ctypes.CArray.html#VALfrom_ptr">from_ptr</a> [<a href="Ctypes.CArray.html">Ctypes.CArray</a>]</td>
 <td><div class="info">
 <code class="code">from_ptr p n</code> creates an <code class="code">n</code>-length array reference to the memory at
@@ -492,6 +500,11 @@ Conversion from <code class="code">void *</code>.
 Construct a function pointer type from a function type.
 </div>
 </td></tr>
+<tr><td><a href="Ctypes.html#VALfunptr_of_raw_address">funptr_of_raw_address</a> [<a href="Ctypes.html">Ctypes</a>]</td>
+<td><div class="info">
+Convert the numeric representation of an address to a function pointer
+</div>
+</td></tr>
 <tr><td><a href="Foreign.html#VALfunptr_opt">funptr_opt</a> [<a href="Foreign.html">Foreign</a>]</td>
 <td><div class="info">
 Construct a function pointer type from a function type.
@@ -503,6 +516,11 @@ Construct a function pointer type from a function type.
 <tr><td><a href="Ctypes.html#VALgenarray">genarray</a> [<a href="Ctypes.html">Ctypes</a>]</td>
 <td><div class="info">
 The class of <code class="code">Bigarray.Genarray.t</code> values
+</div>
+</td></tr>
+<tr><td><a href="Ctypes.Root.html#VALget">get</a> [<a href="Ctypes.Root.html">Ctypes.Root</a>]</td>
+<td><div class="info">
+<code class="code">get p</code> retrieves the OCaml value whose address is stored at <code class="code">p</code>.
 </div>
 </td></tr>
 <tr><td><a href="Ctypes.CArray.html#VALget">get</a> [<a href="Ctypes.CArray.html">Ctypes.CArray</a>]</td>
@@ -556,6 +574,11 @@ Value representing an 8-bit signed integer C type.
 <td></td></tr>
 <tr><td><a href="Cstubs_inverted.INTERNAL.html#VALinternal">internal</a> [<a href="Cstubs_inverted.INTERNAL.html">Cstubs_inverted.INTERNAL</a>]</td>
 <td></td></tr>
+<tr><td><a href="Ctypes_types.TYPE.html#VALintptr_t">intptr_t</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
+<td><div class="info">
+Value representing the C type <code class="code">intptr_t</code>.
+</div>
+</td></tr>
 <tr><td align="left"><br>L</td></tr>
 <tr><td><a href="Ctypes.CArray.html#VALlength">length</a> [<a href="Ctypes.CArray.html">Ctypes.CArray</a>]</td>
 <td><div class="info">
@@ -619,6 +642,8 @@ Value representing the C type (<code class="code">signed</code>) <code class="co
 Allocate a fresh, uninitialised structure or union value.
 </div>
 </td></tr>
+<tr><td><a href="Cstubs_internals.html#VALmake_fun_ptr">make_fun_ptr</a> [<a href="Cstubs_internals.html">Cstubs_internals</a>]</td>
+<td></td></tr>
 <tr><td><a href="Cstubs_internals.html#VALmake_ptr">make_ptr</a> [<a href="Cstubs_internals.html">Cstubs_internals</a>]</td>
 <td></td></tr>
 <tr><td><a href="Cstubs_internals.html#VALmake_structured">make_structured</a> [<a href="Cstubs_internals.html">Cstubs_internals</a>]</td>
@@ -799,6 +824,11 @@ Construct a pointer type from an existing type (called the <i>reference
       type</i>).
 </div>
 </td></tr>
+<tr><td><a href="Ctypes_types.TYPE.html#VALptrdiff_t">ptrdiff_t</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
+<td><div class="info">
+Value representing the C type <code class="code">ptrdiff_t</code>.
+</div>
+</td></tr>
 <tr><td align="left"><br>R</td></tr>
 <tr><td><a href="Ctypes.html#VALraw_address_of_ptr">raw_address_of_ptr</a> [<a href="Ctypes.html">Ctypes</a>]</td>
 <td><div class="info">
@@ -810,12 +840,17 @@ Construct a pointer type from an existing type (called the <i>reference
 Retrieve the reference type of a pointer.
 </div>
 </td></tr>
+<tr><td><a href="Ctypes.Root.html#VALrelease">release</a> [<a href="Ctypes.Root.html">Ctypes.Root</a>]</td>
+<td><div class="info">
+<code class="code">release p</code> unregsiters the root <code class="code">p</code>.
+</div>
+</td></tr>
 <tr><td><a href="Unsigned.S.html#VALrem">rem</a> [<a href="Unsigned.S.html">Unsigned.S</a>]</td>
 <td><div class="info">
 Integer remainder.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_types.FUNCTION.html#VALreturning">returning</a> [<a href="Ctypes_types.FUNCTION.html">Ctypes_types.FUNCTION</a>]</td>
+<tr><td><a href="Ctypes_types.TYPE.html#VALreturning">returning</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
 <td><div class="info">
 Give the return type of a C function.
 </div>
@@ -838,6 +873,11 @@ Value representing the C type <code class="code">signed char</code>.
 </td></tr>
 <tr><td><a href="Ctypes_structs.S.html#VALseal">seal</a> [<a href="Ctypes_structs.S.html">Ctypes_structs.S</a>]</td>
 <td></td></tr>
+<tr><td><a href="Ctypes.Root.html#VALset">set</a> [<a href="Ctypes.Root.html">Ctypes.Root</a>]</td>
+<td><div class="info">
+<code class="code">set p v</code> updates the OCaml value stored as a root at <code class="code">p</code>.
+</div>
+</td></tr>
 <tr><td><a href="Ctypes.CArray.html#VALset">set</a> [<a href="Ctypes.CArray.html">Ctypes.CArray</a>]</td>
 <td><div class="info">
 <code class="code">set a n v</code> overwrites the <code class="code">n</code>th element of the zero-indexed array <code class="code">a</code>
@@ -898,6 +938,14 @@ Value representing the C type <code class="code">size_t</code>, an alias for one
 Return the address of the first element of the given array.
 </div>
 </td></tr>
+<tr><td><a href="Ctypes_types.TYPE.html#VALstatic_funptr">static_funptr</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
+<td><div class="info">
+Construct a function pointer type from an existing function type
+      (called the <i>reference type</i>).
+</div>
+</td></tr>
+<tr><td><a href="Ctypes_static.html#VALstatic_funptr">static_funptr</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
+<td></td></tr>
 <tr><td><a href="Libffi_abi.html#VALstdcall">stdcall</a> [<a href="Libffi_abi.html">Libffi_abi</a>]</td>
 <td></td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALstring">string</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
@@ -1052,6 +1100,11 @@ Value representing an 8-bit unsigned integer C type.
 </td></tr>
 <tr><td><a href="Ctypes_static.html#VALuint8_t">uint8_t</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
 <td></td></tr>
+<tr><td><a href="Ctypes_types.TYPE.html#VALuintptr_t">uintptr_t</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
+<td><div class="info">
+Value representing the C type <code class="code">uintptr_t</code>.
+</div>
+</td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALullong">ullong</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
 <td><div class="info">
 Value representing the C type <code class="code">unsigned long long</code>.

@@ -41,6 +41,9 @@
 &nbsp;&nbsp;&nbsp;&nbsp;?runtime_lock:bool&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;(<span class="keywordsign">'</span>a&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>b)&nbsp;<span class="constructor">Ctypes</span>.fn&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;(<span class="keywordsign">'</span>a&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>b)&nbsp;<span class="constructor">Ctypes</span>.typ<br>
 &nbsp;&nbsp;<span class="keyword">val</span>&nbsp;funptr_opt&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;?abi:<span class="constructor">Libffi_abi</span>.abi&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;?name:string&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;?check_errno:bool&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;?runtime_lock:bool&nbsp;<span class="keywordsign">-&gt;</span><br>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="keywordsign">'</span>a&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>b)&nbsp;<span class="constructor">Ctypes</span>.fn&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;(<span class="keywordsign">'</span>a&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>b)&nbsp;option&nbsp;<span class="constructor">Ctypes</span>.typ<br>
 &nbsp;&nbsp;<span class="keyword">exception</span>&nbsp;<span class="constructor">CallToExpiredClosure</span><br>
 <span class="keyword">end</span></code></body></html>

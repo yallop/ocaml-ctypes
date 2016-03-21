@@ -41,6 +41,10 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;int16_t&nbsp;:&nbsp;int&nbsp;typ<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;int32_t&nbsp;:&nbsp;int32&nbsp;typ<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;int64_t&nbsp;:&nbsp;int64&nbsp;typ<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">module</span>&nbsp;<span class="constructor">Intptr</span>&nbsp;:&nbsp;<span class="constructor">Signed</span>.<span class="constructor">S</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;intptr_t&nbsp;:&nbsp;<span class="constructor">Intptr</span>.t&nbsp;typ<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">module</span>&nbsp;<span class="constructor">Ptrdiff</span>&nbsp;:&nbsp;<span class="constructor">Signed</span>.<span class="constructor">S</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;ptrdiff_t&nbsp;:&nbsp;<span class="constructor">Ptrdiff</span>.t&nbsp;typ<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;camlint&nbsp;:&nbsp;int&nbsp;typ<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;uchar&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.uchar&nbsp;typ<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;bool&nbsp;:&nbsp;bool&nbsp;typ<br>
@@ -53,6 +57,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;uint&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.uint&nbsp;typ<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;ulong&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.ulong&nbsp;typ<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;ullong&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.ullong&nbsp;typ<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">module</span>&nbsp;<span class="constructor">Uintptr</span>&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.<span class="constructor">S</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;uintptr_t&nbsp;:&nbsp;<span class="constructor">Uintptr</span>.t&nbsp;typ<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;float&nbsp;:&nbsp;float&nbsp;typ<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;double&nbsp;:&nbsp;float&nbsp;typ<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;complex32&nbsp;:&nbsp;<span class="constructor">Complex</span>.t&nbsp;typ<br>
@@ -87,6 +93,11 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name:string&nbsp;<span class="keywordsign">-&gt;</span><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;size:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;alignment:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.abstract&nbsp;typ<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;lift_typ&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.typ&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;typ<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;fn&nbsp;=&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.fn<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;(&nbsp;@-&gt;&nbsp;)&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;typ&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>b&nbsp;fn&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;(<span class="keywordsign">'</span>a&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>b)&nbsp;fn<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;returning&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;typ&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;fn<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;static_funptr&nbsp;=&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.static_funptr<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;static_funptr&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;fn&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.static_funptr&nbsp;typ<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;const<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;constant&nbsp;:&nbsp;string&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;typ&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Cstubs</span>.<span class="constructor">Types</span>.<span class="constructor">TYPE</span>.const<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;enum&nbsp;:<br>
