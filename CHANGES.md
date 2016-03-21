@@ -1,3 +1,58 @@
+## ctypes 0.5.0
+
+Thanks to Andreas Hauptmann (@fdopen), David Sheets (@dsheets), Etienne Millon (@emillon), Goswin von Brederlow (@mrvn), Leonid Rozenberg (@rleonid), @orbitz, Max Mouratov (@cakeplus), and Peter Zotov (@whitequark) for contributions to this release.
+
+### Features
+
+* Build and install `*.cmt` and `*.cmti` files.
+
+* Expose `time_t` as an unsigned value
+
+* Expose larger interfaces for POSIX types known to be integer types.
+
+* Add support for 1- and 2-byte unsigned integer typedefs.
+
+* Add support for 1-byte and 2-byte integer typedefs.
+
+* Add a `Signed.Int` module.
+
+* Expose more information in the `Uncoercible` exception.
+
+* `allocate_n` now defaults to zeroing its memory.
+
+* Add public root management interface.
+
+  NB: the interface is experimental and subject to change.
+
+* Look through views to add fields to structs and unions.
+
+* Support signed arithmetic operations for `ssize_t`.
+
+* Add support for `ptrdiff_t` as a typedef for a signed integer type.
+
+* Support `intptr_t` and `uintptr_t` as typedefs
+
+* Support coercions between object and function pointers.
+
+* Add public `funptr_of_raw_address` function.
+
+* Support `static_funptr` coercions
+
+* Add function pointers to the core type language
+
+  (See the `Ctypes_static.static_funptr` type, on which
+  `Foreign.funptr` and `Foreign.foreign` are now based.)
+
+* Better support for functions returning void with inverted stubs.
+
+* Add support for releasing runtime lock to Cstubs_inverted.
+
+### Bug fixes
+
+* Fix: inconsistent use of `caml_stat_*` functions
+
+* Fix: a memory leak in `ctypes_caml_roots_release`
+
 ## ctypes 0.4.2
 
 * Fix a bug involving access to local roots while the runtime lock was not held.
