@@ -43,6 +43,7 @@ The documentation and source distribution contain more complex examples, involvi
 * [Tutorial][tutorial]
 * [API documentation][apidoc]
 * [Mailing list][mailing-list]
+* [Type-safe C bindings using ocaml-ctypes and stub generation][sjb-cstubs-post] introduces the [Cstubs][cstubs] interface
 * [FAQ][faq]
 
 #### Build status:
@@ -58,3 +59,5 @@ Travis: [![Travis build Status](https://travis-ci.org/ocamllabs/ocaml-ctypes.svg
 [mailing-list]: http://lists.ocaml.org/listinfo/ctypes
 [faq]: https://github.com/ocamllabs/ocaml-ctypes/wiki/FAQ
 [mirage]: http://openmirage.org
+[sjb-cstubs-post]: http://simonjbeaumont.com/posts/ocaml-ctypes/
+[cstubs]: https://github.com/ocamllabs/ocaml-ctypes/blob/master/src/cstubs/cstubs.mli
