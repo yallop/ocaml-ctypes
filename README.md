@@ -2,7 +2,11 @@ ctypes is a library for binding to C libraries using pure OCaml.  The primary ai
 
 The core of ctypes is a set of combinators for describing the structure of C types -- numeric types, arrays, pointers, structs, unions and functions.  You can use these combinators to describe the types of the functions that you want to call, then bind directly to those functions -- all without writing or generating any C!
 
-For example, suppose you want to bind to the following C functions:
+[![Travis build Status](https://travis-ci.org/ocamllabs/ocaml-ctypes.svg?branch=master)](https://travis-ci.org/ocamllabs/ocaml-ctypes) [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/n5geenq8sinlptfv/branch/master?svg=true)](https://ci.appveyor.com/project/yallop/ocaml-ctypes/branch/master) 
+
+## Usage
+
+Suppose you want to bind to the following C functions:
 
 ```C
    int sigemptyset(sigset_t *set);
@@ -45,11 +49,6 @@ The documentation and source distribution contain more complex examples, involvi
 * [Mailing list][mailing-list]
 * [Type-safe C bindings using ocaml-ctypes and stub generation][sjb-cstubs-post] introduces the [Cstubs][cstubs] interface
 * [FAQ][faq]
-
-#### Build status:
-
-AppVeyor: [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/n5geenq8sinlptfv/branch/master?svg=true)](https://ci.appveyor.com/project/yallop/ocaml-ctypes/branch/master)  
-Travis: [![Travis build Status](https://travis-ci.org/ocamllabs/ocaml-ctypes.svg?branch=master)](https://travis-ci.org/ocamllabs/ocaml-ctypes)  
 
 [rwo-19]: https://realworldocaml.org/v1/en/html/foreign-function-interface.html
 [rwo]: http://realworldocaml.org/
