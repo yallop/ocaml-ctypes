@@ -17,33 +17,33 @@
 
 /* The order here must correspond to the constructor order in primitives.ml */
 enum ctypes_primitive {
-  Char,
-  Schar,
-  Uchar,
-  Bool,
-  Short,
-  Int,
-  Long,
-  Llong,
-  Ushort,
-  Uint,
-  Ulong,
-  Ullong,
-  Size_t,
-  Int8_t,
-  Int16_t,
-  Int32_t,
-  Int64_t,
-  Uint8_t,
-  Uint16_t,
-  Uint32_t,
-  Uint64_t,
-  Camlint,
-  Nativeint,
-  Float,
-  Double,
-  Complex32,
-  Complex64,
+  Ctypes_Char,
+  Ctypes_Schar,
+  Ctypes_Uchar,
+  Ctypes_Bool,
+  Ctypes_Short,
+  Ctypes_Int,
+  Ctypes_Long,
+  Ctypes_Llong,
+  Ctypes_Ushort,
+  Ctypes_Uint,
+  Ctypes_Ulong,
+  Ctypes_Ullong,
+  Ctypes_Size_t,
+  Ctypes_Int8_t,
+  Ctypes_Int16_t,
+  Ctypes_Int32_t,
+  Ctypes_Int64_t,
+  Ctypes_Uint8_t,
+  Ctypes_Uint16_t,
+  Ctypes_Uint32_t,
+  Ctypes_Uint64_t,
+  Ctypes_Camlint,
+  Ctypes_Nativeint,
+  Ctypes_Float,
+  Ctypes_Double,
+  Ctypes_Complex32,
+  Ctypes_Complex64,
 };
 
 /* short is at least 16 bits. */
@@ -115,16 +115,16 @@ enum ctypes_primitive {
 
 /* Detection of arithmetic types */
 enum ctypes_arithmetic_type {
-  Ctypes_Int8,
-  Ctypes_Int16,
-  Ctypes_Int32,
-  Ctypes_Int64,
-  Ctypes_Uint8,
-  Ctypes_Uint16,
-  Ctypes_Uint32,
-  Ctypes_Uint64,
-  Ctypes_Float,
-  Ctypes_Double
+  Ctypes_arith_Int8,
+  Ctypes_arith_Int16,
+  Ctypes_arith_Int32,
+  Ctypes_arith_Int64,
+  Ctypes_arith_Uint8,
+  Ctypes_arith_Uint16,
+  Ctypes_arith_Uint32,
+  Ctypes_arith_Uint64,
+  Ctypes_arith_Float,
+  Ctypes_arith_Double
 };
 
 #define CTYPES_FLOATING_FLAG_BIT 15
@@ -147,16 +147,16 @@ enum ctypes_arithmetic_type ctypes_classify_arithmetic_type(size_t typeinfo)
 {
   switch (typeinfo)
   {
-  case CTYPES_FLOATING | sizeof(float):    return Ctypes_Float;
-  case CTYPES_FLOATING | sizeof(double):   return Ctypes_Double;
-  case CTYPES_UNSIGNED | sizeof(uint8_t):  return Ctypes_Uint8;
-  case CTYPES_UNSIGNED | sizeof(uint16_t): return Ctypes_Uint16;
-  case CTYPES_UNSIGNED | sizeof(uint32_t): return Ctypes_Uint32;
-  case CTYPES_UNSIGNED | sizeof(uint64_t): return Ctypes_Uint64;
-  case                   sizeof(int8_t):   return Ctypes_Int8;
-  case                   sizeof(int16_t):  return Ctypes_Int16;
-  case                   sizeof(int32_t):  return Ctypes_Int32;
-  case                   sizeof(int64_t):  return Ctypes_Int64;
+  case CTYPES_FLOATING | sizeof(float):    return Ctypes_arith_Float;
+  case CTYPES_FLOATING | sizeof(double):   return Ctypes_arith_Double;
+  case CTYPES_UNSIGNED | sizeof(uint8_t):  return Ctypes_arith_Uint8;
+  case CTYPES_UNSIGNED | sizeof(uint16_t): return Ctypes_arith_Uint16;
+  case CTYPES_UNSIGNED | sizeof(uint32_t): return Ctypes_arith_Uint32;
+  case CTYPES_UNSIGNED | sizeof(uint64_t): return Ctypes_arith_Uint64;
+  case                   sizeof(int8_t):   return Ctypes_arith_Int8;
+  case                   sizeof(int16_t):  return Ctypes_arith_Int16;
+  case                   sizeof(int32_t):  return Ctypes_arith_Int32;
+  case                   sizeof(int64_t):  return Ctypes_arith_Int64;
   default: assert(0);
   }
 }
@@ -166,16 +166,16 @@ const char *ctypes_arithmetic_type_name(enum ctypes_arithmetic_type t)
 {
   switch (t)
   {
-  case Ctypes_Int8:   return "Int8";
-  case Ctypes_Int16:  return "Int16";
-  case Ctypes_Int32:  return "Int32";
-  case Ctypes_Int64:  return "Int64";
-  case Ctypes_Uint8:  return "Uint8";
-  case Ctypes_Uint16: return "Uint16";
-  case Ctypes_Uint32: return "Uint32";
-  case Ctypes_Uint64: return "Uint64";
-  case Ctypes_Float:  return "Float";
-  case Ctypes_Double: return "Double";
+  case Ctypes_arith_Int8:   return "Int8";
+  case Ctypes_arith_Int16:  return "Int16";
+  case Ctypes_arith_Int32:  return "Int32";
+  case Ctypes_arith_Int64:  return "Int64";
+  case Ctypes_arith_Uint8:  return "Uint8";
+  case Ctypes_arith_Uint16: return "Uint16";
+  case Ctypes_arith_Uint32: return "Uint32";
+  case Ctypes_arith_Uint64: return "Uint64";
+  case Ctypes_arith_Float:  return "Float";
+  case Ctypes_arith_Double: return "Double";
   default: assert(0);
   }
 }
