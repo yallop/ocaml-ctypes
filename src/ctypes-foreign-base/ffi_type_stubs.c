@@ -66,33 +66,33 @@ value ctypes_primitive_ffitype(value prim)
 {
   void *ft = NULL;
   switch ((enum ctypes_primitive)Int_val(prim)) {
-    case Char:      ft = &ctypes_ffi_type_char;    break; /* Char */
-    case Schar:     ft = &ffi_type_schar;          break; /* Schar */
-    case Uchar:     ft = &ffi_type_uchar;          break; /* Uchar */
-    case Bool:      ft = bool_ffi_type();          break;
-    case Short:     ft = &ffi_type_sshort;         break; /* Short */
-    case Int:       ft = &ffi_type_sint;           break; /* Int */
-    case Long:      ft = &ffi_type_slong;          break; /* Long */
-    case Llong:     ft = &ctypes_ffi_type_sllong;  break; /* Llong */
-    case Ushort:    ft = &ffi_type_ushort;         break; /* Ushort */
-    case Uint:      ft = &ffi_type_ulong;          break; /* Uint */
-    case Ulong:     ft = &ffi_type_ulong;          break; /* Ulong */
-    case Ullong:    ft = &ctypes_ffi_type_ullong;  break; /* Ullong */
-    case Size_t:    ft = &ctypes_ffi_type_size_t;  break; /* Size */
-    case Int8_t:    ft = &ffi_type_sint8;          break; /* Int8 */
-    case Int16_t:   ft = &ffi_type_sint16;         break; /* Int16 */
-    case Int32_t:   ft = &ffi_type_sint32;         break; /* Int32 */
-    case Int64_t:   ft = &ffi_type_sint64;         break; /* Int64 */
-    case Uint8_t:   ft = &ffi_type_uint8;          break; /* Uint8 */
-    case Uint16_t:  ft = &ffi_type_uint16;         break; /* Uint16 */
-    case Uint32_t:  ft = &ffi_type_uint32;         break; /* Uint32 */
-    case Uint64_t:  ft = &ffi_type_uint64;         break; /* Uint64 */
-    case Camlint:   ft = &ctypes_ffi_type_camlint; break; /* Camlint */
-    case Nativeint: ft = &ctypes_ffi_type_camlint; break; /* Nativeint */
-    case Float:     ft = &ffi_type_float;          break; /* Float */
-    case Double:    ft = &ffi_type_double;         break; /* Double */
-    case Complex32: ft = NULL;                     break; /* Complex32 */
-    case Complex64: ft = NULL;                     break; /* Complex64 */
+    case Ctypes_Char:      ft = &ctypes_ffi_type_char;    break; /* Char */
+    case Ctypes_Schar:     ft = &ffi_type_schar;          break; /* Schar */
+    case Ctypes_Uchar:     ft = &ffi_type_uchar;          break; /* Uchar */
+    case Ctypes_Bool:      ft = bool_ffi_type();          break;
+    case Ctypes_Short:     ft = &ffi_type_sshort;         break; /* Short */
+    case Ctypes_Int:       ft = &ffi_type_sint;           break; /* Int */
+    case Ctypes_Long:      ft = &ffi_type_slong;          break; /* Long */
+    case Ctypes_Llong:     ft = &ctypes_ffi_type_sllong;  break; /* Llong */
+    case Ctypes_Ushort:    ft = &ffi_type_ushort;         break; /* Ushort */
+    case Ctypes_Uint:      ft = &ffi_type_ulong;          break; /* Uint */
+    case Ctypes_Ulong:     ft = &ffi_type_ulong;          break; /* Ulong */
+    case Ctypes_Ullong:    ft = &ctypes_ffi_type_ullong;  break; /* Ullong */
+    case Ctypes_Size_t:    ft = &ctypes_ffi_type_size_t;  break; /* Size */
+    case Ctypes_Int8_t:    ft = &ffi_type_sint8;          break; /* Int8 */
+    case Ctypes_Int16_t:   ft = &ffi_type_sint16;         break; /* Int16 */
+    case Ctypes_Int32_t:   ft = &ffi_type_sint32;         break; /* Int32 */
+    case Ctypes_Int64_t:   ft = &ffi_type_sint64;         break; /* Int64 */
+    case Ctypes_Uint8_t:   ft = &ffi_type_uint8;          break; /* Uint8 */
+    case Ctypes_Uint16_t:  ft = &ffi_type_uint16;         break; /* Uint16 */
+    case Ctypes_Uint32_t:  ft = &ffi_type_uint32;         break; /* Uint32 */
+    case Ctypes_Uint64_t:  ft = &ffi_type_uint64;         break; /* Uint64 */
+    case Ctypes_Camlint:   ft = &ctypes_ffi_type_camlint; break; /* Camlint */
+    case Ctypes_Nativeint: ft = &ctypes_ffi_type_camlint; break; /* Nativeint */
+    case Ctypes_Float:     ft = &ffi_type_float;          break; /* Float */
+    case Ctypes_Double:    ft = &ffi_type_double;         break; /* Double */
+    case Ctypes_Complex32: ft = NULL;                     break; /* Complex32 */
+    case Ctypes_Complex64: ft = NULL;                     break; /* Complex64 */
   }
   return CTYPES_FROM_PTR(ft);
 }
