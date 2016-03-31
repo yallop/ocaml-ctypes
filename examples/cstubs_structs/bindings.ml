@@ -8,4 +8,8 @@ module Stubs = functor (S : Cstubs_structs.TYPE) -> struct
 
     let () = S.seal t
   end
+
+  module Limits = struct
+    let shrt_max = S.(constant "SHRT_MAX" short)
+  end
 end

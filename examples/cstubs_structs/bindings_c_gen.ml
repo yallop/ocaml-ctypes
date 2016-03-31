@@ -1,4 +1,4 @@
-let c_headers = "#include <time.h>"
+let c_headers = "#include <time.h>\n#include <limits.h>"
 
 let main () =
   let stubs_out = open_out "bindings_stubs_gen.c" in

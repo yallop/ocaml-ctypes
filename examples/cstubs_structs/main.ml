@@ -14,6 +14,7 @@ let main () =
   let tme = Ctypes.allocate PosixTypes.time_t (time Ctypes.(from_voidp PosixTypes.time_t null)) in
   let tm = gmtime tme in
   Printf.printf "tm_hour = %d\n" Ctypes.(getf (!@ tm) Stubs.Tm.tm_hour);
-  Printf.printf "tm_year = %d\n" Ctypes.(getf (!@ tm) Stubs.Tm.tm_year)
+  Printf.printf "tm_year = %d\n" Ctypes.(getf (!@ tm) Stubs.Tm.tm_year);
+  Printf.printf "SHRT_MAX = %d\n" Stubs.Limits.shrt_max
 
 let () = main ()
