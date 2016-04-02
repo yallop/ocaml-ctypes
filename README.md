@@ -48,6 +48,7 @@ The documentation and source distribution contain more complex examples, involvi
 * [API documentation][apidoc]
 * [Mailing list][mailing-list]
 * [Type-safe C bindings using ocaml-ctypes and stub generation][sjb-cstubs-post] introduces the [Cstubs][cstubs] interface
+* [Using Cstubs_structs][orbitz-cstubs_structs] shows how to use the [`Cstubs_structs`][cstubs_structs] module to reliably determine data layout
 * [FAQ][faq]
 
 [rwo-19]: https://realworldocaml.org/v1/en/html/foreign-function-interface.html
@@ -60,3 +61,5 @@ The documentation and source distribution contain more complex examples, involvi
 [mirage]: http://openmirage.org
 [sjb-cstubs-post]: http://simonjbeaumont.com/posts/ocaml-ctypes/
 [cstubs]: https://github.com/ocamllabs/ocaml-ctypes/blob/master/src/cstubs/cstubs.mli
+[orbitz-cstubs_structs]: https://github.com/ocamllabs/ocaml-ctypes/blob/master/examples/cstubs_structs/README.md
+[cstubs_structs]: http://ocamllabs.github.io/ocaml-ctypes/Cstubs_structs.html
