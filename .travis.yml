@@ -12,14 +12,11 @@ os:
   - linux
   - osx
 env:
-  - OCAML_VERSION=4.00.1
   - OCAML_VERSION=4.01.0
   - OCAML_VERSION=4.02.3 COVERAGE=true
   - OCAML_VERSION=4.02.3 ARM=true
 matrix:
   exclude:
-    - os: osx
-      env: OCAML_VERSION=4.00.1
     - os: osx
       env: OCAML_VERSION=4.02.3 ARM=true
     - os: osx
