@@ -70,7 +70,7 @@ let rec ceff fmt : ceff -> unit = function
     List.iteri
       (fun i e ->
         fprintf fmt "@[%a@]%(%)" cexp e
-          (if i <> last_exp then ",@ " else ""))
+          (if i <> last_exp then ",@ " else "" : (_,_,_) format))
       es;
     fprintf fmt ")@]@]";
   | `Index (e, i) ->

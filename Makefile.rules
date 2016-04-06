@@ -18,9 +18,9 @@ endif
 endif
 
 ifeq ($(DEBUG),false)
-  OCAMLFLAGS=
+  OCAMLFLAGS=-principal
 else
-  OCAMLFLAGS=-g
+  OCAMLFLAGS=-principal -g
 endif
 ifneq ($(COVERAGE),false)
   OCAMLFIND_BISECT_FLAGS=-package bisect_ppx
