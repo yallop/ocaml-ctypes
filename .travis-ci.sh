@@ -10,7 +10,6 @@ else
     MAKE="make"
 fi
 case "$OCAML_VERSION" in
-4.00.1) ppa=avsm/ocaml40+opam12 ;;
 4.01.0) ppa=avsm/ocaml41+opam12 ;;
 4.02.3) ppa=avsm/ocaml42+opam12 ;;
 *) echo Unknown $OCAML_VERSION; exit 1 ;;
@@ -67,14 +66,9 @@ fi
 
 # check Xen support builds too
 set -eu
-case "$OCAML_VERSION" in
-4.00.*)
-  echo "OCaml too old; not testing Mirage" ;;
-*)
-  if opam install mirage-xen; then
-    make XEN=enable
-    ls -l _build/libctypes_stubs_xen.a
-  else
-    echo "Mirage not installable, so not testing Xen build."
-  fi ;;
-esac
+if opam install mirage-xen; then
+  make XEN=enable
+  ls -l _build/libctypes_stubs_xen.a
+else
+  echo "Mirage not installable, so not testing Xen build."
+fi

@@ -36,7 +36,7 @@ The names bound by this code have the types you might expect:
    val sigismember : sigset_t ptr -> int -> int
 ```
 
-That's all there is to it.  Unlike the [usual way](http://caml.inria.fr/pub/docs/manual-ocaml-4.00/manual033.html) of writing C extensions, there are no C "stub" functions to write, so there's much less opportunity for error.
+That's all there is to it.  Unlike the [usual way](http://caml.inria.fr/pub/docs/manual-ocaml/intfc.html) of writing C extensions, there are no C "stub" functions to write, so there's much less opportunity for error.
 
 The documentation and source distribution contain more complex examples, involving structs, unions, arrays, callback functions, and so on, and show how to create and use C values (like instances of `sigset_t ptr`) in OCaml.
 
