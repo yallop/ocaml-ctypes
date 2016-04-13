@@ -24,13 +24,13 @@ _build/src/cstubs/cstubs_internals.cmx : _build/src/ctypes/unsigned.cmx \
 _build/src/cstubs/cstubs_structs.cmo : _build/src/ctypes/ctypes_types.cmi \
     _build/src/ctypes/ctypes_static.cmi _build/src/ctypes/ctypes_primitives.cmo \
     _build/src/ctypes/ctypes_primitive_types.cmi _build/src/ctypes/ctypes_path.cmi \
-    _build/src/ctypes/ctypes_common.cmo _build/src/ctypes/ctypes.cmi \
+    _build/src/ctypes/ctypes.cmi \
     _build/src/cstubs/cstubs_public_name.cmi _build/src/cstubs/cstubs_c_language.cmo \
     _build/src/cstubs/cstubs_structs.cmi
 _build/src/cstubs/cstubs_structs.cmx : _build/src/ctypes/ctypes_types.cmi \
     _build/src/ctypes/ctypes_static.cmx _build/src/ctypes/ctypes_primitives.cmx \
     _build/src/ctypes/ctypes_primitive_types.cmx _build/src/ctypes/ctypes_path.cmx \
-    _build/src/ctypes/ctypes_common.cmx _build/src/ctypes/ctypes.cmx \
+    _build/src/ctypes/ctypes.cmx \
     _build/src/cstubs/cstubs_public_name.cmx _build/src/cstubs/cstubs_c_language.cmx \
     _build/src/cstubs/cstubs_structs.cmi
 _build/src/cstubs/cstubs_internals.cmi : _build/src/ctypes/unsigned.cmi \
@@ -98,13 +98,11 @@ _build/src/discover/commands.cmi :
 _build/src/ctypes/ctypes_value_printing.cmo : \
     _build/src/ctypes/ctypes_value_printing_stubs.cmo \
     _build/src/ctypes/ctypes_type_printing.cmi _build/src/ctypes/ctypes_static.cmi \
-    _build/src/ctypes/ctypes_ptr.cmo _build/src/ctypes/ctypes_memory.cmo \
-    _build/src/ctypes/ctypes_common.cmo
+    _build/src/ctypes/ctypes_ptr.cmo _build/src/ctypes/ctypes_memory.cmo
 _build/src/ctypes/ctypes_value_printing.cmx : \
     _build/src/ctypes/ctypes_value_printing_stubs.cmx \
     _build/src/ctypes/ctypes_type_printing.cmx _build/src/ctypes/ctypes_static.cmx \
-    _build/src/ctypes/ctypes_ptr.cmx _build/src/ctypes/ctypes_memory.cmx \
-    _build/src/ctypes/ctypes_common.cmx
+    _build/src/ctypes/ctypes_ptr.cmx _build/src/ctypes/ctypes_memory.cmx
 _build/src/ctypes/ctypes_types.cmi : _build/src/ctypes/unsigned.cmi _build/src/ctypes/signed.cmi \
     _build/src/ctypes/ctypes_static.cmi
 _build/src/ctypes/ctypes_std_view_stubs.cmo : _build/src/ctypes/ctypes_static.cmi \
@@ -198,13 +196,11 @@ _build/src/ctypes/ctypes.cmx : _build/src/ctypes/ctypes_value_printing.cmx \
 _build/src/ctypes/ctypes_structs_computed.cmi : _build/src/ctypes/ctypes_structs.cmi \
     _build/src/ctypes/ctypes_static.cmi
 _build/src/ctypes/ctypes_type_printing.cmo : _build/src/ctypes/ctypes_static.cmi \
-    _build/src/ctypes/ctypes_primitives.cmo _build/src/ctypes/ctypes_common.cmo \
+    _build/src/ctypes/ctypes_primitives.cmo \
     _build/src/ctypes/ctypes_bigarray.cmi _build/src/ctypes/ctypes_type_printing.cmi
 _build/src/ctypes/ctypes_type_printing.cmx : _build/src/ctypes/ctypes_static.cmx \
-    _build/src/ctypes/ctypes_primitives.cmx _build/src/ctypes/ctypes_common.cmx \
+    _build/src/ctypes/ctypes_primitives.cmx \
     _build/src/ctypes/ctypes_bigarray.cmx _build/src/ctypes/ctypes_type_printing.cmi
-_build/src/ctypes/ctypes_common.cmo :
-_build/src/ctypes/ctypes_common.cmx :
 _build/src/ctypes/ctypes_std_views.cmo : _build/src/ctypes/unsigned.cmi \
     _build/src/ctypes/signed.cmi _build/src/ctypes/ctypes_std_view_stubs.cmo \
     _build/src/ctypes/ctypes_static.cmi _build/src/ctypes/ctypes_ptr.cmo \
