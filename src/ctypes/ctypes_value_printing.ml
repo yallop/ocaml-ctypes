@@ -87,4 +87,4 @@ and format_funptr  : type a. Format.formatter -> a static_funptr -> unit
   = fun fmt (Static_funptr p) ->
     Format.fprintf fmt "%s" (Ctypes_value_printing_stubs.string_of_pointer p)
 
-let string_of typ v = Ctypes_common.string_of (format typ) v
+let string_of typ v = Format.asprintf "%a" (format typ) v
