@@ -41,3 +41,9 @@ main: main.cmx
 
 clean:
 	-rm *.cmx *.cmi *.c *.o bindings_c_gen bindings_stubs_gen bindings_stubs.ml main
+
+with_ocamlbuild:
+	ocamlbuild -use-ocamlfind -package ctypes,ctypes.foreign,ctypes.stubs main.native
+
+ocamlbuild_clean:
+	ocamlbuild -clean
