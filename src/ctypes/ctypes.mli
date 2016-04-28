@@ -116,12 +116,6 @@ include Ctypes_types.TYPE
 
 (** {3 Operations on types} *)
 
-val ( *:* ) : 't typ -> 'a typ -> ('a, (('s, [`Struct]) structured as 't)) field
-(** @deprecated Add an anonymous field to a structure.  Use {!field} instead. *)
-
-val ( +:+ ) : 't typ -> 'a typ -> ('a, (('s, [`Union]) structured as 't)) field
-(** @deprecated Add an anonymous field to a union.  Use {!field} instead. *)
-
 val sizeof : 'a typ -> int
 (** [sizeof t] computes the size in bytes of the type [t].  The exception
     {!IncompleteType} is raised if [t] is incomplete. *)
