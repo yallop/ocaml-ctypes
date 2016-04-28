@@ -19,8 +19,4 @@ include Ctypes_value_printing
 
 include Ctypes_coerce
 
-let ( *:* ) s t = field s "<unknown>" t
-
-let ( +:+ ) s t = field s "<unknown>" t
-
 let lift_typ x = x
