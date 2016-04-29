@@ -20,10 +20,15 @@ depends: [
    "base-bytes"
    "ocamlfind" {build}
    "conf-pkg-config" {build}
+   "ounit" {test}
+   "ctypes-foreign" {test}
 ]
 depopts: [
    "ctypes-foreign"
    "mirage-xen"
+]
+build-test: [
+  [make "test"]
 ]
 tags: ["org:ocamllabs" "org:mirage"]
 available: [ ocaml-version >= "4.01.0" ]
