@@ -1,5 +1,6 @@
 language: c
 sudo: required
+install: wget https://raw.githubusercontent.com/ocaml/ocaml-ci-scripts/master/.travis-opam.sh
 services:
   - docker
 script:
@@ -12,15 +13,15 @@ os:
   - linux
   - osx
 env:
-  - OCAML_VERSION=4.01.0
-  - OCAML_VERSION=4.02.3 COVERAGE=true
-  - OCAML_VERSION=4.02.3 ARM=true
+  - OCAML_VERSION=4.01 EXTRA_DEPS=ctypes-foreign PACKAGE=ctypes
+  - OCAML_VERSION=4.02 EXTRA_DEPS=ctypes-foreign PACKAGE=ctypes COVERAGE=true
+  - OCAML_VERSION=4.02 EXTRA_DEPS=ctypes-foreign PACKAGE=ctypes ARM=true
 matrix:
   exclude:
     - os: osx
-      env: OCAML_VERSION=4.02.3 ARM=true
+      env: OCAML_VERSION=4.01 EXTRA_DEPS=ctypes-foreign PACKAGE=ctypes
     - os: osx
-      env: OCAML_VERSION=4.02.3 COVERAGE=true
+      env: OCAML_VERSION=4.02 EXTRA_DEPS=ctypes-foreign PACKAGE=ctypes ARM=true
 before_install:
   - if [ "${ARM}z" = "truez" ]; then
       sudo apt-get update && sudo apt-get install --yes qemu-user-static;
