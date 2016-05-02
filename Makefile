@@ -4,6 +4,7 @@ DEBUG=false
 COVERAGE=false
 OCAML=ocaml
 OCAMLFIND=ocamlfind
+HOSTOCAMLFIND=$(OCAMLFIND)
 OCAMLDEP=$(OCAMLFIND) ocamldep
 OCAMLMKLIB=$(OCAMLFIND) ocamlmklib
 VPATH=src examples
@@ -17,7 +18,7 @@ GENERATED=src/ctypes/ctypes_primitives.ml	\
           src/ctypes-foreign-base/dl.ml		\
           src/ctypes-foreign-base/dl_stubs.c	\
           libffi.config				\
-          asneeded.config 
+          asneeded.config
 OCAML_FFI_INCOPTS=$(libffi_opt)
 export CFLAGS DEBUG
 
@@ -121,19 +122,6 @@ ctypes-top.install_native_objects = yes
 ctypes-top: PROJECT=ctypes-top
 ctypes-top: $$(LIB_TARGETS)
 
-# configure subproject
-configure.dir = src/configure
-
-configure: PROJECT=configure
-configure: $$(NATIVE_TARGET)
-
-# libffi-abigen subproject
-libffi-abigen.dir = src/libffi-abigen
-libffi-abigen.install = no
-libffi-abigen.deps = unix
-libffi-abigen: PROJECT=libffi-abigen
-libffi-abigen: $$(NATIVE_TARGET)
-
 # configuration
 configured: src/ctypes/ctypes_primitives.ml src/ctypes-foreign-base/libffi_abi.ml src/ctypes-foreign-base/dl.ml src/ctypes-foreign-base/dl_stubs.c
 
@@ -142,14 +130,16 @@ src/ctypes-foreign-base/dl.ml: src/ctypes-foreign-base/dl.ml$(OS_ALT_SUFFIX)
 src/ctypes-foreign-base/dl_stubs.c: src/ctypes-foreign-base/dl_stubs.c$(OS_ALT_SUFFIX)
 	cp $< $@
 
-src/ctypes/ctypes_primitives.ml: $(BUILDDIR)/configure.native
-	$< > $@
+src/ctypes/ctypes_primitives.ml: src/configure/extract_from_c.ml src/configure/gen_c_primitives.ml
+	$(HOSTOCAMLFIND) ocamlc -o gen_c_primitives -package str,bytes -linkpkg $^ -I src/configure
+	./gen_c_primitives > $@ 2> gen_c_primitives.log || (rm $@ && cat gen_c_primitives.log || false)
 
-src/ctypes-foreign-base/libffi_abi.ml: $(BUILDDIR)/libffi-abigen.native
-	$< > $@
+src/ctypes-foreign-base/libffi_abi.ml: src/configure/extract_from_c.ml src/configure/gen_libffi_abi.ml
+	$(HOSTOCAMLFIND) ocamlc -o gen_libffi_abi -package str,bytes -linkpkg $^ -I src/configure
+	./gen_libffi_abi > $@ 2> gen_c_primitives.log || (rm $@ && cat gen_c_primitives.log || false)
 
 libffi.config: src/discover/commands.mli src/discover/commands.ml src/discover/discover.ml
-	@ocamlfind ocamlc -o discover -package str,bytes -linkpkg $^ -I src/discover
+	$(HOSTOCAMLFIND) ocamlc -o discover -package str,bytes -linkpkg $^ -I src/discover
 	./discover -ocamlc "$(OCAMLFIND) ocamlc" > $@ || (rm $@ && false)
 
 asneeded.config:
