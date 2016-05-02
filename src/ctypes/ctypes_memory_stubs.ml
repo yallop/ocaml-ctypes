@@ -45,3 +45,7 @@ external memcpy : dst:_ Fat.t -> src:_ Fat.t -> size:int -> unit
 (* Read a fixed length OCaml string from memory *)
 external string_of_array : _ Fat.t -> len:int -> string
   = "ctypes_string_of_array"
+
+(* Do nothing, concealing from the optimizer that nothing is being done. *)
+external use_value : 'a -> unit
+  = "ctypes_use"

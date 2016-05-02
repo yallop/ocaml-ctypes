@@ -136,7 +136,7 @@ struct
               raise Ctypes_ffi_stubs.CallToExpiredClosure
           in
           let v = box (Ctypes_weak_ref.make f') in
-          let () = Gc.finalise (fun _ -> ignore (f'); ()) v in
+          let () = Gc.finalise (fun _ -> Ctypes_memory_stubs.use_value f') v in
           v)
 
   let write_arg : type a. a typ -> offset:int -> idx:int -> a ->
