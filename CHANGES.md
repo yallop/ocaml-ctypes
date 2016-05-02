@@ -1,3 +1,9 @@
+## ctypes 0.5.1
+
+### Bug fixes
+
+* Use a C function, not `Pervasives.ignore`, to keep values alive.
+
 ## ctypes 0.5.0
 
 Thanks to Andreas Hauptmann (@fdopen), David Sheets (@dsheets), Etienne Millon (@emillon), Goswin von Brederlow (@mrvn), Leonid Rozenberg (@rleonid), @orbitz, Max Mouratov (@cakeplus), and Peter Zotov (@whitequark) for contributions to this release.
