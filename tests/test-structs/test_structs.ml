@@ -341,7 +341,7 @@ let test_field_references_not_invalidated _ =
       ()
     ) ()
     let () = begin
-      Gc.major ();
+      Gc.full_major ();
       seal s1;
       assert_equal ~printer:string_of_int
         (sizeof int) (sizeof s1)
@@ -368,7 +368,7 @@ let test_struct_ffi_type_lifetime _ =
       in
       Foreign.foreign ~from:testlib "return_struct_by_value" t
 
-    let () = Gc.major()
+    let () = Gc.full_major()
     let x = f ()
   end in ()
 
