@@ -43,7 +43,7 @@ struct
 
     begin
       (* The closure should be collected in the next GC *)
-      store_callback (closure 2);
+      store_callback (closure (int_of_string "2"));
       (* The first GC collects the closure itself, which frees the associated object
          to be collected on the next GC. *)
       Gc.full_major ();
@@ -106,27 +106,27 @@ struct
 
     (* First, the naive implementation.  This should fail, because arg is
        collected before ret is called. *)
-    let ret = Naive.make ~arg:(closure 3) in
+    let ret = Naive.make ~arg:(closure (int_of_string "3")) in
     Gc.full_major ();
     assert_raises CallToExpiredClosure
       (fun () -> Naive.get ret 5);
 
     (* Now a more careful implementation.  This succeeds, because we keep a
        reference to arg around with the reference to ret *)
-    let ret = Better.make ~arg:(closure 3) in
+    let ret = Better.make ~arg:(closure (int_of_string "3")) in
     Gc.full_major ();
     assert_equal 15 (Better.get ret 5);
 
     (* However, even with the careful implementation things can go wrong if we
        keep a reference to ret beyond the lifetime of the pair. *)
-    let ret = Better.get (Better.make ~arg:(closure 3)) in
+    let ret = Better.get (Better.make ~arg:(closure (int_of_string "3"))) in
     Gc.full_major ();
     assert_raises CallToExpiredClosure
       (fun () -> ret 5);
 
     (* The most careful implementation calls ret rather than returning it,
        so arg cannot be collected prematurely. *)
-    let ret = Careful.get (Careful.make ~arg:(closure 3)) in
+    let ret = Careful.get (Careful.make ~arg:(closure (int_of_string "3"))) in
     Gc.full_major ();
     assert_equal 15 (ret 5)
 end
