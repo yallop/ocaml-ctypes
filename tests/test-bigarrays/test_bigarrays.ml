@@ -404,8 +404,8 @@ let test_bigarray_lifetime_with_ctypes_reference _ =
     (* The bigarray is out of scope, but the ctypes object is still live, so
        the memory shouldn't be reclaimed. *)
     begin
-      Gc.major ();
-      Gc.major ();
+      Gc.full_major ();
+      Gc.full_major ();
       assert_equal !state `Not_safe_to_collect;
       assert_equal 1 !@pointer;
     end
@@ -414,8 +414,8 @@ let test_bigarray_lifetime_with_ctypes_reference _ =
      should (or, at least, could) run. *)
   begin
     state := `Safe_to_collect;
-    Gc.major ();
-    Gc.major ();
+    Gc.full_major ();
+    Gc.full_major ();
     assert_equal !state `Collected
   end
 
@@ -446,8 +446,8 @@ let test_ctypes_memory_lifetime_with_bigarray_reference _ =
     (* The ctypes object is out of scope, but the bigarray is still live, so
        the memory shouldn't be reclaimed. *)
     begin
-      Gc.major ();
-      Gc.major ();
+      Gc.full_major ();
+      Gc.full_major ();
       assert_equal !state `Not_safe_to_collect;
       assert_equal ba.{0} 1L;
       assert_equal ba.{3} 4L;
@@ -457,8 +457,8 @@ let test_ctypes_memory_lifetime_with_bigarray_reference _ =
      should (or, at least, could) run. *)
   begin
     state := `Safe_to_collect;
-    Gc.major ();
-    Gc.major ();
+    Gc.full_major ();
+    Gc.full_major ();
     assert_equal !state `Collected
   end
 

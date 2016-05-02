@@ -30,8 +30,8 @@ let test_release_runtime_lock _ =
 *)
 let test_acquire_runtime_lock _ =
   begin
-    let f x y = let _ = Gc.major () in !@x + !@y in
-    let t1 = Thread.create Gc.major () in
+    let f x y = let _ = Gc.full_major () in !@x + !@y in
+    let t1 = Thread.create Gc.full_major () in
     assert (callback_with_pointers f = 7);
     Thread.join t1
   end
