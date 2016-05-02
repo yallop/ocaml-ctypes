@@ -145,4 +145,4 @@ let view : type a b. (a, b) t -> _ Ctypes_ptr.Fat.t -> b =
   | Dims3 (d1, d2, d3) -> view3 kind [| d1; d2; d3 |] ptr in
   match Ctypes_ptr.Fat.managed ptr with
   | None -> ba
-  | Some src -> Gc.finalise (fun _ -> ignore src; ()) ba; ba
+  | Some src -> Gc.finalise (fun _ -> Ctypes_memory_stubs.use_value src) ba; ba
