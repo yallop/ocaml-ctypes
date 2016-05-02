@@ -29,13 +29,13 @@ let test_array_finaliser _ =
         Array.start a
       end in
     begin
-      Gc.major ();
+      Gc.full_major ();
       assert_equal ~msg:"The finaliser was not run"
         false !finaliser_completed;
       assert_equal 1 !@p;
     end in
   begin
-    Gc.major ();
+    Gc.full_major ();
     assert_equal ~msg:"The finaliser was run"
       true !finaliser_completed;
   end
@@ -69,7 +69,7 @@ let test_struct_finaliser _ =
           addr s
         end in
       begin
-        Gc.major ();
+        Gc.full_major ();
         assert_equal ~msg:"The finaliser was not run"
           false !finaliser_completed;
         assert_equal 10l !@(from_voidp int32_t (to_voidp p));
@@ -77,7 +77,7 @@ let test_struct_finaliser _ =
 
     let () =
       begin
-        Gc.major ();
+        Gc.full_major ();
         assert_equal ~msg:"The finaliser was run"
           true !finaliser_completed;
       end

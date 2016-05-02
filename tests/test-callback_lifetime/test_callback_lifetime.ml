@@ -25,7 +25,7 @@ struct
 
     begin
       store_callback double;
-      Gc.major ();
+      Gc.full_major ();
       assert_equal 10 (invoke_stored_callback 5)
     end
 
@@ -46,8 +46,8 @@ struct
       store_callback (closure 2);
       (* The first GC collects the closure itself, which frees the associated object
          to be collected on the next GC. *)
-      Gc.major ();
-      Gc.major (); 
+      Gc.full_major ();
+      Gc.full_major (); 
       assert_raises CallToExpiredClosure
         (fun () -> invoke_stored_callback 5)
     end
