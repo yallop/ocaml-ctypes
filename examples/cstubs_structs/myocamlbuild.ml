@@ -1,7 +1,6 @@
-(* This example relies on Ocamlbuild version 0.9.0 version of OCamlbuild
-   (specifically on PR#6794). Otherwise compiling bindings_stubs_gen.c,
-   Step 4, will fail because the package information isn't passed to
-   "ocamlfind ocamlc". *)
+(* This example relies on Ocamlbuild version 0.9.0 (specifically on PR#6794).
+   Otherwise compiling bindings_stubs_gen.c, Step 4, will fail because the
+   package information isn't passed to "ocamlfind ocamlc". *)
 open Ocamlbuild_plugin
 
 let () =
