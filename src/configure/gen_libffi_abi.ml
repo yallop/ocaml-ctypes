@@ -5,7 +5,7 @@
  * See the file LICENSE for details.
  *)
 
-let header ="
+let header ="\
 (*
  * Copyright (c) 2014 Jeremy Yallop.
  *
@@ -53,63 +53,11 @@ let symbols = [
   ("default_abi"      , "FFI_DEFAULT_ABI");
 ]
 
-let getenv ~default name =
-  try Sys.getenv name
-  with Not_found -> default
-
-let null_device =
-  if Sys.os_type = "Win32" then
-    "nul"
-  else
-    "/dev/null"
-
-let read_output_int input_filename output_filename =
-  let cmd = 
-    Printf.sprintf "%s -o %s %s %s 2>%s && %s"
-      (getenv ~default:"cc" "CC")
-      output_filename
-      (getenv ~default:"" "CFLAGS")
-      input_filename
-      null_device
-      output_filename
-  in
-  let inch = Unix.open_process_in cmd in
-  try Some (Scanf.fscanf inch "%d" (fun i -> i))
-  with End_of_file -> None
-
-let generate_program symbol =
-  Printf.sprintf "\
-#include <ffi.h>
-#include <stdio.h>
-
-int main(void)
-{
-  printf(\"%%d\\n\", %s);
-  return 0;
-}
-" symbol
-
-let determine_code symbol =
-  let program = generate_program symbol in
-  let input_file = Filename.temp_file "ctypes_libffi_config" ".c"
-  and output_file = Filename.temp_file "ctypes_libffi_config" "" in
-  let outch = open_out input_file in
-  begin
-    Printf.fprintf outch "%s" program;
-    flush outch;
-    close_out outch;
-  end;
-  let result = read_output_int input_file output_file in
-  begin
-    Sys.remove input_file;
-    if Sys.file_exists output_file then Sys.remove output_file;
-    result
-  end
-
 let write_line name symbol =
-  match determine_code symbol with
-  | None -> Printf.printf "let %s = Unsupported \"%s\"\n" name symbol
-  | Some code -> Printf.printf "let %s = Code %d\n" name code
+  try
+    Printf.printf "let %s = Code %d\n" name (Extract_from_c.integer symbol)
+  with Not_found ->
+    Printf.printf "let %s = Unsupported \"%s\"\n" name symbol
 
 let () =
   begin
