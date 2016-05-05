@@ -14,7 +14,7 @@ os:
   - osx
 env:
   - OCAML_VERSION=4.01 EXTRA_DEPS=ctypes-foreign PACKAGE=ctypes
-  - OCAML_VERSION=4.02 EXTRA_DEPS=ctypes-foreign PACKAGE=ctypes COVERAGE=true
+  - OCAML_VERSION=4.02 EXTRA_DEPS='ctypes-foreign bisect_ppx ocveralls' PACKAGE=ctypes COVERAGE=true
   - OCAML_VERSION=4.02 EXTRA_DEPS=ctypes-foreign PACKAGE=ctypes ARM=true
 matrix:
   exclude:
