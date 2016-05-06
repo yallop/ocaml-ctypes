@@ -12,15 +12,22 @@ fi
 case "$OCAML_VERSION" in
 4.01.0) ppa=avsm/ocaml41+opam12 ;;
 4.02.3) ppa=avsm/ocaml42+opam12 ;;
-*) echo Unknown $OCAML_VERSION; exit 1 ;;
+*) ppa=avsm/ocaml42+opam12; use_opam=true ;;
 esac
 
 install_on_linux () {
   echo "yes" | sudo add-apt-repository ppa:$ppa
   sudo apt-get update -qq
-  sudo apt-get install -qq ocaml ocaml-native-compilers camlp4-extra opam
-  opam init
-  opam update
+  if test $use_opam; then
+      sudo apt-get install -qq opam
+      opam init
+      opam update
+      opam switch -q $OCAML_VERSION
+  else
+      sudo apt-get install -qq ocaml ocaml-native-compilers camlp4-extra opam
+      opam init
+      opam update
+  fi
 }
 
 install_on_osx () {
