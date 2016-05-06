@@ -7,21 +7,21 @@ script:
   - if [ "${ARM}z" = "truez" ]; then
       docker run -v /usr/bin/qemu-arm-static:/usr/bin/qemu-arm-static -v $(pwd):/travis yallop/ocaml-ctypes-qemu-arm-base /travis/.travis-ci-arm.sh;
     else
-       bash -ex .travis-ci.sh;
+       bash -x .travis-opam.sh;
     fi
 os:
   - linux
   - osx
 env:
-  - OCAML_VERSION=4.01 EXTRA_DEPS=ctypes-foreign PACKAGE=ctypes
-  - OCAML_VERSION=4.02 EXTRA_DEPS='ctypes-foreign bisect_ppx ocveralls' PACKAGE=ctypes COVERAGE=true
-  - OCAML_VERSION=4.02 EXTRA_DEPS=ctypes-foreign PACKAGE=ctypes ARM=true
+  - OCAML_VERSION=4.01 EXTRA_DEPS=ctypes-foreign PACKAGE=ctypes POST_INSTALL_HOOK='bash .travis-ci.sh'
+  - OCAML_VERSION=4.02 EXTRA_DEPS='ctypes-foreign bisect_ppx ocveralls' PACKAGE=ctypes COVERAGE=true POST_INSTALL_HOOK='bash .travis-ci.sh'
+  - OCAML_VERSION=4.02 EXTRA_DEPS=ctypes-foreign PACKAGE=ctypes ARM=true POST_INSTALL_HOOK='bash .travis-ci.sh'
 matrix:
   exclude:
     - os: osx
-      env: OCAML_VERSION=4.01 EXTRA_DEPS=ctypes-foreign PACKAGE=ctypes
+      env: OCAML_VERSION=4.01 EXTRA_DEPS=ctypes-foreign PACKAGE=ctypes POST_INSTALL_HOOK='bash .travis-ci.sh'
     - os: osx
-      env: OCAML_VERSION=4.02 EXTRA_DEPS=ctypes-foreign PACKAGE=ctypes ARM=true
+      env: OCAML_VERSION=4.02 EXTRA_DEPS=ctypes-foreign PACKAGE=ctypes ARM=true POST_INSTALL_HOOK='bash .travis-ci.sh'
 before_install:
   - if [ "${ARM}z" = "truez" ]; then
       sudo apt-get update && sudo apt-get install --yes qemu-user-static;

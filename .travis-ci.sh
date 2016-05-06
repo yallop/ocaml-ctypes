@@ -1,5 +1,3 @@
-bash -x .travis-opam.sh
-
 if test $COVERAGE; then
     MAKE='make COVERAGE=true'
     if test "$TRAVIS_OS_NAME" != osx ; then
