@@ -9,26 +9,15 @@
 
 open Ctypes_static
 open Cstubs_c_language
+open Unchecked_function_types
 
 let max_byte_args = 5
-
-(* We're using an abstract type ([value]) as an argument and return type, so
-   we'll use the [Function] and [Return] constructors directly.  The smart
-   constructors [@->] and [returning] would reject the abstract type. *)
-let (@->) f t = Function (f, t)
-let returning t = Returns t
-
-let value = abstract ~name:"value" ~size:0 ~alignment:0
 
 module Generate_C =
 struct
   let report_unpassable what =
     let msg = Printf.sprintf "cstubs does not support passing %s" what in
     raise (Unsupported msg)
-
-  let reader fname fn = { fname; allocates = false; reads_ocaml_heap = true; fn = Fn fn }
-  let conser fname fn = { fname; allocates = true; reads_ocaml_heap = false; fn = Fn fn }
-  let immediater fname fn = { fname; allocates = false; reads_ocaml_heap = false; fn = Fn fn }
 
   let local name ty = `Local (name, Ty ty)
 
@@ -61,66 +50,6 @@ struct
        `Let (ye, (c, t) >>= k)
 
   let (>>) c1 c2 = (c1, Void) >>= fun _ -> c2
-
-  let prim_prj : type a. a Ctypes_primitive_types.prim -> _ =
-    let open Ctypes_primitive_types in function
-    | Char -> reader "Int_val" (value @-> returning int)
-    | Schar -> reader "Int_val" (value @-> returning int)
-    | Uchar -> reader "Uint8_val" (value @-> returning uint8_t)
-    | Bool -> reader "Bool_val" (value @-> returning bool)
-    | Short -> reader "Int_val" (value @-> returning int)
-    | Int -> reader "Int_val" (value @-> returning int)
-    | Long -> reader "ctypes_long_val" (value @-> returning long)
-    | Llong -> reader "ctypes_llong_val" (value @-> returning llong)
-    | Ushort -> reader "ctypes_ushort_val" (value @-> returning ushort)
-    | Uint -> reader "ctypes_uint_val" (value @-> returning uint)
-    | Ulong -> reader "ctypes_ulong_val" (value @-> returning ulong)
-    | Ullong -> reader "ctypes_ullong_val" (value @-> returning ullong)
-    | Size_t -> reader "ctypes_size_t_val" (value @-> returning size_t)
-    | Int8_t -> reader "Int_val" (value @-> returning int)
-    | Int16_t -> reader "Int_val" (value @-> returning int)
-    | Int32_t -> reader "Int32_val" (value @-> returning int32_t)
-    | Int64_t -> reader "Int64_val" (value @-> returning int64_t)
-    | Uint8_t -> reader "Uint8_val" (value @-> returning uint8_t)
-    | Uint16_t -> reader "Uint16_val" (value @-> returning uint16_t)
-    | Uint32_t -> reader "Uint32_val" (value @-> returning uint32_t)
-    | Uint64_t -> reader "Uint64_val" (value @-> returning uint64_t)
-    | Camlint -> reader "Int_val" (value @-> returning int)
-    | Nativeint -> reader "Nativeint_val" (value @-> returning nativeint)
-    | Float -> reader "Double_val" (value @-> returning double)
-    | Double -> reader "Double_val" (value @-> returning double)
-    | Complex32 -> reader "ctypes_float_complex_val" (value @-> returning complex32)
-    | Complex64 -> reader "ctypes_double_complex_val" (value @-> returning complex64)
-
-  let prim_inj : type a. a Ctypes_primitive_types.prim -> _ =
-    let open Ctypes_primitive_types in function
-    | Char -> immediater "Val_int" (int @-> returning value)
-    | Schar -> immediater "Val_int" (int @-> returning value)
-    | Uchar -> conser "ctypes_copy_uint8" (uint8_t @-> returning value)
-    | Bool -> immediater "Val_bool" (bool @-> returning value)
-    | Short -> immediater "Val_int" (int @-> returning value)
-    | Int -> immediater "Val_int" (int @-> returning value)
-    | Long -> conser "ctypes_copy_long" (long @-> returning value)
-    | Llong -> conser "ctypes_copy_llong" (llong @-> returning value)
-    | Ushort -> conser "ctypes_copy_ushort" (ushort @-> returning value)
-    | Uint -> conser "ctypes_copy_uint" (uint @-> returning value)
-    | Ulong -> conser "ctypes_copy_ulong" (ulong @-> returning value)
-    | Ullong -> conser "ctypes_copy_ullong" (ullong @-> returning value)
-    | Size_t -> conser "ctypes_copy_size_t" (size_t @-> returning value)
-    | Int8_t -> immediater "Val_int" (int @-> returning value)
-    | Int16_t -> immediater "Val_int" (int @-> returning value)
-    | Int32_t -> conser "caml_copy_int32" (int32_t @-> returning value)
-    | Int64_t -> conser "caml_copy_int64" (int64_t @-> returning value)
-    | Uint8_t -> conser "ctypes_copy_uint8" (uint8_t @-> returning value)
-    | Uint16_t -> conser "ctypes_copy_uint16" (uint16_t @-> returning value)
-    | Uint32_t -> conser "ctypes_copy_uint32" (uint32_t @-> returning value)
-    | Uint64_t -> conser "ctypes_copy_uint64" (uint64_t @-> returning value)
-    | Camlint -> immediater "Val_int" (int @-> returning value)
-    | Nativeint -> conser "caml_copy_nativeint" (nativeint @-> returning value)
-    | Float -> conser "caml_copy_double" (double @-> returning value)
-    | Double -> conser "caml_copy_double" (double @-> returning value)
-    | Complex32 -> conser "ctypes_copy_float_complex" (complex32 @-> returning value)
-    | Complex64 -> conser "ctypes_copy_double_complex" (complex64 @-> returning value)
 
   let of_fatptr : cexp -> ccomp =
     fun x -> `App (reader "CTYPES_ADDR_OF_FATPTR"

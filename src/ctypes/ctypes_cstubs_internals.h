@@ -17,5 +17,7 @@
 #include <caml/threads.h>
 #define CTYPES_PTR_OF_OCAML_STRING(s) \
   (String_val(Field(s, 1)) + Int_val(Field(s, 0)))
+#define Ctypes_val_char(c) \
+  (Val_int((c + 256) % 256))
 
 #endif /* CTYPES_CSTUBS_INTERNALS_H */
