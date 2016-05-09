@@ -41,16 +41,14 @@ let mkArithmetic_abstract =
   | Ctypes_static.Float  -> mkAbstract float
   | Ctypes_static.Double -> mkAbstract double
 
-let mkSigned name =
-  let open Ctypes in function
+let mkSigned name = function
   | Ctypes_static.Int8  -> Ctypes_std_views.signed_typedef name ~size:1
   | Ctypes_static.Int16 -> Ctypes_std_views.signed_typedef name ~size:2
   | Ctypes_static.Int32 -> Ctypes_std_views.signed_typedef name ~size:4
   | Ctypes_static.Int64 -> Ctypes_std_views.signed_typedef name ~size:8
   | _ -> assert false
 
-let mkUnsigned name =
-  let open Ctypes in function
+let mkUnsigned name = function
   | Ctypes_static.Uint8  -> Ctypes_std_views.unsigned_typedef name ~size:1
   | Ctypes_static.Uint16 -> Ctypes_std_views.unsigned_typedef name ~size:2
   | Ctypes_static.Uint32 -> Ctypes_std_views.unsigned_typedef name ~size:4

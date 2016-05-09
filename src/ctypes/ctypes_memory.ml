@@ -74,7 +74,7 @@ let rec write : type a b. a typ -> a -> b Fat.t -> unit
       (fun v -> writety (w v))
     | OCaml _ -> raise IncompleteType
 
-let null : unit ptr = CPointer (Fat.make Void Raw.null)
+let null : unit ptr = CPointer (Fat.make ~reftyp:Void Raw.null)
 
 let rec (!@) : type a. a ptr -> a
   = fun (CPointer cptr as ptr) ->

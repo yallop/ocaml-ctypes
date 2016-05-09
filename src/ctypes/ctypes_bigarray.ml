@@ -23,22 +23,6 @@ let prim_of_kind : type a. a kind -> a Ctypes_primitive_types.prim
   | Kind_complex64 -> Complex64
   | Kind_char -> Char
 
-let string_of_kind : type a. a kind -> string
-  = function
-    Kind_float32 -> "float32"
-  | Kind_float64 -> "float64"
-  | Kind_int8_signed -> "int8_signed"
-  | Kind_int8_unsigned -> "int8_unsigned"
-  | Kind_int16_signed -> "int16_signed"
-  | Kind_int16_unsigned -> "int16_unsigned"
-  | Kind_int32 -> "int32"
-  | Kind_int64 -> "int64"
-  | Kind_int -> "int"
-  | Kind_nativeint -> "nativeint"
-  | Kind_complex32 -> "complex32"
-  | Kind_complex64 -> "complex64"
-  | Kind_char -> "char"
-
 let bigarray_kind_sizeof k = Ctypes_primitives.sizeof (prim_of_kind k)
 
 let bigarray_kind_alignment k = Ctypes_primitives.alignment (prim_of_kind k)
@@ -139,10 +123,10 @@ let unsafe_address b = Ctypes_bigarray_stubs.address b
 let view : type a b. (a, b) t -> _ Ctypes_ptr.Fat.t -> b =
   let open Ctypes_bigarray_stubs in
   fun (dims, kind) ptr -> let ba : b = match dims with
-  | DimsGen ds -> view kind ds ptr
-  | Dims1 d -> view1 kind [| d |] ptr
-  | Dims2 (d1, d2) -> view2 kind [| d1; d2 |] ptr
-  | Dims3 (d1, d2, d3) -> view3 kind [| d1; d2; d3 |] ptr in
+  | DimsGen ds -> view kind ~dims:ds ptr
+  | Dims1 d -> view1 kind ~dims:[| d |] ptr
+  | Dims2 (d1, d2) -> view2 kind ~dims:[| d1; d2 |] ptr
+  | Dims3 (d1, d2, d3) -> view3 kind ~dims:[| d1; d2; d3 |] ptr in
   match Ctypes_ptr.Fat.managed ptr with
   | None -> ba
   | Some src -> Gc.finalise (fun _ -> Ctypes_memory_stubs.use_value src) ba; ba

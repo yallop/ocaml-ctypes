@@ -70,7 +70,7 @@ let args : type a. a fn -> (string * ty) list = fun fn ->
 
 module Type_C =
 struct
-  let rec cexp : cexp -> ty = function
+  let cexp : cexp -> ty = function
     | `Int _ -> Ty int
     | `Local (_, ty) -> ty
     | `Cast (Ty ty, _) -> Ty ty

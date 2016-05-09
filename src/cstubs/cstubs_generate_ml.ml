@@ -18,9 +18,6 @@ type ml_type = [ `Ident of path
 
 type ml_external_type = [ `Prim of ml_type list * ml_type ]
 
-type ty = Ty : 'a typ -> ty
-type fnc = Fnc : 'a fn -> fnc
-
 type ml_pat = [ `Var of string
               | `Record of (path * ml_pat) list
               | `As of ml_pat * string
@@ -54,7 +51,7 @@ module Emit_ML : sig
   val extern : Format.formatter -> extern -> unit
 end =
 struct
-  let fprintf, pp_print_string = Format.(fprintf, pp_print_string)
+  let fprintf = Format.fprintf
 
   (* We (only) need to parenthesize function types in certain contexts 
         * on the lhs of a function type: - -> t
@@ -182,7 +179,7 @@ struct
       primname_opt primname_byte primname attrs attributes
 end
 
-let rec arity : ml_external_type -> int =
+let arity : ml_external_type -> int =
   fun (`Prim (args, _)) -> List.length args
 
 let max_byte_args = 5
@@ -202,9 +199,6 @@ let managed_buffer = `Ident (path_of_string "CI.managed_buffer")
 let voidp = `Ident (path_of_string "CI.voidp")
 let fatptr = `Appl (path_of_string "CI.fatptr", [`Ident (path_of_string "_")])
 let fatfunptr = `Appl (path_of_string "CI.fatfunptr", [`Ident (path_of_string "_")])
-let string = `Ident (path_of_string "string")
-let float_array = `Appl (path_of_string "array",
-                         [`Ident (path_of_string "float")])
 
 (* These functions determine the type that should appear in the extern
    signature *)
