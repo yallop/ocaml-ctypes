@@ -123,10 +123,10 @@ let unsafe_address b = Ctypes_bigarray_stubs.address b
 let view : type a b. (a, b) t -> _ Ctypes_ptr.Fat.t -> b =
   let open Ctypes_bigarray_stubs in
   fun (dims, kind) ptr -> let ba : b = match dims with
-  | DimsGen ds -> view kind ds ptr
-  | Dims1 d -> view1 kind [| d |] ptr
-  | Dims2 (d1, d2) -> view2 kind [| d1; d2 |] ptr
-  | Dims3 (d1, d2, d3) -> view3 kind [| d1; d2; d3 |] ptr in
+  | DimsGen ds -> view kind ~dims:ds ptr
+  | Dims1 d -> view1 kind ~dims:[| d |] ptr
+  | Dims2 (d1, d2) -> view2 kind ~dims:[| d1; d2 |] ptr
+  | Dims3 (d1, d2, d3) -> view3 kind ~dims:[| d1; d2; d3 |] ptr in
   match Ctypes_ptr.Fat.managed ptr with
   | None -> ba
   | Some src -> Gc.finalise (fun _ -> Ctypes_memory_stubs.use_value src) ba; ba
