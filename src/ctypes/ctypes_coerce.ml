@@ -132,7 +132,7 @@ let coerce : type a b. a typ -> b typ -> a -> b =
   | Id -> id
   | Coercion c -> c
 
-let rec coerce_fn : type a b. a fn -> b fn -> a -> b =
+let coerce_fn : type a b. a fn -> b fn -> a -> b =
   fun afn bfn -> match fn_coercion afn bfn with
   | Id -> id
   | Coercion c -> c

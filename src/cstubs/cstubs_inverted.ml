@@ -41,7 +41,6 @@ let collector () : (module INTERNAL) * (unit -> decl list) =
   let push d = decls := d :: !decls in
   ((module
     struct
-      type 'a fn = unit
       let enum constants typ = push (Decl_enum (Enum (constants, typ)))
       let structure typ = push (Decl_ty (Ty typ))
       let union typ = push (Decl_ty (Ty typ))

@@ -26,7 +26,6 @@ module type Basics = sig
   val mul : t -> t -> t
   val div : t -> t -> t
   val rem : t -> t -> t
-  val max_int : t
   val logand : t -> t -> t
   val logor : t -> t -> t
   val logxor : t -> t -> t

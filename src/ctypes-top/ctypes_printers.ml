@@ -21,8 +21,6 @@ let format_uint32 fmt v =
   Format.fprintf fmt "<uint32 %s>" (Unsigned.UInt32.to_string v)
 let format_uint64 fmt v =
   Format.fprintf fmt "<uint64 %s>" (Unsigned.UInt64.to_string v)
-let format_size_t fmt v =
-  Format.fprintf fmt "<size_t %s>" (Unsigned.Size_t.to_string v)
 let format_ushort fmt v =
   Format.fprintf fmt "<ushort %s>" (Unsigned.UShort.to_string v)
 let format_uint fmt v =

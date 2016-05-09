@@ -98,7 +98,7 @@ struct
       reads_ocaml_heap = true;
       fn = Fn (ptr void @-> size_t @-> returning value) }
 
-  let cast : type a b. from:ty -> into:ty -> ccomp -> ccomp =
+  let cast : from:ty -> into:ty -> ccomp -> ccomp =
     fun ~from:(Ty from) ~into e ->
       (e, from) >>= fun x ->
       `Cast (into, x)
