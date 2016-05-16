@@ -53,6 +53,8 @@ let rec clvalue fmt : clvalue -> unit = function
     fprintf fmt "@[@[%a@]@[[%a]@]@]" clvalue lv cexp i
   | `Field (lv, f) ->
     fprintf fmt "@[@[%a@]@[.%s@]@]" clvalue lv f
+  | `PointerField (lv, f) ->
+    fprintf fmt "@[@[%a@]@[->%s@]@]" clvalue lv f
 
 
 let camlop fmt : camlop -> unit = function

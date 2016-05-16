@@ -42,7 +42,8 @@ type cexp = [ cconst
             | `Addr of cvar ]
 type clvalue = [ clocal
                | `Index of clvalue * cexp
-               | `Field of clvalue * fieldname ]
+               | `Field of clvalue * fieldname 
+               | `PointerField of clvalue * fieldname ]
 type camlop = [ `CAMLparam0
               | `CAMLlocalN of cexp * cexp
               | `CAMLdrop ]
