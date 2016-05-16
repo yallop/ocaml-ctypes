@@ -100,16 +100,21 @@ let gen_ml prefix fmt : (module FOREIGN') * (unit -> unit) =
        Cstubs_generate_ml.extern ~stub_name:name ~external_name:name fmt
          Ctypes.(void @-> returning (ptr void));
        val_bindings := Val_bind (cname, name, typ) :: !val_bindings
+     let returning = Ctypes.returning
    end),
   fun () ->
     write_foreign fmt !bindings !val_bindings
 
-let write_c fmt ~prefix (module B : BINDINGS) =
+type concurrency_policy = Sequential
+
+let sequential = Sequential
+
+let write_c ?(concurrency=Sequential) fmt ~prefix (module B : BINDINGS) =
   Format.fprintf fmt
     "#include \"ctypes_cstubs_internals.h\"@\n@\n";
   let module M = B((val gen_c prefix fmt)) in ()
 
-let write_ml fmt ~prefix (module B : BINDINGS) =
+let write_ml ?(concurrency=Sequential) fmt ~prefix (module B : BINDINGS) =
   let foreign, finally = gen_ml prefix fmt in
   let () = Format.fprintf fmt "module CI = Cstubs_internals@\n@\n" in
   let module M = B((val foreign)) in
