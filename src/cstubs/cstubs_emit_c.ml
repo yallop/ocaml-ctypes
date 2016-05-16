@@ -51,6 +51,9 @@ let rec clvalue fmt : clvalue -> unit = function
   | `Local _ as x -> cvar fmt x
   | `Index (lv, i) ->
     fprintf fmt "@[@[%a@]@[[%a]@]@]" clvalue lv cexp i
+  | `Field (lv, f) ->
+    fprintf fmt "@[@[%a@]@[.%s@]@]" clvalue lv f
+
 
 let camlop fmt : camlop -> unit = function
   | `CAMLparam0 -> Format.fprintf fmt "CAMLparam0()"

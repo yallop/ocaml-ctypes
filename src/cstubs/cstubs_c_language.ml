@@ -18,6 +18,8 @@ let fresh_var =
 type ty = Ty : _ typ -> ty
 type tfn = Fn : _ fn -> tfn
 
+type fieldname = string
+
 type cfunction = {
   fname: string;
   allocates: bool;
@@ -38,7 +40,9 @@ type cexp = [ cconst
             | clocal
             | `Cast of ty * cexp
             | `Addr of cvar ]
-type clvalue = [ clocal | `Index of clvalue * cexp ]
+type clvalue = [ clocal
+               | `Index of clvalue * cexp
+               | `Field of clvalue * fieldname ]
 type camlop = [ `CAMLparam0
               | `CAMLlocalN of cexp * cexp
               | `CAMLdrop ]
