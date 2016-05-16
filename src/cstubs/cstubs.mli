@@ -85,13 +85,33 @@ module type BINDINGS = functor (F : FOREIGN with type 'a result = unit) -> sig e
 
 type concurrency_policy
 (** Values of the [concurrency_policy] type specify the concurrency support
-    provided by the generated code.  The only option currently available is
-    [sequential].
+    provided by the generated code.  See {!sequential} and {!lwt_jobs} for the
+    available options.
 *)
 
 val sequential : concurrency_policy
 (** Generate code with no special support for concurrency.  This is the
     default.
+*)
+
+val lwt_jobs : concurrency_policy
+(** Generate code which implements C function calls as Lwt jobs:
+
+    http://ocsigen.org/lwt/2.5.1/api/Lwt_unix#TYPEjob
+
+    Passing [lwt_jobs] as the [concurrency] argument to {!Cstubs.write_c} and
+    {!Cstubs.write_ml} changes the return type of bound functions to include
+    the {!Lwt.t} constructor.  For example, the binding specification
+
+       [let unlink = foreign "unlink" (string @-> returning int)]
+
+    generates a value of the following type by default:
+
+       [val unlink : string -> int]
+
+    but when using [lwt_jobs] the generated type is as follows:
+
+       [val unlink : string -> int Lwt.t]
 *)
 
 val write_c : ?concurrency:concurrency_policy ->

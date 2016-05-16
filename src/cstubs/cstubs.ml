@@ -23,7 +23,9 @@ module type FOREIGN' = FOREIGN with type 'a result = unit
 
 module type BINDINGS = functor (F : FOREIGN') -> sig end
 
-let gen_c prefix fmt : (module FOREIGN') =
+type concurrency_policy = [ `Sequential | `Lwt_jobs ]
+
+let gen_c ~concurrency prefix fmt : (module FOREIGN') =
   (module
    struct
      let counter = ref 0
@@ -33,7 +35,8 @@ let gen_c prefix fmt : (module FOREIGN') =
      type 'a return = 'a
      type 'a result = unit
      let foreign cname fn =
-       Cstubs_generate_c.fn ~cname ~stub_name:(var prefix cname) fmt fn
+       Cstubs_generate_c.fn ~concurrency
+         ~cname ~stub_name:(var prefix cname) fmt fn
      let foreign_value cname typ =
        Cstubs_generate_c.value ~cname ~stub_name:(var prefix cname) fmt typ
      let returning = Ctypes.returning
@@ -77,7 +80,7 @@ let write_foreign fmt bindings val_bindings =
   Format.fprintf fmt
     " @[Printf.ksprintf@ failwith@ \"No match for %%s\" s@]@]@]@.@\n"
 
-let gen_ml prefix fmt : (module FOREIGN') * (unit -> unit) =
+let gen_ml ~concurrency prefix fmt : (module FOREIGN') * (unit -> unit) =
   let bindings = ref []
   and val_bindings = ref []
   and counter = ref 0 in
@@ -105,17 +108,22 @@ let gen_ml prefix fmt : (module FOREIGN') * (unit -> unit) =
   fun () ->
     write_foreign fmt !bindings !val_bindings
 
-type concurrency_policy = Sequential
+let sequential = `Sequential
+let lwt_jobs = `Lwt_jobs
 
-let sequential = Sequential
+let headers : concurrency_policy -> string list = function
+    `Sequential -> ["\"ctypes_cstubs_internals.h\""]
+  | `Lwt_jobs ->   ["\"ctypes_cstubs_internals.h\"";
+                    "\"lwt_unix.h\"";
+                    "<errno.h>";
+                    "<caml/memory.h>"]
 
-let write_c ?(concurrency=Sequential) fmt ~prefix (module B : BINDINGS) =
-  Format.fprintf fmt
-    "#include \"ctypes_cstubs_internals.h\"@\n@\n";
-  let module M = B((val gen_c prefix fmt)) in ()
+let write_c ?(concurrency=`Sequential) fmt ~prefix (module B : BINDINGS) =
+  List.iter (Format.fprintf fmt "#include %s@\n") (headers concurrency);
+  let module M = B((val gen_c ~concurrency prefix fmt)) in ()
 
-let write_ml ?(concurrency=Sequential) fmt ~prefix (module B : BINDINGS) =
-  let foreign, finally = gen_ml prefix fmt in
+let write_ml ?(concurrency=`Sequential) fmt ~prefix (module B : BINDINGS) =
+  let foreign, finally = gen_ml ~concurrency prefix fmt in
   let () = Format.fprintf fmt "module CI = Cstubs_internals@\n@\n" in
   let module M = B((val foreign)) in
   finally ()

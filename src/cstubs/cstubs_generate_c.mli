@@ -7,7 +7,8 @@
 
 (* C stub generation *)
 
-val fn : cname:string -> stub_name:string ->
+val fn : concurrency:[ `Sequential | `Lwt_jobs ] ->
+         cname:string -> stub_name:string ->
          Format.formatter -> 'a Ctypes.fn -> unit
 
 val value : cname:string -> stub_name:string -> Format.formatter ->
