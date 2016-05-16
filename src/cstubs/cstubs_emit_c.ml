@@ -81,6 +81,7 @@ let rec ceff fmt : ceff -> unit = function
   | `Index (e, i) ->
     fprintf fmt "@[@[%a@]@[[%a]@]@]" ceff e cexp i
   | `Deref e -> fprintf fmt "@[*@[%a@]@]" cexp e
+  | `DerefField (e, f) -> fprintf fmt "@[@[%a@]->%s@]" cexp e f
   | `Assign (lv, e) ->
     fprintf fmt "@[@[%a@]@;=@;@[%a@]@]" clvalue lv ceff e
 

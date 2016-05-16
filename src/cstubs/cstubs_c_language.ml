@@ -53,6 +53,7 @@ type ceff = [ cexp
             | `App of cfunction * cexp list
             | `Index of ceff * cexp
             | `Deref of cexp
+            | `DerefField of cexp * fieldname
             | `Assign of clvalue * ceff ]
 type cbind = clocal * ceff
 type ccomp = [ ceff
@@ -94,6 +95,7 @@ struct
     | `App ({ fn = Fn f }, _) -> return_type f
     | `Index (e, _) -> reference_ceff e
     | `Deref e -> reference_ceff (e :> ceff)
+    | `DerefField (e, f) -> field_ceff (e :> ceff) f
     | `Assign (_, rv) -> ceff rv
   and reference_ceff : ceff -> ty =
     fun e ->
@@ -104,6 +106,21 @@ struct
         "dereferencing expression of non-pointer type %s"
         (Ctypes.string_of_typ t)
       end
+  and field_ceff : ceff -> fieldname -> ty =
+    fun e f ->
+      begin match ceff e with
+          Ty (Pointer (Struct { fields } as s)) -> lookup_field f s fields
+        | Ty t -> Cstubs_errors.internal_error
+          "accessing a field %s in an expression of type %s, which is not a pointer-to-struct type"
+          f (Ctypes.string_of_typ t)
+      end
+  and lookup_field : type s a. string -> a typ -> s boxed_field list -> ty =
+    fun f ty fields -> match fields with
+        [] -> Cstubs_errors.internal_error
+                "field %s not found in struct %s" f
+                (Ctypes.string_of_typ ty)
+      | BoxedField { ftype; fname } :: _ when fname = f -> Ty ftype
+      | _ :: fields -> lookup_field f ty fields
 
   let rec ccomp : ccomp -> ty = function
     | #cexp as e -> cexp e
