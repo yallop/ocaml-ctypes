@@ -130,6 +130,12 @@
     return Val_int(Uint_custom_val(TYPE(BITS), a));                          \
   }                                                                          \
                                                                              \
+  /* of_int64 : int64 -> t */                                                \
+  value ctypes_uint ## BITS ## _of_int64(value a)                            \
+  {                                                                          \
+    return ctypes_copy_uint ## BITS(Int64_val(a));                           \
+  }                                                                          \
+                                                                             \
   /* to_int64 : t -> int64 */                                                \
   value ctypes_uint ## BITS ## _to_int64(value a)                            \
   {                                                                          \
@@ -175,7 +181,6 @@ value ctypes_ulong_size (value _) { return Val_int(sizeof (unsigned long)); }
 value ctypes_ulonglong_size (value _) { return Val_int(sizeof (unsigned long long)); }
 value ctypes_uint32_of_int32 (value i) { return ctypes_copy_uint32(Int32_val(i)); }
 value ctypes_int32_of_uint32 (value u) { return caml_copy_int32(Uint_custom_val(uint32_t, u)); }
-value ctypes_uint64_of_int64 (value i) { return ctypes_copy_uint64(Int64_val(i)); }
 value ctypes_uintptr_t_size (value _) { return Val_int(sizeof (uintptr_t)); }
 value ctypes_intptr_t_size (value _) { return Val_int(sizeof (intptr_t)); }
 value ctypes_ptrdiff_t_size (value _) { return Val_int(sizeof (ptrdiff_t)); }

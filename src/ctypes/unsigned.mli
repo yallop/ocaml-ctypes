@@ -50,6 +50,9 @@ module type S = sig
   val to_int : t -> int
   (** Convert the given unsigned integer value to an int. *)
 
+  val of_int64 : int64 -> t
+  (** Convert the given int64 value to an unsigned integer. *)
+
   val to_int64 : t -> int64
   (** Convert the given unsigned integer value to an int64. *)
 
