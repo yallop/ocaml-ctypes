@@ -22,6 +22,8 @@ module type Basics = sig
   val shift_right : t -> int -> t
   val of_int : int -> t
   val to_int : t -> int
+  val of_int64 : int64 -> t
+  val to_int64 : t -> int64
   val of_string : string -> t
   val to_string : t -> string
 end
@@ -107,6 +109,8 @@ struct
     external shift_right : t -> int -> t = "ctypes_uint8_shift_right"
     external of_int : int -> t = "ctypes_uint8_of_int"
     external to_int : t -> int = "ctypes_uint8_to_int"
+    external of_int64 : int64 -> t = "ctypes_uint8_of_int64"
+    external to_int64 : t -> int64 = "ctypes_uint8_to_int64"
     external of_string : string -> t = "ctypes_uint8_of_string"
     external to_string : t -> string = "ctypes_uint8_to_string"
     external _max_int : unit -> t = "ctypes_uint8_max"
@@ -135,6 +139,8 @@ struct
     external shift_right : t -> int -> t = "ctypes_uint16_shift_right"
     external of_int : int -> t = "ctypes_uint16_of_int"
     external to_int : t -> int = "ctypes_uint16_to_int"
+    external of_int64 : int64 -> t = "ctypes_uint16_of_int64"
+    external to_int64 : t -> int64 = "ctypes_uint16_to_int64"
     external of_string : string -> t = "ctypes_uint16_of_string"
     external to_string : t -> string = "ctypes_uint16_to_string"
     external _max_int : unit -> t = "ctypes_uint16_max"
@@ -167,6 +173,8 @@ struct
     external shift_right : t -> int -> t = "ctypes_uint32_shift_right"
     external of_int : int -> t = "ctypes_uint32_of_int"
     external to_int : t -> int = "ctypes_uint32_to_int"
+    external of_int64 : int64 -> t = "ctypes_uint32_of_int64"
+    external to_int64 : t -> int64 = "ctypes_uint32_to_int64"
     external of_string : string -> t = "ctypes_uint32_of_string"
     external to_string : t -> string = "ctypes_uint32_to_string"
     external _max_int : unit -> t = "ctypes_uint32_max"
@@ -183,7 +191,7 @@ end
 module UInt64 : sig
   include S
   external of_int64 : int64 -> t = "ctypes_uint64_of_int64"
-  external to_int64 : t -> int64 = "ctypes_int64_of_uint64"
+  external to_int64 : t -> int64 = "ctypes_uint64_to_int64"
 end = 
 struct
   module B =
@@ -201,6 +209,8 @@ struct
     external shift_right : t -> int -> t = "ctypes_uint64_shift_right"
     external of_int : int -> t = "ctypes_uint64_of_int"
     external to_int : t -> int = "ctypes_uint64_to_int"
+    external of_int64 : int64 -> t = "ctypes_uint64_of_int64"
+    external to_int64 : t -> int64 = "ctypes_uint64_to_int64"
     external of_string : string -> t = "ctypes_uint64_of_string"
     external to_string : t -> string = "ctypes_uint64_to_string"
     external _max_int : unit -> t = "ctypes_uint64_max"
@@ -209,8 +219,6 @@ struct
   include B
   include Extras(B)
   module Infix = MakeInfix(B)
-  external of_int64 : int64 -> t = "ctypes_uint64_of_int64"
-  external to_int64 : t -> int64 = "ctypes_int64_of_uint64"
 end
 
 

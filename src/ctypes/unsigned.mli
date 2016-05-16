@@ -50,6 +50,12 @@ module type S = sig
   val to_int : t -> int
   (** Convert the given unsigned integer value to an int. *)
 
+  val of_int64 : int64 -> t
+  (** Convert the given int64 value to an unsigned integer. *)
+
+  val to_int64 : t -> int64
+  (** Convert the given unsigned integer value to an int64. *)
+
   val of_string : string -> t
   (** Convert the given string to an unsigned integer.  Raise {!Failure}
       ["int_of_string"] if the given string is not a valid representation of
