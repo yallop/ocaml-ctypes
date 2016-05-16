@@ -85,6 +85,8 @@ let rec ceff fmt : ceff -> unit = function
     fprintf fmt "@[@[%a@]@;=@;@[%a@]@]" clvalue lv ceff e
 
 let rec ccomp fmt : ccomp -> unit = function
+  | #cexp as e when Type_C.cexp e = Ty Void ->
+    fprintf fmt "@[return@];"
   | #cexp as e ->
     fprintf fmt "@[<2>return@;@[%a@]@];" cexp e
   | #ceff as e -> fprintf fmt "@[<2>return@;@[%a@]@];" ceff e
