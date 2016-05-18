@@ -13,15 +13,16 @@ open Ctypes
    doesn't support passing enums. *)
 module Stubs(F : Cstubs.FOREIGN) =
 struct
+  open F
 
   module T = Types.Struct_stubs(Generated_struct_bindings)
 
-  let classify_integer = F.foreign "classify_integer"
+  let classify_integer = foreign "classify_integer"
       (int @-> returning T.signed)
 
-  let out_of_range = F.foreign "out_of_range"
+  let out_of_range = foreign "out_of_range"
       (void @-> returning T.signed)
 
-  let next_fruit = F.foreign "next_fruit"
+  let next_fruit = foreign "next_fruit"
       (T.fruit @-> returning T.fruit)
 end

@@ -41,6 +41,8 @@ end
    doesn't support passing structs with union or array members. *)
 module Stubs_only(F : Cstubs.FOREIGN) =
 struct
+  open F
+
   type number
   let number : number union typ = union "number"
   let i = field number "i" int
@@ -58,10 +60,10 @@ struct
   let elements = field triple "elements" (array 3 double)
   let () = seal triple
 
-  let add_tagged_numbers = F.foreign "add_tagged_numbers"
+  let add_tagged_numbers = foreign "add_tagged_numbers"
     (tagged @-> tagged @-> returning tagged)
 
-  let add_triples = F.foreign "add_triples"
+  let add_triples = foreign "add_triples"
     (triple @-> triple @-> returning triple)
 end
 

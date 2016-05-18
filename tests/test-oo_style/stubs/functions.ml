@@ -36,8 +36,8 @@ struct
 
   (* method table layout (two virtual methods) *)
   let (-:) ty label = field animal_methods label ty
-  let say = Foreign.funptr (ptr animal @-> returning string)      -: "say"
-  let identify = Foreign.funptr (ptr animal @-> returning string) -: "identify"
+  let say = Foreign.funptr Ctypes.(ptr animal @-> returning string)      -: "say"
+  let identify = Foreign.funptr Ctypes.(ptr animal @-> returning string) -: "identify"
   let () = seal animal_methods
 
   let call_say cinstance =
@@ -67,7 +67,7 @@ struct
   (* method table layout (one additional virtual method) *)
   let (-:) ty label = field camel_methods label ty
   let _     = animal_methods                       -: "_"
-  let humps = Foreign.funptr (ptr camel @-> returning int) -: "humps"
+  let humps = Foreign.funptr Ctypes.(ptr camel @-> returning int) -: "humps"
   let () = seal camel_methods
 
   let call_humps cinstance =

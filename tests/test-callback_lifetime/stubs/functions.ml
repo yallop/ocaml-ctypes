@@ -14,7 +14,7 @@ module Stubs (F: Cstubs.FOREIGN) =
 struct
   open F
 
-  let callback_type_ptr = funptr (int @-> returning int)
+  let callback_type_ptr = funptr Ctypes.(int @-> returning int)
 
   let store_callback = foreign "store_callback"
     (callback_type_ptr @-> returning void)

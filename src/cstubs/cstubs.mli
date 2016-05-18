@@ -72,11 +72,16 @@ end
 module type FOREIGN =
 sig
   type 'a fn
-  val foreign : string -> ('a -> 'b) Ctypes.fn -> ('a -> 'b) fn
-  val foreign_value : string -> 'a Ctypes.typ -> 'a Ctypes.ptr fn
+  type 'a return
+  val (@->) : 'a Ctypes.typ -> 'b fn -> ('a -> 'b) fn
+  val returning : 'a Ctypes.typ -> 'a return fn
+
+  type 'a result
+  val foreign : string -> ('a -> 'b) fn -> ('a -> 'b) result
+  val foreign_value : string -> 'a Ctypes.typ -> 'a Ctypes.ptr result
 end
 
-module type BINDINGS = functor (F : FOREIGN with type 'a fn = unit) -> sig end
+module type BINDINGS = functor (F : FOREIGN with type 'a result = unit) -> sig end
 
 val write_c : Format.formatter -> prefix:string -> (module BINDINGS) -> unit
 (** [write_c fmt ~prefix bindings] generates C stubs for the functions bound

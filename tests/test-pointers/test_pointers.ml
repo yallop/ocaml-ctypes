@@ -12,7 +12,8 @@ open Foreign
 
 let testlib = Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW])
 
-module Common_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
+module Common_tests(S : Cstubs.FOREIGN with type 'a result = 'a
+                                        and type 'a return = 'a) =
 struct
   module M = Functions.Stubs(S)
   open M

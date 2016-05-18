@@ -13,5 +13,5 @@ open Ctypes
    using stub generation. *)
 module Common(F : Cstubs.FOREIGN) =
 struct
-  let bool_and = F.foreign "bool_and" (bool @-> bool @-> returning bool)
+  let bool_and = F.(foreign "bool_and" (bool @-> bool @-> returning bool))
 end

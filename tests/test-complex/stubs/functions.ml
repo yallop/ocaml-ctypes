@@ -14,8 +14,8 @@ open Ctypes
 module Common(F : Cstubs.FOREIGN) =
 struct
   let bind typ name =
-    F.foreign name
-      (ptr typ @-> ptr typ @-> ptr typ @-> returning void)
+    F.(foreign name
+         (ptr typ @-> ptr typ @-> ptr typ @-> returning void))
 
   let add_complexd = bind complex64 "add_complexd"
   let mul_complexd = bind complex64 "mul_complexd"
@@ -28,7 +28,7 @@ end
 module Stubs_only(F : Cstubs.FOREIGN) =
 struct
   let bind typ name =
-    F.foreign name (typ @-> typ @-> returning typ)
+    F.(foreign name (typ @-> typ @-> returning typ))
 
   let add_complexd_val = bind complex64 "add_complexd_val"
   let mul_complexd_val = bind complex64 "mul_complexd_val"

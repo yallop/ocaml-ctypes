@@ -66,7 +66,8 @@ struct
     end
 
   module Build_call_tests
-      (F : Cstubs.FOREIGN with type 'a fn = 'a) =
+      (F : Cstubs.FOREIGN with type 'a result = 'a
+                           and type 'a return = 'a) =
   struct
     module F = Functions.Stubs(F)
     open F
