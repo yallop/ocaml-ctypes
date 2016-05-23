@@ -834,6 +834,39 @@ tests/test-passing-ocaml-values/generated_stubs.c: $(BUILDDIR)/test-passing-ocam
 tests/test-passing-ocaml-values/generated_bindings.ml: $(BUILDDIR)/test-passing-ocaml-values-stub-generator.native
 	$< --ml-file $@
 
+test-lwt-jobs-stubs.dir  = tests/test-lwt-jobs/stubs
+test-lwt-jobs-stubs.threads = yes
+test-lwt-jobs-stubs.subproject_deps = ctypes cstubs \
+   ctypes-foreign-base ctypes-foreign-threaded tests-common
+test-lwt-jobs-stubs: PROJECT=test-lwt-jobs-stubs
+test-lwt-jobs-stubs: $$(LIB_TARGETS)
+
+test-lwt-jobs-stub-generator.dir = tests/test-lwt-jobs/stub-generator
+test-lwt-jobs-stub-generator.threads = yes
+test-lwt-jobs-stub-generator.subproject_deps = ctypes cstubs \
+     ctypes-foreign-base ctypes-foreign-threaded test-lwt-jobs-stubs tests-common
+test-lwt-jobs-stub-generator.deps = str bigarray bytes
+test-lwt-jobs-stub-generator: PROJECT=test-lwt-jobs-stub-generator
+test-lwt-jobs-stub-generator: $$(NATIVE_TARGET)
+
+test-lwt-jobs.dir = tests/test-lwt-jobs
+test-lwt-jobs.threads = yes
+test-lwt-jobs.deps = str bigarray oUnit bytes lwt.unix
+test-lwt-jobs.subproject_deps = ctypes ctypes-foreign-base \
+   ctypes-foreign-threaded cstubs tests-common test-lwt-jobs-stubs
+test-lwt-jobs.link_flags = -L$(BUILDDIR)/clib -ltest_functions
+test-lwt-jobs: PROJECT=test-lwt-jobs
+test-lwt-jobs: $$(NATIVE_TARGET)
+
+test-lwt-jobs-generated: \
+  tests/test-lwt-jobs/generated_bindings.ml \
+  tests/test-lwt-jobs/generated_stubs.c
+
+tests/test-lwt-jobs/generated_stubs.c: $(BUILDDIR)/test-lwt-jobs-stub-generator.native
+	$< --c-file $@
+tests/test-lwt-jobs/generated_bindings.ml: $(BUILDDIR)/test-lwt-jobs-stub-generator.native
+	$< --ml-file $@
+
 test-threads-stubs.dir  = tests/test-threads/stubs
 test-threads-stubs.threads = yes
 test-threads-stubs.subproject_deps = ctypes cstubs \
@@ -882,6 +915,7 @@ TESTS += test-bigarrays-stubs test-bigarrays-stub-generator test-bigarrays-gener
 TESTS += test-coercions-stubs test-coercions-stub-generator test-coercions-generated test-coercions
 TESTS += test-roots
 TESTS += test-passing-ocaml-values-stubs test-passing-ocaml-values-stub-generator test-passing-ocaml-values-generated test-passing-ocaml-values
+TESTS += test-lwt-jobs-stubs test-lwt-jobs-stub-generator test-lwt-jobs-generated test-lwt-jobs
 TESTS += test-threads-stubs test-threads
 
 
@@ -911,5 +945,5 @@ test: build testlib tests-common $(TESTS) \
 
 run-%:	$*
 	@echo running $*
-	@cd $(BUILDDIR) && LD_LIBRARY_PATH=clib DYLD_LIBRARY_PATH=clib ./$*.native
+	@cd $(BUILDDIR) && LD_LIBRARY_PATH=clib DYLD_LIBRARY_PATH=clib ./$*.native -runner sequential
 

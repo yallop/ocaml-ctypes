@@ -57,17 +57,17 @@ let with_open_formatter filename f =
 
 let header = "#include \"clib/test_functions.h\""
 
-let run ?(cheader="") argv ?structs specs =
+let run ?concurrency ?(cheader="") argv ?structs specs =
   let ml_filename, c_filename, c_struct_filename = filenames argv
   in
   if ml_filename <> "" then
     with_open_formatter ml_filename
-      (fun fmt -> Cstubs.write_ml fmt ~prefix:"cstubs_tests" specs);
+      (fun fmt -> Cstubs.write_ml ?concurrency fmt ~prefix:"cstubs_tests" specs);
   if c_filename <> "" then
     with_open_formatter c_filename
       (fun fmt -> 
         Format.fprintf fmt "%s@\n%s@\n" header cheader;
-        Cstubs.write_c fmt ~prefix:"cstubs_tests" specs);
+        Cstubs.write_c ?concurrency fmt ~prefix:"cstubs_tests" specs);
   begin match structs, c_struct_filename with
    | None, _ -> ()
    | Some _, "" -> ()

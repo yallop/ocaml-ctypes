@@ -100,11 +100,11 @@ $(BUILDDIR)/%.cmx : %.ml
 
 $(BUILDDIR)/%.o : %.c
 	@mkdir -p $(@D)
-	cd $(@D) && $(OCAMLFIND) ocamlc -c $(CFLAGS:%=-ccopt %) -o $(@F) $(OCAMLFLAGS) $(realpath $<)
+	cd $(@D) && $(OCAMLFIND) ocamlc -c $(OCAMLFIND_PACKAGE_FLAGS) $(CFLAGS:%=-ccopt %) -o $(@F) $(OCAMLFLAGS) $(realpath $<)
 
 $(BUILDDIR)/xen/%.o : %.c
 	@mkdir -p $(@D)
-	cd $(@D) && $(OCAMLFIND) ocamlc -c $(XEN_CFLAGS:%=-ccopt %) -o $(@F) $(OCAMLFLAGS) $(realpath $<)
+	cd $(@D) && $(OCAMLFIND) ocamlc -c $(OCAMLFIND_PACKAGE_FLAGS) $(XEN_CFLAGS:%=-ccopt %) -o $(@F) $(OCAMLFLAGS) $(realpath $<)
 
 $(BUILDDIR)/%.cmi : %.mli
 	@mkdir -p $(@D)
