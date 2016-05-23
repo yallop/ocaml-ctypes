@@ -29,7 +29,8 @@ type ml_exp = [ `Ident of path
               | `MakePtr of ml_exp * ml_exp
               | `MakeFunPtr of ml_exp * ml_exp
               | `MakeStructured of ml_exp * ml_exp
-              | `Appl of ml_exp * ml_exp 
+              | `Appl of ml_exp * ml_exp
+              | `Tuple of ml_exp list
               | `Unit
               | `Fun of lident list * ml_exp ]
 
@@ -141,6 +142,16 @@ struct
         "@[<hov 2>CI.make_structured@ %a@ %a@]" (ml_exp ApplParens) t (ml_exp ApplParens) e
     | _, `Fun (xs, e) ->
       fprintf fmt "(@[<1>fun@ %a->@ %a)@]" args xs (ml_exp NoApplParens) e
+    | _, `Tuple es ->
+      fprintf fmt "(@[%a)@]" tuple_elements es
+  and tuple_elements fmt : ml_exp list -> unit =
+    fun xs ->
+      let last = List.length xs - 1 in
+      List.iteri
+        (fun i ->
+          if i <> last then fprintf fmt "%a,@ " (ml_exp NoApplParens)
+          else fprintf fmt "%a" (ml_exp NoApplParens))
+        xs
 
   let rec ml_pat appl_parens fmt pat =
     match appl_parens, pat with
