@@ -25,6 +25,8 @@ module type BINDINGS = functor (F : FOREIGN') -> sig end
 
 type concurrency_policy = [ `Sequential | `Lwt_jobs ]
 
+type errno_policy = [`Ignore_errno ]
+
 let gen_c ~concurrency prefix fmt : (module FOREIGN') =
   (module
    struct
@@ -145,19 +147,28 @@ let gen_ml ~concurrency prefix fmt : (module FOREIGN') * (unit -> unit) =
 
 let sequential = `Sequential
 let lwt_jobs = `Lwt_jobs
+let ignore_errno = `Ignore_errno
 
-let headers : concurrency_policy -> string list = function
-    `Sequential -> ["\"ctypes_cstubs_internals.h\""]
-  | `Lwt_jobs ->   ["\"ctypes_cstubs_internals.h\"";
-                    "\"lwt_unix.h\"";
-                    "<errno.h>";
-                    "<caml/memory.h>"]
+let concurrency_headers = function
+    `Sequential -> []
+  | `Lwt_jobs ->   ["\"lwt_unix.h\"";  "<caml/memory.h>"]
 
-let write_c ?(concurrency=`Sequential) fmt ~prefix (module B : BINDINGS) =
-  List.iter (Format.fprintf fmt "#include %s@\n") (headers concurrency);
+let errno_headers = function
+  `Ignore_errno -> []
+
+let headers : concurrency_policy -> errno_policy -> string list =
+  fun concurrency errno ->
+    ["\"ctypes_cstubs_internals.h\""] @
+    errno_headers errno @
+    concurrency_headers concurrency
+
+let write_c ?(concurrency=`Sequential) ?(errno=`Ignore_errno)
+    fmt ~prefix (module B : BINDINGS) =
+  List.iter (Format.fprintf fmt "#include %s@\n") (headers concurrency errno);
   let module M = B((val gen_c ~concurrency prefix fmt)) in ()
 
-let write_ml ?(concurrency=`Sequential) fmt ~prefix (module B : BINDINGS) =
+let write_ml ?(concurrency=`Sequential) ?(errno=`Ignore_errno)
+    fmt ~prefix (module B : BINDINGS) =
   let foreign, finally = gen_ml ~concurrency prefix fmt in
   let () = Format.fprintf fmt "module CI = Cstubs_internals@\n@\n" in
   let module M = B((val foreign)) in

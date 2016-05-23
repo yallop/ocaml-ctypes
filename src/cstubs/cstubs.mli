@@ -83,6 +83,14 @@ end
 
 module type BINDINGS = functor (F : FOREIGN with type 'a result = unit) -> sig end
 
+type errno_policy
+(** Values of the [errno_policy] type specify the errno support provided by
+    the generated code.  See {!ignore_errno} for the available option.
+*)
+
+val ignore_errno : errno_policy
+(** Generate code with no special support for errno.  This is the default. *)
+
 type concurrency_policy
 (** Values of the [concurrency_policy] type specify the concurrency support
     provided by the generated code.  See {!sequential} and {!lwt_jobs} for the
@@ -114,7 +122,7 @@ val lwt_jobs : concurrency_policy
        [val unlink : string -> int Lwt.t]
 *)
 
-val write_c : ?concurrency:concurrency_policy ->
+val write_c : ?concurrency:concurrency_policy -> ?errno:errno_policy ->
   Format.formatter -> prefix:string -> (module BINDINGS) -> unit
 (** [write_c fmt ~prefix bindings] generates C stubs for the functions bound
     with [foreign] in [bindings].  The stubs are intended to be used in
@@ -127,7 +135,7 @@ val write_c : ?concurrency:concurrency_policy ->
     [ctypes_cstubs_internals.h].
 *)
 
-val write_ml : ?concurrency:concurrency_policy ->
+val write_ml : ?concurrency:concurrency_policy -> ?errno:errno_policy ->
   Format.formatter -> prefix:string -> (module BINDINGS) -> unit
 (** [write_ml fmt ~prefix bindings] generates ML bindings for the functions
     bound with [foreign] in [bindings].  The generated code conforms to the
