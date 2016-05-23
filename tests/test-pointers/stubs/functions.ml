@@ -59,17 +59,21 @@ struct
     (ptr int @-> ptr int @-> int @-> returning (ptr int))
 
   let passing_pointers_to_callback = foreign "passing_pointers_to_callback"
-      (Foreign.funptr (ptr int @-> ptr int @-> returning int) @-> returning int)
+      (Foreign.funptr Ctypes.(ptr int @-> ptr int @-> returning int) @->
+       returning int)
 
   let accepting_pointer_from_callback =
     foreign "accepting_pointer_from_callback"
-      (Foreign.funptr (int @-> int @-> returning (ptr int)) @-> returning int)
+      (Foreign.funptr Ctypes.(int @-> int @-> returning (ptr int)) @->
+       returning int)
 
   let accepting_pointer_to_function_pointer =
     foreign "accepting_pointer_to_function_pointer"
-      (ptr (Foreign.funptr (int @-> int @-> returning int)) @-> returning int)
+      (ptr (Foreign.funptr Ctypes.(int @-> int @-> returning int)) @->
+       returning int)
 
   let returning_pointer_to_function_pointer =
     foreign "returning_pointer_to_function_pointer"
-      (void @-> returning (ptr (Foreign.funptr (int @-> int @-> returning int))))
+      (void @->
+       returning (ptr (Foreign.funptr Ctypes.(int @-> int @-> returning int))))
 end

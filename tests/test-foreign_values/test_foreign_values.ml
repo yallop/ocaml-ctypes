@@ -9,7 +9,8 @@ open OUnit2
 open Ctypes
 
 
-module Common_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
+module Common_tests(S : Cstubs.FOREIGN with type 'a result = 'a
+                                        and type 'a return = 'a) =
 struct
   module M = Functions.Common(S)
   open M
@@ -45,7 +46,8 @@ struct
 end
 
 
-module Make_stub_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
+module Make_stub_tests(S : Cstubs.FOREIGN with type 'a result = 'a
+                                           and type 'a return = 'a) =
 struct
   module N = Functions.Stubs(S)
   open N

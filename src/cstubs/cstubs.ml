@@ -10,11 +10,16 @@
 module type FOREIGN =
 sig
   type 'a fn
-  val foreign : string -> ('a -> 'b) Ctypes.fn -> ('a -> 'b) fn
-  val foreign_value : string -> 'a Ctypes.typ -> 'a Ctypes.ptr fn
+  type 'a return
+  val (@->) : 'a Ctypes.typ -> 'b fn -> ('a -> 'b) fn
+  val returning : 'a Ctypes.typ -> 'a return fn
+
+  type 'a result
+  val foreign : string -> ('a -> 'b) fn -> ('a -> 'b) result
+  val foreign_value : string -> 'a Ctypes.typ -> 'a Ctypes.ptr result
 end
 
-module type FOREIGN' = FOREIGN with type 'a fn = unit
+module type FOREIGN' = FOREIGN with type 'a result = unit
 
 module type BINDINGS = functor (F : FOREIGN') -> sig end
 
@@ -24,11 +29,15 @@ let gen_c prefix fmt : (module FOREIGN') =
      let counter = ref 0
      let var prefix name = incr counter;
        Printf.sprintf "%s_%d_%s" prefix !counter name
-     type 'a fn = unit
+     type 'a fn = 'a Ctypes.fn
+     type 'a return = 'a
+     type 'a result = unit
      let foreign cname fn =
        Cstubs_generate_c.fn ~cname ~stub_name:(var prefix cname) fmt fn
      let foreign_value cname typ =
        Cstubs_generate_c.value ~cname ~stub_name:(var prefix cname) fmt typ
+     let returning = Ctypes.returning
+     let (@->) = Ctypes.(@->)
    end)
 
 type bind = Bind : string * string * ('a -> 'b) Ctypes.fn -> bind
@@ -36,7 +45,15 @@ type val_bind = Val_bind : string * string * 'a Ctypes.typ -> val_bind
 
 let write_foreign fmt bindings val_bindings =
   Format.fprintf fmt
-    "type 'a fn = 'a@\n@\n";
+    "type 'a fn = 'a Ctypes.fn@\n";
+  Format.fprintf fmt
+    "type 'a result = 'a@\n";
+  Format.fprintf fmt
+    "type 'a return = 'a@\n";
+  Format.fprintf fmt
+    "let returning = Ctypes.returning@\n";
+  Format.fprintf fmt
+    "let (@@->) f p = Ctypes.(f @@-> p)@\n";
   Format.fprintf fmt
     "let foreign : type a b. string -> (a -> b) Ctypes.fn -> (a -> b) =@\n";
   Format.fprintf fmt
@@ -68,7 +85,12 @@ let gen_ml prefix fmt : (module FOREIGN') * (unit -> unit) =
     Printf.sprintf "%s_%d_%s" prefix !counter name in
   (module
    struct
-     type 'a fn = unit
+     type 'a fn = 'a Ctypes.fn
+     type 'a return = 'a
+     let (@->) = Ctypes.(@->)
+     let returning = Ctypes.returning
+
+     type 'a result = unit
      let foreign cname fn =
        let name = var prefix cname in
        bindings := Bind (cname, name, fn) :: !bindings;

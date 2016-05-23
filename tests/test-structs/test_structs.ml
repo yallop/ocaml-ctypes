@@ -12,7 +12,8 @@ open Ctypes
 let testlib = Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW])
 
 
-module Build_foreign_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
+module Build_foreign_tests(S : Cstubs.FOREIGN with type 'a result = 'a
+                                               and type 'a return = 'a) =
 struct
   module M = Functions.Common(S)
   open M
@@ -373,7 +374,8 @@ let test_struct_ffi_type_lifetime _ =
   end in ()
 
 
-module Build_stub_tests(S : Cstubs.FOREIGN with type 'a fn = 'a) =
+module Build_stub_tests(S : Cstubs.FOREIGN with type 'a result = 'a
+                                            and type 'a return = 'a) =
 struct
   open Functions
   include Build_foreign_tests(S)
@@ -557,7 +559,8 @@ struct
 
 
   module Build_call_tests
-      (F : Cstubs.FOREIGN with type 'a fn = 'a) =
+      (F : Cstubs.FOREIGN with type 'a result = 'a
+                           and type 'a return = 'a) =
   struct
     module F = Functions.Common(F)
     open F

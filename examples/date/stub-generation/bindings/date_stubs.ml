@@ -23,8 +23,7 @@ let tm_isdst = int -: "tm_isdst" (* daylight saving time *)
 let () = seal (tm : tm structure typ)
 
 module Bindings
-  (F : sig type _ fn
-           val foreign : string -> ('a -> 'b) Ctypes.fn -> ('a -> 'b) fn end) =
+  (F : Cstubs.FOREIGN) =
 struct
   open F
 

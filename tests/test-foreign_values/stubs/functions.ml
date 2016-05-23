@@ -20,16 +20,16 @@ struct
   let global_struct = F.foreign_value "global_struct" s
 
   let plus =
-    F.foreign_value "plus_callback"
-      (Foreign.funptr_opt (int @-> int @-> returning int))
+    F.(foreign_value "plus_callback"
+         (Foreign.funptr_opt Ctypes.(int @-> int @-> returning int)))
 
-  let sum = F.foreign "sum_range_with_plus_callback"
-      (int @-> int @-> returning int)
+  let sum = F.(foreign "sum_range_with_plus_callback"
+                 (int @-> int @-> returning int))
 end
 
 
 module Stubs (F: Cstubs.FOREIGN) =
 struct
   include Common(F)
-  let environ = F.foreign_value "environ" (ptr string_opt)
+  let environ = F.(foreign_value "environ" (ptr string_opt))
 end

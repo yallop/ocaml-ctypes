@@ -27,9 +27,16 @@ let filenames argv =
     (!ml_filename, !c_filename, !c_struct_filename)
   end
 
-module Foreign_binder : Cstubs.FOREIGN with type 'a fn = 'a =
+module Foreign_binder : Cstubs.FOREIGN
+  with type 'a result = 'a
+   and type 'a return = 'a =
 struct
-  type 'a fn = 'a
+  type 'a fn = 'a Ctypes.fn
+  type 'a return = 'a
+  let (@->) = Ctypes.(@->)
+  let returning = Ctypes.returning
+
+  type 'a result = 'a
   let foreign name fn = Foreign.foreign name fn
   let foreign_value name fn = Foreign.foreign_value name fn
 end
