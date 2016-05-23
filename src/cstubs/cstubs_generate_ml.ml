@@ -31,6 +31,7 @@ type ml_exp = [ `Ident of path
               | `MakeStructured of ml_exp * ml_exp
               | `Appl of ml_exp * ml_exp
               | `Tuple of ml_exp list
+              | `Seq of ml_exp * ml_exp
               | `Unit
               | `Fun of lident list * ml_exp ]
 
@@ -144,6 +145,8 @@ struct
       fprintf fmt "(@[<1>fun@ %a->@ %a)@]" args xs (ml_exp NoApplParens) e
     | _, `Tuple es ->
       fprintf fmt "(@[%a)@]" tuple_elements es
+    | _, `Seq (e1, e2) ->
+      fprintf fmt "(@[%a;@ %a)@]" (ml_exp NoApplParens) e1 (ml_exp NoApplParens) e2
   and tuple_elements fmt : ml_exp list -> unit =
     fun xs ->
       let last = List.length xs - 1 in
