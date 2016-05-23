@@ -91,6 +91,30 @@ type errno_policy
 val ignore_errno : errno_policy
 (** Generate code with no special support for errno.  This is the default. *)
 
+val return_errno : errno_policy
+(** Generate code that returns errno in addition to the return value of each function.
+
+    Passing [return_errno] as the [errno] argument to {!Cstubs.write_c} and
+    {!Cstubs.write_ml} changes the return type of bound functions from a
+    single value to a pair of values.  For example, the binding
+    specification 
+
+       [let realpath = foreign "reaplath" (string @-> string @-> returning string)]
+
+    generates a value of the following type by default:
+
+       [val realpath : string -> string -> stirng]
+
+    but when using [return_errno] the generated type is as follows:
+
+       [val realpath : string -> string -> stirng * int]
+
+    and when using both [return_errno] and [lwt_jobs] the generated type is as
+    follows:
+
+       [val realpath : string -> string -> (stirng * int) Lwt.t]
+*)
+
 type concurrency_policy
 (** Values of the [concurrency_policy] type specify the concurrency support
     provided by the generated code.  See {!sequential} and {!lwt_jobs} for the

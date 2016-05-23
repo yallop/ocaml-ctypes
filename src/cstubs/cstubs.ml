@@ -25,7 +25,7 @@ module type BINDINGS = functor (F : FOREIGN') -> sig end
 
 type concurrency_policy = [ `Sequential | `Lwt_jobs ]
 
-type errno_policy = [`Ignore_errno ]
+type errno_policy = [ `Ignore_errno | `Return_errno ]
 
 let gen_c ~concurrency prefix fmt : (module FOREIGN') =
   (module
@@ -148,13 +148,15 @@ let gen_ml ~concurrency prefix fmt : (module FOREIGN') * (unit -> unit) =
 let sequential = `Sequential
 let lwt_jobs = `Lwt_jobs
 let ignore_errno = `Ignore_errno
+let return_errno = `Return_errno
 
 let concurrency_headers = function
     `Sequential -> []
   | `Lwt_jobs ->   ["\"lwt_unix.h\"";  "<caml/memory.h>"]
 
 let errno_headers = function
-  `Ignore_errno -> []
+    `Ignore_errno -> []
+  | `Return_errno -> ["<errno.h>"]
 
 let headers : concurrency_policy -> errno_policy -> string list =
   fun concurrency errno ->
