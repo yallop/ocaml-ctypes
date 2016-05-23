@@ -93,3 +93,5 @@ type 'a prim = 'a Ctypes_primitive_types.prim =
 
 val build_enum_type :
   string -> Ctypes_static.arithmetic -> ?unexpected:(int64 -> 'a) -> ('a * int64) list -> 'a typ
+
+val use_value : 'a -> unit
