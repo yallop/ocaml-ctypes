@@ -14,4 +14,7 @@ struct
   open F
 
   let sqrt = foreign "sqrt" (double @-> returning double)
+
+  let sum_int_array = foreign "sum_int_array"
+      (ptr int32_t @-> size_t @-> returning int32_t)
 end
