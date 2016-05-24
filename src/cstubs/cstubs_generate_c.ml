@@ -87,6 +87,10 @@ struct
                                   references_ocaml_heap = true;
                                   typ = Ty value }
 
+  let errno : ceff = `Global { name = "errno";
+                               references_ocaml_heap = false;
+                               typ = Ty int }
+
   let functions : ceff = `Global
     { name = "functions";
       references_ocaml_heap = true;
@@ -327,17 +331,21 @@ struct
   let structure_type stub_name = 
     structure (sprintf "job_%s" stub_name)
 
-  let structure ~stub_name fmt fn args result =
+  let structure ~errno ~stub_name fmt fn args result =
     let open Ctypes in
     let s = structure_type stub_name in
     let (_ : (_,_) field) = field s "job" lwt_unix_job in
     let (_ : (_,_) field) = field s "result" result in
+    let () = match errno with
+        `Ignore_errno -> ()
+      | `Return_errno -> ignore (field s "error_status" int)
+    in
     let () = ListLabels.iter args
         ~f:(fun (BoxedType t, name) -> ignore (field s name t : (_,_) field)) in
     let () = seal s in
     fprintf fmt "@[%a@];@\n" (fun t -> format_typ t) s
     
-  let worker ~cname ~stub_name fmt f result args =
+  let worker ~errno ~cname ~stub_name fmt f result args =
     let fn' = { fname = cname;
                allocates = false;
                reads_ocaml_heap = false;
@@ -345,9 +353,22 @@ struct
     and j = "j", Ty (ptr (structure_type stub_name)) in
     let rec body args : _ -> ccomp = function
         [] ->
-        `LetAssign (`PointerField (`Local j, "result"),
-                    `App (fn', List.rev args),
-                    `Return (Ty Void, `Int 0))
+        let r c =
+          Generate_C.cast ~from:(Ty result) ~into:(Ty Void)
+            (`LetAssign (`PointerField (`Local j, "result"),
+                         `App (fn', List.rev args),
+                         c))
+        in
+        begin match errno with
+            `Ignore_errno -> r (`Return (Ty Void, (`Int 0)))
+          | `Return_errno ->
+            let open Generate_C in
+              r
+              (`LetAssign
+                 (`PointerField (`Local j, "error_status"),
+                  errno,
+                  `Return (Ty Void, (`Int 0))))
+        end
       | (BoxedType ty, x) :: xs ->
         Generate_C.((`DerefField (`Local j, x), ty) >>= fun y ->
                     body (y :: args) xs)
@@ -357,24 +378,32 @@ struct
                   body [] args,
                   `Static))
 
-  let result ~stub_name fmt fn result =
+  let result ~errno ~stub_name fmt fn result =
     begin
       fprintf fmt "@[static@ value@ result_%s@;@[(struct@ job_%s@ *j)@]@]@;@[<2>{@\n"
         stub_name stub_name;
       fprintf fmt "@[CAMLparam0@ ();@]@\n";
       fprintf fmt "@[CAMLlocal1@ (rv);@]@\n";
-      fprintf fmt "@[rv@ =@ (%a);@]@\n"
-        (fun fmt ty ->
-           Cstubs_emit_c.ceff fmt
-             (Generate_C.inj ty
-                (`Local ("j->result", Cstubs_c_language.(Ty ty)))))
-        result;
+      let () = match errno with
+          `Ignore_errno ->
+          fprintf fmt "@[rv@ =@ (";
+        | `Return_errno ->
+          fprintf fmt "@[rv@ =@ caml_alloc_tuple(2);@]@\n";
+          fprintf fmt "@[Store_field(rv,@ 1,@ Val_int(j->error_status));@]@\n";
+          fprintf fmt "@[Store_field(rv,@ 0,@ ";
+      in
+          fprintf fmt "%a);@]@\n"
+            (fun fmt ty ->
+               Cstubs_emit_c.ceff fmt
+                 (Generate_C.inj ty
+                    (`Local ("j->result", Cstubs_c_language.(Ty ty)))))
+            result;
       fprintf fmt "@[lwt_unix_free_job(&j->job)@];@\n";
       fprintf fmt "@[CAMLreturn@ (rv)@];@]@\n";
       fprintf fmt "}@\n";
     end
 
-  let stub ~stub_name fmt fn args =
+  let stub ~errno ~stub_name fmt fn args =
     begin
       fprintf fmt "@[value@ %s@;@[(%s)@]@]@;@[<2>{@\n"
         stub_name
@@ -385,6 +414,11 @@ struct
 
       fprintf fmt "@[LWT_UNIX_INIT_JOB(job,@ %s,@ 0)@];@\n"
         stub_name;
+      let () = match errno with
+          `Ignore_errno -> ()
+        | `Return_errno ->
+          fprintf fmt  "@[job->error_status@ =@ 0@];@\n"
+      in
       ListLabels.iter args
         ~f:(fun (BoxedType t, x) ->
             fprintf fmt "@[job->%s@ =@ %a@];@\n" x
@@ -408,17 +442,17 @@ struct
         | Returns t -> List.rev args, BoxedType t
      in aux fn []  
 
-  let fn ~cname ~stub_name fmt fn =
+  let fn ~errno ~cname ~stub_name fmt fn =
     let args, BoxedType r = fn_args_and_result fn in
     begin
-      structure ~stub_name fmt fn args r;
-      worker ~cname ~stub_name fmt fn r args;
-      result ~stub_name fmt fn r;
-      stub ~stub_name fmt fn args;
+      structure ~errno ~stub_name fmt fn args r;
+      worker ~errno ~cname ~stub_name fmt fn r args;
+      result ~errno ~stub_name fmt fn r;
+      stub ~errno ~stub_name fmt fn args;
       fprintf fmt "@\n";
     end
 end
 
-let fn ~concurrency = match concurrency with
+let fn ~concurrency ~errno = match concurrency with
     `Sequential -> fn
-  | `Lwt_jobs -> Lwt.fn
+  | `Lwt_jobs -> Lwt.fn ~errno

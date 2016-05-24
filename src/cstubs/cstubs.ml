@@ -27,7 +27,7 @@ type concurrency_policy = [ `Sequential | `Lwt_jobs ]
 
 type errno_policy = [ `Ignore_errno | `Return_errno ]
 
-let gen_c ~concurrency prefix fmt : (module FOREIGN') =
+let gen_c ~concurrency ~errno prefix fmt : (module FOREIGN') =
   (module
    struct
      let counter = ref 0
@@ -37,7 +37,7 @@ let gen_c ~concurrency prefix fmt : (module FOREIGN') =
      type 'a return = 'a
      type 'a result = unit
      let foreign cname fn =
-       Cstubs_generate_c.fn ~concurrency
+       Cstubs_generate_c.fn ~concurrency ~errno
          ~cname ~stub_name:(var prefix cname) fmt fn
      let foreign_value cname typ =
        Cstubs_generate_c.value ~cname ~stub_name:(var prefix cname) fmt typ
@@ -167,7 +167,7 @@ let headers : concurrency_policy -> errno_policy -> string list =
 let write_c ?(concurrency=`Sequential) ?(errno=`Ignore_errno)
     fmt ~prefix (module B : BINDINGS) =
   List.iter (Format.fprintf fmt "#include %s@\n") (headers concurrency errno);
-  let module M = B((val gen_c ~concurrency prefix fmt)) in ()
+  let module M = B((val gen_c ~concurrency ~errno prefix fmt)) in ()
 
 let write_ml ?(concurrency=`Sequential) ?(errno=`Ignore_errno)
     fmt ~prefix (module B : BINDINGS) =
