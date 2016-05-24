@@ -180,7 +180,8 @@ struct
       in
       let f' = name_params f in
       `Function (`Fundec (stub_name, value_params f', Ty value),
-                 body [] f')
+                 body [] f',
+                `Extern)
 
   let byte_fn : type a. string -> a Ctypes_static.fn -> int -> cfundef =
     fun fname fn nargs ->
@@ -198,7 +199,8 @@ struct
       in
       let bytename = Printf.sprintf "%s_byte%d" fname nargs in
       `Function (`Fundec (bytename, [argv; argc], Ty value),
-                 build_call nargs)
+                 build_call nargs,
+                 `Extern)
 
   let inverse_fn ~stub_name ~runtime_lock f =
     let `Fundec (_, args, Ty rtyp) as dec = fundec stub_name f in
@@ -254,7 +256,8 @@ struct
                   `CAMLparam0 >>
                   `CAMLlocalN (local "locals" (array (List.length args) value),
                                local "nargs" int) >>
-                    body)))
+                  body)),
+       `Extern)
 
   let value : type a. cname:string -> stub_name:string -> a Ctypes_static.typ -> cfundef =
     fun ~cname ~stub_name typ ->
@@ -263,12 +266,13 @@ struct
       let x = fresh_var () in
       `Function (`Fundec (stub_name, ["_", Ty value], Ty value),
                  `Let ((local x ty, e),
-                       (inj (ptr typ) (local x ty) :> ccomp)))
+                       (inj (ptr typ) (local x ty) :> ccomp)),
+                 `Extern)
 
 end
 
 let fn ~cname ~stub_name fmt fn =
-  let `Function (`Fundec (f, xs, _), _) as dec
+  let `Function (`Fundec (f, xs, _), _, _) as dec
       = Generate_C.fn ~stub_name ~cname fn
   in
   let nargs = List.length xs in

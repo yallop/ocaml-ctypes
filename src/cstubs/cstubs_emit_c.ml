@@ -140,6 +140,11 @@ let cfundec : Format.formatter -> cfundec -> unit =
         format_parameter_list args (Ctypes_type_printing.format_name ~name) fmt)
       `nonarray fmt
 
-let cfundef fmt (`Function (dec, body) : cfundef) =
+let storage_class fmt = function
+    `Static -> fprintf fmt "static@\n"
+  | `Extern -> ()
+
+let cfundef fmt (`Function (dec, body, sc) : cfundef) =
+  storage_class fmt sc;
   fprintf fmt "%a@\n{@[<v 2>@\n%a@]@\n}@\n"
     cfundec dec ccomp body

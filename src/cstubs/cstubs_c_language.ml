@@ -35,6 +35,7 @@ type cglobal = {
 
 type clocal = [ `Local of string * ty ]
 type cvar = [ clocal | `Global of cglobal ]
+type storage_class = [`Static | `Extern]
 type cconst = [ `Int of int ]
 type cexp = [ cconst
             | clocal
@@ -62,7 +63,7 @@ type ccomp = [ ceff
              | `Return of ty * cexp
              | `Let of cbind * ccomp ]
 type cfundec = [ `Fundec of string * (string * ty) list * ty ]
-type cfundef = [ `Function of cfundec * ccomp ]
+type cfundef = [ `Function of cfundec * ccomp * storage_class ]
 
 let rec return_type : type a. a fn -> ty = function
   | Function (_, f) -> return_type f
