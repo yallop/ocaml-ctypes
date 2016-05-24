@@ -48,56 +48,58 @@ let gen_c ~concurrency ~errno prefix fmt : (module FOREIGN') =
 type bind = Bind : string * string * ('a -> 'b) Ctypes.fn -> bind
 type val_bind = Val_bind : string * string * 'a Ctypes.typ -> val_bind
 
-let write_return : concurrency:concurrency_policy -> Format.formatter -> unit =
-  fun ~concurrency fmt -> match concurrency with
-      `Sequential -> Format.fprintf fmt "type 'a return = 'a@\n"
-    | `Lwt_jobs ->
+let write_return :
+  concurrency:concurrency_policy -> errno:errno_policy ->
+  Format.formatter -> unit =
+  fun ~concurrency ~errno fmt -> match concurrency, errno with
+      `Sequential, `Ignore_errno -> Format.fprintf fmt "type 'a return = 'a@\n"
+    | `Sequential, `Return_errno -> Format.fprintf fmt "type 'a return = 'a * int@\n"
+    | `Lwt_jobs, `Ignore_errno ->
       begin
         Format.fprintf fmt "type 'a return = { lwt: 'a Lwt.t }@\n";
         Format.fprintf fmt "let box_lwt lwt = {lwt}@\n";
       end
-
-let write_fn : concurrency:concurrency_policy -> Format.formatter -> unit =
-  fun ~concurrency fmt -> match concurrency with
-      `Sequential ->
+    | `Lwt_jobs, `Return_errno ->
       begin
-        Format.fprintf fmt
-          "type 'a fn = 'a CI.fn = @\n";
-        Format.fprintf fmt
-          " | Returns  : 'a CI.typ   -> 'a return fn@\n";
-        Format.fprintf fmt
-          " | Function : 'a CI.typ * 'b fn  -> ('a -> 'b) fn@\n";
-        Format.fprintf fmt
-          "let returning t = CI.Returns t@\n";
-        Format.fprintf fmt
-          "let (@@->) f p = CI.Function (f, p)@\n";
-      end
-    | `Lwt_jobs ->
-      begin
-        Format.fprintf fmt
-          "type 'a fn = @\n";
-        Format.fprintf fmt
-          " | Returns  : 'a CI.typ   -> 'a return fn@\n";
-        Format.fprintf fmt
-          " | Function : 'a CI.typ * 'b fn  -> ('a -> 'b) fn@\n";
-        Format.fprintf fmt
-          "let returning t = Returns t@\n";
-        Format.fprintf fmt
-          "let (@@->) f p = Function (f, p)@\n";
+        Format.fprintf fmt "type 'a return = { lwt: ('a * int) Lwt.t }@\n";
+        Format.fprintf fmt "let box_lwt lwt = {lwt}@\n";
       end
 
-let write_foreign ~concurrency fmt bindings val_bindings =
+let write_fn ~concurrency ~errno fmt =
+  begin
+    Format.fprintf fmt "type 'a fn =@\n";
+    Format.fprintf fmt " | Returns  : 'a CI.typ   -> 'a return fn@\n";
+    Format.fprintf fmt " | Function : 'a CI.typ * 'b fn  -> ('a -> 'b) fn@\n"
+  end
+
+let write_map_result ~concurrency ~errno fmt =
+  match concurrency, errno with
+    `Sequential, `Ignore_errno ->
+    Format.fprintf fmt "let map_result f x = f x@\n"
+  | `Sequential, `Return_errno ->
+    Format.fprintf fmt "let map_result f (x, y) = (f x, y)@\n"
+  | `Lwt_jobs, `Ignore_errno ->
+    Format.fprintf fmt "let map_result f x = Lwt.map f x@\n"
+  | `Lwt_jobs, `Return_errno ->
+    Format.fprintf fmt "let map_result f v = Lwt.map (fun (x, y) -> (f x, y)) v@\n"
+
+let write_foreign ~concurrency ~errno fmt bindings val_bindings =
   Format.fprintf fmt
     "type 'a result = 'a@\n";
-  write_return ~concurrency fmt;
-  write_fn ~concurrency fmt;
+  write_return ~concurrency ~errno fmt;
+  write_fn ~concurrency ~errno fmt;
+  write_map_result ~concurrency ~errno fmt;
+  Format.fprintf fmt
+    "let returning t = Returns t@\n";
+  Format.fprintf fmt
+    "let (@@->) f p = Function (f, p)@\n";
   Format.fprintf fmt
     "let foreign : type a b. string -> (a -> b) fn -> (a -> b) =@\n";
   Format.fprintf fmt
     "  fun name t -> match t, name with@\n@[<v>";
   ListLabels.iter bindings
     ~f:(fun (Bind (stub_name, external_name, fn)) ->
-      Cstubs_generate_ml.case ~concurrency ~stub_name ~external_name fmt fn);
+      Cstubs_generate_ml.case ~concurrency ~errno ~stub_name ~external_name fmt fn);
   Format.fprintf fmt "@[<hov 2>@[|@ _,@ s@ ->@]@ ";
   Format.fprintf fmt
     " @[Printf.ksprintf@ failwith@ \"No match for %%s\" s@]@]@]@.@\n";
@@ -114,7 +116,7 @@ let write_foreign ~concurrency fmt bindings val_bindings =
   Format.fprintf fmt
     " @[Printf.ksprintf@ failwith@ \"No match for %%s\" s@]@]@]@.@\n"
 
-let gen_ml ~concurrency prefix fmt : (module FOREIGN') * (unit -> unit) =
+let gen_ml ~concurrency ~errno prefix fmt : (module FOREIGN') * (unit -> unit) =
   let bindings = ref []
   and val_bindings = ref []
   and counter = ref 0 in
@@ -131,11 +133,11 @@ let gen_ml ~concurrency prefix fmt : (module FOREIGN') * (unit -> unit) =
      let foreign cname fn =
        let name = var prefix cname in
        bindings := Bind (cname, name, fn) :: !bindings;
-       Cstubs_generate_ml.extern ~concurrency
+       Cstubs_generate_ml.extern ~concurrency ~errno
          ~stub_name:name ~external_name:name fmt fn
      let foreign_value cname typ =
        let name = var prefix cname in
-       Cstubs_generate_ml.extern ~concurrency:`Sequential
+       Cstubs_generate_ml.extern ~concurrency:`Sequential ~errno:`Ignore_errno
          ~stub_name:name ~external_name:name fmt
          Ctypes.(void @-> returning (ptr void));
        val_bindings := Val_bind (cname, name, typ) :: !val_bindings
@@ -143,7 +145,7 @@ let gen_ml ~concurrency prefix fmt : (module FOREIGN') * (unit -> unit) =
      let (@->) = Ctypes.(@->)
    end),
   fun () ->
-    write_foreign ~concurrency fmt !bindings !val_bindings
+    write_foreign ~concurrency ~errno fmt !bindings !val_bindings
 
 let sequential = `Sequential
 let lwt_jobs = `Lwt_jobs
@@ -171,7 +173,7 @@ let write_c ?(concurrency=`Sequential) ?(errno=`Ignore_errno)
 
 let write_ml ?(concurrency=`Sequential) ?(errno=`Ignore_errno)
     fmt ~prefix (module B : BINDINGS) =
-  let foreign, finally = gen_ml ~concurrency prefix fmt in
+  let foreign, finally = gen_ml ~concurrency ~errno prefix fmt in
   let () = Format.fprintf fmt "module CI = Cstubs_internals@\n@\n" in
   let module M = B((val foreign)) in
   finally ()
