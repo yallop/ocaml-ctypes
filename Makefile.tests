@@ -860,12 +860,20 @@ test-lwt-jobs: $$(NATIVE_TARGET)
 
 test-lwt-jobs-generated: \
   tests/test-lwt-jobs/generated_bindings.ml \
-  tests/test-lwt-jobs/generated_stubs.c
+  tests/test-lwt-jobs/generated_stubs.c \
+  tests/test-lwt-jobs/generated_struct_bindings.ml \
+  $(BUILDDIR)/tests/test-lwt-jobs/generated_struct_stubs.c
 
 tests/test-lwt-jobs/generated_stubs.c: $(BUILDDIR)/test-lwt-jobs-stub-generator.native
 	$< --c-file $@
 tests/test-lwt-jobs/generated_bindings.ml: $(BUILDDIR)/test-lwt-jobs-stub-generator.native
 	$< --ml-file $@
+tests/test-lwt-jobs/generated_struct_bindings.ml: $(BUILDDIR)/test-lwt-jobs-ml-stub-generator.native
+	$< > $@
+$(BUILDDIR)/test-lwt-jobs-ml-stub-generator.native: $(BUILDDIR)/tests/test-lwt-jobs/generated_struct_stubs.c
+	$(CC) -I `$(OCAMLFIND) ocamlc -where | sed 's|\r$$||'` $(CFLAGS) $(LDFLAGS) $(WINLDFLAGS) -o $@ $^
+$(BUILDDIR)/tests/test-lwt-jobs/generated_struct_stubs.c: $(BUILDDIR)/test-lwt-jobs-stub-generator.native
+	$< --c-struct-file $@
 
 test-threads-stubs.dir  = tests/test-threads/stubs
 test-threads-stubs.threads = yes

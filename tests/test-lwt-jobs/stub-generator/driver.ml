@@ -7,7 +7,12 @@
 
 (* Stub generation driver for the Lwt jobs tests. *)
 
-let cheader = "#include <math.h>"
+let cheader = "#include <math.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+"
 
 let () = Tests_common.run ~cheader Sys.argv (module Functions.Stubs)
+    ~structs:(module Types.Struct_stubs)
     ~concurrency:Cstubs.lwt_jobs

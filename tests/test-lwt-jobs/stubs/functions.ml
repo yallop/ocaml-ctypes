@@ -18,6 +18,7 @@ struct
   let sum_int_array = foreign "sum_int_array"
       (ptr int32_t @-> size_t @-> returning int32_t)
 
-  let realpath = foreign "realpath"
-      (string @-> string @-> returning string)
+  let struct_stat : [`stat] structure typ = structure "stat"
+  let stat = foreign "stat"
+      (string @-> ptr struct_stat @-> returning int)
 end

@@ -9,6 +9,7 @@ open OUnit2
 open Ctypes
 
 
+module Structures = Types.Struct_stubs(Generated_struct_bindings)
 module Bindings = Functions.Stubs(Generated_bindings)
 
 (*
@@ -45,12 +46,36 @@ let test_object_lifetime _ =
   end
 
 
+(*
+  Test that strings remain alive during the Lwt job call.
+ *)
+let test_string_lifetime _ =
+  let s = make Structures.stat in
+  let call = (Bindings.stat (Bytes.copy ".") (addr s)).Generated_bindings.lwt
+  in
+  begin
+    Gc.compact ();
+    Gc.compact ();
+    Lwt_unix.run
+      (Lwt.(call >>= fun i ->
+            assert_equal 0 i;
+            assert_equal Structures.ifdir
+              (PosixTypes.Mode.logand
+                 Structures.ifmt
+                 (getf s Structures.st_mode));
+            return ()))
+  end
+
+
 let suite = "Lwt job tests" >:::
   ["calling sqrt"
     >:: test_sqrt;
 
    "object lifetime"
     >:: test_object_lifetime;
+
+   "string lifetime"
+    >:: test_string_lifetime;
   ]
 
 
