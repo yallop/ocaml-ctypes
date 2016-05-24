@@ -48,7 +48,7 @@ let test_errno_no_exception_raised _ =
 
     
 
-let suite = "errno tests" >:::
+let suite = "foreign+errno tests" >:::
   ["Exception from close"
     >:: test_errno_exception_raised;
 

@@ -494,12 +494,12 @@ tests/test-arrays/generated_stubs.c: $(BUILDDIR)/test-arrays-stub-generator.nati
 tests/test-arrays/generated_bindings.ml: $(BUILDDIR)/test-arrays-stub-generator.native
 	$< --ml-file $@
 
-test-errno.dir = tests/test-errno
-test-errno.threads = yes
-test-errno.deps = str bigarray oUnit bytes
-test-errno.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-threaded
-test-errno: PROJECT=test-errno
-test-errno: $$(NATIVE_TARGET)
+test-foreign-errno.dir = tests/test-foreign-errno
+test-foreign-errno.threads = yes
+test-foreign-errno.deps = str bigarray oUnit bytes
+test-foreign-errno.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-threaded
+test-foreign-errno: PROJECT=test-foreign-errno
+test-foreign-errno: $$(NATIVE_TARGET)
 
 test-passable.dir = tests/test-passable
 test-passable.threads = yes
@@ -908,7 +908,7 @@ TESTS += test-foreign_values-stubs test-foreign_values-stub-generator test-forei
 TESTS += test-unions-stubs test-unions-stub-generator test-unions-generated test-unions
 TESTS += test-custom_ops
 TESTS += test-arrays-stubs test-arrays-stub-generator test-arrays-generated test-arrays
-TESTS += test-errno
+TESTS += test-foreign-errno
 TESTS += test-passable
 TESTS += test-alignment
 TESTS += test-views-stubs test-views-stub-generator test-views-generated test-views
