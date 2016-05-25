@@ -16,6 +16,7 @@ type concurrency_policy = [ `Sequential | `Lwt_jobs ]
 type lident = string
 type ml_type = [ `Ident of path
                | `Appl of path * ml_type list
+               | `Pair of ml_type * ml_type
                | `Fn of ml_type * ml_type ]
 
 type ml_external_type = [ `Prim of ml_type list * ml_type ]
@@ -92,6 +93,8 @@ struct
       fprintf fmt "@[(%a@ ->@ %a)@]" (ml_type ArrowParens) t (ml_type NoArrowParens) t'
     | NoArrowParens, `Fn (t, t') ->
       fprintf fmt "@[%a@ ->@]@ %a" (ml_type ArrowParens) t (ml_type NoArrowParens) t'
+    | _, `Pair (t, t') ->
+      fprintf fmt "@[(%a@ *@ %a)@]" (ml_type NoArrowParens) t (ml_type NoArrowParens) t'
 
   let ml_external_type fmt (`Prim (args, ret) : ml_external_type) =
     List.iter (fprintf fmt "@[%a@ ->@]@ " (ml_type ArrowParens)) args;
