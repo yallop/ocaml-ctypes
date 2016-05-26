@@ -13,18 +13,27 @@ let filenames argv =
   let usage = "arguments: [--ml-file $filename] [--c-file $filename]" in
   let ml_filename = ref ""
   and c_filename = ref ""
-  and c_struct_filename = ref "" in
+  and c_struct_filename = ref ""
+  and ml_simple_struct_filename = ref ""
+  and c_simple_struct_filename = ref "" in
   let spec = Arg.([("--ml-file",
                     Set_string ml_filename, "ML filename");
                    ("--c-file",
                     Set_string c_filename, "C filename");
                    ("--c-struct-file",
-                    Set_string c_struct_filename, "C struct filename");]) in
+                    Set_string c_struct_filename, "C struct filename");
+                   ("--c-simple-struct-file",
+                    Set_string c_simple_struct_filename,
+                    "C simple struct filename");
+                   ("--ml-simple-struct-file",
+                    Set_string ml_simple_struct_filename,
+                    "ML simple struct filename");]) in
   let no_positional_args _ =
     prerr_endline "No positional arguments" in
   begin
     Arg.parse spec no_positional_args usage;
-    (!ml_filename, !c_filename, !c_struct_filename)
+    (!ml_filename, !c_filename, !c_struct_filename,
+     !c_simple_struct_filename, !ml_simple_struct_filename)
   end
 
 module Foreign_binder : Cstubs.FOREIGN
@@ -58,23 +67,35 @@ let with_open_formatter filename f =
 let header = "#include \"clib/test_functions.h\""
 
 let run ?(cheader="") argv ?structs specs =
-  let ml_filename, c_filename, c_struct_filename = filenames argv
+  let prefix = "cstubs_tests" in
+  let (ml_filename, c_filename, c_struct_filename,
+       c_simple_struct_filename, ml_simple_struct_filename) =
+    filenames argv
   in
   if ml_filename <> "" then
     with_open_formatter ml_filename
-      (fun fmt -> Cstubs.write_ml fmt ~prefix:"cstubs_tests" specs);
+      (fun fmt -> Cstubs.write_ml fmt ~prefix specs);
   if c_filename <> "" then
     with_open_formatter c_filename
       (fun fmt -> 
         Format.fprintf fmt "%s@\n%s@\n" header cheader;
-        Cstubs.write_c fmt ~prefix:"cstubs_tests" specs);
-  begin match structs, c_struct_filename with
-   | None, _ -> ()
-   | Some _, "" -> ()
-   | Some specs, c_filename ->
-     with_open_formatter c_filename
-      (fun fmt ->
-        Format.fprintf fmt "%s@\n%s@\n" header cheader;
-        Cstubs_structs.write_c fmt specs)
+        Cstubs.write_c fmt ~prefix specs);
+  begin match structs with
+   | None -> ()
+   | Some specs ->
+     if c_struct_filename <> "" then
+       with_open_formatter c_struct_filename
+         (fun fmt ->
+            Format.fprintf fmt "%s@\n%s@\n" header cheader;
+            Cstubs_structs.write_c fmt specs);
+     if ml_simple_struct_filename <> "" then
+       with_open_formatter ml_simple_struct_filename
+         (fun fmt ->
+            Cstubs_structs.Easy.write_ml fmt ~prefix specs);
+     if c_simple_struct_filename <> "" then
+       with_open_formatter c_simple_struct_filename
+         (fun fmt ->
+            Format.fprintf fmt "%s@\n%s@\n" header cheader;
+            Cstubs_structs.Easy.write_c fmt ~prefix specs);
   end
 

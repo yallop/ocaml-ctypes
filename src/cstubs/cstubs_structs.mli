@@ -18,3 +18,9 @@ end
 module type BINDINGS = functor (F : TYPE) -> sig end
 
 val write_c : Format.formatter -> (module BINDINGS) -> unit
+
+module Easy :
+sig
+  val write_c : Format.formatter -> prefix:string -> (module BINDINGS) -> unit
+  val write_ml : Format.formatter -> prefix:string -> (module BINDINGS) -> unit
+end
