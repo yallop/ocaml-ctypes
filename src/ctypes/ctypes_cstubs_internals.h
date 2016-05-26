@@ -19,5 +19,18 @@
   (String_val(Field(s, 1)) + Int_val(Field(s, 0)))
 #define Ctypes_val_char(c) \
   (Val_int((c + 256) % 256))
+#define CTYPES_PAIR_WITH_ERRNO(v)
+
+#include <caml/memory.h>
+#include <errno.h>
+static inline value ctypes_pair_with_errno(value p)
+{
+  CAMLparam1 (p);
+  CAMLlocal1 (v);
+  v = caml_alloc_tuple(2);
+  Store_field (v, 0, p);
+  Store_field (v, 1, Val_int(errno));
+  CAMLreturn (v);
+}
 
 #endif /* CTYPES_CSTUBS_INTERNALS_H */
