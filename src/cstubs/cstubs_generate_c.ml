@@ -13,6 +13,8 @@ open Unchecked_function_types
 
 let max_byte_args = 5
 
+type errno_policy = [ `Ignore_errno | `Return_errno ]
+
 module Generate_C =
 struct
   let report_unpassable what =
@@ -62,6 +64,11 @@ struct
                           (value @-> returning (ptr void)),
                    [x])
 
+  let pair_with_errno : cexp -> ceff =
+    fun x -> `App (conser "ctypes_pair_with_errno"
+                     (value @-> returning value),
+                   [x])
+
   let string_to_ptr : cexp -> ccomp =
     fun x -> `App (reader "CTYPES_PTR_OF_OCAML_STRING"
                           (value @-> returning (ptr void)),
@@ -87,9 +94,9 @@ struct
                                   references_ocaml_heap = true;
                                   typ = Ty value }
 
-  let errno : ceff = `Global { name = "errno";
-                               references_ocaml_heap = false;
-                               typ = Ty int }
+  let errno = `Global { name = "errno";
+                        references_ocaml_heap = false;
+                        typ = Ty int }
 
   let functions : ceff = `Global
     { name = "functions";
@@ -167,8 +174,9 @@ struct
   let fundec : type a. string -> a Ctypes.fn -> cfundec =
     fun name fn -> `Fundec (name, args fn, return_type fn)
 
-  let fn : type a. cname:string -> stub_name:string -> a Ctypes_static.fn -> cfundef =
-    fun ~cname ~stub_name f ->
+  let fn : type a. errno:errno_policy ->
+    cname:string -> stub_name:string -> a Ctypes_static.fn -> cfundef =
+    fun ~errno:errno_ ~cname ~stub_name f ->
       let fvar = { fname = cname;
                    allocates = false;
                    reads_ocaml_heap = false;
@@ -177,9 +185,16 @@ struct
          fun vars -> function
          | Returns t ->
            let x = fresh_var () in
-           let e, ty = `App (fvar, (List.rev vars :> cexp list)), t in
-           let k = fun x -> (inj t x :> ccomp)  in
-           `Let ((local x ty, e), k (local x ty))
+           let e = `App (fvar, (List.rev vars :> cexp list)) in
+           begin match errno_ with
+               `Ignore_errno -> `Let ((local x t, e), (inj t (local x t) :> ccomp))
+             | `Return_errno -> 
+               (`LetAssign (errno,
+                           `Int 0,
+                           `Let ((local x t, e),
+                                 ((inj t (local x t) :> ccomp), value) >>= fun v ->
+                                 (pair_with_errno v :> ccomp))) : ccomp)
+           end
          | Function (x, f, t) ->
            begin match prj f (local x value) with
              None -> body vars t
@@ -282,9 +297,9 @@ struct
 
 end
 
-let fn ~cname ~stub_name fmt fn =
+let fn ~errno ~cname ~stub_name fmt fn =
   let `Function (`Fundec (f, xs, _), _, _) as dec
-      = Generate_C.fn ~stub_name ~cname fn
+      = Generate_C.fn ~errno ~stub_name ~cname fn
   in
   let nargs = List.length xs in
   if nargs > max_byte_args then begin
@@ -454,5 +469,5 @@ struct
 end
 
 let fn ~concurrency ~errno = match concurrency with
-    `Sequential -> fn
+    `Sequential -> fn ~errno
   | `Lwt_jobs -> Lwt.fn ~errno
