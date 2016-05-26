@@ -82,8 +82,6 @@ let rec ceff fmt : ceff -> unit = function
     fprintf fmt "@[@[%a@]@[[%a]@]@]" ceff e cexp i
   | `Deref e -> fprintf fmt "@[*@[%a@]@]" cexp e
   | `DerefField (e, f) -> fprintf fmt "@[@[%a@]->%s@]" cexp e f
-  | `Assign (lv, e) ->
-    fprintf fmt "@[@[%a@]@;=@;@[%a@]@]" clvalue lv ceff e
 
 let rec ccomp fmt : ccomp -> unit = function
   | #cexp as e when Type_C.cexp e = Ty Void ->
@@ -119,6 +117,8 @@ let rec ccomp fmt : ccomp -> unit = function
   | `LetConst (`Local (x, _), `Int c, s) ->
     fprintf fmt "@[enum@ {@[@ %s@ =@ %d@ };@]@]@ %a"
       x c ccomp s
+  | `LetAssign (lv, e, c) ->
+    fprintf fmt "@[@[%a@]@;=@;@[%a@];@]@ %a" clvalue lv ceff e ccomp c
 
 let format_parameter_list parameters k fmt =
   let format_arg fmt (name, Ty t) =

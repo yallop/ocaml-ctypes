@@ -54,11 +54,11 @@ type ceff = [ cexp
             | `App of cfunction * cexp list
             | `Index of ceff * cexp
             | `Deref of cexp
-            | `DerefField of cexp * fieldname
-            | `Assign of clvalue * ceff ]
+            | `DerefField of cexp * fieldname ]
 type cbind = clocal * ceff
 type ccomp = [ ceff
              | `LetConst of clocal * cconst * ccomp
+             | `LetAssign of clvalue * ceff * ccomp
              | `CAMLreturnT of ty * cexp
              | `Return of ty * cexp
              | `Let of cbind * ccomp ]
@@ -97,7 +97,6 @@ struct
     | `Index (e, _) -> reference_ceff e
     | `Deref e -> reference_ceff (e :> ceff)
     | `DerefField (e, f) -> field_ceff (e :> ceff) f
-    | `Assign (_, rv) -> ceff rv
   and reference_ceff : ceff -> ty =
     fun e ->
       begin match ceff e with
@@ -128,6 +127,7 @@ struct
     | #ceff as e -> ceff e
     | `Let (_, c)
     | `LetConst (_, _, c) -> ccomp c
+    | `LetAssign (_, _, c) -> ccomp c
     | `CAMLreturnT (ty, _) -> ty
     | `Return (ty, _) -> ty
 end

@@ -48,6 +48,12 @@ struct
           let y = e1 in (let x = e2 in e3) *)
        let Ty t = Type_C.ccomp c in
        `Let (ye, (c, t) >>= k)
+     | `LetAssign (lv, v, c) ->
+       (* let x = (y := e1; e2) in e3
+          ~>
+          y := e1; let x = e2 in e3 *)
+       let Ty t = Type_C.ccomp c in
+       `LetAssign (lv, v, (c, t) >>= k)
 
   let (>>) c1 c2 = (c1, Void) >>= fun _ -> c2
 
@@ -239,9 +245,10 @@ struct
         (ListLabels.fold_right  args
            ~init:(List.length args - 1, call)
            ~f:(fun (x, Ty t) (i, c) ->
-             i - 1,
-             `Assign (`Index (local "locals" (ptr value), `Int i),
-                      (inj t (local x t))) >> c))
+               i - 1,
+               `LetAssign (`Index (local "locals" (ptr value), `Int i),
+                           (inj t (local x t)),
+                           c)))
     in
       (* T f(T0 x0, T1 x1, ..., Tn xn) {
             enum { nargs = n };
