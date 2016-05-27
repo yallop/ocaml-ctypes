@@ -15,7 +15,9 @@ environment:
 
 init:
     - 'echo System architecture: %PLATFORM%'
-    - appveyor DownloadFile "http://wodi.forge.ocamlcore.org/wodi%WODI_ARCH%.tar.xz" -FileName "C:/wodi%WODI_ARCH%.tar.xz"
+    - appveyor DownloadFile "https://dl.dropbox.com/sh/t9ozci9rso9gij4/AADtoDkuFC9ALiLduQ73VOzla/wodi64.tar.xz" -FileName "C:/wodi64.tar.xz"
+    - appveyor DownloadFile "https://dl.dropbox.com/sh/t9ozci9rso9gij4/AABS0ZGie-RdZDxyRaDKImWVa/wodi32.tar.xz" -FileName "C:/wodi32.tar.xz"
+
     - appveyor DownloadFile "https://dl.dropbox.com/sh/feldcwshtinmdo8/AAAaEK0cJoB1h6UDh4Vbvpaaa/packages32.tar.xz" -FileName "C:/packages32.tar.xz"
     - appveyor DownloadFile "https://dl.dropbox.com/sh/feldcwshtinmdo8/AADlqehWQ17xVWCW2GGHIo_za/packages64.tar.xz" -FileName "C:/packages64.tar.xz"
 

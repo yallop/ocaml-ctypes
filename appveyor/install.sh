@@ -22,6 +22,10 @@ tar -xf packages${WODI_ARCH}.tar.xz
 wodi${WODI_ARCH}/install.sh
 
 godi_dir=/opt/wodi${WODI_ARCH}
+
+mkdir -p $godi_dir/var/cache/godi
+mv packages${WODI_ARCH}/* $godi_dir/var/cache/godi
+
 export PATH=$godi_dir/sbin:$godi_dir/bin:$PATH
 godi_add godi-ounit base-libffi godi-lwt
 popd
