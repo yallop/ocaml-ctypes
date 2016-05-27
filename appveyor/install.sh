@@ -27,7 +27,7 @@ mkdir -p $godi_dir/var/cache/godi
 mv packages${WODI_ARCH}/* $godi_dir/var/cache/godi
 
 export PATH=$godi_dir/sbin:$godi_dir/bin:$PATH
-godi_add godi-ounit base-libffi
+godi_add godi-ounit base-libffi godi-lwt
 popd
 
 
