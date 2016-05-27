@@ -10,16 +10,16 @@ environment:
     matrix:
         -   WODI_ARCH: 32
             MINGW_ARCH: i686
+            WODI_FILE: https://dl.dropbox.com/sh/t9ozci9rso9gij4/AABS0ZGie-RdZDxyRaDKImWVa/wodi32.tar.xz
+            WODI_PACKAGES_FILE: https://dl.dropbox.com/sh/feldcwshtinmdo8/AAAaEK0cJoB1h6UDh4Vbvpaaa/packages32.tar.xz
         -   WODI_ARCH: 64
             MINGW_ARCH: x86_64
-
+            WODI_FILE: https://dl.dropbox.com/sh/t9ozci9rso9gij4/AADtoDkuFC9ALiLduQ73VOzla/wodi64.tar.xz
+            WODI_PACKAGES_FILE: https://dl.dropbox.com/sh/feldcwshtinmdo8/AADlqehWQ17xVWCW2GGHIo_za/packages64.tar.xz
 init:
     - 'echo System architecture: %PLATFORM%'
-    - appveyor DownloadFile "https://dl.dropbox.com/sh/t9ozci9rso9gij4/AADtoDkuFC9ALiLduQ73VOzla/wodi64.tar.xz" -FileName "C:/wodi64.tar.xz"
-    - appveyor DownloadFile "https://dl.dropbox.com/sh/t9ozci9rso9gij4/AABS0ZGie-RdZDxyRaDKImWVa/wodi32.tar.xz" -FileName "C:/wodi32.tar.xz"
-
-    - appveyor DownloadFile "https://dl.dropbox.com/sh/feldcwshtinmdo8/AAAaEK0cJoB1h6UDh4Vbvpaaa/packages32.tar.xz" -FileName "C:/packages32.tar.xz"
-    - appveyor DownloadFile "https://dl.dropbox.com/sh/feldcwshtinmdo8/AADlqehWQ17xVWCW2GGHIo_za/packages64.tar.xz" -FileName "C:/packages64.tar.xz"
+    - appveyor DownloadFile "%WODI_FILE%" -FileName "C:/wodi%WODI_ARCH%.tar.xz"
+    - appveyor DownloadFile "%WODI_PACKAGES_FILE%" -FileName "C:/packages%WODI_ARCH%.tar.xz"
 
 install:
     - if not exist "%CYG_ROOT%" mkdir "%CYG_ROOT%"
