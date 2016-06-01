@@ -51,6 +51,11 @@ let rec clvalue fmt : clvalue -> unit = function
   | `Local _ as x -> cvar fmt x
   | `Index (lv, i) ->
     fprintf fmt "@[@[%a@]@[[%a]@]@]" clvalue lv cexp i
+  | `Field (lv, f) ->
+    fprintf fmt "@[@[%a@]@[.%s@]@]" clvalue lv f
+  | `PointerField (lv, f) ->
+    fprintf fmt "@[@[%a@]@[->%s@]@]" clvalue lv f
+
 
 let camlop fmt : camlop -> unit = function
   | `CAMLparam0 -> Format.fprintf fmt "CAMLparam0()"
@@ -76,10 +81,11 @@ let rec ceff fmt : ceff -> unit = function
   | `Index (e, i) ->
     fprintf fmt "@[@[%a@]@[[%a]@]@]" ceff e cexp i
   | `Deref e -> fprintf fmt "@[*@[%a@]@]" cexp e
-  | `Assign (lv, e) ->
-    fprintf fmt "@[@[%a@]@;=@;@[%a@]@]" clvalue lv ceff e
+  | `DerefField (e, f) -> fprintf fmt "@[@[%a@]->%s@]" cexp e f
 
 let rec ccomp fmt : ccomp -> unit = function
+  | #cexp as e when Type_C.cexp e = Ty Void ->
+    fprintf fmt "@[return@];"
   | #cexp as e ->
     fprintf fmt "@[<2>return@;@[%a@]@];" cexp e
   | #ceff as e -> fprintf fmt "@[<2>return@;@[%a@]@];" ceff e
@@ -111,6 +117,8 @@ let rec ccomp fmt : ccomp -> unit = function
   | `LetConst (`Local (x, _), `Int c, s) ->
     fprintf fmt "@[enum@ {@[@ %s@ =@ %d@ };@]@]@ %a"
       x c ccomp s
+  | `LetAssign (lv, e, c) ->
+    fprintf fmt "@[@[%a@]@;=@;@[%a@];@]@ %a" clvalue lv ceff e ccomp c
 
 let format_parameter_list parameters k fmt =
   let format_arg fmt (name, Ty t) =
@@ -132,6 +140,11 @@ let cfundec : Format.formatter -> cfundec -> unit =
         format_parameter_list args (Ctypes_type_printing.format_name ~name) fmt)
       `nonarray fmt
 
-let cfundef fmt (`Function (dec, body) : cfundef) =
+let storage_class fmt = function
+    `Static -> fprintf fmt "static@\n"
+  | `Extern -> ()
+
+let cfundef fmt (`Function (dec, body, sc) : cfundef) =
+  storage_class fmt sc;
   fprintf fmt "%a@\n{@[<v 2>@\n%a@]@\n}@\n"
     cfundec dec ccomp body

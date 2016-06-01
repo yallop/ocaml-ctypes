@@ -134,7 +134,8 @@ let gen_ml fmt register (infos : fn_info list) : unit =
     "type 'a name = @\n";
   ListLabels.iter infos
     ~f:(fun (Fn ({fn_name}, fn)) ->
-      Cstubs_generate_ml.constructor_decl (Printf.sprintf "Fn_%s" fn_name) fn fmt);
+      Cstubs_generate_ml.constructor_decl ~concurrency:`Sequential
+        (Printf.sprintf "Fn_%s" fn_name) fn fmt);
   Format.fprintf fmt
     "@\n";
   Format.fprintf fmt

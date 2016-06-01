@@ -10,19 +10,23 @@ environment:
     matrix:
         -   WODI_ARCH: 32
             MINGW_ARCH: i686
+            WODI_FILE: https://dl.dropbox.com/sh/t9ozci9rso9gij4/AABS0ZGie-RdZDxyRaDKImWVa/wodi32.tar.xz
+            WODI_PACKAGES_FILE: https://dl.dropbox.com/sh/feldcwshtinmdo8/AAAaEK0cJoB1h6UDh4Vbvpaaa/packages32.tar.xz
         -   WODI_ARCH: 64
             MINGW_ARCH: x86_64
-
+            WODI_FILE: https://dl.dropbox.com/sh/t9ozci9rso9gij4/AADtoDkuFC9ALiLduQ73VOzla/wodi64.tar.xz
+            WODI_PACKAGES_FILE: https://dl.dropbox.com/sh/feldcwshtinmdo8/AADlqehWQ17xVWCW2GGHIo_za/packages64.tar.xz
 init:
     - 'echo System architecture: %PLATFORM%'
-    - appveyor DownloadFile "http://wodi.forge.ocamlcore.org/wodi%WODI_ARCH%.tar.xz" -FileName "C:/wodi%WODI_ARCH%.tar.xz"
+    - appveyor DownloadFile "%WODI_FILE%" -FileName "C:/wodi%WODI_ARCH%.tar.xz"
+    - appveyor DownloadFile "%WODI_PACKAGES_FILE%" -FileName "C:/packages%WODI_ARCH%.tar.xz"
 
 install:
     - if not exist "%CYG_ROOT%" mkdir "%CYG_ROOT%"
     - appveyor DownloadFile "http://cygwin.com/setup-%CYG_ARCH%.exe" -FileName "%CYG_ROOT%\setup.exe"
     - '"%CYG_ROOT%\setup.exe" -qnBWNd -R "%CYG_ROOT%" -P cygwin -P wget  -P dos2unix -P diffutils -P cpio -P make -P patch -P mingw64-%MINGW_ARCH%-gcc-core -P mingw64-%MINGW_ARCH%-gcc-g++ >NUL'
     - '%CYG_ROOT%/bin/bash -lc "cygcheck -dc cygwin"'
-    - '%CYG_ROOT%/bin/bash -lc "cd \"$OLDPWD\" && ./appveyor/install.sh %WODI_ARCH% %MINGW_ARCH% wodi%WODI_ARCH%.tar.xz"'
+    - '%CYG_ROOT%/bin/bash -lc "cd \"$OLDPWD\" && ./appveyor/install.sh %WODI_ARCH% %MINGW_ARCH% wodi%WODI_ARCH%.tar.xz packages%WODI_ARCH%.tar.xz"'
 
 build_script:
     - '%CYG_ROOT%/bin/bash -lc "cd \"$OLDPWD\" && ./appveyor/build.sh %WODI_ARCH%"'

@@ -2,7 +2,7 @@ if test $COVERAGE -a $TRAVIS_OS_NAME != osx ; then
     USE_BISECT=true;
 fi
 
-OPAM_DEPENDS="ocamlfind ounit"
+OPAM_DEPENDS="ocamlfind ounit lwt"
 if test $USE_BISECT ; then
     OPAM_DEPENDS="$OPAM_DEPENDS bisect_ppx ocveralls"
     MAKE="make COVERAGE=true"

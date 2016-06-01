@@ -11,6 +11,8 @@ open Ctypes_static
 open Ctypes_path
 open Cstubs_errors
 
+type concurrency_policy = [ `Sequential | `Lwt_jobs ]
+
 type lident = string
 type ml_type = [ `Ident of path
                | `Appl of path * ml_type list
@@ -29,7 +31,10 @@ type ml_exp = [ `Ident of path
               | `MakePtr of ml_exp * ml_exp
               | `MakeFunPtr of ml_exp * ml_exp
               | `MakeStructured of ml_exp * ml_exp
-              | `Appl of ml_exp * ml_exp 
+              | `Appl of ml_exp * ml_exp
+              | `Tuple of ml_exp list
+              | `Seq of ml_exp * ml_exp
+              | `Let of lident * ml_exp * ml_exp
               | `Unit
               | `Fun of lident list * ml_exp ]
 
@@ -141,6 +146,22 @@ struct
         "@[<hov 2>CI.make_structured@ %a@ %a@]" (ml_exp ApplParens) t (ml_exp ApplParens) e
     | _, `Fun (xs, e) ->
       fprintf fmt "(@[<1>fun@ %a->@ %a)@]" args xs (ml_exp NoApplParens) e
+    | _, `Tuple es ->
+      fprintf fmt "(@[%a)@]" tuple_elements es
+    | _, `Seq (e1, e2) ->
+      fprintf fmt "(@[%a;@ %a)@]" (ml_exp NoApplParens) e1 (ml_exp NoApplParens) e2
+    | ApplParens, `Let (x, e1, e2) ->
+      fprintf fmt "(@[let@ %s@ = %a@ in@ %a)@]" x (ml_exp NoApplParens) e1 (ml_exp NoApplParens) e2
+    | NoApplParens, `Let (x, e1, e2) ->
+      fprintf fmt "@[let@ %s@ = %a@ in@ %a@]" x (ml_exp NoApplParens) e1 (ml_exp NoApplParens) e2
+  and tuple_elements fmt : ml_exp list -> unit =
+    fun xs ->
+      let last = List.length xs - 1 in
+      List.iteri
+        (fun i ->
+          if i <> last then fprintf fmt "%a,@ " (ml_exp NoApplParens)
+          else fprintf fmt "%a" (ml_exp NoApplParens))
+        xs
 
   let rec ml_pat appl_parens fmt pat =
     match appl_parens, pat with
@@ -257,21 +278,27 @@ let ml_typ_of_typ = function
     In -> ml_typ_of_arg_typ
   | Out -> ml_typ_of_return_typ
 
-let rec ml_external_type_of_fn : type a. a fn -> polarity -> ml_external_type =
-  fun fn polarity -> match fn with
-  | Returns t -> `Prim ([], ml_typ_of_typ polarity t)
-  | Function (f, t) ->
-    let `Prim (l, t) = ml_external_type_of_fn t polarity in
-    `Prim (ml_typ_of_typ (flip polarity) f :: l, t)
+let lwt_job_type = Ctypes_path.path_of_string "Lwt_unix.job"
+
+let rec ml_external_type_of_fn :
+  type a. concurrency:concurrency_policy -> a fn -> polarity -> ml_external_type =
+  fun ~concurrency fn polarity -> match fn, concurrency with
+    | Returns t, `Sequential ->
+      `Prim ([], ml_typ_of_typ polarity t)
+    | Returns t, `Lwt_jobs ->
+      `Prim ([], `Appl (lwt_job_type, [ml_typ_of_typ polarity t]))
+    | Function (f, t), _ ->
+      let `Prim (l, t) = ml_external_type_of_fn ~concurrency t polarity in
+      `Prim (ml_typ_of_typ (flip polarity) f :: l, t)
 
 let var_counter = ref 0
 let fresh_var () =
   incr var_counter;
   Printf.sprintf "x%d" !var_counter
 
-let extern ~stub_name ~external_name fmt fn =
+let extern ~concurrency ~stub_name ~external_name fmt fn =
   let ext =
-    let typ = ml_external_type_of_fn fn Out in
+    let typ = ml_external_type_of_fn ~concurrency fn Out in
     ({ ident = external_name;
        typ = typ;
        primname = stub_name;
@@ -282,75 +309,99 @@ let extern ~stub_name ~external_name fmt fn =
 let static_con c args =
   `Con (Ctypes_path.path_of_string ("CI." ^ c), args)
 
-let rec pattern_and_exp_of_typ :
-  type a. a typ -> ml_exp -> polarity -> ml_pat * ml_exp option =
-  fun typ e pol -> match typ with
+let local_con c args =
+  `Con (Ctypes_path.path_of_string c, args)
+
+let lwt_map_id = Ctypes_path.path_of_string "Lwt.map"
+let make_ptr = Ctypes_path.path_of_string "CI.make_ptr"
+let make_fun_ptr = Ctypes_path.path_of_string "CI.make_fun_ptr"
+let make_structured = Ctypes_path.path_of_string "CI.make_structured"
+
+let map_result ~concurrency f e =
+  let lwt_map f x = `Appl (`Appl (`Ident lwt_map_id, f), x) in
+  match concurrency, f with
+    `Sequential, `MakePtr x -> `MakePtr (`Ident (path_of_string x), e)
+  | `Sequential, `MakeFunPtr x -> `MakeFunPtr (`Ident (path_of_string x), e)
+  | `Sequential, `MakeStructured x -> `MakeStructured (`Ident (path_of_string x), e)
+  | `Sequential, `Appl x -> `Appl (`Ident (path_of_string x), e)
+  | `Lwt_jobs, `MakePtr x -> lwt_map (`Appl (`Ident make_ptr,
+                                             `Ident (path_of_string x))) e
+  | `Lwt_jobs, `MakeFunPtr x -> lwt_map (`Appl (`Ident make_fun_ptr,
+                                                `Ident (path_of_string x))) e
+  | `Lwt_jobs, `MakeStructured x -> lwt_map (`Appl (`Ident make_structured,
+                                                    `Ident (path_of_string x))) e
+  | `Lwt_jobs, `Appl x -> lwt_map (`Ident (path_of_string x)) e
+
+let rec pattern_and_exp_of_typ : type a. concurrency:concurrency_policy ->
+  a typ -> ml_exp -> polarity -> (lident * ml_exp) list -> ml_pat * ml_exp option * (lident * ml_exp) list =
+  fun ~concurrency typ e pol binds -> match typ with
   | Void ->
-    (static_con "Void" [], None)
+    (static_con "Void" [], None, binds)
   | Primitive p ->
     let id = Cstubs_public_name.constructor_cident_of_prim ~module_name:"CI" p in
-    (static_con "Primitive" [`Con (id, [])], None)
+    (static_con "Primitive" [`Con (id, [])], None, binds)
   | Pointer _ ->
     let x = fresh_var () in
     let pat = static_con "Pointer" [`Var x] in
     begin match pol with
-    | In -> (pat, Some (`Appl (`Ident (path_of_string "CI.cptr"), e)))
-    | Out -> (pat, Some (`MakePtr (`Ident (path_of_string x), e)))
+    | In -> (pat, Some (`Appl (`Ident (path_of_string "CI.cptr"), e)), binds)
+    | Out -> (pat, Some (map_result ~concurrency (`MakePtr x) e), binds)
     end
   | Funptr _ ->
     let x = fresh_var () in
     let pat = static_con "Funptr" [`Var x] in
     begin match pol with
-    | In -> (pat, Some (`Appl (`Ident (path_of_string "CI.fptr"), e)))
-    | Out -> (pat, Some (`MakeFunPtr (`Ident (path_of_string x), e)))
+    | In -> (pat, Some (`Appl (`Ident (path_of_string "CI.fptr"), e)), binds)
+    | Out -> (pat, Some (map_result ~concurrency (`MakeFunPtr x) e), binds)
     end
   | Struct _ ->
     begin match pol with
     | In ->
       let pat = static_con "Struct" [`Underscore] in
       (pat, Some (`Appl (`Ident (path_of_string "CI.cptr"),
-                         `Appl (`Ident (path_of_string "Ctypes.addr"), e))))
+                         `Appl (`Ident (path_of_string "Ctypes.addr"), e))), binds)
     | Out ->
       let x = fresh_var () in
       let pat = `As (static_con "Struct" [`Underscore], x) in
-      (pat, Some (`MakeStructured (`Ident (path_of_string x), e)))
+      (pat, Some (map_result ~concurrency (`MakeStructured x) e), binds)
     end
   | Union _ ->
     begin match pol with
     | In ->
       let pat = static_con "Union" [`Underscore] in
       (pat, Some (`Appl (`Ident (path_of_string "CI.cptr"),
-                         `Appl (`Ident (path_of_string "Ctypes.addr"), e))))
+                         `Appl (`Ident (path_of_string "Ctypes.addr"), e))), binds)
     | Out ->
       let x = fresh_var () in
       let pat = `As (static_con "Union" [`Underscore], x) in
-      (pat, Some (`MakeStructured (`Ident (path_of_string x), e)))
+      (pat, Some (map_result ~concurrency (`MakeStructured x) e), binds)
     end
   | View { ty } ->
     begin match pol  with
     | In ->
       let x = fresh_var () in
+      let y = fresh_var () in
       let e = `Appl (`Ident (path_of_string x), e) in
-      let (p, None), e | (p, Some e), _ =
-        pattern_and_exp_of_typ ty e pol, e in
+      let (p, None, binds), e | (p, Some e, binds), _ =
+        pattern_and_exp_of_typ ~concurrency ty e pol binds, e in
       let pat = static_con "View"
         [`Record [path_of_string "CI.ty", p;
                   path_of_string "write", `Var x]] in
-      (pat, Some e)
+      (pat, Some (`Ident (Ctypes_path.path_of_string y)), (y, e) :: binds)
     | Out ->
-      let (p, None), e | (p, Some e), _ =
-        pattern_and_exp_of_typ ty e pol, e in
+      let (p, None, binds), e | (p, Some e, binds), _ =
+        pattern_and_exp_of_typ ~concurrency ty e pol binds, e in
       let x = fresh_var () in
       let pat = static_con "View"
         [`Record [path_of_string "CI.ty", p;
                   path_of_string "read", `Var x]] in
-      (pat, Some (`Appl (`Ident (path_of_string x), e)))
+      (pat, Some (map_result ~concurrency (`Appl x) e), binds)
     end
   | OCaml ty ->
     begin match pol, ty with
-    | In, String -> (static_con "OCaml" [static_con "String" []], None)
-    | In, Bytes -> (static_con "OCaml" [static_con "Bytes" []], None)
-    | In, FloatArray -> (static_con "OCaml" [static_con "FloatArray" []], None)
+    | In, String -> (static_con "OCaml" [static_con "String" []], None, binds)
+    | In, Bytes -> (static_con "OCaml" [static_con "Bytes" []], None, binds)
+    | In, FloatArray -> (static_con "OCaml" [static_con "FloatArray" []], None, binds)
     | Out, String -> Ctypes_static.unsupported
       "cstubs does not support OCaml strings as return values"
     | Out, Bytes -> Ctypes_static.unsupported
@@ -412,42 +463,89 @@ type wrapper_state = {
   exp: ml_exp;
   args: lident list;
   trivial: bool;
+  binds: (lident * ml_exp) list;
 }
 
-let rec wrapper_body : type a. a fn -> ml_exp -> polarity -> wrapper_state =
-  fun fn exp pol -> match fn with
+let lwt_unix_run_job = Ctypes_path.path_of_string "Lwt_unix.run_job"
+
+let run_exp ~concurrency exp = match concurrency with
+    `Sequential -> exp
+  | `Lwt_jobs -> `Appl (`Ident lwt_unix_run_job, exp)
+
+let let_bind : (lident * ml_exp) list -> ml_exp -> ml_exp =
+  fun binds e ->
+    ListLabels.fold_left ~init:e binds
+      ~f:(fun e' (x, e) -> `Let (x, e, e'))
+
+let rec wrapper_body : type a. concurrency:concurrency_policy ->
+  a fn -> ml_exp -> polarity -> (lident * ml_exp) list -> wrapper_state =
+  fun ~concurrency fn exp pol binds -> match fn with
   | Returns t ->
-    begin match pattern_and_exp_of_typ t exp (flip pol) with
-      pat, None -> { exp ; args = []; trivial = true;
-                     pat = static_con "Returns" [pat] }
-    | pat, Some exp -> { exp; args = []; trivial = false;
-                         pat = static_con "Returns" [pat] }
+    let exp = run_exp ~concurrency exp in
+    begin match pattern_and_exp_of_typ ~concurrency t exp (flip pol) binds with
+      pat, None, binds -> { exp ; args = []; trivial = true; binds;
+                            pat = local_con "Returns" [pat] }
+    | pat, Some exp, binds -> { exp; args = []; trivial = false; binds;
+                                pat = local_con "Returns" [pat] }
     end
   | Function (f, t) ->
     let x = fresh_var () in
-    begin match pattern_and_exp_of_typ f (`Ident (path_of_string x)) pol with
-    | fpat, None ->
-      let { exp; args; trivial; pat = tpat } =
-        wrapper_body t (`Appl (exp, `Ident (path_of_string x))) pol in
-      { exp; args = x :: args; trivial;
-        pat = static_con "Function" [fpat; tpat] }
-    | fpat, Some exp' ->
-      let { exp; args = xs; trivial; pat = tpat } =
-        wrapper_body t (`Appl (exp, exp')) pol in
-      { exp; args = x :: xs; trivial = false;
-        pat = static_con "Function" [fpat; tpat] }
+    begin match pattern_and_exp_of_typ ~concurrency f (`Ident (path_of_string x)) pol binds with
+    | fpat, None, binds ->
+      let { exp; args; trivial; pat = tpat; binds } =
+        wrapper_body ~concurrency t (`Appl (exp, `Ident (path_of_string x))) pol binds  in
+      { exp; args = x :: args; trivial; binds;
+        pat = local_con "Function" [fpat; tpat] }
+    | fpat, Some exp', binds ->
+      let { exp; args = xs; trivial; pat = tpat; binds } =
+        wrapper_body ~concurrency t (`Appl (exp, exp')) pol binds in
+      { exp; args = x :: xs; trivial = false; binds;
+        pat = local_con "Function" [fpat; tpat] }
     end
 
-let wrapper : type a. a fn -> string -> polarity -> ml_pat * ml_exp option =
-  fun fn f pol -> match wrapper_body fn (`Ident (path_of_string f)) pol with
-    { trivial = true; pat } -> (pat, None)
-  | { exp; args; pat } -> (pat, Some (`Fun (args, exp)))
+let lwt_bind = Ctypes_path.path_of_string "Lwt.bind"
+let lwt_return = Ctypes_path.path_of_string "Lwt.return"
+let box_lwt = Ctypes_path.path_of_string "box_lwt"
+let use_value = Ctypes_path.path_of_string "CI.use_value"
 
-let case ~stub_name ~external_name fmt fn =
-  let p, e = match wrapper fn external_name In with
-      pat, None -> pat, `Ident (path_of_string external_name)
-    | pat, Some e -> pat, e
-  in
+let return_result : args:lident list -> ml_exp =
+  fun ~args ->
+    let x = fresh_var () in
+    (* fun v -> CI.use_value (x1,x2,....xn); Lwt.return v *)
+    `Fun ([x],
+          `Seq
+            (`Appl (`Ident use_value,
+                    `Tuple
+                      (ListLabels.map args
+                         ~f:(fun x -> `Ident (Ctypes_path.path_of_string x)))),
+             `Appl (`Ident lwt_return, `Ident (Ctypes_path.path_of_string x))))
+
+let wrapper : type a. concurrency:concurrency_policy -> path ->
+  a fn -> string -> polarity -> ml_pat * ml_exp =
+  fun ~concurrency id fn f pol ->
+    let p = wrapper_body ~concurrency fn (`Ident (path_of_string f)) pol [], concurrency in
+    match p with
+      { trivial = true; pat; binds }, `Sequential ->
+      (pat, let_bind binds (run_exp ~concurrency (`Ident id)))
+    | { exp; args; pat; binds }, `Sequential ->
+      (pat, `Fun (args, let_bind binds exp))
+    | { trivial = true; pat; args; binds }, `Lwt_jobs ->
+      let exp : ml_exp = List.fold_left (fun f p -> `Appl (f, `Ident (path_of_string p))) (`Ident id) args in
+      (pat, `Fun (args,
+                  let_bind binds
+                    (`Appl (`Ident box_lwt,
+                            `Appl (`Appl (`Ident lwt_bind,
+                                          run_exp ~concurrency exp),
+                                   return_result ~args:(args @ (List.map fst binds)))))))
+    | { exp; args; pat; binds }, `Lwt_jobs ->
+      (pat, `Fun (args,
+                  let_bind binds
+                    (`Appl (`Ident box_lwt,
+                            `Appl (`Appl (`Ident lwt_bind, exp),
+                                   return_result ~args:(args @ (List.map fst binds)))))))
+
+let case ~concurrency ~stub_name ~external_name fmt fn =
+  let p, e = wrapper ~concurrency (path_of_string external_name) fn external_name In in
   Format.fprintf fmt "@[<hov 2>@[<h 2>|@ @[@[%a@],@ %S@]@ ->@]@ "
     Emit_ML.(ml_pat NoApplParens) p stub_name;
   Format.fprintf fmt "@[<hov 2>@[%a@]@]@]@." Emit_ML.(ml_exp ApplParens) e
@@ -462,16 +560,14 @@ let val_case ~stub_name ~external_name fmt typ =
   Format.fprintf fmt "@[<hov 2>@[%a@]@]@]@."
     Emit_ML.(ml_exp (ApplParens)) rhs
 
-let constructor_decl : type a. string -> a fn -> Format.formatter -> unit =
-  fun name fn fmt ->
+let constructor_decl : type a. concurrency:concurrency_policy ->
+  string -> a fn -> Format.formatter -> unit =
+  fun ~concurrency name fn fmt ->
     Format.fprintf fmt "@[|@ %s@ : (@[%a@])@ name@]@\n" name
-      Emit_ML.ml_external_type (ml_external_type_of_fn fn In)
+      Emit_ML.ml_external_type (ml_external_type_of_fn ~concurrency fn In)
 
 let inverse_case ~register_name ~constructor name fmt fn : unit =
-  let p, e = match wrapper fn "f" Out with
-      pat, None -> pat, `Ident (path_of_string "f")
-    | pat, Some e -> pat, e
-  in
+  let p, e = wrapper ~concurrency:`Sequential (path_of_string "f") fn "f" Out in
   Format.fprintf fmt "|@[ @[%a, %S@] -> %s %s (%a)@]@\n"
     Emit_ML.(ml_pat NoApplParens) p name register_name constructor
     Emit_ML.(ml_exp ApplParens) 

@@ -18,6 +18,8 @@ let fresh_var =
 type ty = Ty : _ typ -> ty
 type tfn = Fn : _ fn -> tfn
 
+type fieldname = string
+
 type cfunction = {
   fname: string;
   allocates: bool;
@@ -33,12 +35,16 @@ type cglobal = {
 
 type clocal = [ `Local of string * ty ]
 type cvar = [ clocal | `Global of cglobal ]
+type storage_class = [`Static | `Extern]
 type cconst = [ `Int of int ]
 type cexp = [ cconst
             | clocal
             | `Cast of ty * cexp
             | `Addr of cvar ]
-type clvalue = [ clocal | `Index of clvalue * cexp ]
+type clvalue = [ clocal
+               | `Index of clvalue * cexp
+               | `Field of clvalue * fieldname 
+               | `PointerField of clvalue * fieldname ]
 type camlop = [ `CAMLparam0
               | `CAMLlocalN of cexp * cexp
               | `CAMLdrop ]
@@ -48,15 +54,16 @@ type ceff = [ cexp
             | `App of cfunction * cexp list
             | `Index of ceff * cexp
             | `Deref of cexp
-            | `Assign of clvalue * ceff ]
+            | `DerefField of cexp * fieldname ]
 type cbind = clocal * ceff
 type ccomp = [ ceff
              | `LetConst of clocal * cconst * ccomp
+             | `LetAssign of clvalue * ceff * ccomp
              | `CAMLreturnT of ty * cexp
              | `Return of ty * cexp
              | `Let of cbind * ccomp ]
 type cfundec = [ `Fundec of string * (string * ty) list * ty ]
-type cfundef = [ `Function of cfundec * ccomp ]
+type cfundef = [ `Function of cfundec * ccomp * storage_class ]
 
 let rec return_type : type a. a fn -> ty = function
   | Function (_, f) -> return_type f
@@ -89,7 +96,7 @@ struct
     | `App ({ fn = Fn f }, _) -> return_type f
     | `Index (e, _) -> reference_ceff e
     | `Deref e -> reference_ceff (e :> ceff)
-    | `Assign (_, rv) -> ceff rv
+    | `DerefField (e, f) -> field_ceff (e :> ceff) f
   and reference_ceff : ceff -> ty =
     fun e ->
       begin match ceff e with
@@ -99,12 +106,28 @@ struct
         "dereferencing expression of non-pointer type %s"
         (Ctypes.string_of_typ t)
       end
+  and field_ceff : ceff -> fieldname -> ty =
+    fun e f ->
+      begin match ceff e with
+          Ty (Pointer (Struct { fields } as s)) -> lookup_field f s fields
+        | Ty t -> Cstubs_errors.internal_error
+          "accessing a field %s in an expression of type %s, which is not a pointer-to-struct type"
+          f (Ctypes.string_of_typ t)
+      end
+  and lookup_field : type s a. string -> a typ -> s boxed_field list -> ty =
+    fun f ty fields -> match fields with
+        [] -> Cstubs_errors.internal_error
+                "field %s not found in struct %s" f
+                (Ctypes.string_of_typ ty)
+      | BoxedField { ftype; fname } :: _ when fname = f -> Ty ftype
+      | _ :: fields -> lookup_field f ty fields
 
   let rec ccomp : ccomp -> ty = function
     | #cexp as e -> cexp e
     | #ceff as e -> ceff e
     | `Let (_, c)
     | `LetConst (_, _, c) -> ccomp c
+    | `LetAssign (_, _, c) -> ccomp c
     | `CAMLreturnT (ty, _) -> ty
     | `Return (ty, _) -> ty
 end

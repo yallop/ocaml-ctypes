@@ -48,10 +48,16 @@ struct
           let y = e1 in (let x = e2 in e3) *)
        let Ty t = Type_C.ccomp c in
        `Let (ye, (c, t) >>= k)
+     | `LetAssign (lv, v, c) ->
+       (* let x = (y := e1; e2) in e3
+          ~>
+          y := e1; let x = e2 in e3 *)
+       let Ty t = Type_C.ccomp c in
+       `LetAssign (lv, v, (c, t) >>= k)
 
   let (>>) c1 c2 = (c1, Void) >>= fun _ -> c2
 
-  let of_fatptr : cexp -> ccomp =
+  let of_fatptr : cexp -> ceff =
     fun x -> `App (reader "CTYPES_ADDR_OF_FATPTR"
                           (value @-> returning (ptr void)),
                    [x])
@@ -110,13 +116,13 @@ struct
       let { fn = Fn fn } as prj = prim_prj p in
       let rt = return_type fn in
       Some (cast ~from:rt ~into:(Ty (Primitive p)) (`App (prj, [x])))
-    | Pointer _ -> Some (of_fatptr x)
-    | Funptr _ -> Some (of_fatptr x)
+    | Pointer _ -> Some (of_fatptr x :> ccomp)
+    | Funptr _ -> Some (of_fatptr x :> ccomp)
     | Struct s ->
-      Some ((of_fatptr x, ptr void) >>= fun y ->
+      Some (((of_fatptr x :> ccomp), ptr void) >>= fun y ->
             `Deref (`Cast (Ty (ptr orig), y)))
     | Union u ->
-      Some ((of_fatptr x, ptr void) >>= fun y ->
+      Some (((of_fatptr x :> ccomp), ptr void) >>= fun y ->
             `Deref (`Cast (Ty (ptr orig), y)))
     | Abstract _ -> report_unpassable "values of abstract type"
     | View { ty } -> prj ty ~orig x
@@ -180,7 +186,8 @@ struct
       in
       let f' = name_params f in
       `Function (`Fundec (stub_name, value_params f', Ty value),
-                 body [] f')
+                 body [] f',
+                `Extern)
 
   let byte_fn : type a. string -> a Ctypes_static.fn -> int -> cfundef =
     fun fname fn nargs ->
@@ -198,7 +205,8 @@ struct
       in
       let bytename = Printf.sprintf "%s_byte%d" fname nargs in
       `Function (`Fundec (bytename, [argv; argc], Ty value),
-                 build_call nargs)
+                 build_call nargs,
+                 `Extern)
 
   let inverse_fn ~stub_name ~runtime_lock f =
     let `Fundec (_, args, Ty rtyp) as dec = fundec stub_name f in
@@ -237,9 +245,10 @@ struct
         (ListLabels.fold_right  args
            ~init:(List.length args - 1, call)
            ~f:(fun (x, Ty t) (i, c) ->
-             i - 1,
-             `Assign (`Index (local "locals" (ptr value), `Int i),
-                      (inj t (local x t))) >> c))
+               i - 1,
+               `LetAssign (`Index (local "locals" (ptr value), `Int i),
+                           (inj t (local x t)),
+                           c)))
     in
       (* T f(T0 x0, T1 x1, ..., Tn xn) {
             enum { nargs = n };
@@ -254,7 +263,8 @@ struct
                   `CAMLparam0 >>
                   `CAMLlocalN (local "locals" (array (List.length args) value),
                                local "nargs" int) >>
-                    body)))
+                  body)),
+       `Extern)
 
   let value : type a. cname:string -> stub_name:string -> a Ctypes_static.typ -> cfundef =
     fun ~cname ~stub_name typ ->
@@ -263,12 +273,13 @@ struct
       let x = fresh_var () in
       `Function (`Fundec (stub_name, ["_", Ty value], Ty value),
                  `Let ((local x ty, e),
-                       (inj (ptr typ) (local x ty) :> ccomp)))
+                       (inj (ptr typ) (local x ty) :> ccomp)),
+                 `Extern)
 
 end
 
 let fn ~cname ~stub_name fmt fn =
-  let `Function (`Fundec (f, xs, _), _) as dec
+  let `Function (`Fundec (f, xs, _), _, _) as dec
       = Generate_C.fn ~stub_name ~cname fn
   in
   let nargs = List.length xs in
@@ -289,3 +300,125 @@ let inverse_fn ~stub_name ~runtime_lock fmt fn : unit =
 let inverse_fn_decl ~stub_name fmt fn =
   Format.fprintf fmt "@[%a@];@\n"
     Cstubs_emit_c.cfundec (Generate_C.fundec stub_name fn)
+
+module Lwt =
+struct
+  let fprintf, sprintf = Format.fprintf, Printf.sprintf
+
+  let unsupported t = 
+    let fail msg = raise (Unsupported msg) in
+    Printf.ksprintf fail
+      "cstubs.lwt does not support the type %s"
+      (Ctypes.string_of_typ t)
+
+  let rec prj : type a b. a typ -> orig: b typ -> cexp -> ceff =
+    fun ty ~orig x -> match ty with
+    | Primitive p -> `App (prim_prj p, [x])
+    | Pointer _ -> Generate_C.of_fatptr x
+    | Funptr _ -> Generate_C.of_fatptr x
+    | View { ty } -> prj ty ~orig x
+    | t -> unsupported t
+
+  let prj ty x = prj ty ~orig:ty x
+
+  let lwt_unix_job =
+    abstract ~name:"struct lwt_unix_job" ~size:1 ~alignment:1
+
+  let structure_type stub_name = 
+    structure (sprintf "job_%s" stub_name)
+
+  let structure ~stub_name fmt fn args result =
+    let open Ctypes in
+    let s = structure_type stub_name in
+    let (_ : (_,_) field) = field s "job" lwt_unix_job in
+    let (_ : (_,_) field) = field s "result" result in
+    let () = ListLabels.iter args
+        ~f:(fun (BoxedType t, name) -> ignore (field s name t : (_,_) field)) in
+    let () = seal s in
+    fprintf fmt "@[%a@];@\n" (fun t -> format_typ t) s
+    
+  let worker ~cname ~stub_name fmt f result args =
+    let fn' = { fname = cname;
+               allocates = false;
+               reads_ocaml_heap = false;
+               fn = Fn f }
+    and j = "j", Ty (ptr (structure_type stub_name)) in
+    let rec body args : _ -> ccomp = function
+        [] ->
+        `LetAssign (`PointerField (`Local j, "result"),
+                    `App (fn', List.rev args),
+                    `Return (Ty Void, `Int 0))
+      | (BoxedType ty, x) :: xs ->
+        Generate_C.((`DerefField (`Local j, x), ty) >>= fun y ->
+                    body (y :: args) xs)
+    in
+    Cstubs_emit_c.cfundef fmt
+      (`Function (`Fundec (sprintf "worker_%s" stub_name, [j], Ty void),
+                  body [] args,
+                  `Static))
+
+  let result ~stub_name fmt fn result =
+    begin
+      fprintf fmt "@[static@ value@ result_%s@;@[(struct@ job_%s@ *j)@]@]@;@[<2>{@\n"
+        stub_name stub_name;
+      fprintf fmt "@[CAMLparam0@ ();@]@\n";
+      fprintf fmt "@[CAMLlocal1@ (rv);@]@\n";
+      fprintf fmt "@[rv@ =@ (%a);@]@\n"
+        (fun fmt ty ->
+           Cstubs_emit_c.ceff fmt
+             (Generate_C.inj ty
+                (`Local ("j->result", Cstubs_c_language.(Ty ty)))))
+        result;
+      fprintf fmt "@[lwt_unix_free_job(&j->job)@];@\n";
+      fprintf fmt "@[CAMLreturn@ (rv)@];@]@\n";
+      fprintf fmt "}@\n";
+    end
+
+  let stub ~stub_name fmt fn args =
+    begin
+      fprintf fmt "@[value@ %s@;@[(%s)@]@]@;@[<2>{@\n"
+        stub_name
+        (String.concat ", " (List.map (fun (_, x) -> "value "^ x) args));
+      fprintf fmt "@[CAMLparam%d (%s)@];@\n"
+        (List.length args)
+        (String.concat ", " (List.map (fun (_, x) -> x) args));
+
+      fprintf fmt "@[LWT_UNIX_INIT_JOB(job,@ %s,@ 0)@];@\n"
+        stub_name;
+      ListLabels.iter args
+        ~f:(fun (BoxedType t, x) ->
+            fprintf fmt "@[job->%s@ =@ %a@];@\n" x
+              (fun fmt (t, x) ->
+                 Cstubs_emit_c.ceff fmt
+                   (prj t (`Local (x, Cstubs_c_language.(Ty value)))))
+              (t, x));
+      fprintf fmt "@[CAMLreturn(lwt_unix_alloc_job(&(job->job)))@];@]@\n";
+      fprintf fmt "}@\n";
+    end
+
+  let fn_args_and_result fn =
+     let counter = ref 0 in
+     let var prefix =
+       incr counter;
+       Printf.sprintf "%s_%d" prefix !counter
+     in
+    let rec aux : type a. a fn -> _ -> _ =
+      fun fn args -> match fn with
+          Function (t, f) -> aux f ((BoxedType t, var "arg") :: args)
+        | Returns t -> List.rev args, BoxedType t
+     in aux fn []  
+
+  let fn ~cname ~stub_name fmt fn =
+    let args, BoxedType r = fn_args_and_result fn in
+    begin
+      structure ~stub_name fmt fn args r;
+      worker ~cname ~stub_name fmt fn r args;
+      result ~stub_name fmt fn r;
+      stub ~stub_name fmt fn args;
+      fprintf fmt "@\n";
+    end
+end
+
+let fn ~concurrency = match concurrency with
+    `Sequential -> fn
+  | `Lwt_jobs -> Lwt.fn

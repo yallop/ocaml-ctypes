@@ -85,3 +85,5 @@ let build_enum_type name underlying ?unexpected alist =
   | Ctypes_static.Float | Ctypes_static.Double ->
     Printf.ksprintf failwith
       "Enum type detected as floating type: %s" name
+
+let use_value v = Ctypes_memory_stubs.use_value v

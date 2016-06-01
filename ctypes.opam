@@ -20,6 +20,7 @@ depends: [
    "base-bytes"
    "ocamlfind" {build}
    "conf-pkg-config" {build}
+   "lwt" {test}
 ]
 depopts: [
    "ctypes-foreign"

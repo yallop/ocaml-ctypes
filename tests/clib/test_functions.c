@@ -607,6 +607,16 @@ enum fruit next_fruit(enum fruit f)
   }
 }
 
+int32_t sum_int_array(int32_t *arr, size_t len)
+{
+  int32_t sum = 0;
+  size_t i = 0;
+  for (; i < len; i++) {
+    sum += arr[i];
+  }
+  return sum;
+}
+
 void *global_ocaml_value = NULL;
 
 void save_ocaml_value(void *p)
