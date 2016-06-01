@@ -41,7 +41,7 @@ type cexp = [ cconst
             | clocal
             | `Cast of ty * cexp
             | `Addr of cvar ]
-type clvalue = [ clocal
+type clvalue = [ cvar
                | `Index of clvalue * cexp
                | `Field of clvalue * fieldname 
                | `PointerField of clvalue * fieldname ]

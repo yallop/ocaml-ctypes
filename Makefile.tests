@@ -494,12 +494,12 @@ tests/test-arrays/generated_stubs.c: $(BUILDDIR)/test-arrays-stub-generator.nati
 tests/test-arrays/generated_bindings.ml: $(BUILDDIR)/test-arrays-stub-generator.native
 	$< --ml-file $@
 
-test-errno.dir = tests/test-errno
-test-errno.threads = yes
-test-errno.deps = str bigarray oUnit bytes
-test-errno.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-threaded
-test-errno: PROJECT=test-errno
-test-errno: $$(NATIVE_TARGET)
+test-foreign-errno.dir = tests/test-foreign-errno
+test-foreign-errno.threads = yes
+test-foreign-errno.deps = str bigarray oUnit bytes
+test-foreign-errno.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-threaded
+test-foreign-errno: PROJECT=test-foreign-errno
+test-foreign-errno: $$(NATIVE_TARGET)
 
 test-passable.dir = tests/test-passable
 test-passable.threads = yes
@@ -875,6 +875,87 @@ $(BUILDDIR)/test-lwt-jobs-ml-stub-generator.native: $(BUILDDIR)/tests/test-lwt-j
 $(BUILDDIR)/tests/test-lwt-jobs/generated_struct_stubs.c: $(BUILDDIR)/test-lwt-jobs-stub-generator.native
 	$< --c-struct-file $@
 
+test-returning-errno-lwt-stubs.dir  = tests/test-returning-errno-lwt/stubs
+test-returning-errno-lwt-stubs.threads = yes
+test-returning-errno-lwt-stubs.subproject_deps = ctypes cstubs \
+   ctypes-foreign-base ctypes-foreign-threaded tests-common
+test-returning-errno-lwt-stubs: PROJECT=test-returning-errno-lwt-stubs
+test-returning-errno-lwt-stubs: $$(LIB_TARGETS)
+
+test-returning-errno-lwt-stub-generator.dir = tests/test-returning-errno-lwt/stub-generator
+test-returning-errno-lwt-stub-generator.threads = yes
+test-returning-errno-lwt-stub-generator.subproject_deps = ctypes cstubs \
+     ctypes-foreign-base ctypes-foreign-threaded test-returning-errno-lwt-stubs tests-common
+test-returning-errno-lwt-stub-generator.deps = str bigarray bytes
+test-returning-errno-lwt-stub-generator: PROJECT=test-returning-errno-lwt-stub-generator
+test-returning-errno-lwt-stub-generator: $$(NATIVE_TARGET)
+
+test-returning-errno-lwt.dir = tests/test-returning-errno-lwt
+test-returning-errno-lwt.threads = yes
+test-returning-errno-lwt.deps = str bigarray oUnit bytes lwt.unix
+test-returning-errno-lwt.subproject_deps = ctypes ctypes-foreign-base \
+   ctypes-foreign-threaded cstubs tests-common test-returning-errno-lwt-stubs
+test-returning-errno-lwt.link_flags = -L$(BUILDDIR)/clib -ltest_functions
+test-returning-errno-lwt: PROJECT=test-returning-errno-lwt
+test-returning-errno-lwt: $$(NATIVE_TARGET)
+
+test-returning-errno-lwt-generated: \
+  tests/test-returning-errno-lwt/generated_bindings.ml \
+  tests/test-returning-errno-lwt/generated_struct_bindings.ml \
+  tests/test-returning-errno-lwt/generated_stubs.c
+
+tests/test-returning-errno-lwt/generated_stubs.c: $(BUILDDIR)/test-returning-errno-lwt-stub-generator.native
+	$< --c-file $@
+tests/test-returning-errno-lwt/generated_bindings.ml: $(BUILDDIR)/test-returning-errno-lwt-stub-generator.native
+	$< --ml-file $@
+tests/test-returning-errno-lwt/generated_struct_bindings.ml: $(BUILDDIR)/test-returning-errno-lwt-ml-stub-generator.native
+	$< > $@
+$(BUILDDIR)/test-returning-errno-lwt-ml-stub-generator.native: $(BUILDDIR)/tests/test-returning-errno-lwt/generated_struct_stubs.c
+	$(CC) -I `$(OCAMLFIND) ocamlc -where | sed 's|\r$$||'` $(CFLAGS) $(LDFLAGS) $(WINLDFLAGS) -o $@ $^
+$(BUILDDIR)/tests/test-returning-errno-lwt/generated_struct_stubs.c: $(BUILDDIR)/test-returning-errno-lwt-stub-generator.native
+	$< --c-struct-file $@
+
+test-returning-errno-stubs.dir  = tests/test-returning-errno/stubs
+test-returning-errno-stubs.threads = yes
+test-returning-errno-stubs.subproject_deps = ctypes cstubs \
+   ctypes-foreign-base ctypes-foreign-threaded tests-common
+test-returning-errno-stubs: PROJECT=test-returning-errno-stubs
+test-returning-errno-stubs: $$(LIB_TARGETS)
+
+test-returning-errno-stub-generator.dir = tests/test-returning-errno/stub-generator
+test-returning-errno-stub-generator.threads = yes
+test-returning-errno-stub-generator.subproject_deps = ctypes cstubs \
+     ctypes-foreign-base ctypes-foreign-threaded test-returning-errno-stubs tests-common
+test-returning-errno-stub-generator.deps = str bigarray bytes
+test-returning-errno-stub-generator: PROJECT=test-returning-errno-stub-generator
+test-returning-errno-stub-generator: $$(NATIVE_TARGET)
+
+test-returning-errno.dir = tests/test-returning-errno
+test-returning-errno.threads = yes
+test-returning-errno.deps = str bigarray oUnit bytes lwt.unix
+test-returning-errno.subproject_deps = ctypes ctypes-foreign-base \
+   ctypes-foreign-threaded cstubs tests-common test-returning-errno-stubs
+test-returning-errno.link_flags = -L$(BUILDDIR)/clib -ltest_functions
+test-returning-errno: PROJECT=test-returning-errno
+test-returning-errno: $$(NATIVE_TARGET)
+
+test-returning-errno-generated: \
+  tests/test-returning-errno/generated_bindings.ml \
+  tests/test-returning-errno/generated_struct_bindings.ml \
+  tests/test-returning-errno/generated_stubs.c
+
+tests/test-returning-errno/generated_stubs.c: $(BUILDDIR)/test-returning-errno-stub-generator.native
+	$< --c-file $@
+tests/test-returning-errno/generated_bindings.ml: $(BUILDDIR)/test-returning-errno-stub-generator.native
+	$< --ml-file $@
+tests/test-returning-errno/generated_struct_bindings.ml: $(BUILDDIR)/test-returning-errno-ml-stub-generator.native
+	$< > $@
+$(BUILDDIR)/test-returning-errno-ml-stub-generator.native: $(BUILDDIR)/tests/test-returning-errno/generated_struct_stubs.c
+	$(CC) -I `$(OCAMLFIND) ocamlc -where | sed 's|\r$$||'` $(CFLAGS) $(LDFLAGS) $(WINLDFLAGS) -o $@ $^
+$(BUILDDIR)/tests/test-returning-errno/generated_struct_stubs.c: $(BUILDDIR)/test-returning-errno-stub-generator.native
+	$< --c-struct-file $@
+
+
 test-threads-stubs.dir  = tests/test-threads/stubs
 test-threads-stubs.threads = yes
 test-threads-stubs.subproject_deps = ctypes cstubs \
@@ -908,7 +989,7 @@ TESTS += test-foreign_values-stubs test-foreign_values-stub-generator test-forei
 TESTS += test-unions-stubs test-unions-stub-generator test-unions-generated test-unions
 TESTS += test-custom_ops
 TESTS += test-arrays-stubs test-arrays-stub-generator test-arrays-generated test-arrays
-TESTS += test-errno
+TESTS += test-foreign-errno
 TESTS += test-passable
 TESTS += test-alignment
 TESTS += test-views-stubs test-views-stub-generator test-views-generated test-views
@@ -924,6 +1005,8 @@ TESTS += test-coercions-stubs test-coercions-stub-generator test-coercions-gener
 TESTS += test-roots
 TESTS += test-passing-ocaml-values-stubs test-passing-ocaml-values-stub-generator test-passing-ocaml-values-generated test-passing-ocaml-values
 TESTS += test-lwt-jobs-stubs test-lwt-jobs-stub-generator test-lwt-jobs-generated test-lwt-jobs
+TESTS += test-returning-errno-lwt-stubs test-returning-errno-lwt-stub-generator test-returning-errno-lwt-generated test-returning-errno-lwt
+TESTS += test-returning-errno-stubs test-returning-errno-stub-generator test-returning-errno-generated test-returning-errno
 TESTS += test-threads-stubs test-threads
 
 
