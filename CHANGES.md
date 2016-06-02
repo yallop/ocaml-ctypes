@@ -1,3 +1,35 @@
+## ctypes 0.6.0
+
+### Features
+
+* The `Cstubs.FOREIGN` interface has been extended with `returning` and `@->`, and some new types.  
+  See the pull request for details:  
+    https://github.com/ocamllabs/ocaml-ctypes/pull/389
+
+  NB: code that generates bindings using `Cstubs` may need to be updated to select `return` and `@->` from the bindings functor argument rather than from the `Ctypes` module.  Code that needs to be updated will fail to compile with the new interface.  The pull request shows how to update your code, if necessary.
+
+* The `Cstubs` module can now generate asynchronous bindings to C functions using the Lwt jobs framework.  
+  See the pull request for details:  
+    https://github.com/ocamllabs/ocaml-ctypes/pull/391
+
+* The `Cstubs` module now supports optionally returning `errno` alongside the return value of bound C functions.  
+  See the pull request for details:  
+    https://github.com/ocamllabs/ocaml-ctypes/pull/392
+
+* Cross-compilation support is improved: the configuration step no longer runs binaries on the host.  
+  See the pull request for details:  
+    https://github.com/ocamllabs/ocaml-ctypes/pull/383
+
+* The `Unsigned.S` interface has new `of_int64` and `to_int64` functions.
+
+### Compatibility
+
+* The deprecated `*:*` and `+:+` functions have been removed.  Use `Ctypes.field` instead.
+
+* OCaml 4.00.* is no longer supported.  The earliest supported OCaml release is 4.01.0
+
+Thanks to Spiros Eliopoulos (@seliopou), @orbitz, Leonid Rozenberg (@rleonid) and Peter Zotov (@whitequark) for contributions to this release.
+
 ## ctypes 0.5.1
 
 ### Bug fixes
