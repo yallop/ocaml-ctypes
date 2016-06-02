@@ -53,9 +53,11 @@ let symbols = [
   ("default_abi"      , "FFI_DEFAULT_ABI");
 ]
 
+let extra_headers = "#include <ffi.h>"
+
 let write_line name symbol =
   try
-    Printf.printf "let %s = Code %d\n" name (Extract_from_c.integer symbol)
+    Printf.printf "let %s = Code %d\n" name (Extract_from_c.integer ~extra_headers symbol)
   with Not_found ->
     Printf.printf "let %s = Unsupported \"%s\"\n" name symbol
 

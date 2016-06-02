@@ -57,11 +57,11 @@ let headers = "\
 #include <complex.h>
 #include <inttypes.h>
 #include <caml/mlvalues.h>
-#include <ffi.h>
 "
 
-let integer expression =
+let integer ?(extra_headers="") expression =
   let code = Printf.sprintf "%s
+%s
 
 #define alignof(T) (offsetof(struct { char c; T t; }, t))
 
@@ -80,11 +80,12 @@ const char s[] = {
   D9((%s)),
   '-', 'E', 'N', 'D'
 };
-" headers expression in
+" headers extra_headers expression in
   int_of_string (extract (read_output code))
 
-let string expression =
+let string ?(extra_headers="") expression =
   let code = Printf.sprintf "%s
+%s
 
 #define STRINGIFY1(x) #x
 #define STRINGIFY(x) STRINGIFY1(x)
@@ -96,5 +97,5 @@ let string expression =
 #endif
 
 const char *s = \"BEGIN-\" %s \"-END\";
-" headers expression in
+" headers extra_headers expression in
   extract (read_output code)
