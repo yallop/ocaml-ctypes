@@ -23,9 +23,9 @@ let read_output program =
       (getenv ~default:"ocamlfind" "OCAMLFIND")
       ((getenv ~default:"" "CFLAGS") |>
        (nsplit " ") |>
-       (List.map (fun s -> "-ccopt '"^s^"'")) |>
+       (List.map (fun s -> "-ccopt " ^ Filename.quote s)) |>
        (String.concat " "))
-      input_filename
+      (Filename.quote input_filename)
   in
   prerr_endline cmd;
   Sys.chdir (Filename.dirname input_filename);
