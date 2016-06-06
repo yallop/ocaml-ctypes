@@ -62,10 +62,7 @@ $MAKE
 # build and run the tests
 $MAKE test
 # build and run the examples
-$MAKE examples
-_build/date.native
-_build/date-cmd.native
-_build/fts-cmd.native examples
+$MAKE run-examples
 
 if test $USE_BISECT ; then
     ocveralls --send bisect*.out _build/bisect*.out > coveralls.json
