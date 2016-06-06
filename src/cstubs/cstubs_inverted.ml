@@ -130,6 +130,9 @@ let gen_ml fmt register (infos : fn_info list) : unit =
     "type 'a fn = 'a@\n@\n";
   Format.fprintf fmt
     "module CI = Cstubs_internals@\n@\n";
+  Format.fprintf fmt "type 'a f = 'a CI.fn =@\n";
+  Format.fprintf fmt " | Returns  : 'a CI.typ   -> 'a f@\n";
+  Format.fprintf fmt " | Function : 'a CI.typ * 'b f  -> ('a -> 'b) f@\n";
   Format.fprintf fmt
     "type 'a name = @\n";
   ListLabels.iter infos
