@@ -107,6 +107,12 @@ EXAMPLES += ncurses ncurses-stubs                     ncurses-cmd-build ncurses-
 EXAMPLES += fts     fts-stubs     fts-stub-generator  fts-cmd-build     fts-cmd
 EXAMPLES += date    date-stubs    date-stub-generator date-cmd-build    date-cmd
 
+run-examples: examples
+	 # this doesn't run the ncurses example, which takes control of the terminal 
+	_build/date.native
+	_build/date-cmd.native
+	_build/fts-cmd.native src
+
 .PHONY: build $(EXAMPLES)
 
 examples: build $(EXAMPLES)
