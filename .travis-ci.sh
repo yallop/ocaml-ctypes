@@ -59,3 +59,12 @@ opam install mirage-xen || echo "Mirage not installable, so not testing Xen buil
 
 opam pin add -n ctypes $(pwd)
 opam install --build-test --yes ctypes
+
+# Check that the inverted stubs package builds with this release
+opam pin add -n ctypes-inverted-stubs-example https://github.com/yallop/ocaml-ctypes-inverted-stubs-example.git 
+if test ! $COVERAGE && opam install --show-actions ctypes-inverted-stubs-example; then
+    opam install --build-test --yes ctypes-inverted-stubs-example
+else
+    echo "Pinning the inverted stubs example failed, probably due to OCaml version incompatibility"
+fi
+
