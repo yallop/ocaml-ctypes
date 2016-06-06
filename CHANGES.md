@@ -1,3 +1,10 @@
+## ctypes 0.6.1
+
+### Bug fixes
+
+* Fix constructor qualification in code generated for inverted stubs:
+    https://github.com/ocamllabs/ocaml-ctypes/pull/397
+
 ## ctypes 0.6.0
 
 ### Features
