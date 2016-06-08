@@ -418,14 +418,43 @@ struct
       fprintf fmt "}@\n";
     end
 
+  let rec camlxParam fmt args =
+    match args with
+      [] -> ()
+    | x1 :: [] ->
+      fprintf fmt "@[CAMLxparam1 (%s)@];@\n" x1
+    | x1 :: x2 :: [] ->
+      fprintf fmt "@[CAMLxparam2 (%s, %s)@];@\n" x1 x2
+    | x1 :: x2 :: x3 :: [] ->
+      fprintf fmt "@[CAMLxparam3 (%s, %s, %s)@];@\n" x1 x2 x3
+    | x1 :: x2 :: x3 :: x4 :: [] ->
+      fprintf fmt "@[CAMLxparam4 (%s, %s, %s, %s)@];@\n" x1 x2 x3 x4
+    | x1 :: x2 :: x3 :: x4 :: x5 :: rest ->
+      fprintf fmt "@[CAMLxparam5 (%s, %s, %s, %s, %s)@];@\n" x1 x2 x3 x4 x5;
+      camlxParam fmt rest
+
+  let camlParam fmt args =
+    match args with
+      [] ->
+      fprintf fmt "@[CAMLparam0 ()@];@\n"
+    | x1 :: [] ->
+      fprintf fmt "@[CAMLparam1 (%s)@];@\n" x1
+    | x1 :: x2 :: [] ->
+      fprintf fmt "@[CAMLparam2 (%s, %s)@];@\n" x1 x2
+    | x1 :: x2 :: x3 :: [] ->
+      fprintf fmt "@[CAMLparam3 (%s, %s, %s)@];@\n" x1 x2 x3
+    | x1 :: x2 :: x3 :: x4 :: [] ->
+      fprintf fmt "@[CAMLparam4 (%s, %s, %s, %s)@];@\n" x1 x2 x3 x4
+    | x1 :: x2 :: x3 :: x4 :: x5 :: rest ->
+      fprintf fmt "@[CAMLparam5 (%s, %s, %s, %s, %s)@];@\n" x1 x2 x3 x4 x5;
+      camlxParam fmt rest
+
   let stub ~errno ~stub_name fmt fn args =
     begin
       fprintf fmt "@[value@ %s@;@[(%s)@]@]@;@[<2>{@\n"
         stub_name
         (String.concat ", " (List.map (fun (_, x) -> "value "^ x) args));
-      fprintf fmt "@[CAMLparam%d (%s)@];@\n"
-        (List.length args)
-        (String.concat ", " (List.map (fun (_, x) -> x) args));
+      camlParam fmt (List.map snd args);
 
       fprintf fmt "@[LWT_UNIX_INIT_JOB(job,@ %s,@ 0)@];@\n"
         stub_name;
@@ -445,6 +474,20 @@ struct
       fprintf fmt "}@\n";
     end
 
+  let byte_stub ~errno ~stub_name fmt fn args =
+    begin
+      let nargs = List.length args in
+      fprintf fmt "@[value@ %s_byte%d@;@[(value *argv, int argc)@]@]@;@[<2>{@\n"
+        stub_name nargs;
+      fprintf fmt "@[<2>return@ @[%s(@[" stub_name;
+      ListLabels.iteri args
+        ~f:(fun i _ ->
+            if i = nargs - 1 then fprintf fmt "argv[%d]" i
+            else fprintf fmt "argv[%d],@ " i);
+      fprintf fmt ")@]@]@];@]@\n";
+      fprintf fmt "}@\n";
+    end
+
   let fn_args_and_result fn =
      let counter = ref 0 in
      let var prefix =
@@ -453,7 +496,8 @@ struct
      in
     let rec aux : type a. a fn -> _ -> _ =
       fun fn args -> match fn with
-          Function (t, f) -> aux f ((BoxedType t, var "arg") :: args)
+          Function (Void, f) -> aux f args
+        | Function (t, f) -> aux f ((BoxedType t, var "arg") :: args)
         | Returns t -> List.rev args, BoxedType t
      in aux fn []  
 
@@ -464,6 +508,8 @@ struct
       worker ~errno ~cname ~stub_name fmt fn r args;
       result ~errno ~stub_name fmt fn r;
       stub ~errno ~stub_name fmt fn args;
+      if List.length args > max_byte_args then
+        byte_stub ~errno ~stub_name fmt fn args;
       fprintf fmt "@\n";
     end
 end

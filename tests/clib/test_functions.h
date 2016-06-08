@@ -230,4 +230,8 @@ int32_t sum_int_array(int32_t *, size_t);
 
 void save_ocaml_value(void *);
 void *retrieve_ocaml_value(void);
+
+int sixargs(int, int, int, int, int, int);
+int return_10(void);
+
 #endif /* TEST_FUNCTIONS_H */

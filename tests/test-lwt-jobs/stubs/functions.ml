@@ -21,4 +21,10 @@ struct
   let struct_stat : [`stat] structure typ = structure "stat"
   let stat = foreign "stat"
       (string @-> ptr struct_stat @-> returning int)
+
+  let sixargs = foreign "sixargs"
+      (int @-> int @-> int @-> int @-> int @-> int @-> returning int)
+
+  let return_10 = foreign "return_10"
+      (void @-> returning int)
 end

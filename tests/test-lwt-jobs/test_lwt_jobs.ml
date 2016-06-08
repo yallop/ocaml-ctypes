@@ -67,6 +67,28 @@ let test_string_lifetime _ =
   end
 
 
+(*
+  Test calling functions with many arguments.
+ *)
+let test_six_args _ =
+  let open Lwt.Infix in
+  Lwt_unix.run
+    ((Bindings.sixargs 1 2 3 4 5 6).Generated_bindings.lwt >>= fun i ->
+     assert_equal (1 + 2 + 3 + 4 + 5 + 6) i;
+     Lwt.return ())
+
+
+(*
+  Test calling functions with no arguments.
+ *)
+let test_no_args _ =
+  let open Lwt.Infix in
+  Lwt_unix.run
+    ((Bindings.return_10 ()).Generated_bindings.lwt >>= fun i ->
+     assert_equal 10 i;
+     Lwt.return ())
+
+
 let suite = "Lwt job tests" >:::
   ["calling sqrt"
     >:: test_sqrt;
@@ -76,6 +98,12 @@ let suite = "Lwt job tests" >:::
 
    "string lifetime"
     >:: test_string_lifetime;
+
+   "functions with many arguments"
+    >:: test_six_args;
+
+   "functions with no arguments"
+    >:: test_no_args;
   ]
 
 
