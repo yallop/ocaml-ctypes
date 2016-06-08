@@ -474,6 +474,20 @@ struct
       fprintf fmt "}@\n";
     end
 
+  let byte_stub ~errno ~stub_name fmt fn args =
+    begin
+      let nargs = List.length args in
+      fprintf fmt "@[value@ %s_byte%d@;@[(value *argv, int argc)@]@]@;@[<2>{@\n"
+        stub_name nargs;
+      fprintf fmt "@[<2>return@ @[%s(@[" stub_name;
+      ListLabels.iteri args
+        ~f:(fun i _ ->
+            if i = nargs - 1 then fprintf fmt "argv[%d]" i
+            else fprintf fmt "argv[%d],@ " i);
+      fprintf fmt ")@]@]@];@]@\n";
+      fprintf fmt "}@\n";
+    end
+
   let fn_args_and_result fn =
      let counter = ref 0 in
      let var prefix =
@@ -494,6 +508,8 @@ struct
       worker ~errno ~cname ~stub_name fmt fn r args;
       result ~errno ~stub_name fmt fn r;
       stub ~errno ~stub_name fmt fn args;
+      if List.length args > max_byte_args then
+        byte_stub ~errno ~stub_name fmt fn args;
       fprintf fmt "@\n";
     end
 end
