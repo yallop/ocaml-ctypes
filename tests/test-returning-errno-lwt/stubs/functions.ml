@@ -19,4 +19,7 @@ struct
 
   let sixargs = foreign "sixargs"
       (int @-> int @-> int @-> int @-> int @-> int @-> returning int)
+
+  let return_10 = foreign "return_10"
+      (void @-> returning int)
 end

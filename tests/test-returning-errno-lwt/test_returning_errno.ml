@@ -43,12 +43,26 @@ let test_six_args _ =
      Lwt.return ())
 
 
+(*
+  Test calling functions with no arguments.
+ *)
+let test_no_args _ =
+  let open Lwt.Infix in
+  Lwt_unix.run
+    ((Bindings.return_10 ()).Generated_bindings.lwt >>= fun (i, errno) ->
+     assert_equal 10 i;
+     Lwt.return ())
+
+
 let suite = "Errno tests" >:::
   ["calling stat"
     >:: test_stat;
 
    "functions with many arguments"
     >:: test_six_args;
+
+   "functions with no arguments"
+    >:: test_no_args;
   ]
 
 
