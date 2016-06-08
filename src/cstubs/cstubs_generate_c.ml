@@ -482,7 +482,8 @@ struct
      in
     let rec aux : type a. a fn -> _ -> _ =
       fun fn args -> match fn with
-          Function (t, f) -> aux f ((BoxedType t, var "arg") :: args)
+          Function (Void, f) -> aux f args
+        | Function (t, f) -> aux f ((BoxedType t, var "arg") :: args)
         | Returns t -> List.rev args, BoxedType t
      in aux fn []  
 
