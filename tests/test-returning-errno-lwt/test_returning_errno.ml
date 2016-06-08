@@ -32,9 +32,23 @@ let test_stat _ =
   end
 
 
+(*
+  Test calling functions with many arguments.
+ *)
+let test_six_args _ =
+  let open Lwt.Infix in
+  Lwt_unix.run
+    ((Bindings.sixargs 1 2 3 4 5 6).Generated_bindings.lwt >>= fun (i, errno) ->
+     assert_equal (1 + 2 + 3 + 4 + 5 + 6) i;
+     Lwt.return ())
+
+
 let suite = "Errno tests" >:::
   ["calling stat"
     >:: test_stat;
+
+   "functions with many arguments"
+    >:: test_six_args;
   ]
 
 
