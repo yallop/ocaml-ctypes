@@ -1,3 +1,15 @@
+## ctypes 0.6.2
+
+### Bug fixes
+
+* Fix for argument quoting in the Windows build after new cross compilation support
+    https://github.com/ocamllabs/ocaml-ctypes/pull/399
+
+* Improve Lwt jobs support for functions with many or no arguments
+    https://github.com/ocamllabs/ocaml-ctypes/pull/400
+
+Thanks to Andreas Hauptmann (@fdopen) for contributing to this release.
+
 ## ctypes 0.6.1
 
 ### Bug fixes
