@@ -27,6 +27,9 @@ struct
      funptr Ctypes.(int @-> int @-> returning int) @->
      int @-> int @-> returning int)
 
+  let callback_returns_char_a = foreign "callback_returns_char_a"
+    (funptr Ctypes.(void @-> returning char) @-> returning int)
+
   let returning_funptr = foreign "returning_funptr"
     (int @-> returning (funptr Ctypes.(int @-> int @-> returning int)))
 

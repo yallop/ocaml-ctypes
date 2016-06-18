@@ -234,4 +234,5 @@ void *retrieve_ocaml_value(void);
 int sixargs(int, int, int, int, int, int);
 int return_10(void);
 
+int callback_returns_char_a(char (*)(void));
 #endif /* TEST_FUNCTIONS_H */

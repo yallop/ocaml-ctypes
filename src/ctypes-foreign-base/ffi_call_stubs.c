@@ -114,6 +114,17 @@ static struct callspec {
   /* return value offset */
   size_t roffset;
 
+  /* return offset adjustment.
+
+     libffi promotes return types that are less than the size of the
+     system register to the word-sized type ffi_arg.  On a big-endian
+     system this means that the address where libffi writes the return
+     value is not always the same as the address from which ctypes
+     should read the value.
+  */
+  size_t radjustment;
+
+
   /* The context in which the call should run: whether errno is
      checked, whether the runtime lock is released, and so on. */
   struct call_context {
@@ -129,7 +140,7 @@ static struct callspec {
   ffi_cif *cif;
 
 } callspec_prototype = {
-  0, 0, 0, 0, BUILDING, NULL, -1, { 0, 0 }, NULL
+  0, 0, 0, 0, BUILDING, NULL, -1, 0, { 0, 0 }, NULL
 };
 
 
@@ -246,6 +257,31 @@ value ctypes_add_argument(value callspec_, value argument_)
 }
 
 
+static int ffi_return_type_adjustment(ffi_type *f)
+{
+#ifdef ARCH_BIG_ENDIAN
+  /* An adjustment is needed (on bigendian systems) for integer types
+     less than the size of a word */
+  if (f->size < sizeof(ffi_arg)) {
+    switch (f->type) {
+    case FFI_TYPE_INT:
+    case FFI_TYPE_UINT8:
+    case FFI_TYPE_SINT8:
+    case FFI_TYPE_UINT16:
+    case FFI_TYPE_SINT16:
+    case FFI_TYPE_UINT32:
+    case FFI_TYPE_SINT32:
+    case FFI_TYPE_UINT64:
+    case FFI_TYPE_SINT64:
+      return sizeof(ffi_arg) - f->size;
+    default: break;
+    }
+  }
+#endif
+  return 0;
+}
+
+
 /* Pass the return type and conclude the specification preparation */
 /* prep_callspec : callspec -> 'a ffitype -> int -> unit */
 value ctypes_prep_callspec(value callspec_, value abi_, value rtype)
@@ -262,9 +298,11 @@ value ctypes_prep_callspec(value callspec_, value abi_, value rtype)
   /* Add the (aligned) space needed for the return value */
   callspec->roffset = aligned_offset(callspec->bytes,
                                      rffitype->alignment);
+  callspec->radjustment = ffi_return_type_adjustment(rffitype);
   callspec->bytes = callspec->roffset + rffitype->size;
 
-  /* Allocate an extra word after the return value space to work
+
+  /* Allocate an extra word after the return value space, to work
      around a bug in libffi which causes it to write past the return
      value space.
 
@@ -308,7 +346,8 @@ value ctypes_call(value fnname, value function, value callspec_,
   size_t bytes = compute_arg_buffer_size(callspec, &arg_array_offset);
 
   char *callbuffer = alloca(bytes);
-  char *return_slot = callbuffer + roffset;
+  char *return_write_slot = callbuffer + roffset;
+  char *return_read_slot = return_write_slot + callspec->radjustment;
 
   populate_arg_array(callspec, (struct callbuffer *)callbuffer,
                      (void **)(callbuffer + arg_array_offset));
@@ -350,7 +389,7 @@ value ctypes_call(value fnname, value function, value callspec_,
 
   ffi_call(cif,
            cfunction,
-           return_slot,
+           return_write_slot,
            (void **)(callbuffer + arg_array_offset));
   if (check_errno)
   {
@@ -369,7 +408,7 @@ value ctypes_call(value fnname, value function, value callspec_,
     unix_error(saved_errno, buffer, Nothing);
   }
 
-  callback_rv_buf = CTYPES_FROM_PTR(return_slot);
+  callback_rv_buf = CTYPES_FROM_PTR(return_read_slot);
   CAMLreturn(caml_callback(rvreader, callback_rv_buf));
 }
 
@@ -423,7 +462,7 @@ static void callback_handler_with_lock(ffi_cif *cif,
 
   /* now store the return value */
   assert (Tag_val(boxedfn) == Done);
-  argptr = CTYPES_FROM_PTR(ret);
+  argptr = CTYPES_FROM_PTR(ret + ffi_return_type_adjustment(cif->rtype));
   caml_callback(Field(boxedfn, 0), argptr);
 
   CAMLreturn0;

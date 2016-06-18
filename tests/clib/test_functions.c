@@ -637,3 +637,8 @@ int return_10(void)
 {
   return 10;
 }
+
+int callback_returns_char_a(char (*f)(void))
+{
+  return f() == 'a' ? 1 : 0;
+}
