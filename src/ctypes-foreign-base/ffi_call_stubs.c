@@ -462,7 +462,7 @@ static void callback_handler_with_lock(ffi_cif *cif,
 
   /* now store the return value */
   assert (Tag_val(boxedfn) == Done);
-  argptr = CTYPES_FROM_PTR(ret);
+  argptr = CTYPES_FROM_PTR(ret + ffi_return_type_adjustment(cif->rtype));
   caml_callback(Field(boxedfn, 0), argptr);
 
   CAMLreturn0;
