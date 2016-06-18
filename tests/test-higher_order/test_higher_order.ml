@@ -54,6 +54,14 @@ struct
     assert_equal 10 (higher_order_3 acceptor ( + ) 3 4);
     assert_equal 36 (higher_order_3 acceptor ( * ) 3 4)
 
+  (*
+    Call a C function of type
+        int (char( * )(void))
+    and check that the char returned by the function pointer is handled
+    correctly
+  *)
+  let test_function_pointer_returning_char _ =
+    assert_equal 1 (callback_returns_char_a (fun () -> 'a'))
 
   (*
     Call a C function of type
@@ -141,6 +149,12 @@ let suite = "Higher-order tests" >:::
 
    "test_higher_higher_order (stubs)"
    >:: Stub_tests.test_higher_higher_order;
+
+   "test_function_pointer_returning_char (stubs)"
+   >:: Stub_tests.test_function_pointer_returning_char;
+
+   "test_function_pointer_returning_char (foreign)"
+   >:: Foreign_tests.test_function_pointer_returning_char;
 
    "test_returning_pointer_to_function (foreign)"
    >:: Foreign_tests.test_returning_pointer_to_function;
