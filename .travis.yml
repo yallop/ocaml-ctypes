@@ -4,9 +4,9 @@ services:
   - docker
 script:
   - if [ "${ARM}z" = "truez" ]; then
-      docker run -v /usr/bin/qemu-arm-static:/usr/bin/qemu-arm-static -v $(pwd):/travis yallop/ocaml-ctypes-qemu-arm-base /travis/.travis-ci-arm.sh;
+      docker run -v /usr/bin/qemu-arm-static:/usr/bin/qemu-arm-static -v $(pwd):/travis yallop/ocaml-ctypes-qemu-arm-base /travis/arm.sh;
     else
-       bash -ex .travis-ci.sh;
+       bash -ex travis/common.sh;
     fi
 os:
   - linux
