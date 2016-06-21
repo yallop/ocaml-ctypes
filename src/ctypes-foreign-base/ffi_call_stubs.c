@@ -256,12 +256,9 @@ value ctypes_add_argument(value callspec_, value argument_)
   CAMLreturn(Val_int(offset));
 }
 
-
-static int ffi_return_type_adjustment(ffi_type *f)
+static int ffi_return_type_promotes(ffi_type *f)
 {
-#ifdef ARCH_BIG_ENDIAN
-  /* An adjustment is needed (on bigendian systems) for integer types
-     less than the size of a word */
+  /* libffi promotes integer return types that are smaller than a word */
   if (f->size < sizeof(ffi_arg)) {
     switch (f->type) {
     case FFI_TYPE_INT:
@@ -273,9 +270,20 @@ static int ffi_return_type_adjustment(ffi_type *f)
     case FFI_TYPE_SINT32:
     case FFI_TYPE_UINT64:
     case FFI_TYPE_SINT64:
-      return sizeof(ffi_arg) - f->size;
+      return 1;
     default: break;
     }
+  }
+  return 0;
+}
+
+static int ffi_return_type_adjustment(ffi_type *f)
+{
+#ifdef ARCH_BIG_ENDIAN
+  /* An adjustment is needed (on bigendian systems) for integer types
+     less than the size of a word */
+  if (ffi_return_type_promotes(f)) {
+    sizeof(ffi_arg) - f->size;
   }
 #endif
   return 0;
@@ -462,6 +470,11 @@ static void callback_handler_with_lock(ffi_cif *cif,
 
   /* now store the return value */
   assert (Tag_val(boxedfn) == Done);
+
+  if (ffi_return_type_promotes(cif->rtype)) {
+    *(ffi_arg *)ret = 0;     
+  }
+
   argptr = CTYPES_FROM_PTR(ret + ffi_return_type_adjustment(cif->rtype));
   caml_callback(Field(boxedfn, 0), argptr);
 
