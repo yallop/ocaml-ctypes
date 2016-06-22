@@ -283,7 +283,7 @@ static int ffi_return_type_adjustment(ffi_type *f)
   /* An adjustment is needed (on bigendian systems) for integer types
      less than the size of a word */
   if (ffi_return_type_promotes(f)) {
-    sizeof(ffi_arg) - f->size;
+    return sizeof(ffi_arg) - f->size;
   }
 #endif
   return 0;
