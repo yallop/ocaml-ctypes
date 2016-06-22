@@ -1,5 +1,6 @@
 .SECONDEXPANSION:
 
+BEST:=$(shell if which ocamlopt > /dev/null; then echo native; else echo byte; fi)
 DEBUG=false
 COVERAGE=false
 OCAML=ocaml
