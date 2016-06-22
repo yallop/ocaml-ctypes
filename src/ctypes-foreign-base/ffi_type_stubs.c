@@ -75,7 +75,7 @@ value ctypes_primitive_ffitype(value prim)
     case Ctypes_Long:      ft = &ffi_type_slong;          break; /* Long */
     case Ctypes_Llong:     ft = &ctypes_ffi_type_sllong;  break; /* Llong */
     case Ctypes_Ushort:    ft = &ffi_type_ushort;         break; /* Ushort */
-    case Ctypes_Uint:      ft = &ffi_type_ulong;          break; /* Uint */
+    case Ctypes_Uint:      ft = &ffi_type_uint;           break; /* Uint */
     case Ctypes_Ulong:     ft = &ffi_type_ulong;          break; /* Ulong */
     case Ctypes_Ullong:    ft = &ctypes_ffi_type_ullong;  break; /* Ullong */
     case Ctypes_Size_t:    ft = &ctypes_ffi_type_size_t;  break; /* Size */
