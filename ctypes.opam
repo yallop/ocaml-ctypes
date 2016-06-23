@@ -9,7 +9,7 @@ license: "MIT"
 build: [
   [make
     "XEN=%{mirage-xen:enable}%"
-    "COVERAGE=true" {bisect_ppx:installed}
+    "COVERAGE=true" {ocveralls:installed}
     "libffi.config"
     "ctypes-base"
     "ctypes-stubs"]
@@ -36,9 +36,9 @@ depopts: [
    "ocveralls" {test}
 ]
 build-test: [
-   [make "COVERAGE=true" {bisect_ppx:installed} "test"]
-   [make "COVERAGE=true" {bisect_ppx:installed} "run-examples"]
-   ["sh" "-c" "ocveralls" "--send bisect*.out" "_build/bisect*.out" ">" "coveralls.json"] {bisect_ppx:installed}
+   [make "COVERAGE=true" {ocveralls:installed} "test"]
+   [make "COVERAGE=true" {ocveralls:installed} "run-examples"]
+   ["sh" "-c" "ocveralls" "--send bisect*.out" "_build/bisect*.out" ">" "coveralls.json"] {ocveralls:installed}
 ]
 tags: ["org:ocamllabs" "org:mirage"]
 available: [ ocaml-version >= "4.01.0" ]
