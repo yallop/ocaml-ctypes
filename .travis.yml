@@ -1,31 +1,26 @@
 language: c
 sudo: required
+dist: trusty
 services:
   - docker
-script:
-  - if [ "${ARM}z" = "truez" ]; then
-      docker run -v /usr/bin/qemu-arm-static:/usr/bin/qemu-arm-static -v $(pwd):/travis yallop/ocaml-ctypes-qemu-arm-base /travis/arm.sh;
-    else
-       bash -ex travis/common.sh;
-    fi
-os:
-  - linux
-  - osx
-env:
-  - OCAML_VERSION=4.01.0
-  - OCAML_VERSION=4.02.3 COVERAGE=true
-  - OCAML_VERSION=4.02.3 ARM=true
-  - OCAML_VERSION=4.03.0
 matrix:
-  exclude:
-    - os: osx
-      env: OCAML_VERSION=4.02.3 ARM=true
-    - os: osx
-      env: OCAML_VERSION=4.02.3 COVERAGE=true
-    - os: osx
-      env: OCAML_VERSION=4.03.0
+  include:
+    - os: linux
+      env: DOCKERFILE=native-4.01
+    - os: linux
+      env: DOCKERFILE=native-4.02
+    - os: linux
+      env: DOCKERFILE=native-4.03
+    - os: linux
+      env: DOCKERFILE=arm
+    - os: linux
+      env: DOCKERFILE=powerpc
+script:
+  - docker run -v $(pwd):/ctypes yallop/ocaml-ctypes-base-$DOCKERFILE /ctypes/travis/run.sh
 before_install:
-  - if [ "${ARM}z" = "truez" ]; then
-      sudo apt-get update && sudo apt-get install --yes qemu-user-static;
-      docker pull yallop/ocaml-ctypes-qemu-arm-base;
-    fi
+  - sudo apt-get install --yes qemu-user-static;
+    sudo sh -c 'echo -1 > /proc/sys/fs/binfmt_misc/qemu-ppc';
+    sudo su -c 'echo ":qemu-ppc:M:0:\x7fELF\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x14:\xff\xff\xff\xff\xff\xff\xff\xfc\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff:/usr/bin/qemu-ppc-static:OC" > /proc/sys/fs/binfmt_misc/register';
+    docker pull yallop/ocaml-ctypes-base-$DOCKERFILE
+
+
