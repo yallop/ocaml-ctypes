@@ -48,6 +48,7 @@ CMX_OPTS = $($(PROJECT).cmx_opts)
 CMA_OPTS = $(if $(C_OBJECTS),-cclib -l$(PROJECT)_stubs -dllib -l$(PROJECT)_stubs)
 SUBPROJECT_DEPS = $($(PROJECT).subproject_deps)
 LOCAL_CMXAS = $(SUBPROJECT_DEPS:%=$(BUILDDIR)/%.cmxa)
+LOCAL_CMAS = $(SUBPROJECT_DEPS:%=$(BUILDDIR)/%.cma)
 CMXA_OPTS = $(if $(C_OBJECTS),-cclib -l$(PROJECT)_stubs)
 
 OCAMLINCLUDES = -I $(BUILDDIR)/$($(PROJECT).dir) \
@@ -55,11 +56,16 @@ OCAMLINCLUDES = -I $(BUILDDIR)/$($(PROJECT).dir) \
                           -I $(BUILDDIR)/$($(spdep).dir))
 NATIVE_LIB=$(BUILDDIR)/$(PROJECT).cmxa
 NATIVE_TARGET=$(BUILDDIR)/$(PROJECT).native
+BEST_TARGET=$(BUILDDIR)/$(PROJECT).$(BEST)
 LIB_TARGETS = $(BUILDDIR)/$(PROJECT).cma \
               $(STUB_LIB) \
-              $(XEN_LIB) \
-              $(BUILDDIR)/$(PROJECT).cmxa \
-              $(BUILDDIR)/$(PROJECT).cmxs
+              $(XEN_LIB)
+ifeq ($(BEST),native)
+LIB_TARGETS += $(BUILDDIR)/$(PROJECT).cmxa
+endif
+ifneq ($(wildcard $(shell ocamlc -where)/dynlink.cmxa),)
+LIB_TARGETS += $(BUILDDIR)/$(PROJECT).cmxs
+endif
 LIB_TARGET_EXTRAS = $(if $(STUB_LIB),$(BUILDDIR)/lib$(PROJECT)_stubs.a) \
                     $(if $(XEN_LIB),$(BUILDDIR)/lib$(PROJECT)_stubs_xen.a) \
                     $(BUILDDIR)/$(PROJECT).a
@@ -112,3 +118,6 @@ $(BUILDDIR)/%.cmi : %.mli
 
 $(BUILDDIR)/%.native : $$(NATIVE_OBJECTS) $$(C_OBJECTS)
 	$(OCAMLFIND) opt -I $(BUILDDIR) -linkpkg $(OCAMLFLAGS) $(THREAD_FLAG) $(OCAMLFIND_PACKAGE_FLAGS) $(LOCAL_CMXAS) -o $@ $(NATIVE_OBJECTS) $(C_OBJECTS) $(OCAML_LINK_FLAGS) 
+
+$(BUILDDIR)/%.byte : $$(BYTE_OBJECTS) $$(C_OBJECTS)
+	$(OCAMLFIND) ocamlc -custom -I $(BUILDDIR) -linkpkg $(OCAMLFLAGS) $(THREAD_FLAG) $(OCAMLFIND_PACKAGE_FLAGS) $(LOCAL_CMAS) -o $@ $(BYTE_OBJECTS) $(C_OBJECTS) $(OCAML_LINK_FLAGS)
