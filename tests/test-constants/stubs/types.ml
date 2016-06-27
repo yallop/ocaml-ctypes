@@ -19,8 +19,8 @@ struct
   let _SHRT_MIN = constant "SHRT_MIN" short
   let _SHRT_MAX = constant "SHRT_MAX" short
   let _USHRT_MAX = constant "USHRT_MAX" ushort
-  let _INT_MIN = constant "INT_MIN" long
-  let _INT_MAX = constant "INT_MAX" long
+  let _INT_MIN = constant "INT_MIN" sint
+  let _INT_MAX = constant "INT_MAX" sint
   let _UINT_MAX = constant "UINT_MAX" uint
   let _LONG_MAX = constant "LONG_MAX" long
   let _LONG_MIN = constant "LONG_MIN" long

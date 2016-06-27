@@ -49,6 +49,7 @@ value ctypes_read(value prim_, value buffer_)
    case Ctypes_Long: b = ctypes_copy_long(*(long *)buf); break;
    case Ctypes_Llong: b = ctypes_copy_llong(*(long long *)buf); break;
    case Ctypes_Ushort: b = ctypes_copy_ushort(*(unsigned short *)buf); break;
+   case Ctypes_Sint: b = ctypes_copy_sint(*(int *)buf); break;
    case Ctypes_Uint: b = ctypes_copy_uint(*(unsigned int *)buf); break;
    case Ctypes_Ulong: b = ctypes_copy_ulong(*(unsigned long *)buf); break;
    case Ctypes_Ullong: b = ctypes_copy_ullong(*(unsigned long long *)buf); break;
@@ -90,6 +91,7 @@ value ctypes_write(value prim_, value v, value buffer_)
    case Ctypes_Long: *(long *)buf = ctypes_long_val(v); break;
    case Ctypes_Llong: *(long long *)buf = ctypes_llong_val(v); break;
    case Ctypes_Ushort: *(unsigned short *)buf = ctypes_ushort_val(v); break;
+   case Ctypes_Sint: *(int *)buf = ctypes_sint_val(v); break;
    case Ctypes_Uint: *(unsigned int *)buf = ctypes_uint_val(v); break;
    case Ctypes_Ulong: *(unsigned long *)buf = ctypes_ulong_val(v); break;
    case Ctypes_Ullong: *(unsigned long long *)buf = ctypes_ullong_val(v); break;
@@ -133,6 +135,7 @@ value ctypes_string_of_prim(value prim_, value v)
   case Ctypes_Long: len = snprintf(buf, sizeof buf, "%ld", (long)ctypes_long_val(v)); break;
   case Ctypes_Llong: len = snprintf(buf, sizeof buf, "%lld", (long long)ctypes_llong_val(v)); break;
   case Ctypes_Ushort: len = snprintf(buf, sizeof buf, "%hu", (unsigned short)ctypes_ushort_val(v)); break;
+  case Ctypes_Sint: len = snprintf(buf, sizeof buf, "%d", ctypes_sint_val(v)); break;
   case Ctypes_Uint: len = snprintf(buf, sizeof buf, "%u", (unsigned)ctypes_uint_val(v)); break;
   case Ctypes_Ulong: len = snprintf(buf, sizeof buf, "%lu", (unsigned long)ctypes_ulong_val(v)); break;
   case Ctypes_Ullong: len = snprintf(buf, sizeof buf, "%llu", (unsigned long long)ctypes_ullong_val(v)); break;

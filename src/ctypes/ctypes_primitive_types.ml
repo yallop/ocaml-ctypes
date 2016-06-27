@@ -18,6 +18,7 @@ type _ prim =
  | Long : long prim
  | Llong : llong prim
  | Ushort : ushort prim
+ | Sint : sint prim
  | Uint : uint prim
  | Ulong : ulong prim
  | Ullong : ullong prim
@@ -46,6 +47,7 @@ type _ ml_prim =
   | ML_int64 :  int64 ml_prim
   | ML_llong :  llong ml_prim
   | ML_long :  long ml_prim
+  | ML_sint : sint ml_prim
   | ML_nativeint :  nativeint ml_prim
   | ML_size_t :  size_t ml_prim
   | ML_uchar :  uchar ml_prim
@@ -69,6 +71,7 @@ let ml_prim : type a. a prim -> a ml_prim = function
   | Long -> ML_long
   | Llong -> ML_llong
   | Ushort -> ML_ushort
+  | Sint -> ML_sint
   | Uint -> ML_uint
   | Ulong -> ML_ulong
   | Ullong -> ML_ullong

@@ -49,11 +49,17 @@ module Int32 : S with type t = int32
 module Int64 : S with type t = int64
 (** Signed 64-bit integer type and operations. *)
 
+module SInt : S
+(** C's signed integer type and operations. *)
+
 module Long : S
 (** The signed long integer type and operations. *)
 
 module LLong : S
 (** The signed long long integer type and operations. *)
+
+type sint = SInt.t
+(** C's signed integer type. *)
 
 type long = Long.t
 (** The signed long integer type. *)

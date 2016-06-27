@@ -31,6 +31,7 @@ type _ noalloc =
 (* A value of type 'a alloc says that reading a value of type 'a
    may cause an OCaml allocation in C code. *)
 type _ alloc =
+| Alloc_sint : Signed.sint alloc
 | Alloc_long : Signed.long alloc
 | Alloc_llong : Signed.llong alloc
 | Alloc_uint : Unsigned.uint alloc
@@ -71,6 +72,7 @@ let primitive_allocation : type a. a Ctypes_primitive_types.prim -> a allocation
  | Llong -> `Alloc Alloc_llong
  | Ushort -> `Alloc Alloc_ushort
  | Uchar -> `Alloc Alloc_uchar
+ | Sint -> `Alloc Alloc_sint
  | Uint -> `Alloc Alloc_uint
  | Ulong -> `Alloc Alloc_ulong
  | Ullong -> `Alloc Alloc_ullong

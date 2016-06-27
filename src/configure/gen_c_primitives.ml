@@ -37,6 +37,7 @@ let c_primitives = [
   c_primitive "Long"      "long"               (Known_format "ld");
   c_primitive "Llong"     "long long"          (Known_format "lld");
   c_primitive "Ushort"    "unsigned short"     (Known_format "hu");
+  c_primitive "Sint"      "int"                (Known_format "d");
   c_primitive "Uint"      "unsigned int"       (Known_format "u");
   c_primitive "Ulong"     "unsigned long"      (Known_format "lu");
   c_primitive "Ullong"    "unsigned long long" (Known_format "llu");

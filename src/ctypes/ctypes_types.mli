@@ -132,6 +132,9 @@ sig
   val ushort : ushort typ
   (** Value representing the C type [unsigned short]. *)
 
+  val sint : sint typ
+  (** Value representing the C type [int]. *)
+
   val uint : uint typ
   (** Value representing the C type [unsigned int]. *)
 

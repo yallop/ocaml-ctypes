@@ -118,6 +118,7 @@ val complex32 : Complex.t typ
 val complex64 : Complex.t typ
 val short : int typ
 val int : int typ
+val sint : Signed.sint typ
 val long : Signed.long typ
 val llong : Signed.llong typ
 val nativeint : nativeint typ

@@ -170,6 +170,7 @@ let complex32 = Primitive Ctypes_primitive_types.Complex32
 let complex64 = Primitive Ctypes_primitive_types.Complex64
 let short = Primitive Ctypes_primitive_types.Short
 let int = Primitive Ctypes_primitive_types.Int
+let sint = Primitive Ctypes_primitive_types.Sint
 let long = Primitive Ctypes_primitive_types.Long
 let llong = Primitive Ctypes_primitive_types.Llong
 let nativeint = Primitive Ctypes_primitive_types.Nativeint

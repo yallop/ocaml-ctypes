@@ -72,6 +72,7 @@ type 'a prim = 'a Ctypes_primitive_types.prim =
 | Long : long prim
 | Llong : llong prim
 | Ushort : ushort prim
+| Sint : sint prim
 | Uint : uint prim
 | Ulong : ulong prim
 | Ullong : ullong prim
