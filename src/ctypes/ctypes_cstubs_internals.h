@@ -29,7 +29,7 @@ static inline value ctypes_pair_with_errno(value p)
   CAMLlocal1 (v);
   v = caml_alloc_tuple(2);
   Store_field (v, 0, p);
-  Store_field (v, 1, Val_int(errno));
+  Store_field (v, 1, ctypes_copy_sint(errno));
   CAMLreturn (v);
 }
 

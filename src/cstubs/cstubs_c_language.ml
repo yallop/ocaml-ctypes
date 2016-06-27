@@ -36,7 +36,7 @@ type cglobal = {
 type clocal = [ `Local of string * ty ]
 type cvar = [ clocal | `Global of cglobal ]
 type storage_class = [`Static | `Extern]
-type cconst = [ `Int of int ]
+type cconst = [ `Int of Signed.sint ]
 type cexp = [ cconst
             | clocal
             | `Cast of ty * cexp
@@ -78,7 +78,7 @@ let args : type a. a fn -> (string * ty) list = fun fn ->
 module Type_C =
 struct
   let cexp : cexp -> ty = function
-    | `Int _ -> Ty int
+    | `Int _ -> Ty sint
     | `Local (_, ty) -> ty
     | `Cast (Ty ty, _) -> Ty ty
     | `Addr (`Global { typ = Ty ty }) -> Ty (Pointer ty)

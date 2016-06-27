@@ -283,7 +283,7 @@ let ml_typ_of_typ = function
   | Out -> ml_typ_of_return_typ
 
 let lwt_job_type = Ctypes_path.path_of_string "Lwt_unix.job"
-let int_type = `Ident (Ctypes_path.path_of_string "int")
+let int_type = `Ident (Ctypes_path.path_of_string "Signed.sint")
 
 let rec ml_external_type_of_fn :
   type a. concurrency:concurrency_policy -> errno:errno_policy ->

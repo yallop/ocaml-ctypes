@@ -26,7 +26,7 @@ let cvar_name = function
 
 let cvar fmt v = fprintf fmt "%s" (cvar_name v)
 
-let cconst fmt (`Int i) = fprintf fmt "%d" i
+let cconst fmt (`Int i) = fprintf fmt "%s" (Signed.SInt.to_string i)
 
 (* Determine whether the C expression [(ty)e] is equivalent to [e] *)
 let cast_unnecessary : ty -> cexp -> bool =
@@ -115,8 +115,8 @@ let rec ccomp fmt : ccomp -> unit = function
     fprintf fmt "@[@[%a@]@;=@;@[%a;@]@]@ %a"
       (Ctypes.format_typ ~name) ty ceff e ccomp s
   | `LetConst (`Local (x, _), `Int c, s) ->
-    fprintf fmt "@[enum@ {@[@ %s@ =@ %d@ };@]@]@ %a"
-      x c ccomp s
+    fprintf fmt "@[enum@ {@[@ %s@ =@ %s@ };@]@]@ %a"
+      x (Signed.SInt.to_string c) ccomp s
   | `LetAssign (lv, e, c) ->
     fprintf fmt "@[@[%a@]@;=@;@[%a@];@]@ %a" clvalue lv ceff e ccomp c
 
