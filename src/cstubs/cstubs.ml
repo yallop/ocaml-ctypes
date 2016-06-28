@@ -53,7 +53,7 @@ let write_return :
   Format.formatter -> unit =
   fun ~concurrency ~errno fmt -> match concurrency, errno with
       `Sequential, `Ignore_errno -> Format.fprintf fmt "type 'a return = 'a@\n"
-    | `Sequential, `Return_errno -> Format.fprintf fmt "type 'a return = 'a * int@\n"
+    | `Sequential, `Return_errno -> Format.fprintf fmt "type 'a return = 'a * Signed.sint@\n"
     | `Lwt_jobs, `Ignore_errno ->
       begin
         Format.fprintf fmt "type 'a return = { lwt: 'a Lwt.t }@\n";
@@ -61,7 +61,7 @@ let write_return :
       end
     | `Lwt_jobs, `Return_errno ->
       begin
-        Format.fprintf fmt "type 'a return = { lwt: ('a * int) Lwt.t }@\n";
+        Format.fprintf fmt "type 'a return = { lwt: ('a * Signed.sint) Lwt.t }@\n";
         Format.fprintf fmt "let box_lwt lwt = {lwt}@\n";
       end
 

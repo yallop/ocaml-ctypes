@@ -21,7 +21,7 @@ let test_stat _ =
   begin
     let x, errno = Bindings.stat "." (addr st) in
     assert_equal 0 x;
-    assert_equal 0 errno;
+    assert_equal Signed.SInt.zero errno;
 
     let x, errno = Bindings.stat "/does-not-exist" (addr st) in
     assert_equal (-1) x;

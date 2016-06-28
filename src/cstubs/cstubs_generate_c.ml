@@ -96,7 +96,7 @@ struct
 
   let errno = `Global { name = "errno";
                         references_ocaml_heap = false;
-                        typ = Ty int }
+                        typ = Ty sint }
 
   let functions : ceff = `Global
     { name = "functions";
@@ -151,8 +151,8 @@ struct
     | Primitive p -> `App (prim_inj p, [`Cast (Ty (Primitive p), (x :> cexp))])
     | Pointer _ -> from_ptr (x:> cexp)
     | Funptr _ -> from_ptr (x:> cexp)
-    | Struct s -> `App (copy_bytes, [`Addr (x :> cvar); `Int (sizeof ty)])
-    | Union u -> `App (copy_bytes, [`Addr (x :> cvar); `Int (sizeof ty)])
+    | Struct s -> `App (copy_bytes, [`Addr (x :> cvar); `Int (Signed.SInt.of_int (sizeof ty))])
+    | Union u -> `App (copy_bytes, [`Addr (x :> cvar); `Int (Signed.SInt.of_int (sizeof ty))])
     | Abstract _ -> report_unpassable "values of abstract type"
     | View { ty } -> inj ty x
     | Array _ -> report_unpassable "arrays"
@@ -190,7 +190,7 @@ struct
                `Ignore_errno -> `Let ((local x t, e), (inj t (local x t) :> ccomp))
              | `Return_errno -> 
                (`LetAssign (errno,
-                           `Int 0,
+                           `Int Signed.SInt.zero,
                            `Let ((local x t, e),
                                  ((inj t (local x t) :> ccomp), value) >>= fun v ->
                                  (pair_with_errno v :> ccomp))) : ccomp)
@@ -219,7 +219,7 @@ struct
       in
       let rec build_call ?(args=[]) = function
         | 0 -> `App (f, args)
-        | n -> (`Index (`Local argv, `Int (n - 1)), value) >>= fun x ->
+        | n -> (`Index (`Local argv, `Int (Signed.SInt.of_int (n - 1))), value) >>= fun x ->
                build_call ~args:(x :: args) (n - 1)
       in
       let bytename = Printf.sprintf "%s_byte%d" fname nargs in
@@ -265,7 +265,7 @@ struct
            ~init:(List.length args - 1, call)
            ~f:(fun (x, Ty t) (i, c) ->
                i - 1,
-               `LetAssign (`Index (local "locals" (ptr value), `Int i),
+               `LetAssign (`Index (local "locals" (ptr value), `Int (Signed.SInt.of_int i)),
                            (inj t (local x t)),
                            c)))
     in
@@ -277,7 +277,7 @@ struct
          }      *)
     `Function
       (dec,
-       `LetConst (local "nargs" int, `Int (List.length args),
+       `LetConst (local "nargs" int, `Int (Signed.SInt.of_int (List.length args)),
                   wrap_if runtime_lock acquire_runtime_system (
                   `CAMLparam0 >>
                   `CAMLlocalN (local "locals" (array (List.length args) value),
@@ -353,7 +353,7 @@ struct
     let (_ : (_,_) field) = field s "result" result in
     let () = match errno with
         `Ignore_errno -> ()
-      | `Return_errno -> ignore (field s "error_status" int)
+      | `Return_errno -> ignore (field s "error_status" sint)
     in
     let () = ListLabels.iter args
         ~f:(fun (BoxedType t, name) -> ignore (field s name t : (_,_) field)) in
@@ -375,14 +375,14 @@ struct
                          c))
         in
         begin match errno with
-            `Ignore_errno -> r (`Return (Ty Void, (`Int 0)))
+            `Ignore_errno -> r (`Return (Ty Void, (`Int Signed.SInt.zero)))
           | `Return_errno ->
             let open Generate_C in
               r
               (`LetAssign
                  (`PointerField (`Local j, "error_status"),
                   errno,
-                  `Return (Ty Void, (`Int 0))))
+                  `Return (Ty Void, (`Int Signed.SInt.zero))))
         end
       | (BoxedType ty, x) :: xs ->
         Generate_C.((`DerefField (`Local j, x), ty) >>= fun y ->
@@ -404,7 +404,7 @@ struct
           fprintf fmt "@[rv@ =@ (";
         | `Return_errno ->
           fprintf fmt "@[rv@ =@ caml_alloc_tuple(2);@]@\n";
-          fprintf fmt "@[Store_field(rv,@ 1,@ Val_int(j->error_status));@]@\n";
+          fprintf fmt "@[Store_field(rv,@ 1,@ ctypes_copy_sint(j->error_status));@]@\n";
           fprintf fmt "@[Store_field(rv,@ 0,@ ";
       in
           fprintf fmt "%a);@]@\n"

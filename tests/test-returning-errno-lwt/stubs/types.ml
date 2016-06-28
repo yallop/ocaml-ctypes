@@ -12,7 +12,7 @@ module Struct_stubs(S : Cstubs.Types.TYPE) =
 struct
   open S
 
-  let _ENOENT = constant "ENOENT" int
+  let _ENOENT = constant "ENOENT" sint
 
   let ifdir = constant "S_IFDIR" (lift_typ mode_t)
   let ifmt = constant "S_IFMT" (lift_typ mode_t)
