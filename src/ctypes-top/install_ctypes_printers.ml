@@ -2,6 +2,7 @@
 
 let printers = [ "Ctypes_printers.format_typ";
                  "Ctypes_printers.format_fn"; 
+                 "Ctypes_printers.format_sint";
                  "Ctypes_printers.format_long";
                  "Ctypes_printers.format_llong";
                  "Ctypes_printers.format_uchar";

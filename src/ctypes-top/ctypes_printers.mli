@@ -9,6 +9,7 @@ open Format
 
 val format_typ : formatter -> 'a Ctypes.typ -> unit
 val format_fn : formatter -> 'a Ctypes.fn -> unit
+val format_sint : formatter -> Signed.SInt.t -> unit
 val format_long : formatter -> Signed.Long.t -> unit
 val format_llong : formatter -> Signed.LLong.t -> unit
 val format_uchar : formatter -> Unsigned.UChar.t -> unit
