@@ -168,7 +168,6 @@
     return ctypes_copy_uint ## BITS ((TYPE(BITS))(-1));                      \
   }                                                                          \
 
-
 UINT_DEFS(8, 1)
 UINT_DEFS(16, 2)
 UINT_DEFS(32, 4)

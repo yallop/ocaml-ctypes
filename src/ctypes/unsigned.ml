@@ -92,29 +92,32 @@ struct
 end
 
 
-module UInt8 : S = 
+module UInt8 : S =
 struct
   module B =
   struct
-    type t
-    external add : t -> t -> t = "ctypes_uint8_add"
-    external sub : t -> t -> t = "ctypes_uint8_sub"
-    external mul : t -> t -> t = "ctypes_uint8_mul"
-    external div : t -> t -> t = "ctypes_uint8_div"
-    external rem : t -> t -> t = "ctypes_uint8_rem"
-    external logand : t -> t -> t = "ctypes_uint8_logand"
-    external logor : t -> t -> t = "ctypes_uint8_logor"
-    external logxor : t -> t -> t = "ctypes_uint8_logxor"
-    external shift_left : t -> int -> t = "ctypes_uint8_shift_left"
-    external shift_right : t -> int -> t = "ctypes_uint8_shift_right"
-    external of_int : int -> t = "ctypes_uint8_of_int"
-    external to_int : t -> int = "ctypes_uint8_to_int"
-    external of_int64 : int64 -> t = "ctypes_uint8_of_int64"
-    external to_int64 : t -> int64 = "ctypes_uint8_to_int64"
-    external of_string : string -> t = "ctypes_uint8_of_string"
-    external to_string : t -> string = "ctypes_uint8_to_string"
-    external _max_int : unit -> t = "ctypes_uint8_max"
-    let max_int = _max_int ()
+    type t = int
+    let max_int = 255 [@@inline]
+    let add : t -> t -> t = (+) [@@inline]
+    let sub : t -> t -> t = (-) [@@inline]
+    let mul : t -> t -> t = fun x y ->
+      ((x * y) land max_int)
+      [@@inline]
+    let div : t -> t -> t = (/) [@@inline]
+    let rem : t -> t -> t = (mod) [@@inline]
+    let logand: t -> t -> t = (land) [@@inline]
+    let logor: t -> t -> t = (lor) [@@inline]
+    let logxor : t -> t -> t = (lxor) [@@inline]
+    let shift_left : t -> int -> t = (lsl) [@@inline]
+    let shift_right : t -> int -> t = (lsr) [@@inline]
+    let of_int (x: int): t = 
+      if x <= max_int then x else invalid_arg "argument out of range"
+      [@@inline]
+    external to_int : t -> int = "%identity"
+    let of_int64 : int64 -> t = fun x -> Int64.to_int x |> of_int [@@inline]
+    let to_int64 : t -> int64 = fun x -> to_int x |> Int64.of_int [@@inline]
+    external of_string : string -> t = "ctypes_uint8_of_string" [@@inline]
+    let to_string : t -> string = string_of_int [@@inline]
   end
   include B
   include Extras(B)
@@ -126,25 +129,29 @@ module UInt16 : S =
 struct
   module B =
   struct
-    type t
-    external add : t -> t -> t = "ctypes_uint16_add"
-    external sub : t -> t -> t = "ctypes_uint16_sub"
-    external mul : t -> t -> t = "ctypes_uint16_mul"
-    external div : t -> t -> t = "ctypes_uint16_div"
-    external rem : t -> t -> t = "ctypes_uint16_rem"
-    external logand : t -> t -> t = "ctypes_uint16_logand"
-    external logor : t -> t -> t = "ctypes_uint16_logor"
-    external logxor : t -> t -> t = "ctypes_uint16_logxor"
-    external shift_left : t -> int -> t = "ctypes_uint16_shift_left"
-    external shift_right : t -> int -> t = "ctypes_uint16_shift_right"
-    external of_int : int -> t = "ctypes_uint16_of_int"
-    external to_int : t -> int = "ctypes_uint16_to_int"
-    external of_int64 : int64 -> t = "ctypes_uint16_of_int64"
-    external to_int64 : t -> int64 = "ctypes_uint16_to_int64"
-    external of_string : string -> t = "ctypes_uint16_of_string"
-    external to_string : t -> string = "ctypes_uint16_to_string"
-    external _max_int : unit -> t = "ctypes_uint16_max"
-    let max_int = _max_int ()
+    type t = int
+    let max_int = 65535 [@@inline]
+    (* Warning: heavy use of ahead! *)
+    let add : t -> t -> t = (+) [@@inline]
+    let sub : t -> t -> t = (-) [@@inline]
+    let mul : t -> t -> t = fun x y ->
+      ((x * y) land max_int)
+      [@@inline]
+    let div : t -> t -> t = (/) [@@inline]
+    let rem : t -> t -> t = (mod) [@@inline]
+    let logand: t -> t -> t = (land) [@@inline]
+    let logor: t -> t -> t = (lor) [@@inline]
+    let logxor : t -> t -> t = (lxor) [@@inline]
+    let shift_left : t -> int -> t = (lsl) [@@inline]
+    let shift_right : t -> int -> t = (lsr) [@@inline]
+    let of_int (x: int): t =
+      if x <= max_int then x else invalid_arg "argument out of range"
+      [@@inline]
+    external to_int : t -> int = "%identity"
+    let of_int64 : int64 -> t = fun x -> Int64.to_int x |> of_int [@@inline]
+    let to_int64 : t -> int64 = fun x -> to_int x |> Int64.of_int [@@inline]
+    external of_string : string -> t = "ctypes_uint16_of_string" [@@inline]
+    let to_string : t -> string = string_of_int [@@inline]
   end
   include B
   include Extras(B)

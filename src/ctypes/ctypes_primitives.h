@@ -49,7 +49,7 @@ enum ctypes_primitive {
 /* short is at least 16 bits. */
 #if USHRT_MAX == UINT16_MAX
 #define ctypes_ushort_val Uint16_val
-#define ctypes_copy_ushort ctypes_copy_uint16
+#define ctypes_copy_ushort Val_int
 #elif USHRT_MAX == UINT32_MAX
 #define ctypes_ushort_val Uint32_val
 #define ctypes_copy_ushort ctypes_copy_uint32
@@ -63,7 +63,7 @@ enum ctypes_primitive {
 /* int is at least 16 bits. */
 #if UINT_MAX == UINT16_MAX
 #define ctypes_uint_val Uint16_val
-#define ctypes_copy_uint ctypes_copy_uint16
+#define ctypes_copy_uint Val_int
 #elif UINT_MAX == UINT32_MAX
 #define ctypes_uint_val Uint32_val
 #define ctypes_copy_uint ctypes_copy_uint32
@@ -101,7 +101,7 @@ enum ctypes_primitive {
 
 #if SIZE_MAX == UINT16_MAX
 #define ctypes_size_t_val Uint16_val
-#define ctypes_copy_size_t ctypes_copy_uint16
+#define ctypes_copy_size_t Val_int
 #elif SIZE_MAX == UINT32_MAX
 #define ctypes_size_t_val Uint32_val
 #define ctypes_copy_size_t ctypes_copy_uint32
