@@ -22,7 +22,13 @@
 
 #include "ctypes_unsigned_stubs.h"
 
-#define Uint_custom_val(TYPE, V) (*((TYPE *) Data_custom_val(V)))
+#define Uint_custom_val(TYPE, V) Uint_custom_val_(TYPE, V)
+#define Uint_custom_val_(TYPE, V) (TYPE ## _custom_val(TYPE, V))
+#define uint8_t_custom_val(TYPE, V) ((TYPE)(Int_val(V)))
+#define uint16_t_custom_val(TYPE, V) ((TYPE)(Int_val(V)))
+#define uint32_t_custom_val(TYPE, V) (*(TYPE*)(Data_custom_val(V)))
+#define uint64_t_custom_val(TYPE, V) (*(TYPE*)(Data_custom_val(V)))
+
 #define TYPE(SIZE) uint ## SIZE ## _t
 #define BUF_SIZE(TYPE) ((sizeof(TYPE) * CHAR_BIT + 2) / 3 + 1)
 
@@ -166,10 +172,37 @@
   value ctypes_uint ## BITS ## _max(value a)                                 \
   {                                                                          \
     return ctypes_copy_uint ## BITS ((TYPE(BITS))(-1));                      \
-  }                                                                          \
+  }
 
-UINT_DEFS(8, 1)
-UINT_DEFS(16, 2)
+#define UINT_SMALL_DEFS(BITS, BYTES)                                         \
+  /* of_string : string -> t */                                              \
+  value ctypes_uint ## BITS ## _of_string(value a)                           \
+  {                                                                          \
+    TYPE(BITS) u;                                                            \
+    if (sscanf(String_val(a), "%" SCNu ## BITS , &u) != 1)                   \
+      caml_failwith("int_of_string");                                        \
+    else                                                                     \
+      return ctypes_copy_uint ## BITS (u);                                   \
+  }                                                                          \
+                                                                             \
+  /* to_string : t -> string */                                              \
+  value ctypes_uint ## BITS ## _to_string(value a)                           \
+  {                                                                          \
+    char buf[BUF_SIZE(TYPE(BITS))];                                          \
+    if (sprintf(buf, "%" PRIu ## BITS , Uint_custom_val(TYPE(BITS), a)) < 0) \
+      caml_failwith("string_of_int");                                        \
+    else                                                                     \
+      return caml_copy_string(buf);                                          \
+  }                                                                          \
+                                                                             \
+  /* max : unit -> t */                                                      \
+  value ctypes_uint ## BITS ## _max(value unit)                              \
+  {                                                                          \
+     return Val_int((TYPE(BITS))(-1));                                       \
+  }
+
+UINT_SMALL_DEFS(8, 1)
+UINT_SMALL_DEFS(16, 2)
 UINT_DEFS(32, 4)
 UINT_DEFS(64, 8)
 

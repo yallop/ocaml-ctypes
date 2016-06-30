@@ -44,9 +44,16 @@
   extern value ctypes_uint ## BITS ## _to_string(value a);                \
   /* max : unit -> t */                                                   \
   extern value ctypes_uint ## BITS ## _max(value a);
+#define UINT_SMALL_DECLS(BITS)                                            \
+  /* of_string : string -> t */                                           \
+  extern value ctypes_uint ## BITS ## _of_string(value a);                \
+  /* to_string : t -> string */                                           \
+  extern value ctypes_uint ## BITS ## _to_string(value a);                \
+  /* max : unit -> t */                                                   \
+  extern value ctypes_uint ## BITS ## _max(value a);
 
-UINT_DECLS(8)
-UINT_DECLS(16)
+UINT_SMALL_DECLS(8)
+UINT_SMALL_DECLS(16)
 UINT_DECLS(32)
 UINT_DECLS(64)
 
@@ -56,6 +63,9 @@ extern value ctypes_ushort_size (value _);
 extern value ctypes_uint_size (value _);
 extern value ctypes_ulong_size (value _);
 extern value ctypes_ulonglong_size (value _);
+
+#define ctypes_copy_uint8(t) ((uint8_t)(Val_int(t)))
+#define ctypes_copy_uint16(t) ((uint16_t)(Val_int(t)))
 
 #define Uint8_val(V) ((uint8_t)(Int_val(V)))
 #define Uint16_val(V) ((uint16_t)(Int_val(V)))

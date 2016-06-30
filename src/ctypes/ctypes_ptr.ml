@@ -29,8 +29,8 @@ struct
     let (lsr) = shift_right_logical
   end
 
-  let of_nativeint x = x
-  let to_nativeint x = x
+  external of_nativeint : t -> t = "%identity"
+  external to_nativeint : t -> t = "%identity"
 
   let of_int64 = Int64.to_nativeint
   let to_int64  = Int64.of_nativeint
@@ -90,7 +90,7 @@ struct
   let managed { managed } = managed
 
   let coerce p reftyp = { p with reftyp }
-    
+
   let unsafe_raw_addr { raw } = raw
 
   let add_bytes p bytes = { p with raw = Raw.(add p.raw (of_int bytes)) }
