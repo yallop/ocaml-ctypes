@@ -21,6 +21,7 @@ let constant name typ =
 
 let test_retrieve_constants _ =
   begin
+   (*
     Printf.printf "%d = %d\n" (constant "UCHAR_MAX" Ctypes.uchar |>
                                   Unsigned.UChar.to_int)
                   (Constants._UCHAR_MAX |> Unsigned.UChar.to_int);
@@ -34,6 +35,7 @@ let test_retrieve_constants _ =
                                   Unsigned.UInt16.to_int)
                   (Constants._UINT16_MAX |> Unsigned.UInt16.to_int);
     Printf.printf "255 = %d\n" (Unsigned.UInt8.to_int (Unsigned.UInt8.of_string "255"));
+    *)
     assert_equal Constants._LONG_MIN (constant "LONG_MIN" long);
     assert_equal Constants._SCHAR_MIN (constant "SCHAR_MIN" Ctypes.schar);
     assert_equal Constants._SCHAR_MAX (constant "SCHAR_MAX" Ctypes.schar);

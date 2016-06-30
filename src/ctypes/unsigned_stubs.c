@@ -182,14 +182,14 @@
     if (sscanf(String_val(a), "%" SCNu ## BITS , &u) != 1)                   \
       caml_failwith("int_of_string");                                        \
     else                                                                     \
-      return ctypes_copy_uint ## BITS (u);                                   \
+      return ctypes_copy_uint ## BITS(u);                                    \
   }                                                                          \
                                                                              \
   /* to_string : t -> string */                                              \
   value ctypes_uint ## BITS ## _to_string(value a)                           \
   {                                                                          \
     char buf[BUF_SIZE(TYPE(BITS))];                                          \
-    if (sprintf(buf, "%" PRIu ## BITS , Uint_custom_val(TYPE(BITS), a)) < 0) \
+    if (sprintf(buf, "%" PRIu ## BITS , Uint ## BITS ##_val(a)) < 0)         \
       caml_failwith("string_of_int");                                        \
     else                                                                     \
       return caml_copy_string(buf);                                          \
@@ -198,7 +198,7 @@
   /* max : unit -> t */                                                      \
   value ctypes_uint ## BITS ## _max(value unit)                              \
   {                                                                          \
-     return Val_int((TYPE(BITS))(-1));                                       \
+     return ctypes_copy_uint ## BITS((TYPE(BITS))(-1));                      \
   }
 
 UINT_SMALL_DEFS(8, 1)
