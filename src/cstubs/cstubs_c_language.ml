@@ -36,7 +36,7 @@ type cglobal = {
 type clocal = [ `Local of string * ty ]
 type cvar = [ clocal | `Global of cglobal ]
 type storage_class = [`Static | `Extern]
-type cconst = [ `Int of int ]
+type cconst = [ `Int of Signed.sint ]
 type cexp = [ cconst
             | clocal
             | `Cast of ty * cexp
@@ -78,7 +78,7 @@ let args : type a. a fn -> (string * ty) list = fun fn ->
 module Type_C =
 struct
   let cexp : cexp -> ty = function
-    | `Int _ -> Ty int
+    | `Int _ -> Ty sint
     | `Local (_, ty) -> ty
     | `Cast (Ty ty, _) -> Ty ty
     | `Addr (`Global { typ = Ty ty }) -> Ty (Pointer ty)
@@ -162,6 +162,7 @@ let prim_prj : type a. a Ctypes_primitive_types.prim -> _ =
   | Long -> reader "ctypes_long_val" (value @-> returning long)
   | Llong -> reader "ctypes_llong_val" (value @-> returning llong)
   | Ushort -> reader "ctypes_ushort_val" (value @-> returning ushort)
+  | Sint -> reader "ctypes_sint_val" (value @-> returning sint)
   | Uint -> reader "ctypes_uint_val" (value @-> returning uint)
   | Ulong -> reader "ctypes_ulong_val" (value @-> returning ulong)
   | Ullong -> reader "ctypes_ullong_val" (value @-> returning ullong)
@@ -193,6 +194,7 @@ let prim_inj : type a. a Ctypes_primitive_types.prim -> _ =
   | Long -> conser "ctypes_copy_long" (long @-> returning value)
   | Llong -> conser "ctypes_copy_llong" (llong @-> returning value)
   | Ushort -> conser "ctypes_copy_ushort" (ushort @-> returning value)
+  | Sint -> conser "ctypes_copy_sint" (sint @-> returning value)
   | Uint -> conser "ctypes_copy_uint" (uint @-> returning value)
   | Ulong -> conser "ctypes_copy_ulong" (ulong @-> returning value)
   | Ullong -> conser "ctypes_copy_ullong" (ullong @-> returning value)

@@ -22,7 +22,7 @@ let test_stat _ =
     Lwt_unix.run
       Lwt.((Bindings.stat "." (addr s)).lwt >>= fun (x, errno) ->
            assert_equal 0 x;
-           assert_equal 0 errno;
+           assert_equal Signed.SInt.zero errno;
            return ());
     Lwt_unix.run
       Lwt.((Bindings.stat "/does-not-exist" (addr s)).lwt >>= fun (x, errno) ->

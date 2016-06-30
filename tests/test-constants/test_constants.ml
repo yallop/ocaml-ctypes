@@ -45,6 +45,8 @@ let test_retrieve_constants _ =
     assert_equal Constants._SHRT_MIN (constant "SHRT_MIN" Ctypes.short);
     assert_equal Constants._SHRT_MAX (constant "SHRT_MAX" Ctypes.short);
     assert_equal Constants._USHRT_MAX (constant "USHRT_MAX" Ctypes.ushort);
+    assert_equal Constants._INT_MIN (constant "INT_MIN" Ctypes.sint);
+    assert_equal Constants._INT_MAX (constant "INT_MAX" Ctypes.sint);
     assert_equal Constants._UINT_MAX (constant "UINT_MAX" Ctypes.uint);
     assert_equal Constants._LONG_MAX (constant "LONG_MAX" Ctypes.long);
     assert_equal Constants._LONG_MIN (constant "LONG_MIN" Ctypes.long);

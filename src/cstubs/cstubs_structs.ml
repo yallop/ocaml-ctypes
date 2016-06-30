@@ -151,6 +151,7 @@ let primitive_format_string : type a. a Ctypes_primitive_types.prim -> string =
     | Long, Some fmt -> sprintf "Signed.Long.of_string \"%s\"" fmt
     | Llong, Some fmt -> sprintf "Signed.LLong.of_string \"%s\"" fmt
     | Ushort, Some fmt -> sprintf "Unsigned.UShort.of_string \"%s\"" fmt
+    | Sint, Some fmt -> sprintf "Signed.SInt.of_string \"%s\"" fmt
     | Uint, Some fmt -> sprintf "Unsigned.UInt.of_string \"%s\"" fmt
     | Ulong, Some fmt -> sprintf "Unsigned.ULong.of_string \"%s\"" fmt
     | Ullong, Some fmt -> sprintf "Unsigned.ULLong.of_string \"%s\"" fmt
