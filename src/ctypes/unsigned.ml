@@ -112,7 +112,7 @@ struct
     let of_int (x: int): t =
       if x <= max_int then x else invalid_arg "argument out of range"
     external to_int : t -> int = "%identity"
-    let of_int64 : int64 -> t = fun x -> of_int (Int64.to_int)
+    let of_int64 : int64 -> t = fun x -> of_int (Int64.to_int x)
     let to_int64 : t -> int64 = fun x -> Int64.of_int (to_int x)
     external of_string : string -> t = "ctypes_uint8_of_string"
     let to_string : t -> string = string_of_int
