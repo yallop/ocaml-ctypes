@@ -96,28 +96,26 @@ module UInt8 : S =
 struct
   module B =
   struct
+    (* Once 4.01 support is dropped all of these should be [@@inline] *)
     type t = int
-    let max_int = 255 [@@inline]
-    let add : t -> t -> t = (+) [@@inline]
-    let sub : t -> t -> t = (-) [@@inline]
-    let mul : t -> t -> t = fun x y ->
-      ((x * y) land max_int)
-      [@@inline]
-    let div : t -> t -> t = (/) [@@inline]
-    let rem : t -> t -> t = (mod) [@@inline]
-    let logand: t -> t -> t = (land) [@@inline]
-    let logor: t -> t -> t = (lor) [@@inline]
-    let logxor : t -> t -> t = (lxor) [@@inline]
-    let shift_left : t -> int -> t = (lsl) [@@inline]
-    let shift_right : t -> int -> t = (lsr) [@@inline]
-    let of_int (x: int): t = 
+    let max_int = 255
+    let add : t -> t -> t = (+)
+    let sub : t -> t -> t = (-)
+    let mul : t -> t -> t = fun x y -> ((x * y) land max_int)
+    let div : t -> t -> t = (/)
+    let rem : t -> t -> t = (mod)
+    let logand: t -> t -> t = (land)
+    let logor: t -> t -> t = (lor)
+    let logxor : t -> t -> t = (lxor)
+    let shift_left : t -> int -> t = (lsl)
+    let shift_right : t -> int -> t = (lsr)
+    let of_int (x: int): t =
       if x <= max_int then x else invalid_arg "argument out of range"
-      [@@inline]
     external to_int : t -> int = "%identity"
-    let of_int64 : int64 -> t = fun x -> Int64.to_int x |> of_int [@@inline]
-    let to_int64 : t -> int64 = fun x -> to_int x |> Int64.of_int [@@inline]
-    external of_string : string -> t = "ctypes_uint8_of_string" [@@inline]
-    let to_string : t -> string = string_of_int [@@inline]
+    let of_int64 : int64 -> t = fun x -> of_int (Int64.to_int)
+    let to_int64 : t -> int64 = fun x -> Int64.of_int (to_int x)
+    external of_string : string -> t = "ctypes_uint8_of_string"
+    let to_string : t -> string = string_of_int
   end
   include B
   include Extras(B)
@@ -129,29 +127,26 @@ module UInt16 : S =
 struct
   module B =
   struct
+    (* Once 4.01 support is dropped all of these should be [@@inline] *)
     type t = int
-    let max_int = 65535 [@@inline]
-    (* Warning: heavy use of ahead! *)
-    let add : t -> t -> t = (+) [@@inline]
-    let sub : t -> t -> t = (-) [@@inline]
-    let mul : t -> t -> t = fun x y ->
-      ((x * y) land max_int)
-      [@@inline]
-    let div : t -> t -> t = (/) [@@inline]
-    let rem : t -> t -> t = (mod) [@@inline]
-    let logand: t -> t -> t = (land) [@@inline]
-    let logor: t -> t -> t = (lor) [@@inline]
-    let logxor : t -> t -> t = (lxor) [@@inline]
-    let shift_left : t -> int -> t = (lsl) [@@inline]
-    let shift_right : t -> int -> t = (lsr) [@@inline]
+    let max_int = 65535
+    let add : t -> t -> t = (+)
+    let sub : t -> t -> t = (-)
+    let mul : t -> t -> t = fun x y -> ((x * y) land max_int)
+    let div : t -> t -> t = (/)
+    let rem : t -> t -> t = (mod)
+    let logand: t -> t -> t = (land)
+    let logor: t -> t -> t = (lor)
+    let logxor : t -> t -> t = (lxor)
+    let shift_left : t -> int -> t = (lsl)
+    let shift_right : t -> int -> t = (lsr)
     let of_int (x: int): t =
       if x <= max_int then x else invalid_arg "argument out of range"
-      [@@inline]
     external to_int : t -> int = "%identity"
-    let of_int64 : int64 -> t = fun x -> Int64.to_int x |> of_int [@@inline]
-    let to_int64 : t -> int64 = fun x -> to_int x |> Int64.of_int [@@inline]
-    external of_string : string -> t = "ctypes_uint16_of_string" [@@inline]
-    let to_string : t -> string = string_of_int [@@inline]
+    let of_int64 : int64 -> t = fun x -> Int64.to_int x |> of_int
+    let to_int64 : t -> int64 = fun x -> to_int x |> Int64.of_int
+    external of_string : string -> t = "ctypes_uint16_of_string"
+    let to_string : t -> string = string_of_int
   end
   include B
   include Extras(B)
@@ -163,7 +158,7 @@ module UInt32 : sig
   include S
   external of_int32 : int32 -> t = "ctypes_uint32_of_int32"
   external to_int32 : t -> int32 = "ctypes_int32_of_uint32"
-end = 
+end =
 struct
   module B =
   struct
@@ -199,7 +194,7 @@ module UInt64 : sig
   include S
   external of_int64 : int64 -> t = "ctypes_uint64_of_int64"
   external to_int64 : t -> int64 = "ctypes_uint64_to_int64"
-end = 
+end =
 struct
   module B =
   struct
@@ -236,7 +231,7 @@ let pick : size:int -> (module S) =
     | 4 -> (module UInt32)
     | 8 -> (module UInt64)
     | _ -> assert false
-      
+
 external size_t_size : unit -> int = "ctypes_size_t_size"
 external ushort_size : unit -> int = "ctypes_ushort_size"
 external uint_size : unit -> int = "ctypes_uint_size"
