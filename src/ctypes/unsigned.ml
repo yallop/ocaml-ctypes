@@ -99,18 +99,20 @@ struct
     (* Once 4.01 support is dropped all of these should be [@@inline] *)
     type t = int
     let max_int = 255
-    let add : t -> t -> t = (+)
-    let sub : t -> t -> t = (-)
-    let mul : t -> t -> t = fun x y -> ((x * y) land max_int)
+    let add : t -> t -> t = fun x y -> (x + y) land max_int
+    let sub : t -> t -> t = fun x y -> (x - y) land max_int
+    let mul : t -> t -> t = fun x y -> (x * y) land max_int
     let div : t -> t -> t = (/)
     let rem : t -> t -> t = (mod)
     let logand: t -> t -> t = (land)
     let logor: t -> t -> t = (lor)
     let logxor : t -> t -> t = (lxor)
-    let shift_left : t -> int -> t = (lsl)
+    let shift_left : t -> int -> t = fun x y -> (x lsl y) land max_int
     let shift_right : t -> int -> t = (lsr)
     let of_int (x: int): t =
-      if x <= max_int then x else invalid_arg "argument out of range"
+      (* For backwards compatibility, this wraps *)
+      (* if x <= max_int then x else invalid_arg "argument out of range" *)
+      x land max_int
     external to_int : t -> int = "%identity"
     let of_int64 : int64 -> t = fun x -> of_int (Int64.to_int x)
     let to_int64 : t -> int64 = fun x -> Int64.of_int (to_int x)
@@ -130,18 +132,20 @@ struct
     (* Once 4.01 support is dropped all of these should be [@@inline] *)
     type t = int
     let max_int = 65535
-    let add : t -> t -> t = (+)
-    let sub : t -> t -> t = (-)
-    let mul : t -> t -> t = fun x y -> ((x * y) land max_int)
+    let add : t -> t -> t = fun x y -> (x + y) land max_int
+    let sub : t -> t -> t = fun x y -> (x - y) land max_int
+    let mul : t -> t -> t = fun x y -> (x * y) land max_int
     let div : t -> t -> t = (/)
     let rem : t -> t -> t = (mod)
     let logand: t -> t -> t = (land)
     let logor: t -> t -> t = (lor)
     let logxor : t -> t -> t = (lxor)
-    let shift_left : t -> int -> t = (lsl)
+    let shift_left : t -> int -> t = fun x y -> (x lsl y) land max_int
     let shift_right : t -> int -> t = (lsr)
     let of_int (x: int): t =
-      if x <= max_int then x else invalid_arg "argument out of range"
+      (* For backwards compatibility, this wraps *)
+      (* if x <= max_int then x else invalid_arg "argument out of range" *)
+      x land max_int
     external to_int : t -> int = "%identity"
     let of_int64 : int64 -> t = fun x -> Int64.to_int x |> of_int
     let to_int64 : t -> int64 = fun x -> to_int x |> Int64.of_int
