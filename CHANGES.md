@@ -1,3 +1,24 @@
+## ctypes 0.7.0
+
+### Features
+
+* Add support for bytecode-only architectures
+    https://github.com/ocamllabs/ocaml-ctypes/issues/410
+
+* Add a new `sint` type corresponding to a full-range C integer and update `errno` support to use `sint`
+    https://github.com/ocamllabs/ocaml-ctypes/issues/411
+
+### Bug fixes
+
+* Handle small integer return types correctly on big-endian platforms
+    https://github.com/ocamllabs/ocaml-ctypes/issues/404
+    https://github.com/ocamllabs/ocaml-ctypes/issues/405
+
+* Fix a bug with callbacks that return small types (less than a word)
+    https://github.com/ocamllabs/ocaml-ctypes/issues/405
+
+Thanks to Stephane Glondu (@glondu) for contributions to this release.
+
 ## ctypes 0.6.2
 
 ### Bug fixes
