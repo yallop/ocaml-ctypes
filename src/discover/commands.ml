@@ -25,13 +25,14 @@ let with_open_input_file ~filename f =
   unwind_protect ~cleanup:close_in f (open_in filename)
 
 let file_contents ~filename : string =
-  with_open_input_file ~filename
-    (fun file ->
-       let () = set_binary_mode_in file true in
-       let size = in_channel_length file in
-       let buf = Bytes.create size in
-       let () = really_input file buf 0 size in
-       buf)
+  Bytes.to_string
+    (with_open_input_file ~filename
+      (fun file ->
+         let () = set_binary_mode_in file true in
+         let size = in_channel_length file in
+         let buf = Bytes.create size in
+         let () = really_input file buf 0 size in
+         buf))
 
 type command_output = {
   status: int;
