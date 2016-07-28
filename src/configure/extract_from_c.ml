@@ -40,16 +40,16 @@ let read_output program =
   really_input channel result 0 length;
   close_in channel;
   Sys.remove output_filename;
-  result
+  Bytes.to_string result
 
 let find_from haystack pos needle = Str.(search_forward (regexp_string needle) haystack pos)
 
-let prefix = Bytes.of_string "BEGIN-"
-let suffix = Bytes.of_string "-END"
-let extract bytes =
-  let begin_pos = find_from bytes 0 prefix + Bytes.length prefix in
-  let end_pos   = find_from bytes 0 suffix in
-  Bytes.to_string (Bytes.sub bytes begin_pos (end_pos - begin_pos))
+let prefix = "BEGIN-"
+let suffix = "-END"
+let extract s =
+  let begin_pos = find_from s 0 prefix + String.length prefix in
+  let end_pos   = find_from s 0 suffix in
+  String.sub s begin_pos (end_pos - begin_pos)
 
 let headers = "\
 #include <stdint.h>
