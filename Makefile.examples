@@ -4,14 +4,16 @@
 fts-stubs.install = no
 fts-stubs.dir = examples/fts/stub-generation/bindings
 fts-stubs.subproject_deps = ctypes cstubs \
-  ctypes-foreign-base ctypes-foreign-unthreaded
+  ctypes-foreign
+fts-stubs.threads = yes
 fts-stubs: PROJECT=fts-stubs
 fts-stubs: $$(LIB_TARGETS)
 
 fts-stub-generator.install = no
 fts-stub-generator.dir = examples/fts/stub-generation/stub-generator
 fts-stub-generator.subproject_deps = ctypes cstubs \
-  ctypes-foreign-base ctypes-foreign-unthreaded fts-stubs
+  ctypes-foreign fts-stubs
+fts-stub-generator.threads = yes
 fts-stub-generator.deps = bytes str unix bigarray
 fts-stub-generator: PROJECT=fts-stub-generator
 fts-stub-generator: $$(NATIVE_TARGET)
@@ -19,7 +21,8 @@ fts-stub-generator: $$(NATIVE_TARGET)
 fts-cmd.install = no
 fts-cmd.dir = examples/fts/stub-generation
 fts-cmd.subproject_deps = ctypes cstubs \
-  ctypes-foreign-base ctypes-foreign-unthreaded fts-stubs
+  ctypes-foreign fts-stubs
+fts-cmd.threads = yes
 fts-cmd.deps = bytes str unix bigarray
 fts-cmd.extra_mls = fts_generated.ml
 fts-cmd: CFLAGS+=-D_FILE_OFFSET_BITS=32
@@ -34,7 +37,8 @@ examples/fts/stub-generation/fts_generated.ml: fts-stub-generator
 fts.install = no
 fts.dir = examples/fts/foreign
 fts.deps = bytes unix bigarray str
-fts.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
+fts.threads = yes
+fts.subproject_deps = ctypes ctypes-foreign
 fts: PROJECT=fts
 fts: $$(NATIVE_TARGET)
 
@@ -67,7 +71,8 @@ examples/date/stub-generation/date_generated.ml:
 # subproject: date using dynamic linking (foreign)
 date.install = no
 date.dir = examples/date/foreign
-date.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
+date.subproject_deps = ctypes ctypes-foreign
+date.threads = yes
 date.deps = bytes unix bigarray str
 date: PROJECT=date
 date: $$(NATIVE_TARGET)
@@ -96,7 +101,8 @@ examples/ncurses/stub-generation/ncurses_generated.ml: ncurses-stubs
 # subproject: ncurses using dynamic linking (foreign)
 ncurses.install = no
 ncurses.dir = examples/ncurses/foreign
-ncurses.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
+ncurses.subproject_deps = ctypes ctypes-foreign
+ncurses.threads = yes
 ncurses.deps = bytes unix bigarray str
 ncurses.link_flags = -lncurses
 ncurses: PROJECT=ncurses
