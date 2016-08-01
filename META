@@ -33,8 +33,7 @@ package "stubs" (
 package "foreign" (
  version = "0.7.0"
  description = "Dynamic linking of C functions"
- requires(-mt) = "ctypes.foreign.unthreaded"
- requires(mt) = "ctypes.foreign.threaded"
+ requires = "ctypes.foreign.threaded"
 
  package "base" (
   version = "0.7.0"
@@ -56,16 +55,5 @@ package "foreign" (
   archive(native) = "ctypes-foreign-threaded.cmxa"
   archive(native, plugin) = "ctypes-foreign-threaded.cmxs"
   exists_if = "ctypes-foreign-threaded.cma"
- )
-
- package "unthreaded" (
-  version = "0.7.0"
-  description = "Dynamic linking of C functions (for use in unthreaded programs)"
-  requires = "ctypes ctypes.foreign.base"
-  archive(byte) = "ctypes-foreign-unthreaded.cma"
-  archive(byte, plugin) = "ctypes-foreign-unthreaded.cma"
-  archive(native) = "ctypes-foreign-unthreaded.cmxa"
-  archive(native, plugin) = "ctypes-foreign-unthreaded.cmxs"
-  exists_if = "ctypes-foreign-unthreaded.cma"
  )
 )

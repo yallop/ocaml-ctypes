@@ -11,7 +11,7 @@ OCAMLMKLIB=$(OCAMLFIND) ocamlmklib
 VPATH=src examples
 BUILDDIR=_build
 BASE_PROJECTS=configure libffi-abigen configured ctypes ctypes-top
-FOREIGN_PROJECTS=test-libffi ctypes-foreign-base ctypes-foreign-threaded ctypes-foreign-unthreaded
+FOREIGN_PROJECTS=test-libffi ctypes-foreign-base ctypes-foreign-threaded
 STUB_PROJECTS=cstubs
 PROJECTS=$(BASE_PROJECTS) $(FOREIGN_PROJECTS) $(STUB_PROJECTS)
 GENERATED=src/ctypes/ctypes_primitives.ml	\
@@ -97,20 +97,6 @@ ctypes-foreign-threaded.install_native_objects = no
 
 ctypes-foreign-threaded: PROJECT=ctypes-foreign-threaded
 ctypes-foreign-threaded: $$(LIB_TARGETS)
-
-# ctypes-foreign-unthreaded subproject
-ctypes-foreign-unthreaded.public = foreign
-ctypes-foreign-unthreaded.install = yes
-ctypes-foreign-unthreaded.threads = no
-ctypes-foreign-unthreaded.dir = src/ctypes-foreign-unthreaded
-ctypes-foreign-unthreaded.subproject_deps = ctypes ctypes-foreign-base
-ctypes-foreign-unthreaded.link_flags = $(libffi_lib) $(lib_process)
-ctypes-foreign-unthreaded.cmo_opts = $(OCAML_FFI_INCOPTS:%=-ccopt %)
-ctypes-foreign-unthreaded.cmx_opts = $(OCAML_FFI_INCOPTS:%=-ccopt %)
-ctypes-foreign-unthreaded.install_native_objects = no
-
-ctypes-foreign-unthreaded: PROJECT=ctypes-foreign-unthreaded
-ctypes-foreign-unthreaded: $$(LIB_TARGETS)
 
 # ctypes-top subproject
 ctypes-top.public = ctypes_printers
