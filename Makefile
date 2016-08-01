@@ -11,13 +11,13 @@ OCAMLMKLIB=$(OCAMLFIND) ocamlmklib
 VPATH=src examples
 BUILDDIR=_build
 BASE_PROJECTS=configure libffi-abigen configured ctypes ctypes-top
-FOREIGN_PROJECTS=test-libffi ctypes-foreign-base ctypes-foreign-threaded
+FOREIGN_PROJECTS=test-libffi ctypes-foreign
 STUB_PROJECTS=cstubs
 PROJECTS=$(BASE_PROJECTS) $(FOREIGN_PROJECTS) $(STUB_PROJECTS)
 GENERATED=src/ctypes/ctypes_primitives.ml	\
-          src/ctypes-foreign-base/libffi_abi.ml \
-          src/ctypes-foreign-base/dl.ml		\
-          src/ctypes-foreign-base/dl_stubs.c	\
+          src/ctypes-foreign/libffi_abi.ml \
+          src/ctypes-foreign/dl.ml		\
+          src/ctypes-foreign/dl_stubs.c	\
           libffi.config				\
           asneeded.config
 OCAML_FFI_INCOPTS=$(libffi_opt)
@@ -67,36 +67,22 @@ cstubs.install = yes
 cstubs: PROJECT=cstubs
 cstubs: $(cstubs.dir)/$(cstubs.extra_mls) $$(LIB_TARGETS)
 
-# ctypes-foreign-base subproject
-ctypes-foreign-base.public = dl libffi_abi
-ctypes-foreign-base.install = yes
-ctypes-foreign-base.install_native_objects = yes
-ctypes-foreign-base.threads = no
-ctypes-foreign-base.dir = src/ctypes-foreign-base
-ctypes-foreign-base.deps = bytes
-ctypes-foreign-base.subproject_deps = ctypes
-ctypes-foreign-base.extra_mls = libffi_abi.ml dl.ml
-ctypes-foreign-base.extra_cs = dl_stubs.c
-ctypes-foreign-base.link_flags = $(libffi_lib) $(lib_process)
-ctypes-foreign-base.cmo_opts = $(OCAML_FFI_INCOPTS:%=-ccopt %)
-ctypes-foreign-base.cmx_opts = $(OCAML_FFI_INCOPTS:%=-ccopt %)
+# ctypes-foreign subproject
+ctypes-foreign.public = dl libffi_abi foreign
+ctypes-foreign.install = yes
+ctypes-foreign.install_native_objects = yes
+ctypes-foreign.threads = yes
+ctypes-foreign.dir = src/ctypes-foreign
+ctypes-foreign.deps = bytes
+ctypes-foreign.subproject_deps = ctypes
+ctypes-foreign.extra_mls = libffi_abi.ml dl.ml
+ctypes-foreign.extra_cs = dl_stubs.c
+ctypes-foreign.link_flags = $(libffi_lib) $(lib_process)
+ctypes-foreign.cmo_opts = $(OCAML_FFI_INCOPTS:%=-ccopt %)
+ctypes-foreign.cmx_opts = $(OCAML_FFI_INCOPTS:%=-ccopt %)
 
-ctypes-foreign-base: PROJECT=ctypes-foreign-base
-ctypes-foreign-base: $$(LIB_TARGETS)
-
-# ctypes-foreign-threaded subproject
-ctypes-foreign-threaded.public = foreign
-ctypes-foreign-threaded.install = yes
-ctypes-foreign-threaded.threads = yes
-ctypes-foreign-threaded.dir = src/ctypes-foreign-threaded
-ctypes-foreign-threaded.subproject_deps = ctypes ctypes-foreign-base
-ctypes-foreign-threaded.link_flags = $(libffi_lib) $(lib_process)
-ctypes-foreign-threaded.cmo_opts = $(OCAML_FFI_INCOPTS:%=-ccopt %)
-ctypes-foreign-threaded.cmx_opts = $(OCAML_FFI_INCOPTS:%=-ccopt %)
-ctypes-foreign-threaded.install_native_objects = no
-
-ctypes-foreign-threaded: PROJECT=ctypes-foreign-threaded
-ctypes-foreign-threaded: $$(LIB_TARGETS)
+ctypes-foreign: PROJECT=ctypes-foreign
+ctypes-foreign: $$(LIB_TARGETS)
 
 # ctypes-top subproject
 ctypes-top.public = ctypes_printers
@@ -110,18 +96,18 @@ ctypes-top: PROJECT=ctypes-top
 ctypes-top: $$(LIB_TARGETS)
 
 # configuration
-configured: src/ctypes/ctypes_primitives.ml src/ctypes-foreign-base/libffi_abi.ml src/ctypes-foreign-base/dl.ml src/ctypes-foreign-base/dl_stubs.c
+configured: src/ctypes/ctypes_primitives.ml src/ctypes-foreign/libffi_abi.ml src/ctypes-foreign/dl.ml src/ctypes-foreign/dl_stubs.c
 
-src/ctypes-foreign-base/dl.ml: src/ctypes-foreign-base/dl.ml$(OS_ALT_SUFFIX)
+src/ctypes-foreign/dl.ml: src/ctypes-foreign/dl.ml$(OS_ALT_SUFFIX)
 	cp $< $@
-src/ctypes-foreign-base/dl_stubs.c: src/ctypes-foreign-base/dl_stubs.c$(OS_ALT_SUFFIX)
+src/ctypes-foreign/dl_stubs.c: src/ctypes-foreign/dl_stubs.c$(OS_ALT_SUFFIX)
 	cp $< $@
 
 src/ctypes/ctypes_primitives.ml: src/configure/extract_from_c.ml src/configure/gen_c_primitives.ml
 	$(HOSTOCAMLFIND) ocamlc -o gen_c_primitives -package str,bytes -linkpkg $^ -I src/configure
 	./gen_c_primitives > $@ 2> gen_c_primitives.log || (rm $@ && cat gen_c_primitives.log || false)
 
-src/ctypes-foreign-base/libffi_abi.ml: src/configure/extract_from_c.ml src/configure/gen_libffi_abi.ml
+src/ctypes-foreign/libffi_abi.ml: src/configure/extract_from_c.ml src/configure/gen_libffi_abi.ml
 	$(HOSTOCAMLFIND) ocamlc -o gen_libffi_abi -package str,bytes -linkpkg $^ -I src/configure
 	./gen_libffi_abi > $@ 2> gen_c_primitives.log || (rm $@ && cat gen_c_primitives.log || false)
 
@@ -162,7 +148,7 @@ DOCFILES=$(foreach project,$(PROJECTS),\
             $($(project).dir)/$(mli).mli))
 DOCFLAGS=$(foreach project,$(PROJECTS),-I $(BUILDDIR)/$($(project).dir))
 # Avoid passing duplicate interfaces to ocamldoc.
-DOCFILES:=$(filter-out src/ctypes-foreign-threaded/foreign.mli,$(DOCFILES))
+DOCFILES:=$(filter-out src/ctypes-foreign/foreign.mli,$(DOCFILES))
 
 doc:
 	ocamldoc -html $(DOCFLAGS) $(DOCFILES)
