@@ -231,11 +231,15 @@ _build/src/ctypes-top/ctypes_printers.cmx : _build/src/ctypes/unsigned.cmx \
 _build/src/ctypes-foreign-threaded/foreign.cmi : \
     _build/src/ctypes-foreign-base/libffi_abi.cmi _build/src/ctypes-foreign-base/dl.cmi \
     _build/src/ctypes/ctypes.cmi
+_build/src/ctypes-foreign-threaded/ctypes_foreign_threaded_stubs.cmo :
+_build/src/ctypes-foreign-threaded/ctypes_foreign_threaded_stubs.cmx :
 _build/src/ctypes-foreign-threaded/foreign.cmo : \
+    _build/src/ctypes-foreign-threaded/ctypes_foreign_threaded_stubs.cmo \
     _build/src/ctypes-foreign-base/ctypes_foreign_basis.cmo \
     _build/src/ctypes-foreign-base/ctypes_closure_properties.cmi \
     _build/src/ctypes-foreign-threaded/foreign.cmi
 _build/src/ctypes-foreign-threaded/foreign.cmx : \
+    _build/src/ctypes-foreign-threaded/ctypes_foreign_threaded_stubs.cmx \
     _build/src/ctypes-foreign-base/ctypes_foreign_basis.cmx \
     _build/src/ctypes-foreign-base/ctypes_closure_properties.cmx \
     _build/src/ctypes-foreign-threaded/foreign.cmi
