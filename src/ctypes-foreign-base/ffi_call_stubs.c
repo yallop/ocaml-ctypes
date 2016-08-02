@@ -28,6 +28,18 @@
 /* TODO: support callbacks that raise exceptions?  e.g. using
    caml_callback_exn etc.  */
 
+/* Register a C thread with the OCaml runtime.  By default this simply
+   fails.  The ctypes.foreign.threaded subpackage overrides it to call
+   [caml_c_thread_register].
+ */
+static int ctypes_thread_register_fail(void)
+{
+  caml_failwith("ctypes_thread_register unavailable: "
+		"please link with the threads library");
+}
+int (*ctypes_thread_register)(void) = ctypes_thread_register_fail;
+
+
 /* An OCaml function that converts resolves identifiers to OCaml functions */
 static value retrieve_closure_;
 
