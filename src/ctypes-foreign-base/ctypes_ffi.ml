@@ -174,6 +174,7 @@ struct
   let build_function ?name ~abi ~release_runtime_lock ~check_errno fn =
     let c = Ctypes_ffi_stubs.allocate_callspec ~check_errno
       ~runtime_lock:release_runtime_lock
+      ~thread_registration:false
     in
     let e = build_ccallspec ~abi ~check_errno fn c in
     invoke name e [] c
@@ -185,10 +186,11 @@ struct
     let f = build_function ?name ~abi ~check_errno ~release_runtime_lock fn in
     fun (Static_funptr p) -> f p
 
-  let pointer_of_function ~abi ~acquire_runtime_lock fn =
+  let pointer_of_function ~abi ~acquire_runtime_lock ~thread_registration fn =
     let cs' = Ctypes_ffi_stubs.allocate_callspec
       ~check_errno:false
       ~runtime_lock:acquire_runtime_lock
+      ~thread_registration
     in
     let cs = box_function abi fn cs' in
     fun f ->

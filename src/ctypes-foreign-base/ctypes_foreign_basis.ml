@@ -15,17 +15,17 @@ struct
   exception CallToExpiredClosure = Ctypes_ffi_stubs.CallToExpiredClosure
 
   let funptr ?(abi=Libffi_abi.default_abi) ?name ?(check_errno=false)
-      ?(runtime_lock=false) fn =
+      ?(runtime_lock=false) ?(thread_registration=false) fn =
     let open Ffi in
     let read = function_of_pointer
       ~abi ~check_errno ~release_runtime_lock:runtime_lock ?name fn
-    and write = pointer_of_function
-      ~abi ~acquire_runtime_lock:runtime_lock fn in
+    and write = pointer_of_function fn
+      ~abi ~acquire_runtime_lock:runtime_lock ~thread_registration in
     Ctypes_static.(view ~read ~write (static_funptr fn))
 
-  let funptr_opt ?abi ?name ?check_errno ?runtime_lock fn =
+  let funptr_opt ?abi ?name ?check_errno ?runtime_lock ?thread_registration fn =
     Ctypes_std_views.nullable_funptr_view
-      (funptr ?abi ?name ?check_errno ?runtime_lock fn) fn
+      (funptr ?abi ?name ?check_errno ?runtime_lock ?thread_registration fn) fn
 
   let funptr_of_raw_ptr p = 
     Ctypes.funptr_of_raw_address (Ctypes_ptr.Raw.to_nativeint p)

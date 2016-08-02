@@ -51,6 +51,7 @@ val funptr :
   ?name:string ->
   ?check_errno:bool ->
   ?runtime_lock:bool ->
+  ?thread_registration:bool ->
   ('a -> 'b) Ctypes.fn ->
   ('a -> 'b) Ctypes.typ
 (** Construct a function pointer type from a function type.
@@ -81,6 +82,7 @@ val funptr_opt :
   ?name:string ->
   ?check_errno:bool ->
   ?runtime_lock:bool ->
+  ?thread_registration:bool ->
   ('a -> 'b) Ctypes.fn ->
   ('a -> 'b) option Ctypes.typ
 (** Construct a function pointer type from a function type.

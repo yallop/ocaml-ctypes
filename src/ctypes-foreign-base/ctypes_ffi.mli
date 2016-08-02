@@ -30,8 +30,9 @@ sig
   (** Build an OCaml function from a type specification and a pointer to a C
       function. *)
 
-  val pointer_of_function : abi:abi -> acquire_runtime_lock:bool -> ('a -> 'b) fn ->
-    ('a -> 'b) -> ('a -> 'b) static_funptr
+  val pointer_of_function : abi:abi -> acquire_runtime_lock:bool ->
+    thread_registration:bool ->
+    ('a -> 'b) fn -> ('a -> 'b) -> ('a -> 'b) static_funptr
   (** Build an C function from a type specification and an OCaml function.
 
       The C function pointer returned is callable as long as the OCaml function

@@ -28,6 +28,18 @@
 /* TODO: support callbacks that raise exceptions?  e.g. using
    caml_callback_exn etc.  */
 
+/* Register a C thread with the OCaml runtime.  By default this simply
+   fails.  The ctypes.foreign.threaded subpackage overrides it to call
+   [caml_c_thread_register].
+ */
+static int ctypes_thread_register_fail(void)
+{
+  caml_failwith("ctypes_thread_register unavailable: "
+		"please link with the threads library");
+}
+int (*ctypes_thread_register)(void) = ctypes_thread_register_fail;
+
+
 /* An OCaml function that converts resolves identifiers to OCaml functions */
 static value retrieve_closure_;
 
@@ -128,8 +140,9 @@ static struct callspec {
   /* The context in which the call should run: whether errno is
      checked, whether the runtime lock is released, and so on. */
   struct call_context {
-    int check_errno;
-    int runtime_lock;
+    int check_errno:1;
+    int runtime_lock:1;
+    int thread_registration:1;
   } context;
 
   /* The libffi call interface structure.  It would be nice for this member to
@@ -206,11 +219,13 @@ static void populate_arg_array(struct callspec *callspec,
 
 /* Allocate a new C call specification */
 /* allocate_callspec : check_errno:bool -> runtime_lock:bool -> callspec */
-value ctypes_allocate_callspec(value check_errno, value runtime_lock)
+value ctypes_allocate_callspec(value check_errno, value runtime_lock,
+                               value thread_registration)
 {
   struct call_context context = {
     Int_val(check_errno),
     Int_val(runtime_lock),
+    Int_val(thread_registration),
   };
 
   value block = caml_alloc_custom(&callspec_custom_ops,
@@ -488,6 +503,11 @@ static void callback_handler(ffi_cif *cif,
                              void *user_data)
 {
   closure *closure = user_data;
+
+  if (closure->context.thread_registration)
+  {
+    ctypes_thread_register();
+  }
 
   if (closure->context.runtime_lock)
   {

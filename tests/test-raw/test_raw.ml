@@ -24,6 +24,7 @@ let test_fabs _ =
     let callspec = allocate_callspec
       ~check_errno:false
       ~runtime_lock:false
+      ~thread_registration:false
     in
     let arg_1_offset = add_argument callspec double_ffitype in
     let () = prep_callspec callspec Libffi_abi.(abi_code default_abi)
@@ -57,6 +58,7 @@ let test_pow _ =
     let callspec = allocate_callspec
       ~check_errno:false
       ~runtime_lock:false
+      ~thread_registration:false
     in
     let arg_1_offset = add_argument callspec double_ffitype in
     let arg_2_offset = add_argument callspec double_ffitype in
