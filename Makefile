@@ -64,6 +64,7 @@ cstubs.dir = src/cstubs
 cstubs.subproject_deps = ctypes
 cstubs.deps = str bytes
 cstubs.install = yes
+cstubs.install_native_objects = yes
 
 cstubs: PROJECT=cstubs
 cstubs: $(cstubs.dir)/$(cstubs.extra_mls) $$(LIB_TARGETS)
