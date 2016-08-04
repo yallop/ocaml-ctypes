@@ -45,6 +45,7 @@ XEN_CFLAGS=$(if $(XEN_LIB), \
 
 CMO_OPTS = $($(PROJECT).cmo_opts)
 CMX_OPTS = $($(PROJECT).cmx_opts)
+CMI_OPTS = $($(PROJECT).cmi_opts)
 CMA_OPTS = $(if $(C_OBJECTS),-cclib -l$(PROJECT)_stubs -dllib -l$(PROJECT)_stubs)
 SUBPROJECT_DEPS = $($(PROJECT).subproject_deps)
 LOCAL_CMXAS = $(SUBPROJECT_DEPS:%=$(BUILDDIR)/%.cmxa)
@@ -114,7 +115,7 @@ $(BUILDDIR)/xen/%.o : %.c
 
 $(BUILDDIR)/%.cmi : %.mli
 	@mkdir -p $(@D)
-	$(OCAMLFIND) ocamlc -bin-annot -c -o $@ $(OCAMLFIND_PACKAGE_FLAGS) $(OCAMLFLAGS) $(OCAMLINCLUDES) $<
+	$(OCAMLFIND) opt -bin-annot -c -o $@ $(OCAMLFIND_PACKAGE_FLAGS) $(CMI_OPTS) $(OCAMLFLAGS) $(OCAMLINCLUDES) $<
 
 $(BUILDDIR)/%.native : $$(NATIVE_OBJECTS) $$(C_OBJECTS)
 	$(OCAMLFIND) opt -I $(BUILDDIR) -linkpkg $(OCAMLFLAGS) $(THREAD_FLAG) $(OCAMLFIND_PACKAGE_FLAGS) $(LOCAL_CMXAS) -o $@ $(NATIVE_OBJECTS) $(C_OBJECTS) $(OCAML_LINK_FLAGS) 

@@ -1,6 +1,7 @@
 .SECONDEXPANSION:
 
 BEST:=$(shell if ocamlopt > /dev/null 2>&1; then echo native; else echo byte; fi)
+OPAQUE:=$(shell if ocamlopt -opaque 2>/dev/null; then echo -opaque; fi) 
 DEBUG=true
 COVERAGE=false
 OCAML=ocaml
@@ -93,6 +94,7 @@ ctypes-foreign-threaded.subproject_deps = ctypes ctypes-foreign-base
 ctypes-foreign-threaded.link_flags = $(libffi_lib) $(lib_process)
 ctypes-foreign-threaded.cmo_opts = $(OCAML_FFI_INCOPTS:%=-ccopt %)
 ctypes-foreign-threaded.cmx_opts = $(OCAML_FFI_INCOPTS:%=-ccopt %)
+ctypes-foreign-threaded.cmi_opts = $(OPAQUE)
 ctypes-foreign-threaded.install_native_objects = no
 
 ctypes-foreign-threaded: PROJECT=ctypes-foreign-threaded
@@ -107,6 +109,7 @@ ctypes-foreign-unthreaded.subproject_deps = ctypes ctypes-foreign-base
 ctypes-foreign-unthreaded.link_flags = $(libffi_lib) $(lib_process)
 ctypes-foreign-unthreaded.cmo_opts = $(OCAML_FFI_INCOPTS:%=-ccopt %)
 ctypes-foreign-unthreaded.cmx_opts = $(OCAML_FFI_INCOPTS:%=-ccopt %)
+ctypes-foreign-unthreaded.cmi_opts = $(OPAQUE)
 ctypes-foreign-unthreaded.install_native_objects = no
 
 ctypes-foreign-unthreaded: PROJECT=ctypes-foreign-unthreaded
