@@ -334,8 +334,8 @@ val bigarray_of_array : < element: 'a;
                           carray: 'c carray;
                           dims: 'i > bigarray_class ->
     ('a, 'f) Bigarray.kind -> 'c carray -> 'b
-(** [bigarray_of_array c k a] converts the {!CArray.t} value [c] to a bigarray
-    value.  No copy is made; the result occupies the same memory as [c]. *)
+(** [bigarray_of_array c k a] converts the {!CArray.t} value [a] to a bigarray
+    value.  No copy is made; the result occupies the same memory as [a]. *)
 
 (** {3 Struct and union values} *)
 
