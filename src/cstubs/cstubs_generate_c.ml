@@ -378,11 +378,12 @@ struct
             `Ignore_errno -> r (`Return (Ty Void, (`Int Signed.SInt.zero)))
           | `Return_errno ->
             let open Generate_C in
-              r
-              (`LetAssign
-                 (`PointerField (`Local j, "error_status"),
-                  errno,
-                  `Return (Ty Void, (`Int Signed.SInt.zero))))
+            `LetAssign (errno, `Int Signed.SInt.zero,
+                        r
+                          (`LetAssign
+                             (`PointerField (`Local j, "error_status"),
+                              errno,
+                              `Return (Ty Void, (`Int Signed.SInt.zero)))))
         end
       | (BoxedType ty, x) :: xs ->
         Generate_C.((`DerefField (`Local j, x), ty) >>= fun y ->
