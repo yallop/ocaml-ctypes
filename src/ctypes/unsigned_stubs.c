@@ -24,8 +24,6 @@
 
 #define Uint_custom_val(TYPE, V) Uint_custom_val_(TYPE, V)
 #define Uint_custom_val_(TYPE, V) (TYPE ## _custom_val(TYPE, V))
-#define uint8_t_custom_val(TYPE, V) ((TYPE)(Int_val(V)))
-#define uint16_t_custom_val(TYPE, V) ((TYPE)(Int_val(V)))
 #define uint32_t_custom_val(TYPE, V) (*(TYPE*)(Data_custom_val(V)))
 #define uint64_t_custom_val(TYPE, V) (*(TYPE*)(Data_custom_val(V)))
 
@@ -182,7 +180,7 @@
     if (sscanf(String_val(a), "%" SCNu ## BITS , &u) != 1)                   \
       caml_failwith("int_of_string");                                        \
     else                                                                     \
-      return ctypes_copy_uint ## BITS(u);                                    \
+      return Ctypes_val_uint ## BITS(u);                                     \
   }                                                                          \
                                                                              \
   /* to_string : t -> string */                                              \
@@ -198,7 +196,7 @@
   /* max : unit -> t */                                                      \
   value ctypes_uint ## BITS ## _max(value unit)                              \
   {                                                                          \
-     return ctypes_copy_uint ## BITS((TYPE(BITS))(-1));                      \
+     return Ctypes_val_uint ## BITS((TYPE(BITS))(-1));                       \
   }
 
 UINT_SMALL_DEFS(8, 1)

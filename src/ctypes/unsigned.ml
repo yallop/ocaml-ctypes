@@ -111,7 +111,6 @@ struct
     let shift_right : t -> int -> t = (lsr)
     let of_int (x: int): t =
       (* For backwards compatibility, this wraps *)
-      (* if x <= max_int then x else invalid_arg "argument out of range" *)
       x land max_int
     external to_int : t -> int = "%identity"
     let of_int64 : int64 -> t = fun x -> of_int (Int64.to_int x)
@@ -144,7 +143,6 @@ struct
     let shift_right : t -> int -> t = (lsr)
     let of_int (x: int): t =
       (* For backwards compatibility, this wraps *)
-      (* if x <= max_int then x else invalid_arg "argument out of range" *)
       x land max_int
     external to_int : t -> int = "%identity"
     let of_int64 : int64 -> t = fun x -> Int64.to_int x |> of_int

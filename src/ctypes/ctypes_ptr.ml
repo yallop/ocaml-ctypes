@@ -29,9 +29,8 @@ struct
     let (lsr) = shift_right_logical
   end
 
-  external of_nativeint : t -> t = "%identity"
-  external to_nativeint : t -> t = "%identity"
-
+  let of_nativeint x = x
+  let to_nativeint x = x
   let of_int64 = Int64.to_nativeint
   let to_int64  = Int64.of_nativeint
 
