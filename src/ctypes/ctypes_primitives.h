@@ -50,7 +50,7 @@ enum ctypes_primitive {
 /* short is at least 16 bits. */
 #if USHRT_MAX == UINT16_MAX
 #define ctypes_ushort_val Uint16_val
-#define ctypes_copy_ushort ctypes_copy_uint16
+#define ctypes_copy_ushort Ctypes_val_uint16
 #elif USHRT_MAX == UINT32_MAX
 #define ctypes_ushort_val Uint32_val
 #define ctypes_copy_ushort ctypes_copy_uint32
@@ -65,7 +65,7 @@ enum ctypes_primitive {
 #if UINT_MAX == UINT16_MAX
 #error "No suitable OCaml type available for representing signed int values"
 #define ctypes_uint_val Uint16_val
-#define ctypes_copy_uint ctypes_copy_uint16
+#define ctypes_copy_uint Ctypes_val_uint16
 #elif UINT_MAX == UINT32_MAX
 #define ctypes_sint_val Int32_val
 #define ctypes_uint_val Uint32_val
@@ -107,7 +107,7 @@ enum ctypes_primitive {
 
 #if SIZE_MAX == UINT16_MAX
 #define ctypes_size_t_val Uint16_val
-#define ctypes_copy_size_t ctypes_copy_uint16
+#define ctypes_copy_size_t Ctypes_val_uint16
 #elif SIZE_MAX == UINT32_MAX
 #define ctypes_size_t_val Uint32_val
 #define ctypes_copy_size_t ctypes_copy_uint32

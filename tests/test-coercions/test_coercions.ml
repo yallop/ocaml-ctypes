@@ -171,6 +171,10 @@ let test_identity_coercions _ =
   let f' = coerce_fn fn fn f in
   assert_bool "identity coercions are free" (f' == f)
 
+let test_unsigned_coercions _ =
+  assert_equal (Unsigned.UInt8.of_int 256) (Unsigned.UInt8.of_int 0);
+  assert_equal (Unsigned.UInt16.of_int (1 lsl 16))
+  (Unsigned.UInt16.of_int 0)
 
 (* 
    Check that coercions between unsupported types raise an exception
@@ -288,6 +292,9 @@ let suite = "Coercsion tests" >:::
 
    "test unsupported coercions"
     >:: test_unsupported_coercions;
+
+   "test unsigned integer coersions"
+    >:: test_unsigned_coercions
   ]
 
 

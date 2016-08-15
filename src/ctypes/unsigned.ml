@@ -92,29 +92,31 @@ struct
 end
 
 
-module UInt8 : S = 
+module UInt8 : S =
 struct
   module B =
   struct
-    type t
-    external add : t -> t -> t = "ctypes_uint8_add"
-    external sub : t -> t -> t = "ctypes_uint8_sub"
-    external mul : t -> t -> t = "ctypes_uint8_mul"
-    external div : t -> t -> t = "ctypes_uint8_div"
-    external rem : t -> t -> t = "ctypes_uint8_rem"
-    external logand : t -> t -> t = "ctypes_uint8_logand"
-    external logor : t -> t -> t = "ctypes_uint8_logor"
-    external logxor : t -> t -> t = "ctypes_uint8_logxor"
-    external shift_left : t -> int -> t = "ctypes_uint8_shift_left"
-    external shift_right : t -> int -> t = "ctypes_uint8_shift_right"
-    external of_int : int -> t = "ctypes_uint8_of_int"
-    external to_int : t -> int = "ctypes_uint8_to_int"
-    external of_int64 : int64 -> t = "ctypes_uint8_of_int64"
-    external to_int64 : t -> int64 = "ctypes_uint8_to_int64"
+    (* Once 4.01 support is dropped all of these should be [@@inline] *)
+    type t = int
+    let max_int = 255
+    let add : t -> t -> t = fun x y -> (x + y) land max_int
+    let sub : t -> t -> t = fun x y -> (x - y) land max_int
+    let mul : t -> t -> t = fun x y -> (x * y) land max_int
+    let div : t -> t -> t = (/)
+    let rem : t -> t -> t = (mod)
+    let logand: t -> t -> t = (land)
+    let logor: t -> t -> t = (lor)
+    let logxor : t -> t -> t = (lxor)
+    let shift_left : t -> int -> t = fun x y -> (x lsl y) land max_int
+    let shift_right : t -> int -> t = (lsr)
+    let of_int (x: int): t =
+      (* For backwards compatibility, this wraps *)
+      x land max_int
+    external to_int : t -> int = "%identity"
+    let of_int64 : int64 -> t = fun x -> of_int (Int64.to_int x)
+    let to_int64 : t -> int64 = fun x -> Int64.of_int (to_int x)
     external of_string : string -> t = "ctypes_uint8_of_string"
-    external to_string : t -> string = "ctypes_uint8_to_string"
-    external _max_int : unit -> t = "ctypes_uint8_max"
-    let max_int = _max_int ()
+    let to_string : t -> string = string_of_int
   end
   include B
   include Extras(B)
@@ -126,25 +128,27 @@ module UInt16 : S =
 struct
   module B =
   struct
-    type t
-    external add : t -> t -> t = "ctypes_uint16_add"
-    external sub : t -> t -> t = "ctypes_uint16_sub"
-    external mul : t -> t -> t = "ctypes_uint16_mul"
-    external div : t -> t -> t = "ctypes_uint16_div"
-    external rem : t -> t -> t = "ctypes_uint16_rem"
-    external logand : t -> t -> t = "ctypes_uint16_logand"
-    external logor : t -> t -> t = "ctypes_uint16_logor"
-    external logxor : t -> t -> t = "ctypes_uint16_logxor"
-    external shift_left : t -> int -> t = "ctypes_uint16_shift_left"
-    external shift_right : t -> int -> t = "ctypes_uint16_shift_right"
-    external of_int : int -> t = "ctypes_uint16_of_int"
-    external to_int : t -> int = "ctypes_uint16_to_int"
-    external of_int64 : int64 -> t = "ctypes_uint16_of_int64"
-    external to_int64 : t -> int64 = "ctypes_uint16_to_int64"
+    (* Once 4.01 support is dropped all of these should be [@@inline] *)
+    type t = int
+    let max_int = 65535
+    let add : t -> t -> t = fun x y -> (x + y) land max_int
+    let sub : t -> t -> t = fun x y -> (x - y) land max_int
+    let mul : t -> t -> t = fun x y -> (x * y) land max_int
+    let div : t -> t -> t = (/)
+    let rem : t -> t -> t = (mod)
+    let logand: t -> t -> t = (land)
+    let logor: t -> t -> t = (lor)
+    let logxor : t -> t -> t = (lxor)
+    let shift_left : t -> int -> t = fun x y -> (x lsl y) land max_int
+    let shift_right : t -> int -> t = (lsr)
+    let of_int (x: int): t =
+      (* For backwards compatibility, this wraps *)
+      x land max_int
+    external to_int : t -> int = "%identity"
+    let of_int64 : int64 -> t = fun x -> Int64.to_int x |> of_int
+    let to_int64 : t -> int64 = fun x -> to_int x |> Int64.of_int
     external of_string : string -> t = "ctypes_uint16_of_string"
-    external to_string : t -> string = "ctypes_uint16_to_string"
-    external _max_int : unit -> t = "ctypes_uint16_max"
-    let max_int = _max_int ()
+    let to_string : t -> string = string_of_int
   end
   include B
   include Extras(B)
@@ -156,7 +160,7 @@ module UInt32 : sig
   include S
   external of_int32 : int32 -> t = "ctypes_uint32_of_int32"
   external to_int32 : t -> int32 = "ctypes_int32_of_uint32"
-end = 
+end =
 struct
   module B =
   struct
@@ -192,7 +196,7 @@ module UInt64 : sig
   include S
   external of_int64 : int64 -> t = "ctypes_uint64_of_int64"
   external to_int64 : t -> int64 = "ctypes_uint64_to_int64"
-end = 
+end =
 struct
   module B =
   struct
@@ -229,7 +233,7 @@ let pick : size:int -> (module S) =
     | 4 -> (module UInt32)
     | 8 -> (module UInt64)
     | _ -> assert false
-      
+
 external size_t_size : unit -> int = "ctypes_size_t_size"
 external ushort_size : unit -> int = "ctypes_ushort_size"
 external uint_size : unit -> int = "ctypes_uint_size"

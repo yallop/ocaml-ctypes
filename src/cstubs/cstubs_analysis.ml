@@ -24,6 +24,8 @@ let rec float : type a. a fn -> bool = function
 type _ noalloc =
   Noalloc_unit : unit noalloc
 | Noalloc_int : int noalloc
+| Noalloc_uint8_t : Unsigned.uint8 noalloc
+| Noalloc_uint16_t : Unsigned.uint16 noalloc
 | Noalloc_char : char noalloc
 | Noalloc_bool : bool noalloc
 | Noalloc_view : ('a, 'b) view * 'b noalloc -> 'a noalloc
@@ -42,8 +44,6 @@ type _ alloc =
 | Alloc_size_t : Unsigned.size_t alloc
 | Alloc_int32_t : int32 alloc
 | Alloc_int64_t : int64 alloc
-| Alloc_uint8_t : Unsigned.uint8 alloc
-| Alloc_uint16_t : Unsigned.uint16 alloc
 | Alloc_uint32_t : Unsigned.uint32 alloc
 | Alloc_uint64_t : Unsigned.uint64 alloc
 | Alloc_nativeint : nativeint alloc
@@ -67,6 +67,8 @@ let primitive_allocation : type a. a Ctypes_primitive_types.prim -> a allocation
  | Int -> `Noalloc Noalloc_int
  | Int8_t -> `Noalloc Noalloc_int
  | Int16_t -> `Noalloc Noalloc_int
+ | Uint8_t -> `Noalloc Noalloc_uint8_t
+ | Uint16_t -> `Noalloc Noalloc_uint16_t
  | Camlint -> `Noalloc Noalloc_int
  | Long -> `Alloc Alloc_long
  | Llong -> `Alloc Alloc_llong
@@ -79,8 +81,6 @@ let primitive_allocation : type a. a Ctypes_primitive_types.prim -> a allocation
  | Size_t -> `Alloc Alloc_size_t
  | Int32_t -> `Alloc Alloc_int32_t
  | Int64_t -> `Alloc Alloc_int64_t
- | Uint8_t -> `Alloc Alloc_uint8_t
- | Uint16_t -> `Alloc Alloc_uint16_t
  | Uint32_t -> `Alloc Alloc_uint32_t
  | Uint64_t -> `Alloc Alloc_uint64_t
  | Nativeint -> `Alloc Alloc_nativeint
