@@ -1,3 +1,26 @@
+## ctypes 0.8.0
+
+### Features
+
+* Use unboxed types for `uint8_t` and `uint16_t`
+  https://github.com/ocamllabs/ocaml-ctypes/issues/413
+
+* Reset `errno` in Lwt jobs before invoking job function
+  https://github.com/ocamllabs/ocaml-ctypes/issues/426
+
+* Add a `~thread_registration` argument to `funptr` to support registering C threads with the OCaml runtime.
+  https://github.com/ocamllabs/ocaml-ctypes/issues/420
+
+### Bug fixes
+
+* Use `-opaque` for module interfaces whose `cmx` files are not installed.
+  https://github.com/ocamllabs/ocaml-ctypes/issues/423
+
+* Install `cstubs` `cmx` files.
+  https://github.com/ocamllabs/ocaml-ctypes/issues/424
+
+Thanks to David Sheets (@dsheets) and Demi Obenour (@DemiMarie) for contributions to this release.
+
 ## ctypes 0.7.0
 
 ### Features
