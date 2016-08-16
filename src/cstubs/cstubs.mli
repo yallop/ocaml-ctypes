@@ -130,6 +130,29 @@ val unlocked : concurrency_policy
 (** Generate code that releases the runtime lock during C calls.
 *)
 
+val lwt_preemptive : concurrency_policy
+(** Generate code which runs C function calls with the Lwt_preemptive module:
+
+    http://ocsigen.org/lwt/2.5.1/api/Lwt_preemptive
+
+    Passing [lwt_preemptive] as the [concurrency] argument to {!Cstubs.write_c} and
+    {!Cstubs.write_ml} changes the return type of bound functions to include
+    the {!Lwt.t} constructor.  For example, the binding specification
+
+       [let unlink = foreign "unlink" (string @-> returning int)]
+
+    generates a value of the following type by default:
+
+       [val unlink : string -> int]
+
+    but when using [lwt_preemptive] the generated type is as follows:
+
+       [val unlink : string -> int Lwt.t]
+
+    Additionally, the OCaml runtime lock is released during calls to functions
+    bound with [lwt_preemptive].
+*)
+
 val lwt_jobs : concurrency_policy
 (** Generate code which implements C function calls as Lwt jobs:
 

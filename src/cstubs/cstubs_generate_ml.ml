@@ -12,7 +12,8 @@ open Ctypes_path
 open Cstubs_errors
 
 type non_lwt = [ `Sequential | `Unlocked ]
-type concurrency_policy = [ non_lwt | `Lwt_jobs ]
+type lwt = [ `Lwt_jobs | `Lwt_preemptive ]
+type concurrency_policy = [ non_lwt | lwt ]
 type errno_policy = [ `Ignore_errno | `Return_errno ]
 
 type lident = string
@@ -290,9 +291,9 @@ let rec ml_external_type_of_fn :
   type a. concurrency:concurrency_policy -> errno:errno_policy ->
   a fn -> polarity -> ml_external_type =
   fun ~concurrency ~errno fn polarity -> match fn, concurrency, errno with
-    | Returns t, #non_lwt, `Ignore_errno ->
+    | Returns t, (#non_lwt|`Lwt_preemptive), `Ignore_errno ->
       `Prim ([], ml_typ_of_typ polarity t)
-    | Returns t, #non_lwt, `Return_errno ->
+    | Returns t, (#non_lwt|`Lwt_preemptive), `Return_errno ->
       `Prim ([], `Pair (ml_typ_of_typ polarity t, int_type))
     | Returns t, `Lwt_jobs, `Ignore_errno ->
       `Prim ([], `Appl (lwt_job_type, [ml_typ_of_typ polarity t]))
@@ -483,10 +484,15 @@ type wrapper_state = {
 }
 
 let lwt_unix_run_job = Ctypes_path.path_of_string "Lwt_unix.run_job"
+let lwt_preemptive_detach = Ctypes_path.path_of_string "Lwt_preemptive.detach"
 
 let run_exp ~concurrency exp = match concurrency with
     #non_lwt -> exp
   | `Lwt_jobs -> `Appl (`Ident lwt_unix_run_job, exp)
+  | `Lwt_preemptive -> `Appl
+                         (`Appl (`Ident lwt_preemptive_detach,
+                                 `Fun (["_"], exp)),
+                          `Unit)
 
 let let_bind : (lident * ml_exp) list -> ml_exp -> ml_exp =
   fun binds e ->
@@ -548,7 +554,7 @@ let wrapper : type a. concurrency:concurrency_policy -> errno:errno_policy ->
       (pat, let_bind binds (run_exp ~concurrency (`Ident id)))
     | { exp; args; pat; binds }, #non_lwt ->
       (pat, `Fun (args, let_bind binds exp))
-    | { trivial = true; pat; args; binds }, `Lwt_jobs ->
+    | { trivial = true; pat; args; binds }, #lwt ->
       let exp : ml_exp = List.fold_left (fun f p -> `Appl (f, `Ident (path_of_string p))) (`Ident id) args in
       (pat, `Fun (args,
                   let_bind binds
@@ -556,7 +562,7 @@ let wrapper : type a. concurrency:concurrency_policy -> errno:errno_policy ->
                             `Appl (`Appl (`Ident lwt_bind,
                                           run_exp ~concurrency exp),
                                    return_result ~args:(args @ (List.map fst binds)))))))
-    | { exp; args; pat; binds }, `Lwt_jobs ->
+    | { exp; args; pat; binds }, #lwt ->
       (pat, `Fun (args,
                   let_bind binds
                     (`Appl (`Ident box_lwt,

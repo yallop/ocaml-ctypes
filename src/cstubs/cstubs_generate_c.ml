@@ -529,6 +529,7 @@ struct
 end
 
 let fn ~concurrency ~errno = match concurrency with
-    `Sequential | `Unlocked as c -> fn ~concurrency:c ~errno
+  | `Lwt_preemptive | `Unlocked -> fn ~concurrency:`Unlocked ~errno
+  | `Sequential -> fn ~concurrency:`Sequential ~errno
   | `Lwt_jobs -> Lwt.fn ~errno
 

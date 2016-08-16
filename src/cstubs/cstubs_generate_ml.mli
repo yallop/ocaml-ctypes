@@ -7,12 +7,12 @@
 
 (* ML stub generation *)
 
-val extern : concurrency:[ `Sequential | `Lwt_jobs | `Unlocked ] ->
+val extern : concurrency:[ `Sequential | `Lwt_jobs | `Lwt_preemptive | `Unlocked ] ->
          errno:[ `Ignore_errno | `Return_errno ] ->
          stub_name:string -> external_name:string -> Format.formatter ->
          ('a -> 'b) Ctypes.fn -> unit
 
-val case : concurrency:[ `Sequential | `Lwt_jobs | `Unlocked ] ->
+val case : concurrency:[ `Sequential | `Lwt_jobs | `Lwt_preemptive | `Unlocked ] ->
          errno:[ `Ignore_errno | `Return_errno ] ->
          stub_name:string -> external_name:string -> Format.formatter ->
          ('a -> 'b) Ctypes.fn -> unit
@@ -20,7 +20,7 @@ val case : concurrency:[ `Sequential | `Lwt_jobs | `Unlocked ] ->
 val val_case : stub_name:string -> external_name:string -> Format.formatter ->
          'a Ctypes.typ -> unit
 
-val constructor_decl : concurrency:[ `Sequential | `Lwt_jobs | `Unlocked ] ->
+val constructor_decl : concurrency:[ `Sequential | `Lwt_jobs | `Lwt_preemptive | `Unlocked ] ->
   errno:[ `Ignore_errno | `Return_errno ] ->
   string -> 'a Ctypes.fn -> Format.formatter -> unit
 
