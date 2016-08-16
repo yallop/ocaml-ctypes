@@ -8,25 +8,16 @@
 (* Foreign function bindings for the threads tests. *)
 
 open Ctypes
-open Foreign
 
-let () =
-  (* temporary workaround due to flexlink limitations *)
-  if Sys.os_type = "Win32" then
-    ignore (Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW]))
+module Stubs(F: Cstubs.FOREIGN) =
+struct
+  open F
+  let initialize_waiters = foreign "initialize_waiters"
+    (void @-> returning void)
 
-let initialize_waiters = foreign "initialize_waiters"
-  (void @-> returning void)
+  let post1_wait2 = foreign "post1_wait2"
+    (void @-> returning void)
 
-let post1_wait2 = foreign "post1_wait2"
-  ~release_runtime_lock:true
-  (void @-> returning void)
-
-let post2_wait1 = foreign "post2_wait1"
-  ~release_runtime_lock:true
-  (void @-> returning void)
-
-let callback_with_pointers = foreign "passing_pointers_to_callback"
-  ~release_runtime_lock:true
-  (funptr ~runtime_lock:true
-     (ptr int @-> ptr int @-> returning int) @-> returning int)
+  let post2_wait1 = foreign "post2_wait1"
+    (void @-> returning void)
+end

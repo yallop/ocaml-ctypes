@@ -7,7 +7,7 @@
 
 (* C stub generation *)
 
-val fn : concurrency:[ `Sequential | `Lwt_jobs ] ->
+val fn : concurrency:[ `Sequential | `Lwt_jobs | `Unlocked ] ->
          errno:[ `Ignore_errno | `Return_errno ] ->
          cname:string -> stub_name:string ->
          Format.formatter -> 'a Ctypes.fn -> unit

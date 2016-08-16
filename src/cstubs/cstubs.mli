@@ -126,6 +126,10 @@ val sequential : concurrency_policy
     default.
 *)
 
+val unlocked : concurrency_policy
+(** Generate code that releases the runtime lock during C calls.
+*)
+
 val lwt_jobs : concurrency_policy
 (** Generate code which implements C function calls as Lwt jobs:
 
