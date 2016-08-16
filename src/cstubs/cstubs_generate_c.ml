@@ -85,10 +85,10 @@ struct
                    [x])
 
   let acquire_runtime_system : ccomp =
-    `App (conser "caml_acquire_runtime_system" (ptr void @-> returning void), [])
+    `App (conser "caml_acquire_runtime_system" (void @-> returning void), [])
 
   let release_runtime_system : ccomp =
-    `App (conser "caml_release_runtime_system" (ptr void @-> returning void), [])
+    `App (conser "caml_release_runtime_system" (void @-> returning void), [])
 
   let val_unit : ceff = `Global { name = "Val_unit";
                                   references_ocaml_heap = true;
