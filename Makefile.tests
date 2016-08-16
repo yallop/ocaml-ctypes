@@ -965,6 +965,14 @@ test-threads-stubs.subproject_deps = ctypes cstubs \
 test-threads-stubs: PROJECT=test-threads-stubs
 test-threads-stubs: $$(LIB_TARGETS)
 
+test-threads-stub-generator.dir = tests/test-threads/stub-generator
+test-threads-stub-generator.threads = yes
+test-threads-stub-generator.subproject_deps = ctypes cstubs \
+     ctypes-foreign-base ctypes-foreign-threaded test-threads-stubs tests-common
+test-threads-stub-generator.deps = str bigarray bytes
+test-threads-stub-generator: PROJECT=test-threads-stub-generator
+test-threads-stub-generator: $$(BEST_TARGET)
+
 test-threads.dir = tests/test-threads
 test-threads.threads = yes
 test-threads.deps = str bigarray oUnit bytes
@@ -973,6 +981,15 @@ test-threads.subproject_deps = ctypes ctypes-foreign-base \
 test-threads.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-threads: PROJECT=test-threads
 test-threads: $$(BEST_TARGET)
+
+test-threads-generated: \
+  tests/test-threads/generated_bindings.ml \
+  tests/test-threads/generated_stubs.c
+
+tests/test-threads/generated_stubs.c: $(BUILDDIR)/test-threads-stub-generator.$(BEST)
+	$< --c-file $@
+tests/test-threads/generated_bindings.ml: $(BUILDDIR)/test-threads-stub-generator.$(BEST)
+	$< --ml-file $@
 
 TESTS =
 TESTS += test-raw
@@ -1009,8 +1026,7 @@ TESTS += test-passing-ocaml-values-stubs test-passing-ocaml-values-stub-generato
 TESTS += test-lwt-jobs-stubs test-lwt-jobs-stub-generator test-lwt-jobs-generated test-lwt-jobs
 TESTS += test-returning-errno-lwt-stubs test-returning-errno-lwt-stub-generator test-returning-errno-lwt-generated test-returning-errno-lwt
 TESTS += test-returning-errno-stubs test-returning-errno-stub-generator test-returning-errno-generated test-returning-errno
-TESTS += test-threads-stubs test-threads
-
+TESTS += test-threads-stubs test-threads-stub-generator test-threads-generated test-threads
 
 ifneq (,$(filter mingw%,$(OSYSTEM)))
 WINLDFLAGS=-Wl,--out-implib,libtest_functions.dll.a

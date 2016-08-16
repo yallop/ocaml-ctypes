@@ -8,20 +8,50 @@
 open Ctypes
 open OUnit2
 open Foreign
-open Functions
+
+let () =
+  (* temporary workaround due to flexlink limitations *)
+  if Sys.os_type = "Win32" then
+    ignore (Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW]))
 
 
-(*
-  Ensure that passing ~release_runtime_lock releases the runtime lock.
-*)
-let test_release_runtime_lock _ =
-  begin
-    initialize_waiters ();
-    let t1 = Thread.create post1_wait2 () in
-    let t2 = Thread.create post2_wait1 () in
-    Thread.join t1;
-    Thread.join t2;
-  end
+let callback_with_pointers = Foreign.foreign "passing_pointers_to_callback"
+  ~release_runtime_lock:true
+  (Foreign.funptr ~runtime_lock:true
+     (ptr int @-> ptr int @-> returning int) @-> returning int)
+
+
+module Common_tests(S : Cstubs.FOREIGN with type 'a result = 'a
+                                        and type 'a return = 'a) =
+struct
+  module M = Functions.Stubs(S)
+
+  (*
+    Ensure that passing ~release_runtime_lock releases the runtime lock.
+  *)
+  let test_release_runtime_lock _ =
+    begin
+      M.initialize_waiters ();
+      let t1 = Thread.create M.post1_wait2 () in
+      let t2 = Thread.create M.post2_wait1 () in
+      Thread.join t1;
+      Thread.join t2;
+    end
+end
+
+module Foreign_tests = Common_tests(struct 
+    type 'a fn = 'a Ctypes.fn
+    type 'a return = 'a
+    let (@->) = Ctypes.(@->)
+    let returning = Ctypes.returning
+                      
+    type 'a result = 'a
+    let foreign name fn = Foreign.foreign name fn
+    ~release_runtime_lock:true
+    let foreign_value name fn = Foreign.foreign_value name fn
+  end)
+
+module Stub_tests = Common_tests(Generated_bindings)
 
 
 (*
@@ -65,7 +95,10 @@ let test_acquire_runtime_lock_parallel _ =
 
 let suite = "Thread tests" >:::
   ["test_release_runtime_lock (foreign)"
-   >:: test_release_runtime_lock;
+   >:: Foreign_tests.test_release_runtime_lock;
+
+   "test_release_runtime_lock (stubs)"
+   >:: Stub_tests.test_release_runtime_lock;
 
    "test_acquire_runtime_lock (foreign)"
    >:: test_acquire_runtime_lock;
