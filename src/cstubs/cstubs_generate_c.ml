@@ -174,9 +174,9 @@ struct
   let fundec : type a. string -> a Ctypes.fn -> cfundec =
     fun name fn -> `Fundec (name, args fn, return_type fn)
 
-  let fn : type a. errno:errno_policy ->
+  let fn : type a. concurrency:[`Sequential|`Unlocked] -> errno:errno_policy ->
     cname:string -> stub_name:string -> a Ctypes_static.fn -> cfundef =
-    fun ~errno:errno_ ~cname ~stub_name f ->
+    fun ~concurrency ~errno:errno_ ~cname ~stub_name f ->
       let fvar = { fname = cname;
                    allocates = false;
                    reads_ocaml_heap = false;
@@ -186,13 +186,26 @@ struct
          | Returns t ->
            let x = fresh_var () in
            let e = `App (fvar, (List.rev vars :> cexp list)) in
-           begin match errno_ with
-               `Ignore_errno -> `Let ((local x t, e), (inj t (local x t) :> ccomp))
-             | `Return_errno -> 
+           begin match errno_, concurrency with
+               `Ignore_errno, `Sequential -> `Let ((local x t, e), (inj t (local x t) :> ccomp))
+             | `Ignore_errno, `Unlocked ->
+                release_runtime_system >>
+                `Let ((local x t, e), 
+                      acquire_runtime_system >>
+                     (inj t (local x t) :> ccomp))
+             | `Return_errno, `Sequential -> 
                (`LetAssign (errno,
                            `Int Signed.SInt.zero,
                            `Let ((local x t, e),
                                  ((inj t (local x t) :> ccomp), value) >>= fun v ->
+                                 (pair_with_errno v :> ccomp))) : ccomp)
+             | `Return_errno, `Unlocked -> 
+               (`LetAssign (errno,
+                           `Int Signed.SInt.zero,
+                           release_runtime_system >>
+                           `Let ((local x t, e),
+                                 (acquire_runtime_system >>
+                                 (inj t (local x t) :> ccomp), value) >>= fun v ->
                                  (pair_with_errno v :> ccomp))) : ccomp)
            end
          | Function (x, f, t) ->
@@ -297,9 +310,9 @@ struct
 
 end
 
-let fn ~errno ~cname ~stub_name fmt fn =
+let fn ~concurrency ~errno ~cname ~stub_name fmt fn =
   let `Function (`Fundec (f, xs, _), _, _) as dec
-      = Generate_C.fn ~errno ~stub_name ~cname fn
+      = Generate_C.fn ~concurrency ~errno ~stub_name ~cname fn
   in
   let nargs = List.length xs in
   if nargs > max_byte_args then begin
@@ -516,5 +529,6 @@ struct
 end
 
 let fn ~concurrency ~errno = match concurrency with
-    `Sequential -> fn ~errno
+    `Sequential | `Unlocked as c -> fn ~concurrency:c ~errno
   | `Lwt_jobs -> Lwt.fn ~errno
+

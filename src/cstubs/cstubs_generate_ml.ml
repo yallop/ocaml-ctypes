@@ -11,7 +11,8 @@ open Ctypes_static
 open Ctypes_path
 open Cstubs_errors
 
-type concurrency_policy = [ `Sequential | `Lwt_jobs ]
+type non_lwt = [ `Sequential | `Unlocked ]
+type concurrency_policy = [ non_lwt | `Lwt_jobs ]
 type errno_policy = [ `Ignore_errno | `Return_errno ]
 
 type lident = string
@@ -289,9 +290,9 @@ let rec ml_external_type_of_fn :
   type a. concurrency:concurrency_policy -> errno:errno_policy ->
   a fn -> polarity -> ml_external_type =
   fun ~concurrency ~errno fn polarity -> match fn, concurrency, errno with
-    | Returns t, `Sequential, `Ignore_errno ->
+    | Returns t, #non_lwt, `Ignore_errno ->
       `Prim ([], ml_typ_of_typ polarity t)
-    | Returns t, `Sequential, `Return_errno ->
+    | Returns t, #non_lwt, `Return_errno ->
       `Prim ([], `Pair (ml_typ_of_typ polarity t, int_type))
     | Returns t, `Lwt_jobs, `Ignore_errno ->
       `Prim ([], `Appl (lwt_job_type, [ml_typ_of_typ polarity t]))
@@ -330,13 +331,13 @@ let make_structured = Ctypes_path.path_of_string "CI.make_structured"
 let map_result ~concurrency ~errno f e =
   let map_result f x = `Appl (`Appl (`Ident map_result_id, f), x) in
   match concurrency, errno, f with
-    `Sequential, `Ignore_errno, `MakePtr x ->
+    #non_lwt, `Ignore_errno, `MakePtr x ->
     `MakePtr (`Ident (path_of_string x), e)
-  | `Sequential, `Ignore_errno, `MakeFunPtr x ->
+  | #non_lwt, `Ignore_errno, `MakeFunPtr x ->
     `MakeFunPtr (`Ident (path_of_string x), e)
-  | `Sequential, `Ignore_errno, `MakeStructured x ->
+  | #non_lwt, `Ignore_errno, `MakeStructured x ->
     `MakeStructured (`Ident (path_of_string x), e)
-  | `Sequential, `Ignore_errno, `Appl x ->
+  | #non_lwt, `Ignore_errno, `Appl x ->
     `Appl (`Ident (path_of_string x), e)
   | _, _, `MakePtr x ->
     map_result (`Appl (`Ident make_ptr, `Ident (path_of_string x))) e
@@ -484,7 +485,7 @@ type wrapper_state = {
 let lwt_unix_run_job = Ctypes_path.path_of_string "Lwt_unix.run_job"
 
 let run_exp ~concurrency exp = match concurrency with
-    `Sequential -> exp
+    #non_lwt -> exp
   | `Lwt_jobs -> `Appl (`Ident lwt_unix_run_job, exp)
 
 let let_bind : (lident * ml_exp) list -> ml_exp -> ml_exp =
@@ -543,9 +544,9 @@ let wrapper : type a. concurrency:concurrency_policy -> errno:errno_policy ->
   fun ~concurrency ~errno id fn f pol ->
     let p = wrapper_body ~concurrency ~errno fn (`Ident (path_of_string f)) pol [] in
     match p, concurrency with
-      { trivial = true; pat; binds }, `Sequential ->
+      { trivial = true; pat; binds }, #non_lwt ->
       (pat, let_bind binds (run_exp ~concurrency (`Ident id)))
-    | { exp; args; pat; binds }, `Sequential ->
+    | { exp; args; pat; binds }, #non_lwt ->
       (pat, `Fun (args, let_bind binds exp))
     | { trivial = true; pat; args; binds }, `Lwt_jobs ->
       let exp : ml_exp = List.fold_left (fun f p -> `Appl (f, `Ident (path_of_string p))) (`Ident id) args in

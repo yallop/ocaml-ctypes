@@ -23,7 +23,7 @@ module type FOREIGN' = FOREIGN with type 'a result = unit
 
 module type BINDINGS = functor (F : FOREIGN') -> sig end
 
-type concurrency_policy = [ `Sequential | `Lwt_jobs ]
+type concurrency_policy = [ `Sequential | `Lwt_jobs | `Unlocked ]
 
 type errno_policy = [ `Ignore_errno | `Return_errno ]
 
@@ -52,8 +52,8 @@ let write_return :
   concurrency:concurrency_policy -> errno:errno_policy ->
   Format.formatter -> unit =
   fun ~concurrency ~errno fmt -> match concurrency, errno with
-      `Sequential, `Ignore_errno -> Format.fprintf fmt "type 'a return = 'a@\n"
-    | `Sequential, `Return_errno -> Format.fprintf fmt "type 'a return = 'a * Signed.sint@\n"
+      (`Sequential|`Unlocked), `Ignore_errno -> Format.fprintf fmt "type 'a return = 'a@\n"
+    | (`Sequential|`Unlocked), `Return_errno -> Format.fprintf fmt "type 'a return = 'a * Signed.sint@\n"
     | `Lwt_jobs, `Ignore_errno ->
       begin
         Format.fprintf fmt "type 'a return = { lwt: 'a Lwt.t }@\n";
@@ -74,9 +74,9 @@ let write_fn ~concurrency ~errno fmt =
 
 let write_map_result ~concurrency ~errno fmt =
   match concurrency, errno with
-    `Sequential, `Ignore_errno ->
+    (`Sequential|`Unlocked), `Ignore_errno ->
     Format.fprintf fmt "let map_result f x = f x@\n"
-  | `Sequential, `Return_errno ->
+  | (`Sequential|`Unlocked), `Return_errno ->
     Format.fprintf fmt "let map_result f (x, y) = (f x, y)@\n"
   | `Lwt_jobs, `Ignore_errno ->
     Format.fprintf fmt "let map_result f x = Lwt.map f x@\n"
@@ -151,10 +151,12 @@ let sequential = `Sequential
 let lwt_jobs = `Lwt_jobs
 let ignore_errno = `Ignore_errno
 let return_errno = `Return_errno
+let unlocked = `Unlocked
 
 let concurrency_headers = function
     `Sequential -> []
   | `Lwt_jobs ->   ["\"lwt_unix.h\"";  "<caml/memory.h>"]
+  | `Unlocked -> ["<caml/threads.h>"]
 
 let errno_headers = function
     `Ignore_errno -> []
