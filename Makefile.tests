@@ -934,7 +934,7 @@ test-returning-errno-stub-generator: $$(BEST_TARGET)
 
 test-returning-errno.dir = tests/test-returning-errno
 test-returning-errno.threads = yes
-test-returning-errno.deps = str bigarray oUnit bytes lwt.unix
+test-returning-errno.deps = str bigarray oUnit bytes
 test-returning-errno.subproject_deps = ctypes ctypes-foreign-base \
    ctypes-foreign-threaded cstubs tests-common test-returning-errno-stubs
 test-returning-errno.link_flags = -L$(BUILDDIR)/clib -ltest_functions
