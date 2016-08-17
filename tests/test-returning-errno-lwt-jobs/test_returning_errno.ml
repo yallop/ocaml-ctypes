@@ -20,12 +20,12 @@ let test_stat _ =
   let s = make Constants.stat in
   begin
     Lwt_unix.run
-      Lwt.((Bindings.stat "." (addr s)).lwt >>= fun (x, errno) ->
+      Lwt.((Bindings.stat "." (addr s)).Generated_bindings.lwt >>= fun (x, errno) ->
            assert_equal 0 x;
            assert_equal Signed.SInt.zero errno;
            return ());
     Lwt_unix.run
-      Lwt.((Bindings.stat "/does-not-exist" (addr s)).lwt >>= fun (x, errno) ->
+      Lwt.((Bindings.stat "/does-not-exist" (addr s)).Generated_bindings.lwt >>= fun (x, errno) ->
            assert_equal (-1) x;
            assert_equal Constants._ENOENT errno;
            return ())
