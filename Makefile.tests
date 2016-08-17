@@ -506,7 +506,7 @@ test-foreign-errno: $$(BEST_TARGET)
 test-passable.dir = tests/test-passable
 test-passable.threads = yes
 test-passable.deps = str bigarray oUnit bytes
-test-passable.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-threaded
+test-passable.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-threaded cstubs
 test-passable: PROJECT=test-passable
 test-passable: $$(BEST_TARGET)
 
