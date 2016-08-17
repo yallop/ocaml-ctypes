@@ -528,8 +528,10 @@ struct
     end
 end
 
-let fn ~concurrency ~errno = match concurrency with
-  | `Lwt_preemptive | `Unlocked -> fn ~concurrency:`Unlocked ~errno
-  | `Sequential -> fn ~concurrency:`Sequential ~errno
-  | `Lwt_jobs -> Lwt.fn ~errno
+let fn ~concurrency ~errno ~cname ~stub_name fmt f = match concurrency with
+  | `Lwt_preemptive | `Unlocked | `Lwt_jobs when has_ocaml_argument f ->
+    raise (Unsupported "Unsupported argument type when releasing runtime lock")
+  | `Lwt_preemptive | `Unlocked -> fn ~concurrency:`Unlocked ~errno ~cname ~stub_name fmt f
+  | `Sequential -> fn ~concurrency:`Sequential ~errno ~cname ~stub_name fmt f
+  | `Lwt_jobs -> Lwt.fn ~errno ~cname ~stub_name fmt f
 
