@@ -304,7 +304,6 @@ let array_dims : type a b c d f.
        | Array (_, n) -> (a.alength, n)
        | _ -> unsupported ()
        end
-     | _ -> unsupported ()
     end
    | Array3 ->
      begin match a.astart with
@@ -313,7 +312,6 @@ let array_dims : type a b c d f.
        |  Array (Array (_, m), n) -> (a.alength, n, m)
        | _ -> unsupported ()
        end
-     | _ -> unsupported ()
      end
 
 let bigarray_of_array spec kind a =
