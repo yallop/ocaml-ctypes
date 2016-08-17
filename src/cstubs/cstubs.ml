@@ -23,7 +23,7 @@ module type FOREIGN' = FOREIGN with type 'a result = unit
 
 module type BINDINGS = functor (F : FOREIGN') -> sig end
 
-type concurrency_policy = [ `Sequential | `Lwt_jobs | `Unlocked ]
+type concurrency_policy = [ `Sequential | `Lwt_jobs | `Lwt_preemptive | `Unlocked ]
 
 type errno_policy = [ `Ignore_errno | `Return_errno ]
 
@@ -54,12 +54,12 @@ let write_return :
   fun ~concurrency ~errno fmt -> match concurrency, errno with
       (`Sequential|`Unlocked), `Ignore_errno -> Format.fprintf fmt "type 'a return = 'a@\n"
     | (`Sequential|`Unlocked), `Return_errno -> Format.fprintf fmt "type 'a return = 'a * Signed.sint@\n"
-    | `Lwt_jobs, `Ignore_errno ->
+    | (`Lwt_jobs|`Lwt_preemptive), `Ignore_errno ->
       begin
         Format.fprintf fmt "type 'a return = { lwt: 'a Lwt.t }@\n";
         Format.fprintf fmt "let box_lwt lwt = {lwt}@\n";
       end
-    | `Lwt_jobs, `Return_errno ->
+    | (`Lwt_jobs|`Lwt_preemptive), `Return_errno ->
       begin
         Format.fprintf fmt "type 'a return = { lwt: ('a * Signed.sint) Lwt.t }@\n";
         Format.fprintf fmt "let box_lwt lwt = {lwt}@\n";
@@ -78,9 +78,9 @@ let write_map_result ~concurrency ~errno fmt =
     Format.fprintf fmt "let map_result f x = f x@\n"
   | (`Sequential|`Unlocked), `Return_errno ->
     Format.fprintf fmt "let map_result f (x, y) = (f x, y)@\n"
-  | `Lwt_jobs, `Ignore_errno ->
+  | (`Lwt_jobs|`Lwt_preemptive), `Ignore_errno ->
     Format.fprintf fmt "let map_result f x = Lwt.map f x@\n"
-  | `Lwt_jobs, `Return_errno ->
+  | (`Lwt_jobs|`Lwt_preemptive), `Return_errno ->
     Format.fprintf fmt "let map_result f v = Lwt.map (fun (x, y) -> (f x, y)) v@\n"
 
 let write_foreign ~concurrency ~errno fmt bindings val_bindings =
@@ -149,13 +149,14 @@ let gen_ml ~concurrency ~errno prefix fmt : (module FOREIGN') * (unit -> unit) =
 
 let sequential = `Sequential
 let lwt_jobs = `Lwt_jobs
+let lwt_preemptive = `Lwt_preemptive
 let ignore_errno = `Ignore_errno
 let return_errno = `Return_errno
 let unlocked = `Unlocked
 
 let concurrency_headers = function
     `Sequential -> []
-  | `Lwt_jobs ->   ["\"lwt_unix.h\"";  "<caml/memory.h>"]
+  | `Lwt_jobs | `Lwt_preemptive ->   ["\"lwt_unix.h\"";  "<caml/memory.h>"]
   | `Unlocked -> ["<caml/threads.h>"]
 
 let errno_headers = function
