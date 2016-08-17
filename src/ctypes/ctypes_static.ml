@@ -161,6 +161,27 @@ let rec passable : type a. a typ -> bool = function
   | OCaml _                        -> true
   | View { ty }                    -> passable ty
 
+(* Whether a value resides in OCaml-managed memory.
+   Values that reside in OCaml memory cannot be accessed
+   when the runtime lock is not held. *)
+let rec ocaml_value : type a. a typ -> bool = function
+    Void        -> false
+  | Primitive _ -> false
+  | Struct _    -> false
+  | Union _     -> false
+  | Array _     -> false
+  | Bigarray _  -> false
+  | Pointer _   -> false
+  | Funptr _    -> false
+  | Abstract _  -> false
+  | OCaml _     -> true
+  | View { ty } -> ocaml_value ty
+
+let rec has_ocaml_argument : type a. a fn -> bool = function
+    Returns _ -> false
+  | Function (t, _) when ocaml_value t -> true
+  | Function (_, t) -> has_ocaml_argument t
+
 let void = Void
 let char = Primitive Ctypes_primitive_types.Char
 let schar = Primitive Ctypes_primitive_types.Schar

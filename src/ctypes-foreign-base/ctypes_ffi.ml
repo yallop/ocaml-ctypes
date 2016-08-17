@@ -183,8 +183,11 @@ struct
     Static_funptr (Ctypes_ptr.Fat.make ~reftyp:fn raw_ptr)
 
   let function_of_pointer ?name ~abi ~check_errno ~release_runtime_lock fn =
-    let f = build_function ?name ~abi ~check_errno ~release_runtime_lock fn in
-    fun (Static_funptr p) -> f p
+    if release_runtime_lock && has_ocaml_argument fn
+    then raise (Unsupported "Unsupported argument type when releasing runtime lock")
+    else
+      let f = build_function ?name ~abi ~check_errno ~release_runtime_lock fn in
+      fun (Static_funptr p) -> f p
 
   let pointer_of_function ~abi ~acquire_runtime_lock ~thread_registration fn =
     let cs' = Ctypes_ffi_stubs.allocate_callspec

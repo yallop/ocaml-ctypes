@@ -108,6 +108,8 @@ type boxed_typ = BoxedType : 'a typ -> boxed_typ
 val sizeof : 'a typ -> int
 val alignment : 'a typ -> int
 val passable : 'a typ -> bool
+val ocaml_value : 'a typ -> bool
+val has_ocaml_argument : 'a fn -> bool
 
 val void : unit typ
 val char : char typ
