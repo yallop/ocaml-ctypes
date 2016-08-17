@@ -348,6 +348,17 @@ let test_incomplete_passability _ =
   end
 
 
+(*
+  Test that OCaml values cannot be passed to C functions that are called
+  without the OCaml runtime lock.
+*)
+let test_ocaml_values_are_not_passable_when_releasing_the_lock _ =
+  assert_raises (Unsupported "Unsupported argument type when releasing runtime lock")
+    (fun () ->
+       Foreign.foreign "puts" (ocaml_string @-> returning int)
+         ~release_runtime_lock:true)
+
+
 let suite = "Passability tests" >:::
   ["primitives are passable"
     >:: test_primitives_are_passable;
@@ -378,6 +389,9 @@ let suite = "Passability tests" >:::
 
    "incomplete types are not passable"
     >:: test_incomplete_passability;
+
+   "ocaml values are not passable when the runtime lock is released"
+    >:: test_ocaml_values_are_not_passable_when_releasing_the_lock;
   ]
 
 
