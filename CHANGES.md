@@ -1,3 +1,17 @@
+## ctypes 0.9.0
+
+### Features
+
+* NetBSD support
+
+* Support for releasing the runtime lock in generated stubs
+  https://github.com/ocamllabs/ocaml-ctypes/issues/429
+
+* Support for Lwt_preemptive
+  https://github.com/ocamllabs/ocaml-ctypes/issues/430
+
+Thanks to Martin Lucina (@mato) for contributing to this release.
+
 ## ctypes 0.8.0
 
 ### Features
