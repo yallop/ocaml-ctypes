@@ -56,6 +56,18 @@
 #define EXPOSE_ALIGNMENT(X) EXPOSE_ALIGNMENT_COMMON(X, X)
 #define EXPOSE_ALIGNMENT_S(X) EXPOSE_ALIGNMENT_COMMON(X, UNDERSCORE(X))
 
+#ifdef __NetBSD__
+/* NetBSD defines these types as macros, which expands to the wrong thing
+ * in the EXPOSE_* macros above. I have no idea how to prevent cpp from
+ * expanding macro arguments, so just hack around it for now. */
+#undef off_t
+#undef mode_t
+#undef pid_t
+typedef __off_t off_t;
+typedef __mode_t mode_t;
+typedef __pid_t pid_t;
+#endif
+
 EXPOSE_TYPEINFO(clock_t)
 EXPOSE_TYPEINFO_S(dev_t)
 EXPOSE_TYPEINFO_S(ino_t)
