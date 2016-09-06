@@ -1,3 +1,10 @@
+## ctypes 0.6.3
+
+### Bug fixes
+
+* Fix a memory leak that occurs when passing closures to C
+  https://github.com/ocamllabs/ocaml-ctypes/issues/436
+
 ## ctypes 0.6.2
 
 ### Bug fixes
