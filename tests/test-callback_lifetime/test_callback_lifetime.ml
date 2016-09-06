@@ -117,6 +117,7 @@ struct
     let ret = Better.make ~arg:(closure (int_of_string "3")) in
     Gc.full_major ();
     assert_equal 15 (Better.get ret 5);
+    let _ = Ctypes_memory_stubs.use_value ret in
 
     (* However, even with the careful implementation things can go wrong if we
        keep a reference to ret beyond the lifetime of the pair. *)
@@ -129,7 +130,9 @@ struct
        so arg cannot be collected prematurely. *)
     let ret = Careful.get (Careful.make ~arg:(closure (int_of_string "3"))) in
     Gc.full_major ();
-    assert_equal 15 (ret 5)
+    assert_equal 15 (ret 5);
+    let _ = Ctypes_memory_stubs.use_value ret in
+    ()
 end
 
 module Foreign_tests = Common_tests(Tests_common.Foreign_binder)
