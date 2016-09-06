@@ -66,9 +66,14 @@ type boxedfn =
   | Done of (voidp -> unit) * callspec
   | Fn of (voidp -> boxedfn)
 
+type funptr_handle
+
 (* Construct a pointer to an OCaml function represented by an identifier *)
-external make_function_pointer : callspec -> int -> voidp
+external make_function_pointer : callspec -> int -> funptr_handle
   = "ctypes_make_function_pointer"
+
+external raw_address_of_function_pointer : funptr_handle -> voidp
+  = "ctypes_raw_address_of_function_pointer"
 
 (* Set the function used to retrieve functions by identifier. *)
 external set_closure_callback : (int -> Obj.t) -> unit
