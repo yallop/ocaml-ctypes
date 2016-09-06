@@ -37,8 +37,18 @@ struct
 
      [keep_alive w ~while_live:v] ensures that [w] is not collected while [v] is
      still live.
+
+     If the object v in the call [keep_alive w ~while_live:v] is
+     static -- for example, if it is a top-level function -- then it
+     is not possible to attach a finaliser to [v] and [w] should be
+     kept alive indefinitely, which we achieve by adding it to the
+     list [kept_alive_indefinitely].
   *)
-  let keep_alive w ~while_live:v = Gc.finalise (fun _ -> w; ()) v
+  let kept_alive_indefinitely = ref []
+  let keep_alive w ~while_live:v =
+    try Gc.finalise (fun _ -> w; ()) v
+    with Invalid_argument "Gc.finalise" ->
+      kept_alive_indefinitely := Obj.repr w :: !kept_alive_indefinitely
 
   let report_unpassable what =
     let msg = Printf.sprintf "libffi does not support passing %s" what in
@@ -196,5 +206,13 @@ struct
     fun f ->
       let boxed = cs (Ctypes_weak_ref.make f) in
       let id = Closure_properties.record (Obj.repr f) (Obj.repr boxed) in
-      funptr_of_rawptr fn (Ctypes_ffi_stubs.make_function_pointer cs' id)
+      let funptr = Ctypes_ffi_stubs.make_function_pointer cs' id in
+      (* TODO: use a more intelligent strategy for keeping function pointers
+         associated with top-level functions alive (e.g. cache function
+         pointer creation by (function, type), or possibly even just by
+         function, since the C arity and types must be the same in each case.)
+         See the note by [kept_alive_indefinitely].  *)
+      let () = keep_alive funptr ~while_live:f in
+      funptr_of_rawptr fn
+        (Ctypes_ffi_stubs.raw_address_of_function_pointer funptr)
 end
