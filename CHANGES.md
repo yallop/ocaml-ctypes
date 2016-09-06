@@ -1,3 +1,15 @@
+## ctypes 0.9.1
+
+### Bug fixes
+
+* Fix build rules on OpenBSD
+  https://github.com/ocamllabs/ocaml-ctypes/issues/428
+
+* Fix a memory leak that occurs when passing closures to C
+  https://github.com/ocamllabs/ocaml-ctypes/issues/436
+
+Thanks to Enguerrand Decorne (@engil) for contributing to this release.
+
 ## ctypes 0.9.0
 
 ### Features
