@@ -125,6 +125,7 @@ struct
         f x y
       in
       let () = qsort (to_voidp (start arr)) len size cmp in
+      let _ = Ctypes_memory_stubs.use_value cmp in
       to_list arr
       in
 
