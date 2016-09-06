@@ -23,19 +23,26 @@ struct
     let module M = struct
 
       let camel_vtable_singleton = make camel_methods
+
+      let idfn = (fun animal ->
+          let n = call_humps (cast camel animal) in
+          Printf.sprintf "%d-hump camel" n)
+
+      let humpsfn = (fun camel -> !@(camel |-> nhumps))
+
+      let sayfn = (fun animal -> "humph")
+
       let () = begin
         let vt = camel_vtable_singleton in
         let base_vt = !@(cast animal_methods (addr vt)) in
         (* say *)
-        setf base_vt say (fun animal -> "humph");
+        setf base_vt say sayfn;
 
         (* identify *)
-        setf base_vt identify (fun animal ->
-          let n = call_humps (cast camel animal) in
-          Printf.sprintf "%d-hump camel" n);
+        setf base_vt identify idfn;
 
         (* humps *)
-        setf vt humps (fun camel -> !@(camel |-> nhumps))
+        setf vt humps humpsfn;
       end
 
       let new_camel ~humps =
@@ -57,6 +64,8 @@ struct
           assert_equal c#say "humph";
           assert_equal c#humps 3;
         end
+
+      let _ = Ctypes_memory_stubs.use_value (idfn, humpsfn, sayfn)
 
       (* Test that we can call a virtual method in a C-created subclass from
          OCaml *)
