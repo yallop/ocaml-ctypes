@@ -451,6 +451,25 @@ static void callback_handler(ffi_cif *cif,
 }
 
 
+static void finalize_closure(value v)
+{
+  struct closure **closure = Data_custom_val(v);
+  ffi_closure_free(*closure);
+}
+
+/* A custom object whose purpose is the finalizer that calls
+   ffi_closure_free */
+static struct custom_operations closure_custom_ops = {
+  "ocaml-ctypes:closure",
+  finalize_closure,
+  custom_compare_default,
+  custom_hash_default,
+  custom_serialize_default,
+  custom_deserialize_default,
+  custom_compare_ext_default
+};
+
+
 /* Construct a pointer to an OCaml function represented by an identifier */
 /* make_function_pointer : callspec -> int -> raw_pointer */
 value ctypes_make_function_pointer(value callspec_, value fnid)
@@ -463,10 +482,6 @@ value ctypes_make_function_pointer(value callspec_, value fnid)
 
   void (*code_address)(void) = NULL;
 
-  /* TODO: we need to call ffi_closure_free at some point.  This function
-     should return a managed object to which we can attach a finaliser for the
-     closure.
-  */
   closure *closure = ffi_closure_alloc(sizeof *closure, (void *)&code_address);
 
   if (closure == NULL) {
@@ -484,7 +499,16 @@ value ctypes_make_function_pointer(value callspec_, value fnid)
 
     ctypes_check_ffi_status(status);
 
-    codeptr = CTYPES_FROM_PTR((void *)code_address);
+    codeptr =
+      caml_alloc_custom(&closure_custom_ops, sizeof(struct closure *), 1, 1);
+    *(struct closure **)Data_custom_val(codeptr) = closure;
+
     CAMLreturn (codeptr);
   }
+}
+
+/* Extract the raw address from a function pointer object */ 
+value ctypes_raw_address_of_function_pointer(value closure)
+{
+  return CTYPES_FROM_PTR(*(struct closure **)Data_custom_val(closure));
 }
