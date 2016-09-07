@@ -44,7 +44,7 @@ enum ctypes_primitive {
   Ctypes_Float,
   Ctypes_Double,
   Ctypes_Complex32,
-  Ctypes_Complex64,
+  Ctypes_Complex64
 };
 
 /* short is at least 16 bits. */
