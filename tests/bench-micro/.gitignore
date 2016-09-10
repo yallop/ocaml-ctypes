@@ -1,0 +1,15 @@
+bench_micro_generated_stubs.c
+bench_micro_generated.ml
+bench_micro_remote.ml
+bench_micro_local_stubs.c
+bench_micro_remote_stubs.c
+bench_micro_shared.h
+bench_micro
+bench_micro_gen
+bench_micro_remote_server
+libbench_micro.so
+bench_micro.eps
+bench_micro_interpreted.eps
+*.o
+*.cmi
+*.cmx
