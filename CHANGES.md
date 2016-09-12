@@ -1,3 +1,10 @@
+## ctypes 0.9.2
+
+### Bug fixes
+
+* Revert a ctypes-foreign build regression in 0.9.1
+  https://github.com/ocamllabs/ocaml-ctypes/pull/443
+
 ## ctypes 0.9.1
 
 ### Bug fixes
