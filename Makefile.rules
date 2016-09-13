@@ -70,7 +70,8 @@ endif
 LIB_TARGET_EXTRAS = $(if $(STUB_LIB),$(BUILDDIR)/lib$(PROJECT)_stubs.a) \
                     $(if $(XEN_LIB),$(BUILDDIR)/lib$(PROJECT)_stubs_xen.a) \
                     $(BUILDDIR)/$(PROJECT).a
-INSTALL_CMIS = $($(PROJECT).public:%=$(BUILDDIR)/$($(PROJECT).dir)/%.cmi)
+INSTALL_CMIS = $($(PROJECT).public:%=$(BUILDDIR)/$($(PROJECT).dir)/%.cmi) \
+               $($(PROJECT).cmi_only:%=$(BUILDDIR)/$($(PROJECT).dir)/%.cmi)
 INSTALL_CMTIS = $($(PROJECT).public:%=$(BUILDDIR)/$($(PROJECT).dir)/%.cmti)
 INSTALL_CMTS = $($(PROJECT).public:%=$(BUILDDIR)/$($(PROJECT).dir)/%.cmt)
 INSTALL_MLIS = $($(PROJECT).public:%=$($(PROJECT).dir)/%.mli)
