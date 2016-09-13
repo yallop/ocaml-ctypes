@@ -10,7 +10,7 @@ type dlsym_ret =
   | Dlsy_nomem
   | Dlsy_enoent
   | Dlsy_error of string
-  | Dlsy_ok of Ctypes_ptr.voidp
+  | Dlsy_ok of nativeint
 external _dlsym_default: string -> dlsym_ret = "ctypes_win32_dlsym_rtld_default"
 external _dlsym: library -> string -> dlsym_ret = "ctypes_win32_dlsym"
 

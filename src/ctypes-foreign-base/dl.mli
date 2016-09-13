@@ -41,5 +41,5 @@ Note for windows users: the filename must be encoded in UTF-8 *)
 val dlclose : handle:library -> unit
 (** Close a dynamic library. *)
 
-val dlsym : ?handle:library -> symbol:string -> Ctypes_ptr.voidp
+val dlsym : ?handle:library -> symbol:string -> nativeint
 (** Look up a symbol in a dynamic library. *)

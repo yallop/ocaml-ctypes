@@ -34,14 +34,17 @@ struct
     Ctypes.ptr_of_raw_address (Ctypes_ptr.Raw.to_nativeint p)
 
   let foreign_value ?from symbol t =
-    from_voidp t (ptr_of_raw_ptr (dlsym ?handle:from ~symbol))
+    from_voidp t (ptr_of_raw_ptr
+                    (Ctypes_ptr.Raw.of_nativeint (dlsym ?handle:from ~symbol)))
 
   let foreign ?(abi=Libffi_abi.default_abi) ?from ?(stub=false)
       ?(check_errno=false) ?(release_runtime_lock=false) symbol typ =
     try
       let coerce = Ctypes_coerce.coerce (static_funptr (void @-> returning void))
         (funptr ~abi ~name:symbol ~check_errno ~runtime_lock:release_runtime_lock typ) in
-      coerce (funptr_of_raw_ptr (dlsym ?handle:from ~symbol))
+      coerce (funptr_of_raw_ptr
+                (Ctypes_ptr.Raw.of_nativeint
+                   (dlsym ?handle:from ~symbol)))
     with
     | exn -> if stub then fun _ -> raise exn else raise exn
 end
