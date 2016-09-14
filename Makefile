@@ -45,7 +45,8 @@ clean:
 	rm -f $(GENERATED)
 
 # ctypes subproject
-ctypes.public = ctypes_static ctypes_primitive_types unsigned signed ctypes_structs ctypes posixTypes ctypes_types
+ctypes.cmi_only = ctypes_static ctypes_primitive_types ctypes_structs
+ctypes.public = unsigned signed ctypes posixTypes ctypes_types
 ctypes.dir = src/ctypes
 ctypes.extra_mls = ctypes_primitives.ml
 ctypes.deps = str bigarray bytes
@@ -59,7 +60,8 @@ ctypes: PROJECT=ctypes
 ctypes: $(ctypes.dir)/$(ctypes.extra_mls) $$(LIB_TARGETS)
 
 # cstubs subproject
-cstubs.public = cstubs_internals cstubs_structs cstubs cstubs_inverted
+cstubs.cmi_only = cstubs_internals
+cstubs.public = cstubs_structs cstubs cstubs_inverted
 cstubs.dir = src/cstubs
 cstubs.subproject_deps = ctypes
 cstubs.deps = str bytes

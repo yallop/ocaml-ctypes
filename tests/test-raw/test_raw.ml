@@ -30,7 +30,7 @@ let test_fabs _ =
     let () = prep_callspec callspec Libffi_abi.(abi_code default_abi)
       double_ffitype in
     
-    let dlfabs = Dl.dlsym "fabs" in
+    let dlfabs = Ctypes_ptr.Raw.of_nativeint (Dl.dlsym "fabs") in
     let dlfabs_fat = Ctypes_ptr.Fat.make dlfabs
         ~reftyp:Ctypes.(double @-> returning double) in
 
@@ -65,7 +65,7 @@ let test_pow _ =
     let () = prep_callspec callspec Libffi_abi.(abi_code default_abi) 
       double_ffitype in
     
-    let dlpow = Dl.dlsym "pow" in
+    let dlpow = Ctypes_ptr.Raw.of_nativeint (Dl.dlsym "pow") in
     let dlpow_fat = Ctypes_ptr.Fat.make dlpow
         ~reftyp:Ctypes.(double @-> double @-> returning double) in
 
