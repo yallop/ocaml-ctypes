@@ -94,6 +94,124 @@ let test_multidimensional_arrays _ =
 
 
 (*
+  Test the CArray.iter function
+ *)
+let test_iter _ =
+  let r = ref 0 in
+  let a = CArray.of_list int [1; 2; 3] in
+  let () = CArray.iter (fun v -> r := !r + v) a in
+  assert_equal !r 6;
+
+  let r = ref 0 in
+  let a = CArray.of_list int [] in
+  let () = CArray.iter (fun _ -> assert false) a in
+  assert_equal !r 0
+
+
+(*
+  Test the CArray.map function
+ *)
+let test_map _ =
+  let a = CArray.of_list int [1; 2; 3] in
+  let r = CArray.map float float_of_int a in
+  assert_equal [1.0; 2.0; 3.0] (CArray.to_list r);
+    
+  let a = CArray.of_list int [] in
+  let r = CArray.map string (fun _ -> assert false) a in
+  assert_equal (CArray.length r) 0
+
+
+(*
+  Test the CArray.mapi function
+ *)
+let test_mapi _ =
+  let a = CArray.of_list int [1; 2; 3] in
+  let r = CArray.mapi int (+) a in
+  assert_equal [1; 3; 5] (CArray.to_list r);
+    
+  let a = CArray.of_list int [] in
+  let r = CArray.mapi string (fun _ _ -> assert false) a in
+  assert_equal (CArray.length r) 0
+
+
+(*
+  Test the CArray.fold_left function
+ *)
+let test_fold_left _ =
+  let a = CArray.of_list int [1; 2; 3] in
+  let r = CArray.fold_left (Printf.sprintf "%s%d") "." a in
+  assert_equal ".123" r;
+    
+  let a = CArray.of_list int [] in
+  let r = CArray.fold_left (fun _ -> assert false) [] a in
+  assert_equal r []
+
+
+(*
+  Test the CArray.fold_right function
+ *)
+let test_fold_right _ =
+  let a = CArray.of_list int [1; 2; 3] in
+  let r = CArray.fold_right (Printf.sprintf "%d%s") a "." in
+  assert_equal "123." r;
+    
+  let a = CArray.of_list int [] in
+  let r = CArray.fold_right (fun _ -> assert false) a [] in
+  assert_equal r []
+
+(*
+  Test the CArray.copy function
+ *)
+let test_copy _ =
+  let a = CArray.of_list int [1; 2; 3] in
+  let r = CArray.copy a in
+
+  begin
+    assert_equal [1; 2; 3] (CArray.to_list a);
+    assert_equal [1; 2; 3] (CArray.to_list r);
+    CArray.set r 0 10;
+    assert_equal [1; 2; 3] (CArray.to_list a);
+    assert_equal [10; 2; 3] (CArray.to_list r);
+    CArray.set a 1 20;
+    assert_equal [1; 20; 3] (CArray.to_list a);
+    assert_equal [10; 2; 3] (CArray.to_list r);
+  end
+
+
+(*
+  Test the CArray.sub function
+ *)
+let test_sub _ =
+  let a = CArray.of_list int [1; 2; 3] in
+
+  assert_raises (Invalid_argument "CArray.sub") begin fun () ->
+    CArray.sub a ~pos:(-1) ~length:1
+  end;
+
+  assert_raises (Invalid_argument "CArray.sub") begin fun () ->
+    CArray.sub a ~pos:1 ~length:4
+  end;
+  
+  assert_raises (Invalid_argument "CArray.sub") begin fun () ->
+    CArray.sub a ~pos:1 ~length:(-1)
+  end;
+
+  let r = CArray.sub a ~pos:1 ~length:2 in 
+  assert_equal [2; 3] (CArray.to_list r);
+    
+  let r = CArray.sub a ~pos:1 ~length:0 in
+  assert_equal [] (CArray.to_list r);
+
+  let a = CArray.of_list int [1; 2; 3] in
+  let r = CArray.sub a ~pos:1 ~length:2 in
+  begin
+    CArray.set r 0 10;
+    assert_equal [1; 2; 3] (CArray.to_list a);
+    assert_equal [10; 3] (CArray.to_list r);
+  end
+
+
+(*
   Test that creating an array initializes all elements appropriately.
 *)
 let test_array_initialiation _ =
@@ -203,6 +321,27 @@ module Stub_tests = Common_tests(Generated_bindings)
 let suite = "Array tests" >:::
   ["multidimensional arrays"
     >:: test_multidimensional_arrays;
+
+   "CArray.iter "
+    >:: test_iter;
+
+   "CArray.map "
+    >:: test_map;
+
+   "CArray.mapi "
+    >:: test_mapi;
+
+   "CArray.fold_left"
+    >:: test_fold_left;
+
+   "CArray.fold_right"
+    >:: test_fold_right;
+
+   "CArray.copy"
+    >:: test_copy;
+
+   "CArray.sub"
+    >:: test_sub;
 
    "array initialization"
     >:: test_array_initialiation;

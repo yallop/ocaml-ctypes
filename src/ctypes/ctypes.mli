@@ -277,6 +277,30 @@ sig
       element of the list is the result of reading the corresponding element of
       [a]. *)
 
+  val iter : ('a -> unit) -> 'a t -> unit
+  (** [iter f a] is analogous to [Array.iter f a]: it applies [f] in turn to
+      all the elements of [a]. *)
+
+  val map : 'b typ -> ('a -> 'b) -> 'a t -> 'b t
+  (** [map t f a] is analogous to [Array.map f a]: it creates a new array with
+      element type [t] whose elements are obtained by applying [f] to the
+      elements of [a]]. *)
+
+  val mapi : 'b typ -> (int -> 'a -> 'b) -> 'a t -> 'b t
+  (** [mapi] behaves like {!Array.mapi}, except that it also passes the
+      index of each element as the first argument to [f] and the element
+      itself as the second argument. *)
+
+  val fold_left : ('a -> 'b -> 'a) -> 'a -> 'b t -> 'a
+  (** [CArray.fold_left (@) x a] computes 
+         [(((x @ a.(0)) @ a.(1)) ...) @ a.(n-1)]
+       where [n] is the length of the array [a]. *)
+
+  val fold_right : ('b -> 'a -> 'a) -> 'b t -> 'a -> 'a
+  (** [CArray.fold_right f a x] computes
+         [a.(0) @ (a.(1) @ ( ... (a.(n-1) @ x) ...))]
+       where [n] is the length of the array [a]. *)
+
   val length : 'a t -> int
   (** Return the number of elements of the given array. *)
 
@@ -293,8 +317,18 @@ sig
       used to initialise every element of the array.  The argument [?finalise],
       if present, will be called just before the memory is freed. *)
 
+  val copy : 'a t -> 'a t
+  (** [copy a] creates a fresh array with the same elements as [a]. *)
+
+  val sub : 'a t -> pos:int -> length:int -> 'a t
+  (** [sub a ~pos ~length] creates a fresh array of length [length] containing
+      the elements [a.(pos)] to [a.(pos + length - 1)] of [a].
+
+      Raise [Invalid_argument "CArray.sub"] if [pos] and [length] do not
+      designate a valid subarray of [a]. *)
+
   val element_type : 'a t -> 'a typ
-(** Retrieve the element type of an array. *)
+  (** Retrieve the element type of an array. *)
 end
 (** Operations on C arrays. *)
 

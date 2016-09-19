@@ -199,6 +199,19 @@ struct
         | None -> arr
         | Some v -> fill arr v; arr
 
+  let copy {astart = CPointer src; alength} =
+    begin
+      let reftyp = Fat.reftype src in
+      let CPointer dst as r = allocate_n reftyp alength in
+      let () = Stubs.memcpy ~dst ~src ~size:(alength * sizeof reftyp) in
+      from_ptr r alength
+    end
+
+  let sub arr ~pos ~length:len =
+  if pos < 0 || len < 0 || pos > length arr - len
+  then invalid_arg "CArray.sub"
+  else copy { astart = arr.astart +@ pos; alength = len }
+
   let element_type { astart } = reference_type astart
 
   let of_list typ list =
@@ -212,6 +225,41 @@ struct
       l := get a i :: !l
     done;
     !l
+
+  let iter f a =
+    for i = 0 to length a - 1 do
+      f (unsafe_get a i)
+    done
+
+  let map typ f a =
+    let l = length a in
+    let r = make typ l in
+    for i = 0 to l - 1 do
+      unsafe_set r i (f (unsafe_get a i))
+    done;
+    r
+
+  let mapi typ f a =
+    let l = length a in
+    let r = make typ l in
+    for i = 0 to l - 1 do
+      unsafe_set r i (f i (unsafe_get a i))
+    done;
+    r
+
+  let fold_left f x a =
+    let r = ref x in
+    for i = 0 to length a - 1 do
+      r := f !r (unsafe_get a i)
+    done;
+    !r
+
+  let fold_right f a x =
+    let r = ref x in
+    for i = length a - 1 downto 0 do
+      r := f (unsafe_get a i) !r
+    done;
+    !r
 end
 
 let make ?finalise s =
