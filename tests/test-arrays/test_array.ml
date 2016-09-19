@@ -153,6 +153,38 @@ let test_pointer_to_array_arithmetic _ =
   assert_equal 12 a.(3).(2);
   assert_equal 1 a.(0).(0)
 
+
+(*
+  Test bounds checks for CArray.get
+*)
+let test_bounds_checks_get _ =
+  let module Array = CArray in
+  let c = CArray.of_list int [1;2;3] in
+
+  assert_raises (Invalid_argument "index out of bounds") begin fun () ->
+    c.(-1);
+  end;
+
+  assert_raises (Invalid_argument "index out of bounds") begin fun () ->
+    c.(CArray.length c);
+  end
+
+(*
+  Test bounds checks for CArray.set
+*)
+let test_bounds_checks_set _ =
+  let module Array = CArray in
+  let c = CArray.of_list int [1;2;3] in
+
+  assert_raises (Invalid_argument "index out of bounds") begin fun () ->
+    c.(-1) <- 0;
+  end;
+
+  assert_raises (Invalid_argument "index out of bounds") begin fun () ->
+    c.(CArray.length c) <- 0;
+  end
+
+
 module Common_tests(S : Cstubs.FOREIGN with type 'a result = 'a
                                         and type 'a return = 'a) =
 struct
@@ -215,6 +247,12 @@ let suite = "Array tests" >:::
 
    "pointer to array arithmetic"
     >:: test_pointer_to_array_arithmetic;
+
+   "bounds checks (get)"
+    >:: test_bounds_checks_get;
+
+   "bounds checks (set)"
+    >:: test_bounds_checks_set;
 
    "passing pointer to array of structs (foreign)"
     >:: Foreign_tests.test_passing_pointer_to_array_of_structs;
