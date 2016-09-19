@@ -166,7 +166,7 @@ struct
   type 'a t = 'a carray
 
   let check_bound { alength } i =
-    if i >= alength then
+    if i < 0 || i >= alength then
       invalid_arg "index out of bounds"
 
   let unsafe_get { astart } n = !@(astart +@ n)
