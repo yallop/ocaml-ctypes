@@ -28,6 +28,7 @@ depends: [
    "lwt" {test}
    "ctypes-foreign" {test}
    "ounit" {test}
+   "integers"
 ]
 depopts: [
    "ctypes-foreign"

@@ -49,7 +49,7 @@ ctypes.cmi_only = ctypes_static ctypes_primitive_types ctypes_structs
 ctypes.public = unsigned signed ctypes posixTypes ctypes_types
 ctypes.dir = src/ctypes
 ctypes.extra_mls = ctypes_primitives.ml
-ctypes.deps = str bigarray bytes
+ctypes.deps = str bigarray bytes integers
 ctypes.install = yes
 ctypes.install_native_objects = yes
 ifeq ($(XEN),enable)
@@ -64,7 +64,7 @@ cstubs.cmi_only = cstubs_internals
 cstubs.public = cstubs_structs cstubs cstubs_inverted
 cstubs.dir = src/cstubs
 cstubs.subproject_deps = ctypes
-cstubs.deps = str bytes
+cstubs.deps = str bytes integers
 cstubs.install = yes
 cstubs.install_native_objects = yes
 
@@ -77,7 +77,7 @@ ctypes-foreign-base.install = yes
 ctypes-foreign-base.install_native_objects = yes
 ctypes-foreign-base.threads = no
 ctypes-foreign-base.dir = src/ctypes-foreign-base
-ctypes-foreign-base.deps = bytes
+ctypes-foreign-base.deps = bytes integers
 ctypes-foreign-base.subproject_deps = ctypes
 ctypes-foreign-base.extra_mls = libffi_abi.ml dl.ml
 ctypes-foreign-base.extra_cs = dl_stubs.c
@@ -122,7 +122,7 @@ ctypes-foreign-unthreaded: $$(LIB_TARGETS)
 ctypes-top.public = ctypes_printers
 ctypes-top.dir = src/ctypes-top
 ctypes-top.install = yes
-ctypes-top.deps = compiler-libs
+ctypes-top.deps = compiler-libs integers
 ctypes-top.subproject_deps = ctypes
 ctypes-top.install_native_objects = yes
 

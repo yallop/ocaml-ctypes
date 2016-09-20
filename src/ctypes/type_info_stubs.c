@@ -19,8 +19,9 @@
 #include <caml/memory.h>
 #include <caml/alloc.h>
 
+#include "ocaml_integers.h"
+
 #include "ctypes_type_info_stubs.h"
-#include "ctypes_unsigned_stubs.h"
 #include "ctypes_complex_stubs.h"
 #include "ctypes_raw_pointer.h"
 #include "ctypes_primitives.h"
@@ -42,7 +43,7 @@ value ctypes_read(value prim_, value buffer_)
   {
    case Ctypes_Char: b = Val_int(*(unsigned char*)buf); break;
    case Ctypes_Schar: b = Val_int(*(signed char *)buf); break;
-   case Ctypes_Uchar: b = Ctypes_val_uint8(*(unsigned char *)buf); break;
+   case Ctypes_Uchar: b = Integers_val_uint8(*(unsigned char *)buf); break;
    case Ctypes_Bool: b = Val_bool(*(bool *)buf); break;
    case Ctypes_Short: b = Val_int(*(short *)buf); break;
    case Ctypes_Int: b = Val_int(*(int *)buf); break;
@@ -58,10 +59,10 @@ value ctypes_read(value prim_, value buffer_)
    case Ctypes_Int16_t: b = Val_int(*(int16_t *)buf); break;
    case Ctypes_Int32_t: b = caml_copy_int32(*(int32_t *)buf); break;
    case Ctypes_Int64_t: b = caml_copy_int64(*(int64_t *)buf); break;
-   case Ctypes_Uint8_t: b = Ctypes_val_uint8(*(uint8_t *)buf); break;
-   case Ctypes_Uint16_t: b = Ctypes_val_uint16(*(uint16_t *)buf); break;
-   case Ctypes_Uint32_t: b = ctypes_copy_uint32(*(uint32_t *)buf); break;
-   case Ctypes_Uint64_t: b = ctypes_copy_uint64(*(uint64_t *)buf); break;
+   case Ctypes_Uint8_t: b = Integers_val_uint8(*(uint8_t *)buf); break;
+   case Ctypes_Uint16_t: b = Integers_val_uint16(*(uint16_t *)buf); break;
+   case Ctypes_Uint32_t: b = integers_copy_uint32(*(uint32_t *)buf); break;
+   case Ctypes_Uint64_t: b = integers_copy_uint64(*(uint64_t *)buf); break;
    case Ctypes_Camlint: b = Val_int(*(intnat *)buf); break;
    case Ctypes_Nativeint: b = caml_copy_nativeint(*(intnat *)buf); break;
    case Ctypes_Float: b = caml_copy_double(*(float *)buf); break;
@@ -197,3 +198,7 @@ value ctypes_string_of_pointer(value p_)
   snprintf(buf, sizeof buf, "%p", CTYPES_ADDR_OF_FATPTR(p_));
   CAMLreturn (caml_copy_string(buf));
 }
+
+value ctypes_uintptr_t_size (value _) { return Val_int(sizeof (uintptr_t)); }
+value ctypes_intptr_t_size (value _) { return Val_int(sizeof (intptr_t)); }
+value ctypes_ptrdiff_t_size (value _) { return Val_int(sizeof (ptrdiff_t)); }

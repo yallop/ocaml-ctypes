@@ -242,7 +242,8 @@ let test_pointer_assignment_with_primitives _ =
     assert_equal 14L (!@p_int64_t);
     assert_equal (UInt8.of_int 15) (!@p_uint8_t);
     assert_equal (UInt16.of_int 16) (!@p_uint16_t);
-    assert_equal (UInt32.of_int 17) (!@p_uint32_t);
+    assert_equal (UInt32.of_int 17) (!@p_uint32_t)
+      ~printer:UInt32.to_string;
     assert_equal (UInt64.of_int 18) (!@p_uint64_t);
     assert_equal (Size_t.of_int 19) (!@p_size_t);
     assert_equal (UShort.of_int 20) (!@p_ushort);
