@@ -19,6 +19,8 @@
 
 #if defined _WIN32 && !defined __CYGWIN__
 #include <windows.h>
+#elif defined(__APPLE__)
+#include <dispatch/dispatch.h>
 #else
 #include <semaphore.h>
 #endif
@@ -516,7 +518,18 @@ void call_registered_callback(int times, int starting_value)
   }
 }
 
-#if defined _WIN32 && !defined __CYGWIN__
+#ifdef __APPLE__
+#define sem_t dispatch_semaphore_t
+#define sem_init(sem, sem_attr1, sem_init_value)                \
+  ((*sem = dispatch_semaphore_create(sem_init_value)) == NULL)
+#define sem_wait(sem)                                   \
+  dispatch_semaphore_wait(*sem, DISPATCH_TIME_FOREVER)
+#define sem_post(sem)                           \
+  (dispatch_semaphore_signal(*sem),0)
+#define sem_destroy(sem)                        \
+  (dispatch_release(*sem),0)
+
+#elif defined(_WIN32) && !defined(__CYGWIN__)
 #define sem_t HANDLE
 #define sem_init(sem, sem_attr1, sem_init_value)        \
   ((*sem = CreateSemaphore(NULL,0,32768,NULL)) == NULL)
