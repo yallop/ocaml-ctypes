@@ -15,9 +15,12 @@
 #include <assert.h>
 #include <string.h>
 #include <complex.h>
+#include <errno.h>
 
 #if defined _WIN32 && !defined __CYGWIN__
 #include <windows.h>
+#elif defined(__APPLE__)
+#include <dispatch/dispatch.h>
 #else
 #include <semaphore.h>
 #endif
@@ -515,34 +518,62 @@ void call_registered_callback(int times, int starting_value)
   }
 }
 
-#if defined _WIN32 && !defined __CYGWIN__
+#ifdef __APPLE__
+#define sem_t dispatch_semaphore_t
+#define sem_init(sem, sem_attr1, sem_init_value)                \
+  ((*sem = dispatch_semaphore_create(sem_init_value)) == NULL)
+#define sem_wait(sem)                                   \
+  dispatch_semaphore_wait(*sem, DISPATCH_TIME_FOREVER)
+#define sem_post(sem)                           \
+  (dispatch_semaphore_signal(*sem),0)
+#define sem_destroy(sem)                        \
+  (dispatch_release(*sem),0)
+
+#elif defined(_WIN32) && !defined(__CYGWIN__)
 #define sem_t HANDLE
 #define sem_init(sem, sem_attr1, sem_init_value)        \
-  (void)((*sem = CreateSemaphore(NULL,0,32768,NULL))==NULL)
+  ((*sem = CreateSemaphore(NULL,0,32768,NULL)) == NULL)
 #define sem_wait(sem) \
-  (void)(WAIT_OBJECT_0 != WaitForSingleObject(*sem,INFINITE))
-#define sem_post(sem) (void)ReleaseSemaphore(*sem,1,NULL)
+  (WAIT_OBJECT_0 != WaitForSingleObject(*sem,INFINITE))
+#define sem_post(sem) (ReleaseSemaphore(*sem,1,NULL) == 0)
+#define sem_destroy(sem) (CloseHandle(*sem) == 0 )
 #endif
 
 static sem_t semaphore1;
 static sem_t semaphore2;
+static int semaphores_intialized;
 
 void initialize_waiters(void)
 {
-  sem_init(&semaphore1, 0, -1);
-  sem_init(&semaphore2, 0, -1);
+  if ( semaphores_intialized ) {
+    assert ( sem_destroy(&semaphore1) == 0 );
+    assert ( sem_destroy(&semaphore2) == 0 );
+  }
+  assert ( sem_init(&semaphore1, 0, 0) == 0 );
+  assert ( sem_init(&semaphore2, 0, 0) == 0 );
+  semaphores_intialized = 1;
 }
 
 void post1_wait2(void)
 {
-  sem_post(&semaphore1);
-  sem_wait(&semaphore2);
+  int e;
+  assert ( sem_post(&semaphore1) == 0 );
+  errno = 0;
+  do {
+    e = sem_wait(&semaphore2);
+  } while ( e && errno == EINTR );
+  assert ( e == 0 );
 }
 
 void post2_wait1(void)
 {
-  sem_post(&semaphore2);
-  sem_wait(&semaphore1);
+  int e;
+  assert ( sem_post(&semaphore2) == 0 );
+  errno = 0;
+  do {
+    e = sem_wait(&semaphore1);
+  } while ( e && errno == EINTR );
+  assert ( e == 0 );
 }
 
 size_t sizeof_s1(void) { return sizeof(struct s1); }
