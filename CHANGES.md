@@ -1,18 +1,51 @@
+## ctypes 0.10.0
+
+### Features
+
+* Windows support for registration of C threads from callbacks  
+  https://github.com/ocamllabs/ocaml-ctypes/issues/450
+
+* Auto-load custom printers in the OCaml toplevel  
+  https://github.com/ocamllabs/ocaml-ctypes/issues/448
+
+* Add some extra `CArray` functions: `sub`, `copy`, `fold_right`,
+  `fold_left`, `mapi`, `map`, `iter`  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/323
+
+### Bug fixes
+
+* Build fix for OpenBSD  
+  https://github.com/ocamllabs/ocaml-ctypes/issues/454
+
+* Fix for platforms (e.g. NetBSD) where standard integer types are
+  defined as macros  
+  https://github.com/ocamllabs/ocaml-ctypes/issues/453
+
+* Add missing bounds check in `CArray`  
+  https://github.com/ocamllabs/ocaml-ctypes/issues/447
+
+### Compatibility
+
+* Dl.dlsym now returns `nativeint`, not `Ctypes_ptr.voidp`  
+  https://github.com/ocamllabs/ocaml-ctypes/issues/445
+    
+Thanks to Andreas Hauptmann (@fdopen) for contributions to this release.
+
 ## ctypes 0.9.2
 
 ### Bug fixes
 
-* Revert a ctypes-foreign build regression in 0.9.1
+* Revert a ctypes-foreign build regression in 0.9.1  
   https://github.com/ocamllabs/ocaml-ctypes/pull/443
 
 ## ctypes 0.9.1
 
 ### Bug fixes
 
-* Fix build rules on OpenBSD
+* Fix build rules on OpenBSD  
   https://github.com/ocamllabs/ocaml-ctypes/issues/428
 
-* Fix a memory leak that occurs when passing closures to C
+* Fix a memory leak that occurs when passing closures to C  
   https://github.com/ocamllabs/ocaml-ctypes/issues/436
 
 Thanks to Enguerrand Decorne (@engil) for contributing to this release.
@@ -23,10 +56,10 @@ Thanks to Enguerrand Decorne (@engil) for contributing to this release.
 
 * NetBSD support
 
-* Support for releasing the runtime lock in generated stubs
+* Support for releasing the runtime lock in generated stubs  
   https://github.com/ocamllabs/ocaml-ctypes/issues/429
 
-* Support for Lwt_preemptive
+* Support for Lwt_preemptive  
   https://github.com/ocamllabs/ocaml-ctypes/issues/430
 
 Thanks to Martin Lucina (@mato) for contributing to this release.
@@ -35,21 +68,21 @@ Thanks to Martin Lucina (@mato) for contributing to this release.
 
 ### Features
 
-* Use unboxed types for `uint8_t` and `uint16_t`
+* Use unboxed types for `uint8_t` and `uint16_t`  
   https://github.com/ocamllabs/ocaml-ctypes/issues/413
 
-* Reset `errno` in Lwt jobs before invoking job function
+* Reset `errno` in Lwt jobs before invoking job function  
   https://github.com/ocamllabs/ocaml-ctypes/issues/426
 
-* Add a `~thread_registration` argument to `funptr` to support registering C threads with the OCaml runtime.
+* Add a `~thread_registration` argument to `funptr` to support registering C threads with the OCaml runtime.  
   https://github.com/ocamllabs/ocaml-ctypes/issues/420
 
 ### Bug fixes
 
-* Use `-opaque` for module interfaces whose `cmx` files are not installed.
+* Use `-opaque` for module interfaces whose `cmx` files are not installed.  
   https://github.com/ocamllabs/ocaml-ctypes/issues/423
 
-* Install `cstubs` `cmx` files.
+* Install `cstubs` `cmx` files.  
   https://github.com/ocamllabs/ocaml-ctypes/issues/424
 
 Thanks to David Sheets (@dsheets) and Demi Obenour (@DemiMarie) for contributions to this release.
@@ -58,19 +91,19 @@ Thanks to David Sheets (@dsheets) and Demi Obenour (@DemiMarie) for contribution
 
 ### Features
 
-* Add support for bytecode-only architectures
+* Add support for bytecode-only architectures  
     https://github.com/ocamllabs/ocaml-ctypes/issues/410
 
-* Add a new `sint` type corresponding to a full-range C integer and update `errno` support to use `sint`
+* Add a new `sint` type corresponding to a full-range C integer and update `errno` support to use `sint`  
     https://github.com/ocamllabs/ocaml-ctypes/issues/411
 
 ### Bug fixes
 
-* Handle small integer return types correctly on big-endian platforms
+* Handle small integer return types correctly on big-endian platforms  
     https://github.com/ocamllabs/ocaml-ctypes/issues/404
     https://github.com/ocamllabs/ocaml-ctypes/issues/405
 
-* Fix a bug with callbacks that return small types (less than a word)
+* Fix a bug with callbacks that return small types (less than a word)  
     https://github.com/ocamllabs/ocaml-ctypes/issues/405
 
 Thanks to Stephane Glondu (@glondu) for contributions to this release.
@@ -79,10 +112,10 @@ Thanks to Stephane Glondu (@glondu) for contributions to this release.
 
 ### Bug fixes
 
-* Fix for argument quoting in the Windows build after new cross compilation support
+* Fix for argument quoting in the Windows build after new cross compilation support  
     https://github.com/ocamllabs/ocaml-ctypes/pull/399
 
-* Improve Lwt jobs support for functions with many or no arguments
+* Improve Lwt jobs support for functions with many or no arguments  
     https://github.com/ocamllabs/ocaml-ctypes/pull/400
 
 Thanks to Andreas Hauptmann (@fdopen) for contributing to this release.
@@ -91,7 +124,7 @@ Thanks to Andreas Hauptmann (@fdopen) for contributing to this release.
 
 ### Bug fixes
 
-* Fix constructor qualification in code generated for inverted stubs:
+* Fix constructor qualification in code generated for inverted stubs:  
     https://github.com/ocamllabs/ocaml-ctypes/pull/397
 
 ## ctypes 0.6.0
