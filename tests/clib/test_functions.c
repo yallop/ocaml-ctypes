@@ -642,3 +642,24 @@ int callback_returns_char_a(char (*f)(void))
 {
   return f() == 'a' ? 1 : 0;
 }
+
+#define GEN_RETURN_F(type)                          \
+  type callback_returns_ ## type (type  (*f)(void)) \
+  {                                                 \
+    type x = f();                                   \
+    return x;                                       \
+  }                                                 \
+
+GEN_RETURN_F(uint8_t)
+GEN_RETURN_F(uint16_t)
+GEN_RETURN_F(uint32_t)
+GEN_RETURN_F(uint64_t)
+
+GEN_RETURN_F(int8_t)
+GEN_RETURN_F(int16_t)
+GEN_RETURN_F(int32_t)
+GEN_RETURN_F(int64_t)
+
+GEN_RETURN_F(float)
+GEN_RETURN_F(double)
+GEN_RETURN_F(bool)
