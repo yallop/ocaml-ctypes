@@ -271,9 +271,11 @@ value ctypes_add_argument(value callspec_, value argument_)
   CAMLreturn(Val_int(offset));
 }
 
-static int ffi_return_type_promotes(ffi_type *f)
+static int ffi_return_type_adjustment(ffi_type *f)
 {
-  /* libffi promotes integer return types that are smaller than a word */
+#ifdef ARCH_BIG_ENDIAN
+  /* An adjustment is needed (on bigendian systems) for integer types
+     less than the size of a word */
   if (f->size < sizeof(ffi_arg)) {
     switch (f->type) {
     case FFI_TYPE_INT:
@@ -285,20 +287,9 @@ static int ffi_return_type_promotes(ffi_type *f)
     case FFI_TYPE_SINT32:
     case FFI_TYPE_UINT64:
     case FFI_TYPE_SINT64:
-      return 1;
+      return sizeof(ffi_arg) - f->size;
     default: break;
     }
-  }
-  return 0;
-}
-
-static int ffi_return_type_adjustment(ffi_type *f)
-{
-#ifdef ARCH_BIG_ENDIAN
-  /* An adjustment is needed (on bigendian systems) for integer types
-     less than the size of a word */
-  if (ffi_return_type_promotes(f)) {
-    return sizeof(ffi_arg) - f->size;
   }
 #endif
   return 0;
@@ -486,13 +477,50 @@ static void callback_handler_with_lock(ffi_cif *cif,
   /* now store the return value */
   assert (Tag_val(boxedfn) == Done);
 
-  if (ffi_return_type_promotes(cif->rtype)) {
-    *(ffi_arg *)ret = 0;     
-  }
-
-  argptr = CTYPES_FROM_PTR(ret + ffi_return_type_adjustment(cif->rtype));
+  argptr = CTYPES_FROM_PTR(ret);
   caml_callback(Field(boxedfn, 0), argptr);
 
+  /* workaround for libffi api: small integers must be promoted to
+   * full word size (sign/zero extended) */
+  if (cif->rtype->size < sizeof(ffi_arg)) {
+    int do_nothing = 0;
+    ffi_arg x;
+    switch (cif->rtype->type) {
+    case FFI_TYPE_INT:
+      x = *(int*)ret;
+      break;
+    case FFI_TYPE_UINT8:
+      x = *(uint8_t*)ret;
+      break;
+    case FFI_TYPE_SINT8:
+      x = *(int8_t*)ret;
+      break;
+    case FFI_TYPE_UINT16:
+      x = *(uint16_t*)ret;
+      break;
+    case FFI_TYPE_SINT16:
+      x = *(int16_t*)ret;
+      break;
+    case FFI_TYPE_UINT32:
+      x = *(uint32_t*)ret;
+      break;
+    case FFI_TYPE_SINT32:
+      x = *(int32_t*)ret;
+      break;
+    case FFI_TYPE_UINT64:
+      x = *(uint64_t*)ret;
+      break;
+    case FFI_TYPE_SINT64:
+      x = *(int64_t*)ret;
+      break;
+    default:
+      do_nothing = 1;
+      break;
+    }
+    if ( do_nothing == 0 ) {
+      *(ffi_arg*)ret = x;
+    }
+  }
   CAMLreturn0;
 }
 
