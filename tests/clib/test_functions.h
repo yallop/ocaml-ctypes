@@ -235,4 +235,19 @@ int sixargs(int, int, int, int, int, int);
 int return_10(void);
 
 int callback_returns_char_a(char (*)(void));
+
+uint8_t callback_returns_uint8_t(uint8_t (*f)(void));
+uint16_t callback_returns_uint16_t(uint16_t (*f)(void));
+uint32_t callback_returns_uint32_t(uint32_t (*f)(void));
+uint64_t callback_returns_uint64_t(uint64_t (*f)(void));
+
+int8_t callback_returns_int8_t(int8_t (*f)(void));
+int16_t callback_returns_int16_t(int16_t (*f)(void));
+int32_t callback_returns_int32_t(int32_t (*f)(void));
+int64_t callback_returns_int64_t(int64_t (*f)(void));
+
+float callback_returns_float(float (*f)(void));
+double callback_returns_double(double (*f)(void));
+bool callback_returns_bool(bool (*f)(void));
+
 #endif /* TEST_FUNCTIONS_H */
