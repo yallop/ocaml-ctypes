@@ -974,6 +974,39 @@ test-threads.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-threads: PROJECT=test-threads
 test-threads: $$(BEST_TARGET)
 
+test-closure-type-promotion-stubs.dir  = tests/test-closure-type-promotion/stubs
+test-closure-type-promotion-stubs.threads = yes
+test-closure-type-promotion-stubs.subproject_deps = ctypes cstubs \
+   ctypes-foreign-base ctypes-foreign-threaded tests-common
+test-closure-type-promotion-stubs: PROJECT=test-closure-type-promotion-stubs
+test-closure-type-promotion-stubs: $$(LIB_TARGETS)
+
+test-closure-type-promotion-stub-generator.dir = tests/test-closure-type-promotion/stub-generator
+test-closure-type-promotion-stub-generator.threads = yes
+test-closure-type-promotion-stub-generator.subproject_deps = ctypes cstubs \
+     ctypes-foreign-base ctypes-foreign-threaded test-closure-type-promotion-stubs tests-common
+test-closure-type-promotion-stub-generator.deps = str bigarray bytes
+test-closure-type-promotion-stub-generator: PROJECT=test-closure-type-promotion-stub-generator
+test-closure-type-promotion-stub-generator: $$(BEST_TARGET)
+
+test-closure-type-promotion.dir = tests/test-closure-type-promotion
+test-closure-type-promotion.threads = yes
+test-closure-type-promotion.deps = str bigarray oUnit bytes
+test-closure-type-promotion.subproject_deps = ctypes ctypes-foreign-base \
+  ctypes-foreign-threaded cstubs test-closure-type-promotion-stubs tests-common
+test-closure-type-promotion.link_flags = -L$(BUILDDIR)/clib -ltest_functions
+test-closure-type-promotion: PROJECT=test-closure-type-promotion
+test-closure-type-promotion: $$(BEST_TARGET)
+
+test-closure-type-promotion-generated: \
+  tests/test-closure-type-promotion/generated_bindings.ml \
+  tests/test-closure-type-promotion/generated_stubs.c
+
+tests/test-closure-type-promotion/generated_stubs.c: $(BUILDDIR)/test-closure-type-promotion-stub-generator.$(BEST)
+	$< --c-file $@
+tests/test-closure-type-promotion/generated_bindings.ml: $(BUILDDIR)/test-closure-type-promotion-stub-generator.$(BEST)
+	$< --ml-file $@
+
 TESTS =
 TESTS += test-raw
 TESTS += test-pointers-stubs test-pointers-stub-generator test-pointers-generated test-pointers
@@ -1009,7 +1042,8 @@ TESTS += test-passing-ocaml-values-stubs test-passing-ocaml-values-stub-generato
 TESTS += test-lwt-jobs-stubs test-lwt-jobs-stub-generator test-lwt-jobs-generated test-lwt-jobs
 TESTS += test-returning-errno-lwt-stubs test-returning-errno-lwt-stub-generator test-returning-errno-lwt-generated test-returning-errno-lwt
 TESTS += test-returning-errno-stubs test-returning-errno-stub-generator test-returning-errno-generated test-returning-errno
-TESTS += test-threads-stubs test-threads
+TESTS += test-threads-stubs test-threads-stub-generator test-threads-generated test-threads
+TESTS += test-closure-type-promotion-stubs test-closure-type-promotion-stub-generator test-closure-type-promotion-generated test-closure-type-promotion
 
 
 ifneq (,$(filter mingw%,$(OSYSTEM)))
