@@ -114,7 +114,11 @@ $(BUILDDIR)/xen/%.o : %.c
 
 $(BUILDDIR)/%.cmi : %.mli
 	@mkdir -p $(@D)
-	$(OCAMLFIND) ocamlc -bin-annot -c -o $@ $(OCAMLFIND_PACKAGE_FLAGS) $(OCAMLFLAGS) $(OCAMLINCLUDES) $<
+ifeq ($(BEST),native)
+	$(OCAMLFIND) ocamlopt -bin-annot -c -o $@ $(OCAMLFIND_PACKAGE_FLAGS) $(CMI_OPTS) $(OCAMLFLAGS) $(OCAMLINCLUDES) $<
+else
+	$(OCAMLFIND) ocamlc -bin-annot -c -o $@ $(OCAMLFIND_PACKAGE_FLAGS) $(CMI_OPTS) $(OCAMLFLAGS) $(OCAMLINCLUDES) $<
+endif
 
 $(BUILDDIR)/%.native : $$(NATIVE_OBJECTS) $$(C_OBJECTS)
 	$(OCAMLFIND) opt -I $(BUILDDIR) -linkpkg $(OCAMLFLAGS) $(THREAD_FLAG) $(OCAMLFIND_PACKAGE_FLAGS) $(LOCAL_CMXAS) -o $@ $(NATIVE_OBJECTS) $(C_OBJECTS) $(OCAML_LINK_FLAGS) 
