@@ -43,19 +43,23 @@ sig
 
         you might first retrieve the values of the enumeration constants:
 
+        {[
           let a = constant "A" int64_t
           and b = constant "B" int64_t
           and c = constant "C" int64_t
           and d = constant "D" int64_t
+        ]}
 
         and then build the enumeration type
 
+        {[
           let letters = enum "letters" [
              `A, a;
              `B, b;
              `C, c;
              `D, d;
           ] ~unexpected:(fun i -> `E i)
+        ]}
 
         The [unexpected] function specifies the value to return in the case
         that some unexpected value is encountered -- for example, if a
