@@ -1,3 +1,13 @@
+## ctypes 0.10.1
+
+### Bug fixes 
+
+* Always extend integers returned from closures to full word size  
+  (Fixes incorrectly-promoted integers returned from callbacks on ARM and MIPS)  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/456
+
+Thanks to Andreas Hauptmann (@fdopen) for contributions to this release.
+
 ## ctypes 0.10.0
 
 ### Features
