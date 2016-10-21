@@ -233,6 +233,7 @@ void *retrieve_ocaml_value(void);
 
 int sixargs(int, int, int, int, int, int);
 int return_10(void);
+void return_void(int *);
 
 int callback_returns_char_a(char (*)(void));
 

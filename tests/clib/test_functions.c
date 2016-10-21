@@ -669,6 +669,12 @@ int return_10(void)
   return 10;
 }
 
+void return_void(int *x)
+{
+  *x = 10;
+  return;
+}
+
 int callback_returns_char_a(char (*f)(void))
 {
   return f() == 'a' ? 1 : 0;
