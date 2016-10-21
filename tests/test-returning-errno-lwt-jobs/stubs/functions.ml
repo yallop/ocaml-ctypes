@@ -22,4 +22,7 @@ struct
 
   let return_10 = foreign "return_10"
       (void @-> returning int)
+
+  let return_void = foreign "return_void"
+      (ptr int @-> returning void)
 end

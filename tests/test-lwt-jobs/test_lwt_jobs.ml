@@ -88,6 +88,16 @@ let test_no_args _ =
      assert_equal 10 i;
      Lwt.return ())
 
+(*
+  Test calling functions that return void.
+ *)
+let test_return_void _ =
+  let open Lwt.Infix in
+  Lwt_unix.run
+    (let x_p = allocate_n ~count:1 int in
+     (Bindings.return_void x_p).Generated_bindings.lwt >>= fun () ->
+     assert_equal 10 (!@ x_p);
+     Lwt.return ())
 
 let suite = "Lwt job tests" >:::
   ["calling sqrt"
@@ -104,6 +114,9 @@ let suite = "Lwt job tests" >:::
 
    "functions with no arguments"
     >:: test_no_args;
+
+   "functions that return void"
+    >:: test_return_void;
   ]
 
 
