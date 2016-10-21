@@ -359,11 +359,14 @@ struct
   let structure_type stub_name = 
     structure (sprintf "job_%s" stub_name)
 
-  let structure ~errno ~stub_name fmt fn args result =
+  let structure (type r) ~errno ~stub_name fmt fn args (result : r typ) =
     let open Ctypes in
     let s = structure_type stub_name in
     let (_ : (_,_) field) = field s "job" lwt_unix_job in
-    let (_ : (_,_) field) = field s "result" result in
+    let () = match result with
+        Void -> let (_ : (_,_) field) = field s "result" int in ()
+      | result -> let (_ : (_,_) field) = field s "result" result in ()
+    in
     let () = match errno with
         `Ignore_errno -> ()
       | `Return_errno -> ignore (field s "error_status" sint)
@@ -373,7 +376,7 @@ struct
     let () = seal s in
     fprintf fmt "@[%a@];@\n" (fun t -> format_typ t) s
     
-  let worker ~errno ~cname ~stub_name fmt f result args =
+  let worker (type r) ~errno ~cname ~stub_name fmt f (result : r typ) args =
     let fn' = { fname = cname;
                allocates = false;
                reads_ocaml_heap = false;
@@ -381,11 +384,13 @@ struct
     and j = "j", Ty (ptr (structure_type stub_name)) in
     let rec body args : _ -> ccomp = function
         [] ->
-        let r c =
-          Generate_C.cast ~from:(Ty result) ~into:(Ty Void)
-            (`LetAssign (`PointerField (`Local j, "result"),
-                         `App (fn', List.rev args),
-                         c))
+        let r c = match result with
+          | Void -> Generate_C.(`App (fn', List.rev args) >> c)
+          | result ->
+            Generate_C.cast ~from:(Ty result) ~into:(Ty Void)
+              (`LetAssign (`PointerField (`Local j, "result"),
+                           `App (fn', List.rev args),
+                           c))
         in
         begin match errno with
             `Ignore_errno -> r (`Return (Ty Void, (`Int Signed.SInt.zero)))
@@ -407,7 +412,7 @@ struct
                   body [] args,
                   `Static))
 
-  let result ~errno ~stub_name fmt fn result =
+  let result (type r) ~errno ~stub_name fmt fn (result : r typ) =
     begin
       fprintf fmt "@[static@ value@ result_%s@;@[(struct@ job_%s@ *j)@]@]@;@[<2>{@\n"
         stub_name stub_name;
@@ -421,12 +426,17 @@ struct
           fprintf fmt "@[Store_field(rv,@ 1,@ ctypes_copy_sint(j->error_status));@]@\n";
           fprintf fmt "@[Store_field(rv,@ 0,@ ";
       in
-          fprintf fmt "%a);@]@\n"
-            (fun fmt ty ->
-               Cstubs_emit_c.ceff fmt
-                 (Generate_C.inj ty
-                    (`Local ("j->result", Cstubs_c_language.(Ty ty)))))
-            result;
+      fprintf fmt "%a);@]@\n"
+        (let f (type r) fmt : r typ -> _ = function
+             Void ->
+             Cstubs_emit_c.ceff fmt Generate_C.val_unit
+           | ty ->
+             Cstubs_emit_c.ceff fmt
+               (Generate_C.inj ty
+                  (`Local ("j->result", Cstubs_c_language.(Ty ty))))
+         in f
+        )
+        result;
       fprintf fmt "@[lwt_unix_free_job(&j->job)@];@\n";
       fprintf fmt "@[CAMLreturn@ (rv)@];@]@\n";
       fprintf fmt "}@\n";
