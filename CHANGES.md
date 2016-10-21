@@ -1,3 +1,12 @@
+## ctypes 0.10.2
+
+### Bug fixes 
+
+* Fix generated code for Lwt jobs where the return type is `void`.
+  https://github.com/ocamllabs/ocaml-ctypes/pull/460
+
+Thanks to David Sheets (@dsheets) for contributions to this release.
+
 ## ctypes 0.10.1
 
 ### Bug fixes 
