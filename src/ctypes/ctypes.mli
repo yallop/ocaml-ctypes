@@ -200,6 +200,9 @@ val ptr_compare : 'a ptr -> 'a ptr -> int
     negative if [i] is less than [j], positive if [i] is greater than [j], and
     zero if [i] and [j] are equal. *)
 
+val is_null : 'a ptr -> bool
+(** [is_null p] is true when [p] is a null pointer. *)
+
 val reference_type : 'a ptr -> 'a typ
 (** Retrieve the reference type of a pointer. *)
 
