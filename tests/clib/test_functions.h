@@ -254,4 +254,6 @@ bool callback_returns_bool(bool (*f)(void));
 extern char *string_array[2];
 extern int32_t int_array[5];
 
+void check_ones(const int *, size_t);
+
 #endif /* TEST_FUNCTIONS_H */
