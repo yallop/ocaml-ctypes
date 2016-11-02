@@ -26,6 +26,10 @@ let rec format_typ' : type a. a typ ->
       format_typ' ty k context fmt
     | Abstract { aname } ->
       fprintf fmt "%s%t" aname (k `nonarray)
+    | Struct { tag = "" ; fields } ->
+      fprintf fmt "struct {@;<1 2>@[";
+      format_fields fields fmt;
+      fprintf fmt "@]@;}%t" (k `nonarray)
     | Struct { tag ; spec; fields } ->
       begin match spec, context with
         | Complete _, `toplevel ->
@@ -36,6 +40,10 @@ let rec format_typ' : type a. a typ ->
           end
         | _ -> fprintf fmt "struct %s%t" tag (k `nonarray)
       end
+    | Union { utag = ""; ufields } ->
+      fprintf fmt "union {@;<1 2>@[";
+      format_fields ufields fmt;
+      fprintf fmt "@]@;}%t" (k `nonarray)
     | Union { utag; uspec; ufields } ->
       begin match uspec, context with
         | Some _, `toplevel ->
