@@ -250,6 +250,14 @@ let gen_c () =
   in
   let finally fmt = write_c fmt (fun fmt ->
                     write_ml fmt !fields !structures !consts !enums) in
+
+  let string_of_type t =
+    Format.asprintf "%a" (
+      fun fmt typ ->
+	let open Ctypes_type_printing in
+	format_typ' typ (fun context -> format_name ?name:None) `nonarray fmt) 
+      t in
+
   let m =
     (module struct
       include Ctypes
@@ -266,7 +274,9 @@ let gen_c () =
           field' structname ty fname ftype
         | _ -> raise (Unsupported "Adding a field to non-structured type")
 
-      let field s fname ftype = field' (Ctypes.string_of_typ s) s fname ftype
+      let field s fname ftype = 
+	let _ : _ Ctypes.field = Ctypes.field s fname ftype in
+	field' (string_of_type s) s fname ftype
 
       let rec seal' : type s. string -> s typ -> unit =
         fun structname -> function
@@ -278,7 +288,9 @@ let gen_c () =
            seal' structname ty
         | _ -> raise (Unsupported "Sealing a field to non-structured type")
 
-      let seal ty = seal' (Ctypes.string_of_typ ty) ty
+      let seal ty = 
+	let () = Ctypes.seal ty in
+	seal' (string_of_type ty) ty
 
       type _ const = unit
       let constant name ty  = consts := (name, Ctypes_static.BoxedType ty) :: !consts
@@ -286,7 +298,7 @@ let gen_c () =
         let () = enums := name :: !enums in
         let format_typ k fmt = Format.fprintf fmt "enum %s%t" name k in
         (* a dummy value of type 'a typ, mostly unusable *)
-        view void
+        view int
           ~format_typ
           ~read:(fun _ -> assert false)
           ~write:(fun _ -> assert false)
