@@ -469,6 +469,11 @@ struct
   let alignmentof_s6 = retrieve_size "alignmentof_s6"
   let offsetof_v1 = retrieve_size "offsetof_v1"
   let offsetof_v2 = retrieve_size "offsetof_v2"
+  let sizeof_s7 = retrieve_size "sizeof_s7"
+  let alignmentof_s7 = retrieve_size "alignmentof_s7"
+  let offsetof_c1 = retrieve_size "offsetof_c1"
+  (* let offsetof_c2 = retrieve_size "offsetof_c2" *)
+  let offsetof_c3 = retrieve_size "offsetof_c3"
 
   (*
     Test that struct layout retrieved from C correctly accounts for missing
@@ -555,6 +560,29 @@ struct
 
       assert_equal offsetof_v2
         (offsetof M.v2);
+    end
+
+
+  (* Test that we can retrieve information for structs without tags that appear
+     as struct fields, e.g.
+         struct s7 { int c1; struct { int c2; } c3; };
+   *)
+  let test_tagless_struct_fields _ =
+    begin
+      assert_equal sizeof_s7
+        (sizeof M.s7);
+
+      assert_equal alignmentof_s7
+        (alignment M.s7);
+
+      assert_equal offsetof_c1
+        (offsetof M.c1);
+
+      (* assert_equal offsetof_c2 *)
+      (* 	(offsetof M.c2); *)
+
+      assert_equal offsetof_c3
+        (offsetof M.c3);
     end
 
 
@@ -662,6 +690,9 @@ let suite = "Struct tests" >:::
 
    "test adding fields to tagless structs"
    >:: Struct_stubs_tests.test_tagless_structs;
+
+   "test retrieving layout of tagless struct fields"
+   >:: Struct_stubs_tests.test_tagless_struct_fields;
   ]
 
 

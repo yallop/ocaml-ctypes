@@ -600,11 +600,17 @@ size_t sizeof_s6(void) { return sizeof(s6); }
 size_t alignmentof_s6(void) { return offsetof(struct { char c; s6 x; }, x); }
 size_t offsetof_v1(void) { return offsetof(s6, v1); }
 size_t offsetof_v2(void) { return offsetof(s6, v2); }
+size_t sizeof_s7(void) { return sizeof(struct s7); }
+size_t alignmentof_s7(void) { return offsetof(struct { char c; struct s7 x; }, x); }
+size_t offsetof_c1(void) { return offsetof(struct s7, c1); }
+/* size_t offsetof_c2(void) { return offsetof(struct s7, c2); } */
+size_t offsetof_c3(void) { return offsetof(struct s7, c3); }
 
 size_t sizeof_u1(void) { return sizeof(union u1); }
 size_t alignmentof_u1(void) { return offsetof (struct { char c; union u1 x; }, x); }
 size_t sizeof_u2(void) { return sizeof(u2); }
 size_t alignmentof_u2(void) { return offsetof (struct { char c; u2 x; }, x); }
+
 
 bool bool_and(bool l, bool r)
 {

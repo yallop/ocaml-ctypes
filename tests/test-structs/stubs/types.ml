@@ -49,4 +49,13 @@ struct
   let v1 = field s6 "v1" int
   let v2 = field s6 "v2" float
   let () = seal s6
+
+  (* tagless structs *)
+  let s7 : [`s7] structure typ = structure "s7"
+  let c1 = field s7 "c1" int
+  let anon : unit structure typ = structure ""
+  let c2 = field anon "c2" int
+  let () = seal anon
+  let c3 = field s7 "c3" anon
+  let () = seal s7
 end

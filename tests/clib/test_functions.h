@@ -170,6 +170,7 @@ struct s3 { int z1; struct s3 *z2; };
 struct s4 { struct s3 z3; struct s3 *z4; };
 struct s5 { int (*w1)(struct s1 *); };
 typedef struct { int v1; float v2; } s6;
+struct s7 { int c1; struct { int c2; } c3; };
 
 size_t sizeof_s1(void);
 size_t alignmentof_s1(void);
@@ -198,6 +199,12 @@ size_t sizeof_s6(void);
 size_t alignmentof_s6(void);
 size_t offsetof_v1(void);
 size_t offsetof_v2(void);
+
+size_t sizeof_s7(void);
+size_t alignmentof_s7(void);
+size_t offsetof_c1(void);
+size_t offsetof_c2(void);
+size_t offsetof_c3(void);
 
 union u1 { char x1; float x2; double x3; char x4[13]; };
 typedef union { int t1; float t2; } u2;
