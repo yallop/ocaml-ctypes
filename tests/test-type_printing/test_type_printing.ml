@@ -322,6 +322,14 @@ let test_struct_and_union_printing _ =
     let _ = field inner_u "_" int in
     seal inner_u;
 
+    let anon_s = structure "" in
+    let _ = field anon_s "a" int in
+    seal anon_s;
+
+    let anon_u = union "" in
+    let _ = field anon_u "b" int in
+    seal anon_u;
+
     let struct_containing_struct = structure "scs" in
     let _ = field struct_containing_struct "inner" inner_s in
     seal struct_containing_struct;
@@ -333,6 +341,14 @@ let test_struct_and_union_printing _ =
     let struct_containing_union = structure "scu" in
     let _ = field struct_containing_union "scuf" inner_u in
     seal struct_containing_union;
+
+    let struct_containing_anonymous_struct = structure "scas" in
+    let _ = field struct_containing_anonymous_struct "scasf" anon_s in
+    seal struct_containing_anonymous_struct;
+
+    let struct_containing_anonymous_union = structure "scau" in
+    let _ = field struct_containing_anonymous_union "scauf" anon_u in
+    seal struct_containing_anonymous_union;
 
     let union_containing_union = union "ucu" in
     let _ = field union_containing_union "ucuf" inner_u in
@@ -359,6 +375,16 @@ let test_struct_and_union_printing _ =
                               union inner_u ucuf;
                            } g"
       union_containing_union;
+
+    assert_typ_printed_as "struct scas {
+                              struct { int a; } scasf;
+                           }"
+      struct_containing_anonymous_struct;
+
+    assert_typ_printed_as "struct scau {
+                              union { int b; } scauf;
+                           }"
+      struct_containing_anonymous_union;
   end
 
 
