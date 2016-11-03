@@ -257,6 +257,9 @@ struct
     let () =
       assert_equal None (find_month_by_name empty)
 
+    let _ = Ctypes_memory_stubs.use_value
+      [jan; feb; mar; apr; may; jun;
+       jul; aug; sep; oct; nov; dec]
     end in ()
 end
 
