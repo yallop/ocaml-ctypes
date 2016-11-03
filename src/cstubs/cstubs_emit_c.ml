@@ -120,6 +120,8 @@ let rec ccomp fmt : ccomp -> unit = function
   | #cexp as e ->
     fprintf fmt "@[<2>return@;@[%a@]@];" cexp e
   | #ceff as e -> fprintf fmt "@[<2>return@;@[%a@]@];" ceff e
+  | `CAMLparam (xs, c) ->
+    fprintf fmt "@[%a;@]@ %a" camlParam xs ccomp c
   | `Return (Ty Void, _) ->
     fprintf fmt "@[return@];"
   | `Return (Ty ty, e) ->

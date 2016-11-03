@@ -32,6 +32,9 @@ struct
        k v
      | #ceff as e ->
        `Let ((local x ty, e), k (local x ty))
+     | `CAMLparam (xs, c) ->
+	let Ty t = Type_C.ccomp c in
+	`CAMLparam (xs, (c, t) >>= k)
      | `LetConst (y, i, c) ->
        (* let x = (let const y = i in c) in e
           ~>
