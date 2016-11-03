@@ -43,6 +43,24 @@ struct
 
       plus <-@ None;
     end
+
+  (* Access an array exposed as a global value *)
+  let test_retrieving_array _ =
+    let sarr = !@string_array in
+    begin
+      assert_equal "Hello" (CArray.get sarr 0);
+      assert_equal "world" (CArray.get sarr 1);
+    end;
+
+    let iarr = !@int_array in
+    begin
+      let expected_ints = Bigarray.(Array1.create int32 c_layout 5) in
+      for i = 0 to 4 do
+	Bigarray.Array1.set expected_ints i (Int32.of_int i)
+      done;
+      assert_equal expected_ints iarr
+    end
+
 end
 
 
@@ -91,8 +109,14 @@ let suite = "Foreign value tests" >:::
    "global callback function (foreign)"
     >:: Foreign_tests.test_global_callback;
 
+   "retrieving global array (foreign)"
+    >:: Foreign_tests.test_retrieving_array;
+
    "retrieving global struct (stubs)"
     >:: Stub_tests.test_retrieving_struct;
+
+   "retrieving global array (stubs)"
+    >:: Stub_tests.test_retrieving_array;
 
    "global callback function (stubs)"
     >:: Stub_tests.test_global_callback;

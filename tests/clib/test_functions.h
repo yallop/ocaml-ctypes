@@ -251,4 +251,7 @@ float callback_returns_float(float (*f)(void));
 double callback_returns_double(double (*f)(void));
 bool callback_returns_bool(bool (*f)(void));
 
+extern char *string_array[2];
+extern int32_t int_array[5];
+
 #endif /* TEST_FUNCTIONS_H */

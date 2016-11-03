@@ -25,6 +25,9 @@ struct
 
   let sum = F.(foreign "sum_range_with_plus_callback"
                  (int @-> int @-> returning int))
+
+  let string_array = F.(foreign_value "string_array" (array 2 string))
+  let int_array = F.(foreign_value "int_array" (bigarray array1 5 Bigarray.int32))
 end
 
 
