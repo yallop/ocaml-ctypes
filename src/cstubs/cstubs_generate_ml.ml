@@ -453,6 +453,10 @@ let rec pattern_of_typ : type a. a typ -> ml_pat = function
   | View { ty } ->
     static_con "View"
       [`Record [path_of_string "CI.ty", pattern_of_typ ty]]
+  | Array (_, _) ->
+     static_con "Array" [`Underscore; `Underscore]
+  | Bigarray _ ->
+     static_con "Bigarray" [`Underscore]
   | OCaml String ->
     Ctypes_static.unsupported
       "cstubs does not support OCaml strings as global values"
@@ -465,14 +469,6 @@ let rec pattern_of_typ : type a. a typ -> ml_pat = function
   | Abstract _ as ty ->
     internal_error
       "Unexpected abstract type encountered during ML code generation: %s"
-      (Ctypes.string_of_typ ty)
-  | Array _ as ty ->
-    internal_error
-      "Unexpected array type encountered during ML code generation: %s"
-      (Ctypes.string_of_typ ty)
-  | Bigarray _ as ty ->
-    internal_error
-      "Unexpected bigarray type encountered during ML code generation: %s"
       (Ctypes.string_of_typ ty)
 
 type wrapper_state = {
