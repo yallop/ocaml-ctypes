@@ -204,7 +204,7 @@ test-libffi:
 	@echo " For example, if libffi is installed in /opt/local, you can type:"
 	@echo
 	@echo "   export LIBFFI_CFLAGS=-I/opt/local/include"
-	@echo "   export LIBFFI_LIBS=-L/opt/local/lib"
+	@echo "   export LIBFFI_LIBS=\"-L/opt/local/lib -lffi\""
 	@exit 1
 else:
 test-libffi:
