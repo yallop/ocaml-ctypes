@@ -442,43 +442,12 @@ struct
       fprintf fmt "}@\n";
     end
 
-  let rec camlxParam fmt args =
-    match args with
-      [] -> ()
-    | x1 :: [] ->
-      fprintf fmt "@[CAMLxparam1 (%s)@];@\n" x1
-    | x1 :: x2 :: [] ->
-      fprintf fmt "@[CAMLxparam2 (%s, %s)@];@\n" x1 x2
-    | x1 :: x2 :: x3 :: [] ->
-      fprintf fmt "@[CAMLxparam3 (%s, %s, %s)@];@\n" x1 x2 x3
-    | x1 :: x2 :: x3 :: x4 :: [] ->
-      fprintf fmt "@[CAMLxparam4 (%s, %s, %s, %s)@];@\n" x1 x2 x3 x4
-    | x1 :: x2 :: x3 :: x4 :: x5 :: rest ->
-      fprintf fmt "@[CAMLxparam5 (%s, %s, %s, %s, %s)@];@\n" x1 x2 x3 x4 x5;
-      camlxParam fmt rest
-
-  let camlParam fmt args =
-    match args with
-      [] ->
-      fprintf fmt "@[CAMLparam0 ()@];@\n"
-    | x1 :: [] ->
-      fprintf fmt "@[CAMLparam1 (%s)@];@\n" x1
-    | x1 :: x2 :: [] ->
-      fprintf fmt "@[CAMLparam2 (%s, %s)@];@\n" x1 x2
-    | x1 :: x2 :: x3 :: [] ->
-      fprintf fmt "@[CAMLparam3 (%s, %s, %s)@];@\n" x1 x2 x3
-    | x1 :: x2 :: x3 :: x4 :: [] ->
-      fprintf fmt "@[CAMLparam4 (%s, %s, %s, %s)@];@\n" x1 x2 x3 x4
-    | x1 :: x2 :: x3 :: x4 :: x5 :: rest ->
-      fprintf fmt "@[CAMLparam5 (%s, %s, %s, %s, %s)@];@\n" x1 x2 x3 x4 x5;
-      camlxParam fmt rest
-
   let stub ~errno ~stub_name fmt fn args =
     begin
       fprintf fmt "@[value@ %s@;@[(%s)@]@]@;@[<2>{@\n"
         stub_name
         (String.concat ", " (List.map (fun (_, x) -> "value "^ x) args));
-      camlParam fmt (List.map snd args);
+      Cstubs_emit_c.camlParam fmt (List.map snd args);
 
       fprintf fmt "@[LWT_UNIX_INIT_JOB(job,@ %s,@ 0)@];@\n"
         stub_name;
