@@ -700,3 +700,6 @@ GEN_RETURN_F(int64_t)
 GEN_RETURN_F(float)
 GEN_RETURN_F(double)
 GEN_RETURN_F(bool)
+
+char *string_array[2] = { "Hello", "world" };
+int32_t int_array[5] = { 0, 1, 2, 3, 4 };
