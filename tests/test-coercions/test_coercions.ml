@@ -258,7 +258,7 @@ let test_unsupported_coercions _ =
       ListLabels.iter types ~f:(fun (T t1, ts) ->
       ListLabels.iter ts ~f:(fun (T t2) ->
               try 
-                coerce t1 t2;
+                let (_ : _ -> _) = coerce t1 t2 in
                 assert_failure "coercion unexpectedly succeeded"
               with Uncoercible _ -> ()))
   end in ()
