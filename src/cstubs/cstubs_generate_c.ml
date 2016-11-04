@@ -195,7 +195,8 @@ struct
                 release_runtime_system >>
                 `Let ((local x t, e), 
                       acquire_runtime_system >>
-                     (inj t (local x t) :> ccomp))
+                     (((inj t (local x t) :> ccomp), value) >>= fun x ->
+		      `CAMLreturnT (Ty value, x) :> ccomp))
              | `Return_errno, `Sequential -> 
                (`LetAssign (errno,
                            `Int Signed.SInt.zero,
@@ -209,7 +210,8 @@ struct
                            `Let ((local x t, e),
                                  (acquire_runtime_system >>
                                  (inj t (local x t) :> ccomp), value) >>= fun v ->
-                                 (pair_with_errno v :> ccomp))) : ccomp)
+                                 ((pair_with_errno v :> ccomp), value) >>= fun x ->
+				 `CAMLreturnT (Ty value, x))) : ccomp)
            end
          | Function (x, f, t) ->
            begin match prj f (local x value) with
@@ -220,9 +222,12 @@ struct
            end
       in
       let f' = name_params f in
-      `Function (`Fundec (stub_name, value_params f', Ty value),
-                 body [] f',
-                `Extern)
+      let vp = value_params f' in
+      `Function (`Fundec (stub_name, vp, Ty value),
+		 (match concurrency with
+		   `Unlocked -> `CAMLparam(List.map fst vp, body [] f')
+		 | `Sequential -> body [] f'),
+                 `Extern)
 
   let byte_fn : type a. string -> a Ctypes_static.fn -> int -> cfundef =
     fun fname fn nargs ->
