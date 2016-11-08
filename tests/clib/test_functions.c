@@ -410,6 +410,16 @@ void mul_complexd(double complex *l, double complex *r, double complex *out)
   *out = *l * *r;
 }
 
+void add_complexld(long double complex *l, long double complex *r, long double complex *out)
+{
+  *out = *l + *r;
+}
+
+void mul_complexld(long double complex *l, long double complex *r, long double complex *out)
+{
+  *out = *l * *r;
+}
+
 void add_complexf(float complex *l, float complex *r, float complex *out)
 {
   *out = *l + *r;
@@ -418,6 +428,16 @@ void add_complexf(float complex *l, float complex *r, float complex *out)
 void mul_complexf(float complex *l, float complex *r, float complex *out)
 {
   *out = *l * *r;
+}
+
+long double complex add_complexld_val(long double complex l, long double complex r)
+{
+  return l + r;
+}
+
+long double complex mul_complexld_val(long double complex l, long double complex r)
+{
+  return l * r;
 }
 
 double complex add_complexd_val(double complex l, double complex r)

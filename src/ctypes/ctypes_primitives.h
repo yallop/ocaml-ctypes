@@ -43,8 +43,10 @@ enum ctypes_primitive {
   Ctypes_Nativeint,
   Ctypes_Float,
   Ctypes_Double,
+  Ctypes_LDouble,
   Ctypes_Complex32,
-  Ctypes_Complex64
+  Ctypes_Complex64,
+  Ctypes_Complexld,
 };
 
 /* short is at least 16 bits. */

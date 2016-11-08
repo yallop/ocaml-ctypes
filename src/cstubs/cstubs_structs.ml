@@ -169,8 +169,10 @@ let primitive_format_string : type a. a Ctypes_primitive_types.prim -> string =
     (* Integer constant expressions cannot have non-integer type *)
     | Complex32, _ -> fail ()
     | Complex64, _ -> fail ()
+    | Complexld, _ -> fail ()
     | Float, _ -> fail ()
     | Double, _ -> fail ()
+    | LDouble, _ -> fail ()
 
 let rec ml_pat_and_exp_of_typ : type a. a typ -> string * string =
   fun ty -> 

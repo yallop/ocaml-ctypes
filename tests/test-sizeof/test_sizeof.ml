@@ -28,6 +28,9 @@ let test_sizeof_primitives _ = begin
   assert_bool "sizeof (float) <= sizeof (double)"
     (sizeof float <= sizeof double);
 
+  assert_bool "sizeof (double) <= sizeof (long double)"
+    (sizeof double <= sizeof ldouble);
+
   assert_bool "sizeof (short) <= sizeof (int)"
     (sizeof short <= sizeof int);
 
@@ -36,6 +39,9 @@ let test_sizeof_primitives _ = begin
 
   assert_bool "sizeof (long) <= sizeof (long long)"
     (sizeof long <= sizeof llong);
+
+  assert_bool "sizeof (double complex) <= sizeof (long double complex)"
+    (sizeof complex64 <= sizeof complexld);
 
   assert_equal ~msg:"2 * sizeof (int32_t) == sizeof (int64_t)"
     (2 * sizeof int32_t) (sizeof int64_t);

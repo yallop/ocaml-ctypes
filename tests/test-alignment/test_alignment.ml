@@ -51,6 +51,9 @@ let test_primitive_alignment _ = begin
 
   assert_equal ~msg:"alignmentof(complex64) == alignmentof(double)"
     (alignment complex64) (alignment double);
+
+  assert_equal ~msg:"alignmentof(complexld) == alignmentof(ldouble)"
+    (alignment complexld) (alignment ldouble);
 end
 
 

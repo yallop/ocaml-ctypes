@@ -205,6 +205,12 @@ let test_unsupported_coercions _ =
        T (structure "s"); T (union "u");
        T (abstract ~name:"a" ~size:12 ~alignment:4)];
 
+      T ldouble,
+      [T int8_t; T uint16_t; T int; T short; T complex64;
+       T (bigarray array1 10 Bigarray.int32); T (array 5 int32_t);
+       T (structure "s"); T (union "u");
+       T (abstract ~name:"a" ~size:12 ~alignment:4)];
+
       T short,
       [T uint16_t; T float; T complex64; T (bigarray array1 10 Bigarray.int32);
        T (array 5 int32_t); T (structure "s"); T (union "u");
@@ -212,6 +218,12 @@ let test_unsupported_coercions _ =
 
       T complex64,
       [T int8_t; T uint16_t; T int; T float; T short;
+       T (bigarray array1 10 Bigarray.int32); T (array 5 int32_t);
+       T (structure "s"); T (union "u");
+       T (abstract ~name:"a" ~size:12 ~alignment:4)];
+
+      T complexld,
+      [T int8_t; T uint16_t; T int; T short; 
        T (bigarray array1 10 Bigarray.int32); T (array 5 int32_t);
        T (structure "s"); T (union "u");
        T (abstract ~name:"a" ~size:12 ~alignment:4)];

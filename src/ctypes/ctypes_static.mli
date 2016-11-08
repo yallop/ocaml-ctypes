@@ -116,8 +116,10 @@ val char : char typ
 val schar : int typ
 val float : float typ
 val double : float typ
+val ldouble : Ldouble.t typ
 val complex32 : Complex.t typ
 val complex64 : Complex.t typ
+val complexld : Ldouble.complex typ
 val short : int typ
 val int : int typ
 val sint : Signed.sint typ

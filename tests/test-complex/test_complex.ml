@@ -35,6 +35,8 @@ struct
     and mulz64 = wrap complex64 mul_complexd
     and addz32 = wrap complex32 add_complexf
     and mulz32 = wrap complex32 mul_complexf
+    and addzld = wrap complexld add_complexld
+    and mulzld = wrap complexld mul_complexld
     in
 
     begin
@@ -55,6 +57,17 @@ struct
 
       assert_equal ~cmp:complex32_eq (Complex.add l r) (addz32 l r);
       assert_equal ~cmp:complex32_eq (Complex.mul l r) (mulz32 l r);
+
+      (* test long double complex *)
+      let re x = Ldouble.(to_float (real x)) in
+      let im x = Ldouble.(to_float (imag x)) in
+      let to_complexld c = Ldouble.(complex (of_float c.re) (of_float c.im)) in
+      let of_complexld c = { re = re c; im = im c } in
+
+      let l', r' = to_complexld l, to_complexld r in
+      assert_equal ~cmp:complex64_eq (Complex.add l r) (of_complexld @@ addzld l' r');
+      assert_equal ~cmp:complex64_eq (Complex.mul l r) (of_complexld @@ mulzld l' r');
+
     end
 end
 
@@ -89,6 +102,16 @@ struct
 
       assert_equal ~cmp:complex32_eq (Complex.add l r) (add_complexf_val l r);
       assert_equal ~cmp:complex32_eq (Complex.mul l r) (mul_complexf_val l r);
+
+      (* test long double complex *)
+      let re x = Ldouble.(to_float (real x)) in
+      let im x = Ldouble.(to_float (imag x)) in
+      let to_complexld c = Ldouble.(complex (of_float c.re) (of_float c.im)) in
+      let of_complexld c = { re = re c; im = im c } in
+
+      let l', r' = to_complexld l, to_complexld r in
+      assert_equal ~cmp:complex64_eq (Complex.add l r) (of_complexld @@ add_complexld_val l' r');
+      assert_equal ~cmp:complex64_eq (Complex.mul l r) (of_complexld @@ mul_complexld_val l' r');
     end
 end
 

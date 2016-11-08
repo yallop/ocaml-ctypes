@@ -39,13 +39,17 @@ type _ prim =
  | Nativeint : nativeint prim
  | Float : float prim
  | Double : float prim
+ | LDouble : Ldouble.t prim
  | Complex32 : Complex.t prim
  | Complex64 : Complex.t prim
+ | Complexld : Ldouble.complex prim
 
 type _ ml_prim = 
   | ML_char :  char ml_prim
   | ML_complex :  Complex.t ml_prim
+  | ML_complexld :  Ldouble.complex ml_prim
   | ML_float :  float ml_prim
+  | ML_ldouble :  Ldouble.t ml_prim
   | ML_int :  int ml_prim
   | ML_int32 :  int32 ml_prim
   | ML_int64 :  int64 ml_prim

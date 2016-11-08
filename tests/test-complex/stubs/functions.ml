@@ -19,6 +19,8 @@ struct
 
   let add_complexd = bind complex64 "add_complexd"
   let mul_complexd = bind complex64 "mul_complexd"
+  let add_complexld = bind complexld "add_complexld"
+  let mul_complexld = bind complexld "mul_complexld"
   let add_complexf = bind complex32 "add_complexf"
   let mul_complexf = bind complex32 "mul_complexf"
 end
@@ -32,6 +34,8 @@ struct
 
   let add_complexd_val = bind complex64 "add_complexd_val"
   let mul_complexd_val = bind complex64 "mul_complexd_val"
+  let add_complexld_val = bind complexld "add_complexld_val"
+  let mul_complexld_val = bind complexld "mul_complexld_val"
   let add_complexf_val = bind complex32 "add_complexf_val"
   let mul_complexf_val = bind complex32 "mul_complexf_val"
 end

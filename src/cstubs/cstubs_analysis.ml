@@ -48,7 +48,9 @@ type _ alloc =
 | Alloc_uint64_t : Unsigned.uint64 alloc
 | Alloc_nativeint : nativeint alloc
 | Alloc_float : float alloc
+| Alloc_ldouble : Ldouble.t alloc
 | Alloc_complex : Complex.t alloc
+| Alloc_complexld : Ldouble.complex alloc
 | Alloc_pointer : (_, _) pointer alloc
 | Alloc_funptr : _ static_funptr alloc
 | Alloc_structured : (_, _) structured alloc
@@ -86,8 +88,10 @@ let primitive_allocation : type a. a Ctypes_primitive_types.prim -> a allocation
  | Nativeint -> `Alloc Alloc_nativeint
  | Float -> `Alloc Alloc_float
  | Double -> `Alloc Alloc_float
+ | LDouble -> `Alloc Alloc_ldouble
  | Complex32 -> `Alloc Alloc_complex
  | Complex64 -> `Alloc Alloc_complex
+ | Complexld -> `Alloc Alloc_complexld
 
 let rec allocation : type a. a typ -> a allocation = function
  | Void -> `Noalloc Noalloc_unit
