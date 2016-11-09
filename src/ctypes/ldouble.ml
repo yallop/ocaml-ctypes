@@ -10,6 +10,12 @@ type t
 external to_float : t -> float = "ctypes_ldouble_to_float"
 external of_float : float -> t = "ctypes_ldouble_of_float"
 
+let zero = of_int 0
+let one = of_int 1
+
+external size_ : unit -> (int * int) = "ctypes_ldouble_size"
+let byte_sizes = size_ ()
+
 type complex
 
 external real : complex -> t = "ctypes_ldouble_complex_real"
