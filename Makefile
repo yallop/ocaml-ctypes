@@ -15,6 +15,7 @@ BASE_PROJECTS=configure libffi-abigen configured ctypes ctypes-top
 FOREIGN_PROJECTS=test-libffi ctypes-foreign-base ctypes-foreign-threaded ctypes-foreign-unthreaded
 STUB_PROJECTS=cstubs
 PROJECTS=$(BASE_PROJECTS) $(FOREIGN_PROJECTS) $(STUB_PROJECTS)
+DEP_DIRS=$(foreach project,$(PROJECTS),$($(project).dir))
 GENERATED=src/ctypes/ctypes_primitives.ml	\
           src/ctypes-foreign-base/libffi_abi.ml \
           src/ctypes-foreign-base/dl.ml		\
@@ -154,7 +155,7 @@ asneeded.config:
 
 # dependencies
 depend: configure
-	$(OCAMLDEP) $(foreach project,$(PROJECTS),-I $($(project).dir)) \
+	$(OCAMLDEP) $(foreach dir,$(DEP_DIRS),-I $(dir)) \
             $(shell find src examples -name '*.mli' -o -name '*.ml') \
            | sed "s!src/!_build/src/!g; s!examples/!_build/examples/!g" > .depend
 
