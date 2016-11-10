@@ -19,6 +19,8 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <float.h>
+#include <math.h>
 #include <complex.h>
 
 #include "ctypes_ldouble_stubs.h"
@@ -105,20 +107,157 @@ value ctypes_copy_ldouble(long double u)
   return res;
 }
 
-long double ctypes_ldouble_val(value v) {
-  return ldouble_custom_val(v);
+long double ctypes_ldouble_val(value v) { return ldouble_custom_val(v); }
+
+CAMLprim value ctypes_ldouble_of_float(value a) { 
+  CAMLparam1(a); 
+  CAMLreturn(ctypes_copy_ldouble(Double_val(a))); 
+}
+CAMLprim value ctypes_ldouble_to_float(value a) { 
+  CAMLparam1(a); 
+  CAMLreturn(caml_copy_double(ldouble_custom_val(a))); 
+}
+CAMLprim value ctypes_ldouble_of_int(value a) { 
+  CAMLparam1(a); 
+  CAMLreturn(ctypes_copy_ldouble(Int_val(a))); 
+}
+CAMLprim value ctypes_ldouble_to_int(value a) { 
+  CAMLparam1(a); 
+  CAMLreturn(Val_int(ldouble_custom_val(a))); 
 }
 
-/* of_double : float -> t */
-value ctypes_ldouble_of_float(value a)
-{
-  return ctypes_copy_ldouble(Double_val(a));
+#define OP2(OPNAME, OP)                                                               \
+  CAMLprim value ctypes_ldouble_ ## OPNAME(value a, value b) {                        \
+    CAMLparam2(a, b);                                                                 \
+    CAMLreturn(ctypes_copy_ldouble( ldouble_custom_val(a) OP ldouble_custom_val(b))); \
+  }
+
+OP2(add, +)
+OP2(sub, -)
+OP2(mul, *)
+OP2(div, /)
+
+value ctypes_ldouble_neg(value a) { return ctypes_copy_ldouble( - ldouble_custom_val(a) ); }
+
+#define FN1(OP)                                               \
+  value ctypes_ldouble_ ## OP (value a) {                     \
+    return ctypes_copy_ldouble( OP (ldouble_custom_val(a)) ); \
+  }
+
+#define FN2(OP)                                                                      \
+  value ctypes_ldouble_ ## OP (value a, value b) {                                   \
+    return ctypes_copy_ldouble( OP (ldouble_custom_val(a), ldouble_custom_val(b)) ); \
+  }
+
+FN2(powl)
+FN1(sqrtl)
+FN1(expl)
+FN1(logl)
+FN1(log10l)
+FN1(expm1l)
+FN1(log1pl)
+FN1(cosl)
+FN1(sinl)
+FN1(tanl)
+FN1(acosl)
+FN1(asinl)
+FN1(atanl)
+FN2(atan2l)
+FN2(hypotl)
+FN1(coshl)
+FN1(sinhl)
+FN1(tanhl)
+FN1(acoshl)
+FN1(asinhl)
+FN1(atanhl)
+FN1(ceill)
+FN1(floorl)
+FN1(fabsl)
+FN2(remainderl)
+FN2(copysignl)
+
+value ctypes_ldouble_frexp(value v) {
+  long double f = ldouble_custom_val(v);
+  value r = caml_alloc_tuple(2);
+  int ri;
+  long double rf = frexpl(f, &ri);
+  Field(r,0) = ctypes_copy_ldouble(rf);
+  Field(r,1) = Val_int(ri);
+  return r;
 }
 
-/* to_double : t -> float */
-value ctypes_ldouble_to_float(value a)
-{
-  return caml_copy_double(ldouble_custom_val(a));
+value ctypes_ldouble_ldexp(value vf, value vi) {
+  long double f = ldouble_custom_val(vf);
+  int i = Int_val(vi);
+  long double rf = ldexpl(f, i);
+  return ctypes_copy_ldouble(rf);
+}
+
+value ctypes_ldouble_modf(value v) {
+  long double f = ldouble_custom_val(v);
+  value r = caml_alloc_tuple(2);
+  long double rf2;
+  long double rf1 = modfl(f, &rf2);
+  Field(r,0) = ctypes_copy_ldouble(rf1);
+  Field(r,1) = ctypes_copy_ldouble(rf2);
+  return r;
+}
+
+enum {
+  ml_FP_NORMAL = 0,
+  ml_FP_SUBNORMAL,
+  ml_FP_ZERO,
+  ml_FP_INFINITE,
+  ml_FP_NAN,
+};
+
+value ctypes_ldouble_classify(value v){
+  long double f = ldouble_custom_val(v);
+  switch (fpclassify(f)){
+  case FP_NORMAL    : return Val_int(ml_FP_NORMAL);
+  case FP_SUBNORMAL : return Val_int(ml_FP_SUBNORMAL);
+  case FP_ZERO      : return Val_int(ml_FP_ZERO);
+  case FP_INFINITE  : return Val_int(ml_FP_INFINITE);
+  case FP_NAN       : 
+  default: return Val_int(ml_FP_NAN);
+  }
+}
+
+static char *format_ldouble(char *fmt, long double d) {
+  static size_t buf_len = 10;
+  static char *buf = NULL;
+  static char *empty = "";
+  size_t print_len = 0;
+
+  // allocate initial string
+  if (buf == NULL) buf = malloc(buf_len);
+  if (buf == NULL) return empty; // oops...stuck
+
+  // try to print
+  print_len = snprintf(buf, buf_len, fmt, d);
+
+  // not enough space - reallocate and try again
+  if (print_len >= buf_len) {
+    // re-allocate string
+    if (buf) free(buf);
+    buf = malloc(print_len+1);
+    buf_len = print_len+1;
+    // try again
+    return format_ldouble(fmt, d);
+  } else 
+    // ok
+    return buf;
+}
+
+value ctypes_ldouble_format(value fmt, value d) {
+  return caml_copy_string( format_ldouble( String_val(fmt), ldouble_custom_val(d) ) );
+}
+
+value ctypes_ldouble_of_string(value v) {
+  char *str = String_val(v);
+  char *end = str + caml_string_length(v);
+  long double r = strtold(str, &end);
+  return ctypes_copy_ldouble(r);
 }
 
 value ctypes_ldouble_min(void) { return ctypes_copy_ldouble(-LDBL_MAX); }

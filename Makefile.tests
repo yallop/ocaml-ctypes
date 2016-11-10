@@ -1147,6 +1147,13 @@ tests/test-closure-type-promotion/generated_stubs.c: $(BUILDDIR)/test-closure-ty
 tests/test-closure-type-promotion/generated_bindings.ml: $(BUILDDIR)/test-closure-type-promotion-stub-generator.$(BEST)
 	$< --ml-file $@
 
+test-ldouble.dir = tests/test-ldouble
+test-ldouble.threads = yes
+test-ldouble.deps = str bigarray oUnit bytes
+test-ldouble.subproject_deps = ctypes 
+test-ldouble: PROJECT=test-ldouble
+test-ldouble: $$(BEST_TARGET)
+
 TESTS =
 TESTS += test-raw
 TESTS += test-pointers-stubs test-pointers-stub-generator test-pointers-generated test-pointers
@@ -1188,6 +1195,7 @@ TESTS += test-returning-errno-lwt-preemptive-stubs test-returning-errno-lwt-pree
 TESTS += test-returning-errno-stubs test-returning-errno-stub-generator test-returning-errno-generated test-returning-errno
 TESTS += test-closure-type-promotion-stubs test-closure-type-promotion-stub-generator test-closure-type-promotion-generated test-closure-type-promotion
 TESTS += test-threads-stubs test-threads-stub-generator test-threads-generated test-threads
+TESTS += test-ldouble
 
 ifneq (,$(filter mingw%,$(OSYSTEM)))
 WINLDFLAGS=-Wl,--out-implib,libtest_functions.dll.a

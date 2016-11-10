@@ -65,3 +65,5 @@ let format_time_t fmt v =
   Ctypes.format PosixTypes.time_t fmt v
 let format_useconds_t fmt v =
   Ctypes.format PosixTypes.useconds_t fmt v
+let format_ldouble fmt v = 
+  Format.fprintf fmt "<ldouble %s>" (Ldouble.to_string v)
