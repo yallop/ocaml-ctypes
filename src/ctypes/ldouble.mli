@@ -176,8 +176,80 @@ val byte_sizes : int * int
     (unused bytes may contain undefined values) *)
 
 type complex
+(** The type of long double complex values *)
 
-val real : complex -> t 
-val imag : complex -> t 
-val complex : t -> t -> complex 
+module Complex : sig
+
+  val make : t -> t -> complex 
+  (** [make x y] creates the long double complex value [x + y * i] *)
+
+  val of_complex : Complex.t -> complex
+  (** create a long double complex from a Complex.t *)
+
+  val to_complex : complex -> Complex.t 
+  (** convert a long double complex to a Complex.t *)
+
+  val zero : complex
+  (** [0 + i0] *)
+
+  val one : complex
+  (** [1 + i0] *)
+
+  val i : complex
+  (** [0 + i] *)
+
+  val re : complex -> t 
+  (** return the real part of the long double complex *)
+
+  val im : complex -> t 
+  (** return the imaginary part of the long double complex *)
+
+  val neg : complex -> complex
+  (** Unary negation *)
+
+  val conj : complex -> complex
+  (** Conjugate: given the complex [x + i.y], returns [x - i.y]. *) 
+
+  val add : complex -> complex -> complex
+  (** Addition *)
+  
+  val sub : complex -> complex -> complex
+  (** Subtraction *)
+  
+  val mul : complex -> complex -> complex
+  (** Multiplication *)
+  
+  val div : complex -> complex -> complex
+  (** Division *)
+  
+  val inv : complex -> complex
+  (** Multiplicative inverse ([1/z]). *)
+  
+  val sqrt : complex -> complex
+  (** Square root. *)
+  
+  val norm2 : complex -> t
+  (** Norm squared: given [x + i.y], returns [x^2 + y^2]. *)
+
+  val norm : complex -> t
+  (** Norm: given [x + i.y], returns [sqrt(x^2 + y^2)]. *)
+
+  val polar : t -> t -> complex
+  (** [polar norm arg] returns the complex having norm [norm] and argument [arg]. *)
+
+  val arg : complex -> t
+  (** Argument.  The argument of a complex number is the angle
+      in the complex plane between the positive real axis and a line
+      passing through zero and the number. *)
+
+  val exp : complex -> complex 
+  (** Exponentiation.  [exp z] returns [e] to the [z] power. *)
+  
+  val log : complex -> complex 
+  (** Natural logarithm (in base [e]). *)
+  
+  val pow : complex -> complex -> complex
+  (** Power function.  [pow z1 z2] returns [z1] to the [z2] power. *)
+
+end
 

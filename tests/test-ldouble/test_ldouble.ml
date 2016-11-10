@@ -1,3 +1,10 @@
+(*
+ * Copyright (c) 2016 Andy Ray.
+ *
+ * This file is distributed under the terms of the MIT License.
+ * See the file LICENSE for details.
+ *)
+
 open OUnit2
 open Ctypes
 
@@ -16,7 +23,11 @@ let op2 f a b = Ldouble.(to_float (f (of_float a) (of_float b)))
 let chk_float x y = 
   match classify_float x, classify_float y with
   | FP_normal, FP_normal 
-  | FP_subnormal, FP_subnormal -> abs_float (x -. y) < 1e-12
+  | FP_subnormal, FP_subnormal 
+  | FP_zero, FP_normal
+  | FP_zero, FP_subnormal
+  | FP_normal, FP_zero
+  | FP_subnormal, FP_zero -> abs_float (x -. y) < 1e-12
   | x, y when x=y -> true (* infinite, zero, nan *)
   | _ -> false
 
@@ -48,6 +59,7 @@ let test_op1 _ =
   let assert_chk1 n f l = 
     List.iter (fun a -> assert_bool n @@ chk1 f l a) flts
   in
+  assert_chk1 "neg" (fun x -> -. x) Ldouble.neg;
   assert_chk1 "sqrt" sqrt Ldouble.sqrt;
   assert_chk1 "exp" exp Ldouble.exp;
   assert_chk1 "log" log Ldouble.log;
@@ -106,7 +118,60 @@ let test_conv _ =
   assert_bool "to_int" (-34 = Ldouble.(to_int (of_float (-34.999))));
   assert_bool "of_string" (3.5 = Ldouble.(to_float (of_string "3.5")));
   assert_bool "to_string" ("3.500000" = Ldouble.(to_string (of_float 3.5)))
-  
+
+let test_complex _ = 
+  let module C = Complex in
+  let cplx = 
+    [
+      { C.re = 2.9;    im = 4.26 };
+      { C.re = 0.32;   im = -7.6 };
+      { C.re = -35.1;  im = 12.3 };
+      { C.re = -0.002; im = -9.1 };
+    ]
+  in
+  let chk_complex ?(prec=1e-12) x y = C.norm (C.sub x y) < prec in
+  let assert_chk2 ?prec name opc opl = 
+    List.iter (fun a -> List.iter (fun b -> 
+      let open Ldouble.Complex in
+      assert_bool name (chk_complex ?prec (opc a b) (to_complex (opl (of_complex a) (of_complex b))))
+    ) cplx) cplx
+  in
+  let assert_chk1 ?prec name opc opl = 
+    List.iter (fun a -> 
+      let open Ldouble.Complex in
+      assert_bool name (chk_complex ?prec (opc a) (to_complex (opl (of_complex a))))
+    ) cplx
+  in
+  let assert_chkf ?prec name opc opl = 
+    List.iter (fun a -> 
+      let open Ldouble.Complex in
+      assert_bool name (chk_float (opc a) (Ldouble.to_float (opl (of_complex a))))
+    ) cplx
+  in
+  let assert_polar () = 
+    let open Ldouble.Complex in
+    assert_bool "polar" 
+      (chk_complex (C.polar 3.4 1.2) 
+         (to_complex (polar (Ldouble.of_float 3.4) (Ldouble.of_float 1.2))))
+  in
+
+  assert_chk2 "add" C.add Ldouble.Complex.add;
+  assert_chk2 "sub" C.sub Ldouble.Complex.sub;
+  assert_chk2 "mul" C.mul Ldouble.Complex.mul;
+  assert_chk2 "div" C.div Ldouble.Complex.div;
+  (* fairly large accrue here, so reduce precision *)
+  assert_chk2 "pow" ~prec:1e-3 C.pow Ldouble.Complex.pow;
+  assert_chk1 "neg" C.neg Ldouble.Complex.neg;
+  assert_chk1 "conj" C.conj Ldouble.Complex.conj;
+  assert_chk1 "inv" C.inv Ldouble.Complex.inv;
+  assert_chk1 "sqrt" C.sqrt Ldouble.Complex.sqrt;
+  assert_chk1 "exp" C.exp Ldouble.Complex.exp;
+  assert_chk1 "log" C.log Ldouble.Complex.log;
+  assert_chkf "norm2" C.norm2 Ldouble.Complex.norm2;
+  assert_chkf "norm" C.norm Ldouble.Complex.norm;
+  assert_chkf "arg" C.arg Ldouble.Complex.arg;
+  assert_polar ()
+
 let suite = "Ldouble tests" >:::
   [
     "test functions with 2 args" >:: test_op2;
@@ -114,6 +179,7 @@ let suite = "Ldouble tests" >:::
     "test functions with weird args" >:: test_opw;
     "test classify" >:: test_classify;
     "test conversion" >:: test_conv;
+    "test complex api" >:: test_complex;
   ]
 
 let _ = run_test_tt_main suite

@@ -31,7 +31,8 @@ let printers = [ "Ctypes_printers.format_typ";
                  "Ctypes_printers.format_ssize_t";
                  "Ctypes_printers.format_time_t";
                  "Ctypes_printers.format_useconds_t";
-                 "Ctypes_printers.format_ldouble";]
+                 "Ctypes_printers.format_ldouble";
+                 "Ctypes_printers.format_complexld";]
 
 let eval_string
       ?(print_outcome = false) ?(err_formatter = Format.err_formatter) str =

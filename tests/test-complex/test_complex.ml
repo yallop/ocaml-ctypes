@@ -59,9 +59,9 @@ struct
       assert_equal ~cmp:complex32_eq (Complex.mul l r) (mulz32 l r);
 
       (* test long double complex *)
-      let re x = Ldouble.(to_float (real x)) in
-      let im x = Ldouble.(to_float (imag x)) in
-      let to_complexld c = Ldouble.(complex (of_float c.re) (of_float c.im)) in
+      let re x = Ldouble.(to_float (Complex.re x)) in
+      let im x = Ldouble.(to_float (Complex.im x)) in
+      let to_complexld c = Ldouble.(Complex.make (of_float c.re) (of_float c.im)) in
       let of_complexld c = { re = re c; im = im c } in
 
       let l', r' = to_complexld l, to_complexld r in
@@ -104,9 +104,9 @@ struct
       assert_equal ~cmp:complex32_eq (Complex.mul l r) (mul_complexf_val l r);
 
       (* test long double complex *)
-      let re x = Ldouble.(to_float (real x)) in
-      let im x = Ldouble.(to_float (imag x)) in
-      let to_complexld c = Ldouble.(complex (of_float c.re) (of_float c.im)) in
+      let re x = Ldouble.(to_float (Complex.re x)) in
+      let im x = Ldouble.(to_float (Complex.im x)) in
+      let to_complexld c = Ldouble.(Complex.make (of_float c.re) (of_float c.im)) in
       let of_complexld c = { re = re c; im = im c } in
 
       let l', r' = to_complexld l, to_complexld r in

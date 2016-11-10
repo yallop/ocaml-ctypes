@@ -67,3 +67,7 @@ let format_useconds_t fmt v =
   Ctypes.format PosixTypes.useconds_t fmt v
 let format_ldouble fmt v = 
   Format.fprintf fmt "<ldouble %s>" (Ldouble.to_string v)
+let format_complexld fmt v = 
+  Format.fprintf fmt "<complexld %s + %si>" 
+    (Ldouble.to_string (Ldouble.Complex.re v))
+    (Ldouble.to_string (Ldouble.Complex.im v))

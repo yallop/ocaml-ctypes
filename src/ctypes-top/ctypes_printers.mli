@@ -38,3 +38,4 @@ val format_ssize_t : formatter -> PosixTypes.ssize_t -> unit
 val format_time_t : formatter -> PosixTypes.time_t -> unit
 val format_useconds_t : formatter -> PosixTypes.useconds_t -> unit
 val format_ldouble : formatter -> Ldouble.t -> unit
+val format_complexld : formatter -> Ldouble.complex -> unit

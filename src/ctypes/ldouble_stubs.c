@@ -137,16 +137,21 @@ OP2(sub, -)
 OP2(mul, *)
 OP2(div, /)
 
-value ctypes_ldouble_neg(value a) { return ctypes_copy_ldouble( - ldouble_custom_val(a) ); }
+CAMLprim value ctypes_ldouble_neg(value a) { 
+  CAMLparam1(a);
+  CAMLreturn(ctypes_copy_ldouble( - ldouble_custom_val(a))); 
+}
 
-#define FN1(OP)                                               \
-  value ctypes_ldouble_ ## OP (value a) {                     \
-    return ctypes_copy_ldouble( OP (ldouble_custom_val(a)) ); \
+#define FN1(OP)                                                   \
+  CAMLprim value ctypes_ldouble_ ## OP (value a) {                \
+    CAMLparam1(a);                                                \
+    CAMLreturn(ctypes_copy_ldouble( OP (ldouble_custom_val(a)))); \
   }
 
-#define FN2(OP)                                                                      \
-  value ctypes_ldouble_ ## OP (value a, value b) {                                   \
-    return ctypes_copy_ldouble( OP (ldouble_custom_val(a), ldouble_custom_val(b)) ); \
+#define FN2(OP)                                                                          \
+  CAMLprim value ctypes_ldouble_ ## OP (value a, value b) {                              \
+    CAMLparam2(a, b);                                                                    \
+    CAMLreturn(ctypes_copy_ldouble( OP (ldouble_custom_val(a), ldouble_custom_val(b)))); \
   }
 
 FN2(powl)
@@ -176,31 +181,44 @@ FN1(fabsl)
 FN2(remainderl)
 FN2(copysignl)
 
-value ctypes_ldouble_frexp(value v) {
+#undef OP2
+#undef FN1
+#undef FN2
+
+CAMLprim value ctypes_ldouble_frexp(value v) {
+  CAMLparam1(v);
+  CAMLlocal2(r, rfv);
   long double f = ldouble_custom_val(v);
-  value r = caml_alloc_tuple(2);
   int ri;
-  long double rf = frexpl(f, &ri);
-  Field(r,0) = ctypes_copy_ldouble(rf);
-  Field(r,1) = Val_int(ri);
-  return r;
+  long double rf;
+  r = caml_alloc_tuple(2);
+  rf = frexpl(f, &ri);
+  rfv = ctypes_copy_ldouble(rf);
+  Store_field(r,0, rfv);
+  Store_field(r,1, Val_int(ri));
+  CAMLreturn(r);
 }
 
-value ctypes_ldouble_ldexp(value vf, value vi) {
+CAMLprim value ctypes_ldouble_ldexp(value vf, value vi) {
+  CAMLparam2(vf, vi);
+  CAMLlocal1(r);
   long double f = ldouble_custom_val(vf);
   int i = Int_val(vi);
   long double rf = ldexpl(f, i);
-  return ctypes_copy_ldouble(rf);
+  r = ctypes_copy_ldouble(rf);
+  CAMLreturn(r);
 }
 
-value ctypes_ldouble_modf(value v) {
+CAMLprim value ctypes_ldouble_modf(value v) {
+  CAMLparam1(v);
+  CAMLlocal1(r);
   long double f = ldouble_custom_val(v);
-  value r = caml_alloc_tuple(2);
   long double rf2;
   long double rf1 = modfl(f, &rf2);
-  Field(r,0) = ctypes_copy_ldouble(rf1);
-  Field(r,1) = ctypes_copy_ldouble(rf2);
-  return r;
+  r = caml_alloc_tuple(2);
+  Store_field(r, 0, ctypes_copy_ldouble(rf1));
+  Store_field(r, 1, ctypes_copy_ldouble(rf2));
+  CAMLreturn(r);
 }
 
 enum {
@@ -211,16 +229,19 @@ enum {
   ml_FP_NAN,
 };
 
-value ctypes_ldouble_classify(value v){
+CAMLprim value ctypes_ldouble_classify(value v){
+  CAMLparam1(v);
+  CAMLlocal1(r);
   long double f = ldouble_custom_val(v);
   switch (fpclassify(f)){
-  case FP_NORMAL    : return Val_int(ml_FP_NORMAL);
-  case FP_SUBNORMAL : return Val_int(ml_FP_SUBNORMAL);
-  case FP_ZERO      : return Val_int(ml_FP_ZERO);
-  case FP_INFINITE  : return Val_int(ml_FP_INFINITE);
+  case FP_NORMAL    : r = Val_int(ml_FP_NORMAL); break;
+  case FP_SUBNORMAL : r = Val_int(ml_FP_SUBNORMAL); break;
+  case FP_ZERO      : r = Val_int(ml_FP_ZERO); break;
+  case FP_INFINITE  : r = Val_int(ml_FP_INFINITE); break;
   case FP_NAN       : 
-  default: return Val_int(ml_FP_NAN);
+  default           : r = Val_int(ml_FP_NAN); break;
   }
+  CAMLreturn(r);
 }
 
 static char *format_ldouble(char *fmt, long double d) {
@@ -249,15 +270,17 @@ static char *format_ldouble(char *fmt, long double d) {
     return buf;
 }
 
-value ctypes_ldouble_format(value fmt, value d) {
-  return caml_copy_string( format_ldouble( String_val(fmt), ldouble_custom_val(d) ) );
+CAMLprim value ctypes_ldouble_format(value fmt, value d) {
+  CAMLparam2(fmt, d);
+  CAMLreturn(caml_copy_string(format_ldouble( String_val(fmt), ldouble_custom_val(d))));
 }
 
-value ctypes_ldouble_of_string(value v) {
+CAMLprim value ctypes_ldouble_of_string(value v) {
+  CAMLparam1(v);
   char *str = String_val(v);
   char *end = str + caml_string_length(v);
   long double r = strtold(str, &end);
-  return ctypes_copy_ldouble(r);
+  CAMLreturn(ctypes_copy_ldouble(r));
 }
 
 value ctypes_ldouble_min(void) { return ctypes_copy_ldouble(-LDBL_MAX); }
@@ -314,20 +337,64 @@ long double complex ctypes_ldouble_complex_val(value v) {
 }
 
 /* make : t -> t -> complex */
-value ctypes_ldouble_complex_make(value r, value i) {
+CAMLprim value ctypes_ldouble_complex_make(value r, value i) {
+  CAMLparam2(r, i);
   long double re = ldouble_custom_val(r);
   long double im = ldouble_custom_val(i);
-  return ctypes_copy_ldouble_complex(re + (im * I));
+  CAMLreturn(ctypes_copy_ldouble_complex(re + (im * I)));
 }
 
 /* real : complex -> t */
-value ctypes_ldouble_complex_real(value v) {
-  return ctypes_copy_ldouble(creall(ldouble_complex_custom_val(v)));
+CAMLprim value ctypes_ldouble_complex_real(value v) {
+  CAMLparam1(v);
+  CAMLreturn(ctypes_copy_ldouble(creall(ldouble_complex_custom_val(v))));
 }
 
-/* image : complex -> t */
-value ctypes_ldouble_complex_imag(value v) {
-  return ctypes_copy_ldouble(cimagl(ldouble_complex_custom_val(v)));
+/* imag : complex -> t */
+CAMLprim value ctypes_ldouble_complex_imag(value v) {
+  CAMLparam1(v);
+  CAMLreturn(ctypes_copy_ldouble(cimagl(ldouble_complex_custom_val(v))));
+}
+
+#define OP2(OPNAME, OP)                                                    \
+  CAMLprim value ctypes_ldouble_complex_ ## OPNAME(value a, value b) {     \
+    CAMLparam2(a, b);                                                      \
+    CAMLreturn(ctypes_copy_ldouble_complex(                                \
+        ldouble_complex_custom_val(a) OP ldouble_complex_custom_val(b) )); \
+  }
+
+OP2(add, +)
+OP2(sub, -)
+OP2(mul, *)
+OP2(div, /)
+
+CAMLprim value ctypes_ldouble_complex_neg(value a) {
+  CAMLparam1(a);
+  CAMLreturn(ctypes_copy_ldouble_complex( - ldouble_complex_custom_val(a) )); 
+}
+
+#define FN1(OP)                                                                   \
+  CAMLprim value ctypes_ldouble_complex_ ## OP (value a) {                        \
+    CAMLparam1(a);                                                                \
+    CAMLreturn(ctypes_copy_ldouble_complex( OP (ldouble_complex_custom_val(a)))); \
+  }
+
+#define FN2(OP)                                                            \
+  CAMLprim value ctypes_ldouble_complex_ ## OP (value a, value b) {        \
+    CAMLparam2(a, b);                                                      \
+    CAMLreturn(ctypes_copy_ldouble_complex(                                \
+      OP (ldouble_complex_custom_val(a), ldouble_complex_custom_val(b)))); \
+  }
+
+FN1(conjl)
+FN1(csqrtl)
+FN1(cexpl)
+FN1(clogl)
+FN2(cpowl)
+
+CAMLprim value ctypes_ldouble_complex_cargl(value a) {
+  CAMLparam1(a);
+  CAMLreturn(ctypes_copy_ldouble( cargl(ldouble_complex_custom_val(a))));
 }
 
 
