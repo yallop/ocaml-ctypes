@@ -57,6 +57,7 @@ type ceff = [ cexp
             | `DerefField of cexp * fieldname ]
 type cbind = clocal * ceff
 type ccomp = [ ceff
+             | `CAMLparam of string list * ccomp
              | `LetConst of clocal * cconst * ccomp
              | `LetAssign of clvalue * ceff * ccomp
              | `CAMLreturnT of ty * cexp
@@ -125,6 +126,7 @@ struct
   let rec ccomp : ccomp -> ty = function
     | #cexp as e -> cexp e
     | #ceff as e -> ceff e
+    | `CAMLparam (_, c) -> ccomp c
     | `Let (_, c)
     | `LetConst (_, _, c) -> ccomp c
     | `LetAssign (_, _, c) -> ccomp c

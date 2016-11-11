@@ -703,3 +703,12 @@ GEN_RETURN_F(bool)
 
 char *string_array[2] = { "Hello", "world" };
 int32_t int_array[5] = { 0, 1, 2, 3, 4 };
+
+void check_ones(const int *p, size_t sz)
+{
+  unsigned i = 0;
+  for (; i < sz; i++) {
+    assert (p[i] == 1);
+  }
+}
+

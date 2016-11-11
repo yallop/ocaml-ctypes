@@ -730,6 +730,39 @@ tests/test-callback_lifetime/generated_stubs.c: $(BUILDDIR)/test-callback_lifeti
 tests/test-callback_lifetime/generated_bindings.ml: $(BUILDDIR)/test-callback_lifetime-stub-generator.$(BEST)
 	$< --ml-file $@
 
+test-lifetime-stubs.dir  = tests/test-lifetime/stubs
+test-lifetime-stubs.threads = yes
+test-lifetime-stubs.subproject_deps = ctypes cstubs \
+   ctypes-foreign-base ctypes-foreign-threaded tests-common
+test-lifetime-stubs: PROJECT=test-lifetime-stubs
+test-lifetime-stubs: $$(LIB_TARGETS)
+
+test-lifetime-stub-generator.dir = tests/test-lifetime/stub-generator
+test-lifetime-stub-generator.threads = yes
+test-lifetime-stub-generator.subproject_deps = ctypes cstubs \
+     ctypes-foreign-base ctypes-foreign-threaded test-lifetime-stubs tests-common
+test-lifetime-stub-generator.deps = str bigarray bytes
+test-lifetime-stub-generator: PROJECT=test-lifetime-stub-generator
+test-lifetime-stub-generator: $$(BEST_TARGET)
+
+test-lifetime.dir = tests/test-lifetime
+test-lifetime.threads = yes
+test-lifetime.deps = str bigarray oUnit bytes
+test-lifetime.subproject_deps = ctypes ctypes-foreign-base \
+  ctypes-foreign-threaded cstubs test-lifetime-stubs tests-common
+test-lifetime.link_flags = -L$(BUILDDIR)/clib -ltest_functions
+test-lifetime: PROJECT=test-lifetime
+test-lifetime: $$(BEST_TARGET)
+
+test-lifetime-generated: \
+  tests/test-lifetime/generated_bindings.ml \
+  tests/test-lifetime/generated_stubs.c
+
+tests/test-lifetime/generated_stubs.c: $(BUILDDIR)/test-lifetime-stub-generator.$(BEST)
+	$< --c-file $@
+tests/test-lifetime/generated_bindings.ml: $(BUILDDIR)/test-lifetime-stub-generator.$(BEST)
+	$< --ml-file $@
+
 test-stubs.dir = tests/test-stubs
 test-stubs.threads = yes
 test-stubs.deps = str bigarray oUnit bytes
@@ -1142,6 +1175,7 @@ TESTS += test-value_printing-stubs test-value_printing-stub-generator test-value
 TESTS += test-complex-stubs test-complex-stub-generator test-complex-generated test-complex
 TESTS += test-bools-stubs test-bools-stub-generator test-bools-generated test-bools
 TESTS += test-callback_lifetime-stubs test-callback_lifetime-stub-generator test-callback_lifetime-generated test-callback_lifetime
+TESTS += test-lifetime-stubs test-lifetime-stub-generator test-lifetime-generated test-lifetime
 TESTS += test-stubs
 TESTS += test-bigarrays-stubs test-bigarrays-stub-generator test-bigarrays-generated test-bigarrays
 TESTS += test-coercions-stubs test-coercions-stub-generator test-coercions-generated test-coercions

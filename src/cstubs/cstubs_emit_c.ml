@@ -28,6 +28,37 @@ let cvar fmt v = fprintf fmt "%s" (cvar_name v)
 
 let cconst fmt (`Int i) = fprintf fmt "%s" (Signed.SInt.to_string i)
 
+let rec camlxParam fmt args =
+  match args with
+    [] -> ()
+  | x1 :: [] ->
+    fprintf fmt "@[CAMLxparam1@;(%s)@];" x1
+  | x1 :: x2 :: [] ->
+    fprintf fmt "@[CAMLxparam2@;(%s,@;%s)@];" x1 x2
+  | x1 :: x2 :: x3 :: [] ->
+    fprintf fmt "@[CAMLxparam3@;(%s,@;%s,@;%s)@];" x1 x2 x3
+  | x1 :: x2 :: x3 :: x4 :: [] ->
+    fprintf fmt "@[CAMLxparam4@;(%s,@;%s,@;%s,@;%s)@];" x1 x2 x3 x4
+  | x1 :: x2 :: x3 :: x4 :: x5 :: rest ->
+    fprintf fmt "@[CAMLxparam5@;(%s,@;%s,@;%s,@;%s,@;%s)@];" x1 x2 x3 x4 x5;
+    camlxParam fmt rest
+
+let camlParam fmt args =
+  match args with
+    [] ->
+    fprintf fmt "@[CAMLparam0@;()@];"
+  | x1 :: [] ->
+    fprintf fmt "@[CAMLparam1@;(%s)@];" x1
+  | x1 :: x2 :: [] ->
+    fprintf fmt "@[CAMLparam2@;(%s,@;%s)@];" x1 x2
+  | x1 :: x2 :: x3 :: [] ->
+    fprintf fmt "@[CAMLparam3@;(%s,@;%s,@;%s)@];" x1 x2 x3
+  | x1 :: x2 :: x3 :: x4 :: [] ->
+    fprintf fmt "@[CAMLparam4@;(%s,@;%s,@;%s,@;%s)@];" x1 x2 x3 x4
+  | x1 :: x2 :: x3 :: x4 :: x5 :: rest ->
+    fprintf fmt "@[CAMLparam5@;(%s,@;%s,@;%s,@;%s,@;%s)@];@ %a" x1 x2 x3 x4 x5
+      camlxParam rest
+
 (* Determine whether the C expression [(ty)e] is equivalent to [e] *)
 let cast_unnecessary : ty -> cexp -> bool =
   let rec harmless l r = match l, r with
@@ -89,6 +120,8 @@ let rec ccomp fmt : ccomp -> unit = function
   | #cexp as e ->
     fprintf fmt "@[<2>return@;@[%a@]@];" cexp e
   | #ceff as e -> fprintf fmt "@[<2>return@;@[%a@]@];" ceff e
+  | `CAMLparam (xs, c) ->
+    fprintf fmt "@[%a;@]@ %a" camlParam xs ccomp c
   | `Return (Ty Void, _) ->
     fprintf fmt "@[return@];"
   | `Return (Ty ty, e) ->
