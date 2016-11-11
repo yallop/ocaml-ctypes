@@ -5,6 +5,9 @@
  * See the file LICENSE for details.
  *)
 
+external init : unit -> unit = "ctypes_unsigned_init"
+let () = init ()
+
 (* Boxed unsigned types *)
 module type Basics = sig
   type t
