@@ -582,6 +582,15 @@ tests/test-oo_style/generated_stubs.c: $(BUILDDIR)/test-oo_style-stub-generator.
 tests/test-oo_style/generated_bindings.ml: $(BUILDDIR)/test-oo_style-stub-generator.$(BEST)
 	$< --ml-file $@
 
+test-marshal.dir = tests/test-marshal
+test-marshal.threads = yes
+test-marshal.deps = str bigarray oUnit bytes
+test-marshal.subproject_deps = ctypes ctypes-foreign-base \
+   ctypes-foreign-threaded cstubs tests-common
+test-marshal.link_flags = -L$(BUILDDIR)/clib -ltest_functions
+test-marshal: PROJECT=test-marshal
+test-marshal: $$(BEST_TARGET)
+
 test-type_printing.dir = tests/test-type_printing
 test-type_printing.threads = yes
 test-type_printing.deps = str bigarray oUnit bytes
@@ -1127,6 +1136,7 @@ TESTS += test-passable
 TESTS += test-alignment
 TESTS += test-views-stubs test-views-stub-generator test-views-generated test-views
 TESTS += test-oo_style-stubs test-oo_style-stub-generator test-oo_style-generated test-oo_style
+TESTS += test-marshal
 TESTS += test-type_printing
 TESTS += test-value_printing-stubs test-value_printing-stub-generator test-value_printing-generated test-value_printing
 TESTS += test-complex-stubs test-complex-stub-generator test-complex-generated test-complex
