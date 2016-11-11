@@ -172,6 +172,24 @@ let test_complex _ =
   assert_chkf "arg" C.arg Ldouble.Complex.arg;
   assert_polar ()
 
+let test_marshal _ = 
+  let assert_ldouble x = 
+    let x = "foo", Ldouble.of_float x, 1 in
+    let s = Marshal.to_string x [] in
+    let y : string * Ldouble.t * int = Marshal.from_string s 0 in
+    assert_bool "marshal ldouble" (x=y)
+  in
+  let assert_complex x = 
+    let x = "f00", Ldouble.Complex.of_complex x, 1 in
+    let s = Marshal.to_string x [] in
+    let y : string * Ldouble.complex * int = Marshal.from_string s 0 in
+    assert_bool "marshal ldouble complex" (x=y)
+  in
+  assert_ldouble 23.11234;
+  assert_ldouble (-23.9345);
+  assert_complex { Complex.re = 11.23; im = -46.7764 };
+  assert_complex { Complex.re = 0.00037; im = 881.222314 }
+
 let suite = "Ldouble tests" >:::
   [
     "test functions with 2 args" >:: test_op2;
@@ -180,6 +198,7 @@ let suite = "Ldouble tests" >:::
     "test classify" >:: test_classify;
     "test conversion" >:: test_conv;
     "test complex api" >:: test_complex;
+    "test marshal" >:: test_marshal;
   ]
 
 let _ = run_test_tt_main suite

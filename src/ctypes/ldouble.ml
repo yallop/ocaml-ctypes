@@ -5,6 +5,9 @@
  * See the file LICENSE for details.
  *)
 
+external init : unit -> unit = "ldouble_init"
+let () = init ()
+
 type t
 
 external to_float : t -> float = "ctypes_ldouble_to_float"
@@ -15,6 +18,7 @@ external of_int : int -> t = "ctypes_ldouble_of_int"
 external format : string -> t -> string = "ctypes_ldouble_format"
 let to_string d = format "%Lf" d
 external of_string : string -> t = "ctypes_ldouble_of_string"
+external to_hex_string : t -> string = "ctypes_ldouble_to_hex"
 
 external add : t -> t -> t = "ctypes_ldouble_add"
 external sub : t -> t -> t = "ctypes_ldouble_sub"

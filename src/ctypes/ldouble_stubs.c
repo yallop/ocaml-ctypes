@@ -27,6 +27,31 @@
 
 /*********************** long double *************************/
 
+/*
+ * long double comes in various different flavours on different
+ * platforms/architectures.
+ *
+ * 8 byte double - arm, msvc
+ * 10 byte extended - intel gcc.  can be packed into 12 or 16 bytes.
+ * 16 byte - powerpc, either IEEE quad float or __ibm128 double double
+ *
+ * We make a best guess as to the format based on LDBL_MANT_DIG. 
+ * This only affects the operation of hashing and serialization.
+ *
+ * For deserialization we consider it an error if the stored
+ * value is a different format.  Doing such conversions would
+ * get very complicated.
+ *
+ * Regarding endianness - the 8 and 16 byte formats should
+ * interwork between big and little endian systems.  The
+ * intel extended 10 byte format only seems to occurs on 
+ * x86 so we dont need to consider endianness.
+ *
+ * In case a format is encountered that we do not understand, 
+ * then we fall back to casting the value to a double.
+ *
+ */
+
 #define LDOUBLE_STORAGE_BYTES sizeof(long double)
 #if (LDBL_MANT_DIG == 53)      // 64 bit - same as double
 #define LDOUBLE_VALUE_BYTES 8
@@ -90,13 +115,65 @@ static intnat ldouble_hash(value v) {
   return ldouble_mix_hash(0, ldouble_custom_val(v));
 }
 
+static int ldouble_serialize_data(long double *q) {
+  unsigned char *p = (unsigned char *)q;
+  if (LDOUBLE_VALUE_BYTES == 16) {
+    caml_serialize_block_8(p, 2);
+    return 16;
+  } else if (LDOUBLE_VALUE_BYTES == 10) {
+    caml_serialize_block_8(p, 1);
+    caml_serialize_block_2(p+8, 1);
+    return 10;
+  } else {
+    double d = (double) *q;
+    if (sizeof(double) == 4) caml_serialize_float_4(d);
+    else caml_serialize_float_8(d);
+    return sizeof(double);
+  }
+}
+
+static void ldouble_serialize(value v, uintnat *wsize_32, uintnat *wsize_64) {
+  long double *p = Data_custom_val(v);
+  int size;
+  caml_serialize_int_1(LDBL_MANT_DIG);
+  size = ldouble_serialize_data(p);
+  *wsize_32 = 1+size;
+  *wsize_64 = 1+size;
+}
+
+static int ldouble_deserialize_data(long double *q) {
+  unsigned char *p = (unsigned char *)q;
+  if (LDOUBLE_VALUE_BYTES == 16) {
+    caml_deserialize_block_8(p, 2);
+    return 16;
+  } else if (LDOUBLE_VALUE_BYTES == 10) {
+    caml_deserialize_block_8(p, 1);
+    caml_deserialize_block_2(p+8, 1);
+    return 10;
+  } else {
+    double d;
+    if (sizeof(double) == 4) d = caml_deserialize_float_4();
+    else d = caml_deserialize_float_8();
+    *q = (long double) d;
+    return sizeof(double);
+  }
+}
+
+static uintnat ldouble_deserialize(void *d) {
+  int size;
+  if (caml_deserialize_uint_1() != LDBL_MANT_DIG) 
+    caml_deserialize_error("invalid long double size");
+  size = ldouble_deserialize_data((long double *) d);
+  return 1+size;
+}
+
 static struct custom_operations caml_ldouble_ops = {
   "ctypes:ldouble",
   custom_finalize_default,
   ldouble_cmp_val,
   ldouble_hash,
-  NULL, //ldouble_serialize,
-  NULL, //ldouble_deserialize,
+  ldouble_serialize,
+  ldouble_deserialize,
   custom_compare_ext_default
 };
 
@@ -283,19 +360,39 @@ CAMLprim value ctypes_ldouble_of_string(value v) {
   CAMLreturn(ctypes_copy_ldouble(r));
 }
 
-value ctypes_ldouble_min(void) { return ctypes_copy_ldouble(-LDBL_MAX); }
-value ctypes_ldouble_max(void) { return ctypes_copy_ldouble(LDBL_MAX); }
-value ctypes_ldouble_epsilon(void) { return ctypes_copy_ldouble(LDBL_EPSILON); }
-value ctypes_ldouble_nan(void) { return ctypes_copy_ldouble(nanl("char-sequence")); }
-// XXX note; -(log 0) gives +ve inf (and vice versa).  Is this consistent? *)
-value ctypes_ldouble_inf(void) { return ctypes_copy_ldouble(-log(0)); } 
-value ctypes_ldouble_ninf(void) { return ctypes_copy_ldouble(log(0)); }
+char hex_char(char x) {
+  if (x < 10) return '0' + x;
+  return 'a' + x - 10;
+}
 
-value ctypes_ldouble_size(void) {
-  value r = caml_alloc_tuple(2);
-  Field(r,0) = Val_int(LDOUBLE_STORAGE_BYTES);
-  Field(r,1) = Val_int(LDOUBLE_VALUE_BYTES);
-  return r;
+CAMLprim value ctypes_ldouble_to_hex(value v) {
+  CAMLparam1(v);
+  static char x[LDOUBLE_STORAGE_BYTES*2 + 1];
+  char *p = (char *) Data_custom_val(v);
+  int i;
+  for (i=0; i<LDOUBLE_STORAGE_BYTES; i++) {
+    x[i*2+0] = hex_char(((*(p+i)) >> 0) & 0xf);
+    x[i*2+1] = hex_char(((*(p+i)) >> 4) & 0xf);
+  }
+  x[LDOUBLE_STORAGE_BYTES*2] = 0;
+  CAMLreturn(caml_copy_string(x));
+}
+
+value ctypes_ldouble_min(value unit) { return ctypes_copy_ldouble(-LDBL_MAX); }
+value ctypes_ldouble_max(value unit) { return ctypes_copy_ldouble(LDBL_MAX); }
+value ctypes_ldouble_epsilon(value unit) { return ctypes_copy_ldouble(LDBL_EPSILON); }
+value ctypes_ldouble_nan(value unit) { return ctypes_copy_ldouble(nanl("char-sequence")); }
+// XXX note; -(log 0) gives +ve inf (and vice versa).  Is this consistent? *)
+value ctypes_ldouble_inf(value unit) { return ctypes_copy_ldouble(-log(0)); } 
+value ctypes_ldouble_ninf(value unit) { return ctypes_copy_ldouble(log(0)); }
+
+value ctypes_ldouble_size(value unit) {
+  CAMLparam1(unit);
+  CAMLlocal1(r);
+  r = caml_alloc_tuple(2);
+  Store_field(r,0, Val_int(LDOUBLE_STORAGE_BYTES));
+  Store_field(r,1, Val_int(LDOUBLE_VALUE_BYTES));
+  CAMLreturn(r);
 }
 
 /*********************** complex *************************/
@@ -315,13 +412,36 @@ static intnat ldouble_complex_hash(value v) {
   return ldouble_mix_hash(ldouble_mix_hash(0, creall(c)), cimagl(c));
 }
 
+static void ldouble_complex_serialize(value v, uintnat *wsize_32, uintnat *wsize_64) {
+  long double re,im,*p = Data_custom_val(v);
+  int size;
+  caml_serialize_int_1(LDBL_MANT_DIG);
+  re = creall(*p);
+  size = ldouble_serialize_data(&re);
+  im = cimagl(*p);
+  size += ldouble_serialize_data(&im);
+  *wsize_32 = 1+size;
+  *wsize_64 = 1+size;
+}
+
+static uintnat ldouble_complex_deserialize(void *d) {
+  long double re, im;
+  int size;
+  if (caml_deserialize_uint_1() != LDBL_MANT_DIG) 
+    caml_deserialize_error("invalid long double size");
+  size = ldouble_deserialize_data(&re);
+  size += ldouble_deserialize_data(&im);
+  *(long double *)d = (re + im * I);
+  return 1+size;
+}
+
 static struct custom_operations caml_ldouble_complex_ops = {
   "ctypes:ldouble_complex",
   custom_finalize_default,
   ldouble_complex_cmp_val,
   ldouble_complex_hash,
-  NULL, //ldouble_complex_serialize,
-  NULL, //ldouble_complex_deserialize,
+  ldouble_complex_serialize,
+  ldouble_complex_deserialize,
   custom_compare_ext_default
 };
 
@@ -397,4 +517,9 @@ CAMLprim value ctypes_ldouble_complex_cargl(value a) {
   CAMLreturn(ctypes_copy_ldouble( cargl(ldouble_complex_custom_val(a))));
 }
 
+value ldouble_init(value unit) {
+  caml_register_custom_operations(&caml_ldouble_ops);
+  caml_register_custom_operations(&caml_ldouble_complex_ops);
+  return Val_unit;
+}
 
