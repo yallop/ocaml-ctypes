@@ -26,10 +26,10 @@ let test_sizeof_primitives _ = begin
     (sizeof char <= sizeof int);
 
   assert_bool "sizeof (float) <= sizeof (double)"
-    (sizeof char <= sizeof int);
+    (sizeof float <= sizeof double);
 
   assert_bool "sizeof (short) <= sizeof (int)"
-    (sizeof char <= sizeof int);
+    (sizeof short <= sizeof int);
 
   assert_bool "sizeof (int) <= sizeof (long)"
     (sizeof int <= sizeof long);
