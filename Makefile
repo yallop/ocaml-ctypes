@@ -155,9 +155,9 @@ asneeded.config:
 
 # dependencies
 depend: configure
-	$(OCAMLDEP) $(foreach dir,$(DEP_DIRS),-I $(dir)) \
+	$(OCAMLDEP) -one-line $(foreach dir,$(DEP_DIRS),-I $(dir)) \
             $(shell find src examples -name '*.mli' -o -name '*.ml') \
-           | sed "s!src/!_build/src/!g; s!examples/!_build/examples/!g" > .depend
+           | sed "s!src/!_build/src/!g; s!examples/!_build/examples/!g" | sort > .depend
 
 #installation
 META-install:
