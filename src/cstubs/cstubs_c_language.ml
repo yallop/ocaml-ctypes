@@ -181,8 +181,10 @@ let prim_prj : type a. a Ctypes_primitive_types.prim -> _ =
   | Nativeint -> reader "Nativeint_val" (value @-> returning nativeint)
   | Float -> reader "Double_val" (value @-> returning double)
   | Double -> reader "Double_val" (value @-> returning double)
+  | LDouble -> reader "ctypes_ldouble_val" (value @-> returning ldouble)
   | Complex32 -> reader "ctypes_float_complex_val" (value @-> returning complex32)
   | Complex64 -> reader "ctypes_double_complex_val" (value @-> returning complex64)
+  | Complexld -> reader "ctypes_ldouble_complex_val" (value @-> returning complexld)
 
 let prim_inj : type a. a Ctypes_primitive_types.prim -> _ =
   let open Unchecked_function_types in
@@ -213,5 +215,7 @@ let prim_inj : type a. a Ctypes_primitive_types.prim -> _ =
   | Nativeint -> conser "caml_copy_nativeint" (nativeint @-> returning value)
   | Float -> conser "caml_copy_double" (double @-> returning value)
   | Double -> conser "caml_copy_double" (double @-> returning value)
+  | LDouble -> conser "ctypes_copy_ldouble" (ldouble @-> returning value)
   | Complex32 -> conser "ctypes_copy_float_complex" (complex32 @-> returning value)
   | Complex64 -> conser "ctypes_copy_double_complex" (complex64 @-> returning value)
+  | Complexld -> conser "ctypes_copy_ldouble_complex" (complexld @-> returning value)

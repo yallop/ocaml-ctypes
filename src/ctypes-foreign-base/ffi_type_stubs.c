@@ -92,8 +92,10 @@ value ctypes_primitive_ffitype(value prim)
     case Ctypes_Nativeint: ft = &ctypes_ffi_type_camlint; break; /* Nativeint */
     case Ctypes_Float:     ft = &ffi_type_float;          break; /* Float */
     case Ctypes_Double:    ft = &ffi_type_double;         break; /* Double */
+    case Ctypes_LDouble:   ft = NULL;                     break; /* LDouble */
     case Ctypes_Complex32: ft = NULL;                     break; /* Complex32 */
     case Ctypes_Complex64: ft = NULL;                     break; /* Complex64 */
+    case Ctypes_Complexld: ft = NULL;                     break; /* Complexld */
   }
   return CTYPES_FROM_PTR(ft);
 }

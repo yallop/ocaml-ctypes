@@ -12,6 +12,7 @@
 
 #include "ctypes_primitives.h"
 #include "ctypes_complex_stubs.h"
+#include "ctypes_ldouble_stubs.h"
 #include "ctypes_raw_pointer.h"
 #include "ctypes_managed_buffer_stubs.h"
 #include <caml/threads.h>

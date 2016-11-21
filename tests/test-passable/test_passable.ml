@@ -69,6 +69,17 @@ let test_unions_are_not_passable _ =
     end
   end in ()
 
+(*
+  Test the passability of long double values
+*)
+let test_ldouble_not_passable _ =
+  assert_raises ~msg:"Foreign rejects ldouble type as argument"
+    (Unsupported "libffi does not support passing long double")
+    (fun () -> Foreign.funptr (ldouble @-> returning void));
+
+  assert_raises ~msg:"Foreign rejects ldouble type as return type"
+    (Unsupported "libffi does not support passing long double")
+    (fun () -> Foreign.funptr (void @-> returning ldouble))
 
 (*
   Test the passability of complex values
@@ -77,30 +88,44 @@ let test_complex_value_passability _ =
   (* complex32 can be used as an argument type *)
   ignore (complex32 @-> returning void);
 
+  (* complex64 can be used as an argument type *)
+  ignore (complex64 @-> returning void);
+
+  (* complexld can be used as an argument type *)
+  ignore (complexld @-> returning void);
+
   assert_raises ~msg:"Foreign rejects complex32 type as argument"
     (Unsupported "libffi does not support passing float _Complex")
     (fun () -> Foreign.funptr (complex32 @-> returning void));
-
-  (* complex64 can be used as an argument type *)
-  ignore (complex64 @-> returning void);
 
   assert_raises ~msg:"Foreign rejects complex64 type as argument"
     (Unsupported "libffi does not support passing double _Complex")
     (fun () -> Foreign.funptr (complex64 @-> returning void));
   
+  assert_raises ~msg:"Foreign rejects complexld type as argument"
+    (Unsupported "libffi does not support passing long double _Complex")
+    (fun () -> Foreign.funptr (complexld @-> returning void));
+  
   (* complex32 can be used as a return type *)
   ignore (void @-> returning complex32);
+
+  (* complex64 can be used as a return type *)
+  ignore (void @-> returning complex64);
+
+  (* complexld can be used as a return type *)
+  ignore (void @-> returning complexld);
 
   assert_raises ~msg:"Foreign rejects complex32 type as return type"
     (Unsupported "libffi does not support passing float _Complex")
     (fun () -> Foreign.funptr (void @-> returning complex32));
 
-  (* complex64 can be used as a return type *)
-  ignore (void @-> returning complex64);
-
   assert_raises ~msg:"Foreign rejects complex64 type as return type"
     (Unsupported "libffi does not support passing double _Complex")
-    (fun () -> Foreign.funptr (void @-> returning complex64))
+    (fun () -> Foreign.funptr (void @-> returning complex64));
+
+  assert_raises ~msg:"Foreign rejects complexld type as return type"
+    (Unsupported "libffi does not support passing long double _Complex")
+    (fun () -> Foreign.funptr (void @-> returning complexld))
 
 
 (*
@@ -389,6 +414,9 @@ let suite = "Passability tests" >:::
 
    "complex values passability"
     >:: test_complex_value_passability;
+
+   "long doubles are not passble"
+    >:: test_ldouble_not_passable;
 
    "arrays are not passable"
     >:: test_arrays_are_not_passable;

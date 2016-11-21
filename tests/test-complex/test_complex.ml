@@ -25,16 +25,22 @@ struct
     since libffi doesn't support passing complex numbers.
   *)
   let test_complex_primitive_operations _ =
-    let wrap typ f l r =
-      let rv = allocate_n ~count:1 typ in
-      f (allocate typ l) (allocate typ r) rv;
+    let wrap' typ1 typ2 f l r =
+      let rv = allocate_n ~count:1 typ2 in
+      f (allocate typ1 l) (allocate typ2 r) rv;
       !@rv
     in
+    let wrap typ f l r = wrap' typ typ f l r in
 
     let addz64 = wrap complex64 add_complexd
     and mulz64 = wrap complex64 mul_complexd
+    and rotz64 = wrap' complex64 double rotdist_complexd
     and addz32 = wrap complex32 add_complexf
     and mulz32 = wrap complex32 mul_complexf
+    and rotz32 = wrap' complex32 float rotdist_complexf
+    and addzld = wrap complexld add_complexld
+    and mulzld = wrap complexld mul_complexld
+    and rotzld = wrap' complexld ldouble rotdist_complexld
     in
 
     begin
@@ -55,6 +61,39 @@ struct
 
       assert_equal ~cmp:complex32_eq (Complex.add l r) (addz32 l r);
       assert_equal ~cmp:complex32_eq (Complex.mul l r) (mulz32 l r);
+
+      (* test long double complex *)
+      let re x = LDouble.(to_float (ComplexL.re x)) in
+      let im x = LDouble.(to_float (ComplexL.im x)) in
+      let to_complexld c = LDouble.(ComplexL.make (of_float c.re) (of_float c.im)) in
+      let of_complexld c = { re = re c; im = im c } in
+
+      let l', r' = to_complexld l, to_complexld r in
+      assert_equal ~cmp:complex64_eq (Complex.add l r) (of_complexld @@ addzld l' r');
+      assert_equal ~cmp:complex64_eq (Complex.mul l r) (of_complexld @@ mulzld l' r');
+
+      (* The rotdist test is designed to check passing and returning long doubles.
+         The function rotates a complex number by the given angle in radians,
+         then returns the manhatten distance (sum of absolute value of real and
+         imaginary parts) *)
+      let rot x a = 
+        let open Complex in
+        let y = mul x { re = cos a; im = sin a } in
+        abs_float y.re +. abs_float y.im
+      in
+      let rotzld x r = 
+        let open LDouble in
+        to_float (rotzld (ComplexL.make (of_float x.re) (of_float x.im)) (of_float r)) 
+      in
+      let test_rotdist f eps x r = 
+        let a = rot x r in
+        let b = f x r in
+        assert_bool "rotdist" (abs_float (a -. b) < eps)
+      in
+      test_rotdist rotzld eps64 { re = 2.3; im = -0.6; } 1.4;
+      test_rotdist rotz64 eps64 { re = 2.3; im = -0.6; } 1.4;
+      test_rotdist rotz32 eps32 { re = 2.3; im = -0.6; } 1.4;
+
     end
 end
 
@@ -89,6 +128,35 @@ struct
 
       assert_equal ~cmp:complex32_eq (Complex.add l r) (add_complexf_val l r);
       assert_equal ~cmp:complex32_eq (Complex.mul l r) (mul_complexf_val l r);
+
+      (* test long double complex *)
+      let re x = LDouble.(to_float (ComplexL.re x)) in
+      let im x = LDouble.(to_float (ComplexL.im x)) in
+      let to_complexld c = LDouble.(ComplexL.make (of_float c.re) (of_float c.im)) in
+      let of_complexld c = { re = re c; im = im c } in
+
+      let l', r' = to_complexld l, to_complexld r in
+      assert_equal ~cmp:complex64_eq (Complex.add l r) (of_complexld @@ add_complexld_val l' r');
+      assert_equal ~cmp:complex64_eq (Complex.mul l r) (of_complexld @@ mul_complexld_val l' r');
+
+      (* rot-dist test *)
+      let rot x a = 
+        let open Complex in
+        let y = mul x { re = cos a; im = sin a } in
+        abs_float y.re +. abs_float y.im
+      in
+      let rotdist_complexld_val x r = 
+        let open LDouble in
+        to_float (rotdist_complexld_val (ComplexL.make (of_float x.re) (of_float x.im)) (of_float r)) 
+      in
+      let test_rotdist f eps x r = 
+        let a = rot x r in
+        let b = f x r in
+        assert_bool "rotdist" (abs_float (a -. b) < eps)
+      in
+      test_rotdist rotdist_complexld_val eps64 { re = 2.3; im = -0.6; } 1.4;
+      test_rotdist rotdist_complexd_val eps64 { re = 2.3; im = -0.6; } 1.4;
+      test_rotdist rotdist_complexf_val eps32 { re = 2.3; im = -0.6; } 1.4;
     end
 end
 

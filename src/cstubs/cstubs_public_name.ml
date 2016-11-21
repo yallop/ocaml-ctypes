@@ -32,6 +32,8 @@ let ident_of_ml_prim : type a. a Ctypes_primitive_types.ml_prim -> path =
    | ML_ullong -> path_of_string "Unsigned.ullong"
    | ML_ulong -> path_of_string "Unsigned.ulong"
    | ML_ushort -> path_of_string "Unsigned.ushort"
+   | ML_ldouble -> path_of_string "LDouble.t"
+   | ML_complexld -> path_of_string "ComplexL.t"
 
 let constructor_ident_of_prim : type a. a Ctypes_primitive_types.prim -> path =
   let open Ctypes_primitive_types in function
@@ -61,8 +63,10 @@ let constructor_ident_of_prim : type a. a Ctypes_primitive_types.prim -> path =
    | Nativeint -> path_of_string "Ctypes.nativeint"
    | Float -> path_of_string "Ctypes.float"
    | Double -> path_of_string "Ctypes.double"
+   | LDouble -> path_of_string "Ctypes.ldouble"
    | Complex32 -> path_of_string "Ctypes.complex32"
    | Complex64 -> path_of_string "Ctypes.complex64"
+   | Complexld -> path_of_string "Ctypes.complexld"
 
 let constructor_cident_of_prim :
   type a. ?module_name:string -> a Ctypes_primitive_types.prim -> path =
@@ -96,5 +100,7 @@ let constructor_cident_of_prim :
     | Nativeint -> path "Nativeint"
     | Float -> path "Float"
     | Double -> path "Double"
+    | LDouble -> path "LDouble"
     | Complex32 -> path "Complex32"
-    | Complex64 -> path "Complex64")
+    | Complex64 -> path "Complex64"
+    | Complexld -> path "Complexld")
