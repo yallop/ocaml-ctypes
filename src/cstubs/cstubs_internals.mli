@@ -89,10 +89,10 @@ type 'a prim = 'a Ctypes_primitive_types.prim =
 | Nativeint : nativeint prim
 | Float : float prim
 | Double : float prim
-| LDouble : Ldouble.t prim
+| LDouble : LDouble.t prim
 | Complex32 : Complex.t prim
 | Complex64 : Complex.t prim
-| Complexld : Ldouble.complex prim
+| Complexld : ComplexL.t prim
 
 val build_enum_type :
   string -> Ctypes_static.arithmetic -> ?unexpected:(int64 -> 'a) -> ('a * int64) list -> 'a typ

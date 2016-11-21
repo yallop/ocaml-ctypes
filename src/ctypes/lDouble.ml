@@ -15,10 +15,12 @@ external of_float : float -> t = "ctypes_ldouble_of_float"
 external to_int : t -> int = "ctypes_ldouble_to_int"
 external of_int : int -> t = "ctypes_ldouble_of_int"
 
-external format : string -> t -> string = "ctypes_ldouble_format"
-let to_string d = format "%Lf" d
+external format : int -> int -> t -> string = "ctypes_ldouble_format"
+let to_string ?(width=0) ?(prec=6) d = format width prec d
 external of_string : string -> t = "ctypes_ldouble_of_string"
-external to_hex_string : t -> string = "ctypes_ldouble_to_hex"
+
+(* debug *)
+(*external to_hex_string : t -> string = "ctypes_ldouble_to_hex"*)
 
 external add : t -> t -> t = "ctypes_ldouble_add"
 external sub : t -> t -> t = "ctypes_ldouble_sub"
@@ -74,48 +76,4 @@ let one = of_int 1
 
 external size_ : unit -> (int * int) = "ctypes_ldouble_size"
 let byte_sizes = size_ ()
-
-type complex
-
-module Complex = struct
-
-  external make : t -> t -> complex = "ctypes_ldouble_complex_make"
-
-  external re : complex -> t = "ctypes_ldouble_complex_real"
-  external im : complex -> t = "ctypes_ldouble_complex_imag"
-
-  let of_complex x = make (of_float x.Complex.re) (of_float x.Complex.im)
-  let to_complex x = { Complex.re = to_float (re x); im = to_float (im x) }
-
-  let norm2 x = 
-    let r, i = re x, im x in
-    add (mul r r) (mul i i)
-
-  let norm x = 
-    let r = abs (re x) and i = abs (im x) in
-    if r = zero then i
-    else if i = zero then r
-    else if r >= i then
-      let q = div i r in mul r (sqrt (add one (mul q q)))
-    else
-      let q = div r i in mul i (sqrt (add one (mul q q)))
-
-  let polar n a = make (mul (cos a) n) (mul (sin a) n)
-
-  let zero, one, i = make zero zero, make one zero, make zero one
-
-  external neg : complex -> complex = "ctypes_ldouble_complex_neg"
-  external conj : complex -> complex = "ctypes_ldouble_complex_conjl"
-  external add : complex -> complex -> complex = "ctypes_ldouble_complex_add"
-  external sub : complex -> complex -> complex = "ctypes_ldouble_complex_sub"
-  external mul : complex -> complex -> complex = "ctypes_ldouble_complex_mul"
-  external div : complex -> complex -> complex = "ctypes_ldouble_complex_div"
-  let inv x = div one x
-  external sqrt : complex -> complex = "ctypes_ldouble_complex_csqrtl"
-  external arg : complex -> t = "ctypes_ldouble_complex_cargl"
-  external exp : complex -> complex = "ctypes_ldouble_complex_cexpl"
-  external log : complex -> complex = "ctypes_ldouble_complex_clogl"
-  external pow : complex -> complex -> complex = "ctypes_ldouble_complex_cpowl"
-
-end
 

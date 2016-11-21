@@ -9,24 +9,28 @@ type t
 (** The type of long doubles. *)
 
 val to_float : t -> float 
-(** Convert a long double to a float *)
+(** Convert a long double to a float.  The result is unspecified if the argument is
+    either too large or too small to be represented as a [float].*)
 
 val of_float : float -> t 
 (** Create a long double from a float *)
 
 val to_int : t -> int 
-(** Convert a long double to an int *)
+(** Convert a long double to an int.  The result is unspecified if the argument is NAN
+    or falls outside the range of representable integers. *)
 
 val of_int : int -> t 
 (** Create a long double from an int *)
 
-val format : string -> t -> string
-(** This function is dangerous!  always use as "%<...>Lf" or related long double conversion! 
-    [format fmt ldbl] will be used in C as [sprintf(..., fmt, ldbl)]. *)
+val to_string : ?width:int -> ?prec: int -> t -> string
+(** Convert a long double to a string.
+ 
+ [width] specifies the minimum number of digits to format the string
+ with.  A negative value left aligns.  The default is 0.
 
-val to_string : t -> string
-(** Convert a long double to a string *)
-
+ [prec] specifies the number of digits after the decimal point.  
+ The default is 6. *)
+ 
 val of_string : string -> t
 (** Create a long double from a string *)
 
@@ -68,7 +72,6 @@ val expm1 : t -> t
 val log1p : t -> t 
 (** [log1p x] computes [log(1.0 +. x)] (natural logarithm),
     giving numerically-accurate results even if [x] is close to [0.0].
-    @since 3.12.0
 *)
 
 val cos : t -> t 
@@ -174,82 +177,4 @@ val byte_sizes : int * int
 (** size, in bytes, used for storing long doubles, 
     and the actual number of bytes used by the value.
     (unused bytes may contain undefined values) *)
-
-type complex
-(** The type of long double complex values *)
-
-module Complex : sig
-
-  val make : t -> t -> complex 
-  (** [make x y] creates the long double complex value [x + y * i] *)
-
-  val of_complex : Complex.t -> complex
-  (** create a long double complex from a Complex.t *)
-
-  val to_complex : complex -> Complex.t 
-  (** convert a long double complex to a Complex.t *)
-
-  val zero : complex
-  (** [0 + i0] *)
-
-  val one : complex
-  (** [1 + i0] *)
-
-  val i : complex
-  (** [0 + i] *)
-
-  val re : complex -> t 
-  (** return the real part of the long double complex *)
-
-  val im : complex -> t 
-  (** return the imaginary part of the long double complex *)
-
-  val neg : complex -> complex
-  (** Unary negation *)
-
-  val conj : complex -> complex
-  (** Conjugate: given the complex [x + i.y], returns [x - i.y]. *) 
-
-  val add : complex -> complex -> complex
-  (** Addition *)
-  
-  val sub : complex -> complex -> complex
-  (** Subtraction *)
-  
-  val mul : complex -> complex -> complex
-  (** Multiplication *)
-  
-  val div : complex -> complex -> complex
-  (** Division *)
-  
-  val inv : complex -> complex
-  (** Multiplicative inverse ([1/z]). *)
-  
-  val sqrt : complex -> complex
-  (** Square root. *)
-  
-  val norm2 : complex -> t
-  (** Norm squared: given [x + i.y], returns [x^2 + y^2]. *)
-
-  val norm : complex -> t
-  (** Norm: given [x + i.y], returns [sqrt(x^2 + y^2)]. *)
-
-  val polar : t -> t -> complex
-  (** [polar norm arg] returns the complex having norm [norm] and argument [arg]. *)
-
-  val arg : complex -> t
-  (** Argument.  The argument of a complex number is the angle
-      in the complex plane between the positive real axis and a line
-      passing through zero and the number. *)
-
-  val exp : complex -> complex 
-  (** Exponentiation.  [exp z] returns [e] to the [z] power. *)
-  
-  val log : complex -> complex 
-  (** Natural logarithm (in base [e]). *)
-  
-  val pow : complex -> complex -> complex
-  (** Power function.  [pow z1 z2] returns [z1] to the [z2] power. *)
-
-end
 

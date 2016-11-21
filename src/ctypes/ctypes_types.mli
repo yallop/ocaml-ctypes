@@ -156,7 +156,7 @@ sig
   val double : float typ
   (** Value representing the C type [double]. *)
 
-  val ldouble : Ldouble.t typ
+  val ldouble : LDouble.t typ
   (** Value representing the C type [long double]. *)
 
   (** {5 Complex types} *)
@@ -167,7 +167,7 @@ sig
   val complex64 : Complex.t typ
   (** Value representing the C99 double-precision [double complex] type. *)
 
-  val complexld : Ldouble.complex typ
+  val complexld : ComplexL.t typ
   (** Value representing the C99 long-double-precision [long double complex] type. *)
 
   (** {4:pointer_types Pointer types} *)

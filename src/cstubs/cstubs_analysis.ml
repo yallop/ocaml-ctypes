@@ -48,9 +48,9 @@ type _ alloc =
 | Alloc_uint64_t : Unsigned.uint64 alloc
 | Alloc_nativeint : nativeint alloc
 | Alloc_float : float alloc
-| Alloc_ldouble : Ldouble.t alloc
+| Alloc_ldouble : LDouble.t alloc
 | Alloc_complex : Complex.t alloc
-| Alloc_complexld : Ldouble.complex alloc
+| Alloc_complexld : ComplexL.t alloc
 | Alloc_pointer : (_, _) pointer alloc
 | Alloc_funptr : _ static_funptr alloc
 | Alloc_structured : (_, _) structured alloc

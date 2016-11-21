@@ -16,6 +16,7 @@
 #include <string.h>
 #include <complex.h>
 #include <errno.h>
+#include <math.h>
 
 #if defined _WIN32 && !defined __CYGWIN__
 #include <windows.h>
@@ -410,6 +411,11 @@ void mul_complexd(double complex *l, double complex *r, double complex *out)
   *out = *l * *r;
 }
 
+void rotdist_complexd(double complex *c, double *r, double *out) {
+  double complex x = *c * (cos(*r) + sin(*r) * I);
+  *out = fabs(creal(x)) + fabs(cimag(x));
+}
+
 void add_complexld(long double complex *l, long double complex *r, long double complex *out)
 {
   *out = *l + *r;
@@ -418,6 +424,11 @@ void add_complexld(long double complex *l, long double complex *r, long double c
 void mul_complexld(long double complex *l, long double complex *r, long double complex *out)
 {
   *out = *l * *r;
+}
+
+void rotdist_complexld(long double complex *c, long double *r, long double *out) {
+  long double complex x = *c * (cosl(*r) + sinl(*r) * I);
+  *out = fabsl(creall(x)) + fabsl(cimagl(x));
 }
 
 void add_complexf(float complex *l, float complex *r, float complex *out)
@@ -430,6 +441,11 @@ void mul_complexf(float complex *l, float complex *r, float complex *out)
   *out = *l * *r;
 }
 
+void rotdist_complexf(float complex *c, float *r, float *out) {
+  float complex x = *c * (cosf(*r) + sinf(*r) * I);
+  *out = fabsf(crealf(x)) + fabsf(cimagf(x));
+}
+
 long double complex add_complexld_val(long double complex l, long double complex r)
 {
   return l + r;
@@ -438,6 +454,11 @@ long double complex add_complexld_val(long double complex l, long double complex
 long double complex mul_complexld_val(long double complex l, long double complex r)
 {
   return l * r;
+}
+
+long double rotdist_complexld_val(long double complex c, long double r) {
+  long double complex x = c * (cosl(r) + sinl(r) * I);
+  return fabsl(creall(x)) + fabsl(cimagl(x));
 }
 
 double complex add_complexd_val(double complex l, double complex r)
@@ -450,6 +471,11 @@ double complex mul_complexd_val(double complex l, double complex r)
   return l * r;
 }
 
+double rotdist_complexd_val(double complex c, double r) {
+  double complex x = c * (cos(r) + sin(r) * I);
+  return fabs(creal(x)) + fabs(cimag(x));
+}
+
 float complex add_complexf_val(float complex l, float complex r)
 {
   return l + r;
@@ -458,6 +484,11 @@ float complex add_complexf_val(float complex l, float complex r)
 float complex mul_complexf_val(float complex l, float complex r)
 {
   return l * r;
+}
+
+float rotdist_complexf_val(float complex c, float r) {
+  float complex x = c * (cosf(r) + sinf(r) * I);
+  return fabsf(crealf(x)) + fabsf(cimagf(x));
 }
 
 static int (*global_stored_callback)(int) = NULL;

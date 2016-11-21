@@ -67,8 +67,27 @@
 
 #define ldouble_custom_val(V) (*(long double *)(Data_custom_val(V)))
 
+// initialized in ldouble_init
+static long double nan_;
+
+static long double norm(long double x) {
+  switch (fpclassify(x)){
+  case FP_ZERO      : return 0.0L; // if -0 force to +0.
+  case FP_NAN       : return nan_;  // cannonical nan
+  default           : return x;
+  }
+}
+
 static int ldouble_cmp(long double u1, long double u2) {
-  return (u1 == u2) ? 0 : (u1 < u2 ? -1 : 1);
+  if (u1 < u2) return -1;
+  if (u1 > u2) return 1;
+  if (u1 != u2) {
+    caml_compare_unordered = 1;
+    if (u1 == u1) return 1;  // u2 is nan
+    if (u2 == u2) return -1; // u1 is nan
+    // both nan ==> equal
+  } 
+  return 0;
 }
 
 static int ldouble_cmp_val(value v1, value v2)
@@ -83,7 +102,7 @@ static uint32_t ldouble_mix_hash(uint32_t hash, long double d) {
     long double d;
     uint32_t a[(LDOUBLE_STORAGE_BYTES+3)/4];
   } u;
-  u.d = d;
+  u.d = norm(d);
  
   if (LDOUBLE_VALUE_BYTES == 16) {
     // ieee quad or __ibm128
@@ -133,10 +152,10 @@ static int ldouble_serialize_data(long double *q) {
 }
 
 static void ldouble_serialize(value v, uintnat *wsize_32, uintnat *wsize_64) {
-  long double *p = Data_custom_val(v);
+  long double p = norm(ldouble_custom_val(v));
   int size;
   caml_serialize_int_1(LDBL_MANT_DIG);
-  size = ldouble_serialize_data(p);
+  size = ldouble_serialize_data(&p);
   *wsize_32 = 1+size;
   *wsize_64 = 1+size;
 }
@@ -321,46 +340,49 @@ CAMLprim value ctypes_ldouble_classify(value v){
   CAMLreturn(r);
 }
 
-static char *format_ldouble(char *fmt, long double d) {
-  static size_t buf_len = 10;
-  static char *buf = NULL;
-  static char *empty = "";
-  size_t print_len = 0;
+static char *format_ldouble(int width, int prec, long double d) {
+  size_t print_len;
+  char *buf = NULL;
 
-  // allocate initial string
-  if (buf == NULL) buf = malloc(buf_len);
-  if (buf == NULL) return empty; // oops...stuck
+  // find length
+  print_len = snprintf(NULL, 0, "%*.*Lf", width, prec, d);
+  if (0 == print_len) // this shouldn't happen
+    caml_invalid_argument("bad ldouble format");
 
-  // try to print
-  print_len = snprintf(buf, buf_len, fmt, d);
+  // allocate buffer
+  buf = malloc(print_len+1);
+  if (NULL == buf) caml_raise_out_of_memory();
 
-  // not enough space - reallocate and try again
-  if (print_len >= buf_len) {
-    // re-allocate string
-    if (buf) free(buf);
-    buf = malloc(print_len+1);
-    buf_len = print_len+1;
-    // try again
-    return format_ldouble(fmt, d);
-  } else 
-    // ok
-    return buf;
+  // format string
+  buf[0] = '\0';
+  snprintf(buf, print_len+1, "%*.*Lf", width, prec, d);
+  return buf;
 }
 
-CAMLprim value ctypes_ldouble_format(value fmt, value d) {
-  CAMLparam2(fmt, d);
-  CAMLreturn(caml_copy_string(format_ldouble( String_val(fmt), ldouble_custom_val(d))));
+CAMLprim value ctypes_ldouble_format(value width, value prec, value d) {
+  CAMLparam3(width, prec, d);
+  CAMLlocal1(s);
+  char *str = format_ldouble(Int_val(width), Int_val(prec), 
+                             ldouble_custom_val(d));
+  s = caml_copy_string(str);
+  free(str);
+  CAMLreturn(s);
 }
 
 CAMLprim value ctypes_ldouble_of_string(value v) {
   CAMLparam1(v);
   char *str = String_val(v);
-  char *end = str + caml_string_length(v);
-  long double r = strtold(str, &end);
+  int len = caml_string_length(v);
+  char *end;
+  long double r;
+  if (0 == len) caml_invalid_argument("LDouble.of_string");
+  r = strtold(str, &end);
+  if (*end != '\0') caml_invalid_argument("LDouble.of_string");
   CAMLreturn(ctypes_copy_ldouble(r));
 }
 
-char hex_char(char x) {
+/* debug code */
+/*static char hex_char(char x) {
   if (x < 10) return '0' + x;
   return 'a' + x - 10;
 }
@@ -376,12 +398,12 @@ CAMLprim value ctypes_ldouble_to_hex(value v) {
   }
   x[LDOUBLE_STORAGE_BYTES*2] = 0;
   CAMLreturn(caml_copy_string(x));
-}
+}*/
 
 value ctypes_ldouble_min(value unit) { return ctypes_copy_ldouble(-LDBL_MAX); }
 value ctypes_ldouble_max(value unit) { return ctypes_copy_ldouble(LDBL_MAX); }
 value ctypes_ldouble_epsilon(value unit) { return ctypes_copy_ldouble(LDBL_EPSILON); }
-value ctypes_ldouble_nan(value unit) { return ctypes_copy_ldouble(nanl("char-sequence")); }
+value ctypes_ldouble_nan(value unit) { return ctypes_copy_ldouble(nan_); }
 // XXX note; -(log 0) gives +ve inf (and vice versa).  Is this consistent? *)
 value ctypes_ldouble_inf(value unit) { return ctypes_copy_ldouble(-log(0)); } 
 value ctypes_ldouble_ninf(value unit) { return ctypes_copy_ldouble(log(0)); }
@@ -431,7 +453,7 @@ static uintnat ldouble_complex_deserialize(void *d) {
     caml_deserialize_error("invalid long double size");
   size = ldouble_deserialize_data(&re);
   size += ldouble_deserialize_data(&im);
-  *(long double *)d = (re + im * I);
+  *(long double complex *)d = (re + im * I);
   return 1+size;
 }
 
@@ -518,6 +540,7 @@ CAMLprim value ctypes_ldouble_complex_cargl(value a) {
 }
 
 value ldouble_init(value unit) {
+  nan_ = nanl(""); // platform dependant argument - use as cannonical nan
   caml_register_custom_operations(&caml_ldouble_ops);
   caml_register_custom_operations(&caml_ldouble_complex_ops);
   return Val_unit;

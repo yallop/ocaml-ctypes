@@ -32,8 +32,8 @@ let ident_of_ml_prim : type a. a Ctypes_primitive_types.ml_prim -> path =
    | ML_ullong -> path_of_string "Unsigned.ullong"
    | ML_ulong -> path_of_string "Unsigned.ulong"
    | ML_ushort -> path_of_string "Unsigned.ushort"
-   | ML_ldouble -> path_of_string "Ldouble.t"
-   | ML_complexld -> path_of_string "Ldouble.complex"
+   | ML_ldouble -> path_of_string "LDouble.t"
+   | ML_complexld -> path_of_string "ComplexL.t"
 
 let constructor_ident_of_prim : type a. a Ctypes_primitive_types.prim -> path =
   let open Ctypes_primitive_types in function

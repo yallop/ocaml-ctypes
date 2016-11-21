@@ -43,4 +43,3 @@ double complex ctypes_double_complex_val(value v)
 {
   return Double_field(v, 0) + Double_field(v, 1) * I;
 }
-

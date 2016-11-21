@@ -130,11 +130,11 @@ _build/src/cstubs/cstubs.cmx : _build/src/ctypes/ctypes.cmx _build/src/cstubs/cs
 _build/src/cstubs/cstubs_errors.cmo : _build/src/cstubs/cstubs_errors.cmi
 _build/src/cstubs/cstubs_errors.cmx : _build/src/cstubs/cstubs_errors.cmi
 _build/src/cstubs/cstubs_analysis.cmo : _build/src/ctypes/unsigned.cmi \
-    _build/src/ctypes/signed.cmi _build/src/ctypes/ldouble.cmi _build/src/ctypes/ctypes_static.cmi \
+    _build/src/ctypes/signed.cmi _build/src/ctypes/lDouble.cmi _build/src/ctypes/ctypes_static.cmi \
     _build/src/ctypes/ctypes_primitive_types.cmi _build/src/ctypes/ctypes_bigarray.cmi \
     _build/src/cstubs/cstubs_analysis.cmi
 _build/src/cstubs/cstubs_analysis.cmx : _build/src/ctypes/unsigned.cmx \
-    _build/src/ctypes/signed.cmx _build/src/ctypes/ldouble.cmx _build/src/ctypes/ctypes_static.cmx \
+    _build/src/ctypes/signed.cmx _build/src/ctypes/lDouble.cmx _build/src/ctypes/ctypes_static.cmx \
     _build/src/ctypes/ctypes_primitive_types.cmx _build/src/ctypes/ctypes_bigarray.cmx \
     _build/src/cstubs/cstubs_analysis.cmi
 _build/src/cstubs/cstubs_structs.cmi : _build/src/ctypes/ctypes_types.cmi
@@ -153,16 +153,18 @@ _build/src/cstubs/cstubs_public_name.cmi : _build/src/ctypes/ctypes_primitive_ty
     _build/src/ctypes/ctypes_path.cmi
 _build/src/cstubs/cstubs_generate_ml.cmi : _build/src/ctypes/ctypes.cmi
 _build/src/cstubs/cstubs_internals.cmi : _build/src/ctypes/unsigned.cmi \
-    _build/src/ctypes/signed.cmi _build/src/ctypes/ldouble.cmi _build/src/ctypes/ctypes_static.cmi \
+    _build/src/ctypes/signed.cmi _build/src/ctypes/lDouble.cmi _build/src/ctypes/ctypes_static.cmi \
     _build/src/ctypes/ctypes_ptr.cmo _build/src/ctypes/ctypes_primitive_types.cmi \
     _build/src/ctypes/ctypes_memory_stubs.cmo _build/src/ctypes/ctypes_bigarray.cmi \
     _build/src/ctypes/ctypes.cmi
 _build/src/cstubs/cstubs_generate_c.cmi : _build/src/ctypes/ctypes.cmi
 _build/src/ctypes/ctypes_primitive_types.cmo : _build/src/ctypes/unsigned.cmi \
-    _build/src/ctypes/signed.cmi _build/src/ctypes/ldouble.cmi \
+    _build/src/ctypes/signed.cmi _build/src/ctypes/lDouble.cmi \
+    _build/src/ctypes/complexL.cmi \
     _build/src/ctypes/ctypes_primitive_types.cmi
 _build/src/ctypes/ctypes_primitive_types.cmx : _build/src/ctypes/unsigned.cmx \
-    _build/src/ctypes/signed.cmx _build/src/ctypes/ldouble.cmx \
+    _build/src/ctypes/signed.cmx _build/src/ctypes/lDouble.cmx \
+    _build/src/ctypes/complexL.cmx \
     _build/src/ctypes/ctypes_primitive_types.cmi
 _build/src/ctypes/ctypes_bigarray.cmi : _build/src/ctypes/ctypes_ptr.cmo \
     _build/src/ctypes/ctypes_primitive_types.cmi _build/src/ctypes/ctypes_path.cmi
@@ -200,16 +202,17 @@ _build/src/ctypes/ctypes_structs.cmi : _build/src/ctypes/ctypes_static.cmi
 _build/src/ctypes/ctypes.cmi : _build/src/ctypes/ctypes_types.cmi \
     _build/src/ctypes/ctypes_static.cmi
 _build/src/ctypes/ctypes_types.cmi : _build/src/ctypes/unsigned.cmi _build/src/ctypes/signed.cmi \
-    _build/src/ctypes/ldouble.cmi _build/src/ctypes/ctypes_static.cmi
+    _build/src/ctypes/lDouble.cmi _build/src/ctypes/ctypes_static.cmi
 _build/src/ctypes/ctypes_static.cmi : _build/src/ctypes/unsigned.cmi _build/src/ctypes/signed.cmi \
-    _build/src/ctypes/ldouble.cmi _build/src/ctypes/ctypes_ptr.cmo \
+    _build/src/ctypes/lDouble.cmi _build/src/ctypes/ctypes_ptr.cmo \
     _build/src/ctypes/ctypes_primitive_types.cmi _build/src/ctypes/ctypes_bigarray.cmi
 _build/src/ctypes/ctypes_memory_stubs.cmo : _build/src/ctypes/ctypes_ptr.cmo \
     _build/src/ctypes/ctypes_primitive_types.cmi
 _build/src/ctypes/ctypes_memory_stubs.cmx : _build/src/ctypes/ctypes_ptr.cmx \
     _build/src/ctypes/ctypes_primitive_types.cmx
 _build/src/ctypes/ctypes_primitive_types.cmi : _build/src/ctypes/unsigned.cmi \
-    _build/src/ctypes/signed.cmi _build/src/ctypes/ldouble.cmi
+    _build/src/ctypes/signed.cmi _build/src/ctypes/lDouble.cmi \
+    _build/src/ctypes/complexL.cmi
 _build/src/ctypes/ctypes_coerce.cmo : _build/src/ctypes/ctypes_type_printing.cmi \
     _build/src/ctypes/ctypes_static.cmi _build/src/ctypes/ctypes_ptr.cmo \
     _build/src/ctypes/ctypes_primitive_types.cmi
@@ -405,6 +408,9 @@ _build/examples/cstubs_structs/bindings.cmx : _build/src/ctypes/ctypes.cmx \
     _build/src/cstubs/cstubs_structs.cmx
 _build/examples/cstubs_structs/myocamlbuild.cmo :
 _build/examples/cstubs_structs/myocamlbuild.cmx :
-_build/src/ctypes/ldouble.cmi :
-_build/src/ctypes/ldouble.cmo : _build/src/ctypes/ldouble.cmi
-_build/src/ctypes/ldouble.cmx : _build/src/ctypes/ldouble.cmi
+_build/src/ctypes/lDouble.cmi :
+_build/src/ctypes/lDouble.cmo : _build/src/ctypes/lDouble.cmi
+_build/src/ctypes/lDouble.cmx : _build/src/ctypes/lDouble.cmi
+_build/src/ctypes/complexL.cmi :
+_build/src/ctypes/complexL.cmo : _build/src/ctypes/complexL.cmi
+_build/src/ctypes/complexL.cmx : _build/src/ctypes/complexL.cmi
