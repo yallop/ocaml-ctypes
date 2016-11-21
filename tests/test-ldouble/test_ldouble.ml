@@ -88,7 +88,8 @@ let test_opw _ =
     assert_bool "ldexp" (chk_float x y)
   in
   List.iter chk_frexp flts;
-  List.iter chk_modf flts;
+  (* XXX work around bug.  see comment for LDouble.modf *)
+  (if not Sys.win32 then List.iter chk_modf flts);
   List.iter (fun a -> List.iter (fun b -> chk_ldexp a b) [2;5;8]) flts
 
 let test_classify _ = 

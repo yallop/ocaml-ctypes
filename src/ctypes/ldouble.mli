@@ -135,7 +135,9 @@ val ldexp : t -> int -> t
 (** [ldexp x n] returns [x *. 2 ** n]. *)
 
 val modf : t -> t * t
-(** return [(fractional,integer)] parts of number. *)
+(** return [(fractional,integer)] parts of number.
+ 
+    Known fatal bug on mingw32; see https://sourceforge.net/p/mingw-w64/bugs/478 *)
 
 val classify : t -> fpclass
 (** Return the class of the given floating-point number:
