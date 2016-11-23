@@ -1,3 +1,30 @@
+## ctypes 0.11.0
+
+### Features
+
+* Support for the `long double` and `long double complex` types  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/475
+
+* Support for binding foreign arrays  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/470
+
+* Improved printing for structs and unions without tags  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/467
+
+* Added a function `is_null`  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/463
+
+### Bug fixes
+
+* Custom operations (namely deserializing) for unsigned integers registered  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/480
+
+* All objects kept live when the runtime lock is released  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/473
+
+Thanks to Andrew Ray (@andrewray) and Yunxing Dai (@yunxing) for contributions
+to this release.
+
 ## ctypes 0.10.2
 
 ### Bug fixes 
