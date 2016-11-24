@@ -76,11 +76,11 @@ void ctypes_check_ffi_status(ffi_status status)
   case FFI_OK:
     break;
   case FFI_BAD_TYPEDEF:
-    raise_with_string(*caml_named_value("FFI_internal_error"),
-                      "FFI_BAD_TYPEDEF");
+    caml_raise_with_string(*caml_named_value("FFI_internal_error"),
+                           "FFI_BAD_TYPEDEF");
   case FFI_BAD_ABI:
-    raise_with_string(*caml_named_value("FFI_internal_error"),
-                      "FFI_BAD_ABI");
+    caml_raise_with_string(*caml_named_value("FFI_internal_error"),
+                           "FFI_BAD_ABI");
   default:
     assert(0);
   }
@@ -607,7 +607,7 @@ value ctypes_make_function_pointer(value callspec_, value fnid)
   }
 }
 
-/* Extract the raw address from a function pointer object */ 
+/* Extract the raw address from a function pointer object */
 value ctypes_raw_address_of_function_pointer(value closure)
 {
   return CTYPES_FROM_PTR(*(struct closure **)Data_custom_val(closure));
