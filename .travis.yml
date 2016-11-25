@@ -17,6 +17,7 @@ env:
   - OCAML_VERSION=4.02.3 ARM=true
   - OCAML_VERSION=4.03.0
   - OCAML_VERSION=4.04.0+flambda
+  - OCAML_VERSION=4.04.0+32bit ANDROID=true
 matrix:
   exclude:
     - os: osx
@@ -27,6 +28,8 @@ matrix:
       env: OCAML_VERSION=4.01.0
     - os: osx
       env: OCAML_VERSION=4.04.0+flambda
+    - os: osx
+      env: OCAML_VERSION=4.04.0+32bit ANDROID=true
 before_install:
   - if [ "${ARM}z" = "truez" ]; then
       sudo apt-get update && sudo apt-get install --yes qemu-user-static;

@@ -531,13 +531,13 @@ CAMLprim value ctypes_ldouble_complex_neg(value a) {
 #define FN1FAIL(OP)                                                        \
   CAMLprim value ctypes_ldouble_complex_ ## OP (value a) {                 \
     CAMLparam1(a);                                                         \
-    caml_failwith("ctypes: " #OP " does not exist on current platform")    \
+    caml_failwith("ctypes: " #OP " does not exist on current platform");   \
   }
 
 #define FN2FAIL(OP)                                                        \
   CAMLprim value ctypes_ldouble_complex_ ## OP (value a, value b) {        \
     CAMLparam2(a, b);                                                      \
-    caml_failwith("ctypes: " #OP " does not exist on current platform")    \
+    caml_failwith("ctypes: " #OP " does not exist on current platform");   \
   }
 
 FN1(conjl)
