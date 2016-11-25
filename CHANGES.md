@@ -1,5 +1,15 @@
 ## ctypes 0.11.0
 
+### Bug fixes
+
+* Stub out some `long double complex` functions that are not supported on Android  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/486
+
+Thanks to Peter Zotov (@whitequark) and Jeremie Dimino (@diml) for
+contributions to this release.
+
+## ctypes 0.11.0
+
 ### Features
 
 * Support for the `long double` and `long double complex` types  
