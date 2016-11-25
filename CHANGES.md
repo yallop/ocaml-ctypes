@@ -1,4 +1,4 @@
-## ctypes 0.11.0
+## ctypes 0.11.1
 
 ### Bug fixes
 
