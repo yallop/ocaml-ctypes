@@ -35,7 +35,7 @@
  * 10 byte extended - intel gcc.  can be packed into 12 or 16 bytes.
  * 16 byte - powerpc, either IEEE quad float or __ibm128 double double
  *
- * We make a best guess as to the format based on LDBL_MANT_DIG. 
+ * We make a best guess as to the format based on LDBL_MANT_DIG.
  * This only affects the operation of hashing and serialization.
  *
  * For deserialization we consider it an error if the stored
@@ -44,10 +44,10 @@
  *
  * Regarding endianness - the 8 and 16 byte formats should
  * interwork between big and little endian systems.  The
- * intel extended 10 byte format only seems to occurs on 
+ * intel extended 10 byte format only seems to occurs on
  * x86 so we dont need to consider endianness.
  *
- * In case a format is encountered that we do not understand, 
+ * In case a format is encountered that we do not understand,
  * then we fall back to casting the value to a double.
  *
  */
@@ -55,7 +55,7 @@
 #define LDOUBLE_STORAGE_BYTES sizeof(long double)
 #if (LDBL_MANT_DIG == 53)      // 64 bit - same as double
 #define LDOUBLE_VALUE_BYTES 8
-#elif (LDBL_MANT_DIG == 64)    // intel 80 bit extended 
+#elif (LDBL_MANT_DIG == 64)    // intel 80 bit extended
 #define LDOUBLE_VALUE_BYTES 10
 #elif (LDBL_MANT_DIG == 106)   // __ibm128 (pair of doubles)
 #define LDOUBLE_VALUE_BYTES 16
@@ -86,7 +86,7 @@ static int ldouble_cmp(long double u1, long double u2) {
     if (u1 == u1) return 1;  // u2 is nan
     if (u2 == u2) return -1; // u1 is nan
     // both nan ==> equal
-  } 
+  }
   return 0;
 }
 
@@ -103,7 +103,7 @@ static uint32_t ldouble_mix_hash(uint32_t hash, long double d) {
     uint32_t a[(LDOUBLE_STORAGE_BYTES+3)/4];
   } u;
   u.d = norm(d);
- 
+
   if (LDOUBLE_VALUE_BYTES == 16) {
     // ieee quad or __ibm128
 #ifdef ARCH_BIG_ENDIAN
@@ -118,7 +118,7 @@ static uint32_t ldouble_mix_hash(uint32_t hash, long double d) {
     hash = caml_hash_mix_uint32(hash, u.a[2]);
 #endif
   } else if (LDOUBLE_VALUE_BYTES == 10) {
-    // intel extended 
+    // intel extended
     hash = caml_hash_mix_uint32(hash, u.a[0]);
     hash = caml_hash_mix_uint32(hash, u.a[1]);
     hash = caml_hash_mix_uint32(hash, u.a[2] & 0xFFFF);
@@ -180,7 +180,7 @@ static int ldouble_deserialize_data(long double *q) {
 
 static uintnat ldouble_deserialize(void *d) {
   int size;
-  if (caml_deserialize_uint_1() != LDBL_MANT_DIG) 
+  if (caml_deserialize_uint_1() != LDBL_MANT_DIG)
     caml_deserialize_error("invalid long double size");
   size = ldouble_deserialize_data((long double *) d);
   return 1+size;
@@ -205,21 +205,21 @@ value ctypes_copy_ldouble(long double u)
 
 long double ctypes_ldouble_val(value v) { return ldouble_custom_val(v); }
 
-CAMLprim value ctypes_ldouble_of_float(value a) { 
-  CAMLparam1(a); 
-  CAMLreturn(ctypes_copy_ldouble(Double_val(a))); 
+CAMLprim value ctypes_ldouble_of_float(value a) {
+  CAMLparam1(a);
+  CAMLreturn(ctypes_copy_ldouble(Double_val(a)));
 }
-CAMLprim value ctypes_ldouble_to_float(value a) { 
-  CAMLparam1(a); 
-  CAMLreturn(caml_copy_double(ldouble_custom_val(a))); 
+CAMLprim value ctypes_ldouble_to_float(value a) {
+  CAMLparam1(a);
+  CAMLreturn(caml_copy_double(ldouble_custom_val(a)));
 }
-CAMLprim value ctypes_ldouble_of_int(value a) { 
-  CAMLparam1(a); 
-  CAMLreturn(ctypes_copy_ldouble(Int_val(a))); 
+CAMLprim value ctypes_ldouble_of_int(value a) {
+  CAMLparam1(a);
+  CAMLreturn(ctypes_copy_ldouble(Int_val(a)));
 }
-CAMLprim value ctypes_ldouble_to_int(value a) { 
-  CAMLparam1(a); 
-  CAMLreturn(Val_int(ldouble_custom_val(a))); 
+CAMLprim value ctypes_ldouble_to_int(value a) {
+  CAMLparam1(a);
+  CAMLreturn(Val_int(ldouble_custom_val(a)));
 }
 
 #define OP2(OPNAME, OP)                                                               \
@@ -233,9 +233,9 @@ OP2(sub, -)
 OP2(mul, *)
 OP2(div, /)
 
-CAMLprim value ctypes_ldouble_neg(value a) { 
+CAMLprim value ctypes_ldouble_neg(value a) {
   CAMLparam1(a);
-  CAMLreturn(ctypes_copy_ldouble( - ldouble_custom_val(a))); 
+  CAMLreturn(ctypes_copy_ldouble( - ldouble_custom_val(a)));
 }
 
 #define FN1(OP)                                                   \
@@ -334,7 +334,7 @@ CAMLprim value ctypes_ldouble_classify(value v){
   case FP_SUBNORMAL : r = Val_int(ml_FP_SUBNORMAL); break;
   case FP_ZERO      : r = Val_int(ml_FP_ZERO); break;
   case FP_INFINITE  : r = Val_int(ml_FP_INFINITE); break;
-  case FP_NAN       : 
+  case FP_NAN       :
   default           : r = Val_int(ml_FP_NAN); break;
   }
   CAMLreturn(r);
@@ -362,7 +362,7 @@ static char *format_ldouble(int width, int prec, long double d) {
 CAMLprim value ctypes_ldouble_format(value width, value prec, value d) {
   CAMLparam3(width, prec, d);
   CAMLlocal1(s);
-  char *str = format_ldouble(Int_val(width), Int_val(prec), 
+  char *str = format_ldouble(Int_val(width), Int_val(prec),
                              ldouble_custom_val(d));
   s = caml_copy_string(str);
   free(str);
@@ -405,7 +405,7 @@ value ctypes_ldouble_max(value unit) { return ctypes_copy_ldouble(LDBL_MAX); }
 value ctypes_ldouble_epsilon(value unit) { return ctypes_copy_ldouble(LDBL_EPSILON); }
 value ctypes_ldouble_nan(value unit) { return ctypes_copy_ldouble(nan_); }
 // XXX note; -(log 0) gives +ve inf (and vice versa).  Is this consistent? *)
-value ctypes_ldouble_inf(value unit) { return ctypes_copy_ldouble(-log(0)); } 
+value ctypes_ldouble_inf(value unit) { return ctypes_copy_ldouble(-log(0)); }
 value ctypes_ldouble_ninf(value unit) { return ctypes_copy_ldouble(log(0)); }
 
 value ctypes_ldouble_size(value unit) {
@@ -449,7 +449,7 @@ static void ldouble_complex_serialize(value v, uintnat *wsize_32, uintnat *wsize
 static uintnat ldouble_complex_deserialize(void *d) {
   long double re, im;
   int size;
-  if (caml_deserialize_uint_1() != LDBL_MANT_DIG) 
+  if (caml_deserialize_uint_1() != LDBL_MANT_DIG)
     caml_deserialize_error("invalid long double size");
   size = ldouble_deserialize_data(&re);
   size += ldouble_deserialize_data(&im);
@@ -512,7 +512,7 @@ OP2(div, /)
 
 CAMLprim value ctypes_ldouble_complex_neg(value a) {
   CAMLparam1(a);
-  CAMLreturn(ctypes_copy_ldouble_complex( - ldouble_complex_custom_val(a) )); 
+  CAMLreturn(ctypes_copy_ldouble_complex( - ldouble_complex_custom_val(a) ));
 }
 
 #define FN1(OP)                                                                   \
@@ -528,11 +528,31 @@ CAMLprim value ctypes_ldouble_complex_neg(value a) {
       OP (ldouble_complex_custom_val(a), ldouble_complex_custom_val(b)))); \
   }
 
+#define FN1FAIL(OP)                                                        \
+  CAMLprim value ctypes_ldouble_complex_ ## OP (value a) {                 \
+    CAMLparam1(a);                                                         \
+    caml_failwith("ctypes: " #OP " does not exist on current platform")    \
+  }
+
+#define FN2FAIL(OP)                                                        \
+  CAMLprim value ctypes_ldouble_complex_ ## OP (value a, value b) {        \
+    CAMLparam2(a, b);                                                      \
+    caml_failwith("ctypes: " #OP " does not exist on current platform")    \
+  }
+
 FN1(conjl)
 FN1(csqrtl)
+
+// As of API level 24, these functions do not exist.
+#ifdef __ANDROID__
+FN1FAIL(cexpl)
+FN1FAIL(clogl)
+FN2FAIL(cpowl)
+#else
 FN1(cexpl)
 FN1(clogl)
 FN2(cpowl)
+#endif
 
 CAMLprim value ctypes_ldouble_complex_cargl(value a) {
   CAMLparam1(a);
