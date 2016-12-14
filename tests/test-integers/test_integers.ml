@@ -16,6 +16,7 @@ open Unsigned
 let test_uint64_of_int _ =
   begin
     assert_equal max_int (UInt64.to_int (UInt64.of_int max_int))
+      ~printer:string_of_int
   end
 
 
