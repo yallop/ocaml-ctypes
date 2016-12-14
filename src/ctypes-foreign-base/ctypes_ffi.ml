@@ -47,7 +47,7 @@ struct
   let kept_alive_indefinitely = ref []
   let keep_alive w ~while_live:v =
     try Gc.finalise (fun _ -> Ctypes_memory_stubs.use_value w; ()) v
-    with Invalid_argument "Gc.finalise" ->
+    with Invalid_argument _ ->
       kept_alive_indefinitely := Obj.repr w :: !kept_alive_indefinitely
 
   let report_unpassable what =

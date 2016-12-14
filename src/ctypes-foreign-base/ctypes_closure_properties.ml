@@ -58,27 +58,28 @@ module Make (Mutex : MUTEX) = struct
       end
     in cleanup
 
+  let try_finalise f x =
+    try Gc.finalise f x; true
+    with Invalid_argument _ -> false
+
   let record closure boxed_closure : int =
     let key = fresh () in
-    try
-      (* For closures we add an entry to function_by_id and a finaliser that
-         removes the entry. *)
-      Gc.finalise (finalise key) closure;
-      begin
-        Mutex.lock tables_lock;
-        Hashtbl.add function_by_id key boxed_closure;
-        Mutex.unlock tables_lock;
-      end;
+    (* For closures we add an entry to function_by_id and a finaliser that
+       removes the entry. *)
+    if try_finalise (finalise key) closure then begin
+      Mutex.lock tables_lock;
+      Hashtbl.add function_by_id key boxed_closure;
+      Mutex.unlock tables_lock;
       key
-    with Invalid_argument "Gc.finalise" ->
+    end
+    else begin
       (* For non-closures we add entries to function_by_id and
          id_by_function. *)
-      begin
-        Mutex.lock tables_lock;
-        let id = store_non_closure_function closure boxed_closure key in
-        Mutex.unlock tables_lock;
-        id
-      end
+      Mutex.lock tables_lock;
+      let id = store_non_closure_function closure boxed_closure key in
+      Mutex.unlock tables_lock;
+      id
+    end
 
   let retrieve id =
     begin
