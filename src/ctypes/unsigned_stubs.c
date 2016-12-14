@@ -112,20 +112,20 @@
   value ctypes_uint ## BITS ## _shift_left(value a, value b)                 \
   {                                                                          \
     return ctypes_copy_uint ## BITS(Uint_custom_val(TYPE(BITS), a)           \
-                                    << Int_val(b));                          \
+                                    << Long_val(b));                         \
   }                                                                          \
                                                                              \
   /* shift_right : t -> int -> t */                                          \
   value ctypes_uint ## BITS ## _shift_right(value a, value b)                \
   {                                                                          \
     return ctypes_copy_uint ## BITS(Uint_custom_val(TYPE(BITS), a)           \
-                                    >> Int_val(b));                          \
+                                    >> Long_val(b));                         \
   }                                                                          \
                                                                              \
   /* of_int : int -> t */                                                    \
   value ctypes_uint ## BITS ## _of_int(value a)                              \
   {                                                                          \
-    return ctypes_copy_uint ## BITS (Int_val(a));                            \
+    return ctypes_copy_uint ## BITS (Long_val(a));                           \
   }                                                                          \
                                                                              \
   /* to_int : t -> int */                                                    \
