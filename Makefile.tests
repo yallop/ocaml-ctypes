@@ -57,6 +57,15 @@ tests/test-pointers/generated_stubs.c: $(BUILDDIR)/test-pointers-stub-generator.
 tests/test-pointers/generated_bindings.ml: $(BUILDDIR)/test-pointers-stub-generator.$(BEST)
 	$< --ml-file $@
 
+test-integers.dir = tests/test-integers
+test-integers.threads = yes
+test-integers.deps = str bigarray oUnit bytes
+test-integers.subproject_deps = ctypes ctypes-foreign-base \
+  ctypes-foreign-threaded cstubs tests-common
+test-integers.link_flags = -L$(BUILDDIR)/clib -ltest_functions
+test-integers: PROJECT=test-integers
+test-integers: $$(BEST_TARGET)
+
 test-variadic-stubs.dir  = tests/test-variadic/stubs
 test-variadic-stubs.threads = yes
 test-variadic-stubs.subproject_deps = ctypes cstubs \
@@ -1157,6 +1166,7 @@ test-ldouble: $$(BEST_TARGET)
 TESTS =
 TESTS += test-raw
 TESTS += test-pointers-stubs test-pointers-stub-generator test-pointers-generated test-pointers
+TESTS += test-integers
 TESTS += test-variadic-stubs test-variadic-stub-generator test-variadic-generated test-variadic
 TESTS += test-builtins-stubs test-builtins-stub-generator test-builtins-generated test-builtins
 TESTS += test-macros-stubs test-macros-stub-generator test-macros-generated test-macros
