@@ -251,4 +251,6 @@ float callback_returns_float(float (*f)(void));
 double callback_returns_double(double (*f)(void));
 bool callback_returns_bool(bool (*f)(void));
 
+intnat max_caml_int(void);
+
 #endif /* TEST_FUNCTIONS_H */
