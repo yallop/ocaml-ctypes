@@ -58,7 +58,7 @@ let c_primitives = [
   c_primitive "Complexld" "long double complex"(No_format);
   c_primitive "Nativeint" "intnat"             (Defined_format "REAL_ARCH_INTNAT_PRINTF_FORMAT \"d\"");
   { constructor = "Camlint";
-    typ         = "camlint";
+    typ         = "intnat";
     format      = Defined_format "REAL_ARCH_INTNAT_PRINTF_FORMAT \"d\"";
     size        = "sizeof(intnat)";
     alignment   = "alignof(intnat)" };
