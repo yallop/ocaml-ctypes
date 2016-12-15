@@ -25,7 +25,7 @@ value ctypes_bigarray_view(value kind_, value dims_, value ptr_)
   intnat dims[CAML_BA_MAX_NUM_DIMS];
   int i;
   for (i = 0; i < ndims; i++) {
-    dims[i] = Int_val(Field(dims_, i));
+    dims[i] = Long_val(Field(dims_, i));
   }
   int flags = kind | CAML_BA_C_LAYOUT | CAML_BA_EXTERNAL;
   void *data = CTYPES_ADDR_OF_FATPTR(ptr_);
