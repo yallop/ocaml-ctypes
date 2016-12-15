@@ -62,8 +62,8 @@ value ctypes_copy_bytes(void *src, size_t size)
 value ctypes_allocate(value count_, value size_)
 {
   CAMLparam2(count_, size_);
-  int size = Int_val(size_);
-  int count = Int_val(count_);
+  intnat size = Long_val(size_);
+  intnat count = Long_val(count_);
   CAMLlocal1(block);
   block = caml_alloc_custom(&managed_buffer_custom_ops, sizeof(void*), 0, 1);
   // libc's calloc guarantees the memory is zero-filled

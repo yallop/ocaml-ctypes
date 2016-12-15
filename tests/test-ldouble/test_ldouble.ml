@@ -219,6 +219,18 @@ let test_comparisons _ =
     assert_equal (-1) (compare nan neg_infinity);
   end
 
+let test_int_conversions _ =
+  begin
+    assert_equal max_int (LDouble.to_int
+			    (LDouble.of_int max_int))
+      ~printer:string_of_int;
+
+    assert_equal min_int (LDouble.to_int
+			    (LDouble.of_int min_int))
+      ~printer:string_of_int;
+  end
+    
+
 let suite = "LDouble tests" >:::
   [
     "test functions with 2 args" >:: test_op2;
@@ -229,6 +241,7 @@ let suite = "LDouble tests" >:::
     "test complex api" >:: test_complex;
     "test marshal" >:: test_marshal;
     "test comparisons" >:: test_comparisons;
+    "test int conversions" >:: test_int_conversions;
   ]
 
 let _ = run_test_tt_main suite

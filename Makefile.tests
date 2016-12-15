@@ -57,6 +57,39 @@ tests/test-pointers/generated_stubs.c: $(BUILDDIR)/test-pointers-stub-generator.
 tests/test-pointers/generated_bindings.ml: $(BUILDDIR)/test-pointers-stub-generator.$(BEST)
 	$< --ml-file $@
 
+test-integers-stubs.dir  = tests/test-integers/stubs
+test-integers-stubs.threads = yes
+test-integers-stubs.subproject_deps = ctypes cstubs \
+   ctypes-foreign-base ctypes-foreign-threaded tests-common
+test-integers-stubs: PROJECT=test-integers-stubs
+test-integers-stubs: $$(LIB_TARGETS)
+
+test-integers-stub-generator.dir = tests/test-integers/stub-generator
+test-integers-stub-generator.threads = yes
+test-integers-stub-generator.subproject_deps = ctypes cstubs \
+     ctypes-foreign-base ctypes-foreign-threaded test-integers-stubs tests-common
+test-integers-stub-generator.deps = str bigarray bytes
+test-integers-stub-generator: PROJECT=test-integers-stub-generator
+test-integers-stub-generator: $$(BEST_TARGET)
+
+test-integers.dir = tests/test-integers
+test-integers.threads = yes
+test-integers.deps = str bigarray oUnit bytes
+test-integers.subproject_deps = ctypes ctypes-foreign-base \
+  ctypes-foreign-threaded cstubs tests-common test-integers-stubs
+test-integers.link_flags = -L$(BUILDDIR)/clib -ltest_functions
+test-integers: PROJECT=test-integers
+test-integers: $$(BEST_TARGET)
+
+test-integers-generated: \
+  tests/test-integers/generated_bindings.ml \
+  tests/test-integers/generated_stubs.c
+
+tests/test-integers/generated_stubs.c: $(BUILDDIR)/test-integers-stub-generator.$(BEST)
+	$< --c-file $@
+tests/test-integers/generated_bindings.ml: $(BUILDDIR)/test-integers-stub-generator.$(BEST)
+	$< --ml-file $@
+
 test-variadic-stubs.dir  = tests/test-variadic/stubs
 test-variadic-stubs.threads = yes
 test-variadic-stubs.subproject_deps = ctypes cstubs \
@@ -1157,6 +1190,7 @@ test-ldouble: $$(BEST_TARGET)
 TESTS =
 TESTS += test-raw
 TESTS += test-pointers-stubs test-pointers-stub-generator test-pointers-generated test-pointers
+TESTS += test-integers-stubs test-integers-stub-generator test-integers-generated test-integers
 TESTS += test-variadic-stubs test-variadic-stub-generator test-variadic-generated test-variadic
 TESTS += test-builtins-stubs test-builtins-stub-generator test-builtins-generated test-builtins
 TESTS += test-macros-stubs test-macros-stub-generator test-macros-generated test-macros

@@ -763,3 +763,7 @@ void check_ones(const int *p, size_t sz)
   }
 }
 
+intnat max_caml_int(void)
+{
+  return (intnat)(((uintnat)-1) / 4);
+}
