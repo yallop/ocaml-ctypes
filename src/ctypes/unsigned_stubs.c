@@ -130,7 +130,7 @@
   /* to_int : t -> int */                                                    \
   value ctypes_uint ## BITS ## _to_int(value a)                              \
   {                                                                          \
-    return Val_int(Uint_custom_val(BITS, a));                                \
+    return Val_long(Uint_custom_val(BITS, a));                               \
   }                                                                          \
                                                                              \
   /* of_int64 : int64 -> t */                                                \
@@ -203,13 +203,13 @@ UINT_SMALL_DEFS(16, 2)
 UINT_DEFS(32, 4)
 UINT_DEFS(64, 8)
 
-value ctypes_size_t_size (value _) { return Val_int(sizeof (size_t)); }
-value ctypes_ushort_size (value _) { return Val_int(sizeof (unsigned short)); }
-value ctypes_uint_size (value _) { return Val_int(sizeof (unsigned int)); }
-value ctypes_ulong_size (value _) { return Val_int(sizeof (unsigned long)); }
-value ctypes_ulonglong_size (value _) { return Val_int(sizeof (unsigned long long)); }
+value ctypes_size_t_size (value _) { return Val_long(sizeof (size_t)); }
+value ctypes_ushort_size (value _) { return Val_long(sizeof (unsigned short)); }
+value ctypes_uint_size (value _) { return Val_long(sizeof (unsigned int)); }
+value ctypes_ulong_size (value _) { return Val_long(sizeof (unsigned long)); }
+value ctypes_ulonglong_size (value _) { return Val_long(sizeof (unsigned long long)); }
 value ctypes_uint32_of_int32 (value i) { return ctypes_copy_uint32(Int32_val(i)); }
 value ctypes_int32_of_uint32 (value u) { return caml_copy_int32(Uint_custom_val(32, u)); }
-value ctypes_uintptr_t_size (value _) { return Val_int(sizeof (uintptr_t)); }
-value ctypes_intptr_t_size (value _) { return Val_int(sizeof (intptr_t)); }
-value ctypes_ptrdiff_t_size (value _) { return Val_int(sizeof (ptrdiff_t)); }
+value ctypes_uintptr_t_size (value _) { return Val_long(sizeof (uintptr_t)); }
+value ctypes_intptr_t_size (value _) { return Val_long(sizeof (intptr_t)); }
+value ctypes_ptrdiff_t_size (value _) { return Val_long(sizeof (ptrdiff_t)); }

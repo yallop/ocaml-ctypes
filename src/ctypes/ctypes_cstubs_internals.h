@@ -16,7 +16,7 @@
 #include "ctypes_managed_buffer_stubs.h"
 #include <caml/threads.h>
 #define CTYPES_PTR_OF_OCAML_STRING(s) \
-  (String_val(Field(s, 1)) + Int_val(Field(s, 0)))
+  (String_val(Field(s, 1)) + Long_val(Field(s, 0)))
 #define Ctypes_val_char(c) \
   (Val_int((c + 256) % 256))
 #define CTYPES_PAIR_WITH_ERRNO(v)
