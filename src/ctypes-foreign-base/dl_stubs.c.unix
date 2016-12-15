@@ -66,7 +66,7 @@ value ctypes_resolve_dl_flag(value flag)
     default: assert(0);
   }
 
-  return Val_int(rv);
+  return Val_long(rv);
 }
 
 /* ctypes_dlopen : filename:string -> flags:int -> library option */
@@ -101,7 +101,7 @@ value ctypes_dlsym(value handle_option, value symbol)
 /* ctypes_dlclose : handle:library -> int */
 value ctypes_dlclose(value handle)
 {
-  return Val_int(dlclose((void *)handle));
+  return Val_long(dlclose((void *)handle));
 }
 
 /* ctypes_dlerror : unit -> string option */
