@@ -44,11 +44,11 @@ int (*ctypes_thread_register)(void) = ctypes_thread_register_fail;
 static value retrieve_closure_;
 
 /* Resolve identifiers to OCaml functions */
-static value retrieve_closure(int key)
+static value retrieve_closure(intnat key)
 {
   CAMLparam0 ();
   CAMLlocal1(result);
-  result = caml_callback_exn(retrieve_closure_, Val_int(key));
+  result = caml_callback_exn(retrieve_closure_, Val_long(key));
 
   if (Is_exception_result(result)) {
     caml_raise_constant(*caml_named_value("CallToExpiredClosure"));
@@ -268,7 +268,7 @@ value ctypes_add_argument(value callspec_, value argument_)
   callspec->max_align = argtype->alignment > callspec->max_align
     ? argtype->alignment
     : callspec->max_align;
-  CAMLreturn(Val_int(offset));
+  CAMLreturn(Val_long(offset));
 }
 
 static int ffi_return_type_adjustment(ffi_type *f)
@@ -383,7 +383,7 @@ value ctypes_call(value fnname, value function, value callspec_,
 
     /* Only strings have defined semantics for now. */
     assert(Is_block(arg_ptr) && Tag_val(arg_ptr) == String_tag);
-    val_refs[arg_idx] = String_val(arg_ptr) + Int_val(arg_offset);
+    val_refs[arg_idx] = String_val(arg_ptr) + Long_val(arg_offset);
 
     ((void**)(callbuffer + arg_array_offset))[arg_idx] = &val_refs[arg_idx];
   }
@@ -430,7 +430,7 @@ typedef struct closure closure;
 struct closure
 {
   ffi_closure         closure;
-  int                 fnkey;
+  intnat                fnkey;
   struct call_context context;
 };
 
@@ -587,7 +587,7 @@ value ctypes_make_function_pointer(value callspec_, value fnid)
   if (closure == NULL) {
     caml_raise_out_of_memory();
   } else {
-    closure->fnkey = Int_val(fnid);
+    closure->fnkey = Long_val(fnid);
     closure->context = callspec->context;
 
     ffi_status status =  ffi_prep_closure_loc
