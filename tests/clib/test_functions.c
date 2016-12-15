@@ -663,3 +663,9 @@ GEN_RETURN_F(int64_t)
 GEN_RETURN_F(float)
 GEN_RETURN_F(double)
 GEN_RETURN_F(bool)
+
+intnat max_caml_int(void)
+{
+  return (intnat)(((uintnat)-1) / 4);
+}
+

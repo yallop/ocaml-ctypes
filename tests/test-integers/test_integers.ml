@@ -8,7 +8,21 @@
 open OUnit2
 open Ctypes
 open Unsigned
+open Foreign
 
+module Common_tests(S : Cstubs.FOREIGN with type 'a result = 'a
+                                        and type 'a return = 'a) =
+struct
+  module M = Functions.Stubs(S)
+  open M
+
+  (*
+    Test retrieving max caml ints from C.
+  *)
+  let test_max_caml_int _ =
+    assert_equal max_int (max_caml_int ())
+      ~printer:string_of_int
+end
 
 (*
   Test UInt64.of_int.
@@ -20,9 +34,19 @@ let test_uint64_of_int _ =
   end
 
 
+module Foreign_tests = Common_tests(Tests_common.Foreign_binder)
+module Stub_tests = Common_tests(Generated_bindings)
+
+
 let suite = "Integer tests" >:::
   ["UInt64.of_int"
     >:: test_uint64_of_int;
+
+   "max_caml_int (foreign)"
+   >:: Foreign_tests.test_max_caml_int;
+
+   "max_caml_int (stubs)"
+   >:: Stub_tests.test_max_caml_int;
   ]
 
 
