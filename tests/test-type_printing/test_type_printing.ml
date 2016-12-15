@@ -442,7 +442,7 @@ let test_bigarray_signed_printing _ =
     assert_typ_printed_as "int64_t[7][8]"
       (bigarray array2 (7, 8) Bigarray.int64);
 
-    assert_typ_printed_as "camlint[9][10]"
+    assert_typ_printed_as "intnat[9][10]"
       (bigarray array2 (9, 10) Bigarray.int);
 
     assert_typ_printed_as "intnat[13][14][15]"
