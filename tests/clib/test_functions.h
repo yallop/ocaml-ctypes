@@ -266,4 +266,6 @@ extern int32_t int_array[5];
 
 void check_ones(const int *, size_t);
 
+intnat max_caml_int(void);
+
 #endif /* TEST_FUNCTIONS_H */
