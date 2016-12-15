@@ -33,6 +33,16 @@ let test_uint64_of_int _ =
       ~printer:string_of_int
   end
 
+(*
+  Test storing and reading camlints.
+*)
+let test_store_caml_int _ =
+  begin
+    let p = allocate camlint max_int in
+    assert_equal max_int !@p
+      ~printer:string_of_int
+  end
+
 
 module Foreign_tests = Common_tests(Tests_common.Foreign_binder)
 module Stub_tests = Common_tests(Generated_bindings)
@@ -47,6 +57,9 @@ let suite = "Integer tests" >:::
 
    "max_caml_int (stubs)"
    >:: Stub_tests.test_max_caml_int;
+
+   "storing camlint"
+   >:: test_store_caml_int;
   ]
 
 
