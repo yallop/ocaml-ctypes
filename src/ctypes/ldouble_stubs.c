@@ -215,11 +215,11 @@ CAMLprim value ctypes_ldouble_to_float(value a) {
 }
 CAMLprim value ctypes_ldouble_of_int(value a) {
   CAMLparam1(a);
-  CAMLreturn(ctypes_copy_ldouble(Int_val(a)));
+  CAMLreturn(ctypes_copy_ldouble(Long_val(a)));
 }
 CAMLprim value ctypes_ldouble_to_int(value a) {
   CAMLparam1(a);
-  CAMLreturn(Val_int(ldouble_custom_val(a)));
+  CAMLreturn(Val_long(ldouble_custom_val(a)));
 }
 
 #define OP2(OPNAME, OP)                                                               \
