@@ -62,7 +62,7 @@ value ctypes_read(value prim_, value buffer_)
    case Ctypes_Uint16_t: b = Ctypes_val_uint16(*(uint16_t *)buf); break;
    case Ctypes_Uint32_t: b = ctypes_copy_uint32(*(uint32_t *)buf); break;
    case Ctypes_Uint64_t: b = ctypes_copy_uint64(*(uint64_t *)buf); break;
-   case Ctypes_Camlint: b = Val_int(*(intnat *)buf); break;
+   case Ctypes_Camlint: b = Val_long(*(intnat *)buf); break;
    case Ctypes_Nativeint: b = caml_copy_nativeint(*(intnat *)buf); break;
    case Ctypes_Float: b = caml_copy_double(*(float *)buf); break;
    case Ctypes_Double: b = caml_copy_double(*(double *)buf); break;
@@ -104,7 +104,7 @@ value ctypes_write(value prim_, value v, value buffer_)
    case Ctypes_Uint16_t: *(uint16_t *)buf = Uint16_val(v); break;
    case Ctypes_Uint32_t: *(uint32_t *)buf = Uint32_val(v); break;
    case Ctypes_Uint64_t: *(uint64_t *)buf = Uint64_val(v); break;
-   case Ctypes_Camlint: *(intnat *)buf = Int_val(v); break;
+   case Ctypes_Camlint: *(intnat *)buf = Long_val(v); break;
    case Ctypes_Nativeint: *(intnat *)buf = Nativeint_val(v); break;
    case Ctypes_Float: *(float *)buf = Double_val(v); break;
    case Ctypes_Double: *(double *)buf = Double_val(v); break;
@@ -149,7 +149,7 @@ value ctypes_string_of_prim(value prim_, value v)
   case Ctypes_Uint32_t: len = snprintf(buf, sizeof buf, "%" PRIu32, Uint32_val(v)); break;
   case Ctypes_Uint64_t: len = snprintf(buf, sizeof buf, "%" PRIu64, Uint64_val(v)); break;
   case Ctypes_Camlint: len = snprintf(buf, sizeof buf, "%" REAL_ARCH_INTNAT_PRINTF_FORMAT "d",
-                         (intnat)Int_val(v)); break;
+                         (intnat)Long_val(v)); break;
   case Ctypes_Nativeint: len = snprintf(buf, sizeof buf, "%" REAL_ARCH_INTNAT_PRINTF_FORMAT "d",
                            (intnat)Nativeint_val(v)); break;
   case Ctypes_Float: len = snprintf(buf, sizeof buf, "%.12g", Double_val(v)); break;
