@@ -68,8 +68,8 @@ static value functions[fn_count];
 value %s(value i, value v)
 {
   CAMLparam2(i, v);
-  functions[Int_val(i)] = v;
-  caml_register_global_root(&functions[Int_val(i)]);
+  functions[Long_val(i)] = v;
+  caml_register_global_root(&functions[Long_val(i)]);
   CAMLreturn (Val_unit);
 }@\n" register
 
