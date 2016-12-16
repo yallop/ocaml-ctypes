@@ -1,3 +1,10 @@
+## ctypes 0.11.2
+
+### Bug fixes
+
+* Fix truncation in UInt64.of_int; remove other uses of `Val_int`/`Int_val`  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/492
+
 ## ctypes 0.11.1
 
 ### Bug fixes
