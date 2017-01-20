@@ -16,7 +16,7 @@ module Bindings = Functions.Stubs(Generated_bindings)
   Test the Lwt binding to "sqrt".
  *)
 let test_sqrt _ =
-  Lwt_unix.run
+  Lwt_main.run
     Lwt.((Bindings.sqrt 9.0).Generated_bindings.lwt >>= fun x ->
          return (assert (x = 3.0)))
 
@@ -39,7 +39,7 @@ let test_object_lifetime _ =
   begin
     Gc.compact ();
     Gc.compact ();
-    Lwt_unix.run
+    Lwt_main.run
       (Lwt.(call >>= fun n ->
             assert_equal 6l n ~printer:Int32.to_string;
             return ()))
@@ -56,7 +56,7 @@ let test_string_lifetime _ =
   begin
     Gc.compact ();
     Gc.compact ();
-    Lwt_unix.run
+    Lwt_main.run
       (Lwt.(call >>= fun i ->
             assert_equal 0 i;
             assert_equal Structures.ifdir
@@ -72,7 +72,7 @@ let test_string_lifetime _ =
  *)
 let test_six_args _ =
   let open Lwt.Infix in
-  Lwt_unix.run
+  Lwt_main.run
     ((Bindings.sixargs 1 2 3 4 5 6).Generated_bindings.lwt >>= fun i ->
      assert_equal (1 + 2 + 3 + 4 + 5 + 6) i;
      Lwt.return ())
@@ -83,7 +83,7 @@ let test_six_args _ =
  *)
 let test_no_args _ =
   let open Lwt.Infix in
-  Lwt_unix.run
+  Lwt_main.run
     ((Bindings.return_10 ()).Generated_bindings.lwt >>= fun i ->
      assert_equal 10 i;
      Lwt.return ())
@@ -93,7 +93,7 @@ let test_no_args _ =
  *)
 let test_return_void _ =
   let open Lwt.Infix in
-  Lwt_unix.run
+  Lwt_main.run
     (let x_p = allocate_n ~count:1 int in
      (Bindings.return_void x_p).Generated_bindings.lwt >>= fun () ->
      assert_equal 10 (!@ x_p);
