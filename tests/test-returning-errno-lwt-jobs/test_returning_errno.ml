@@ -19,12 +19,12 @@ module Constants = Types.Struct_stubs(Generated_struct_bindings)
 let test_stat _ =
   let s = make Constants.stat in
   begin
-    Lwt_unix.run
+    Lwt_main.run
       Lwt.((Bindings.stat "." (addr s)).Generated_bindings.lwt >>= fun (x, errno) ->
            assert_equal 0 x;
            assert_equal Signed.SInt.zero errno;
            return ());
-    Lwt_unix.run
+    Lwt_main.run
       Lwt.((Bindings.stat "/does-not-exist" (addr s)).Generated_bindings.lwt >>= fun (x, errno) ->
            assert_equal (-1) x;
            assert_equal Constants._ENOENT errno;
@@ -37,7 +37,7 @@ let test_stat _ =
  *)
 let test_six_args _ =
   let open Lwt.Infix in
-  Lwt_unix.run
+  Lwt_main.run
     ((Bindings.sixargs 1 2 3 4 5 6).Generated_bindings.lwt >>= fun (i, errno) ->
      assert_equal (1 + 2 + 3 + 4 + 5 + 6) i;
      Lwt.return ())
@@ -48,7 +48,7 @@ let test_six_args _ =
  *)
 let test_no_args _ =
   let open Lwt.Infix in
-  Lwt_unix.run
+  Lwt_main.run
     ((Bindings.return_10 ()).Generated_bindings.lwt >>= fun (i, errno) ->
      assert_equal 10 i;
      Lwt.return ())
@@ -58,7 +58,7 @@ let test_no_args _ =
  *)
 let test_return_void _ =
   let open Lwt.Infix in
-  Lwt_unix.run
+  Lwt_main.run
     (let x_p = allocate_n ~count:1 int in
      (Bindings.return_void x_p).Generated_bindings.lwt >>= fun ((), errno) ->
      assert_equal 10 (!@ x_p);
