@@ -41,17 +41,18 @@ int (*ctypes_thread_register)(void) = ctypes_thread_register_fail;
 
 
 /* An OCaml function that converts resolves identifiers to OCaml functions */
-static value retrieve_closure_;
+static caml_root retrieve_closure_;
 
 /* Resolve identifiers to OCaml functions */
 static value retrieve_closure(intnat key)
 {
   CAMLparam0 ();
-  CAMLlocal1(result);
-  result = caml_callback_exn(retrieve_closure_, Val_long(key));
+  CAMLlocal2(result, ex);
+  result = caml_callback_exn(caml_read_root(retrieve_closure_), Val_long(key));
 
   if (Is_exception_result(result)) {
-    caml_raise_constant(*caml_named_value("CallToExpiredClosure"));
+    ex = caml_read_root(caml_named_root("CallToExpiredClosure"));
+    caml_raise_constant(ex);
   }
 
   CAMLreturn (result);
@@ -63,8 +64,7 @@ value ctypes_set_closure_callback(value retrieve)
 {
   CAMLparam1(retrieve);
 
-  caml_register_global_root(&retrieve_closure_);
-  retrieve_closure_ = retrieve;
+  retrieve_closure_ = caml_create_root(retrieve);
 
   CAMLreturn(Val_unit);
 }
@@ -76,10 +76,10 @@ void ctypes_check_ffi_status(ffi_status status)
   case FFI_OK:
     break;
   case FFI_BAD_TYPEDEF:
-    caml_raise_with_string(*caml_named_value("FFI_internal_error"),
+    caml_raise_with_string(caml_read_root(caml_named_root("FFI_internal_error")),
                            "FFI_BAD_TYPEDEF");
   case FFI_BAD_ABI:
-    caml_raise_with_string(*caml_named_value("FFI_internal_error"),
+    caml_raise_with_string(caml_read_root(caml_named_root("FFI_internal_error")),
                            "FFI_BAD_ABI");
   default:
     assert(0);
@@ -374,12 +374,12 @@ value ctypes_call(value fnname, value function, value callspec_,
 
   unsigned arg_idx;
   for(arg_idx = 0; arg_idx < Wosize_val(callback_val_arr); arg_idx++) {
-    value arg_tuple = Field(callback_val_arr, arg_idx);
+    value arg_tuple = Field_imm(callback_val_arr, arg_idx);
     /* <4.02 initialize to 0; >=4.02 initialize to unit. */
     if(arg_tuple == 0 || arg_tuple == Val_unit) continue;
 
-    value arg_ptr    = Field(arg_tuple, 0);
-    value arg_offset = Field(arg_tuple, 1);
+    value arg_ptr    = Field_imm(arg_tuple, 0);
+    value arg_offset = Field_imm(arg_tuple, 1);
 
     /* Only strings have defined semantics for now. */
     assert(Is_block(arg_ptr) && Tag_val(arg_ptr) == String_tag);
@@ -457,7 +457,7 @@ static void callback_handler_with_lock(ffi_cif *cif,
     case 0:
     {
       assert (Tag_val(boxedfn) == Fn);
-      boxedfn = caml_callback(Field(boxedfn, 0), Val_unit);
+      boxedfn = caml_callback(Field_imm(boxedfn, 0), Val_unit);
       break;
     }
     default:
@@ -468,7 +468,7 @@ static void callback_handler_with_lock(ffi_cif *cif,
         assert (Tag_val(boxedfn) == Fn);
         /* unbox and call */
         argptr = CTYPES_FROM_PTR(cvalue);
-        boxedfn = caml_callback(Field(boxedfn, 0), argptr);
+        boxedfn = caml_callback(Field_imm(boxedfn, 0), argptr);
       }
       break;
     }
@@ -478,7 +478,7 @@ static void callback_handler_with_lock(ffi_cif *cif,
   assert (Tag_val(boxedfn) == Done);
 
   argptr = CTYPES_FROM_PTR(ret);
-  caml_callback(Field(boxedfn, 0), argptr);
+  caml_callback(Field_imm(boxedfn, 0), argptr);
 
   /* workaround for libffi api: small integers must be promoted to
    * full word size (sign/zero extended) */

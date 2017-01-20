@@ -16,6 +16,6 @@
 #define CTYPES_TO_PTR(I) ((void *)Nativeint_val(I))
 
 /* CTYPES_ADDR_OF_FATPTR : _ Ctypes_ptr.Fat.t -> void * */
-#define CTYPES_ADDR_OF_FATPTR(P) CTYPES_TO_PTR(Field(P, 1))
+#define CTYPES_ADDR_OF_FATPTR(P) CTYPES_TO_PTR(Field_imm(P, 1))
 
 #endif /* CTYPES_RAW_POINTER_STUBS_H */

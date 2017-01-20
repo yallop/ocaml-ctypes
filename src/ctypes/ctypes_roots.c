@@ -5,32 +5,31 @@
 /* 'a -> voidp */
 value ctypes_caml_roots_create(value v)
 {
-  value *p = caml_stat_alloc(sizeof *p);
-  *p = v;
-  caml_register_generational_global_root(p);
+  caml_root *p = caml_stat_alloc(sizeof *p);
+  *p = caml_create_root(v);
   return CTYPES_FROM_PTR(p);
 }
 
 /* voidp -> 'a -> unit */
 value ctypes_caml_roots_set(value p_, value v)
 {
-  value *p = CTYPES_TO_PTR(p_);
-  caml_modify_generational_global_root(p, v);
+  caml_root *p = CTYPES_TO_PTR(p_);
+  caml_modify_root(*p, v);
   return Val_unit;
 }
 
 /* voidp -> 'a */
 value ctypes_caml_roots_get(value p_)
 {
-  value *p = CTYPES_TO_PTR(p_);
-  return *p;
+  caml_root *p = CTYPES_TO_PTR(p_);
+  return caml_read_root(*p);
 }
 
 /* voidp -> unit */
 value ctypes_caml_roots_release(value p_)
 {
-  value *p = CTYPES_TO_PTR(p_);
-  caml_remove_generational_global_root(p);
+  caml_root *p = CTYPES_TO_PTR(p_);
+  caml_delete_root(*p);
   caml_stat_free(p);
   return Val_unit;
 }
