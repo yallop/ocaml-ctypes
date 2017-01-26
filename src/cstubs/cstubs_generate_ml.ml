@@ -359,18 +359,24 @@ let rec pattern_and_exp_of_typ : type a. concurrency:concurrency_policy -> errno
     let id = Cstubs_public_name.constructor_cident_of_prim ~module_name:"CI" p in
     (static_con "Primitive" [`Con (id, [])], None, binds)
   | Pointer _ ->
-    let x = fresh_var () in
-    let pat = static_con "Pointer" [`Var x] in
     begin match pol with
-    | In -> (pat, Some (`Appl (`Ident (path_of_string "CI.cptr"), e)), binds)
-    | Out -> (pat, Some (map_result ~concurrency ~errno (`MakePtr x) e), binds)
+    | In ->
+      let pat = static_con "Pointer" [`Underscore] in
+      (pat, Some (`Appl (`Ident (path_of_string "CI.cptr"), e)), binds)
+    | Out ->
+      let x = fresh_var () in
+      let pat = static_con "Pointer" [`Var x] in
+      (pat, Some (map_result ~concurrency ~errno (`MakePtr x) e), binds)
     end
   | Funptr _ ->
-    let x = fresh_var () in
-    let pat = static_con "Funptr" [`Var x] in
     begin match pol with
-    | In -> (pat, Some (`Appl (`Ident (path_of_string "CI.fptr"), e)), binds)
-    | Out -> (pat, Some (map_result ~concurrency ~errno (`MakeFunPtr x) e), binds)
+    | In ->
+      let pat = static_con "Funptr" [`Underscore] in
+      (pat, Some (`Appl (`Ident (path_of_string "CI.fptr"), e)), binds)
+    | Out ->
+      let x = fresh_var () in
+      let pat = static_con "Funptr" [`Var x] in
+      (pat, Some (map_result ~concurrency ~errno (`MakeFunPtr x) e), binds)
     end
   | Struct _ ->
     begin match pol with
