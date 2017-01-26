@@ -25,7 +25,7 @@ type ml_type = [ `Ident of path
 type ml_external_type = [ `Prim of ml_type list * ml_type ]
 
 type ml_pat = [ `Var of string
-              | `Record of (path * ml_pat) list
+              | `Record of (path * ml_pat) list * [`Etc | `Complete]
               | `As of ml_pat * string
               | `Underscore
               | `Con of path * ml_pat list ]
@@ -172,7 +172,8 @@ struct
   let rec ml_pat appl_parens fmt pat =
     match appl_parens, pat with
     | _, `Var x -> fprintf fmt "%s" x
-    | _, `Record fs -> fprintf fmt "{@[%a}@]" pat_fields fs
+    | _, `Record (fs, `Etc) -> fprintf fmt "{@[%a_}@]" pat_fields fs
+    | _, `Record (fs, `Complete) -> fprintf fmt "{@[%a}@]" pat_fields fs
     | _, `As (p, x) -> fprintf fmt "@[(%a@ as@ %s)@]" (ml_pat NoApplParens) p x
     | _, `Underscore -> fprintf fmt "_"
     | _, `Con (c, []) -> fprintf fmt "%a" format_path c
@@ -358,18 +359,24 @@ let rec pattern_and_exp_of_typ : type a. concurrency:concurrency_policy -> errno
     let id = Cstubs_public_name.constructor_cident_of_prim ~module_name:"CI" p in
     (static_con "Primitive" [`Con (id, [])], None, binds)
   | Pointer _ ->
-    let x = fresh_var () in
-    let pat = static_con "Pointer" [`Var x] in
     begin match pol with
-    | In -> (pat, Some (`Appl (`Ident (path_of_string "CI.cptr"), e)), binds)
-    | Out -> (pat, Some (map_result ~concurrency ~errno (`MakePtr x) e), binds)
+    | In ->
+      let pat = static_con "Pointer" [`Underscore] in
+      (pat, Some (`Appl (`Ident (path_of_string "CI.cptr"), e)), binds)
+    | Out ->
+      let x = fresh_var () in
+      let pat = static_con "Pointer" [`Var x] in
+      (pat, Some (map_result ~concurrency ~errno (`MakePtr x) e), binds)
     end
   | Funptr _ ->
-    let x = fresh_var () in
-    let pat = static_con "Funptr" [`Var x] in
     begin match pol with
-    | In -> (pat, Some (`Appl (`Ident (path_of_string "CI.fptr"), e)), binds)
-    | Out -> (pat, Some (map_result ~concurrency ~errno (`MakeFunPtr x) e), binds)
+    | In ->
+      let pat = static_con "Funptr" [`Underscore] in
+      (pat, Some (`Appl (`Ident (path_of_string "CI.fptr"), e)), binds)
+    | Out ->
+      let x = fresh_var () in
+      let pat = static_con "Funptr" [`Var x] in
+      (pat, Some (map_result ~concurrency ~errno (`MakeFunPtr x) e), binds)
     end
   | Struct _ ->
     begin match pol with
@@ -402,16 +409,16 @@ let rec pattern_and_exp_of_typ : type a. concurrency:concurrency_policy -> errno
       let (p, None, binds), e | (p, Some e, binds), _ =
         pattern_and_exp_of_typ ~concurrency ~errno ty e pol binds, e in
       let pat = static_con "View"
-        [`Record [path_of_string "CI.ty", p;
-                  path_of_string "write", `Var x]] in
+        [`Record ([path_of_string "CI.ty", p;
+                   path_of_string "write", `Var x], `Etc)] in
       (pat, Some (`Ident (Ctypes_path.path_of_string y)), (y, e) :: binds)
     | Out ->
       let (p, None, binds), e | (p, Some e, binds), _ =
         pattern_and_exp_of_typ ~concurrency ~errno ty e pol binds, e in
       let x = fresh_var () in
       let pat = static_con "View"
-        [`Record [path_of_string "CI.ty", p;
-                  path_of_string "read", `Var x]] in
+        [`Record ([path_of_string "CI.ty", p;
+                   path_of_string "read", `Var x], `Etc)] in
       (pat, Some (map_result ~concurrency ~errno (`Appl x) e), binds)
     end
   | OCaml ty ->
@@ -452,7 +459,7 @@ let rec pattern_of_typ : type a. a typ -> ml_pat = function
     static_con "Union" [`Underscore]
   | View { ty } ->
     static_con "View"
-      [`Record [path_of_string "CI.ty", pattern_of_typ ty]]
+      [`Record ([path_of_string "CI.ty", pattern_of_typ ty], `Etc)]
   | Array (_, _) ->
      static_con "Array" [`Underscore; `Underscore]
   | Bigarray _ ->
