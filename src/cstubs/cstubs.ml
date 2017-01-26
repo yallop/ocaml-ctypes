@@ -106,7 +106,7 @@ let write_foreign ~concurrency ~errno fmt bindings val_bindings =
   Format.fprintf fmt
     "@\n";
   Format.fprintf fmt
-    "let foreign_value : type a b. string -> a Ctypes.typ -> a Ctypes.ptr =@\n";
+    "let foreign_value : type a. string -> a Ctypes.typ -> a Ctypes.ptr =@\n";
   Format.fprintf fmt
     "  fun name t -> match t, name with@\n@[<v>";
   ListLabels.iter val_bindings
