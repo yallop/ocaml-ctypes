@@ -20,10 +20,14 @@
 
 #if defined _WIN32 && !defined __CYGWIN__
 #include <windows.h>
-#elif defined(__APPLE__)
+#else
+#include <pthread.h>
+#include <unistd.h>
+#if defined(__APPLE__)
 #include <dispatch/dispatch.h>
 #else
 #include <semaphore.h>
+#endif
 #endif
 
 #include "test_functions.h"
@@ -766,4 +770,126 @@ void check_ones(const int *p, size_t sz)
 intnat max_caml_int(void)
 {
   return (intnat)(((uintnat)-1) / 4);
+}
+
+static
+uint64_t thread_id(void)
+{
+#ifdef _WIN32
+  return (GetCurrentThreadId());
+#else
+  /* if pthread_t is a struct greater than uint64_t,
+     the test could fail ... */
+  union {
+      uint64_t i;
+      pthread_t t;
+  } u;
+  memset(&u, 0, sizeof(u));
+  u.t = pthread_self();
+  return u.i;
+#endif
+}
+
+#ifndef _WIN32
+typedef pthread_t thread_t;
+typedef void *(*start_routine)(void *);
+#else
+typedef HANDLE thread_t;
+typedef DWORD WINAPI (*start_routine)(void *);
+#endif
+
+static int thread_create(thread_t *t, start_routine f, void * param)
+{
+#ifndef _WIN32
+  return (pthread_create(t, NULL, f, param));
+#else
+  HANDLE h = CreateThread(NULL,0,f,param,0,NULL);
+  *t = h;
+  return ( h == NULL );
+#endif
+}
+
+static int thread_join(thread_t t)
+{
+#ifndef _WIN32
+  return ( pthread_join(t, NULL) );
+#else
+  WaitForSingleObject(t, INFINITE);
+  return 0;
+#endif
+}
+
+typedef struct {
+    void (*f)(uint64_t);
+    const unsigned n_callback;
+} t_info;
+
+static void call_multiple_times_r(void *fp)
+{
+  const t_info * t = fp;
+  void (*f)(uint64_t) = t->f;
+  const unsigned n_callback = t->n_callback;
+  const uint64_t tid = thread_id();
+  unsigned i;
+  for ( i = 0 ; i < n_callback ; ++i ) {
+    f(tid);
+  }
+}
+
+#ifndef _WIN32
+static void *call_multiple_times(void *fp)
+{
+  call_multiple_times_r(fp);
+  return NULL;
+}
+#else
+static DWORD WINAPI call_multiple_times(void *fp)
+{
+  call_multiple_times_r(fp);
+  return 0;
+}
+#endif
+
+int foreign_thread_registration_test(void (*test_f)(uint64_t),
+                                     unsigned n_threads,
+                                     unsigned n_callback)
+{
+  thread_t * h_thread;
+  unsigned i;
+  int ret_code = 0;
+  unsigned i_max = 0;
+  t_info thread_info = { .f = test_f , .n_callback = n_callback };
+  const uint64_t tid = thread_id();
+
+  h_thread = malloc(n_threads * (sizeof *h_thread));
+  if ( h_thread == NULL ){
+    fputs("malloc failed\n",stderr);
+    return 1;
+  }
+
+  for ( i = 0 ; i < n_threads ; ++i ) {
+    if ( thread_create(&h_thread[i], call_multiple_times, &thread_info) ) {
+      fputs("Error creating thread\n",stderr);
+      ret_code = 1;
+      break;
+    }
+  }
+  i_max = i;
+
+  for ( i = 0 ; i < i_max ; ++i ) {
+    if ( i < n_callback ) {
+      test_f(tid);
+    }
+    if ( thread_join(h_thread[i]) ) {
+      fputs("Error joining thread\n",stderr);
+      ret_code = 1;
+    }
+  }
+
+  for ( i = n_threads ; i < n_callback ; ++i ) {
+    test_f(tid);
+  }
+
+  free(h_thread);
+  return ret_code;
 }

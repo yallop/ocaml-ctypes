@@ -12,6 +12,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <complex.h>
+#include <stdint.h>
 
 #include <caml/mlvalues.h>
 
@@ -268,4 +269,5 @@ void check_ones(const int *, size_t);
 
 intnat max_caml_int(void);
 
+int foreign_thread_registration_test(void (*)(uint64_t),unsigned,unsigned);
 #endif /* TEST_FUNCTIONS_H */
