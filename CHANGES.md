@@ -1,3 +1,14 @@
+## ctypes 0.11.3
+
+* Stub out some `long double` functions that are not supported on NetBSD and OpenBSD  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/503
+
+* Fix the build when shared libraries are not available  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/495
+
+Thanks to Andreas Hauptmann (@fdopen) and Peter Zotov (@whitequark)
+for contributions to this release.
+
 ## ctypes 0.11.2
 
 ### Bug fixes
@@ -46,7 +57,7 @@ to this release.
 
 ### Bug fixes 
 
-* Fix generated code for Lwt jobs where the return type is `void`.
+* Fix generated code for Lwt jobs where the return type is `void`.  
   https://github.com/ocamllabs/ocaml-ctypes/pull/460
 
 Thanks to David Sheets (@dsheets) for contributions to this release.
