@@ -250,13 +250,30 @@ CAMLprim value ctypes_ldouble_neg(value a) {
     CAMLreturn(ctypes_copy_ldouble( OP (ldouble_custom_val(a), ldouble_custom_val(b)))); \
   }
 
+#define FN1FAIL(OP)                                                        \
+  CAMLprim value ctypes_ldouble_ ## OP (value a) {                         \
+    CAMLparam1(a);                                                         \
+    caml_failwith("ctypes: " #OP " does not exist on current platform");   \
+  }
+
+#define FN2FAIL(OP)                                                        \
+  CAMLprim value ctypes_ldouble_ ## OP (value a, value b) {                \
+    CAMLparam2(a, b);                                                      \
+    caml_failwith("ctypes: " #OP " does not exist on current platform");   \
+  }
+
 FN2(powl)
 FN1(sqrtl)
 FN1(expl)
 FN1(logl)
 FN1(log10l)
+#ifdef __NetBSD__
+FN1FAIL(expm1l)
+FN1FAIL(log1pl)
+#else
 FN1(expm1l)
 FN1(log1pl)
+#endif
 FN1(cosl)
 FN1(sinl)
 FN1(tanl)
@@ -274,12 +291,18 @@ FN1(atanhl)
 FN1(ceill)
 FN1(floorl)
 FN1(fabsl)
+#ifdef __NetBSD__
+FN2FAIL(remainderl)
+#else
 FN2(remainderl)
+#endif
 FN2(copysignl)
 
 #undef OP2
 #undef FN1
 #undef FN2
+#undef FN1FAIL
+#undef FN2FAIL
 
 CAMLprim value ctypes_ldouble_frexp(value v) {
   CAMLparam1(v);
@@ -543,8 +566,10 @@ CAMLprim value ctypes_ldouble_complex_neg(value a) {
 FN1(conjl)
 FN1(csqrtl)
 
-// As of API level 24, these functions do not exist.
-#ifdef __ANDROID__
+/* Android: As of API level 24, these functions do not exist.
+   Freebsd: still missing in FreeBSD 11.0-RELEASE-p2
+ */
+#if defined(__ANDROID__) || defined(__FreeBSD__)
 FN1FAIL(cexpl)
 FN1FAIL(clogl)
 FN2FAIL(cpowl)
