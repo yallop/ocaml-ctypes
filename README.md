@@ -49,8 +49,7 @@ The documentation and source distribution contain more complex examples, involvi
 * [Mailing list][mailing-list]
 * [Type-safe C bindings using ocaml-ctypes and stub generation][sjb-cstubs-post] introduces the [Cstubs][cstubs] interface
 * [Using Cstubs_structs][orbitz-cstubs_structs] shows how to use the [`Cstubs_structs`][cstubs_structs] module to reliably determine data layout
-* [Declarative foreign function binding through generic programming][flops-paper] is a research paper that presents the design of ctypes.
-  [A modular foreign function interface][flops-extended] is a draft of an extended version.
+* [A modular foreign function interface][scp-extended] is a research paper (extending an [earlier paper][flops-paper]) that presents the design of ctypes
 * [FAQ][faq]
 
 [rwo-19]: https://realworldocaml.org/v1/en/html/foreign-function-interface.html
@@ -66,4 +65,4 @@ The documentation and source distribution contain more complex examples, involvi
 [orbitz-cstubs_structs]: https://github.com/ocamllabs/ocaml-ctypes/blob/master/examples/cstubs_structs/README.md
 [cstubs_structs]: http://ocamllabs.github.io/ocaml-ctypes/Cstubs_structs.html
 [flops-paper]: http://www.cl.cam.ac.uk/~jdy22/papers/declarative-foreign-function-binding-through-generic-programming.pdf
-[flops-extended]: http://www.cl.cam.ac.uk/~jdy22/papers/a-modular-foreign-function-interface.pdf
+[scp-extended]: http://www.cl.cam.ac.uk/~jdy22/papers/a-modular-foreign-function-interface.pdf
