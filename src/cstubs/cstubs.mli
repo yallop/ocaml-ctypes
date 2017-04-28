@@ -29,7 +29,8 @@ sig
 
            warning: overflow in implicit constant conversion *)
 
-    val enum : string -> ?unexpected:(int64 -> 'a) -> ('a * int64 const) list -> 'a typ
+    val enum : string -> ?typedef:bool ->
+      ?unexpected:(int64 -> 'a) -> ('a * int64 const) list -> 'a typ
     (** [enum name ?unexpected alist] builds a type representation for the
         enum named [name].  The size and alignment are retrieved so that the
         resulting type can be used everywhere an integer type can be used: as
@@ -64,7 +65,17 @@ sig
         The [unexpected] function specifies the value to return in the case
         that some unexpected value is encountered -- for example, if a
         function with the return type 'enum letters' actually returns the
-        value [-1]. *)
+        value [-1].
+
+        The optional flag [typedef] specifies whether the first argument,
+        [name], indicates an tag or an alias.  If [typedef] is [false] (the
+        default) then [name] is treated as an enumeration tag:
+
+          enum letters { ... }
+
+        If [typedef] is [true] then [name] is instead treated as an alias:
+
+          typedef enum { ... } letters *)
   end
 
   module type BINDINGS = functor (F : TYPE) -> sig end

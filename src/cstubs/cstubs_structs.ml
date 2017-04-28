@@ -14,7 +14,7 @@ sig
   type 'a const
   val constant : string -> 'a typ -> 'a const
 
-  val enum : string -> ?unexpected:(int64 -> 'a) -> ('a * int64 const) list -> 'a typ
+  val enum : string -> ?typedef:bool -> ?unexpected:(int64 -> 'a) -> ('a * int64 const) list -> 'a typ
 end
 
 module type BINDINGS = functor (F : TYPE) -> sig end
@@ -217,7 +217,7 @@ let write_consts fmt consts =
     
 
 let write_enums fmt enums =
-  let case name =
+  let case (name, typedef) =
     printf1 fmt
       (Format.sprintf
          "  | %S -> \n    Cstubs_internals.build_enum_type %S Ctypes_static.%%s ?unexpected alist\n"
@@ -225,12 +225,13 @@ let write_enums fmt enums =
          name)
       (fun fmt ->
          Format.fprintf fmt
-           "ctypes_arithmetic_type_name(CTYPES_CLASSIFY_ARITHMETIC_TYPE(enum %s))"
+           "ctypes_arithmetic_type_name(CTYPES_CLASSIFY_ARITHMETIC_TYPE(%s%s))"
+           (if typedef then "" else "enum ")
            name)
   in
   cases fmt enums
     ["";
-     "let enum (type a) name ?unexpected (alist : (a * int64) list) =";
+     "let enum (type a) name ?typedef ?unexpected (alist : (a * int64) list) =";
      "  match name with"]
     ~case
     ["  | s ->";
@@ -284,9 +285,10 @@ let gen_c () =
 
       type _ const = unit
       let constant name ty  = consts := (name, Ctypes_static.BoxedType ty) :: !consts
-      let enum name ?unexpected alist =
-        let () = enums := name :: !enums in
-        let format_typ k fmt = Format.fprintf fmt "enum %s%t" name k in
+      let enum name ?(typedef=false) ?unexpected alist =
+        let () = enums := (name, typedef) :: !enums in
+        let format_typ k fmt = Format.fprintf fmt "%s%s%t"
+          (if typedef then "" else "enum ") name k in
         (* a dummy value of type 'a typ, mostly unusable *)
         view void
           ~format_typ
