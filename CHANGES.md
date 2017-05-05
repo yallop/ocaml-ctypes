@@ -1,3 +1,10 @@
+## ctypes 0.11.4
+
+* Fix function pointer support on no-exec platforms  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/511
+
+Thanks to Matthias Horn (@tiash) for contributing to this release.
+
 ## ctypes 0.11.3
 
 * Stub out some `long double` functions that are not supported on NetBSD and OpenBSD  
