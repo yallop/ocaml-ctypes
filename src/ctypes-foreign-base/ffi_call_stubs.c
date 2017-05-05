@@ -432,6 +432,7 @@ struct closure
   ffi_closure         closure;
   intnat                fnkey;
   struct call_context context;
+  void*                 fnptr;
 };
 
 enum boxedfn_tags { Done, Fn };
@@ -589,6 +590,7 @@ value ctypes_make_function_pointer(value callspec_, value fnid)
   } else {
     closure->fnkey = Long_val(fnid);
     closure->context = callspec->context;
+    closure->fnptr = code_address;
 
     ffi_status status =  ffi_prep_closure_loc
       ((ffi_closure *)closure,
@@ -610,5 +612,5 @@ value ctypes_make_function_pointer(value callspec_, value fnid)
 /* Extract the raw address from a function pointer object */ 
 value ctypes_raw_address_of_function_pointer(value closure)
 {
-  return CTYPES_FROM_PTR(*(struct closure **)Data_custom_val(closure));
+  return CTYPES_FROM_PTR((*(struct closure **)Data_custom_val(closure))->fnptr);
 }
