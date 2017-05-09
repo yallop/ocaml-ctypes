@@ -13,7 +13,7 @@
 
 #include <stdint.h>
 
-#include "ctypes_unsigned_stubs.h"
+#include "ocaml_integers.h"
 
 /* The order here must correspond to the constructor order in primitives.ml */
 enum ctypes_primitive {
@@ -52,13 +52,13 @@ enum ctypes_primitive {
 /* short is at least 16 bits. */
 #if USHRT_MAX == UINT16_MAX
 #define ctypes_ushort_val Uint16_val
-#define ctypes_copy_ushort Ctypes_val_uint16
+#define ctypes_copy_ushort Integers_val_uint16
 #elif USHRT_MAX == UINT32_MAX
 #define ctypes_ushort_val Uint32_val
-#define ctypes_copy_ushort ctypes_copy_uint32
+#define ctypes_copy_ushort integers_copy_uint32
 #elif USHRT_MAX == UINT64_MAX
 #define ctypes_ushort_val Uint64_val
-#define ctypes_copy_ushort ctypes_copy_uint64
+#define ctypes_copy_ushort integers_copy_uint64
 #else
 # error "No suitable OCaml type available for representing unsigned short values"
 #endif
@@ -67,17 +67,17 @@ enum ctypes_primitive {
 #if UINT_MAX == UINT16_MAX
 #error "No suitable OCaml type available for representing signed int values"
 #define ctypes_uint_val Uint16_val
-#define ctypes_copy_uint Ctypes_val_uint16
+#define ctypes_copy_uint Integers_val_uint16
 #elif UINT_MAX == UINT32_MAX
 #define ctypes_sint_val Int32_val
 #define ctypes_uint_val Uint32_val
 #define ctypes_copy_sint caml_copy_int32
-#define ctypes_copy_uint ctypes_copy_uint32
+#define ctypes_copy_uint integers_copy_uint32
 #elif UINT_MAX == UINT64_MAX
 #define ctypes_sint_val Int64_val
 #define ctypes_uint_val Uint64_val
 #define ctypes_copy_sint caml_copy_int64
-#define ctypes_copy_uint ctypes_copy_uint64
+#define ctypes_copy_uint integers_copy_uint64
 #else
 # error "No suitable OCaml type available for representing unsigned int values"
 #endif
@@ -87,12 +87,12 @@ enum ctypes_primitive {
 #define ctypes_long_val Int32_val
 #define ctypes_ulong_val Uint32_val
 #define ctypes_copy_long caml_copy_int32
-#define ctypes_copy_ulong ctypes_copy_uint32
+#define ctypes_copy_ulong integers_copy_uint32
 #elif ULONG_MAX == UINT64_MAX
 #define ctypes_long_val Int64_val
 #define ctypes_ulong_val Uint64_val
 #define ctypes_copy_long caml_copy_int64
-#define ctypes_copy_ulong ctypes_copy_uint64
+#define ctypes_copy_ulong integers_copy_uint64
 #else
 # error "No suitable OCaml type available for representing longs"
 #endif
@@ -102,20 +102,20 @@ enum ctypes_primitive {
 #define ctypes_llong_val Int64_val
 #define ctypes_ullong_val Uint64_val
 #define ctypes_copy_llong caml_copy_int64
-#define ctypes_copy_ullong ctypes_copy_uint64
+#define ctypes_copy_ullong integers_copy_uint64
 #else
 # error "No suitable OCaml type available for representing long longs"
 #endif
 
 #if SIZE_MAX == UINT16_MAX
 #define ctypes_size_t_val Uint16_val
-#define ctypes_copy_size_t Ctypes_val_uint16
+#define ctypes_copy_size_t Integers_val_uint16
 #elif SIZE_MAX == UINT32_MAX
 #define ctypes_size_t_val Uint32_val
-#define ctypes_copy_size_t ctypes_copy_uint32
+#define ctypes_copy_size_t integers_copy_uint32
 #elif SIZE_MAX == UINT64_MAX
 #define ctypes_size_t_val Uint64_val
-#define ctypes_copy_size_t ctypes_copy_uint64
+#define ctypes_copy_size_t integers_copy_uint64
 #else
 # error "No suitable OCaml type available for representing size_t values"
 #endif

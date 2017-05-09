@@ -35,6 +35,8 @@ struct
   let to_int64  = Int64.of_nativeint
 
   let null = zero
+  let min = Pervasives.min
+  let max = Pervasives.max
 end
 
 type voidp = Raw.t
