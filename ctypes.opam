@@ -28,6 +28,7 @@ depends: [
    "lwt" {test}
    "ctypes-foreign" {test}
    "ounit" {test}
+   "conf-ncurses" {test}
 ]
 depopts: [
    "ctypes-foreign"
