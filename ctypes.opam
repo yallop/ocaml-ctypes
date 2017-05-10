@@ -28,6 +28,7 @@ depends: [
    "lwt" {test}
    "ctypes-foreign" {test}
    "ounit" {test}
+   "conf-ncurses" {test}
 ]
 depopts: [
    "ctypes-foreign"
@@ -37,7 +38,7 @@ depopts: [
 ]
 build-test: [
    [make "COVERAGE=true" {bisect_ppx:installed} "test"]
-   [make "COVERAGE=true" {bisect_ppx:installed} "run-examples"]
+   [make "COVERAGE=true" {bisect_ppx:installed} "run-examples" ] {os != "win32"}
    ["sh" "-c" "ocveralls" "--send bisect*.out" "_build/bisect*.out" ">" "coveralls.json"] {bisect_ppx:installed}
 ]
 tags: ["org:ocamllabs" "org:mirage"]
