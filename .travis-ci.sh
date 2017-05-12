@@ -1,4 +1,4 @@
-ANDROID_REPOSITORY=git://github.com/whitequark/opam-cross-android
+ANDROID_REPOSITORY=git://github.com/yallop/opam-cross-android
 export OCAMLFINDFLAGS
 
 case "$OCAML_VERSION" in
@@ -46,6 +46,7 @@ install_android_toolchain () {
     STLVER=4.9 STLARCH=armeabi \
     opam install conf-android
   opam install ocaml-android
+  opam install integers-android
   OCAMLFINDFLAGS='-toolchain android'
 }
 
