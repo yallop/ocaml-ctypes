@@ -12,11 +12,6 @@ os:
   - linux
   - osx
 env:
-  - OCAML_VERSION=4.01.0
-  - OCAML_VERSION=4.02.3 COVERAGE=true
-  - OCAML_VERSION=4.02.3 ARM=true
-  - OCAML_VERSION=4.03.0
-  - OCAML_VERSION=4.04.0+flambda
   - OCAML_VERSION=4.04.0+32bit ANDROID=true
 matrix:
   exclude:
