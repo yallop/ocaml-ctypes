@@ -46,7 +46,7 @@ let temp_dir = "."
    build, which uses a mixture of Windows- and Unix-style paths due to using MinGW
    to compile OCaml and Bash for the shell.
 *)
-let unixify = Str.(global_replace (regexp "\\\\") "/")
+let unixify = Re_str.(global_replace (regexp_string "\\") "/")
 
 let shell_command_results command =
   let stdout_filename = Filename.temp_file ~temp_dir "ctypes_config" ".stdout" in

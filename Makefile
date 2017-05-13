@@ -50,7 +50,7 @@ ctypes.cmi_only = ctypes_static ctypes_primitive_types ctypes_structs
 ctypes.public = unsigned signed lDouble complexL ctypes posixTypes ctypes_types
 ctypes.dir = src/ctypes
 ctypes.extra_mls = ctypes_primitives.ml
-ctypes.deps = str bigarray bytes
+ctypes.deps = re.str bigarray bytes
 ctypes.install = yes
 ctypes.install_native_objects = yes
 ifeq ($(XEN),enable)
@@ -65,7 +65,7 @@ cstubs.cmi_only = cstubs_internals
 cstubs.public = cstubs_structs cstubs cstubs_inverted
 cstubs.dir = src/cstubs
 cstubs.subproject_deps = ctypes
-cstubs.deps = str bytes
+cstubs.deps = re.str bytes
 cstubs.install = yes
 cstubs.install_native_objects = yes
 
@@ -78,7 +78,7 @@ ctypes-foreign-base.install = yes
 ctypes-foreign-base.install_native_objects = yes
 ctypes-foreign-base.threads = no
 ctypes-foreign-base.dir = src/ctypes-foreign-base
-ctypes-foreign-base.deps = bytes
+ctypes-foreign-base.deps = re.str bytes
 ctypes-foreign-base.subproject_deps = ctypes
 ctypes-foreign-base.extra_mls = libffi_abi.ml dl.ml
 ctypes-foreign-base.extra_cs = dl_stubs.c
@@ -139,15 +139,15 @@ src/ctypes-foreign-base/dl_stubs.c: src/ctypes-foreign-base/dl_stubs.c$(OS_ALT_S
 	cp $< $@
 
 src/ctypes/ctypes_primitives.ml: src/configure/extract_from_c.ml src/configure/gen_c_primitives.ml
-	$(HOSTOCAMLFIND) ocamlc -o gen_c_primitives -package str,bytes -linkpkg $^ -I src/configure
+	$(HOSTOCAMLFIND) ocamlc -o gen_c_primitives -package re.str,bytes -linkpkg $^ -I src/configure
 	./gen_c_primitives > $@ 2> gen_c_primitives.log || (rm $@ && cat gen_c_primitives.log || false)
 
 src/ctypes-foreign-base/libffi_abi.ml: src/configure/extract_from_c.ml src/configure/gen_libffi_abi.ml
-	$(HOSTOCAMLFIND) ocamlc -o gen_libffi_abi -package str,bytes -linkpkg $^ -I src/configure
+	$(HOSTOCAMLFIND) ocamlc -o gen_libffi_abi -package re.str,bytes -linkpkg $^ -I src/configure
 	./gen_libffi_abi > $@ 2> gen_c_primitives.log || (rm $@ && cat gen_c_primitives.log || false)
 
 libffi.config: src/discover/commands.mli src/discover/commands.ml src/discover/discover.ml
-	$(HOSTOCAMLFIND) ocamlc -o discover -package str,bytes -linkpkg $^ -I src/discover
+	$(HOSTOCAMLFIND) ocamlc -o discover -package re.str,bytes -linkpkg $^ -I src/discover
 	./discover -ocamlc "$(OCAMLFIND) ocamlc" > $@ || (rm $@ && false)
 
 asneeded.config:

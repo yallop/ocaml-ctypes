@@ -49,12 +49,12 @@ let is_win = Sys.os_type = "Win32"
 
 let path_sep = if is_win then ";" else ":"
 
-let split_path = Str.(split (regexp (path_sep ^ "+")))
+let split_path = Re_str.(split (regexp (path_sep ^ "+")))
 
 let ( // ) = Filename.concat
 
 (** See the comment in commands.ml *)
-let unixify = Str.(global_replace (regexp "\\") "/")
+let unixify = Re_str.(global_replace (regexp_string "\\") "/")
 
 (* +-----------------------------------------------------------------+
    | Test codes                                                      |
@@ -151,7 +151,7 @@ let test_feature name test =
    | pkg-config                                                      |
    +-----------------------------------------------------------------+ *)
 
-let split = Str.(split (regexp " +"))
+let split = Re_str.(split (regexp " +"))
 
 let brew_libffi_version flags =
   match Commands.command "brew ls libffi --versions | awk '{print $NF}'" with

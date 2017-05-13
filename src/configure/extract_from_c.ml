@@ -9,7 +9,7 @@ let getenv ~default name =
   try Sys.getenv name
   with Not_found -> default
 
-let nsplit sep str = Str.(split (regexp_string sep)) str
+let nsplit sep str = Re_str.(split (regexp_string sep)) str
 
 let read_output program =
   let input_filename = Filename.temp_file "ctypes_libffi_config" ".c" in
@@ -42,7 +42,7 @@ let read_output program =
   Sys.remove output_filename;
   Bytes.to_string result
 
-let find_from haystack pos needle = Str.(search_forward (regexp_string needle) haystack pos)
+let find_from haystack pos needle = Re_str.(search_forward (regexp_string needle) haystack pos)
 
 let prefix = "BEGIN-"
 let suffix = "-END"

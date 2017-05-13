@@ -9,7 +9,7 @@ open OUnit2
 open Ctypes
 
 
-let strip_whitespace = Str.(global_replace (regexp "[\n ]+") "")
+let strip_whitespace = Re_str.(global_replace (regexp "[\n ]+") "")
 
 let equal_ignoring_whitespace l r =
   strip_whitespace l = strip_whitespace r
