@@ -5,6 +5,7 @@ fts-stubs.install = no
 fts-stubs.dir = examples/fts/stub-generation/bindings
 fts-stubs.subproject_deps = ctypes cstubs \
   ctypes-foreign-base ctypes-foreign-unthreaded
+fts-stubs.deps = re.str
 fts-stubs: PROJECT=fts-stubs
 fts-stubs: $$(LIB_TARGETS)
 
