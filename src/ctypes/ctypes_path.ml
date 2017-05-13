@@ -10,10 +10,10 @@
 type path = string list
 
 let is_uident s =
-  Str.(string_match (regexp "[A-Z][a-zA-Z0-9_]*") s 0);;
+  Re_str.(string_match (regexp "[A-Z][a-zA-Z0-9_]*") s 0);;
 
 let is_ident s =
-  Str.(string_match (regexp "[A-Za-z_][a-zA-Z0-9_]*") s 0);;
+  Re_str.(string_match (regexp "[A-Za-z_][a-zA-Z0-9_]*") s 0);;
 
 let rec is_valid_path = function
   | [] -> false
@@ -21,7 +21,7 @@ let rec is_valid_path = function
   | u :: p -> is_uident u && is_valid_path p
 
 let path_of_string s = 
-  let p = Str.(split (regexp_string ".") s) in
+  let p = Re_str.(split (regexp_string ".") s) in
   if is_valid_path p then p
   else invalid_arg "Ctypes_ident.path_of_string"
 

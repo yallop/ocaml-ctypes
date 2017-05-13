@@ -21,10 +21,10 @@ module type BINDINGS = functor (F : TYPE) -> sig end
 
 let cstring s =
   (* Format a string for output as a C string literal. *)
-  let mappings = [Str.regexp "\"", "\\\"";
-                  Str.regexp "\n", "\\n"] in
+  let mappings = [Re_str.regexp "\"", "\\\"";
+                  Re_str.regexp "\n", "\\n"] in
   let escaped =
-    List.fold_left (fun s (r, r') -> Str.(global_replace r r') s) s mappings
+    List.fold_left (fun s (r, r') -> Re_str.(global_replace r r') s) s mappings
   in "\""^ escaped ^"\""
 
 let cprologue = [

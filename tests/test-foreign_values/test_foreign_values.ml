@@ -75,7 +75,7 @@ struct
   *)
   let test_environ _ =
     let parse_entry s =
-      match Str.(bounded_split (regexp "=") s 2), "" with
+      match Re_str.(bounded_split (regexp_string "=") s 2), "" with
         [k; v], _ | [k], v -> (String.uppercase k, v)
       | _ -> Printf.ksprintf failwith "Parsing %S failed" s
     in
