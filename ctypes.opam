@@ -23,6 +23,7 @@ remove: [
 ]
 depends: [
    "base-bytes"
+   "integers"
    "ocamlfind" {build}
    "conf-pkg-config" {build}
    "lwt" {test}

@@ -3,6 +3,7 @@
 # subproject: fts with stub generation
 fts-stubs.install = no
 fts-stubs.dir = examples/fts/stub-generation/bindings
+fts-stubs.deps = integers
 fts-stubs.subproject_deps = ctypes cstubs \
   ctypes-foreign-base ctypes-foreign-unthreaded
 fts-stubs: PROJECT=fts-stubs
@@ -10,9 +11,10 @@ fts-stubs: $$(LIB_TARGETS)
 
 fts-stub-generator.install = no
 fts-stub-generator.dir = examples/fts/stub-generation/stub-generator
+fts-stub-generator.deps = integers
 fts-stub-generator.subproject_deps = ctypes cstubs \
   ctypes-foreign-base ctypes-foreign-unthreaded fts-stubs
-fts-stub-generator.deps = bytes str unix bigarray
+fts-stub-generator.deps = bytes str unix bigarray integers
 fts-stub-generator: PROJECT=fts-stub-generator
 fts-stub-generator: $$(NATIVE_TARGET)
 
@@ -20,7 +22,7 @@ fts-cmd.install = no
 fts-cmd.dir = examples/fts/stub-generation
 fts-cmd.subproject_deps = ctypes cstubs \
   ctypes-foreign-base ctypes-foreign-unthreaded fts-stubs
-fts-cmd.deps = bytes str unix bigarray
+fts-cmd.deps = bytes str unix bigarray integers
 fts-cmd.extra_mls = fts_generated.ml
 fts-cmd: CFLAGS+=-D_FILE_OFFSET_BITS=32
 fts-cmd: PROJECT=fts-cmd
@@ -33,7 +35,7 @@ examples/fts/stub-generation/fts_generated.ml: fts-stub-generator
 # subproject: fts using dynamic linking (foreign)
 fts.install = no
 fts.dir = examples/fts/foreign
-fts.deps = bytes unix bigarray str
+fts.deps = bytes unix bigarray str integers
 fts.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
 fts: PROJECT=fts
 fts: $$(NATIVE_TARGET)
@@ -48,14 +50,14 @@ date-stubs: $$(LIB_TARGETS)
 date-stub-generator.install = no
 date-stub-generator.dir = examples/date/stub-generation/stub-generator
 date-stub-generator.subproject_deps = ctypes cstubs date-stubs
-date-stub-generator.deps = bytes str unix bigarray
+date-stub-generator.deps = bytes str unix bigarray integers
 date-stub-generator: PROJECT=date-stub-generator
 date-stub-generator: $$(NATIVE_TARGET)
 
 date-cmd.install = no
 date-cmd.dir = examples/date/stub-generation
 date-cmd.subproject_deps = ctypes cstubs date-stubs
-date-cmd.deps = bytes str unix bigarray
+date-cmd.deps = bytes str unix bigarray integers
 date-cmd.extra_mls = date_generated.ml
 date-cmd: PROJECT=date-cmd
 date-cmd: $$(NATIVE_TARGET)
@@ -68,7 +70,7 @@ examples/date/stub-generation/date_generated.ml:
 date.install = no
 date.dir = examples/date/foreign
 date.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
-date.deps = bytes unix bigarray str
+date.deps = bytes unix bigarray str integers
 date: PROJECT=date
 date: $$(NATIVE_TARGET)
 
@@ -76,14 +78,14 @@ date: $$(NATIVE_TARGET)
 ncurses-stubs.install = no
 ncurses-stubs.dir = examples/ncurses/stub-generation/bindings
 ncurses-stubs.subproject_deps = ctypes cstubs
-ncurses-stubs.deps = bytes str unix bigarray
+ncurses-stubs.deps = bytes str unix bigarray integers
 ncurses-stubs: PROJECT=ncurses-stubs
 ncurses-stubs: $$(NATIVE_TARGET) $$(LIB_TARGETS)
 
 ncurses-cmd.install = no
 ncurses-cmd.dir = examples/ncurses/stub-generation
 ncurses-cmd.subproject_deps = ctypes cstubs ncurses-stubs
-ncurses-cmd.deps = bytes str unix bigarray
+ncurses-cmd.deps = bytes str unix bigarray integers
 ncurses-cmd.extra_mls = ncurses_generated.ml
 ncurses-cmd.link_flags = -lncurses
 ncurses-cmd: PROJECT=ncurses-cmd
@@ -97,7 +99,7 @@ examples/ncurses/stub-generation/ncurses_generated.ml: ncurses-stubs
 ncurses.install = no
 ncurses.dir = examples/ncurses/foreign
 ncurses.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
-ncurses.deps = bytes unix bigarray str
+ncurses.deps = bytes unix bigarray str integers
 ncurses.link_flags = -lncurses
 ncurses: PROJECT=ncurses
 ncurses: $$(NATIVE_TARGET)

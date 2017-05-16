@@ -46,6 +46,7 @@ install_android_toolchain () {
     STLVER=4.9 STLARCH=armeabi \
     opam install conf-android
   opam install ocaml-android
+  opam install integers-android
   OCAMLFINDFLAGS='-toolchain android'
 }
 

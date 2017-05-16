@@ -16,10 +16,10 @@ external cstring_of_string : string -> Ctypes_memory_stubs.managed_buffer
   = "ctypes_cstring_of_string"
 
 (* Size information for uintptr_t *)
-external uintptr_t_size : unit -> int = "ctypes_uintptr_t_size"
+external uintptr_t_size : unit -> int = "integers_uintptr_t_size"
 
 (* Size information for uintptr_t *)
-external intptr_t_size : unit -> int = "ctypes_intptr_t_size"
+external intptr_t_size : unit -> int = "integers_intptr_t_size"
 
 (* Size information for ptrdiff_t *)
-external ptrdiff_t_size : unit -> int = "ctypes_ptrdiff_t_size"
+external ptrdiff_t_size : unit -> int = "integers_ptrdiff_t_size"
