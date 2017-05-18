@@ -78,28 +78,28 @@ and _ fn =
   | Function : 'a typ * 'b fn  -> ('a -> 'b) fn
 
 type _ bigarray_class =
-  Genarray : 'l Bigarray.layout ->
+  Genarray :
   < element: 'a;
     layout: 'l;
     dims: int array;
     ba_repr: 'b;
     bigarray: ('a, 'b, 'l) Bigarray.Genarray.t;
     carray: 'a carray > bigarray_class
-| Array1 : 'l Bigarray.layout ->
+| Array1 :
   < element: 'a;
     layout: 'l;
     dims: int;
     ba_repr: 'b;
     bigarray: ('a, 'b, 'l) Bigarray.Array1.t;
     carray: 'a carray > bigarray_class
-| Array2 : 'l Bigarray.layout ->
+| Array2 :
   < element: 'a;
     layout: 'l;
     dims: int * int;
     ba_repr: 'b;
     bigarray: ('a, 'b, 'l) Bigarray.Array2.t;
     carray: 'a carray carray > bigarray_class
-| Array3 : 'l Bigarray.layout ->
+| Array3 :
   < element: 'a;
     layout: 'l;
     dims: int * int * int;
@@ -164,7 +164,14 @@ val bigarray : < ba_repr : 'c;
                  dims : 'b;
                  layout: Bigarray.c_layout;
                  element : 'a > bigarray_class ->
-               'b -> ('a, 'c) Bigarray.kind -> 'd typ
+  'b -> ('a, 'c) Bigarray.kind -> 'd typ
+val fortran_bigarray : < ba_repr : 'c;
+                         bigarray : 'd;
+                         carray : 'e;
+                         dims : 'b;
+                         layout: Bigarray.fortran_layout;
+                         element : 'a > bigarray_class ->
+  'b -> ('a, 'c) Bigarray.kind -> 'd typ
 val returning : 'a typ -> 'a fn
 val static_funptr : 'a fn -> 'a static_funptr typ
 val structure : string -> 'a structure typ

@@ -86,28 +86,28 @@ and _ fn =
   | Function : 'a typ * 'b fn  -> ('a -> 'b) fn
 
 type _ bigarray_class =
-  Genarray : 'l Bigarray.layout ->
+  Genarray :
   < element: 'a;
     layout: 'l;
     dims: int array;
     ba_repr: 'b;
     bigarray: ('a, 'b, 'l) Bigarray.Genarray.t;
     carray: 'a carray > bigarray_class
-| Array1 : 'l Bigarray.layout ->
+| Array1 :
   < element: 'a;
     layout: 'l;
     dims: int;
     ba_repr: 'b;
     bigarray: ('a, 'b, 'l) Bigarray.Array1.t;
     carray: 'a carray > bigarray_class
-| Array2 : 'l Bigarray.layout ->
+| Array2 :
   < element: 'a;
     layout: 'l;
     dims: int * int;
     ba_repr: 'b;
     bigarray: ('a, 'b, 'l) Bigarray.Array2.t;
     carray: 'a carray carray > bigarray_class
-| Array3 : 'l Bigarray.layout ->
+| Array3 :
   < element: 'a;
     layout: 'l;
     dims: int * int * int;
@@ -235,21 +235,26 @@ let id v = v
 let typedef old name =
   view ~format_typ:(fun k fmt -> Format.fprintf fmt "%s%t" name k)
     ~read:id ~write:id old
-let bigarray : type a b c d e.
+
+let bigarray_ : type a b c d e l.
   < element: a;
-    layout: Bigarray.c_layout;
+    layout: l;
     dims: b;
     ba_repr: c;
     bigarray: d;
-    carray: e > bigarray_class ->
-   b -> (a, c) Bigarray.kind -> d typ =
-  fun spec dims kind -> match spec with
-  | Genarray _ -> Bigarray (Ctypes_bigarray.bigarray dims kind Bigarray.c_layout)
-  | Array1 _ -> Bigarray (Ctypes_bigarray.bigarray1 dims kind Bigarray.c_layout)
-  | Array2 _ -> let d1, d2 = dims in
-                Bigarray (Ctypes_bigarray.bigarray2 d1 d2 kind Bigarray.c_layout)
-  | Array3 _ -> let d1, d2, d3 = dims in
-                Bigarray (Ctypes_bigarray.bigarray3 d1 d2 d3 kind Bigarray.c_layout)
+    carray: e > bigarray_class -> 
+   b -> (a, c) Bigarray.kind -> l Bigarray.layout -> d typ =
+  fun spec dims kind l -> match spec with
+  | Genarray -> Bigarray (Ctypes_bigarray.bigarray dims kind l)
+  | Array1 -> Bigarray (Ctypes_bigarray.bigarray1 dims kind l)
+  | Array2 -> let d1, d2 = dims in
+              Bigarray (Ctypes_bigarray.bigarray2 d1 d2 kind l)
+  | Array3 -> let d1, d2, d3 = dims in
+              Bigarray (Ctypes_bigarray.bigarray3 d1 d2 d3 kind l)
+
+let bigarray spec c k = bigarray_ spec c k Bigarray.c_layout
+let fortran_bigarray spec c k = bigarray_ spec c k Bigarray.fortran_layout
+
 let returning v =
   if not (passable v) then
     raise (Unsupported "Unsupported return type")
