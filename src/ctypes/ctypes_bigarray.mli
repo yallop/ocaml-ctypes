@@ -5,13 +5,13 @@
  * See the file LICENSE for details.
  *)
 
-(** {2 Types *)
+(** {2 Types} *)
 
 type ('a, 'b) t
 (** The type of bigarray values of particular sizes.  A value of type
     [(a, b) t] can be used to read and write values of type [b].  *)
 
-(** {3 Type constructors *)
+(** {3 Type constructors} *)
 
 val bigarray : int array -> ('a, 'b) Bigarray.kind ->
   ('a, ('a, 'b, Bigarray.c_layout) Bigarray.Genarray.t) t
@@ -32,7 +32,7 @@ val bigarray3 : int -> int -> int -> ('a, 'b) Bigarray.kind ->
 val prim_of_kind : ('a, _) Bigarray.kind -> 'a Ctypes_primitive_types.prim
 (** Create a {!Ctypes_ptr.Types.ctype} for a {!Bigarray.kind}. *)
 
-(** {3 Type eliminators *)
+(** {3 Type eliminators} *)
 
 val sizeof : (_, _) t -> int
 (** Compute the size of a bigarray type. *)
@@ -50,7 +50,7 @@ val type_expression : ('a, 'b) t -> ([> `Appl of Ctypes_path.path * 'c list
                                      |  `Ident of Ctypes_path.path ] as 'c)
 (** Compute a type expression that denotes a bigarray type. *)
 
-(** {2 Values *)
+(** {2 Values} *)
 
 val unsafe_address : 'a -> Ctypes_ptr.voidp
 (** Return the address of a bigarray value.  This function is unsafe because
