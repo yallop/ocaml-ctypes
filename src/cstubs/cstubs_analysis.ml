@@ -55,7 +55,7 @@ type _ alloc =
 | Alloc_funptr : _ static_funptr alloc
 | Alloc_structured : (_, _) structured alloc
 | Alloc_array : _ carray alloc
-| Alloc_bigarray : (_, 'a) Ctypes_bigarray.t -> 'a alloc
+| Alloc_bigarray : (_, 'a, _) Ctypes_bigarray.t -> 'a alloc
 | Alloc_view : ('a, 'b) view * 'b alloc -> 'a alloc
 
 type 'a allocation = [ `Noalloc of 'a noalloc | `Alloc of 'a alloc ]

@@ -42,7 +42,7 @@ type _ typ =
   | Abstract        : abstract_type      -> 'a abstract typ
   | View            : ('a, 'b) view      -> 'a typ
   | Array           : 'a typ * int       -> 'a carray typ
-  | Bigarray        : (_, 'a) Ctypes_bigarray.t
+  | Bigarray        : (_, 'a, _) Ctypes_bigarray.t
                                          -> 'a typ
   | OCaml           : 'a ocaml_type      -> 'a ocaml typ
 and 'a carray = { astart : 'a ptr; alength : int }
@@ -239,12 +239,12 @@ let bigarray : type a b c d e.
     carray: e > bigarray_class ->
    b -> (a, c) Bigarray.kind -> d typ =
   fun spec dims kind -> match spec with
-  | Genarray -> Bigarray (Ctypes_bigarray.bigarray dims kind)
-  | Array1 -> Bigarray (Ctypes_bigarray.bigarray1 dims kind)
+  | Genarray -> Bigarray (Ctypes_bigarray.bigarray dims kind Bigarray.c_layout)
+  | Array1 -> Bigarray (Ctypes_bigarray.bigarray1 dims kind Bigarray.c_layout)
   | Array2 -> let d1, d2 = dims in
-              Bigarray (Ctypes_bigarray.bigarray2 d1 d2 kind)
+              Bigarray (Ctypes_bigarray.bigarray2 d1 d2 kind Bigarray.c_layout)
   | Array3 -> let d1, d2, d3 = dims in
-              Bigarray (Ctypes_bigarray.bigarray3 d1 d2 d3 kind)
+              Bigarray (Ctypes_bigarray.bigarray3 d1 d2 d3 kind Bigarray.c_layout)
 let returning v =
   if not (passable v) then
     raise (Unsupported "Unsupported return type")

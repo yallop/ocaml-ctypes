@@ -34,17 +34,17 @@ external address : 'b -> Ctypes_ptr.voidp
   = "ctypes_bigarray_address"
 
 external view : 'a kind -> dims:int array -> _ Ctypes_ptr.Fat.t ->
-  ('a, 'b, Bigarray.c_layout) Bigarray.Genarray.t
+  'l Bigarray.layout -> ('a, 'b, 'l) Bigarray.Genarray.t
   = "ctypes_bigarray_view"
 
 external view1 : 'a kind -> dims:int array -> _ Ctypes_ptr.Fat.t ->
-  ('a, 'b, Bigarray.c_layout) Bigarray.Array1.t
+  'l Bigarray.layout -> ('a, 'b, 'l) Bigarray.Array1.t
   = "ctypes_bigarray_view"
 
 external view2 : 'a kind -> dims:int array -> _ Ctypes_ptr.Fat.t ->
-  ('a, 'b, Bigarray.c_layout) Bigarray.Array2.t
+  'l Bigarray.layout -> ('a, 'b, 'l) Bigarray.Array2.t
   = "ctypes_bigarray_view"
 
 external view3 : 'a kind -> dims:int array -> _ Ctypes_ptr.Fat.t ->
-  ('a, 'b, Bigarray.c_layout) Bigarray.Array3.t
+  'l Bigarray.layout -> ('a, 'b, 'l) Bigarray.Array3.t
   = "ctypes_bigarray_view"

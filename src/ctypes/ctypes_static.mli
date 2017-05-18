@@ -36,7 +36,7 @@ type _ typ =
   | Abstract        : abstract_type      -> 'a abstract typ
   | View            : ('a, 'b) view      -> 'a typ
   | Array           : 'a typ * int       -> 'a carray typ
-  | Bigarray        : (_, 'a) Ctypes_bigarray.t
+  | Bigarray        : (_, 'a, _) Ctypes_bigarray.t
                                          -> 'a typ
   | OCaml           : 'a ocaml_type      -> 'a ocaml typ
 and 'a carray = { astart : 'a ptr; alength : int }
