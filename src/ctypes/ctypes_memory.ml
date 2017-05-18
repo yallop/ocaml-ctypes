@@ -285,20 +285,22 @@ let _bigarray_start kind ba =
 
 let bigarray_kind : type a b c d f.
   < element: a;
+    layout: Bigarray.c_layout;
     ba_repr: f;
     bigarray: b;
     carray: c;
     dims: d > bigarray_class -> b -> (a, f) Bigarray.kind =
   function
-  | Genarray -> Genarray.kind
-  | Array1 -> Array1.kind
-  | Array2 -> Array2.kind
-  | Array3 -> Array3.kind
+  | Genarray _ -> Genarray.kind
+  | Array1 _ -> Array1.kind
+  | Array2 _ -> Array2.kind
+  | Array3 _ -> Array3.kind
 
 let bigarray_start spec ba = _bigarray_start (bigarray_kind spec ba) ba
 
 let array_of_bigarray : type a b c d e.
   < element: a;
+    layout: Bigarray.c_layout;
     ba_repr: e;
     bigarray: b;
     carray: c;
@@ -307,45 +309,47 @@ let array_of_bigarray : type a b c d e.
     let CPointer p as element_ptr =
       bigarray_start spec ba in
     match spec with
-  | Genarray ->
+  | Genarray _ ->
     let ds = Genarray.dims ba in
     CArray.from_ptr element_ptr (Array.fold_left ( * ) 1 ds)
-  | Array1 ->
+  | Array1 _ ->
     let d = Array1.dim ba in
     CArray.from_ptr element_ptr d
-  | Array2 ->
+  | Array2 _ ->
     let d1 = Array2.dim1 ba and d2 = Array2.dim2 ba in
     CArray.from_ptr (castp (array d2 (Fat.reftype p)) element_ptr) d1
-  | Array3 ->
+  | Array3 _ ->
     let d1 = Array3.dim1 ba and d2 = Array3.dim2 ba and d3 = Array3.dim3 ba in
     CArray.from_ptr (castp (array d2 (array d3 (Fat.reftype p))) element_ptr) d1
 
 let bigarray_elements : type a b c d f.
    < element: a;
+     layout: Bigarray.c_layout;
      ba_repr: f;
      bigarray: b;
      carray: c;
      dims: d > bigarray_class -> d -> int
   = fun spec dims -> match spec, dims with
-   | Genarray, ds -> Array.fold_left ( * ) 1 ds
-   | Array1, d -> d
-   | Array2, (d1, d2) -> d1 * d2
-   | Array3, (d1, d2, d3) -> d1 * d2 * d3
+   | Genarray _, ds -> Array.fold_left ( * ) 1 ds
+   | Array1 _, d -> d
+   | Array2 _, (d1, d2) -> d1 * d2
+   | Array3 _, (d1, d2, d3) -> d1 * d2 * d3
 
 let bigarray_of_ptr spec dims kind ptr =
   !@ (castp (bigarray spec dims kind) ptr)
 
 let array_dims : type a b c d f.
    < element: a;
+     layout: Bigarray.c_layout;
      ba_repr: f;
      bigarray: b;
      carray: c carray;
      dims: d > bigarray_class -> c carray -> d =
    let unsupported () = raise (Unsupported "taking dimensions of non-array type") in
    fun spec a -> match spec with
-   | Genarray -> [| a.alength |]
-   | Array1 -> a.alength
-   | Array2 ->
+   | Genarray _ -> [| a.alength |]
+   | Array1 _ -> a.alength
+   | Array2 _ ->
      begin match a.astart with
      | CPointer p ->
        begin match Fat.reftype p with
@@ -353,7 +357,7 @@ let array_dims : type a b c d f.
        | _ -> unsupported ()
        end
     end
-   | Array3 ->
+   | Array3 _ ->
      begin match a.astart with
      | CPointer p ->
        begin match Fat.reftype p with
@@ -366,10 +370,10 @@ let bigarray_of_array spec kind a =
   let dims = array_dims spec a in
   !@ (castp (bigarray spec dims kind) (CArray.start a))
 
-let genarray = Genarray
-let array1 = Array1
-let array2 = Array2
-let array3 = Array3
+let genarray = Genarray Bigarray.c_layout
+let array1 = Array1 Bigarray.c_layout
+let array2 = Array2 Bigarray.c_layout
+let array3 = Array3 Bigarray.c_layout
 let typ_of_bigarray_kind k = Primitive (Ctypes_bigarray.prim_of_kind k)
 
 let string_from_ptr (CPointer p) ~length:len =

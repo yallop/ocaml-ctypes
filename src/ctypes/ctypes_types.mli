@@ -219,6 +219,7 @@ sig
 
   val bigarray :
     < element: 'a;
+      layout: Bigarray.c_layout;
       ba_repr: 'b;
       dims: 'dims;
       bigarray: 'bigarray;

@@ -46,6 +46,7 @@ type 'a bigarray_class = 'a Ctypes_static.bigarray_class
 
 val genarray :
   < element: 'a;
+    layout: Bigarray.c_layout;
     ba_repr: 'b;
     bigarray: ('a, 'b, Bigarray.c_layout) Bigarray.Genarray.t;
     carray: 'a carray;
@@ -54,6 +55,7 @@ val genarray :
 
 val array1 :
   < element: 'a;
+    layout: Bigarray.c_layout;
     ba_repr: 'b;
     bigarray: ('a, 'b, Bigarray.c_layout) Bigarray.Array1.t;
     carray: 'a carray;
@@ -62,6 +64,7 @@ val array1 :
 
 val array2 :
   < element: 'a;
+    layout: Bigarray.c_layout;
     ba_repr: 'b;
     bigarray: ('a, 'b, Bigarray.c_layout) Bigarray.Array2.t;
     carray: 'a carray carray;
@@ -70,6 +73,7 @@ val array2 :
 
 val array3 :
   < element: 'a;
+    layout: Bigarray.c_layout;
     ba_repr: 'b;
     bigarray: ('a, 'b, Bigarray.c_layout) Bigarray.Array3.t;
     carray: 'a carray carray carray;
@@ -338,6 +342,7 @@ end
 (** {4 Bigarray values} *)
 
 val bigarray_start : < element: 'a;
+                       layout: Bigarray.c_layout;
                        ba_repr: _;
                        bigarray: 'b;
                        carray: _;
@@ -345,6 +350,7 @@ val bigarray_start : < element: 'a;
 (** Return the address of the first element of the given Bigarray value. *)
 
 val bigarray_of_ptr : < element: 'a;
+                        layout: Bigarray.c_layout;
                         ba_repr: 'f;
                         bigarray: 'b;
                         carray: _;
@@ -355,6 +361,7 @@ val bigarray_of_ptr : < element: 'a;
     [p]. *)
 
 val array_of_bigarray : < element: _;
+                          layout: Bigarray.c_layout;
                           ba_repr: _;
                           bigarray: 'b;
                           carray: 'c;
@@ -366,6 +373,7 @@ val array_of_bigarray : < element: _;
 (** Convert a Bigarray value to a C array. *)
 
 val bigarray_of_array : < element: 'a;
+                          layout: Bigarray.c_layout;
                           ba_repr: 'f;
                           bigarray: 'b;
                           carray: 'c carray;
