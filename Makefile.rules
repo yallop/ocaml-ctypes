@@ -47,11 +47,15 @@ XEN_CFLAGS=$(if $(XEN_LIB), \
 CMO_OPTS = $($(PROJECT).cmo_opts)
 CMX_OPTS = $($(PROJECT).cmx_opts)
 CMI_OPTS = $($(PROJECT).cmi_opts)
-CMA_OPTS = $(if $(C_OBJECTS),-cclib -l$(PROJECT)_stubs -dllib -l$(PROJECT)_stubs)
+CMA_OPTS = $(if $(C_OBJECTS),-cclib -l$(PROJECT)_stubs -dllib -l$(PROJECT)_stubs) \
+           $(foreach libdep,$($(PROJECT).linkdeps),\
+             -cclib -l$(libdep) -dllib -l$(libdep))
 SUBPROJECT_DEPS = $($(PROJECT).subproject_deps)
 LOCAL_CMXAS = $(SUBPROJECT_DEPS:%=$(BUILDDIR)/%.cmxa)
 LOCAL_CMAS = $(SUBPROJECT_DEPS:%=$(BUILDDIR)/%.cma)
-CMXA_OPTS = $(if $(C_OBJECTS),-cclib -l$(PROJECT)_stubs)
+CMXA_OPTS = $(if $(C_OBJECTS),-cclib -l$(PROJECT)_stubs)\
+           $(foreach libdep,$($(PROJECT).linkdeps),\
+             -cclib -l$(libdep))
 
 OCAMLINCLUDES = -I $(BUILDDIR)/$($(PROJECT).dir) \
                 $(foreach spdep,$($(PROJECT).subproject_deps),\
@@ -99,7 +103,7 @@ $(BUILDDIR)/%.cmxs : $$(NATIVE_OBJECTS)
 	$(OCAMLFIND) opt -shared -linkall $(OCAMLFLAGS) $(THREAD_FLAG) $(OCAMLFIND_PACKAGE_FLAGS) -o $@ $(NATIVE_OBJECTS) $(C_OBJECTS) $(OCAML_LINK_FLAGS)
 
 $(BUILDDIR)/%.cma: $$(BYTE_OBJECTS)
-	$(OCAMLFIND) ocamlc -a $(OCAMLFLAGS) $(THREAD_FLAG) $(CMA_OPTS) $(OCAMLFIND_PACKAGE_FLAGS) -o $@ $(BYTE_OBJECTS) $(OCAML_LINK_FLAGS)
+	$(OCAMLFIND) ocamlc -a -linkall $(OCAMLFLAGS) $(THREAD_FLAG) $(CMA_OPTS) $(OCAMLFIND_PACKAGE_FLAGS) -o $@ $(BYTE_OBJECTS) $(OCAML_LINK_FLAGS)
 
 $(BUILDDIR)/%.cmo : %.ml
 	@mkdir -p $(@D)
