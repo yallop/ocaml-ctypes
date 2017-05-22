@@ -36,7 +36,7 @@ type _ typ =
   | Abstract        : abstract_type      -> 'a abstract typ
   | View            : ('a, 'b) view      -> 'a typ
   | Array           : 'a typ * int       -> 'a carray typ
-  | Bigarray        : (_, 'a) Ctypes_bigarray.t
+  | Bigarray        : (_, 'a, _) Ctypes_bigarray.t
                                          -> 'a typ
   | OCaml           : 'a ocaml_type      -> 'a ocaml typ
 and 'a carray = { astart : 'a ptr; alength : int }
@@ -80,27 +80,31 @@ and _ fn =
 type _ bigarray_class =
   Genarray :
   < element: 'a;
+    layout: 'l;
     dims: int array;
     ba_repr: 'b;
-    bigarray: ('a, 'b, Bigarray.c_layout) Bigarray.Genarray.t;
+    bigarray: ('a, 'b, 'l) Bigarray.Genarray.t;
     carray: 'a carray > bigarray_class
 | Array1 :
   < element: 'a;
+    layout: 'l;
     dims: int;
     ba_repr: 'b;
-    bigarray: ('a, 'b, Bigarray.c_layout) Bigarray.Array1.t;
+    bigarray: ('a, 'b, 'l) Bigarray.Array1.t;
     carray: 'a carray > bigarray_class
 | Array2 :
   < element: 'a;
+    layout: 'l;
     dims: int * int;
     ba_repr: 'b;
-    bigarray: ('a, 'b, Bigarray.c_layout) Bigarray.Array2.t;
+    bigarray: ('a, 'b, 'l) Bigarray.Array2.t;
     carray: 'a carray carray > bigarray_class
 | Array3 :
   < element: 'a;
+    layout: 'l;
     dims: int * int * int;
     ba_repr: 'b;
-    bigarray: ('a, 'b, Bigarray.c_layout) Bigarray.Array3.t;
+    bigarray: ('a, 'b, 'l) Bigarray.Array3.t;
     carray: 'a carray carray carray > bigarray_class
 
 type boxed_typ = BoxedType : 'a typ -> boxed_typ
@@ -158,8 +162,16 @@ val bigarray : < ba_repr : 'c;
                  bigarray : 'd;
                  carray : 'e;
                  dims : 'b;
+                 layout: Bigarray.c_layout;
                  element : 'a > bigarray_class ->
-               'b -> ('a, 'c) Bigarray.kind -> 'd typ
+  'b -> ('a, 'c) Bigarray.kind -> 'd typ
+val fortran_bigarray : < ba_repr : 'c;
+                         bigarray : 'd;
+                         carray : 'e;
+                         dims : 'b;
+                         layout: Bigarray.fortran_layout;
+                         element : 'a > bigarray_class ->
+  'b -> ('a, 'c) Bigarray.kind -> 'd typ
 val returning : 'a typ -> 'a fn
 val static_funptr : 'a fn -> 'a static_funptr typ
 val structure : string -> 'a structure typ

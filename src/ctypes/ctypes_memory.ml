@@ -283,8 +283,9 @@ let _bigarray_start kind ba =
   let reftyp = Primitive (Ctypes_bigarray.prim_of_kind kind) in
   CPointer (Fat.make ~managed:ba ~reftyp raw_address)
 
-let bigarray_kind : type a b c d f.
+let bigarray_kind : type a b c d f l.
   < element: a;
+    layout: l;
     ba_repr: f;
     bigarray: b;
     carray: c;
@@ -299,6 +300,7 @@ let bigarray_start spec ba = _bigarray_start (bigarray_kind spec ba) ba
 
 let array_of_bigarray : type a b c d e.
   < element: a;
+    layout: Bigarray.c_layout;
     ba_repr: e;
     bigarray: b;
     carray: c;
@@ -320,8 +322,9 @@ let array_of_bigarray : type a b c d e.
     let d1 = Array3.dim1 ba and d2 = Array3.dim2 ba and d3 = Array3.dim3 ba in
     CArray.from_ptr (castp (array d2 (array d3 (Fat.reftype p))) element_ptr) d1
 
-let bigarray_elements : type a b c d f.
+let bigarray_elements : type a b c d f l.
    < element: a;
+     layout: l;
      ba_repr: f;
      bigarray: b;
      carray: c;
@@ -335,8 +338,12 @@ let bigarray_elements : type a b c d f.
 let bigarray_of_ptr spec dims kind ptr =
   !@ (castp (bigarray spec dims kind) ptr)
 
-let array_dims : type a b c d f.
+let fortran_bigarray_of_ptr spec dims kind ptr =
+  !@ (castp (fortran_bigarray spec dims kind) ptr)
+
+let array_dims : type a b c d f l.
    < element: a;
+     layout: l;
      ba_repr: f;
      bigarray: b;
      carray: c carray;

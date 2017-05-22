@@ -7,26 +7,26 @@
 
 (** {2 Types} *)
 
-type ('a, 'b) t
+type ('a, 'b, 'l) t
 (** The type of bigarray values of particular sizes.  A value of type
-    [(a, b) t] can be used to read and write values of type [b].  *)
+    [(a, b, l) t] can be used to read and write values of type [b].  *)
 
 (** {3 Type constructors} *)
 
-val bigarray : int array -> ('a, 'b) Bigarray.kind ->
-  ('a, ('a, 'b, Bigarray.c_layout) Bigarray.Genarray.t) t
+val bigarray : int array -> ('a, 'b) Bigarray.kind -> 'l Bigarray.layout ->
+  ('a, ('a, 'b, 'l) Bigarray.Genarray.t, 'l) t
 (** Create a {!t} value for the {!Bigarray.Genarray.t} type. *)
 
-val bigarray1 : int -> ('a, 'b) Bigarray.kind ->
-  ('a, ('a, 'b, Bigarray.c_layout) Bigarray.Array1.t) t
+val bigarray1 : int -> ('a, 'b) Bigarray.kind -> 'l Bigarray.layout ->
+  ('a, ('a, 'b, 'l) Bigarray.Array1.t, 'l) t
 (** Create a {!t} value for the {!Bigarray.Array1.t} type. *)
 
-val bigarray2 : int -> int -> ('a, 'b) Bigarray.kind ->
-  ('a, ('a, 'b, Bigarray.c_layout) Bigarray.Array2.t) t
+val bigarray2 : int -> int -> ('a, 'b) Bigarray.kind -> 'l Bigarray.layout ->
+  ('a, ('a, 'b, 'l) Bigarray.Array2.t, 'l) t
 (** Create a {!t} value for the {!Bigarray.Array2.t} type. *)
 
-val bigarray3 : int -> int -> int -> ('a, 'b) Bigarray.kind ->
-  ('a, ('a, 'b, Bigarray.c_layout) Bigarray.Array3.t) t
+val bigarray3 : int -> int -> int -> ('a, 'b) Bigarray.kind -> 'l Bigarray.layout ->
+  ('a, ('a, 'b, 'l) Bigarray.Array3.t, 'l) t
 (** Create a {!t} value for the {!Bigarray.Array3.t} type. *)
 
 val prim_of_kind : ('a, _) Bigarray.kind -> 'a Ctypes_primitive_types.prim
@@ -34,20 +34,20 @@ val prim_of_kind : ('a, _) Bigarray.kind -> 'a Ctypes_primitive_types.prim
 
 (** {3 Type eliminators} *)
 
-val sizeof : (_, _) t -> int
+val sizeof : (_, _, _) t -> int
 (** Compute the size of a bigarray type. *)
 
-val alignment : (_, _) t -> int
+val alignment : (_, _, _) t -> int
 (** Compute the alignment of a bigarray type. *)
 
-val element_type : ('a, _) t -> 'a Ctypes_primitive_types.prim
+val element_type : ('a, _, _) t -> 'a Ctypes_primitive_types.prim
 (** Compute the element type of a bigarray type. *)
 
-val dimensions : (_, _) t -> int array
+val dimensions : (_, _, _) t -> int array
 (** Compute the dimensions of a bigarray type. *)
 
-val type_expression : ('a, 'b) t -> ([> `Appl of Ctypes_path.path * 'c list
-                                     |  `Ident of Ctypes_path.path ] as 'c)
+val type_expression : ('a, 'b, 'l) t -> ([> `Appl of Ctypes_path.path * 'c list
+                                         |  `Ident of Ctypes_path.path ] as 'c)
 (** Compute a type expression that denotes a bigarray type. *)
 
 (** {2 Values} *)
@@ -59,7 +59,7 @@ val unsafe_address : 'a -> Ctypes_ptr.voidp
     reference to the OCaml object then the array might be freed, invalidating
     the address. *)
 
-val view : (_, 'a) t -> _ Ctypes_ptr.Fat.t -> 'a
+val view : (_, 'a, _) t -> _ Ctypes_ptr.Fat.t -> 'a
 (** [view b ptr] creates a bigarray view onto existing memory.
 
     If [ptr] references an OCaml object then [view] will ensure that

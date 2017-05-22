@@ -46,32 +46,36 @@ type 'a bigarray_class = 'a Ctypes_static.bigarray_class
 
 val genarray :
   < element: 'a;
+    layout: 'l;
     ba_repr: 'b;
-    bigarray: ('a, 'b, Bigarray.c_layout) Bigarray.Genarray.t;
+    bigarray: ('a, 'b, 'l) Bigarray.Genarray.t;
     carray: 'a carray;
     dims: int array > bigarray_class
 (** The class of {!Bigarray.Genarray.t} values *)
 
 val array1 :
   < element: 'a;
+    layout: 'l;
     ba_repr: 'b;
-    bigarray: ('a, 'b, Bigarray.c_layout) Bigarray.Array1.t;
+    bigarray: ('a, 'b, 'l) Bigarray.Array1.t;
     carray: 'a carray;
     dims: int > bigarray_class
 (** The class of {!Bigarray.Array1.t} values *)
 
 val array2 :
   < element: 'a;
+    layout: 'l;
     ba_repr: 'b;
-    bigarray: ('a, 'b, Bigarray.c_layout) Bigarray.Array2.t;
+    bigarray: ('a, 'b, 'l) Bigarray.Array2.t;
     carray: 'a carray carray;
     dims: int * int > bigarray_class
 (** The class of {!Bigarray.Array2.t} values *)
 
 val array3 :
   < element: 'a;
+    layout: 'l;
     ba_repr: 'b;
-    bigarray: ('a, 'b, Bigarray.c_layout) Bigarray.Array3.t;
+    bigarray: ('a, 'b, 'l) Bigarray.Array3.t;
     carray: 'a carray carray carray;
     dims: int * int * int > bigarray_class
 (** The class of {!Bigarray.Array3.t} values *)
@@ -338,6 +342,7 @@ end
 (** {4 Bigarray values} *)
 
 val bigarray_start : < element: 'a;
+                       layout: 'l;
                        ba_repr: _;
                        bigarray: 'b;
                        carray: _;
@@ -345,16 +350,29 @@ val bigarray_start : < element: 'a;
 (** Return the address of the first element of the given Bigarray value. *)
 
 val bigarray_of_ptr : < element: 'a;
+                        layout: Bigarray.c_layout;
                         ba_repr: 'f;
                         bigarray: 'b;
                         carray: _;
                         dims: 'i > bigarray_class ->
     'i -> ('a, 'f) Bigarray.kind -> 'a ptr -> 'b
-(** [bigarray_of_ptr c dims k p] converts the C pointer [p] to a bigarray
-    value.  No copy is made; the bigarray references the memory pointed to by
-    [p]. *)
+(** [bigarray_of_ptr c dims k p] converts the C pointer [p] to a C-layout
+    bigarray value.  No copy is made; the bigarray references the memory
+    pointed to by [p]. *)
+
+val fortran_bigarray_of_ptr : < element: 'a;
+                                layout: Bigarray.fortran_layout;
+                                ba_repr: 'f;
+                                bigarray: 'b;
+                                carray: _;
+                                dims: 'i > bigarray_class ->
+    'i -> ('a, 'f) Bigarray.kind -> 'a ptr -> 'b
+(** [fortran_bigarray_of_ptr c dims k p] converts the C pointer [p] to a
+    Fortran-layout bigarray value.  No copy is made; the bigarray references
+    the memory pointed to by [p]. *)
 
 val array_of_bigarray : < element: _;
+                          layout: Bigarray.c_layout;
                           ba_repr: _;
                           bigarray: 'b;
                           carray: 'c;
@@ -366,13 +384,15 @@ val array_of_bigarray : < element: _;
 (** Convert a Bigarray value to a C array. *)
 
 val bigarray_of_array : < element: 'a;
+                          layout: Bigarray.c_layout;
                           ba_repr: 'f;
                           bigarray: 'b;
                           carray: 'c carray;
                           dims: 'i > bigarray_class ->
     ('a, 'f) Bigarray.kind -> 'c carray -> 'b
-(** [bigarray_of_array c k a] converts the {!CArray.t} value [a] to a bigarray
-    value.  No copy is made; the result occupies the same memory as [a]. *)
+(** [bigarray_of_array c k a] converts the {!CArray.t} value [a] to a
+    C-layout bigarray value.  No copy is made; the result occupies the
+    same memory as [a]. *)
 
 (** {3 Struct and union values} *)
 
