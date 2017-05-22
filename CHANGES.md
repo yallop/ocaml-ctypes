@@ -1,3 +1,24 @@
+## ctypes 0.12.0
+
+* Support for Fortran-layout bigarrays  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/523
+
+* Use the integers package for signed and unsigned integer support  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/515
+
+* Add support for binding enums defined without tags  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/510
+
+Thanks to Bertrand Bonnefoy-Claudet (@bbc2) and Leo White (@lpw25) for
+contributions to this release.
+
+## ctypes 0.11.4
+
+* Fix function pointer support on no-exec platforms  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/511
+
+Thanks to Matthias Horn (@tiash) for contributing to this release.
+
 ## ctypes 0.11.3
 
 * Stub out some `long double` functions that are not supported on NetBSD and OpenBSD  
