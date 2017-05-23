@@ -579,6 +579,7 @@ module Foreign_tests = Common_tests(Tests_common.Foreign_binder)
 module Stub_tests = Common_tests(Generated_bindings)
 
 let suite = "Pointer tests" >:::
+  let (>::) name f = name >: OUnitTest.TestCase (OUnitTest.Long, f) in
   ["passing pointers (foreign)"
     >:: Foreign_tests.test_passing_pointers;
 
