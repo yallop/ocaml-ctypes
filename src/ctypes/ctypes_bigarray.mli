@@ -46,8 +46,8 @@ val element_type : ('a, _, _) t -> 'a Ctypes_primitive_types.prim
 val dimensions : (_, _, _) t -> int array
 (** Compute the dimensions of a bigarray type. *)
 
-val type_expression : ('a, 'b, 'l) t -> ([> `Appl of Ctypes_path.path * 'c list
-                                         |  `Ident of Ctypes_path.path ] as 'c)
+val type_expression : ('a, 'b, 'l) t -> ([> `Appl of string list * 'c list
+                                         |  `Ident of string list ] as 'c)
 (** Compute a type expression that denotes a bigarray type. *)
 
 (** {2 Values} *)
