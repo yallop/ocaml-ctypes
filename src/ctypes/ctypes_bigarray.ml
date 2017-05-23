@@ -58,71 +58,68 @@ let bigarray1 d k l = (Dims1 d, kind k, l)
 let bigarray2 d1 d2 k l = (Dims2 (d1, d2), kind k, l)
 let bigarray3 d1 d2 d3 k l = (Dims3 (d1, d2, d3), kind k, l)
 
-let path_of_string = Ctypes_path.path_of_string
-let type_name : type a b l. (b, a, l) dims -> Ctypes_path.path = function
-  | DimsGen _ -> path_of_string "Bigarray.Genarray.t"
-  | Dims1 _ -> path_of_string "Bigarray.Array1.t"
-  | Dims2 _ -> path_of_string "Bigarray.Array2.t"
-  | Dims3 _ -> path_of_string "Bigarray.Array3.t"
+let type_name : type a b l. (b, a, l) dims -> string list = function
+  | DimsGen _ -> ["Bigarray"; "Genarray"; "t"]
+  | Dims1 _ -> ["Bigarray"; "Array1"; "t"]
+  | Dims2 _ -> ["Bigarray"; "Array2"; "t"]
+  | Dims3 _ -> ["Bigarray"; "Array3"; "t"]
 
 let kind_type_names : type a. a kind -> _ = function
   | Kind_float32 ->
-    (`Ident (path_of_string "float"),
-     `Ident (path_of_string "Bigarray.float32_elt"))
+    (`Ident ["float"],
+     `Ident ["Bigarray"; "float32_elt"])
   | Kind_float64 ->
-    (`Ident (path_of_string "float"),
-     `Ident (path_of_string "Bigarray.float64_elt"))
+    (`Ident ["float"],
+     `Ident ["Bigarray"; "float64_elt"])
   | Kind_int8_signed ->
-    (`Ident (path_of_string "int"),
-     `Ident (path_of_string "Bigarray.int8_signed_elt"))
+    (`Ident ["int"],
+     `Ident ["Bigarray"; "int8_signed_elt"])
   | Kind_int8_unsigned ->
-    (`Ident (path_of_string "int"),
-     `Ident (path_of_string "Bigarray.int8_unsigned_elt"))
+    (`Ident ["int"],
+     `Ident ["Bigarray"; "int8_unsigned_elt"])
   | Kind_int16_signed ->
-    (`Ident (path_of_string "int"),
-     `Ident (path_of_string "Bigarray.int16_signed_elt"))
+    (`Ident ["int"],
+     `Ident ["Bigarray"; "int16_signed_elt"])
   | Kind_int16_unsigned ->
-    (`Ident (path_of_string "int"),
-     `Ident (path_of_string "Bigarray.int16_unsigned_elt"))
+    (`Ident ["int"],
+     `Ident ["Bigarray"; "int16_unsigned_elt"])
   | Kind_int32 ->
-    (`Ident (path_of_string "int32"),
-     `Ident (path_of_string "Bigarray.int32_elt"))
+    (`Ident ["int32"],
+     `Ident ["Bigarray"; "int32_elt"])
   | Kind_int64 ->
-    (`Ident (path_of_string "int64"),
-     `Ident (path_of_string "Bigarray.int64_elt"))
+    (`Ident ["int64"],
+     `Ident ["Bigarray"; "int64_elt"])
   | Kind_int ->
-    (`Ident (path_of_string "int"),
-     `Ident (path_of_string "Bigarray.int_elt"))
+    (`Ident ["int"],
+     `Ident ["Bigarray"; "int_elt"])
   | Kind_nativeint ->
-    (`Ident (path_of_string "nativeint"),
-     `Ident (path_of_string "Bigarray.nativeint_elt"))
+    (`Ident ["nativeint"],
+     `Ident ["Bigarray"; "nativeint_elt"])
   | Kind_complex32 ->
-    (`Ident (path_of_string "Complex.t"),
-     `Ident (path_of_string "Bigarray.complex32_elt"))
+    (`Ident ["Complex"; "t"],
+     `Ident ["Bigarray"; "complex32_elt"])
   | Kind_complex64 ->
-    (`Ident (path_of_string "Complex.t"),
-     `Ident (path_of_string "Bigarray.complex64_elt"))
+    (`Ident ["Complex"; "t"],
+     `Ident ["Bigarray"; "complex64_elt"])
   | Kind_char ->
-    (`Ident (path_of_string "char"),
-     `Ident (path_of_string "Bigarray.int8_unsigned_elt"))
+    (`Ident ["char"],
+     `Ident ["Bigarray"; "int8_unsigned_elt"])
 
 (** OCaml-4.01-compatible comparison.  This can be replaced with
     pattern matching once ctypes requires OCaml 4.02 *)
 type boxed_layout = Boxed_layout : _ Bigarray.layout -> boxed_layout
-let layout_path : type a. a Bigarray.layout -> Ctypes_path.path =
+let layout_path : type a. a Bigarray.layout -> string list =
   fun layout ->
     if Boxed_layout layout = Boxed_layout Bigarray.c_layout
-    then path_of_string "Bigarray.c_layout"
-    else path_of_string "Bigarray.fortran_layout"
+    then ["Bigarray"; "c_layout"]
+    else ["Bigarray"; "fortran_layout"]
 
 let type_expression : type a b l. (a, b, l) t -> _ =
   fun (t, ck, l) ->
   begin
     let a, b = kind_type_names ck in
     let layout = `Ident (layout_path l) in
-    (`Appl (type_name t, [a; b; layout])
-        : [> `Ident of Ctypes_path.path
-          | `Appl of Ctypes_path.path * 'a list ] as 'a)
+    (`Appl (type_name t, [a; b; layout]))
   end
 
 let prim_of_kind k = prim_of_kind (kind k)
