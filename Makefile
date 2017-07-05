@@ -182,7 +182,7 @@ uninstall:
 DOCFILES=$(foreach project,$(PROJECTS),\
            $(foreach mli,$($(project).public),\
             $($(project).dir)/$(mli).mli))
-DOCFLAGS=$(foreach project,$(PROJECTS),-I $(BUILDDIR)/$($(project).dir))
+DOCFLAGS=-I $(shell ocamlfind query integers) $(foreach project,$(PROJECTS),-I $(BUILDDIR)/$($(project).dir))
 # Avoid passing duplicate interfaces to ocamldoc.
 DOCFILES:=$(filter-out src/ctypes-foreign-threaded/foreign.mli,$(DOCFILES))
 
