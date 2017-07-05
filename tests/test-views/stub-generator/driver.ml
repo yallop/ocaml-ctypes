@@ -9,6 +9,7 @@
 
 let cheader = "
 #include <ctype.h>
+#include <string.h>
 "
 
 let () = Tests_common.run ~cheader Sys.argv (module Functions.Stubs)
