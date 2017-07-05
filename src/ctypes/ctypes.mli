@@ -291,7 +291,7 @@ sig
   val map : 'b typ -> ('a -> 'b) -> 'a t -> 'b t
   (** [map t f a] is analogous to [Array.map f a]: it creates a new array with
       element type [t] whose elements are obtained by applying [f] to the
-      elements of [a]]. *)
+      elements of [a]. *)
 
   val mapi : 'b typ -> (int -> 'a -> 'b) -> 'a t -> 'b t
   (** [mapi] behaves like {!Array.mapi}, except that it also passes the
