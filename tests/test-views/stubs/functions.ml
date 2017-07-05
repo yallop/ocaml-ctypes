@@ -28,4 +28,7 @@ struct
     (int @-> returning nullable_intptr)
   let accepting_possibly_null_funptr = foreign "accepting_possibly_null_funptr"
     (nullable_intptr @-> int @-> int @-> returning int)
+
+  let strcmp = foreign "strcmp"
+    (string @-> string @-> returning int)
 end
