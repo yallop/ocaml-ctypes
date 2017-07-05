@@ -28,7 +28,7 @@ struct
 
   type _ ccallspec =
       Call : bool * (Ctypes_ptr.voidp -> 'a) -> 'a ccallspec
-    | WriteArg : ('a -> Ctypes_ptr.voidp -> (Obj.t * int) array -> unit) * 'b ccallspec ->
+    | WriteArg : ('a -> Ctypes_ptr.voidp -> (Obj.t * int) array -> Obj.t) * 'b ccallspec ->
                  ('a -> 'b) ccallspec
 
   type arg_type = ArgType : 'a Ctypes_ffi_stubs.ffitype -> arg_type
@@ -99,7 +99,7 @@ struct
   let rec invoke : type a b.
     string option ->
     a ccallspec ->
-    (Ctypes_ptr.voidp -> (Obj.t * int) array -> unit) list ->
+    (Ctypes_ptr.voidp -> (Obj.t * int) array -> Obj.t) list ->
     Ctypes_ffi_stubs.callspec ->
     b fn Ctypes_ptr.Fat.t ->
     a
@@ -107,9 +107,13 @@ struct
       | Call (check_errno, read_return_value) ->
         let name = match name with Some name -> name | None -> "" in
         fun writers callspec addr ->
-          Ctypes_ffi_stubs.call name addr callspec
-            (fun buf arr -> List.iter (fun w -> w buf arr) writers)
-            read_return_value
+          let r = ref [] in
+          let v = Ctypes_ffi_stubs.call name addr callspec
+              (fun buf arr -> List.iter (fun w -> r := w buf arr :: !r) writers)
+              read_return_value
+          in 
+          Ctypes_memory_stubs.use_value r;
+          v
       | WriteArg (write, ccallspec) ->
         let next = invoke name ccallspec in
         fun writers callspec addr v ->
@@ -149,17 +153,25 @@ struct
           let () = Gc.finalise (fun _ -> Ctypes_memory_stubs.use_value f') v in
           v)
 
-  let write_arg : type a. a typ -> offset:int -> idx:int -> a ->
-                  Ctypes_ptr.voidp -> (Obj.t * int) array -> unit =
+  let rec write_arg : type a. a typ -> offset:int -> idx:int -> a ->
+                  Ctypes_ptr.voidp -> (Obj.t * int) array -> Obj.t =
     let ocaml_arg elt_size =
       fun ~offset ~idx (OCamlRef (disp, obj, _)) dst mov ->
-        mov.(idx) <- (Obj.repr obj, disp * elt_size)
+        mov.(idx) <- (Obj.repr obj, disp * elt_size);
+        Obj.repr obj
     in function
     | OCaml String     -> ocaml_arg 1
     | OCaml Bytes      -> ocaml_arg 1
     | OCaml FloatArray -> ocaml_arg (Ctypes_primitives.sizeof Ctypes_primitive_types.Double)
-    | ty -> (fun ~offset ~idx v dst mov -> Ctypes_memory.write ty v
-      (Ctypes_ptr.Fat.(add_bytes (make ~reftyp:Void dst) offset)))
+    | View { write = w; ty } ->
+      (fun ~offset ~idx v dst mov -> 
+         let wv = w v in
+         let wa = write_arg ty ~offset ~idx wv dst mov in
+         Obj.repr (wv, wa))
+    | ty -> (fun ~offset ~idx v dst mov -> 
+        Ctypes_memory.write ty v
+          (Ctypes_ptr.Fat.(add_bytes (make ~reftyp:Void dst) offset));
+        Obj.repr v)
 
   (*
     callspec = allocate_callspec ()
