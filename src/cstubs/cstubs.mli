@@ -71,11 +71,11 @@ sig
         [name], indicates an tag or an alias.  If [typedef] is [false] (the
         default) then [name] is treated as an enumeration tag:
 
-          enum letters { ... }
+          [enum letters { ... }]
 
         If [typedef] is [true] then [name] is instead treated as an alias:
 
-          typedef enum { ... } letters *)
+          [typedef enum { ... } letters] *)
   end
 
   module type BINDINGS = functor (F : TYPE) -> sig end
