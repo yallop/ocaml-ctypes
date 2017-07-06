@@ -84,7 +84,22 @@ struct
       assert_equal ~msg:"passing non-null function pointer obtained from C"
         6 (accepting_possibly_null_funptr (returning_funptr 1) 2 3);
     end
+
+
+  (*
+    Test that intermediate values from views are not prematurely collected.
+  *)
+  let test_intermediate_value_lifetime _ =
+    for i = 0 to 100_000 do
+      assert_equal 0
+        ~printer:(Printf.sprintf "%d")
+        (strcmp
+           (String.copy "abcdefg")
+           (String.copy "abcdefg"));
+      (* Gc.compact ();  *)
+    done
 end
+
 
 (*
   Use the nullable pointer view to view nulls as Nones.
@@ -175,6 +190,12 @@ let suite = "View tests" >:::
 
    "nullable function pointers (stubs)"
    >:: Stub_tests.test_nullable_function_pointer_view;
+
+   "intermediate value lifetime (foreign)"
+   >:: Foreign_tests.test_intermediate_value_lifetime;
+
+   "intermediate value lifetime (stubs)"
+   >:: Stub_tests.test_intermediate_value_lifetime;
 
    "nullable pointers"
     >:: test_nullable_pointer_view;
