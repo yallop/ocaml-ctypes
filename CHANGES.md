@@ -1,3 +1,8 @@
+## ctypes 0.12.1
+
+* Preserve intermediate values from views across foreign calls.
+  https://github.com/ocamllabs/ocaml-ctypes/pull/531
+
 ## ctypes 0.12.0
 
 * Support for Fortran-layout bigarrays  
