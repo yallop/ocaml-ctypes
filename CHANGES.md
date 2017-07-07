@@ -1,3 +1,8 @@
+## ctypes 0.11.5
+
+* Preserve intermediate values from views across foreign calls.
+  https://github.com/ocamllabs/ocaml-ctypes/pull/531
+
 ## ctypes 0.11.4
 
 * Fix function pointer support on no-exec platforms  
