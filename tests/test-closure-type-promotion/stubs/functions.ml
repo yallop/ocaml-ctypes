@@ -6,7 +6,7 @@
 open Ctypes
 open Foreign
 
-module Stubs (F: Cstubs.FOREIGN) =
+module Stubs (F: Ctypes.FOREIGN) =
 struct
   open F
   let callback_returns_int8_t = foreign "callback_returns_int8_t"

@@ -14,7 +14,7 @@ let name_strdup =
     | "Win32" -> "_strdup"
     | _ -> "strdup"
 
-module Stubs (F: Cstubs.FOREIGN) =
+module Stubs (F: Ctypes.FOREIGN) =
 struct
   open F
 

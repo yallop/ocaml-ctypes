@@ -9,7 +9,7 @@
 
 open Ctypes
 
-module Common (F: Cstubs.FOREIGN) =
+module Common (F: Ctypes.FOREIGN) =
 struct
   let s : [`global_struct] structure typ = structure "global_struct"
   let (-:) ty label = field s label ty
@@ -31,7 +31,7 @@ struct
 end
 
 
-module Stubs (F: Cstubs.FOREIGN) =
+module Stubs (F: Ctypes.FOREIGN) =
 struct
   include Common(F)
   let environ = F.(foreign_value "environ" (ptr string_opt))

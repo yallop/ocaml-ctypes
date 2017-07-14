@@ -11,7 +11,7 @@ open Ctypes
 
 (* These functions can be bound either dynamically using Foreign or statically
    using stub generation. *)
-module Common (F: Cstubs.FOREIGN) =
+module Common (F: Ctypes.FOREIGN) =
 struct
   open F
 
@@ -39,7 +39,7 @@ end
 
 (* These functions can only be bound using stub generation, since Foreign
    doesn't support passing structs with union or array members. *)
-module Stubs_only(F : Cstubs.FOREIGN) =
+module Stubs_only(F : Ctypes.FOREIGN) =
 struct
   open F
 
@@ -68,7 +68,7 @@ struct
 end
 
 
-module Stubs (F: Cstubs.FOREIGN) =
+module Stubs (F: Ctypes.FOREIGN) =
 struct
   include Common(F)
   include Stubs_only(F)

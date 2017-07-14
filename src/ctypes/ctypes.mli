@@ -471,6 +471,23 @@ val coerce_fn : 'a fn -> 'b fn -> 'a -> 'b
     ctypes may both add new types of coercion and restrict the existing
     coercions. *)
 
+
+(** {2 Foreign function binding interface}.
+
+    The {!Foreign} and {!Cstubs} modules provide concrete implementations.  *)
+module type FOREIGN =
+sig
+  type 'a fn
+  type 'a return
+  val (@->) : 'a typ -> 'b fn -> ('a -> 'b) fn
+  val returning : 'a typ -> 'a return fn
+
+  type 'a result
+  val foreign : string -> ('a -> 'b) fn -> ('a -> 'b) result
+  val foreign_value : string -> 'a typ -> 'a ptr result
+end
+
+
 (** {2:roots Registration of OCaml values as roots} *)
 module Root :
 sig

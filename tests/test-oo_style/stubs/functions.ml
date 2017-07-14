@@ -10,7 +10,7 @@
 open Ctypes
 open Foreign
 
-module Stubs (F: Cstubs.FOREIGN) =
+module Stubs (F: Ctypes.FOREIGN) =
 struct
   open F
 

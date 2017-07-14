@@ -23,7 +23,7 @@ let tm_isdst = int -: "tm_isdst" (* daylight saving time *)
 let () = seal (tm : tm structure typ)
 
 module Bindings
-  (F : Cstubs.FOREIGN) =
+  (F : Ctypes.FOREIGN) =
 struct
   open F
 

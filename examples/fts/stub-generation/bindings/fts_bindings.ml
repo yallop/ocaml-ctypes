@@ -11,7 +11,7 @@ open Fts_types
 open FTSENT
 open FTS
 
-module Bindings (F : Cstubs.FOREIGN) =
+module Bindings (F : Ctypes.FOREIGN) =
 struct
   open F
 
