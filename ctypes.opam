@@ -40,6 +40,8 @@ depopts: [
 build-test: [
    [make "COVERAGE=true" {bisect_ppx:installed} "test"]
    [make "COVERAGE=true" {bisect_ppx:installed} "run-examples" ] {os != "win32"}
+   [make "date" "date-stubs" "date-stub-generator" "date-cmd-build" "date-cmd" ] {os = "win32"}
+   ["sh" "-c" "_build/date-cmd.native ; _build/date.native" ] {os = "win32"}
    ["sh" "-c" "ocveralls" "--send bisect*.out" "_build/bisect*.out" ">" "coveralls.json"] {bisect_ppx:installed}
 ]
 tags: ["org:ocamllabs" "org:mirage"]
