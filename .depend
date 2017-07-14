@@ -13,8 +13,8 @@ _build/examples/date/stub-generation/bindings/date_stubs.cmo : _build/src/ctypes
 _build/examples/date/stub-generation/bindings/date_stubs.cmx : _build/src/ctypes/posixTypes.cmx _build/src/ctypes/ctypes.cmx _build/src/cstubs/cstubs.cmx
 _build/examples/date/stub-generation/date_cmd.cmo : _build/src/ctypes/posixTypes.cmi _build/src/ctypes/ctypes.cmi
 _build/examples/date/stub-generation/date_cmd.cmx : _build/src/ctypes/posixTypes.cmx _build/src/ctypes/ctypes.cmx
-_build/examples/date/stub-generation/date_generated.cmo : _build/src/ctypes/ctypes.cmi _build/src/cstubs/cstubs_internals.cmi
-_build/examples/date/stub-generation/date_generated.cmx : _build/src/ctypes/ctypes.cmx _build/src/cstubs/cstubs_internals.cmx
+_build/examples/date/stub-generation/date_generated.cmo : _build/src/ctypes/ctypes.cmi _build/src/ctypes/cstubs_internals.cmi
+_build/examples/date/stub-generation/date_generated.cmx : _build/src/ctypes/ctypes.cmx _build/src/ctypes/cstubs_internals.cmx
 _build/examples/date/stub-generation/stub-generator/date_stub_generator.cmo : _build/src/cstubs/cstubs.cmi
 _build/examples/date/stub-generation/stub-generator/date_stub_generator.cmx : _build/src/cstubs/cstubs.cmx
 _build/examples/fts/foreign/fts_cmd.cmo : _build/src/ctypes/ctypes.cmi
@@ -29,8 +29,8 @@ _build/examples/fts/stub-generation/bindings/fts_types.cmo : _build/src/ctypes/p
 _build/examples/fts/stub-generation/bindings/fts_types.cmx : _build/src/ctypes/posixTypes.cmx _build/src/ctypes-foreign-threaded/foreign.cmx _build/src/ctypes/ctypes_coerce.cmx _build/src/ctypes/ctypes.cmx
 _build/examples/fts/stub-generation/fts_cmd.cmo : _build/src/ctypes/ctypes.cmi
 _build/examples/fts/stub-generation/fts_cmd.cmx : _build/src/ctypes/ctypes.cmx
-_build/examples/fts/stub-generation/fts_generated.cmo : _build/src/ctypes/ctypes.cmi _build/src/cstubs/cstubs_internals.cmi
-_build/examples/fts/stub-generation/fts_generated.cmx : _build/src/ctypes/ctypes.cmx _build/src/cstubs/cstubs_internals.cmx
+_build/examples/fts/stub-generation/fts_generated.cmo : _build/src/ctypes/ctypes.cmi _build/src/ctypes/cstubs_internals.cmi
+_build/examples/fts/stub-generation/fts_generated.cmx : _build/src/ctypes/ctypes.cmx _build/src/ctypes/cstubs_internals.cmx
 _build/examples/fts/stub-generation/fts_if.cmo : _build/src/ctypes/ctypes.cmi
 _build/examples/fts/stub-generation/fts_if.cmx : _build/src/ctypes/ctypes.cmx
 _build/examples/fts/stub-generation/stub-generator/fts_stub_generator.cmo : _build/src/cstubs/cstubs.cmi
@@ -42,8 +42,8 @@ _build/examples/ncurses/foreign/ncurses.cmo : _build/src/ctypes-foreign-threaded
 _build/examples/ncurses/foreign/ncurses.cmx : _build/src/ctypes-foreign-threaded/foreign.cmx _build/src/ctypes/ctypes.cmx _build/examples/ncurses/foreign/ncurses.cmi
 _build/examples/ncurses/stub-generation/bindings/ncurses_bindings.cmo : _build/src/ctypes/ctypes.cmi _build/src/cstubs/cstubs.cmi
 _build/examples/ncurses/stub-generation/bindings/ncurses_bindings.cmx : _build/src/ctypes/ctypes.cmx _build/src/cstubs/cstubs.cmx
-_build/examples/ncurses/stub-generation/ncurses_generated.cmo : _build/src/ctypes/ctypes.cmi _build/src/cstubs/cstubs_internals.cmi
-_build/examples/ncurses/stub-generation/ncurses_generated.cmx : _build/src/ctypes/ctypes.cmx _build/src/cstubs/cstubs_internals.cmx
+_build/examples/ncurses/stub-generation/ncurses_generated.cmo : _build/src/ctypes/ctypes.cmi _build/src/ctypes/cstubs_internals.cmi
+_build/examples/ncurses/stub-generation/ncurses_generated.cmx : _build/src/ctypes/ctypes.cmx _build/src/ctypes/cstubs_internals.cmx
 _build/examples/ncurses/stub-generation/ncurses_stub_cmd.cmo :
 _build/examples/ncurses/stub-generation/ncurses_stub_cmd.cmx :
 _build/examples/sigset/sigset.cmi : _build/src/ctypes/posixTypes.cmi _build/src/ctypes/ctypes.cmi
@@ -74,9 +74,9 @@ _build/src/cstubs/cstubs_generate_c.cmx : _build/src/ctypes/ctypes_static.cmx _b
 _build/src/cstubs/cstubs_generate_ml.cmi : _build/src/ctypes/ctypes.cmi
 _build/src/cstubs/cstubs_generate_ml.cmo : _build/src/ctypes/ctypes_static.cmi _build/src/ctypes/ctypes_primitive_types.cmi _build/src/cstubs/ctypes_path.cmi _build/src/ctypes/ctypes.cmi _build/src/cstubs/cstubs_public_name.cmi _build/src/cstubs/cstubs_errors.cmi _build/src/cstubs/cstubs_analysis.cmi _build/src/cstubs/cstubs_generate_ml.cmi
 _build/src/cstubs/cstubs_generate_ml.cmx : _build/src/ctypes/ctypes_static.cmx _build/src/ctypes/ctypes_primitive_types.cmx _build/src/cstubs/ctypes_path.cmx _build/src/ctypes/ctypes.cmx _build/src/cstubs/cstubs_public_name.cmx _build/src/cstubs/cstubs_errors.cmx _build/src/cstubs/cstubs_analysis.cmx _build/src/cstubs/cstubs_generate_ml.cmi
-_build/src/cstubs/cstubs_internals.cmi : _build/src/ctypes/lDouble.cmi _build/src/ctypes/ctypes_static.cmi _build/src/ctypes/ctypes_ptr.cmo _build/src/ctypes/ctypes_primitive_types.cmi _build/src/ctypes/ctypes_memory_stubs.cmo _build/src/ctypes/ctypes_bigarray.cmi _build/src/ctypes/ctypes.cmi _build/src/ctypes/complexL.cmi
-_build/src/cstubs/cstubs_internals.cmo : _build/src/ctypes/ctypes_static.cmi _build/src/ctypes/ctypes_ptr.cmo _build/src/ctypes/ctypes_primitive_types.cmi _build/src/ctypes/ctypes_memory_stubs.cmo _build/src/ctypes/ctypes.cmi _build/src/cstubs/cstubs_internals.cmi
-_build/src/cstubs/cstubs_internals.cmx : _build/src/ctypes/ctypes_static.cmx _build/src/ctypes/ctypes_ptr.cmx _build/src/ctypes/ctypes_primitive_types.cmx _build/src/ctypes/ctypes_memory_stubs.cmx _build/src/ctypes/ctypes.cmx _build/src/cstubs/cstubs_internals.cmi
+_build/src/ctypes/cstubs_internals.cmi : _build/src/ctypes/lDouble.cmi _build/src/ctypes/ctypes_static.cmi _build/src/ctypes/ctypes_ptr.cmo _build/src/ctypes/ctypes_primitive_types.cmi _build/src/ctypes/ctypes_memory_stubs.cmo _build/src/ctypes/ctypes_bigarray.cmi _build/src/ctypes/ctypes.cmi _build/src/ctypes/complexL.cmi
+_build/src/ctypes/cstubs_internals.cmo : _build/src/ctypes/ctypes_static.cmi _build/src/ctypes/ctypes_ptr.cmo _build/src/ctypes/ctypes_primitive_types.cmi _build/src/ctypes/ctypes_memory_stubs.cmo _build/src/ctypes/ctypes.cmi _build/src/ctypes/cstubs_internals.cmi
+_build/src/ctypes/cstubs_internals.cmx : _build/src/ctypes/ctypes_static.cmx _build/src/ctypes/ctypes_ptr.cmx _build/src/ctypes/ctypes_primitive_types.cmx _build/src/ctypes/ctypes_memory_stubs.cmx _build/src/ctypes/ctypes.cmx _build/src/ctypes/cstubs_internals.cmi
 _build/src/cstubs/cstubs_inverted.cmi : _build/src/ctypes/ctypes.cmi
 _build/src/cstubs/cstubs_inverted.cmo : _build/src/ctypes/ctypes_type_printing.cmi _build/src/ctypes/ctypes.cmi _build/src/cstubs/cstubs_generate_ml.cmi _build/src/cstubs/cstubs_generate_c.cmi _build/src/cstubs/cstubs_inverted.cmi
 _build/src/cstubs/cstubs_inverted.cmx : _build/src/ctypes/ctypes_type_printing.cmx _build/src/ctypes/ctypes.cmx _build/src/cstubs/cstubs_generate_ml.cmx _build/src/cstubs/cstubs_generate_c.cmx _build/src/cstubs/cstubs_inverted.cmi
