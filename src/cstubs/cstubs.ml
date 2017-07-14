@@ -7,17 +7,7 @@
 
 (* Cstubs public interface. *)
 
-module type FOREIGN =
-sig
-  type 'a fn
-  type 'a return
-  val (@->) : 'a Ctypes.typ -> 'b fn -> ('a -> 'b) fn
-  val returning : 'a Ctypes.typ -> 'a return fn
-
-  type 'a result
-  val foreign : string -> ('a -> 'b) fn -> ('a -> 'b) result
-  val foreign_value : string -> 'a Ctypes.typ -> 'a Ctypes.ptr result
-end
+module type FOREIGN = Ctypes.FOREIGN
 
 module type FOREIGN' = FOREIGN with type 'a result = unit
 
