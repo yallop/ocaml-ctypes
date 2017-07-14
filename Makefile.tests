@@ -26,7 +26,7 @@ test-raw: $$(BEST_TARGET)
 
 test-pointers-stubs.dir  = tests/test-pointers/stubs
 test-pointers-stubs.threads = yes
-test-pointers-stubs.subproject_deps = ctypes cstubs \
+test-pointers-stubs.subproject_deps = ctypes \
    ctypes-foreign-base ctypes-foreign-threaded tests-common
 test-pointers-stubs: PROJECT=test-pointers-stubs
 test-pointers-stubs: $$(LIB_TARGETS)
@@ -59,7 +59,7 @@ tests/test-pointers/generated_bindings.ml: $(BUILDDIR)/test-pointers-stub-genera
 
 test-integers-stubs.dir  = tests/test-integers/stubs
 test-integers-stubs.threads = yes
-test-integers-stubs.subproject_deps = ctypes cstubs \
+test-integers-stubs.subproject_deps = ctypes \
    ctypes-foreign-base ctypes-foreign-threaded tests-common
 test-integers-stubs: PROJECT=test-integers-stubs
 test-integers-stubs: $$(LIB_TARGETS)
@@ -93,7 +93,7 @@ tests/test-integers/generated_bindings.ml: $(BUILDDIR)/test-integers-stub-genera
 test-variadic-stubs.dir  = tests/test-variadic/stubs
 test-variadic-stubs.threads = yes
 test-variadic-stubs.deps = integers
-test-variadic-stubs.subproject_deps = ctypes cstubs \
+test-variadic-stubs.subproject_deps = ctypes \
    ctypes-foreign-base ctypes-foreign-threaded tests-common
 test-variadic-stubs: PROJECT=test-variadic-stubs
 test-variadic-stubs: $$(LIB_TARGETS)
@@ -127,7 +127,7 @@ tests/test-variadic/generated_bindings.ml: $(BUILDDIR)/test-variadic-stub-genera
 
 test-builtins-stubs.dir  = tests/test-builtins/stubs
 test-builtins-stubs.threads = yes
-test-builtins-stubs.subproject_deps = ctypes cstubs tests-common
+test-builtins-stubs.subproject_deps = ctypes tests-common
 test-builtins-stubs: PROJECT=test-builtins-stubs
 test-builtins-stubs: $$(LIB_TARGETS)
 
@@ -160,7 +160,7 @@ tests/test-builtins/generated_bindings.ml: $(BUILDDIR)/test-builtins-stub-genera
 
 test-macros-stubs.dir  = tests/test-macros/stubs
 test-macros-stubs.threads = yes
-test-macros-stubs.subproject_deps = ctypes cstubs tests-common
+test-macros-stubs.subproject_deps = ctypes tests-common
 test-macros-stubs: PROJECT=test-macros-stubs
 test-macros-stubs: $$(LIB_TARGETS)
 
@@ -193,7 +193,7 @@ tests/test-macros/generated_bindings.ml: $(BUILDDIR)/test-macros-stub-generator.
 
 test-higher_order-stubs.dir  = tests/test-higher_order/stubs
 test-higher_order-stubs.threads = yes
-test-higher_order-stubs.subproject_deps = ctypes cstubs \
+test-higher_order-stubs.subproject_deps = ctypes \
    ctypes-foreign-base ctypes-foreign-threaded tests-common
 test-higher_order-stubs: PROJECT=test-higher_order-stubs
 test-higher_order-stubs: $$(LIB_TARGETS)
@@ -288,7 +288,7 @@ $(BUILDDIR)/tests/test-enums/generated_struct_stubs.c: $(BUILDDIR)/test-enums-st
 
 test-structs-stubs.dir  = tests/test-structs/stubs
 test-structs-stubs.threads = yes
-test-structs-stubs.subproject_deps = ctypes cstubs \
+test-structs-stubs.subproject_deps = ctypes \
    ctypes-foreign-base ctypes-foreign-threaded tests-common
 test-structs-stubs: PROJECT=test-structs-stubs
 test-structs-stubs: $$(LIB_TARGETS)
@@ -378,7 +378,7 @@ test-finalisers: $$(BEST_TARGET)
 
 test-cstdlib-stubs.dir  = tests/test-cstdlib/stubs
 test-cstdlib-stubs.threads = yes
-test-cstdlib-stubs.subproject_deps = ctypes cstubs \
+test-cstdlib-stubs.subproject_deps = ctypes \
    ctypes-foreign-base ctypes-foreign-threaded tests-common
 test-cstdlib-stubs: PROJECT=test-cstdlib-stubs
 test-cstdlib-stubs: $$(LIB_TARGETS)
@@ -418,7 +418,7 @@ test-sizeof: $$(BEST_TARGET)
 
 test-foreign_values-stubs.dir  = tests/test-foreign_values/stubs
 test-foreign_values-stubs.threads = yes
-test-foreign_values-stubs.subproject_deps = ctypes cstubs \
+test-foreign_values-stubs.subproject_deps = ctypes \
    ctypes-foreign-base ctypes-foreign-threaded tests-common
 test-foreign_values-stubs: PROJECT=test-foreign_values-stubs
 test-foreign_values-stubs: $$(LIB_TARGETS)
@@ -451,7 +451,7 @@ tests/test-foreign_values/generated_bindings.ml: $(BUILDDIR)/test-foreign_values
 
 test-unions-stubs.dir  = tests/test-unions/stubs
 test-unions-stubs.threads = yes
-test-unions-stubs.subproject_deps = ctypes cstubs \
+test-unions-stubs.subproject_deps = ctypes \
    ctypes-foreign-base ctypes-foreign-threaded tests-common
 test-unions-stubs: PROJECT=test-unions-stubs
 test-unions-stubs: $$(LIB_TARGETS)
@@ -499,7 +499,7 @@ test-custom_ops: $$(BEST_TARGET)
 
 test-arrays-stubs.dir  = tests/test-arrays/stubs
 test-arrays-stubs.threads = yes
-test-arrays-stubs.subproject_deps = ctypes cstubs \
+test-arrays-stubs.subproject_deps = ctypes \
    ctypes-foreign-base ctypes-foreign-threaded tests-common
 test-arrays-stubs: PROJECT=test-arrays-stubs
 test-arrays-stubs: $$(LIB_TARGETS)
@@ -553,7 +553,7 @@ test-alignment: $$(BEST_TARGET)
 
 test-views-stubs.dir  = tests/test-views/stubs
 test-views-stubs.threads = yes
-test-views-stubs.subproject_deps = ctypes cstubs \
+test-views-stubs.subproject_deps = ctypes \
    ctypes-foreign-base ctypes-foreign-threaded tests-common
 test-views-stubs: PROJECT=test-views-stubs
 test-views-stubs: $$(LIB_TARGETS)
@@ -585,7 +585,7 @@ tests/test-views/generated_bindings.ml: $(BUILDDIR)/test-views-stub-generator.$(
 
 test-oo_style-stubs.dir  = tests/test-oo_style/stubs
 test-oo_style-stubs.threads = yes
-test-oo_style-stubs.subproject_deps = ctypes cstubs \
+test-oo_style-stubs.subproject_deps = ctypes \
    ctypes-foreign-base ctypes-foreign-threaded tests-common
 test-oo_style-stubs: PROJECT=test-oo_style-stubs
 test-oo_style-stubs: $$(LIB_TARGETS)
@@ -634,7 +634,7 @@ test-type_printing: $$(BEST_TARGET)
 
 test-value_printing-stubs.dir  = tests/test-value_printing/stubs
 test-value_printing-stubs.threads = yes
-test-value_printing-stubs.subproject_deps = ctypes cstubs \
+test-value_printing-stubs.subproject_deps = ctypes \
    ctypes-foreign-base ctypes-foreign-threaded tests-common
 test-value_printing-stubs: PROJECT=test-value_printing-stubs
 test-value_printing-stubs: $$(LIB_TARGETS)
@@ -667,7 +667,7 @@ tests/test-value_printing/generated_bindings.ml: $(BUILDDIR)/test-value_printing
 
 test-complex-stubs.dir  = tests/test-complex/stubs
 test-complex-stubs.threads = yes
-test-complex-stubs.subproject_deps = ctypes cstubs \
+test-complex-stubs.subproject_deps = ctypes \
    ctypes-foreign-base ctypes-foreign-threaded tests-common
 test-complex-stubs: PROJECT=test-complex-stubs
 test-complex-stubs: $$(LIB_TARGETS)
@@ -700,7 +700,7 @@ tests/test-complex/generated_bindings.ml: $(BUILDDIR)/test-complex-stub-generato
 
 test-bools-stubs.dir  = tests/test-bools/stubs
 test-bools-stubs.threads = yes
-test-bools-stubs.subproject_deps = ctypes cstubs \
+test-bools-stubs.subproject_deps = ctypes \
    ctypes-foreign-base ctypes-foreign-threaded tests-common
 test-bools-stubs: PROJECT=test-bools-stubs
 test-bools-stubs: $$(LIB_TARGETS)
@@ -733,7 +733,7 @@ tests/test-bools/generated_bindings.ml: $(BUILDDIR)/test-bools-stub-generator.$(
 
 test-callback_lifetime-stubs.dir  = tests/test-callback_lifetime/stubs
 test-callback_lifetime-stubs.threads = yes
-test-callback_lifetime-stubs.subproject_deps = ctypes cstubs \
+test-callback_lifetime-stubs.subproject_deps = ctypes \
    ctypes-foreign-base ctypes-foreign-threaded tests-common
 test-callback_lifetime-stubs: PROJECT=test-callback_lifetime-stubs
 test-callback_lifetime-stubs: $$(LIB_TARGETS)
@@ -766,7 +766,7 @@ tests/test-callback_lifetime/generated_bindings.ml: $(BUILDDIR)/test-callback_li
 
 test-lifetime-stubs.dir  = tests/test-lifetime/stubs
 test-lifetime-stubs.threads = yes
-test-lifetime-stubs.subproject_deps = ctypes cstubs \
+test-lifetime-stubs.subproject_deps = ctypes \
    ctypes-foreign-base ctypes-foreign-threaded tests-common
 test-lifetime-stubs: PROJECT=test-lifetime-stubs
 test-lifetime-stubs: $$(LIB_TARGETS)
@@ -806,7 +806,7 @@ test-stubs: $$(BEST_TARGET)
 
 test-bigarrays-stubs.dir  = tests/test-bigarrays/stubs
 test-bigarrays-stubs.threads = yes
-test-bigarrays-stubs.subproject_deps = ctypes cstubs \
+test-bigarrays-stubs.subproject_deps = ctypes \
    ctypes-foreign-base ctypes-foreign-threaded tests-common
 test-bigarrays-stubs: PROJECT=test-bigarrays-stubs
 test-bigarrays-stubs: $$(LIB_TARGETS)
@@ -839,7 +839,7 @@ tests/test-bigarrays/generated_bindings.ml: $(BUILDDIR)/test-bigarrays-stub-gene
 
 test-coercions-stubs.dir  = tests/test-coercions/stubs
 test-coercions-stubs.threads = yes
-test-coercions-stubs.subproject_deps = ctypes cstubs \
+test-coercions-stubs.subproject_deps = ctypes \
    ctypes-foreign-base ctypes-foreign-threaded tests-common
 test-coercions-stubs: PROJECT=test-coercions-stubs
 test-coercions-stubs: $$(LIB_TARGETS)
@@ -881,7 +881,7 @@ test-roots: $$(BEST_TARGET)
 
 test-passing-ocaml-values-stubs.dir  = tests/test-passing-ocaml-values/stubs
 test-passing-ocaml-values-stubs.threads = yes
-test-passing-ocaml-values-stubs.subproject_deps = ctypes cstubs \
+test-passing-ocaml-values-stubs.subproject_deps = ctypes \
    ctypes-foreign-base ctypes-foreign-threaded tests-common
 test-passing-ocaml-values-stubs: PROJECT=test-passing-ocaml-values-stubs
 test-passing-ocaml-values-stubs: $$(LIB_TARGETS)
@@ -1117,7 +1117,7 @@ $(BUILDDIR)/tests/test-returning-errno/generated_struct_stubs.c: $(BUILDDIR)/tes
 
 test-threads-stubs.dir  = tests/test-threads/stubs
 test-threads-stubs.threads = yes
-test-threads-stubs.subproject_deps = ctypes cstubs \
+test-threads-stubs.subproject_deps = ctypes \
    ctypes-foreign-base ctypes-foreign-threaded tests-common
 test-threads-stubs: PROJECT=test-threads-stubs
 test-threads-stubs: $$(LIB_TARGETS)
@@ -1150,7 +1150,7 @@ tests/test-threads/generated_bindings.ml: $(BUILDDIR)/test-threads-stub-generato
 
 test-closure-type-promotion-stubs.dir  = tests/test-closure-type-promotion/stubs
 test-closure-type-promotion-stubs.threads = yes
-test-closure-type-promotion-stubs.subproject_deps = ctypes cstubs \
+test-closure-type-promotion-stubs.subproject_deps = ctypes \
    ctypes-foreign-base ctypes-foreign-threaded tests-common
 test-closure-type-promotion-stubs: PROJECT=test-closure-type-promotion-stubs
 test-closure-type-promotion-stubs: $$(LIB_TARGETS)

@@ -18,7 +18,7 @@ let () = seal padded
 
 (* These functions can be bound either dynamically using Foreign or statically
    using stub generation. *)
-module Common (F: Cstubs.FOREIGN) =
+module Common (F: Ctypes.FOREIGN) =
 struct
   let sum_union_components =
     F.(foreign "sum_union_components"
@@ -27,14 +27,14 @@ end
 
 (* These functions can only be bound using stub generation, since Foreign
    doesn't support passing unions by value. *)
-module Stubs_only(F : Cstubs.FOREIGN) =
+module Stubs_only(F : Ctypes.FOREIGN) =
 struct
   let add_unions =
     F.(foreign "add_unions"
          (padded @-> padded @-> returning padded))
 end
 
-module Stubs (F: Cstubs.FOREIGN) =
+module Stubs (F: Ctypes.FOREIGN) =
 struct
   include Common(F)
   include Stubs_only(F)

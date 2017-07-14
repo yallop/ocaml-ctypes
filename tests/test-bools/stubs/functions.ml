@@ -11,7 +11,7 @@ open Ctypes
 
 (* These functions can be bound either dynamically using Foreign or statically
    using stub generation. *)
-module Common(F : Cstubs.FOREIGN) =
+module Common(F : Ctypes.FOREIGN) =
 struct
   let bool_and = F.(foreign "bool_and" (bool @-> bool @-> returning bool))
 end

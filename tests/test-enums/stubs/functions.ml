@@ -11,7 +11,7 @@ open Ctypes
 
 (* These functions can only be bound using stub generation, since Foreign
    doesn't support passing enums. *)
-module Stubs(F : Cstubs.FOREIGN) =
+module Stubs(F : Ctypes.FOREIGN) =
 struct
   open F
 
