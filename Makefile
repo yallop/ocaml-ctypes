@@ -21,7 +21,22 @@ GENERATED=src/ctypes/ctypes_primitives.ml	\
           src/ctypes-foreign-base/dl.ml		\
           src/ctypes-foreign-base/dl_stubs.c	\
           libffi.config				\
-          asneeded.config
+          asneeded.config                       \
+          discover				\
+          gen_c_primitives			\
+          gen_c_primitives.log			\
+          gen_libffi_abi			\
+	  src/configure/extract_from_c.cmi	\
+	  src/configure/extract_from_c.cmo	\
+	  src/configure/gen_c_primitives.cmi	\
+	  src/configure/gen_c_primitives.cmo	\
+	  src/configure/gen_libffi_abi.cmi	\
+	  src/configure/gen_libffi_abi.cmo	\
+	  src/discover/commands.cmi		\
+	  src/discover/commands.cmo		\
+	  src/discover/discover.cmi		\
+	  src/discover/discover.cmo
+
 OCAML_FFI_INCOPTS=$(libffi_opt)
 export CFLAGS DEBUG
 
@@ -41,7 +56,7 @@ ctypes-base: $(BASE_PROJECTS)
 ctypes-foreign: ctypes-base $(FOREIGN_PROJECTS)
 ctypes-stubs: ctypes-base $(STUB_PROJECTS)
 
-clean:
+clean: clean-examples clean-tests
 	rm -fr _build
 	rm -f $(GENERATED)
 

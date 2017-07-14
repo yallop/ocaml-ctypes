@@ -24,6 +24,7 @@ fts-cmd.subproject_deps = ctypes cstubs \
   ctypes-foreign-base ctypes-foreign-unthreaded fts-stubs
 fts-cmd.deps = bytes str unix bigarray integers
 fts-cmd.extra_mls = fts_generated.ml
+fts-cmd.extra_cs = fts_stubs.c
 fts-cmd: CFLAGS+=-D_FILE_OFFSET_BITS=32
 fts-cmd: PROJECT=fts-cmd
 fts-cmd: $$(NATIVE_TARGET)
@@ -59,6 +60,7 @@ date-cmd.dir = examples/date/stub-generation
 date-cmd.subproject_deps = ctypes cstubs date-stubs
 date-cmd.deps = bytes str unix bigarray integers
 date-cmd.extra_mls = date_generated.ml
+date-cmd.extra_cs = date_stubs.c
 date-cmd: PROJECT=date-cmd
 date-cmd: $$(NATIVE_TARGET)
 
@@ -87,6 +89,7 @@ ncurses-cmd.dir = examples/ncurses/stub-generation
 ncurses-cmd.subproject_deps = ctypes cstubs ncurses-stubs
 ncurses-cmd.deps = bytes str unix bigarray integers
 ncurses-cmd.extra_mls = ncurses_generated.ml
+ncurses-cmd.extra_cs = ncurses_stubs.c
 ncurses-cmd.link_flags = -lncurses
 ncurses-cmd: PROJECT=ncurses-cmd
 ncurses-cmd: $$(NATIVE_TARGET)
@@ -115,6 +118,15 @@ run-examples: examples
 	_build/date-cmd.native
 	_build/fts-cmd.native src
 
-.PHONY: build $(EXAMPLES)
+EXAMPLES_GENERATED=$(foreach example,$(EXAMPLES),\
+                     $(if $($(example).extra_mls), \
+                       $($(example).dir)/$($(example).extra_mls)) \
+                     $(if $($(example).extra_cs), \
+                       $($(example).dir)/$($(example).extra_cs)))
+
+clean-examples:
+	rm -f $(EXAMPLES_GENERATED)
+
+.PHONY: build $(EXAMPLES) clean-examples
 
 examples: build $(EXAMPLES)

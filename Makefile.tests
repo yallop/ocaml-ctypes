@@ -48,9 +48,11 @@ test-pointers.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-pointers: PROJECT=test-pointers
 test-pointers: $$(BEST_TARGET)
 
-test-pointers-generated: \
+test-pointers-generated= \
   tests/test-pointers/generated_bindings.ml \
   tests/test-pointers/generated_stubs.c
+
+test-pointers-generated: $(test-pointers-generated)
 
 tests/test-pointers/generated_stubs.c: $(BUILDDIR)/test-pointers-stub-generator.$(BEST)
 	$< --c-file $@
@@ -81,9 +83,11 @@ test-integers.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-integers: PROJECT=test-integers
 test-integers: $$(BEST_TARGET)
 
-test-integers-generated: \
+test-integers-generated= \
   tests/test-integers/generated_bindings.ml \
   tests/test-integers/generated_stubs.c
+
+test-integers-generated: $(test-integers-generated)
 
 tests/test-integers/generated_stubs.c: $(BUILDDIR)/test-integers-stub-generator.$(BEST)
 	$< --c-file $@
@@ -115,9 +119,11 @@ test-variadic.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-variadic: PROJECT=test-variadic
 test-variadic: $$(BEST_TARGET)
 
-test-variadic-generated: \
+test-variadic-generated= \
   tests/test-variadic/generated_bindings.ml \
   tests/test-variadic/generated_stubs.c
+
+test-variadic-generated: $(test-variadic-generated)
 
 tests/test-variadic/generated_stubs.c: $(BUILDDIR)/test-variadic-stub-generator.$(BEST)
 	$< --c-file $@
@@ -148,9 +154,11 @@ test-builtins.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-builtins: PROJECT=test-builtins
 test-builtins: $$(BEST_TARGET)
 
-test-builtins-generated: \
+test-builtins-generated= \
   tests/test-builtins/generated_bindings.ml \
   tests/test-builtins/generated_stubs.c
+
+test-builtins-generated: $(test-builtins-generated)
 
 tests/test-builtins/generated_stubs.c: $(BUILDDIR)/test-builtins-stub-generator.$(BEST)
 	$< --c-file $@
@@ -181,9 +189,11 @@ test-macros.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-macros: PROJECT=test-macros
 test-macros: $$(BEST_TARGET)
 
-test-macros-generated: \
+test-macros-generated= \
   tests/test-macros/generated_bindings.ml \
   tests/test-macros/generated_stubs.c
+
+test-macros-generated: $(test-macros-generated)
 
 tests/test-macros/generated_stubs.c: $(BUILDDIR)/test-macros-stub-generator.$(BEST)
 	$< --c-file $@
@@ -215,9 +225,11 @@ test-higher_order.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-higher_order: PROJECT=test-higher_order
 test-higher_order: $$(BEST_TARGET)
 
-test-higher_order-generated: \
+test-higher_order-generated= \
   tests/test-higher_order/generated_bindings.ml \
   tests/test-higher_order/generated_stubs.c
+
+test-higher_order-generated: $(test-higher_order-generated)
 
 tests/test-higher_order/generated_stubs.c: $(BUILDDIR)/test-higher_order-stub-generator.$(BEST)
 	$< --c-file $@
@@ -267,13 +279,17 @@ test-enums.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-enums: PROJECT=test-enums
 test-enums: $$(BEST_TARGET)
 
-test-enums-structs-generated: \
+test-enums-structs-generated= \
   tests/test-enums/stubs/generated_struct_bindings.ml \
   $(BUILDDIR)/tests/test-enums/generated_struct_stubs.c
 
-test-enums-generated: \
+test-enums-structs-generated: $(test-enums-structs-generated)
+
+test-enums-generated= \
   tests/test-enums/generated_bindings.ml \
   tests/test-enums/generated_stubs.c \
+
+test-enums-generated: $(test-enums-generated)
 
 tests/test-enums/generated_stubs.c: $(BUILDDIR)/test-enums-stub-generator.$(BEST)
 	$< --c-file $@
@@ -310,11 +326,13 @@ test-structs.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-structs: PROJECT=test-structs
 test-structs: $$(BEST_TARGET)
 
-test-structs-generated: \
+test-structs-generated= \
   tests/test-structs/generated_bindings.ml \
   tests/test-structs/generated_stubs.c \
   tests/test-structs/generated_struct_bindings.ml \
   $(BUILDDIR)/tests/test-structs/generated_struct_stubs.c
+
+test-structs-generated: $(test-structs-generated)
 
 tests/test-structs/generated_stubs.c: $(BUILDDIR)/test-structs-stub-generator.$(BEST)
 	$< --c-file $@
@@ -351,11 +369,13 @@ test-constants.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-constants: PROJECT=test-constants
 test-constants: $$(BEST_TARGET)
 
-test-constants-generated: \
+test-constants-generated= \
   tests/test-constants/generated_bindings.ml \
   tests/test-constants/generated_stubs.c \
   tests/test-constants/generated_struct_bindings.ml \
   $(BUILDDIR)/tests/test-constants/generated_struct_stubs.c
+
+test-constants-generated: $(test-constants-generated)
 
 tests/test-constants/generated_stubs.c: $(BUILDDIR)/test-constants-stub-generator.$(BEST)
 	$< --c-file $@
@@ -400,9 +420,11 @@ test-cstdlib.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-cstdlib: PROJECT=test-cstdlib
 test-cstdlib: $$(BEST_TARGET)
 
-test-cstdlib-generated: \
+test-cstdlib-generated= \
   tests/test-cstdlib/generated_bindings.ml \
   tests/test-cstdlib/generated_stubs.c
+
+test-cstdlib-generated: $(test-cstdlib-generated)
 
 tests/test-cstdlib/generated_stubs.c: $(BUILDDIR)/test-cstdlib-stub-generator.$(BEST)
 	$< --c-file $@
@@ -440,9 +462,11 @@ test-foreign_values.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-foreign_values: PROJECT=test-foreign_values
 test-foreign_values: $$(BEST_TARGET)
 
-test-foreign_values-generated: \
+test-foreign_values-generated= \
   tests/test-foreign_values/generated_bindings.ml \
   tests/test-foreign_values/generated_stubs.c
+
+test-foreign_values-generated: $(test-foreign_values-generated)
 
 tests/test-foreign_values/generated_stubs.c: $(BUILDDIR)/test-foreign_values-stub-generator.$(BEST)
 	$< --c-file $@
@@ -473,11 +497,13 @@ test-unions.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-unions: PROJECT=test-unions
 test-unions: $$(BEST_TARGET)
 
-test-unions-generated: \
+test-unions-generated= \
   tests/test-unions/generated_bindings.ml \
   tests/test-unions/generated_stubs.c \
   tests/test-unions/generated_struct_bindings.ml \
   $(BUILDDIR)/tests/test-unions/generated_struct_stubs.c
+
+test-unions-generated: $(test-unions-generated)
 
 tests/test-unions/generated_stubs.c: $(BUILDDIR)/test-unions-stub-generator.$(BEST)
 	$< --c-file $@
@@ -521,9 +547,11 @@ test-arrays.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-arrays: PROJECT=test-arrays
 test-arrays: $$(BEST_TARGET)
 
-test-arrays-generated: \
+test-arrays-generated= \
   tests/test-arrays/generated_bindings.ml \
   tests/test-arrays/generated_stubs.c
+
+test-arrays-generated: $(test-arrays-generated)
 
 tests/test-arrays/generated_stubs.c: $(BUILDDIR)/test-arrays-stub-generator.$(BEST)
 	$< --c-file $@
@@ -574,9 +602,11 @@ test-views.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-views: PROJECT=test-views
 test-views: $$(BEST_TARGET)
 
-test-views-generated: \
+test-views-generated= \
   tests/test-views/generated_bindings.ml \
   tests/test-views/generated_stubs.c
+
+test-views-generated: $(test-views-generated)
 
 tests/test-views/generated_stubs.c: $(BUILDDIR)/test-views-stub-generator.$(BEST)
 	$< --c-file $@
@@ -607,9 +637,11 @@ test-oo_style.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-oo_style: PROJECT=test-oo_style
 test-oo_style: $$(BEST_TARGET)
 
-test-oo_style-generated: \
+test-oo_style-generated= \
   tests/test-oo_style/generated_bindings.ml \
   tests/test-oo_style/generated_stubs.c
+
+test-oo_style-generated: $(test-oo_style-generated)
 
 tests/test-oo_style/generated_stubs.c: $(BUILDDIR)/test-oo_style-stub-generator.$(BEST)
 	$< --c-file $@
@@ -656,9 +688,11 @@ test-value_printing.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-value_printing: PROJECT=test-value_printing
 test-value_printing: $$(BEST_TARGET)
 
-test-value_printing-generated: \
+test-value_printing-generated= \
   tests/test-value_printing/generated_bindings.ml \
   tests/test-value_printing/generated_stubs.c
+
+test-value_printing-generated: $(test-value_printing-generated)
 
 tests/test-value_printing/generated_stubs.c: $(BUILDDIR)/test-value_printing-stub-generator.$(BEST)
 	$< --c-file $@
@@ -689,9 +723,11 @@ test-complex.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-complex: PROJECT=test-complex
 test-complex: $$(BEST_TARGET)
 
-test-complex-generated: \
+test-complex-generated= \
   tests/test-complex/generated_bindings.ml \
   tests/test-complex/generated_stubs.c
+
+test-complex-generated: $(test-complex-generated)
 
 tests/test-complex/generated_stubs.c: $(BUILDDIR)/test-complex-stub-generator.$(BEST)
 	$< --c-file $@
@@ -722,9 +758,11 @@ test-bools.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-bools: PROJECT=test-bools
 test-bools: $$(BEST_TARGET)
 
-test-bools-generated: \
+test-bools-generated= \
   tests/test-bools/generated_bindings.ml \
   tests/test-bools/generated_stubs.c
+
+test-bools-generated: $(test-bools-generated)
 
 tests/test-bools/generated_stubs.c: $(BUILDDIR)/test-bools-stub-generator.$(BEST)
 	$< --c-file $@
@@ -755,9 +793,11 @@ test-callback_lifetime.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-callback_lifetime: PROJECT=test-callback_lifetime
 test-callback_lifetime: $$(BEST_TARGET)
 
-test-callback_lifetime-generated: \
+test-callback_lifetime-generated= \
   tests/test-callback_lifetime/generated_bindings.ml \
   tests/test-callback_lifetime/generated_stubs.c
+
+test-callback_lifetime-generated: $(test-callback_lifetime-generated)
 
 tests/test-callback_lifetime/generated_stubs.c: $(BUILDDIR)/test-callback_lifetime-stub-generator.$(BEST)
 	$< --c-file $@
@@ -788,9 +828,11 @@ test-lifetime.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-lifetime: PROJECT=test-lifetime
 test-lifetime: $$(BEST_TARGET)
 
-test-lifetime-generated: \
+test-lifetime-generated= \
   tests/test-lifetime/generated_bindings.ml \
   tests/test-lifetime/generated_stubs.c
+
+test-lifetime-generated: $(test-lifetime-generated)
 
 tests/test-lifetime/generated_stubs.c: $(BUILDDIR)/test-lifetime-stub-generator.$(BEST)
 	$< --c-file $@
@@ -828,9 +870,11 @@ test-bigarrays.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-bigarrays: PROJECT=test-bigarrays
 test-bigarrays: $$(BEST_TARGET)
 
-test-bigarrays-generated: \
+test-bigarrays-generated= \
   tests/test-bigarrays/generated_bindings.ml \
   tests/test-bigarrays/generated_stubs.c
+
+test-bigarrays-generated: $(test-bigarrays-generated)
 
 tests/test-bigarrays/generated_stubs.c: $(BUILDDIR)/test-bigarrays-stub-generator.$(BEST)
 	$< --c-file $@
@@ -861,9 +905,11 @@ test-coercions.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-coercions: PROJECT=test-coercions
 test-coercions: $$(BEST_TARGET)
 
-test-coercions-generated: \
+test-coercions-generated= \
   tests/test-coercions/generated_bindings.ml \
   tests/test-coercions/generated_stubs.c
+
+test-coercions-generated: $(test-coercions-generated)
 
 tests/test-coercions/generated_stubs.c: $(BUILDDIR)/test-coercions-stub-generator.$(BEST)
 	$< --c-file $@
@@ -903,9 +949,11 @@ test-passing-ocaml-values.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-passing-ocaml-values: PROJECT=test-passing-ocaml-values
 test-passing-ocaml-values: $$(BEST_TARGET)
 
-test-passing-ocaml-values-generated: \
+test-passing-ocaml-values-generated= \
   tests/test-passing-ocaml-values/generated_bindings.ml \
   tests/test-passing-ocaml-values/generated_stubs.c
+
+test-passing-ocaml-values-generated: $(test-passing-ocaml-values-generated)
 
 tests/test-passing-ocaml-values/generated_stubs.c: $(BUILDDIR)/test-passing-ocaml-values-stub-generator.$(BEST)
 	$< --c-file $@
@@ -936,11 +984,13 @@ test-lwt-jobs.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-lwt-jobs: PROJECT=test-lwt-jobs
 test-lwt-jobs: $$(BEST_TARGET)
 
-test-lwt-jobs-generated: \
+test-lwt-jobs-generated= \
   tests/test-lwt-jobs/generated_bindings.ml \
   tests/test-lwt-jobs/generated_stubs.c \
   tests/test-lwt-jobs/generated_struct_bindings.ml \
   $(BUILDDIR)/tests/test-lwt-jobs/generated_struct_stubs.c
+
+test-lwt-jobs-generated: $(test-lwt-jobs-generated)
 
 tests/test-lwt-jobs/generated_stubs.c: $(BUILDDIR)/test-lwt-jobs-stub-generator.$(BEST)
 	$< --c-file $@
@@ -977,11 +1027,13 @@ test-lwt-preemptive.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-lwt-preemptive: PROJECT=test-lwt-preemptive
 test-lwt-preemptive: $$(BEST_TARGET)
 
-test-lwt-preemptive-generated: \
+test-lwt-preemptive-generated= \
   tests/test-lwt-preemptive/generated_bindings.ml \
   tests/test-lwt-preemptive/generated_stubs.c \
   tests/test-lwt-preemptive/generated_struct_bindings.ml \
   $(BUILDDIR)/tests/test-lwt-preemptive/generated_struct_stubs.c
+
+test-lwt-preemptive-generated: $(test-lwt-preemptive-generated)
 
 tests/test-lwt-preemptive/generated_stubs.c: $(BUILDDIR)/test-lwt-preemptive-stub-generator.$(BEST)
 	$< --c-file $@
@@ -1018,10 +1070,12 @@ test-returning-errno-lwt-jobs.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-returning-errno-lwt-jobs: PROJECT=test-returning-errno-lwt-jobs
 test-returning-errno-lwt-jobs: $$(BEST_TARGET)
 
-test-returning-errno-lwt-jobs-generated: \
+test-returning-errno-lwt-jobs-generated= \
   tests/test-returning-errno-lwt-jobs/generated_bindings.ml \
   tests/test-returning-errno-lwt-jobs/generated_struct_bindings.ml \
   tests/test-returning-errno-lwt-jobs/generated_stubs.c
+
+test-returning-errno-lwt-jobs-generated: $(test-returning-errno-lwt-jobs-generated)
 
 tests/test-returning-errno-lwt-jobs/generated_stubs.c: $(BUILDDIR)/test-returning-errno-lwt-jobs-stub-generator.$(BEST)
 	$< --c-file $@
@@ -1058,10 +1112,12 @@ test-returning-errno-lwt-preemptive.link_flags = -L$(BUILDDIR)/clib -ltest_funct
 test-returning-errno-lwt-preemptive: PROJECT=test-returning-errno-lwt-preemptive
 test-returning-errno-lwt-preemptive: $$(BEST_TARGET)
 
-test-returning-errno-lwt-preemptive-generated: \
+test-returning-errno-lwt-preemptive-generated= \
   tests/test-returning-errno-lwt-preemptive/generated_bindings.ml \
   tests/test-returning-errno-lwt-preemptive/generated_struct_bindings.ml \
   tests/test-returning-errno-lwt-preemptive/generated_stubs.c
+
+test-returning-errno-lwt-preemptive-generated: $(test-returning-errno-lwt-preemptive-generated)
 
 tests/test-returning-errno-lwt-preemptive/generated_stubs.c: $(BUILDDIR)/test-returning-errno-lwt-preemptive-stub-generator.$(BEST)
 	$< --c-file $@
@@ -1098,10 +1154,12 @@ test-returning-errno.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-returning-errno: PROJECT=test-returning-errno
 test-returning-errno: $$(BEST_TARGET)
 
-test-returning-errno-generated: \
+test-returning-errno-generated= \
   tests/test-returning-errno/generated_bindings.ml \
   tests/test-returning-errno/generated_struct_bindings.ml \
   tests/test-returning-errno/generated_stubs.c
+
+test-returning-errno-generated: $(test-returning-errno-generated)
 
 tests/test-returning-errno/generated_stubs.c: $(BUILDDIR)/test-returning-errno-stub-generator.$(BEST)
 	$< --c-file $@
@@ -1139,9 +1197,11 @@ test-threads.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-threads: PROJECT=test-threads
 test-threads: $$(BEST_TARGET)
 
-test-threads-generated: \
+test-threads-generated= \
   tests/test-threads/generated_bindings.ml \
   tests/test-threads/generated_stubs.c
+
+test-threads-generated: $(test-threads-generated)
 
 tests/test-threads/generated_stubs.c: $(BUILDDIR)/test-threads-stub-generator.$(BEST)
 	$< --c-file $@
@@ -1172,9 +1232,11 @@ test-closure-type-promotion.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-closure-type-promotion: PROJECT=test-closure-type-promotion
 test-closure-type-promotion: $$(BEST_TARGET)
 
-test-closure-type-promotion-generated: \
+test-closure-type-promotion-generated= \
   tests/test-closure-type-promotion/generated_bindings.ml \
   tests/test-closure-type-promotion/generated_stubs.c
+
+test-closure-type-promotion-generated: $(test-closure-type-promotion-generated)
 
 tests/test-closure-type-promotion/generated_stubs.c: $(BUILDDIR)/test-closure-type-promotion-stub-generator.$(BEST)
 	$< --c-file $@
@@ -1249,12 +1311,17 @@ $(BUILDDIR)/clib/test_functions.o: tests/clib/test_functions.c
 	$(CC) -c $(CFLAGS) -I `$(OCAMLFIND) ocamlc -where | sed 's|\r$$||'` -o $@ $^
 tests/clib/test_functions.c: tests/clib/test_functions.h
 
-.PHONY: test testlib $(TESTS) tests-common
+.PHONY: test testlib $(TESTS) tests-common clean-tests
 test: build testlib tests-common $(TESTS) \
          $(filter-out %-stubs,\
          $(filter-out %-stub-generator,\
          $(filter-out %-generated,\
            $(TESTS:%=run-%))))
+
+TESTS_GENERATED=$(foreach test,$(filter %-generated,$(TESTS)),$($(test)))
+
+clean-tests:
+	rm -f $(TESTS_GENERATED)
 
 run-%:	$*
 	@echo running $*
