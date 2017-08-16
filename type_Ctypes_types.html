@@ -1,17 +1,15 @@
 <html><head>
 <link rel="stylesheet" href="style.css" type="text/css">
 <meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="Start" href="index.html">
 <link title="Index of types" rel=Appendix href="index_types.html">
 <link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
 <link title="Index of values" rel=Appendix href="index_values.html">
 <link title="Index of modules" rel=Appendix href="index_modules.html">
 <link title="Index of module types" rel=Appendix href="index_module_types.html">
-<link title="Ctypes_static" rel="Chapter" href="Ctypes_static.html">
-<link title="Ctypes_primitive_types" rel="Chapter" href="Ctypes_primitive_types.html">
-<link title="Unsigned" rel="Chapter" href="Unsigned.html">
-<link title="Signed" rel="Chapter" href="Signed.html">
-<link title="Ctypes_structs" rel="Chapter" href="Ctypes_structs.html">
+<link title="LDouble" rel="Chapter" href="LDouble.html">
+<link title="ComplexL" rel="Chapter" href="ComplexL.html">
 <link title="Ctypes" rel="Chapter" href="Ctypes.html">
 <link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
 <link title="Ctypes_types" rel="Chapter" href="Ctypes_types.html">
@@ -19,7 +17,6 @@
 <link title="Dl" rel="Chapter" href="Dl.html">
 <link title="Libffi_abi" rel="Chapter" href="Libffi_abi.html">
 <link title="Foreign" rel="Chapter" href="Foreign.html">
-<link title="Cstubs_internals" rel="Chapter" href="Cstubs_internals.html">
 <link title="Cstubs_structs" rel="Chapter" href="Cstubs_structs.html">
 <link title="Cstubs" rel="Chapter" href="Cstubs.html">
 <link title="Cstubs_inverted" rel="Chapter" href="Cstubs_inverted.html"><title>Ctypes_types</title>
@@ -54,6 +51,7 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;uint64_t&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.uint64&nbsp;<span class="constructor">Ctypes_types</span>.<span class="constructor">TYPE</span>.typ<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;size_t&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.size_t&nbsp;<span class="constructor">Ctypes_types</span>.<span class="constructor">TYPE</span>.typ<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;ushort&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.ushort&nbsp;<span class="constructor">Ctypes_types</span>.<span class="constructor">TYPE</span>.typ<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;sint&nbsp;:&nbsp;<span class="constructor">Signed</span>.sint&nbsp;<span class="constructor">Ctypes_types</span>.<span class="constructor">TYPE</span>.typ<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;uint&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.uint&nbsp;<span class="constructor">Ctypes_types</span>.<span class="constructor">TYPE</span>.typ<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;ulong&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.ulong&nbsp;<span class="constructor">Ctypes_types</span>.<span class="constructor">TYPE</span>.typ<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;ullong&nbsp;:&nbsp;<span class="constructor">Unsigned</span>.ullong&nbsp;<span class="constructor">Ctypes_types</span>.<span class="constructor">TYPE</span>.typ<br>
@@ -61,8 +59,10 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;uintptr_t&nbsp;:&nbsp;<span class="constructor">Uintptr</span>.t&nbsp;<span class="constructor">Ctypes_types</span>.<span class="constructor">TYPE</span>.typ<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;float&nbsp;:&nbsp;float&nbsp;<span class="constructor">Ctypes_types</span>.<span class="constructor">TYPE</span>.typ<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;double&nbsp;:&nbsp;float&nbsp;<span class="constructor">Ctypes_types</span>.<span class="constructor">TYPE</span>.typ<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;ldouble&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="constructor">Ctypes_types</span>.<span class="constructor">TYPE</span>.typ<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;complex32&nbsp;:&nbsp;<span class="constructor">Complex</span>.t&nbsp;<span class="constructor">Ctypes_types</span>.<span class="constructor">TYPE</span>.typ<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;complex64&nbsp;:&nbsp;<span class="constructor">Complex</span>.t&nbsp;<span class="constructor">Ctypes_types</span>.<span class="constructor">TYPE</span>.typ<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;complexld&nbsp;:&nbsp;<span class="constructor">ComplexL</span>.t&nbsp;<span class="constructor">Ctypes_types</span>.<span class="constructor">TYPE</span>.typ<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;ptr&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_types</span>.<span class="constructor">TYPE</span>.typ&nbsp;<span class="keywordsign">-&gt;</span><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.ptr&nbsp;<span class="constructor">Ctypes_types</span>.<span class="constructor">TYPE</span>.typ<br>
@@ -79,7 +79,12 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Ctypes_static</span>.carray&nbsp;<span class="constructor">Ctypes_types</span>.<span class="constructor">TYPE</span>.typ<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;bigarray&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;&nbsp;ba_repr&nbsp;:&nbsp;<span class="keywordsign">'</span>b;&nbsp;bigarray&nbsp;:&nbsp;<span class="keywordsign">'</span>bigarray;&nbsp;carray&nbsp;:&nbsp;<span class="keywordsign">'</span>c;&nbsp;dims&nbsp;:&nbsp;<span class="keywordsign">'</span>dims;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;element&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;element&nbsp;:&nbsp;<span class="keywordsign">'</span>a;&nbsp;layout&nbsp;:&nbsp;<span class="constructor">Bigarray</span>.c_layout&nbsp;&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Ctypes_static</span>.bigarray_class&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">'</span>dims&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;(<span class="keywordsign">'</span>a,&nbsp;<span class="keywordsign">'</span>b)&nbsp;<span class="constructor">Bigarray</span>.kind&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>bigarray&nbsp;<span class="constructor">Ctypes_types</span>.<span class="constructor">TYPE</span>.typ<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;fortran_bigarray&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;&nbsp;ba_repr&nbsp;:&nbsp;<span class="keywordsign">'</span>b;&nbsp;bigarray&nbsp;:&nbsp;<span class="keywordsign">'</span>bigarray;&nbsp;carray&nbsp;:&nbsp;<span class="keywordsign">'</span>c;&nbsp;dims&nbsp;:&nbsp;<span class="keywordsign">'</span>dims;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;element&nbsp;:&nbsp;<span class="keywordsign">'</span>a;&nbsp;layout&nbsp;:&nbsp;<span class="constructor">Bigarray</span>.fortran_layout&nbsp;&gt;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Ctypes_static</span>.bigarray_class&nbsp;<span class="keywordsign">-&gt;</span><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">'</span>dims&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;(<span class="keywordsign">'</span>a,&nbsp;<span class="keywordsign">'</span>b)&nbsp;<span class="constructor">Bigarray</span>.kind&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="keywordsign">'</span>bigarray&nbsp;<span class="constructor">Ctypes_types</span>.<span class="constructor">TYPE</span>.typ<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;typ_of_bigarray_kind&nbsp;:<br>

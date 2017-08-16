@@ -2,17 +2,15 @@
 <head>
 <link rel="stylesheet" href="style.css" type="text/css">
 <meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="Start" href="index.html">
 <link title="Index of types" rel=Appendix href="index_types.html">
 <link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
 <link title="Index of values" rel=Appendix href="index_values.html">
 <link title="Index of modules" rel=Appendix href="index_modules.html">
 <link title="Index of module types" rel=Appendix href="index_module_types.html">
-<link title="Ctypes_static" rel="Chapter" href="Ctypes_static.html">
-<link title="Ctypes_primitive_types" rel="Chapter" href="Ctypes_primitive_types.html">
-<link title="Unsigned" rel="Chapter" href="Unsigned.html">
-<link title="Signed" rel="Chapter" href="Signed.html">
-<link title="Ctypes_structs" rel="Chapter" href="Ctypes_structs.html">
+<link title="LDouble" rel="Chapter" href="LDouble.html">
+<link title="ComplexL" rel="Chapter" href="ComplexL.html">
 <link title="Ctypes" rel="Chapter" href="Ctypes.html">
 <link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
 <link title="Ctypes_types" rel="Chapter" href="Ctypes_types.html">
@@ -20,7 +18,6 @@
 <link title="Dl" rel="Chapter" href="Dl.html">
 <link title="Libffi_abi" rel="Chapter" href="Libffi_abi.html">
 <link title="Foreign" rel="Chapter" href="Foreign.html">
-<link title="Cstubs_internals" rel="Chapter" href="Cstubs_internals.html">
 <link title="Cstubs_structs" rel="Chapter" href="Cstubs_structs.html">
 <link title="Cstubs" rel="Chapter" href="Cstubs.html">
 <link title="Cstubs_inverted" rel="Chapter" href="Cstubs_inverted.html"><title>Index of values</title>
@@ -31,28 +28,10 @@
 <h1>Index of values</h1>
 <table>
 <tr><td align="left"><br></td></tr>
-<tr><td><a href="Unsigned.S.Infix.html#VAL( * )">( * )</a> [<a href="Unsigned.S.Infix.html">Unsigned.S.Infix</a>]</td>
-<td><div class="info">
-Multiplication.
-</div>
-</td></tr>
-<tr><td><a href="Ctypes.html#VAL( *:* )">( *:* )</a> [<a href="Ctypes.html">Ctypes</a>]</td>
-<td><div class="info">
-<span class="deprecated"></span></div>
-</td></tr>
 <tr><td><a href="Ctypes.html#VAL(!@)">(!@)</a> [<a href="Ctypes.html">Ctypes</a>]</td>
 <td><div class="info">
 <code class="code">!@ p</code> dereferences the pointer <code class="code">p</code>.
 </div>
-</td></tr>
-<tr><td><a href="Unsigned.S.Infix.html#VAL(+)">(+)</a> [<a href="Unsigned.S.Infix.html">Unsigned.S.Infix</a>]</td>
-<td><div class="info">
-Addition.
-</div>
-</td></tr>
-<tr><td><a href="Ctypes.html#VAL(+:+)">(+:+)</a> [<a href="Ctypes.html">Ctypes</a>]</td>
-<td><div class="info">
-<span class="deprecated"></span></div>
 </td></tr>
 <tr><td><a href="Ctypes.html#VAL(+@)">(+@)</a> [<a href="Ctypes.html">Ctypes</a>]</td>
 <td><div class="info">
@@ -60,20 +39,10 @@ If <code class="code">p</code> is a pointer to an array element then <code class
     address of the <code class="code">n</code>th next element.
 </div>
 </td></tr>
-<tr><td><a href="Unsigned.S.Infix.html#VAL(-)">(-)</a> [<a href="Unsigned.S.Infix.html">Unsigned.S.Infix</a>]</td>
-<td><div class="info">
-Subtraction.
-</div>
-</td></tr>
 <tr><td><a href="Ctypes.html#VAL(-@)">(-@)</a> [<a href="Ctypes.html">Ctypes</a>]</td>
 <td><div class="info">
 If <code class="code">p</code> is a pointer to an array element then <code class="code">p -@ n</code> computes the address
     of the nth previous element.
-</div>
-</td></tr>
-<tr><td><a href="Unsigned.S.Infix.html#VAL(/)">(/)</a> [<a href="Unsigned.S.Infix.html">Unsigned.S.Infix</a>]</td>
-<td><div class="info">
-Division.
 </div>
 </td></tr>
 <tr><td><a href="Ctypes.html#VAL(<-@)">(&lt;-@)</a> [<a href="Ctypes.html">Ctypes</a>]</td>
@@ -86,42 +55,12 @@ Division.
 Construct a function type from a type and an existing function type.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VAL(@->)">(@-&gt;)</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
+<tr><td><a href="Ctypes.FOREIGN.html#VAL(@->)">(@-&gt;)</a> [<a href="Ctypes.FOREIGN.html">Ctypes.FOREIGN</a>]</td>
 <td></td></tr>
 <tr><td><a href="Ctypes.html#VAL(@.)">(@.)</a> [<a href="Ctypes.html">Ctypes</a>]</td>
 <td><div class="info">
 <code class="code">s @. f</code> computes the address of the field <code class="code">f</code> in the structure or union
     value <code class="code">s</code>.
-</div>
-</td></tr>
-<tr><td><a href="Unsigned.S.Infix.html#VAL(land)">(land)</a> [<a href="Unsigned.S.Infix.html">Unsigned.S.Infix</a>]</td>
-<td><div class="info">
-Bitwise logical and.
-</div>
-</td></tr>
-<tr><td><a href="Unsigned.S.Infix.html#VAL(lor)">(lor)</a> [<a href="Unsigned.S.Infix.html">Unsigned.S.Infix</a>]</td>
-<td><div class="info">
-Bitwise logical or.
-</div>
-</td></tr>
-<tr><td><a href="Unsigned.S.Infix.html#VAL(lsl)">(lsl)</a> [<a href="Unsigned.S.Infix.html">Unsigned.S.Infix</a>]</td>
-<td><div class="info">
-<code class="code">x lsl y</code> shifts <code class="code">x</code> to the left by <code class="code">y</code> bits.
-</div>
-</td></tr>
-<tr><td><a href="Unsigned.S.Infix.html#VAL(lsr)">(lsr)</a> [<a href="Unsigned.S.Infix.html">Unsigned.S.Infix</a>]</td>
-<td><div class="info">
-<code class="code">x lsr y</code> shifts <code class="code">x</code> to the right by <code class="code">y</code> bits.
-</div>
-</td></tr>
-<tr><td><a href="Unsigned.S.Infix.html#VAL(lxor)">(lxor)</a> [<a href="Unsigned.S.Infix.html">Unsigned.S.Infix</a>]</td>
-<td><div class="info">
-Bitwise logical exclusive or.
-</div>
-</td></tr>
-<tr><td><a href="Unsigned.S.Infix.html#VAL(mod)">(mod)</a> [<a href="Unsigned.S.Infix.html">Unsigned.S.Infix</a>]</td>
-<td><div class="info">
-Integer remainder.
 </div>
 </td></tr>
 <tr><td><a href="Ctypes.html#VAL(|->)">(|-&gt;)</a> [<a href="Ctypes.html">Ctypes</a>]</td>
@@ -133,9 +72,9 @@ Integer remainder.
 <tr><td align="left"><br>A</td></tr>
 <tr><td><a href="Libffi_abi.html#VALabi_code">abi_code</a> [<a href="Libffi_abi.html">Libffi_abi</a>]</td>
 <td></td></tr>
-<tr><td><a href="Signed.S.html#VALabs">abs</a> [<a href="Signed.S.html">Signed.S</a>]</td>
+<tr><td><a href="LDouble.html#VALabs">abs</a> [<a href="LDouble.html">LDouble</a>]</td>
 <td><div class="info">
-Return the absolute value of its argument.
+<code class="code">abs f</code> returns absolute value of <code class="code">f</code>
 </div>
 </td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALabstract">abstract</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
@@ -144,11 +83,24 @@ Create an abstract type specification from the size and alignment
       requirements for the type.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALabstract">abstract</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
-<tr><td><a href="Unsigned.S.html#VALadd">add</a> [<a href="Unsigned.S.html">Unsigned.S</a>]</td>
+<tr><td><a href="LDouble.html#VALacos">acos</a> [<a href="LDouble.html">LDouble</a>]</td>
 <td><div class="info">
-Addition.
+Arc cosine
+</div>
+</td></tr>
+<tr><td><a href="LDouble.html#VALacosh">acosh</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td><div class="info">
+Inverse hyperbolic cosine
+</div>
+</td></tr>
+<tr><td><a href="ComplexL.html#VALadd">add</a> [<a href="ComplexL.html">ComplexL</a>]</td>
+<td><div class="info">
+Addition
+</div>
+</td></tr>
+<tr><td><a href="LDouble.html#VALadd">add</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td><div class="info">
+Addition
 </div>
 </td></tr>
 <tr><td><a href="Ctypes.html#VALaddr">addr</a> [<a href="Ctypes.html">Ctypes</a>]</td>
@@ -163,8 +115,6 @@ Addition.
 <code class="code">alignment t</code> computes the alignment requirements of the type <code class="code">t</code>.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALalignment">alignment</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
 <tr><td><a href="Ctypes.html#VALallocate">allocate</a> [<a href="Ctypes.html">Ctypes</a>]</td>
 <td><div class="info">
 <code class="code">allocate t v</code> allocates a fresh value of type <code class="code">t</code>, initialises it
@@ -177,14 +127,17 @@ Addition.
     <code class="code">t</code> and length <code class="code">n</code>, and returns its address.
 </div>
 </td></tr>
+<tr><td><a href="ComplexL.html#VALarg">arg</a> [<a href="ComplexL.html">ComplexL</a>]</td>
+<td><div class="info">
+Argument.
+</div>
+</td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALarray">array</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
 <td><div class="info">
 Construct a sized array type from a length and an existing type (called
       the <i>element type</i>).
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALarray">array</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
 <tr><td><a href="Ctypes.html#VALarray1">array1</a> [<a href="Ctypes.html">Ctypes</a>]</td>
 <td><div class="info">
 The class of <code class="code">Bigarray.Array1.t</code> values
@@ -206,25 +159,48 @@ The class of <code class="code">Bigarray.Array3.t</code> values
     <a href="Ctypes.CArray.html#TYPEt"><code class="code">Ctypes.CArray.t</code></a>.
 </div>
 </td></tr>
+<tr><td><a href="LDouble.html#VALasin">asin</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td><div class="info">
+Arc sine
+</div>
+</td></tr>
+<tr><td><a href="LDouble.html#VALasinh">asinh</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td><div class="info">
+Inverse hyperbolic sine
+</div>
+</td></tr>
+<tr><td><a href="LDouble.html#VALatan">atan</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td><div class="info">
+Arc tangent
+</div>
+</td></tr>
+<tr><td><a href="LDouble.html#VALatan2">atan2</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td><div class="info">
+<code class="code">atan2 y x</code> returns the arc tangent of <code class="code">y /. x</code>.
+</div>
+</td></tr>
+<tr><td><a href="LDouble.html#VALatanh">atanh</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td><div class="info">
+Inverse hyperbolic tangent
+</div>
+</td></tr>
 <tr><td align="left"><br>B</td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALbigarray">bigarray</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
 <td><div class="info">
-Construct a sized bigarray type representation from a bigarray class, the
-      dimensions, and the <code class="code">Bigarray.kind</code>.
+Construct a sized C-layout bigarray type representation from a bigarray
+      class, the dimensions, and the <code class="code">Bigarray.kind</code>.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALbigarray">bigarray</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
 <tr><td><a href="Ctypes.html#VALbigarray_of_array">bigarray_of_array</a> [<a href="Ctypes.html">Ctypes</a>]</td>
 <td><div class="info">
-<code class="code">bigarray_of_array c k a</code> converts the <a href="Ctypes.CArray.html#TYPEt"><code class="code">Ctypes.CArray.t</code></a> value <code class="code">c</code> to a bigarray
-    value.
+<code class="code">bigarray_of_array c k a</code> converts the <a href="Ctypes.CArray.html#TYPEt"><code class="code">Ctypes.CArray.t</code></a> value <code class="code">a</code> to a
+    C-layout bigarray value.
 </div>
 </td></tr>
 <tr><td><a href="Ctypes.html#VALbigarray_of_ptr">bigarray_of_ptr</a> [<a href="Ctypes.html">Ctypes</a>]</td>
 <td><div class="info">
-<code class="code">bigarray_of_ptr c dims k p</code> converts the C pointer <code class="code">p</code> to a bigarray
-    value.
+<code class="code">bigarray_of_ptr c dims k p</code> converts the C pointer <code class="code">p</code> to a C-layout
+    bigarray value.
 </div>
 </td></tr>
 <tr><td><a href="Ctypes.html#VALbigarray_start">bigarray_start</a> [<a href="Ctypes.html">Ctypes</a>]</td>
@@ -237,10 +213,12 @@ Return the address of the first element of the given Bigarray value.
 Value representing the C type <code class="code">bool</code>.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALbool">bool</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
-<tr><td><a href="Cstubs_internals.html#VALbuild_enum_type">build_enum_type</a> [<a href="Cstubs_internals.html">Cstubs_internals</a>]</td>
-<td></td></tr>
+<tr><td><a href="LDouble.html#VALbyte_sizes">byte_sizes</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td><div class="info">
+size, in bytes, used for storing long doubles, 
+    and the actual number of bytes used by the value.
+</div>
+</td></tr>
 <tr><td align="left"><br>C</td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALcamlint">camlint</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
 <td><div class="info">
@@ -248,15 +226,22 @@ Value representing an integer type with the same storage requirements as
       an OCaml <code class="code">int</code>.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALcamlint">camlint</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
+<tr><td><a href="LDouble.html#VALceil">ceil</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td><div class="info">
+Round above to an integer value.
+</div>
+</td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALchar">char</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
 <td><div class="info">
 Value representing the C type <code class="code">char</code>.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALchar">char</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
+<tr><td><a href="LDouble.html#VALclassify">classify</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td><div class="info">
+Return the class of the given floating-point number:
+   normal, subnormal, zero, infinite, or not a number.
+</div>
+</td></tr>
 <tr><td><a href="PosixTypes.html#VALclock_t">clock_t</a> [<a href="PosixTypes.html">PosixTypes</a>]</td>
 <td></td></tr>
 <tr><td><a href="Ctypes.html#VALcoerce">coerce</a> [<a href="Ctypes.html">Ctypes</a>]</td>
@@ -271,26 +256,26 @@ Value representing the C type <code class="code">char</code>.
     types represented by <code class="code">f1</code> and <code class="code">f2</code>.
 </div>
 </td></tr>
-<tr><td><a href="Unsigned.S.html#VALcompare">compare</a> [<a href="Unsigned.S.html">Unsigned.S</a>]</td>
-<td><div class="info">
-The comparison function for unsigned integers, with the same
-      specification as <code class="code">Pervasives.compare</code>.
-</div>
-</td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALcomplex32">complex32</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
 <td><div class="info">
 Value representing the C99 single-precision <code class="code">float complex</code> type.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALcomplex32">complex32</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALcomplex64">complex64</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
 <td><div class="info">
 Value representing the C99 double-precision <code class="code">double complex</code> type.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALcomplex64">complex64</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
+<tr><td><a href="Ctypes_types.TYPE.html#VALcomplexld">complexld</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
+<td><div class="info">
+Value representing the C99 long-double-precision <code class="code">long double complex</code> type.
+</div>
+</td></tr>
+<tr><td><a href="ComplexL.html#VALconj">conj</a> [<a href="ComplexL.html">ComplexL</a>]</td>
+<td><div class="info">
+Conjugate: given the complex <code class="code">x + i.y</code>, returns <code class="code">x - i.y</code>.
+</div>
+</td></tr>
 <tr><td><a href="Cstubs.Types.TYPE.html#VALconstant">constant</a> [<a href="Cstubs.Types.TYPE.html">Cstubs.Types.TYPE</a>]</td>
 <td><div class="info">
 <code class="code">constant name typ</code> retrieves the value of the compile-time constant
@@ -299,8 +284,27 @@ Value representing the C99 double-precision <code class="code">double complex</c
 </td></tr>
 <tr><td><a href="Cstubs_structs.TYPE.html#VALconstant">constant</a> [<a href="Cstubs_structs.TYPE.html">Cstubs_structs.TYPE</a>]</td>
 <td></td></tr>
-<tr><td><a href="Cstubs_internals.html#VALcptr">cptr</a> [<a href="Cstubs_internals.html">Cstubs_internals</a>]</td>
-<td></td></tr>
+<tr><td><a href="Ctypes.CArray.html#VALcopy">copy</a> [<a href="Ctypes.CArray.html">Ctypes.CArray</a>]</td>
+<td><div class="info">
+<code class="code">copy a</code> creates a fresh array with the same elements as <code class="code">a</code>.
+</div>
+</td></tr>
+<tr><td><a href="LDouble.html#VALcopysign">copysign</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td><div class="info">
+<code class="code">copysign x y</code> returns a float whose absolute value is that of <code class="code">x</code>
+  and whose sign is that of <code class="code">y</code>.
+</div>
+</td></tr>
+<tr><td><a href="LDouble.html#VALcos">cos</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td><div class="info">
+Cosine.
+</div>
+</td></tr>
+<tr><td><a href="LDouble.html#VALcosh">cosh</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td><div class="info">
+Hyperbolic cosine
+</div>
+</td></tr>
 <tr><td><a href="Ctypes.Root.html#VALcreate">create</a> [<a href="Ctypes.Root.html">Ctypes.Root</a>]</td>
 <td><div class="info">
 <code class="code">create v</code> allocates storage for the address of the OCaml value <code class="code">v</code>,
@@ -314,9 +318,14 @@ Value representing the C99 double-precision <code class="code">double complex</c
 <td></td></tr>
 <tr><td><a href="PosixTypes.html#VALdev_t">dev_t</a> [<a href="PosixTypes.html">PosixTypes</a>]</td>
 <td></td></tr>
-<tr><td><a href="Unsigned.S.html#VALdiv">div</a> [<a href="Unsigned.S.html">Unsigned.S</a>]</td>
+<tr><td><a href="ComplexL.html#VALdiv">div</a> [<a href="ComplexL.html">ComplexL</a>]</td>
 <td><div class="info">
-Division.
+Division
+</div>
+</td></tr>
+<tr><td><a href="LDouble.html#VALdiv">div</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td><div class="info">
+Division
 </div>
 </td></tr>
 <tr><td><a href="Dl.html#VALdlclose">dlclose</a> [<a href="Dl.html">Dl</a>]</td>
@@ -339,8 +348,6 @@ Look up a symbol in a dynamic library.
 Value representing the C type <code class="code">double</code>.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALdouble">double</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
 <tr><td align="left"><br>E</td></tr>
 <tr><td><a href="Libffi_abi.html#VALeabi">eabi</a> [<a href="Libffi_abi.html">Libffi_abi</a>]</td>
 <td></td></tr>
@@ -359,6 +366,28 @@ Retrieve the element type of an array.
 </td></tr>
 <tr><td><a href="Cstubs_structs.TYPE.html#VALenum">enum</a> [<a href="Cstubs_structs.TYPE.html">Cstubs_structs.TYPE</a>]</td>
 <td></td></tr>
+<tr><td><a href="LDouble.html#VALepsilon">epsilon</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td><div class="info">
+The difference between <code class="code">1.0</code> and the smallest exactly representable
+    floating-point number greater than <code class="code">1.0</code>.
+</div>
+</td></tr>
+<tr><td><a href="ComplexL.html#VALexp">exp</a> [<a href="ComplexL.html">ComplexL</a>]</td>
+<td><div class="info">
+Exponentiation.
+</div>
+</td></tr>
+<tr><td><a href="LDouble.html#VALexp">exp</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td><div class="info">
+Exponential
+</div>
+</td></tr>
+<tr><td><a href="LDouble.html#VALexpm1">expm1</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td><div class="info">
+<code class="code">expm1 x</code> computes <code class="code">exp x -. 1.0</code>, giving numerically-accurate results
+    even if <code class="code">x</code> is close to <code class="code">0.0</code>.
+</div>
+</td></tr>
 <tr><td align="left"><br>F</td></tr>
 <tr><td><a href="Libffi_abi.html#VALfastcall">fastcall</a> [<a href="Libffi_abi.html">Libffi_abi</a>]</td>
 <td></td></tr>
@@ -369,38 +398,47 @@ Retrieve the element type of an array.
       read and write the field in structure or union instances (e.g.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_structs.S.html#VALfield">field</a> [<a href="Ctypes_structs.S.html">Ctypes_structs.S</a>]</td>
-<td></td></tr>
 <tr><td><a href="Ctypes.html#VALfield_name">field_name</a> [<a href="Ctypes.html">Ctypes</a>]</td>
 <td><div class="info">
 <code class="code">field_name f</code> returns the name of the field <code class="code">f</code>.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALfield_name">field_name</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
 <tr><td><a href="Ctypes.html#VALfield_type">field_type</a> [<a href="Ctypes.html">Ctypes</a>]</td>
 <td><div class="info">
 <code class="code">field_type f</code> returns the type of the field <code class="code">f</code>.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALfield_type">field_type</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALfloat">float</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
 <td><div class="info">
 Value representing the C single-precision <code class="code">float</code> type.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALfloat">float</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
-<tr><td><a href="Cstubs.FOREIGN.html#VALforeign">foreign</a> [<a href="Cstubs.FOREIGN.html">Cstubs.FOREIGN</a>]</td>
-<td></td></tr>
+<tr><td><a href="LDouble.html#VALfloor">floor</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td><div class="info">
+Round below to an integer value.
+</div>
+</td></tr>
+<tr><td><a href="Ctypes.CArray.html#VALfold_left">fold_left</a> [<a href="Ctypes.CArray.html">Ctypes.CArray</a>]</td>
+<td><div class="info">
+<code class="code">CArray.fold_left (@) x a</code> computes 
+         <code class="code">(((x @ a.(0)) @ a.(1)) ...) @ a.(n-1)</code>
+       where <code class="code">n</code> is the length of the array <code class="code">a</code>.
+</div>
+</td></tr>
+<tr><td><a href="Ctypes.CArray.html#VALfold_right">fold_right</a> [<a href="Ctypes.CArray.html">Ctypes.CArray</a>]</td>
+<td><div class="info">
+<code class="code">CArray.fold_right f a x</code> computes
+         <code class="code">a.(0) @ (a.(1) @ ( ... (a.(n-1) @ x) ...))</code>
+       where <code class="code">n</code> is the length of the array <code class="code">a</code>.
+</div>
+</td></tr>
 <tr><td><a href="Foreign.html#VALforeign">foreign</a> [<a href="Foreign.html">Foreign</a>]</td>
 <td><div class="info">
 <code class="code">foreign name typ</code> exposes the C function of type <code class="code">typ</code> named by <code class="code">name</code> as
     an OCaml value.
 </div>
 </td></tr>
-<tr><td><a href="Cstubs.FOREIGN.html#VALforeign_value">foreign_value</a> [<a href="Cstubs.FOREIGN.html">Cstubs.FOREIGN</a>]</td>
+<tr><td><a href="Ctypes.FOREIGN.html#VALforeign">foreign</a> [<a href="Ctypes.FOREIGN.html">Ctypes.FOREIGN</a>]</td>
 <td></td></tr>
 <tr><td><a href="Foreign.html#VALforeign_value">foreign_value</a> [<a href="Foreign.html">Foreign</a>]</td>
 <td><div class="info">
@@ -408,6 +446,8 @@ Value representing the C single-precision <code class="code">float</code> type.
     as an OCaml value.
 </div>
 </td></tr>
+<tr><td><a href="Ctypes.FOREIGN.html#VALforeign_value">foreign_value</a> [<a href="Ctypes.FOREIGN.html">Ctypes.FOREIGN</a>]</td>
+<td></td></tr>
 <tr><td><a href="Ctypes.html#VALformat">format</a> [<a href="Ctypes.html">Ctypes</a>]</td>
 <td><div class="info">
 Pretty-print a representation of the C value to the specified formatter.
@@ -416,6 +456,8 @@ Pretty-print a representation of the C value to the specified formatter.
 <tr><td><a href="Ctypes_printers.html#VALformat_array">format_array</a> [<a href="Ctypes_printers.html">Ctypes_printers</a>]</td>
 <td></td></tr>
 <tr><td><a href="Ctypes_printers.html#VALformat_clock_t">format_clock_t</a> [<a href="Ctypes_printers.html">Ctypes_printers</a>]</td>
+<td></td></tr>
+<tr><td><a href="Ctypes_printers.html#VALformat_complexld">format_complexld</a> [<a href="Ctypes_printers.html">Ctypes_printers</a>]</td>
 <td></td></tr>
 <tr><td><a href="Ctypes_printers.html#VALformat_dev_t">format_dev_t</a> [<a href="Ctypes_printers.html">Ctypes_printers</a>]</td>
 <td></td></tr>
@@ -428,6 +470,8 @@ Pretty-print a C representation of the function type to the specified
 </div>
 </td></tr>
 <tr><td><a href="Ctypes_printers.html#VALformat_ino_t">format_ino_t</a> [<a href="Ctypes_printers.html">Ctypes_printers</a>]</td>
+<td></td></tr>
+<tr><td><a href="Ctypes_printers.html#VALformat_ldouble">format_ldouble</a> [<a href="Ctypes_printers.html">Ctypes_printers</a>]</td>
 <td></td></tr>
 <tr><td><a href="Ctypes_printers.html#VALformat_llong">format_llong</a> [<a href="Ctypes_printers.html">Ctypes_printers</a>]</td>
 <td></td></tr>
@@ -444,6 +488,8 @@ Pretty-print a C representation of the function type to the specified
 <tr><td><a href="Ctypes_printers.html#VALformat_pid_t">format_pid_t</a> [<a href="Ctypes_printers.html">Ctypes_printers</a>]</td>
 <td></td></tr>
 <tr><td><a href="Ctypes_printers.html#VALformat_pointer">format_pointer</a> [<a href="Ctypes_printers.html">Ctypes_printers</a>]</td>
+<td></td></tr>
+<tr><td><a href="Ctypes_printers.html#VALformat_sint">format_sint</a> [<a href="Ctypes_printers.html">Ctypes_printers</a>]</td>
 <td></td></tr>
 <tr><td><a href="Ctypes_printers.html#VALformat_size_t">format_size_t</a> [<a href="Ctypes_printers.html">Ctypes_printers</a>]</td>
 <td></td></tr>
@@ -482,8 +528,23 @@ Pretty-print a C representation of the type to the specified formatter.
 <td></td></tr>
 <tr><td><a href="Ctypes_printers.html#VALformat_ushort">format_ushort</a> [<a href="Ctypes_printers.html">Ctypes_printers</a>]</td>
 <td></td></tr>
-<tr><td><a href="Cstubs_internals.html#VALfptr">fptr</a> [<a href="Cstubs_internals.html">Cstubs_internals</a>]</td>
-<td></td></tr>
+<tr><td><a href="Ctypes_types.TYPE.html#VALfortran_bigarray">fortran_bigarray</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
+<td><div class="info">
+Construct a sized Fortran-layout bigarray type representation from a
+      bigarray class, the dimensions, and the <code class="code">Bigarray.kind</code>.
+</div>
+</td></tr>
+<tr><td><a href="Ctypes.html#VALfortran_bigarray_of_ptr">fortran_bigarray_of_ptr</a> [<a href="Ctypes.html">Ctypes</a>]</td>
+<td><div class="info">
+<code class="code">fortran_bigarray_of_ptr c dims k p</code> converts the C pointer <code class="code">p</code> to a
+    Fortran-layout bigarray value.
+</div>
+</td></tr>
+<tr><td><a href="LDouble.html#VALfrexp">frexp</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td><div class="info">
+<code class="code">frexp f</code> returns the pair of the significant and the exponent of <code class="code">f</code>.
+</div>
+</td></tr>
 <tr><td><a href="Ctypes.CArray.html#VALfrom_ptr">from_ptr</a> [<a href="Ctypes.CArray.html">Ctypes.CArray</a>]</td>
 <td><div class="info">
 <code class="code">from_ptr p n</code> creates an <code class="code">n</code>-length array reference to the memory at
@@ -534,7 +595,30 @@ The class of <code class="code">Bigarray.Genarray.t</code> values
     <code class="code">s</code>.
 </div>
 </td></tr>
+<tr><td align="left"><br>H</td></tr>
+<tr><td><a href="LDouble.html#VALhypot">hypot</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td></td></tr>
 <tr><td align="left"><br>I</td></tr>
+<tr><td><a href="ComplexL.html#VALi">i</a> [<a href="ComplexL.html">ComplexL</a>]</td>
+<td><div class="info">
+<code class="code">0 + i</code>
+</div>
+</td></tr>
+<tr><td><a href="Cstubs.html#VALignore_errno">ignore_errno</a> [<a href="Cstubs.html">Cstubs</a>]</td>
+<td><div class="info">
+Generate code with no special support for errno.
+</div>
+</td></tr>
+<tr><td><a href="ComplexL.html#VALim">im</a> [<a href="ComplexL.html">ComplexL</a>]</td>
+<td><div class="info">
+return the imaginary part of the long double complex
+</div>
+</td></tr>
+<tr><td><a href="LDouble.html#VALinfinity">infinity</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td><div class="info">
+Positive infinity
+</div>
+</td></tr>
 <tr><td><a href="PosixTypes.html#VALino_t">ino_t</a> [<a href="PosixTypes.html">PosixTypes</a>]</td>
 <td></td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALint">int</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
@@ -542,36 +626,26 @@ The class of <code class="code">Bigarray.Genarray.t</code> values
 Value representing the C type (<code class="code">signed</code>) <code class="code">int</code>.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALint">int</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALint16_t">int16_t</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
 <td><div class="info">
 Value representing a 16-bit signed integer C type.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALint16_t">int16_t</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALint32_t">int32_t</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
 <td><div class="info">
 Value representing a 32-bit signed integer C type.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALint32_t">int32_t</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALint64_t">int64_t</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
 <td><div class="info">
 Value representing a 64-bit signed integer C type.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALint64_t">int64_t</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALint8_t">int8_t</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
 <td><div class="info">
 Value representing an 8-bit signed integer C type.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALint8_t">int8_t</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
 <tr><td><a href="Cstubs_inverted.INTERNAL.html#VALinternal">internal</a> [<a href="Cstubs_inverted.INTERNAL.html">Cstubs_inverted.INTERNAL</a>]</td>
 <td></td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALintptr_t">intptr_t</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
@@ -579,7 +653,33 @@ Value representing an 8-bit signed integer C type.
 Value representing the C type <code class="code">intptr_t</code>.
 </div>
 </td></tr>
+<tr><td><a href="ComplexL.html#VALinv">inv</a> [<a href="ComplexL.html">ComplexL</a>]</td>
+<td><div class="info">
+Multiplicative inverse (<code class="code">1/z</code>).
+</div>
+</td></tr>
+<tr><td><a href="Ctypes.html#VALis_null">is_null</a> [<a href="Ctypes.html">Ctypes</a>]</td>
+<td><div class="info">
+<code class="code">is_null p</code> is true when <code class="code">p</code> is a null pointer.
+</div>
+</td></tr>
+<tr><td><a href="Ctypes.CArray.html#VALiter">iter</a> [<a href="Ctypes.CArray.html">Ctypes.CArray</a>]</td>
+<td><div class="info">
+<code class="code">iter f a</code> is analogous to <code class="code">Array.iter f a</code>: it applies <code class="code">f</code> in turn to
+      all the elements of <code class="code">a</code>.
+</div>
+</td></tr>
 <tr><td align="left"><br>L</td></tr>
+<tr><td><a href="LDouble.html#VALldexp">ldexp</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td><div class="info">
+<code class="code">ldexp x n</code> returns <code class="code">x *. 2 ** n</code>.
+</div>
+</td></tr>
+<tr><td><a href="Ctypes_types.TYPE.html#VALldouble">ldouble</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
+<td><div class="info">
+Value representing the C type <code class="code">long double</code>.
+</div>
+</td></tr>
 <tr><td><a href="Ctypes.CArray.html#VALlength">length</a> [<a href="Ctypes.CArray.html">Ctypes.CArray</a>]</td>
 <td><div class="info">
 Return the number of elements of the given array.
@@ -602,26 +702,25 @@ Return the number of elements of the given array.
 Value representing the C type (<code class="code">signed</code>) <code class="code">long long</code>.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALllong">llong</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
-<tr><td><a href="Unsigned.S.html#VALlogand">logand</a> [<a href="Unsigned.S.html">Unsigned.S</a>]</td>
+<tr><td><a href="ComplexL.html#VALlog">log</a> [<a href="ComplexL.html">ComplexL</a>]</td>
 <td><div class="info">
-Bitwise logical and.
+Natural logarithm (in base <code class="code">e</code>).
 </div>
 </td></tr>
-<tr><td><a href="Unsigned.S.html#VALlognot">lognot</a> [<a href="Unsigned.S.html">Unsigned.S</a>]</td>
+<tr><td><a href="LDouble.html#VALlog">log</a> [<a href="LDouble.html">LDouble</a>]</td>
 <td><div class="info">
-Bitwise logical negation.
+Natural logarithm
 </div>
 </td></tr>
-<tr><td><a href="Unsigned.S.html#VALlogor">logor</a> [<a href="Unsigned.S.html">Unsigned.S</a>]</td>
+<tr><td><a href="LDouble.html#VALlog10">log10</a> [<a href="LDouble.html">LDouble</a>]</td>
 <td><div class="info">
-Bitwise logical or.
+Base 10 logarithm
 </div>
 </td></tr>
-<tr><td><a href="Unsigned.S.html#VALlogxor">logxor</a> [<a href="Unsigned.S.html">Unsigned.S</a>]</td>
+<tr><td><a href="LDouble.html#VALlog1p">log1p</a> [<a href="LDouble.html">LDouble</a>]</td>
 <td><div class="info">
-Bitwise logical exclusive or.
+<code class="code">log1p x</code> computes <code class="code">log(1.0 +. x)</code> (natural logarithm),
+    giving numerically-accurate results even if <code class="code">x</code> is close to <code class="code">0.0</code>.
 </div>
 </td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALlong">long</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
@@ -629,8 +728,16 @@ Bitwise logical exclusive or.
 Value representing the C type (<code class="code">signed</code>) <code class="code">long</code>.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALlong">long</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
+<tr><td><a href="Cstubs.html#VALlwt_jobs">lwt_jobs</a> [<a href="Cstubs.html">Cstubs</a>]</td>
+<td><div class="info">
+Generate code which implements C function calls as Lwt jobs:
+</div>
+</td></tr>
+<tr><td><a href="Cstubs.html#VALlwt_preemptive">lwt_preemptive</a> [<a href="Cstubs.html">Cstubs</a>]</td>
+<td><div class="info">
+Generate code which runs C function calls with the Lwt_preemptive module:
+</div>
+</td></tr>
 <tr><td align="left"><br>M</td></tr>
 <tr><td><a href="Ctypes.CArray.html#VALmake">make</a> [<a href="Ctypes.CArray.html">Ctypes.CArray</a>]</td>
 <td><div class="info">
@@ -642,36 +749,52 @@ Value representing the C type (<code class="code">signed</code>) <code class="co
 Allocate a fresh, uninitialised structure or union value.
 </div>
 </td></tr>
-<tr><td><a href="Cstubs_internals.html#VALmake_fun_ptr">make_fun_ptr</a> [<a href="Cstubs_internals.html">Cstubs_internals</a>]</td>
-<td></td></tr>
-<tr><td><a href="Cstubs_internals.html#VALmake_ptr">make_ptr</a> [<a href="Cstubs_internals.html">Cstubs_internals</a>]</td>
-<td></td></tr>
-<tr><td><a href="Cstubs_internals.html#VALmake_structured">make_structured</a> [<a href="Cstubs_internals.html">Cstubs_internals</a>]</td>
-<td></td></tr>
-<tr><td><a href="Unsigned.S.html#VALmax_int">max_int</a> [<a href="Unsigned.S.html">Unsigned.S</a>]</td>
+<tr><td><a href="ComplexL.html#VALmake">make</a> [<a href="ComplexL.html">ComplexL</a>]</td>
 <td><div class="info">
-The greatest representable integer.
+<code class="code">make x y</code> creates the long double complex value <code class="code">x + y * i</code>
 </div>
 </td></tr>
-<tr><td><a href="Signed.S.html#VALmin_int">min_int</a> [<a href="Signed.S.html">Signed.S</a>]</td>
+<tr><td><a href="Ctypes.CArray.html#VALmap">map</a> [<a href="Ctypes.CArray.html">Ctypes.CArray</a>]</td>
 <td><div class="info">
-The smallest representable integer.
+<code class="code">map t f a</code> is analogous to <code class="code">Array.map f a</code>: it creates a new array with
+      element type <code class="code">t</code> whose elements are obtained by applying <code class="code">f</code> to the
+      elements of <code class="code">a</code>.
 </div>
 </td></tr>
-<tr><td><a href="Signed.S.html#VALminus_one">minus_one</a> [<a href="Signed.S.html">Signed.S</a>]</td>
+<tr><td><a href="Ctypes.CArray.html#VALmapi">mapi</a> [<a href="Ctypes.CArray.html">Ctypes.CArray</a>]</td>
 <td><div class="info">
-The value -1
+<code class="code">mapi</code> behaves like <code class="code">Array.mapi</code>, except that it also passes the
+      index of each element as the first argument to <code class="code">f</code> and the element
+      itself as the second argument.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_primitive_types.html#VALml_prim">ml_prim</a> [<a href="Ctypes_primitive_types.html">Ctypes_primitive_types</a>]</td>
-<td></td></tr>
+<tr><td><a href="LDouble.html#VALmax_float">max_float</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td><div class="info">
+The largest positive finite value
+</div>
+</td></tr>
+<tr><td><a href="LDouble.html#VALmin_float">min_float</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td><div class="info">
+The smallest positive, non-zero, non-denormalized value
+</div>
+</td></tr>
 <tr><td><a href="PosixTypes.html#VALmode_t">mode_t</a> [<a href="PosixTypes.html">PosixTypes</a>]</td>
 <td></td></tr>
+<tr><td><a href="LDouble.html#VALmodf">modf</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td><div class="info">
+return <code class="code">(fractional,integer)</code> parts of number.
+</div>
+</td></tr>
 <tr><td><a href="Libffi_abi.html#VALms_cdecl">ms_cdecl</a> [<a href="Libffi_abi.html">Libffi_abi</a>]</td>
 <td></td></tr>
-<tr><td><a href="Unsigned.S.html#VALmul">mul</a> [<a href="Unsigned.S.html">Unsigned.S</a>]</td>
+<tr><td><a href="ComplexL.html#VALmul">mul</a> [<a href="ComplexL.html">ComplexL</a>]</td>
 <td><div class="info">
-Multiplication.
+Multiplication
+</div>
+</td></tr>
+<tr><td><a href="LDouble.html#VALmul">mul</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td><div class="info">
+Multiplication
 </div>
 </td></tr>
 <tr><td align="left"><br>N</td></tr>
@@ -683,20 +806,44 @@ Multiplication.
 <td></td></tr>
 <tr><td><a href="Libffi_abi.html#VALn64_soft_float">n64_soft_float</a> [<a href="Libffi_abi.html">Libffi_abi</a>]</td>
 <td></td></tr>
+<tr><td><a href="LDouble.html#VALnan">nan</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td><div class="info">
+A special floating-point value denoting the result of an
+   undefined operation such as <code class="code">0.0 /. 0.0</code>.
+</div>
+</td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALnativeint">nativeint</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
 <td><div class="info">
 Value representing the C type (<code class="code">signed</code>) <code class="code">int</code>.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALnativeint">nativeint</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
-<tr><td><a href="Signed.S.html#VALneg">neg</a> [<a href="Signed.S.html">Signed.S</a>]</td>
+<tr><td><a href="ComplexL.html#VALneg">neg</a> [<a href="ComplexL.html">ComplexL</a>]</td>
 <td><div class="info">
-Unary negation.
+Unary negation
+</div>
+</td></tr>
+<tr><td><a href="LDouble.html#VALneg">neg</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td><div class="info">
+Negation
+</div>
+</td></tr>
+<tr><td><a href="LDouble.html#VALneg_infinity">neg_infinity</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td><div class="info">
+Negative infinity
 </div>
 </td></tr>
 <tr><td><a href="PosixTypes.html#VALnlink_t">nlink_t</a> [<a href="PosixTypes.html">PosixTypes</a>]</td>
 <td></td></tr>
+<tr><td><a href="ComplexL.html#VALnorm">norm</a> [<a href="ComplexL.html">ComplexL</a>]</td>
+<td><div class="info">
+Norm: given <code class="code">x + i.y</code>, returns <code class="code">sqrt(x^2 + y^2)</code>.
+</div>
+</td></tr>
+<tr><td><a href="ComplexL.html#VALnorm2">norm2</a> [<a href="ComplexL.html">ComplexL</a>]</td>
+<td><div class="info">
+Norm squared: given <code class="code">x + i.y</code>, returns <code class="code">x^2 + y^2</code>.
+</div>
+</td></tr>
 <tr><td><a href="Ctypes.html#VALnull">null</a> [<a href="Ctypes.html">Ctypes</a>]</td>
 <td><div class="info">
 A null pointer.
@@ -712,57 +859,47 @@ A null pointer.
 Value representing the directly mapped storage of an OCaml byte array.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALocaml_bytes">ocaml_bytes</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
 <tr><td><a href="Ctypes.html#VALocaml_bytes_start">ocaml_bytes_start</a> [<a href="Ctypes.html">Ctypes</a>]</td>
 <td><div class="info">
 <code class="code">ocaml_bytes_start s</code> allows to pass a pointer to the contents of an OCaml
     byte array directly to a C function.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALocaml_float_array">ocaml_float_array</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALocaml_string">ocaml_string</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
 <td><div class="info">
 Value representing the directly mapped storage of an OCaml string.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALocaml_string">ocaml_string</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
 <tr><td><a href="Ctypes.html#VALocaml_string_start">ocaml_string_start</a> [<a href="Ctypes.html">Ctypes</a>]</td>
 <td><div class="info">
 <code class="code">ocaml_string_start s</code> allows to pass a pointer to the contents of an OCaml
     string directly to a C function.
 </div>
 </td></tr>
-<tr><td><a href="Unsigned.S.html#VALof_int">of_int</a> [<a href="Unsigned.S.html">Unsigned.S</a>]</td>
+<tr><td><a href="ComplexL.html#VALof_complex">of_complex</a> [<a href="ComplexL.html">ComplexL</a>]</td>
 <td><div class="info">
-Convert the given int value to an unsigned integer.
+create a long double complex from a Complex.t
 </div>
 </td></tr>
-<tr><td><a href="Unsigned.UInt32.html#VALof_int32">of_int32</a> [<a href="Unsigned.UInt32.html">Unsigned.UInt32</a>]</td>
-<td></td></tr>
-<tr><td><a href="Signed.S.html#VALof_int64">of_int64</a> [<a href="Signed.S.html">Signed.S</a>]</td>
+<tr><td><a href="LDouble.html#VALof_float">of_float</a> [<a href="LDouble.html">LDouble</a>]</td>
 <td><div class="info">
-Convert the given int64 value to a signed integer.
+Create a long double from a float
 </div>
 </td></tr>
-<tr><td><a href="Unsigned.UInt64.html#VALof_int64">of_int64</a> [<a href="Unsigned.UInt64.html">Unsigned.UInt64</a>]</td>
-<td></td></tr>
+<tr><td><a href="LDouble.html#VALof_int">of_int</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td><div class="info">
+Create a long double from an int
+</div>
+</td></tr>
 <tr><td><a href="Ctypes.CArray.html#VALof_list">of_list</a> [<a href="Ctypes.CArray.html">Ctypes.CArray</a>]</td>
 <td><div class="info">
 <code class="code">of_list t l</code> builds an array of type <code class="code">t</code> of the same length as <code class="code">l</code>, and
       writes the elements of <code class="code">l</code> to the corresponding elements of the array.
 </div>
 </td></tr>
-<tr><td><a href="Signed.S.html#VALof_nativeint">of_nativeint</a> [<a href="Signed.S.html">Signed.S</a>]</td>
+<tr><td><a href="LDouble.html#VALof_string">of_string</a> [<a href="LDouble.html">LDouble</a>]</td>
 <td><div class="info">
-Convert the given nativeint value to a signed integer.
-</div>
-</td></tr>
-<tr><td><a href="Unsigned.S.html#VALof_string">of_string</a> [<a href="Unsigned.S.html">Unsigned.S</a>]</td>
-<td><div class="info">
-Convert the given string to an unsigned integer.
+Create a long double from a string
 </div>
 </td></tr>
 <tr><td><a href="PosixTypes.html#VALoff_t">off_t</a> [<a href="PosixTypes.html">PosixTypes</a>]</td>
@@ -773,11 +910,14 @@ Convert the given string to an unsigned integer.
     beginning of the associated struct type.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALoffsetof">offsetof</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
-<tr><td><a href="Unsigned.S.html#VALone">one</a> [<a href="Unsigned.S.html">Unsigned.S</a>]</td>
+<tr><td><a href="ComplexL.html#VALone">one</a> [<a href="ComplexL.html">ComplexL</a>]</td>
 <td><div class="info">
-The integer 1.
+<code class="code">1 + i0</code>
+</div>
+</td></tr>
+<tr><td><a href="LDouble.html#VALone">one</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td><div class="info">
+1.0
 </div>
 </td></tr>
 <tr><td><a href="Libffi_abi.html#VALosf">osf</a> [<a href="Libffi_abi.html">Libffi_abi</a>]</td>
@@ -785,13 +925,21 @@ The integer 1.
 <tr><td align="left"><br>P</td></tr>
 <tr><td><a href="Libffi_abi.html#VALpa32">pa32</a> [<a href="Libffi_abi.html">Libffi_abi</a>]</td>
 <td></td></tr>
-<tr><td><a href="Ctypes_static.html#VALpassable">passable</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
 <tr><td><a href="PosixTypes.html#VALpid_t">pid_t</a> [<a href="PosixTypes.html">PosixTypes</a>]</td>
 <td></td></tr>
-<tr><td><a href="Unsigned.S.html#VALpred">pred</a> [<a href="Unsigned.S.html">Unsigned.S</a>]</td>
+<tr><td><a href="ComplexL.html#VALpolar">polar</a> [<a href="ComplexL.html">ComplexL</a>]</td>
 <td><div class="info">
-Predecessor.
+<code class="code">polar norm arg</code> returns the complex having norm <code class="code">norm</code> and argument <code class="code">arg</code>.
+</div>
+</td></tr>
+<tr><td><a href="ComplexL.html#VALpow">pow</a> [<a href="ComplexL.html">ComplexL</a>]</td>
+<td><div class="info">
+Power function.
+</div>
+</td></tr>
+<tr><td><a href="LDouble.html#VALpow">pow</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td><div class="info">
+Exponentiation
 </div>
 </td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALptr">ptr</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
@@ -800,8 +948,6 @@ Construct a pointer type from an existing type (called the <i>reference
       type</i>).
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALptr">ptr</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
 <tr><td><a href="Ctypes.html#VALptr_compare">ptr_compare</a> [<a href="Ctypes.html">Ctypes</a>]</td>
 <td><div class="info">
 If <code class="code">p</code> and <code class="code">q</code> are pointers to elements <code class="code">i</code> and <code class="code">j</code> of the same array then
@@ -835,6 +981,11 @@ Value representing the C type <code class="code">ptrdiff_t</code>.
 <code class="code">raw_address_of_ptr p</code> returns the numeric representation of p.
 </div>
 </td></tr>
+<tr><td><a href="ComplexL.html#VALre">re</a> [<a href="ComplexL.html">ComplexL</a>]</td>
+<td><div class="info">
+return the real part of the long double complex
+</div>
+</td></tr>
 <tr><td><a href="Ctypes.html#VALreference_type">reference_type</a> [<a href="Ctypes.html">Ctypes</a>]</td>
 <td><div class="info">
 Retrieve the reference type of a pointer.
@@ -845,9 +996,14 @@ Retrieve the reference type of a pointer.
 <code class="code">release p</code> unregsiters the root <code class="code">p</code>.
 </div>
 </td></tr>
-<tr><td><a href="Unsigned.S.html#VALrem">rem</a> [<a href="Unsigned.S.html">Unsigned.S</a>]</td>
+<tr><td><a href="LDouble.html#VALrem">rem</a> [<a href="LDouble.html">LDouble</a>]</td>
 <td><div class="info">
-Integer remainder.
+<code class="code">rem x y</code> is the remainder of dividing x by y
+</div>
+</td></tr>
+<tr><td><a href="Cstubs.html#VALreturn_errno">return_errno</a> [<a href="Cstubs.html">Cstubs</a>]</td>
+<td><div class="info">
+Generate code that returns errno in addition to the return value of each function.
 </div>
 </td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALreturning">returning</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
@@ -855,7 +1011,7 @@ Integer remainder.
 Give the return type of a C function.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALreturning">returning</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
+<tr><td><a href="Ctypes.FOREIGN.html#VALreturning">returning</a> [<a href="Ctypes.FOREIGN.html">Ctypes.FOREIGN</a>]</td>
 <td></td></tr>
 <tr><td align="left"><br>S</td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALschar">schar</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
@@ -863,16 +1019,17 @@ Give the return type of a C function.
 Value representing the C type <code class="code">signed char</code>.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALschar">schar</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALseal">seal</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
 <td><div class="info">
 <code class="code">seal t</code> completes the struct or union type <code class="code">t</code> so that no further fields
       can be added.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_structs.S.html#VALseal">seal</a> [<a href="Ctypes_structs.S.html">Ctypes_structs.S</a>]</td>
-<td></td></tr>
+<tr><td><a href="Cstubs.html#VALsequential">sequential</a> [<a href="Cstubs.html">Cstubs</a>]</td>
+<td><div class="info">
+Generate code with no special support for concurrency.
+</div>
+</td></tr>
 <tr><td><a href="Ctypes.Root.html#VALset">set</a> [<a href="Ctypes.Root.html">Ctypes.Root</a>]</td>
 <td><div class="info">
 <code class="code">set p v</code> updates the OCaml value stored as a root at <code class="code">p</code>.
@@ -890,30 +1047,28 @@ Value representing the C type <code class="code">signed char</code>.
     union <code class="code">s</code> with <code class="code">v</code>.
 </div>
 </td></tr>
-<tr><td><a href="Unsigned.S.html#VALshift_left">shift_left</a> [<a href="Unsigned.S.html">Unsigned.S</a>]</td>
-<td><div class="info">
-<a href="Unsigned.S.html#VALshift_left"><code class="code">Unsigned.S.shift_left</code></a> <code class="code">x</code> <code class="code">y</code> shifts <code class="code">x</code> to the left by <code class="code">y</code> bits.
-</div>
-</td></tr>
-<tr><td><a href="Unsigned.S.html#VALshift_right">shift_right</a> [<a href="Unsigned.S.html">Unsigned.S</a>]</td>
-<td><div class="info">
-<a href="Unsigned.S.html#VALshift_right"><code class="code">Unsigned.S.shift_right</code></a> <code class="code">x</code> <code class="code">y</code> shifts <code class="code">x</code> to the right by <code class="code">y</code> bits.
-</div>
-</td></tr>
-<tr><td><a href="Signed.S.html#VALshift_right_logical">shift_right_logical</a> [<a href="Signed.S.html">Signed.S</a>]</td>
-<td><div class="info">
-<a href="Signed.S.html#VALshift_right_logical"><code class="code">Signed.S.shift_right_logical</code></a> <code class="code">x</code> <code class="code">y</code> shifts <code class="code">x</code> to the right by <code class="code">y</code> bits.
-</div>
-</td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALshort">short</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
 <td><div class="info">
 Value representing the C type (<code class="code">signed</code>) <code class="code">short</code>.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALshort">short</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
 <tr><td><a href="PosixTypes.html#VALsigset_t">sigset_t</a> [<a href="PosixTypes.html">PosixTypes</a>]</td>
 <td></td></tr>
+<tr><td><a href="LDouble.html#VALsin">sin</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td><div class="info">
+Sine.
+</div>
+</td></tr>
+<tr><td><a href="LDouble.html#VALsinh">sinh</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td><div class="info">
+Hyperbolic sine
+</div>
+</td></tr>
+<tr><td><a href="Ctypes_types.TYPE.html#VALsint">sint</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
+<td><div class="info">
+Value representing the C type <code class="code">int</code>.
+</div>
+</td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALsize_t">size_t</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
 <td><div class="info">
 Value representing the C type <code class="code">size_t</code>, an alias for one of the unsigned
@@ -922,15 +1077,21 @@ Value representing the C type <code class="code">size_t</code>, an alias for one
 </td></tr>
 <tr><td><a href="PosixTypes.html#VALsize_t">size_t</a> [<a href="PosixTypes.html">PosixTypes</a>]</td>
 <td></td></tr>
-<tr><td><a href="Ctypes_static.html#VALsize_t">size_t</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
 <tr><td><a href="Ctypes.html#VALsizeof">sizeof</a> [<a href="Ctypes.html">Ctypes</a>]</td>
 <td><div class="info">
 <code class="code">sizeof t</code> computes the size in bytes of the type <code class="code">t</code>.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALsizeof">sizeof</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
+<tr><td><a href="ComplexL.html#VALsqrt">sqrt</a> [<a href="ComplexL.html">ComplexL</a>]</td>
+<td><div class="info">
+Square root.
+</div>
+</td></tr>
+<tr><td><a href="LDouble.html#VALsqrt">sqrt</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td><div class="info">
+Square root
+</div>
+</td></tr>
 <tr><td><a href="PosixTypes.html#VALssize_t">ssize_t</a> [<a href="PosixTypes.html">PosixTypes</a>]</td>
 <td></td></tr>
 <tr><td><a href="Ctypes.CArray.html#VALstart">start</a> [<a href="Ctypes.CArray.html">Ctypes.CArray</a>]</td>
@@ -944,8 +1105,6 @@ Construct a function pointer type from an existing function type
       (called the <i>reference type</i>).
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALstatic_funptr">static_funptr</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
 <tr><td><a href="Libffi_abi.html#VALstdcall">stdcall</a> [<a href="Libffi_abi.html">Libffi_abi</a>]</td>
 <td></td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALstring">string</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
@@ -986,39 +1145,54 @@ A high-level representation of the string type.
 Construct a new structure type.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALstructure">structure</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
-<tr><td><a href="Unsigned.S.html#VALsub">sub</a> [<a href="Unsigned.S.html">Unsigned.S</a>]</td>
+<tr><td><a href="Ctypes.CArray.html#VALsub">sub</a> [<a href="Ctypes.CArray.html">Ctypes.CArray</a>]</td>
 <td><div class="info">
-Subtraction.
+<code class="code">sub a ~pos ~length</code> creates a fresh array of length <code class="code">length</code> containing
+      the elements <code class="code">a.(pos)</code> to <code class="code">a.(pos + length - 1)</code> of <code class="code">a</code>.
 </div>
 </td></tr>
-<tr><td><a href="Unsigned.S.html#VALsucc">succ</a> [<a href="Unsigned.S.html">Unsigned.S</a>]</td>
+<tr><td><a href="ComplexL.html#VALsub">sub</a> [<a href="ComplexL.html">ComplexL</a>]</td>
 <td><div class="info">
-Successor.
+Subtraction
+</div>
+</td></tr>
+<tr><td><a href="LDouble.html#VALsub">sub</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td><div class="info">
+Subtraction
 </div>
 </td></tr>
 <tr><td><a href="Libffi_abi.html#VALsysv">sysv</a> [<a href="Libffi_abi.html">Libffi_abi</a>]</td>
 <td></td></tr>
 <tr><td align="left"><br>T</td></tr>
+<tr><td><a href="LDouble.html#VALtan">tan</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td><div class="info">
+Tangent.
+</div>
+</td></tr>
+<tr><td><a href="LDouble.html#VALtanh">tanh</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td><div class="info">
+Hyperbolic tangent
+</div>
+</td></tr>
 <tr><td><a href="Libffi_abi.html#VALthiscall">thiscall</a> [<a href="Libffi_abi.html">Libffi_abi</a>]</td>
 <td></td></tr>
 <tr><td><a href="PosixTypes.html#VALtime_t">time_t</a> [<a href="PosixTypes.html">PosixTypes</a>]</td>
 <td></td></tr>
-<tr><td><a href="Unsigned.S.html#VALto_int">to_int</a> [<a href="Unsigned.S.html">Unsigned.S</a>]</td>
+<tr><td><a href="ComplexL.html#VALto_complex">to_complex</a> [<a href="ComplexL.html">ComplexL</a>]</td>
 <td><div class="info">
-Convert the given unsigned integer value to an int.
+Convert a long double complex to a Complex.t.
 </div>
 </td></tr>
-<tr><td><a href="Unsigned.UInt32.html#VALto_int32">to_int32</a> [<a href="Unsigned.UInt32.html">Unsigned.UInt32</a>]</td>
-<td></td></tr>
-<tr><td><a href="Signed.S.html#VALto_int64">to_int64</a> [<a href="Signed.S.html">Signed.S</a>]</td>
+<tr><td><a href="LDouble.html#VALto_float">to_float</a> [<a href="LDouble.html">LDouble</a>]</td>
 <td><div class="info">
-Convert the given signed integer to an int64 value.
+Convert a long double to a float.
 </div>
 </td></tr>
-<tr><td><a href="Unsigned.UInt64.html#VALto_int64">to_int64</a> [<a href="Unsigned.UInt64.html">Unsigned.UInt64</a>]</td>
-<td></td></tr>
+<tr><td><a href="LDouble.html#VALto_int">to_int</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td><div class="info">
+Convert a long double to an int.
+</div>
+</td></tr>
 <tr><td><a href="Ctypes.CArray.html#VALto_list">to_list</a> [<a href="Ctypes.CArray.html">Ctypes.CArray</a>]</td>
 <td><div class="info">
 <code class="code">to_list a</code> builds a list of the same length as <code class="code">a</code> such that each
@@ -1026,14 +1200,9 @@ Convert the given signed integer to an int64 value.
       <code class="code">a</code>.
 </div>
 </td></tr>
-<tr><td><a href="Signed.S.html#VALto_nativeint">to_nativeint</a> [<a href="Signed.S.html">Signed.S</a>]</td>
+<tr><td><a href="LDouble.html#VALto_string">to_string</a> [<a href="LDouble.html">LDouble</a>]</td>
 <td><div class="info">
-Convert the given signed integer to a nativeint value.
-</div>
-</td></tr>
-<tr><td><a href="Unsigned.S.html#VALto_string">to_string</a> [<a href="Unsigned.S.html">Unsigned.S</a>]</td>
-<td><div class="info">
-Return the string representation of its argument.
+Convert a long double to a string.
 </div>
 </td></tr>
 <tr><td><a href="Ctypes.html#VALto_voidp">to_voidp</a> [<a href="Ctypes.html">Ctypes</a>]</td>
@@ -1055,51 +1224,37 @@ Conversion to <code class="code">void *</code>.
       is equivalent to <code class="code">t</code> except its name is printed as <code class="code">name</code>.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALtypedef">typedef</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
 <tr><td align="left"><br>U</td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALuchar">uchar</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
 <td><div class="info">
 Value representing the C type <code class="code">unsigned char</code>.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALuchar">uchar</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALuint">uint</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
 <td><div class="info">
 Value representing the C type <code class="code">unsigned int</code>.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALuint">uint</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALuint16_t">uint16_t</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
 <td><div class="info">
 Value representing a 16-bit unsigned integer C type.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALuint16_t">uint16_t</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALuint32_t">uint32_t</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
 <td><div class="info">
 Value representing a 32-bit unsigned integer C type.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALuint32_t">uint32_t</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALuint64_t">uint64_t</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
 <td><div class="info">
 Value representing a 64-bit unsigned integer C type.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALuint64_t">uint64_t</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALuint8_t">uint8_t</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
 <td><div class="info">
 Value representing an 8-bit unsigned integer C type.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALuint8_t">uint8_t</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALuintptr_t">uintptr_t</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
 <td><div class="info">
 Value representing the C type <code class="code">uintptr_t</code>.
@@ -1110,15 +1265,11 @@ Value representing the C type <code class="code">uintptr_t</code>.
 Value representing the C type <code class="code">unsigned long long</code>.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALullong">ullong</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALulong">ulong</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
 <td><div class="info">
 Value representing the C type <code class="code">unsigned long</code>.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALulong">ulong</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
 <tr><td><a href="Cstubs_inverted.INTERNAL.html#VALunion">union</a> [<a href="Cstubs_inverted.INTERNAL.html">Cstubs_inverted.INTERNAL</a>]</td>
 <td></td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALunion">union</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
@@ -1126,12 +1277,15 @@ Value representing the C type <code class="code">unsigned long</code>.
 Construct a new union type.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALunion">union</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
 <tr><td><a href="Libffi_abi.html#VALunix">unix</a> [<a href="Libffi_abi.html">Libffi_abi</a>]</td>
 <td></td></tr>
 <tr><td><a href="Libffi_abi.html#VALunix64">unix64</a> [<a href="Libffi_abi.html">Libffi_abi</a>]</td>
 <td></td></tr>
+<tr><td><a href="Cstubs.html#VALunlocked">unlocked</a> [<a href="Cstubs.html">Cstubs</a>]</td>
+<td><div class="info">
+Generate code that releases the runtime lock during C calls.
+</div>
+</td></tr>
 <tr><td><a href="Ctypes.CArray.html#VALunsafe_get">unsafe_get</a> [<a href="Ctypes.CArray.html">Ctypes.CArray</a>]</td>
 <td><div class="info">
 <code class="code">unsafe_get a n</code> behaves like <code class="code">get a n</code> except that the check that <code class="code">n</code>
@@ -1144,8 +1298,6 @@ Construct a new union type.
       <code class="code">n</code> between <code class="code">0</code> and <code class="code">(CArray.length a - 1)</code> is not performed.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALunsupported">unsupported</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
 <tr><td><a href="PosixTypes.html#VALuseconds_t">useconds_t</a> [<a href="PosixTypes.html">PosixTypes</a>]</td>
 <td></td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALushort">ushort</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
@@ -1153,8 +1305,6 @@ Construct a new union type.
 Value representing the C type <code class="code">unsigned short</code>.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALushort">ushort</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
 <tr><td align="left"><br>V</td></tr>
 <tr><td><a href="Libffi_abi.html#VALv8">v8</a> [<a href="Libffi_abi.html">Libffi_abi</a>]</td>
 <td></td></tr>
@@ -1172,15 +1322,11 @@ Value representing the C type <code class="code">unsigned short</code>.
       transformed using the function <code class="code">w</code>.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALview">view</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
 <tr><td><a href="Ctypes_types.TYPE.html#VALvoid">void</a> [<a href="Ctypes_types.TYPE.html">Ctypes_types.TYPE</a>]</td>
 <td><div class="info">
 Value representing the C void type.
 </div>
 </td></tr>
-<tr><td><a href="Ctypes_static.html#VALvoid">void</a> [<a href="Ctypes_static.html">Ctypes_static</a>]</td>
-<td></td></tr>
 <tr><td align="left"><br>W</td></tr>
 <tr><td><a href="Cstubs_inverted.html#VALwrite_c">write_c</a> [<a href="Cstubs_inverted.html">Cstubs_inverted</a>]</td>
 <td><div class="info">
@@ -1217,9 +1363,14 @@ Value representing the C void type.
 </div>
 </td></tr>
 <tr><td align="left"><br>Z</td></tr>
-<tr><td><a href="Unsigned.S.html#VALzero">zero</a> [<a href="Unsigned.S.html">Unsigned.S</a>]</td>
+<tr><td><a href="ComplexL.html#VALzero">zero</a> [<a href="ComplexL.html">ComplexL</a>]</td>
 <td><div class="info">
-The integer 0.
+<code class="code">0 + i0</code>
+</div>
+</td></tr>
+<tr><td><a href="LDouble.html#VALzero">zero</a> [<a href="LDouble.html">LDouble</a>]</td>
+<td><div class="info">
+0.0
 </div>
 </td></tr>
 </table>

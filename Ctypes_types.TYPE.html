@@ -3,6 +3,7 @@
 <head>
 <link rel="stylesheet" href="style.css" type="text/css">
 <meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="Start" href="index.html">
 <link rel="Up" href="Ctypes_types.html">
 <link title="Index of types" rel=Appendix href="index_types.html">
@@ -10,11 +11,8 @@
 <link title="Index of values" rel=Appendix href="index_values.html">
 <link title="Index of modules" rel=Appendix href="index_modules.html">
 <link title="Index of module types" rel=Appendix href="index_module_types.html">
-<link title="Ctypes_static" rel="Chapter" href="Ctypes_static.html">
-<link title="Ctypes_primitive_types" rel="Chapter" href="Ctypes_primitive_types.html">
-<link title="Unsigned" rel="Chapter" href="Unsigned.html">
-<link title="Signed" rel="Chapter" href="Signed.html">
-<link title="Ctypes_structs" rel="Chapter" href="Ctypes_structs.html">
+<link title="LDouble" rel="Chapter" href="LDouble.html">
+<link title="ComplexL" rel="Chapter" href="ComplexL.html">
 <link title="Ctypes" rel="Chapter" href="Ctypes.html">
 <link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
 <link title="Ctypes_types" rel="Chapter" href="Ctypes_types.html">
@@ -22,14 +20,11 @@
 <link title="Dl" rel="Chapter" href="Dl.html">
 <link title="Libffi_abi" rel="Chapter" href="Libffi_abi.html">
 <link title="Foreign" rel="Chapter" href="Foreign.html">
-<link title="Cstubs_internals" rel="Chapter" href="Cstubs_internals.html">
 <link title="Cstubs_structs" rel="Chapter" href="Cstubs_structs.html">
 <link title="Cstubs" rel="Chapter" href="Cstubs.html">
 <link title="Cstubs_inverted" rel="Chapter" href="Cstubs_inverted.html"><link title="Values representing C types" rel="Section" href="#types">
 <link title="The void type" rel="Subsection" href="#3_Thevoidtype">
 <link title="Scalar types" rel="Subsection" href="#3_Scalartypes">
-<link title="Scalar types" rel="Subsection" href="#3_Scalartypes">
-<link title="Array types" rel="Subsection" href="#3_Arraytypes">
 <link title="Array types" rel="Subsection" href="#3_Arraytypes">
 <link title="Struct and union types" rel="Subsection" href="#3_Structanduniontypes">
 <link title="View types" rel="Subsection" href="#3_Viewtypes">
@@ -91,11 +86,6 @@ Value representing the C void type.  Void values appear in OCaml as the
 
       The scalar types consist of the <a href="Ctypes_types.TYPE.html#arithmetic_types"><i>Arithmetic types</i></a> and the <a href="Ctypes_types.TYPE.html#pointer_types"><i>Pointer types</i></a>.<br>
 <br>
-<h3 id="3_Scalartypes">Scalar types</h3>
-<p>
-
-      The scalar types consist of the <a href="Ctypes_types.TYPE.html#arithmetic_types"><i>Arithmetic types</i></a> and the <a href="Ctypes_types.TYPE.html#pointer_types"><i>Pointer types</i></a>.<br>
-<br>
 <h4 id="arithmetic_types">Arithmetic types</h4>
 <p>
 
@@ -123,11 +113,11 @@ Value representing the C type (<code class="code">signed</code>) <code class="co
 Value representing the C type (<code class="code">signed</code>) <code class="code">int</code>.<br>
 </div>
 
-<pre><span id="VALlong"><span class="keyword">val</span> long</span> : <code class="type"><a href="Signed.html#TYPElong">Signed.long</a> <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
+<pre><span id="VALlong"><span class="keyword">val</span> long</span> : <code class="type">Signed.long <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
 Value representing the C type (<code class="code">signed</code>) <code class="code">long</code>.<br>
 </div>
 
-<pre><span id="VALllong"><span class="keyword">val</span> llong</span> : <code class="type"><a href="Signed.html#TYPEllong">Signed.llong</a> <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
+<pre><span id="VALllong"><span class="keyword">val</span> llong</span> : <code class="type">Signed.llong <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
 Value representing the C type (<code class="code">signed</code>) <code class="code">long long</code>.<br>
 </div>
 
@@ -151,12 +141,12 @@ Value representing a 32-bit signed integer C type.<br>
 Value representing a 64-bit signed integer C type.<br>
 </div>
 
-<pre><span class="keyword">module</span> <a href="Ctypes_types.TYPE.Intptr.html">Intptr</a>: <code class="type"><a href="Signed.S.html">Signed.S</a></code><code class="type"> </code></pre>
+<pre><span class="keyword">module</span> <a href="Ctypes_types.TYPE.Intptr.html">Intptr</a>: <code class="type">Signed.S</code><code class="type"> </code></pre>
 <pre><span id="VALintptr_t"><span class="keyword">val</span> intptr_t</span> : <code class="type">Intptr.t <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
 Value representing the C type <code class="code">intptr_t</code>.<br>
 </div>
 
-<pre><span class="keyword">module</span> <a href="Ctypes_types.TYPE.Ptrdiff.html">Ptrdiff</a>: <code class="type"><a href="Signed.S.html">Signed.S</a></code><code class="type"> </code></pre>
+<pre><span class="keyword">module</span> <a href="Ctypes_types.TYPE.Ptrdiff.html">Ptrdiff</a>: <code class="type">Signed.S</code><code class="type"> </code></pre>
 <pre><span id="VALptrdiff_t"><span class="keyword">val</span> ptrdiff_t</span> : <code class="type">Ptrdiff.t <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
 Value representing the C type <code class="code">ptrdiff_t</code>.<br>
 </div>
@@ -168,7 +158,7 @@ Value representing an integer type with the same storage requirements as
 <br>
 <h5 id="5_Unsignedintegertypes">Unsigned integer types</h5><br>
 
-<pre><span id="VALuchar"><span class="keyword">val</span> uchar</span> : <code class="type"><a href="Unsigned.html#TYPEuchar">Unsigned.uchar</a> <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
+<pre><span id="VALuchar"><span class="keyword">val</span> uchar</span> : <code class="type">Unsigned.uchar <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
 Value representing the C type <code class="code">unsigned char</code>.<br>
 </div>
 
@@ -176,45 +166,49 @@ Value representing the C type <code class="code">unsigned char</code>.<br>
 Value representing the C type <code class="code">bool</code>.<br>
 </div>
 
-<pre><span id="VALuint8_t"><span class="keyword">val</span> uint8_t</span> : <code class="type"><a href="Unsigned.html#TYPEuint8">Unsigned.uint8</a> <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
+<pre><span id="VALuint8_t"><span class="keyword">val</span> uint8_t</span> : <code class="type">Unsigned.uint8 <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
 Value representing an 8-bit unsigned integer C type.<br>
 </div>
 
-<pre><span id="VALuint16_t"><span class="keyword">val</span> uint16_t</span> : <code class="type"><a href="Unsigned.html#TYPEuint16">Unsigned.uint16</a> <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
+<pre><span id="VALuint16_t"><span class="keyword">val</span> uint16_t</span> : <code class="type">Unsigned.uint16 <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
 Value representing a 16-bit unsigned integer C type.<br>
 </div>
 
-<pre><span id="VALuint32_t"><span class="keyword">val</span> uint32_t</span> : <code class="type"><a href="Unsigned.html#TYPEuint32">Unsigned.uint32</a> <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
+<pre><span id="VALuint32_t"><span class="keyword">val</span> uint32_t</span> : <code class="type">Unsigned.uint32 <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
 Value representing a 32-bit unsigned integer C type.<br>
 </div>
 
-<pre><span id="VALuint64_t"><span class="keyword">val</span> uint64_t</span> : <code class="type"><a href="Unsigned.html#TYPEuint64">Unsigned.uint64</a> <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
+<pre><span id="VALuint64_t"><span class="keyword">val</span> uint64_t</span> : <code class="type">Unsigned.uint64 <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
 Value representing a 64-bit unsigned integer C type.<br>
 </div>
 
-<pre><span id="VALsize_t"><span class="keyword">val</span> size_t</span> : <code class="type"><a href="Unsigned.html#TYPEsize_t">Unsigned.size_t</a> <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
+<pre><span id="VALsize_t"><span class="keyword">val</span> size_t</span> : <code class="type">Unsigned.size_t <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
 Value representing the C type <code class="code">size_t</code>, an alias for one of the unsigned
       integer types.  The actual size and alignment requirements for <code class="code">size_t</code>
       vary between platforms.<br>
 </div>
 
-<pre><span id="VALushort"><span class="keyword">val</span> ushort</span> : <code class="type"><a href="Unsigned.html#TYPEushort">Unsigned.ushort</a> <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
+<pre><span id="VALushort"><span class="keyword">val</span> ushort</span> : <code class="type">Unsigned.ushort <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
 Value representing the C type <code class="code">unsigned short</code>.<br>
 </div>
 
-<pre><span id="VALuint"><span class="keyword">val</span> uint</span> : <code class="type"><a href="Unsigned.html#TYPEuint">Unsigned.uint</a> <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
+<pre><span id="VALsint"><span class="keyword">val</span> sint</span> : <code class="type">Signed.sint <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
+Value representing the C type <code class="code">int</code>.<br>
+</div>
+
+<pre><span id="VALuint"><span class="keyword">val</span> uint</span> : <code class="type">Unsigned.uint <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
 Value representing the C type <code class="code">unsigned int</code>.<br>
 </div>
 
-<pre><span id="VALulong"><span class="keyword">val</span> ulong</span> : <code class="type"><a href="Unsigned.html#TYPEulong">Unsigned.ulong</a> <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
+<pre><span id="VALulong"><span class="keyword">val</span> ulong</span> : <code class="type">Unsigned.ulong <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
 Value representing the C type <code class="code">unsigned long</code>.<br>
 </div>
 
-<pre><span id="VALullong"><span class="keyword">val</span> ullong</span> : <code class="type"><a href="Unsigned.html#TYPEullong">Unsigned.ullong</a> <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
+<pre><span id="VALullong"><span class="keyword">val</span> ullong</span> : <code class="type">Unsigned.ullong <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
 Value representing the C type <code class="code">unsigned long long</code>.<br>
 </div>
 
-<pre><span class="keyword">module</span> <a href="Ctypes_types.TYPE.Uintptr.html">Uintptr</a>: <code class="type"><a href="Unsigned.S.html">Unsigned.S</a></code><code class="type"> </code></pre>
+<pre><span class="keyword">module</span> <a href="Ctypes_types.TYPE.Uintptr.html">Uintptr</a>: <code class="type">Unsigned.S</code><code class="type"> </code></pre>
 <pre><span id="VALuintptr_t"><span class="keyword">val</span> uintptr_t</span> : <code class="type">Uintptr.t <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
 Value representing the C type <code class="code">uintptr_t</code>.<br>
 </div>
@@ -228,6 +222,10 @@ Value representing the C single-precision <code class="code">float</code> type.<
 <pre><span id="VALdouble"><span class="keyword">val</span> double</span> : <code class="type">float <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
 Value representing the C type <code class="code">double</code>.<br>
 </div>
+
+<pre><span id="VALldouble"><span class="keyword">val</span> ldouble</span> : <code class="type"><a href="LDouble.html#TYPEt">LDouble.t</a> <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
+Value representing the C type <code class="code">long double</code>.<br>
+</div>
 <br>
 <h5 id="5_Complextypes">Complex types</h5><br>
 
@@ -238,19 +236,21 @@ Value representing the C99 single-precision <code class="code">float complex</co
 <pre><span id="VALcomplex64"><span class="keyword">val</span> complex64</span> : <code class="type">Complex.t <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
 Value representing the C99 double-precision <code class="code">double complex</code> type.<br>
 </div>
-<br>
-<h4 id="pointer_types">Pointer types</h4><br>
+
+<pre><span id="VALcomplexld"><span class="keyword">val</span> complexld</span> : <code class="type"><a href="ComplexL.html#TYPEt">ComplexL.t</a> <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
+Value representing the C99 long-double-precision <code class="code">long double complex</code> type.<br>
+</div>
 <br>
 <h4 id="pointer_types">Pointer types</h4><br>
 <br>
 <h5 id="5_Ccompatiblepointers">C-compatible pointers</h5><br>
 
-<pre><span id="VALptr"><span class="keyword">val</span> ptr</span> : <code class="type">'a <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a> -> 'a <a href="Ctypes_static.html#TYPEptr">Ctypes_static.ptr</a> <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
+<pre><span id="VALptr"><span class="keyword">val</span> ptr</span> : <code class="type">'a <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a> -> 'a Ctypes_static.ptr <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
 Construct a pointer type from an existing type (called the <i>reference
       type</i>).<br>
 </div>
 
-<pre><span id="VALptr_opt"><span class="keyword">val</span> ptr_opt</span> : <code class="type">'a <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a> -> 'a <a href="Ctypes_static.html#TYPEptr">Ctypes_static.ptr</a> option <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
+<pre><span id="VALptr_opt"><span class="keyword">val</span> ptr_opt</span> : <code class="type">'a <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a> -> 'a Ctypes_static.ptr option <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
 Construct a pointer type from an existing type (called the <i>reference
       type</i>).  This behaves like <a href="Ctypes_types.TYPE.html#VALptr"><code class="code">Ctypes_types.TYPE.ptr</code></a>, except that null pointers appear in OCaml
       as <code class="code">None</code>.<br>
@@ -276,30 +276,33 @@ A high-level representation of the string type.  This behaves like <a href="Ctyp
 <br>
 <h5 id="5_OCamlpointers">OCaml pointers</h5><br>
 
-<pre><span id="VALocaml_string"><span class="keyword">val</span> ocaml_string</span> : <code class="type">string <a href="Ctypes_static.html#TYPEocaml">Ctypes_static.ocaml</a> <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
+<pre><span id="VALocaml_string"><span class="keyword">val</span> ocaml_string</span> : <code class="type">string Ctypes_static.ocaml <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
 Value representing the directly mapped storage of an OCaml string.<br>
 </div>
 
-<pre><span id="VALocaml_bytes"><span class="keyword">val</span> ocaml_bytes</span> : <code class="type">Bytes.t <a href="Ctypes_static.html#TYPEocaml">Ctypes_static.ocaml</a> <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
+<pre><span id="VALocaml_bytes"><span class="keyword">val</span> ocaml_bytes</span> : <code class="type">Bytes.t Ctypes_static.ocaml <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
 Value representing the directly mapped storage of an OCaml byte array.<br>
 </div>
 <br>
 <h3 id="3_Arraytypes">Array types</h3><br>
 <br>
-<h3 id="3_Arraytypes">Array types</h3><br>
-<br>
 <h4 id="4_Carraytypes">C array types</h4><br>
 
-<pre><span id="VALarray"><span class="keyword">val</span> array</span> : <code class="type">int -><br>       'a <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a> -> 'a <a href="Ctypes_static.html#TYPEcarray">Ctypes_static.carray</a> <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
+<pre><span id="VALarray"><span class="keyword">val</span> array</span> : <code class="type">int -><br>       'a <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a> -> 'a Ctypes_static.carray <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
 Construct a sized array type from a length and an existing type (called
       the <i>element type</i>).<br>
 </div>
 <br>
 <h4 id="4_Bigarraytypes">Bigarray types</h4><br>
 
-<pre><span id="VALbigarray"><span class="keyword">val</span> bigarray</span> : <code class="type">< ba_repr : 'b; bigarray : 'bigarray; carray : 'c; dims : 'dims;<br>         element : 'a ><br>       <a href="Ctypes_static.html#TYPEbigarray_class">Ctypes_static.bigarray_class</a> -><br>       'dims -> ('a, 'b) Bigarray.kind -> 'bigarray <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
-Construct a sized bigarray type representation from a bigarray class, the
-      dimensions, and the <code class="code">Bigarray.kind</code>.<br>
+<pre><span id="VALbigarray"><span class="keyword">val</span> bigarray</span> : <code class="type">< ba_repr : 'b; bigarray : 'bigarray; carray : 'c; dims : 'dims;<br>         element : 'a; layout : Bigarray.c_layout ><br>       Ctypes_static.bigarray_class -><br>       'dims -> ('a, 'b) Bigarray.kind -> 'bigarray <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
+Construct a sized C-layout bigarray type representation from a bigarray
+      class, the dimensions, and the <code class="code">Bigarray.kind</code>.<br>
+</div>
+
+<pre><span id="VALfortran_bigarray"><span class="keyword">val</span> fortran_bigarray</span> : <code class="type">< ba_repr : 'b; bigarray : 'bigarray; carray : 'c; dims : 'dims;<br>         element : 'a; layout : Bigarray.fortran_layout ><br>       Ctypes_static.bigarray_class -><br>       'dims -> ('a, 'b) Bigarray.kind -> 'bigarray <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
+Construct a sized Fortran-layout bigarray type representation from a
+      bigarray class, the dimensions, and the <code class="code">Bigarray.kind</code>.<br>
 </div>
 
 <pre><span id="VALtyp_of_bigarray_kind"><span class="keyword">val</span> typ_of_bigarray_kind</span> : <code class="type">('a, 'b) Bigarray.kind -> 'a <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
@@ -312,7 +315,7 @@ Construct a sized bigarray type representation from a bigarray class, the
 <pre><span id="TYPEfield"><span class="keyword">type</span> <code class="type">('a, 't)</code> field</span> </pre>
 
 
-<pre><span id="VALstructure"><span class="keyword">val</span> structure</span> : <code class="type">string -> 's <a href="Ctypes_static.html#TYPEstructure">Ctypes_static.structure</a> <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
+<pre><span id="VALstructure"><span class="keyword">val</span> structure</span> : <code class="type">string -> 's Ctypes_static.structure <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
 Construct a new structure type.  The type value returned is incomplete and
       can be updated using <a href="Ctypes_types.TYPE.html#VALfield"><code class="code">Ctypes_types.TYPE.field</code></a> until it is passed to <a href="Ctypes_types.TYPE.html#VALseal"><code class="code">Ctypes_types.TYPE.seal</code></a>, at which point
       the set of fields is fixed.
@@ -330,12 +333,12 @@ Construct a new structure type.  The type value returned is incomplete and
       <code class="code">let tagname : tagname structure typ = structure "tagname"</code><br>
 </div>
 
-<pre><span id="VALunion"><span class="keyword">val</span> union</span> : <code class="type">string -> 's <a href="Ctypes_static.html#TYPEunion">Ctypes_static.union</a> <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
+<pre><span id="VALunion"><span class="keyword">val</span> union</span> : <code class="type">string -> 's Ctypes_static.union <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
 Construct a new union type.  This behaves analogously to <a href="Ctypes_types.TYPE.html#VALstructure"><code class="code">Ctypes_types.TYPE.structure</code></a>;
       fields are added with <a href="Ctypes_types.TYPE.html#VALfield"><code class="code">Ctypes_types.TYPE.field</code></a>.<br>
 </div>
 
-<pre><span id="VALfield"><span class="keyword">val</span> field</span> : <code class="type">('s, [< `Struct | `Union ] as 'b) <a href="Ctypes_static.html#TYPEstructured">Ctypes_static.structured</a><br>       <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a> -><br>       string -><br>       'a <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a> -><br>       ('a, ('s, 'b) <a href="Ctypes_static.html#TYPEstructured">Ctypes_static.structured</a>) <a href="Ctypes_types.TYPE.html#TYPEfield">field</a></code></pre><div class="info ">
+<pre><span id="VALfield"><span class="keyword">val</span> field</span> : <code class="type">('s, [< `Struct | `Union ] as 'b) Ctypes_static.structured<br>       <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a> -><br>       string -><br>       'a <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a> -><br>       ('a, ('s, 'b) Ctypes_static.structured) <a href="Ctypes_types.TYPE.html#TYPEfield">field</a></code></pre><div class="info ">
 <code class="code">field ty label ty'</code> adds a field of type <code class="code">ty'</code> with label <code class="code">label</code> to the
       structure or union type <code class="code">ty</code> and returns a field value that can be used to
       read and write the field in structure or union instances (e.g. using
@@ -346,7 +349,7 @@ Construct a new union type.  This behaves analogously to <a href="Ctypes_types.T
       is an error, and will raise <code class="code">ModifyingSealedType</code>.<br>
 </div>
 
-<pre><span id="VALseal"><span class="keyword">val</span> seal</span> : <code class="type">('a, [< `Struct | `Union ]) <a href="Ctypes_static.html#TYPEstructured">Ctypes_static.structured</a> <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a> -><br>       unit</code></pre><div class="info ">
+<pre><span id="VALseal"><span class="keyword">val</span> seal</span> : <code class="type">('a, [< `Struct | `Union ]) Ctypes_static.structured <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a> -><br>       unit</code></pre><div class="info ">
 <code class="code">seal t</code> completes the struct or union type <code class="code">t</code> so that no further fields
       can be added.  Struct and union types must be sealed before they can be used
       in a way that involves their size or alignment; see the documentation for
@@ -396,14 +399,14 @@ Construct a new union type.  This behaves analogously to <a href="Ctypes_types.T
 <br>
 <h3 id="3_Abstracttypes">Abstract types</h3><br>
 
-<pre><span id="VALabstract"><span class="keyword">val</span> abstract</span> : <code class="type">name:string -><br>       size:int -> alignment:int -> 'a <a href="Ctypes_static.html#TYPEabstract">Ctypes_static.abstract</a> <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
+<pre><span id="VALabstract"><span class="keyword">val</span> abstract</span> : <code class="type">name:string -><br>       size:int -> alignment:int -> 'a Ctypes_static.abstract <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
 Create an abstract type specification from the size and alignment
       requirements for the type.<br>
 </div>
 <br>
 <h3 id="3_Injectionofconcretetypes">Injection of concrete types</h3><br>
 
-<pre><span id="VALlift_typ"><span class="keyword">val</span> lift_typ</span> : <code class="type">'a <a href="Ctypes_static.html#TYPEtyp">Ctypes_static.typ</a> -> 'a <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
+<pre><span id="VALlift_typ"><span class="keyword">val</span> lift_typ</span> : <code class="type">'a Ctypes_static.typ -> 'a <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
 <code class="code">lift_typ t</code> turns a concrete type representation into an abstract type
       representation.
 <p>
@@ -419,7 +422,7 @@ Create an abstract type specification from the size and alignment
 <br>
 Abstract interface to C function type descriptions<br>
 
-<pre><span id="TYPEfn"><span class="keyword">type</span> <code class="type">'a</code> fn</span> = <code class="type">'a <a href="Ctypes_static.html#TYPEfn">Ctypes_static.fn</a></code> </pre>
+<pre><span id="TYPEfn"><span class="keyword">type</span> <code class="type">'a</code> fn</span> = <code class="type">'a Ctypes_static.fn</code> </pre>
 <div class="info ">
 The type of values representing C function types.  A value of type <code class="code">t fn</code>
       can be used to bind to C functions and to describe type of OCaml functions
@@ -446,7 +449,7 @@ Give the return type of a C function.  Note that <code class="code">returning</c
       example.<br>
 </div>
 
-<pre><span id="TYPEstatic_funptr"><span class="keyword">type</span> <code class="type">'a</code> static_funptr</span> = <code class="type">'a <a href="Ctypes_static.html#TYPEstatic_funptr">Ctypes_static.static_funptr</a></code> </pre>
+<pre><span id="TYPEstatic_funptr"><span class="keyword">type</span> <code class="type">'a</code> static_funptr</span> = <code class="type">'a Ctypes_static.static_funptr</code> </pre>
 <div class="info ">
 <h3 id="3_Functionpointertypes">Function pointer types</h3>
 <p>
@@ -454,7 +457,7 @@ The type of values representing C function pointer types.<br>
 </div>
 
 
-<pre><span id="VALstatic_funptr"><span class="keyword">val</span> static_funptr</span> : <code class="type">'a <a href="Ctypes_types.TYPE.html#TYPEfn">fn</a> -><br>       'a <a href="Ctypes_static.html#TYPEstatic_funptr">Ctypes_static.static_funptr</a> <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
+<pre><span id="VALstatic_funptr"><span class="keyword">val</span> static_funptr</span> : <code class="type">'a <a href="Ctypes_types.TYPE.html#TYPEfn">fn</a> -><br>       'a Ctypes_static.static_funptr <a href="Ctypes_types.TYPE.html#TYPEtyp">typ</a></code></pre><div class="info ">
 Construct a function pointer type from an existing function type
       (called the <i>reference type</i>).<br>
 </div>

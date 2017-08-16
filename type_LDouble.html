@@ -1,0 +1,77 @@
+<html><head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="Start" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Index of module types" rel=Appendix href="index_module_types.html">
+<link title="LDouble" rel="Chapter" href="LDouble.html">
+<link title="ComplexL" rel="Chapter" href="ComplexL.html">
+<link title="Ctypes" rel="Chapter" href="Ctypes.html">
+<link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
+<link title="Ctypes_types" rel="Chapter" href="Ctypes_types.html">
+<link title="Ctypes_printers" rel="Chapter" href="Ctypes_printers.html">
+<link title="Dl" rel="Chapter" href="Dl.html">
+<link title="Libffi_abi" rel="Chapter" href="Libffi_abi.html">
+<link title="Foreign" rel="Chapter" href="Foreign.html">
+<link title="Cstubs_structs" rel="Chapter" href="Cstubs_structs.html">
+<link title="Cstubs" rel="Chapter" href="Cstubs.html">
+<link title="Cstubs_inverted" rel="Chapter" href="Cstubs_inverted.html"><title>LDouble</title>
+</head>
+<body>
+<code class="code"><span class="keyword">sig</span><br>
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;to_float&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;float<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;of_float&nbsp;:&nbsp;float&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;to_int&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;int<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;of_int&nbsp;:&nbsp;int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;to_string&nbsp;:&nbsp;?width:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;?prec:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;string<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;of_string&nbsp;:&nbsp;string&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;add&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;sub&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;mul&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;div&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;neg&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;pow&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;sqrt&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;exp&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;log&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;log10&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;expm1&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;log1p&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;cos&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;sin&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;tan&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;acos&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;asin&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;atan&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;atan2&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;hypot&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;cosh&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;sinh&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;tanh&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;acosh&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;asinh&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;atanh&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;ceil&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;floor&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;abs&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;rem&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;copysign&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;frexp&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t&nbsp;*&nbsp;int<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;ldexp&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;modf&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">LDouble</span>.t&nbsp;*&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;classify&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Pervasives</span>.fpclass<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;min_float&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;max_float&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;epsilon&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;nan&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;infinity&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;neg_infinity&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;zero&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;one&nbsp;:&nbsp;<span class="constructor">LDouble</span>.t<br>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;byte_sizes&nbsp;:&nbsp;int&nbsp;*&nbsp;int<br>
+<span class="keyword">end</span></code></body></html>

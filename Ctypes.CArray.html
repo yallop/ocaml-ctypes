@@ -3,6 +3,7 @@
 <head>
 <link rel="stylesheet" href="style.css" type="text/css">
 <meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="Start" href="index.html">
 <link rel="next" href="Ctypes.Root.html">
 <link rel="Up" href="Ctypes.html">
@@ -11,11 +12,8 @@
 <link title="Index of values" rel=Appendix href="index_values.html">
 <link title="Index of modules" rel=Appendix href="index_modules.html">
 <link title="Index of module types" rel=Appendix href="index_module_types.html">
-<link title="Ctypes_static" rel="Chapter" href="Ctypes_static.html">
-<link title="Ctypes_primitive_types" rel="Chapter" href="Ctypes_primitive_types.html">
-<link title="Unsigned" rel="Chapter" href="Unsigned.html">
-<link title="Signed" rel="Chapter" href="Signed.html">
-<link title="Ctypes_structs" rel="Chapter" href="Ctypes_structs.html">
+<link title="LDouble" rel="Chapter" href="LDouble.html">
+<link title="ComplexL" rel="Chapter" href="ComplexL.html">
 <link title="Ctypes" rel="Chapter" href="Ctypes.html">
 <link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
 <link title="Ctypes_types" rel="Chapter" href="Ctypes_types.html">
@@ -23,7 +21,6 @@
 <link title="Dl" rel="Chapter" href="Dl.html">
 <link title="Libffi_abi" rel="Chapter" href="Libffi_abi.html">
 <link title="Foreign" rel="Chapter" href="Foreign.html">
-<link title="Cstubs_internals" rel="Chapter" href="Cstubs_internals.html">
 <link title="Cstubs_structs" rel="Chapter" href="Cstubs_structs.html">
 <link title="Cstubs" rel="Chapter" href="Cstubs.html">
 <link title="Cstubs_inverted" rel="Chapter" href="Cstubs_inverted.html"><title>Ctypes.CArray</title>
@@ -89,6 +86,35 @@ Operations on C arrays.<br>
       <code class="code">a</code>.<br>
 </div>
 
+<pre><span id="VALiter"><span class="keyword">val</span> iter</span> : <code class="type">('a -> unit) -> 'a <a href="Ctypes.CArray.html#TYPEt">t</a> -> unit</code></pre><div class="info ">
+<code class="code">iter f a</code> is analogous to <code class="code">Array.iter f a</code>: it applies <code class="code">f</code> in turn to
+      all the elements of <code class="code">a</code>.<br>
+</div>
+
+<pre><span id="VALmap"><span class="keyword">val</span> map</span> : <code class="type">'b typ -> ('a -> 'b) -> 'a <a href="Ctypes.CArray.html#TYPEt">t</a> -> 'b <a href="Ctypes.CArray.html#TYPEt">t</a></code></pre><div class="info ">
+<code class="code">map t f a</code> is analogous to <code class="code">Array.map f a</code>: it creates a new array with
+      element type <code class="code">t</code> whose elements are obtained by applying <code class="code">f</code> to the
+      elements of <code class="code">a</code>.<br>
+</div>
+
+<pre><span id="VALmapi"><span class="keyword">val</span> mapi</span> : <code class="type">'b typ -> (int -> 'a -> 'b) -> 'a <a href="Ctypes.CArray.html#TYPEt">t</a> -> 'b <a href="Ctypes.CArray.html#TYPEt">t</a></code></pre><div class="info ">
+<code class="code">mapi</code> behaves like <code class="code">Array.mapi</code>, except that it also passes the
+      index of each element as the first argument to <code class="code">f</code> and the element
+      itself as the second argument.<br>
+</div>
+
+<pre><span id="VALfold_left"><span class="keyword">val</span> fold_left</span> : <code class="type">('a -> 'b -> 'a) -> 'a -> 'b <a href="Ctypes.CArray.html#TYPEt">t</a> -> 'a</code></pre><div class="info ">
+<code class="code">CArray.fold_left (@) x a</code> computes 
+         <code class="code">(((x @ a.(0)) @ a.(1)) ...) @ a.(n-1)</code>
+       where <code class="code">n</code> is the length of the array <code class="code">a</code>.<br>
+</div>
+
+<pre><span id="VALfold_right"><span class="keyword">val</span> fold_right</span> : <code class="type">('b -> 'a -> 'a) -> 'b <a href="Ctypes.CArray.html#TYPEt">t</a> -> 'a -> 'a</code></pre><div class="info ">
+<code class="code">CArray.fold_right f a x</code> computes
+         <code class="code">a.(0) @ (a.(1) @ ( ... (a.(n-1) @ x) ...))</code>
+       where <code class="code">n</code> is the length of the array <code class="code">a</code>.<br>
+</div>
+
 <pre><span id="VALlength"><span class="keyword">val</span> length</span> : <code class="type">'a <a href="Ctypes.CArray.html#TYPEt">t</a> -> int</code></pre><div class="info ">
 Return the number of elements of the given array.<br>
 </div>
@@ -107,6 +133,19 @@ Return the address of the first element of the given array.<br>
       argument <code class="code">?initial</code> is supplied, it indicates a value that should be
       used to initialise every element of the array.  The argument <code class="code">?finalise</code>,
       if present, will be called just before the memory is freed.<br>
+</div>
+
+<pre><span id="VALcopy"><span class="keyword">val</span> copy</span> : <code class="type">'a <a href="Ctypes.CArray.html#TYPEt">t</a> -> 'a <a href="Ctypes.CArray.html#TYPEt">t</a></code></pre><div class="info ">
+<code class="code">copy a</code> creates a fresh array with the same elements as <code class="code">a</code>.<br>
+</div>
+
+<pre><span id="VALsub"><span class="keyword">val</span> sub</span> : <code class="type">'a <a href="Ctypes.CArray.html#TYPEt">t</a> -> pos:int -> length:int -> 'a <a href="Ctypes.CArray.html#TYPEt">t</a></code></pre><div class="info ">
+<code class="code">sub a ~pos ~length</code> creates a fresh array of length <code class="code">length</code> containing
+      the elements <code class="code">a.(pos)</code> to <code class="code">a.(pos + length - 1)</code> of <code class="code">a</code>.
+<p>
+
+      Raise <code class="code">Invalid_argument "CArray.sub"</code> if <code class="code">pos</code> and <code class="code">length</code> do not
+      designate a valid subarray of <code class="code">a</code>.<br>
 </div>
 
 <pre><span id="VALelement_type"><span class="keyword">val</span> element_type</span> : <code class="type">'a <a href="Ctypes.CArray.html#TYPEt">t</a> -> 'a typ</code></pre><div class="info ">

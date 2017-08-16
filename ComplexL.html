@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="Start" href="index.html">
+<link rel="previous" href="LDouble.html">
+<link rel="next" href="Ctypes.html">
+<link rel="Up" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Index of module types" rel=Appendix href="index_module_types.html">
+<link title="LDouble" rel="Chapter" href="LDouble.html">
+<link title="ComplexL" rel="Chapter" href="ComplexL.html">
+<link title="Ctypes" rel="Chapter" href="Ctypes.html">
+<link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
+<link title="Ctypes_types" rel="Chapter" href="Ctypes_types.html">
+<link title="Ctypes_printers" rel="Chapter" href="Ctypes_printers.html">
+<link title="Dl" rel="Chapter" href="Dl.html">
+<link title="Libffi_abi" rel="Chapter" href="Libffi_abi.html">
+<link title="Foreign" rel="Chapter" href="Foreign.html">
+<link title="Cstubs_structs" rel="Chapter" href="Cstubs_structs.html">
+<link title="Cstubs" rel="Chapter" href="Cstubs.html">
+<link title="Cstubs_inverted" rel="Chapter" href="Cstubs_inverted.html"><title>ComplexL</title>
+</head>
+<body>
+<div class="navbar"><a class="pre" href="LDouble.html" title="LDouble">Previous</a>
+&nbsp;<a class="up" href="index.html" title="Index">Up</a>
+&nbsp;<a class="post" href="Ctypes.html" title="Ctypes">Next</a>
+</div>
+<h1>Module <a href="type_ComplexL.html">ComplexL</a></h1>
+
+<pre><span class="keyword">module</span> ComplexL: <code class="code">sig</code> <a href="ComplexL.html">..</a> <code class="code">end</code></pre><div class="info module top">
+The type of long double complex values<br>
+</div>
+<hr width="100%">
+
+<pre><span id="TYPEt"><span class="keyword">type</span> <code class="type"></code>t</span> </pre>
+<div class="info ">
+The type of long double complex values<br>
+</div>
+
+
+<pre><span id="VALmake"><span class="keyword">val</span> make</span> : <code class="type"><a href="LDouble.html#TYPEt">LDouble.t</a> -> <a href="LDouble.html#TYPEt">LDouble.t</a> -> <a href="ComplexL.html#TYPEt">t</a></code></pre><div class="info ">
+<code class="code">make x y</code> creates the long double complex value <code class="code">x + y * i</code><br>
+</div>
+
+<pre><span id="VALof_complex"><span class="keyword">val</span> of_complex</span> : <code class="type">Complex.t -> <a href="ComplexL.html#TYPEt">t</a></code></pre><div class="info ">
+create a long double complex from a Complex.t<br>
+</div>
+
+<pre><span id="VALto_complex"><span class="keyword">val</span> to_complex</span> : <code class="type"><a href="ComplexL.html#TYPEt">t</a> -> Complex.t</code></pre><div class="info ">
+Convert a long double complex to a Complex.t.  The real and imaginary components
+    are converted by calling <code class="code">LDouble.to_float</code> which can produce unspecified results.<br>
+</div>
+
+<pre><span id="VALzero"><span class="keyword">val</span> zero</span> : <code class="type"><a href="ComplexL.html#TYPEt">t</a></code></pre><div class="info ">
+<code class="code">0 + i0</code><br>
+</div>
+
+<pre><span id="VALone"><span class="keyword">val</span> one</span> : <code class="type"><a href="ComplexL.html#TYPEt">t</a></code></pre><div class="info ">
+<code class="code">1 + i0</code><br>
+</div>
+
+<pre><span id="VALi"><span class="keyword">val</span> i</span> : <code class="type"><a href="ComplexL.html#TYPEt">t</a></code></pre><div class="info ">
+<code class="code">0 + i</code><br>
+</div>
+
+<pre><span id="VALre"><span class="keyword">val</span> re</span> : <code class="type"><a href="ComplexL.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">LDouble.t</a></code></pre><div class="info ">
+return the real part of the long double complex<br>
+</div>
+
+<pre><span id="VALim"><span class="keyword">val</span> im</span> : <code class="type"><a href="ComplexL.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">LDouble.t</a></code></pre><div class="info ">
+return the imaginary part of the long double complex<br>
+</div>
+
+<pre><span id="VALneg"><span class="keyword">val</span> neg</span> : <code class="type"><a href="ComplexL.html#TYPEt">t</a> -> <a href="ComplexL.html#TYPEt">t</a></code></pre><div class="info ">
+Unary negation<br>
+</div>
+
+<pre><span id="VALconj"><span class="keyword">val</span> conj</span> : <code class="type"><a href="ComplexL.html#TYPEt">t</a> -> <a href="ComplexL.html#TYPEt">t</a></code></pre><div class="info ">
+Conjugate: given the complex <code class="code">x + i.y</code>, returns <code class="code">x - i.y</code>.<br>
+</div>
+
+<pre><span id="VALadd"><span class="keyword">val</span> add</span> : <code class="type"><a href="ComplexL.html#TYPEt">t</a> -> <a href="ComplexL.html#TYPEt">t</a> -> <a href="ComplexL.html#TYPEt">t</a></code></pre><div class="info ">
+Addition<br>
+</div>
+
+<pre><span id="VALsub"><span class="keyword">val</span> sub</span> : <code class="type"><a href="ComplexL.html#TYPEt">t</a> -> <a href="ComplexL.html#TYPEt">t</a> -> <a href="ComplexL.html#TYPEt">t</a></code></pre><div class="info ">
+Subtraction<br>
+</div>
+
+<pre><span id="VALmul"><span class="keyword">val</span> mul</span> : <code class="type"><a href="ComplexL.html#TYPEt">t</a> -> <a href="ComplexL.html#TYPEt">t</a> -> <a href="ComplexL.html#TYPEt">t</a></code></pre><div class="info ">
+Multiplication<br>
+</div>
+
+<pre><span id="VALdiv"><span class="keyword">val</span> div</span> : <code class="type"><a href="ComplexL.html#TYPEt">t</a> -> <a href="ComplexL.html#TYPEt">t</a> -> <a href="ComplexL.html#TYPEt">t</a></code></pre><div class="info ">
+Division<br>
+</div>
+
+<pre><span id="VALinv"><span class="keyword">val</span> inv</span> : <code class="type"><a href="ComplexL.html#TYPEt">t</a> -> <a href="ComplexL.html#TYPEt">t</a></code></pre><div class="info ">
+Multiplicative inverse (<code class="code">1/z</code>).<br>
+</div>
+
+<pre><span id="VALsqrt"><span class="keyword">val</span> sqrt</span> : <code class="type"><a href="ComplexL.html#TYPEt">t</a> -> <a href="ComplexL.html#TYPEt">t</a></code></pre><div class="info ">
+Square root.<br>
+</div>
+
+<pre><span id="VALnorm2"><span class="keyword">val</span> norm2</span> : <code class="type"><a href="ComplexL.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">LDouble.t</a></code></pre><div class="info ">
+Norm squared: given <code class="code">x + i.y</code>, returns <code class="code">x^2 + y^2</code>.<br>
+</div>
+
+<pre><span id="VALnorm"><span class="keyword">val</span> norm</span> : <code class="type"><a href="ComplexL.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">LDouble.t</a></code></pre><div class="info ">
+Norm: given <code class="code">x + i.y</code>, returns <code class="code">sqrt(x^2 + y^2)</code>.<br>
+</div>
+
+<pre><span id="VALpolar"><span class="keyword">val</span> polar</span> : <code class="type"><a href="LDouble.html#TYPEt">LDouble.t</a> -> <a href="LDouble.html#TYPEt">LDouble.t</a> -> <a href="ComplexL.html#TYPEt">t</a></code></pre><div class="info ">
+<code class="code">polar norm arg</code> returns the complex having norm <code class="code">norm</code> and argument <code class="code">arg</code>.<br>
+</div>
+
+<pre><span id="VALarg"><span class="keyword">val</span> arg</span> : <code class="type"><a href="ComplexL.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">LDouble.t</a></code></pre><div class="info ">
+Argument.  The argument of a complex number is the angle
+    in the complex plane between the positive real axis and a line
+    passing through zero and the number.<br>
+</div>
+
+<pre><span id="VALexp"><span class="keyword">val</span> exp</span> : <code class="type"><a href="ComplexL.html#TYPEt">t</a> -> <a href="ComplexL.html#TYPEt">t</a></code></pre><div class="info ">
+Exponentiation.  <code class="code">exp z</code> returns <code class="code">e</code> to the <code class="code">z</code> power.<br>
+</div>
+
+<pre><span id="VALlog"><span class="keyword">val</span> log</span> : <code class="type"><a href="ComplexL.html#TYPEt">t</a> -> <a href="ComplexL.html#TYPEt">t</a></code></pre><div class="info ">
+Natural logarithm (in base <code class="code">e</code>).<br>
+</div>
+
+<pre><span id="VALpow"><span class="keyword">val</span> pow</span> : <code class="type"><a href="ComplexL.html#TYPEt">t</a> -> <a href="ComplexL.html#TYPEt">t</a> -> <a href="ComplexL.html#TYPEt">t</a></code></pre><div class="info ">
+Power function.  <code class="code">pow z1 z2</code> returns <code class="code">z1</code> to the <code class="code">z2</code> power.<br>
+</div>
+</body></html>

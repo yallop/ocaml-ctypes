@@ -3,6 +3,7 @@
 <head>
 <link rel="stylesheet" href="style.css" type="text/css">
 <meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="Start" href="index.html">
 <link rel="previous" href="Ctypes.html">
 <link rel="next" href="Ctypes_types.html">
@@ -12,11 +13,8 @@
 <link title="Index of values" rel=Appendix href="index_values.html">
 <link title="Index of modules" rel=Appendix href="index_modules.html">
 <link title="Index of module types" rel=Appendix href="index_module_types.html">
-<link title="Ctypes_static" rel="Chapter" href="Ctypes_static.html">
-<link title="Ctypes_primitive_types" rel="Chapter" href="Ctypes_primitive_types.html">
-<link title="Unsigned" rel="Chapter" href="Unsigned.html">
-<link title="Signed" rel="Chapter" href="Signed.html">
-<link title="Ctypes_structs" rel="Chapter" href="Ctypes_structs.html">
+<link title="LDouble" rel="Chapter" href="LDouble.html">
+<link title="ComplexL" rel="Chapter" href="ComplexL.html">
 <link title="Ctypes" rel="Chapter" href="Ctypes.html">
 <link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
 <link title="Ctypes_types" rel="Chapter" href="Ctypes_types.html">
@@ -24,7 +22,6 @@
 <link title="Dl" rel="Chapter" href="Dl.html">
 <link title="Libffi_abi" rel="Chapter" href="Libffi_abi.html">
 <link title="Foreign" rel="Chapter" href="Foreign.html">
-<link title="Cstubs_internals" rel="Chapter" href="Cstubs_internals.html">
 <link title="Cstubs_structs" rel="Chapter" href="Cstubs_structs.html">
 <link title="Cstubs" rel="Chapter" href="Cstubs.html">
 <link title="Cstubs_inverted" rel="Chapter" href="Cstubs_inverted.html"><link title="POSIX arithmetic types" rel="Section" href="#2_POSIXarithmetictypes">
@@ -47,18 +44,16 @@ Some POSIX types.<br>
 <br>
 Some POSIX types.<br>
 <br>
-Some POSIX types.<br>
-<br>
 <h2 id="2_POSIXarithmetictypes">POSIX arithmetic types</h2><br>
 
-<pre><span class="keyword">module</span> <a href="PosixTypes.Dev.html">Dev</a>: <code class="type"><a href="Unsigned.S.html">Unsigned.S</a></code><code class="type"> </code></pre>
-<pre><span class="keyword">module</span> <a href="PosixTypes.Ino.html">Ino</a>: <code class="type"><a href="Unsigned.S.html">Unsigned.S</a></code><code class="type"> </code></pre>
-<pre><span class="keyword">module</span> <a href="PosixTypes.Mode.html">Mode</a>: <code class="type"><a href="Unsigned.S.html">Unsigned.S</a></code><code class="type"> </code></pre>
-<pre><span class="keyword">module</span> <a href="PosixTypes.Nlink.html">Nlink</a>: <code class="type"><a href="Unsigned.S.html">Unsigned.S</a></code><code class="type"> </code></pre>
-<pre><span class="keyword">module</span> <a href="PosixTypes.Off.html">Off</a>: <code class="type"><a href="Signed.S.html">Signed.S</a></code><code class="type"> </code></pre>
-<pre><span class="keyword">module</span> <a href="PosixTypes.Pid.html">Pid</a>: <code class="type"><a href="Signed.S.html">Signed.S</a></code><code class="type"> </code></pre>
-<pre><span class="keyword">module</span> <a href="PosixTypes.Ssize.html">Ssize</a>: <code class="type"><a href="Signed.S.html">Signed.S</a></code><code class="type"> </code></pre>
-<pre><span class="keyword">module</span> <a href="PosixTypes.Time.html">Time</a>: <code class="type"><a href="Unsigned.S.html">Unsigned.S</a></code><code class="type"> </code></pre>
+<pre><span class="keyword">module</span> <a href="PosixTypes.Dev.html">Dev</a>: <code class="type">Unsigned.S</code><code class="type"> </code></pre>
+<pre><span class="keyword">module</span> <a href="PosixTypes.Ino.html">Ino</a>: <code class="type">Unsigned.S</code><code class="type"> </code></pre>
+<pre><span class="keyword">module</span> <a href="PosixTypes.Mode.html">Mode</a>: <code class="type">Unsigned.S</code><code class="type"> </code></pre>
+<pre><span class="keyword">module</span> <a href="PosixTypes.Nlink.html">Nlink</a>: <code class="type">Unsigned.S</code><code class="type"> </code></pre>
+<pre><span class="keyword">module</span> <a href="PosixTypes.Off.html">Off</a>: <code class="type">Signed.S</code><code class="type"> </code></pre>
+<pre><span class="keyword">module</span> <a href="PosixTypes.Pid.html">Pid</a>: <code class="type">Signed.S</code><code class="type"> </code></pre>
+<pre><span class="keyword">module</span> <a href="PosixTypes.Ssize.html">Ssize</a>: <code class="type">Signed.S</code><code class="type"> </code></pre>
+<pre><span class="keyword">module</span> <a href="PosixTypes.Time.html">Time</a>: <code class="type">Unsigned.S</code><code class="type"> </code></pre>
 <pre><span id="TYPEclock_t"><span class="keyword">type</span> <code class="type"></code>clock_t</span> </pre>
 
 
@@ -80,7 +75,7 @@ Some POSIX types.<br>
 <pre><span id="TYPEpid_t"><span class="keyword">type</span> <code class="type"></code>pid_t</span> = <code class="type">Pid.t</code> </pre>
 
 
-<pre><span id="TYPEsize_t"><span class="keyword">type</span> <code class="type"></code>size_t</span> = <code class="type"><a href="Unsigned.html#TYPEsize_t">Unsigned.size_t</a></code> </pre>
+<pre><span id="TYPEsize_t"><span class="keyword">type</span> <code class="type"></code>size_t</span> = <code class="type">Unsigned.size_t</code> </pre>
 
 
 <pre><span id="TYPEssize_t"><span class="keyword">type</span> <code class="type"></code>ssize_t</span> = <code class="type">Ssize.t</code> </pre>

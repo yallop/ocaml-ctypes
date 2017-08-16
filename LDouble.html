@@ -1,0 +1,263 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="Start" href="index.html">
+<link rel="next" href="ComplexL.html">
+<link rel="Up" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Index of module types" rel=Appendix href="index_module_types.html">
+<link title="LDouble" rel="Chapter" href="LDouble.html">
+<link title="ComplexL" rel="Chapter" href="ComplexL.html">
+<link title="Ctypes" rel="Chapter" href="Ctypes.html">
+<link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
+<link title="Ctypes_types" rel="Chapter" href="Ctypes_types.html">
+<link title="Ctypes_printers" rel="Chapter" href="Ctypes_printers.html">
+<link title="Dl" rel="Chapter" href="Dl.html">
+<link title="Libffi_abi" rel="Chapter" href="Libffi_abi.html">
+<link title="Foreign" rel="Chapter" href="Foreign.html">
+<link title="Cstubs_structs" rel="Chapter" href="Cstubs_structs.html">
+<link title="Cstubs" rel="Chapter" href="Cstubs.html">
+<link title="Cstubs_inverted" rel="Chapter" href="Cstubs_inverted.html"><title>LDouble</title>
+</head>
+<body>
+<div class="navbar">&nbsp;<a class="up" href="index.html" title="Index">Up</a>
+&nbsp;<a class="post" href="ComplexL.html" title="ComplexL">Next</a>
+</div>
+<h1>Module <a href="type_LDouble.html">LDouble</a></h1>
+
+<pre><span class="keyword">module</span> LDouble: <code class="code">sig</code> <a href="LDouble.html">..</a> <code class="code">end</code></pre><div class="info module top">
+The type of long doubles.<br>
+</div>
+<hr width="100%">
+
+<pre><span id="TYPEt"><span class="keyword">type</span> <code class="type"></code>t</span> </pre>
+<div class="info ">
+The type of long doubles.<br>
+</div>
+
+
+<pre><span id="VALto_float"><span class="keyword">val</span> to_float</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a> -> float</code></pre><div class="info ">
+Convert a long double to a float.  The result is unspecified if the argument is
+    either too large or too small to be represented as a <code class="code">float</code>.<br>
+</div>
+
+<pre><span id="VALof_float"><span class="keyword">val</span> of_float</span> : <code class="type">float -> <a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+Create a long double from a float<br>
+</div>
+
+<pre><span id="VALto_int"><span class="keyword">val</span> to_int</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a> -> int</code></pre><div class="info ">
+Convert a long double to an int.  The result is unspecified if the argument is NAN
+    or falls outside the range of representable integers.<br>
+</div>
+
+<pre><span id="VALof_int"><span class="keyword">val</span> of_int</span> : <code class="type">int -> <a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+Create a long double from an int<br>
+</div>
+
+<pre><span id="VALto_string"><span class="keyword">val</span> to_string</span> : <code class="type">?width:int -> ?prec:int -> <a href="LDouble.html#TYPEt">t</a> -> string</code></pre><div class="info ">
+Convert a long double to a string.
+<p>
+
+ <code class="code">width</code> specifies the minimum number of digits to format the string
+ with.  A negative value left aligns.  The default is 0.
+<p>
+
+ <code class="code">prec</code> specifies the number of digits after the decimal point.  
+ The default is 6.<br>
+</div>
+
+<pre><span id="VALof_string"><span class="keyword">val</span> of_string</span> : <code class="type">string -> <a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+Create a long double from a string<br>
+</div>
+
+<pre><span id="VALadd"><span class="keyword">val</span> add</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+Addition<br>
+</div>
+
+<pre><span id="VALsub"><span class="keyword">val</span> sub</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+Subtraction<br>
+</div>
+
+<pre><span id="VALmul"><span class="keyword">val</span> mul</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+Multiplication<br>
+</div>
+
+<pre><span id="VALdiv"><span class="keyword">val</span> div</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+Division<br>
+</div>
+
+<pre><span id="VALneg"><span class="keyword">val</span> neg</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+Negation<br>
+</div>
+
+<pre><span id="VALpow"><span class="keyword">val</span> pow</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+Exponentiation<br>
+</div>
+
+<pre><span id="VALsqrt"><span class="keyword">val</span> sqrt</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+Square root<br>
+</div>
+
+<pre><span id="VALexp"><span class="keyword">val</span> exp</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+Exponential<br>
+</div>
+
+<pre><span id="VALlog"><span class="keyword">val</span> log</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+Natural logarithm<br>
+</div>
+
+<pre><span id="VALlog10"><span class="keyword">val</span> log10</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+Base 10 logarithm<br>
+</div>
+
+<pre><span id="VALexpm1"><span class="keyword">val</span> expm1</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+<code class="code">expm1 x</code> computes <code class="code">exp x -. 1.0</code>, giving numerically-accurate results
+    even if <code class="code">x</code> is close to <code class="code">0.0</code>.<br>
+</div>
+
+<pre><span id="VALlog1p"><span class="keyword">val</span> log1p</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+<code class="code">log1p x</code> computes <code class="code">log(1.0 +. x)</code> (natural logarithm),
+    giving numerically-accurate results even if <code class="code">x</code> is close to <code class="code">0.0</code>.<br>
+</div>
+
+<pre><span id="VALcos"><span class="keyword">val</span> cos</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+Cosine.  Argument is in radians.<br>
+</div>
+
+<pre><span id="VALsin"><span class="keyword">val</span> sin</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+Sine.  Argument is in radians.<br>
+</div>
+
+<pre><span id="VALtan"><span class="keyword">val</span> tan</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+Tangent.  Argument is in radians.<br>
+</div>
+
+<pre><span id="VALacos"><span class="keyword">val</span> acos</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+Arc cosine<br>
+</div>
+
+<pre><span id="VALasin"><span class="keyword">val</span> asin</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+Arc sine<br>
+</div>
+
+<pre><span id="VALatan"><span class="keyword">val</span> atan</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+Arc tangent<br>
+</div>
+
+<pre><span id="VALatan2"><span class="keyword">val</span> atan2</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+<code class="code">atan2 y x</code> returns the arc tangent of <code class="code">y /. x</code>.<br>
+</div>
+
+<pre><span id="VALhypot"><span class="keyword">val</span> hypot</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a></code></pre>
+<pre><span id="VALcosh"><span class="keyword">val</span> cosh</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+Hyperbolic cosine<br>
+</div>
+
+<pre><span id="VALsinh"><span class="keyword">val</span> sinh</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+Hyperbolic sine<br>
+</div>
+
+<pre><span id="VALtanh"><span class="keyword">val</span> tanh</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+Hyperbolic tangent<br>
+</div>
+
+<pre><span id="VALacosh"><span class="keyword">val</span> acosh</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+Inverse hyperbolic cosine<br>
+</div>
+
+<pre><span id="VALasinh"><span class="keyword">val</span> asinh</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+Inverse hyperbolic sine<br>
+</div>
+
+<pre><span id="VALatanh"><span class="keyword">val</span> atanh</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+Inverse hyperbolic tangent<br>
+</div>
+
+<pre><span id="VALceil"><span class="keyword">val</span> ceil</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+Round above to an integer value.<br>
+</div>
+
+<pre><span id="VALfloor"><span class="keyword">val</span> floor</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+Round below to an integer value.<br>
+</div>
+
+<pre><span id="VALabs"><span class="keyword">val</span> abs</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+<code class="code">abs f</code> returns absolute value of <code class="code">f</code><br>
+</div>
+
+<pre><span id="VALrem"><span class="keyword">val</span> rem</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+<code class="code">rem x y</code> is the remainder of dividing x by y<br>
+</div>
+
+<pre><span id="VALcopysign"><span class="keyword">val</span> copysign</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+<code class="code">copysign x y</code> returns a float whose absolute value is that of <code class="code">x</code>
+  and whose sign is that of <code class="code">y</code>.<br>
+</div>
+
+<pre><span id="VALfrexp"><span class="keyword">val</span> frexp</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a> * int</code></pre><div class="info ">
+<code class="code">frexp f</code> returns the pair of the significant and the exponent of <code class="code">f</code>.<br>
+</div>
+
+<pre><span id="VALldexp"><span class="keyword">val</span> ldexp</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a> -> int -> <a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+<code class="code">ldexp x n</code> returns <code class="code">x *. 2 ** n</code>.<br>
+</div>
+
+<pre><span id="VALmodf"><span class="keyword">val</span> modf</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a> -> <a href="LDouble.html#TYPEt">t</a> * <a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+return <code class="code">(fractional,integer)</code> parts of number.
+<p>
+
+    Known fatal bug on mingw32; see https://sourceforge.net/p/mingw-w64/bugs/478<br>
+</div>
+
+<pre><span id="VALclassify"><span class="keyword">val</span> classify</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a> -> Pervasives.fpclass</code></pre><div class="info ">
+Return the class of the given floating-point number:
+   normal, subnormal, zero, infinite, or not a number.<br>
+</div>
+
+<pre><span id="VALmin_float"><span class="keyword">val</span> min_float</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+The smallest positive, non-zero, non-denormalized value<br>
+</div>
+
+<pre><span id="VALmax_float"><span class="keyword">val</span> max_float</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+The largest positive finite value<br>
+</div>
+
+<pre><span id="VALepsilon"><span class="keyword">val</span> epsilon</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+The difference between <code class="code">1.0</code> and the smallest exactly representable
+    floating-point number greater than <code class="code">1.0</code>.<br>
+</div>
+
+<pre><span id="VALnan"><span class="keyword">val</span> nan</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+A special floating-point value denoting the result of an
+   undefined operation such as <code class="code">0.0 /. 0.0</code>.  Stands for
+   'not a number'.<br>
+</div>
+
+<pre><span id="VALinfinity"><span class="keyword">val</span> infinity</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+Positive infinity<br>
+</div>
+
+<pre><span id="VALneg_infinity"><span class="keyword">val</span> neg_infinity</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+Negative infinity<br>
+</div>
+
+<pre><span id="VALzero"><span class="keyword">val</span> zero</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+0.0<br>
+</div>
+
+<pre><span id="VALone"><span class="keyword">val</span> one</span> : <code class="type"><a href="LDouble.html#TYPEt">t</a></code></pre><div class="info ">
+1.0<br>
+</div>
+
+<pre><span id="VALbyte_sizes"><span class="keyword">val</span> byte_sizes</span> : <code class="type">int * int</code></pre><div class="info ">
+size, in bytes, used for storing long doubles, 
+    and the actual number of bytes used by the value.
+    (unused bytes may contain undefined values)<br>
+</div>
+</body></html>

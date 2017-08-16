@@ -3,6 +3,7 @@
 <head>
 <link rel="stylesheet" href="style.css" type="text/css">
 <meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="Start" href="index.html">
 <link rel="next" href="Cstubs.Types.BINDINGS.html">
 <link rel="Up" href="Cstubs.Types.html">
@@ -11,11 +12,8 @@
 <link title="Index of values" rel=Appendix href="index_values.html">
 <link title="Index of modules" rel=Appendix href="index_modules.html">
 <link title="Index of module types" rel=Appendix href="index_module_types.html">
-<link title="Ctypes_static" rel="Chapter" href="Ctypes_static.html">
-<link title="Ctypes_primitive_types" rel="Chapter" href="Ctypes_primitive_types.html">
-<link title="Unsigned" rel="Chapter" href="Unsigned.html">
-<link title="Signed" rel="Chapter" href="Signed.html">
-<link title="Ctypes_structs" rel="Chapter" href="Ctypes_structs.html">
+<link title="LDouble" rel="Chapter" href="LDouble.html">
+<link title="ComplexL" rel="Chapter" href="ComplexL.html">
 <link title="Ctypes" rel="Chapter" href="Ctypes.html">
 <link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
 <link title="Ctypes_types" rel="Chapter" href="Ctypes_types.html">
@@ -23,7 +21,6 @@
 <link title="Dl" rel="Chapter" href="Dl.html">
 <link title="Libffi_abi" rel="Chapter" href="Libffi_abi.html">
 <link title="Foreign" rel="Chapter" href="Foreign.html">
-<link title="Cstubs_internals" rel="Chapter" href="Cstubs_internals.html">
 <link title="Cstubs_structs" rel="Chapter" href="Cstubs_structs.html">
 <link title="Cstubs" rel="Chapter" href="Cstubs.html">
 <link title="Cstubs_inverted" rel="Chapter" href="Cstubs_inverted.html"><title>Cstubs.Types.TYPE</title>
@@ -60,7 +57,7 @@
            warning: overflow in implicit constant conversion<br>
 </div>
 
-<pre><span id="VALenum"><span class="keyword">val</span> enum</span> : <code class="type">string -><br>       ?unexpected:(int64 -> 'a) -><br>       ('a * int64 <a href="Cstubs.Types.TYPE.html#TYPEconst">const</a>) list -> 'a typ</code></pre><div class="info ">
+<pre><span id="VALenum"><span class="keyword">val</span> enum</span> : <code class="type">string -><br>       ?typedef:bool -><br>       ?unexpected:(int64 -> 'a) -><br>       ('a * int64 <a href="Cstubs.Types.TYPE.html#TYPEconst">const</a>) list -> 'a typ</code></pre><div class="info ">
 <code class="code">enum name ?unexpected alist</code> builds a type representation for the
         enum named <code class="code">name</code>.  The size and alignment are retrieved so that the
         resulting type can be used everywhere an integer type can be used: as
@@ -78,26 +75,42 @@
         you might first retrieve the values of the enumeration constants:
 <p>
 
-          let a = constant "A" int64_t
+        <pre class="codepre"><code class="code">          let a = constant "A" int64_t
           and b = constant "B" int64_t
           and c = constant "C" int64_t
           and d = constant "D" int64_t
+        </code></pre>
 <p>
 
         and then build the enumeration type
 <p>
 
-          let letters = enum "letters" <code class="code">
+        <pre class="codepre"><code class="code">          let letters = enum "letters" [
              `A, a;
              `B, b;
              `C, c;
              `D, d;
-          </code> ~unexpected:(fun i -&gt; `E i)
+          ] ~unexpected:(fun i -&gt; `E i)
+        </code></pre>
 <p>
 
         The <code class="code">unexpected</code> function specifies the value to return in the case
         that some unexpected value is encountered -- for example, if a
         function with the return type 'enum letters' actually returns the
-        value <code class="code">-1</code>.<br>
+        value <code class="code">-1</code>.
+<p>
+
+        The optional flag <code class="code">typedef</code> specifies whether the first argument,
+        <code class="code">name</code>, indicates an tag or an alias.  If <code class="code">typedef</code> is <code class="code">false</code> (the
+        default) then <code class="code">name</code> is treated as an enumeration tag:
+<p>
+
+          <code class="code">enum letters { ... }</code>
+<p>
+
+        If <code class="code">typedef</code> is <code class="code">true</code> then <code class="code">name</code> is instead treated as an alias:
+<p>
+
+          <code class="code">typedef enum { ... } letters</code><br>
 </div>
 </body></html>

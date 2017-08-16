@@ -3,6 +3,7 @@
 <head>
 <link rel="stylesheet" href="style.css" type="text/css">
 <meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="Start" href="index.html">
 <link rel="previous" href="Ctypes_types.html">
 <link rel="next" href="Dl.html">
@@ -12,11 +13,8 @@
 <link title="Index of values" rel=Appendix href="index_values.html">
 <link title="Index of modules" rel=Appendix href="index_modules.html">
 <link title="Index of module types" rel=Appendix href="index_module_types.html">
-<link title="Ctypes_static" rel="Chapter" href="Ctypes_static.html">
-<link title="Ctypes_primitive_types" rel="Chapter" href="Ctypes_primitive_types.html">
-<link title="Unsigned" rel="Chapter" href="Unsigned.html">
-<link title="Signed" rel="Chapter" href="Signed.html">
-<link title="Ctypes_structs" rel="Chapter" href="Ctypes_structs.html">
+<link title="LDouble" rel="Chapter" href="LDouble.html">
+<link title="ComplexL" rel="Chapter" href="ComplexL.html">
 <link title="Ctypes" rel="Chapter" href="Ctypes.html">
 <link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
 <link title="Ctypes_types" rel="Chapter" href="Ctypes_types.html">
@@ -24,7 +22,6 @@
 <link title="Dl" rel="Chapter" href="Dl.html">
 <link title="Libffi_abi" rel="Chapter" href="Libffi_abi.html">
 <link title="Foreign" rel="Chapter" href="Foreign.html">
-<link title="Cstubs_internals" rel="Chapter" href="Cstubs_internals.html">
 <link title="Cstubs_structs" rel="Chapter" href="Cstubs_structs.html">
 <link title="Cstubs" rel="Chapter" href="Cstubs.html">
 <link title="Cstubs_inverted" rel="Chapter" href="Cstubs_inverted.html"><title>Ctypes_printers</title>
@@ -40,6 +37,7 @@
 
 <pre><span id="VALformat_typ"><span class="keyword">val</span> format_typ</span> : <code class="type">Format.formatter -> 'a Ctypes.typ -> unit</code></pre>
 <pre><span id="VALformat_fn"><span class="keyword">val</span> format_fn</span> : <code class="type">Format.formatter -> 'a Ctypes.fn -> unit</code></pre>
+<pre><span id="VALformat_sint"><span class="keyword">val</span> format_sint</span> : <code class="type">Format.formatter -> Signed.SInt.t -> unit</code></pre>
 <pre><span id="VALformat_long"><span class="keyword">val</span> format_long</span> : <code class="type">Format.formatter -> Signed.Long.t -> unit</code></pre>
 <pre><span id="VALformat_llong"><span class="keyword">val</span> format_llong</span> : <code class="type">Format.formatter -> Signed.LLong.t -> unit</code></pre>
 <pre><span id="VALformat_uchar"><span class="keyword">val</span> format_uchar</span> : <code class="type">Format.formatter -> Unsigned.UChar.t -> unit</code></pre>
@@ -66,4 +64,6 @@
 <pre><span id="VALformat_size_t"><span class="keyword">val</span> format_size_t</span> : <code class="type">Format.formatter -> <a href="PosixTypes.html#TYPEsize_t">PosixTypes.size_t</a> -> unit</code></pre>
 <pre><span id="VALformat_ssize_t"><span class="keyword">val</span> format_ssize_t</span> : <code class="type">Format.formatter -> <a href="PosixTypes.html#TYPEssize_t">PosixTypes.ssize_t</a> -> unit</code></pre>
 <pre><span id="VALformat_time_t"><span class="keyword">val</span> format_time_t</span> : <code class="type">Format.formatter -> <a href="PosixTypes.html#TYPEtime_t">PosixTypes.time_t</a> -> unit</code></pre>
-<pre><span id="VALformat_useconds_t"><span class="keyword">val</span> format_useconds_t</span> : <code class="type">Format.formatter -> <a href="PosixTypes.html#TYPEuseconds_t">PosixTypes.useconds_t</a> -> unit</code></pre></body></html>
+<pre><span id="VALformat_useconds_t"><span class="keyword">val</span> format_useconds_t</span> : <code class="type">Format.formatter -> <a href="PosixTypes.html#TYPEuseconds_t">PosixTypes.useconds_t</a> -> unit</code></pre>
+<pre><span id="VALformat_ldouble"><span class="keyword">val</span> format_ldouble</span> : <code class="type">Format.formatter -> <a href="LDouble.html#TYPEt">LDouble.t</a> -> unit</code></pre>
+<pre><span id="VALformat_complexld"><span class="keyword">val</span> format_complexld</span> : <code class="type">Format.formatter -> <a href="ComplexL.html#TYPEt">ComplexL.t</a> -> unit</code></pre></body></html>

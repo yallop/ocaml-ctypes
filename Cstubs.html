@@ -3,6 +3,7 @@
 <head>
 <link rel="stylesheet" href="style.css" type="text/css">
 <meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="Start" href="index.html">
 <link rel="previous" href="Cstubs_structs.html">
 <link rel="next" href="Cstubs_inverted.html">
@@ -12,11 +13,8 @@
 <link title="Index of values" rel=Appendix href="index_values.html">
 <link title="Index of modules" rel=Appendix href="index_modules.html">
 <link title="Index of module types" rel=Appendix href="index_module_types.html">
-<link title="Ctypes_static" rel="Chapter" href="Ctypes_static.html">
-<link title="Ctypes_primitive_types" rel="Chapter" href="Ctypes_primitive_types.html">
-<link title="Unsigned" rel="Chapter" href="Unsigned.html">
-<link title="Signed" rel="Chapter" href="Signed.html">
-<link title="Ctypes_structs" rel="Chapter" href="Ctypes_structs.html">
+<link title="LDouble" rel="Chapter" href="LDouble.html">
+<link title="ComplexL" rel="Chapter" href="ComplexL.html">
 <link title="Ctypes" rel="Chapter" href="Ctypes.html">
 <link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
 <link title="Ctypes_types" rel="Chapter" href="Ctypes_types.html">
@@ -24,7 +22,6 @@
 <link title="Dl" rel="Chapter" href="Dl.html">
 <link title="Libffi_abi" rel="Chapter" href="Libffi_abi.html">
 <link title="Foreign" rel="Chapter" href="Foreign.html">
-<link title="Cstubs_internals" rel="Chapter" href="Cstubs_internals.html">
 <link title="Cstubs_structs" rel="Chapter" href="Cstubs_structs.html">
 <link title="Cstubs" rel="Chapter" href="Cstubs.html">
 <link title="Cstubs_inverted" rel="Chapter" href="Cstubs_inverted.html"><title>Cstubs</title>
@@ -42,22 +39,148 @@ Operations for generating C bindings stubs.<br>
 <hr width="100%">
 
 <pre><span class="keyword">module</span> <a href="Cstubs.Types.html">Types</a>: <code class="code">sig</code> <a href="Cstubs.Types.html">..</a> <code class="code">end</code></pre>
-<pre><span class="keyword">module type</span> <a href="Cstubs.FOREIGN.html">FOREIGN</a> = <code class="code">sig</code> <a href="Cstubs.FOREIGN.html">..</a> <code class="code">end</code></pre>
-<pre><span class="keyword">module type</span> <a href="Cstubs.BINDINGS.html">BINDINGS</a> = <code class="code">functor (</code><code class="code">F</code><code class="code"> : </code><code class="type"><a href="Cstubs.FOREIGN.html">FOREIGN</a></code><code class="type">  with type 'a fn = unit</code><code class="code">) -&gt; </code><code class="code">sig</code> <a href="Cstubs.BINDINGS.html">..</a> <code class="code">end</code></pre>
-<pre><span id="VALwrite_c"><span class="keyword">val</span> write_c</span> : <code class="type">Format.formatter -> prefix:string -> (module Cstubs.BINDINGS) -> unit</code></pre><div class="info ">
+<pre><span class="keyword">module type</span> <a href="Cstubs.FOREIGN.html">FOREIGN</a> = <code class="type"><a href="Ctypes.FOREIGN.html">Ctypes.FOREIGN</a></code></pre>
+<pre><span class="keyword">module type</span> <a href="Cstubs.BINDINGS.html">BINDINGS</a> = <code class="code">functor (</code><code class="code">F</code><code class="code"> : </code><code class="type"><a href="Cstubs.FOREIGN.html">FOREIGN</a></code><code class="type">  with type 'a result = unit</code><code class="code">) -&gt; </code><code class="code">sig</code> <a href="Cstubs.BINDINGS.html">..</a> <code class="code">end</code></pre>
+<pre><span id="TYPEerrno_policy"><span class="keyword">type</span> <code class="type"></code>errno_policy</span> </pre>
+<div class="info ">
+Values of the <code class="code">errno_policy</code> type specify the errno support provided by
+    the generated code.  See <a href="Cstubs.html#VALignore_errno"><code class="code">Cstubs.ignore_errno</code></a> for the available option.<br>
+</div>
+
+
+<pre><span id="VALignore_errno"><span class="keyword">val</span> ignore_errno</span> : <code class="type"><a href="Cstubs.html#TYPEerrno_policy">errno_policy</a></code></pre><div class="info ">
+Generate code with no special support for errno.  This is the default.<br>
+</div>
+
+<pre><span id="VALreturn_errno"><span class="keyword">val</span> return_errno</span> : <code class="type"><a href="Cstubs.html#TYPEerrno_policy">errno_policy</a></code></pre><div class="info ">
+Generate code that returns errno in addition to the return value of each function.
+<p>
+
+    Passing <code class="code">return_errno</code> as the <code class="code">errno</code> argument to <a href="Cstubs.html#VALwrite_c"><code class="code">Cstubs.write_c</code></a> and
+    <a href="Cstubs.html#VALwrite_ml"><code class="code">Cstubs.write_ml</code></a> changes the return type of bound functions from a
+    single value to a pair of values.  For example, the binding
+    specification 
+<p>
+
+       <code class="code">let realpath = foreign "reaplath" (string @-&gt; string @-&gt; returning string)</code>
+<p>
+
+    generates a value of the following type by default:
+<p>
+
+       <code class="code">val realpath : string -&gt; string -&gt; stirng</code>
+<p>
+
+    but when using <code class="code">return_errno</code> the generated type is as follows:
+<p>
+
+       <code class="code">val realpath : string -&gt; string -&gt; stirng * int</code>
+<p>
+
+    and when using both <code class="code">return_errno</code> and <code class="code">lwt_jobs</code> the generated type is as
+    follows:
+<p>
+
+       <code class="code">val realpath : string -&gt; string -&gt; (stirng * int) Lwt.t</code><br>
+</div>
+
+<pre><span id="TYPEconcurrency_policy"><span class="keyword">type</span> <code class="type"></code>concurrency_policy</span> </pre>
+<div class="info ">
+Values of the <code class="code">concurrency_policy</code> type specify the concurrency support
+    provided by the generated code.  See <a href="Cstubs.html#VALsequential"><code class="code">Cstubs.sequential</code></a> and <a href="Cstubs.html#VALlwt_jobs"><code class="code">Cstubs.lwt_jobs</code></a> for the
+    available options.<br>
+</div>
+
+
+<pre><span id="VALsequential"><span class="keyword">val</span> sequential</span> : <code class="type"><a href="Cstubs.html#TYPEconcurrency_policy">concurrency_policy</a></code></pre><div class="info ">
+Generate code with no special support for concurrency.  This is the
+    default.<br>
+</div>
+
+<pre><span id="VALunlocked"><span class="keyword">val</span> unlocked</span> : <code class="type"><a href="Cstubs.html#TYPEconcurrency_policy">concurrency_policy</a></code></pre><div class="info ">
+Generate code that releases the runtime lock during C calls.<br>
+</div>
+
+<pre><span id="VALlwt_preemptive"><span class="keyword">val</span> lwt_preemptive</span> : <code class="type"><a href="Cstubs.html#TYPEconcurrency_policy">concurrency_policy</a></code></pre><div class="info ">
+Generate code which runs C function calls with the Lwt_preemptive module:
+<p>
+
+    http://ocsigen.org/lwt/2.5.1/api/Lwt_preemptive
+<p>
+
+    Passing <code class="code">lwt_preemptive</code> as the <code class="code">concurrency</code> argument to <a href="Cstubs.html#VALwrite_c"><code class="code">Cstubs.write_c</code></a> and
+    <a href="Cstubs.html#VALwrite_ml"><code class="code">Cstubs.write_ml</code></a> changes the return type of bound functions to include
+    the <code class="code">Lwt.t</code> constructor.  For example, the binding specification
+<p>
+
+       <code class="code">let unlink = foreign "unlink" (string @-&gt; returning int)</code>
+<p>
+
+    generates a value of the following type by default:
+<p>
+
+       <code class="code">val unlink : string -&gt; int</code>
+<p>
+
+    but when using <code class="code">lwt_preemptive</code> the generated type is as follows:
+<p>
+
+       <code class="code">val unlink : string -&gt; int Lwt.t</code>
+<p>
+
+    Additionally, the OCaml runtime lock is released during calls to functions
+    bound with <code class="code">lwt_preemptive</code>.<br>
+</div>
+
+<pre><span id="VALlwt_jobs"><span class="keyword">val</span> lwt_jobs</span> : <code class="type"><a href="Cstubs.html#TYPEconcurrency_policy">concurrency_policy</a></code></pre><div class="info ">
+Generate code which implements C function calls as Lwt jobs:
+<p>
+
+    http://ocsigen.org/lwt/2.5.1/api/Lwt_unix#TYPEjob
+<p>
+
+    Passing <code class="code">lwt_jobs</code> as the <code class="code">concurrency</code> argument to <a href="Cstubs.html#VALwrite_c"><code class="code">Cstubs.write_c</code></a> and
+    <a href="Cstubs.html#VALwrite_ml"><code class="code">Cstubs.write_ml</code></a> changes the return type of bound functions to include
+    the <code class="code">Lwt.t</code> constructor.  For example, the binding specification
+<p>
+
+       <code class="code">let unlink = foreign "unlink" (string @-&gt; returning int)</code>
+<p>
+
+    generates a value of the following type by default:
+<p>
+
+       <code class="code">val unlink : string -&gt; int</code>
+<p>
+
+    but when using <code class="code">lwt_jobs</code> the generated type is as follows:
+<p>
+
+       <code class="code">val unlink : string -&gt; int Lwt.t</code><br>
+</div>
+
+<pre><span id="VALwrite_c"><span class="keyword">val</span> write_c</span> : <code class="type">?concurrency:<a href="Cstubs.html#TYPEconcurrency_policy">concurrency_policy</a> -><br>       ?errno:<a href="Cstubs.html#TYPEerrno_policy">errno_policy</a> -><br>       Format.formatter -> prefix:string -> (module Cstubs.BINDINGS) -> unit</code></pre><div class="info ">
 <code class="code">write_c fmt ~prefix bindings</code> generates C stubs for the functions bound
     with <code class="code">foreign</code> in <code class="code">bindings</code>.  The stubs are intended to be used in
     conjunction with the ML code generated by <a href="Cstubs.html#VALwrite_ml"><code class="code">Cstubs.write_ml</code></a>.
+<p>
+
+    The optional argument <code class="code">concurrency</code> specifies the concurrency support
+    provided by the generated code.  The default is <code class="code">sequential</code>.
 <p>
 
     The generated code uses definitions exposed in the header file
     <code class="code">ctypes_cstubs_internals.h</code>.<br>
 </div>
 
-<pre><span id="VALwrite_ml"><span class="keyword">val</span> write_ml</span> : <code class="type">Format.formatter -> prefix:string -> (module Cstubs.BINDINGS) -> unit</code></pre><div class="info ">
+<pre><span id="VALwrite_ml"><span class="keyword">val</span> write_ml</span> : <code class="type">?concurrency:<a href="Cstubs.html#TYPEconcurrency_policy">concurrency_policy</a> -><br>       ?errno:<a href="Cstubs.html#TYPEerrno_policy">errno_policy</a> -><br>       Format.formatter -> prefix:string -> (module Cstubs.BINDINGS) -> unit</code></pre><div class="info ">
 <code class="code">write_ml fmt ~prefix bindings</code> generates ML bindings for the functions
     bound with <code class="code">foreign</code> in <code class="code">bindings</code>.  The generated code conforms to the
     <a href="Cstubs.FOREIGN.html"><code class="code">Cstubs.FOREIGN</code></a> interface.
+<p>
+
+    The optional argument <code class="code">concurrency</code> specifies the concurrency support
+    provided by the generated code.  The default is <code class="code">sequential</code>.
 <p>
 
     The generated code uses definitions exposed in the module

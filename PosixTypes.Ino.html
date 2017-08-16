@@ -3,6 +3,7 @@
 <head>
 <link rel="stylesheet" href="style.css" type="text/css">
 <meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="Start" href="index.html">
 <link rel="previous" href="PosixTypes.Dev.html">
 <link rel="next" href="PosixTypes.Mode.html">
@@ -12,11 +13,8 @@
 <link title="Index of values" rel=Appendix href="index_values.html">
 <link title="Index of modules" rel=Appendix href="index_modules.html">
 <link title="Index of module types" rel=Appendix href="index_module_types.html">
-<link title="Ctypes_static" rel="Chapter" href="Ctypes_static.html">
-<link title="Ctypes_primitive_types" rel="Chapter" href="Ctypes_primitive_types.html">
-<link title="Unsigned" rel="Chapter" href="Unsigned.html">
-<link title="Signed" rel="Chapter" href="Signed.html">
-<link title="Ctypes_structs" rel="Chapter" href="Ctypes_structs.html">
+<link title="LDouble" rel="Chapter" href="LDouble.html">
+<link title="ComplexL" rel="Chapter" href="ComplexL.html">
 <link title="Ctypes" rel="Chapter" href="Ctypes.html">
 <link title="PosixTypes" rel="Chapter" href="PosixTypes.html">
 <link title="Ctypes_types" rel="Chapter" href="Ctypes_types.html">
@@ -24,7 +22,6 @@
 <link title="Dl" rel="Chapter" href="Dl.html">
 <link title="Libffi_abi" rel="Chapter" href="Libffi_abi.html">
 <link title="Foreign" rel="Chapter" href="Foreign.html">
-<link title="Cstubs_internals" rel="Chapter" href="Cstubs_internals.html">
 <link title="Cstubs_structs" rel="Chapter" href="Cstubs_structs.html">
 <link title="Cstubs" rel="Chapter" href="Cstubs.html">
 <link title="Cstubs_inverted" rel="Chapter" href="Cstubs_inverted.html"><title>PosixTypes.Ino</title>
@@ -36,100 +33,5 @@
 </div>
 <h1>Module <a href="type_PosixTypes.Ino.html">PosixTypes.Ino</a></h1>
 
-<pre><span class="keyword">module</span> Ino: <code class="type"><a href="Unsigned.S.html">Unsigned.S</a></code><code class="type"> </code></pre><hr width="100%">
-
-<pre><span id="TYPEt"><span class="keyword">type</span> <code class="type"></code>t</span> </pre>
-
-
-<pre><span id="VALadd"><span class="keyword">val</span> add</span> : <code class="type"><a href="Unsigned.S.html#TYPEt">t</a> -> <a href="Unsigned.S.html#TYPEt">t</a> -> <a href="Unsigned.S.html#TYPEt">t</a></code></pre><div class="info ">
-Addition.<br>
-</div>
-
-<pre><span id="VALsub"><span class="keyword">val</span> sub</span> : <code class="type"><a href="Unsigned.S.html#TYPEt">t</a> -> <a href="Unsigned.S.html#TYPEt">t</a> -> <a href="Unsigned.S.html#TYPEt">t</a></code></pre><div class="info ">
-Subtraction.<br>
-</div>
-
-<pre><span id="VALmul"><span class="keyword">val</span> mul</span> : <code class="type"><a href="Unsigned.S.html#TYPEt">t</a> -> <a href="Unsigned.S.html#TYPEt">t</a> -> <a href="Unsigned.S.html#TYPEt">t</a></code></pre><div class="info ">
-Multiplication.<br>
-</div>
-
-<pre><span id="VALdiv"><span class="keyword">val</span> div</span> : <code class="type"><a href="Unsigned.S.html#TYPEt">t</a> -> <a href="Unsigned.S.html#TYPEt">t</a> -> <a href="Unsigned.S.html#TYPEt">t</a></code></pre><div class="info ">
-Division.  Raise <code class="code">Division_by_zero</code> if the second argument is zero.<br>
-</div>
-
-<pre><span id="VALrem"><span class="keyword">val</span> rem</span> : <code class="type"><a href="Unsigned.S.html#TYPEt">t</a> -> <a href="Unsigned.S.html#TYPEt">t</a> -> <a href="Unsigned.S.html#TYPEt">t</a></code></pre><div class="info ">
-Integer remainder.  Raise <code class="code">Division_by_zero</code> if the second argument is
-      zero.<br>
-</div>
-
-<pre><span id="VALmax_int"><span class="keyword">val</span> max_int</span> : <code class="type"><a href="Unsigned.S.html#TYPEt">t</a></code></pre><div class="info ">
-The greatest representable integer.<br>
-</div>
-
-<pre><span id="VALlogand"><span class="keyword">val</span> logand</span> : <code class="type"><a href="Unsigned.S.html#TYPEt">t</a> -> <a href="Unsigned.S.html#TYPEt">t</a> -> <a href="Unsigned.S.html#TYPEt">t</a></code></pre><div class="info ">
-Bitwise logical and.<br>
-</div>
-
-<pre><span id="VALlogor"><span class="keyword">val</span> logor</span> : <code class="type"><a href="Unsigned.S.html#TYPEt">t</a> -> <a href="Unsigned.S.html#TYPEt">t</a> -> <a href="Unsigned.S.html#TYPEt">t</a></code></pre><div class="info ">
-Bitwise logical or.<br>
-</div>
-
-<pre><span id="VALlogxor"><span class="keyword">val</span> logxor</span> : <code class="type"><a href="Unsigned.S.html#TYPEt">t</a> -> <a href="Unsigned.S.html#TYPEt">t</a> -> <a href="Unsigned.S.html#TYPEt">t</a></code></pre><div class="info ">
-Bitwise logical exclusive or.<br>
-</div>
-
-<pre><span id="VALshift_left"><span class="keyword">val</span> shift_left</span> : <code class="type"><a href="Unsigned.S.html#TYPEt">t</a> -> int -> <a href="Unsigned.S.html#TYPEt">t</a></code></pre><div class="info ">
-<a href="Unsigned.S.html#VALshift_left"><code class="code">Unsigned.S.shift_left</code></a> <code class="code">x</code> <code class="code">y</code> shifts <code class="code">x</code> to the left by <code class="code">y</code> bits.<br>
-</div>
-
-<pre><span id="VALshift_right"><span class="keyword">val</span> shift_right</span> : <code class="type"><a href="Unsigned.S.html#TYPEt">t</a> -> int -> <a href="Unsigned.S.html#TYPEt">t</a></code></pre><div class="info ">
-<a href="Unsigned.S.html#VALshift_right"><code class="code">Unsigned.S.shift_right</code></a> <code class="code">x</code> <code class="code">y</code> shifts <code class="code">x</code> to the right by <code class="code">y</code> bits.<br>
-</div>
-
-<pre><span id="VALof_int"><span class="keyword">val</span> of_int</span> : <code class="type">int -> <a href="Unsigned.S.html#TYPEt">t</a></code></pre><div class="info ">
-Convert the given int value to an unsigned integer.<br>
-</div>
-
-<pre><span id="VALto_int"><span class="keyword">val</span> to_int</span> : <code class="type"><a href="Unsigned.S.html#TYPEt">t</a> -> int</code></pre><div class="info ">
-Convert the given unsigned integer value to an int.<br>
-</div>
-
-<pre><span id="VALof_string"><span class="keyword">val</span> of_string</span> : <code class="type">string -> <a href="Unsigned.S.html#TYPEt">t</a></code></pre><div class="info ">
-Convert the given string to an unsigned integer.  Raise <code class="code">Failure</code>
-      <code class="code">"int_of_string"</code> if the given string is not a valid representation of
-      an unsigned integer.<br>
-</div>
-
-<pre><span id="VALto_string"><span class="keyword">val</span> to_string</span> : <code class="type"><a href="Unsigned.S.html#TYPEt">t</a> -> string</code></pre><div class="info ">
-Return the string representation of its argument.<br>
-</div>
-
-<pre><span id="VALzero"><span class="keyword">val</span> zero</span> : <code class="type"><a href="Unsigned.S.html#TYPEt">t</a></code></pre><div class="info ">
-The integer 0.<br>
-</div>
-
-<pre><span id="VALone"><span class="keyword">val</span> one</span> : <code class="type"><a href="Unsigned.S.html#TYPEt">t</a></code></pre><div class="info ">
-The integer 1.<br>
-</div>
-
-<pre><span id="VALlognot"><span class="keyword">val</span> lognot</span> : <code class="type"><a href="Unsigned.S.html#TYPEt">t</a> -> <a href="Unsigned.S.html#TYPEt">t</a></code></pre><div class="info ">
-Bitwise logical negation.<br>
-</div>
-
-<pre><span id="VALsucc"><span class="keyword">val</span> succ</span> : <code class="type"><a href="Unsigned.S.html#TYPEt">t</a> -> <a href="Unsigned.S.html#TYPEt">t</a></code></pre><div class="info ">
-Successor.<br>
-</div>
-
-<pre><span id="VALpred"><span class="keyword">val</span> pred</span> : <code class="type"><a href="Unsigned.S.html#TYPEt">t</a> -> <a href="Unsigned.S.html#TYPEt">t</a></code></pre><div class="info ">
-Predecessor.<br>
-</div>
-
-<pre><span id="VALcompare"><span class="keyword">val</span> compare</span> : <code class="type"><a href="Unsigned.S.html#TYPEt">t</a> -> <a href="Unsigned.S.html#TYPEt">t</a> -> int</code></pre><div class="info ">
-The comparison function for unsigned integers, with the same
-      specification as <code class="code">Pervasives.compare</code>.<br>
-</div>
-
-<pre><span class="keyword">module</span> <a href="Unsigned.S.Infix.html">Infix</a>: <code class="code">sig</code> <a href="Unsigned.S.Infix.html">..</a> <code class="code">end</code></pre><div class="info">
-Infix names for the unsigned integer operations.
-</div>
+<pre><span class="keyword">module</span> Ino: <code class="type">Unsigned.S</code><code class="type"> </code></pre><hr width="100%">
 </body></html>
