@@ -472,9 +472,12 @@ val coerce_fn : 'a fn -> 'b fn -> 'a -> 'b
     coercions. *)
 
 
-(** {2 Foreign function binding interface}.
+(** {2 binding interfaces}.
+*)
 
-    The {!Foreign} and {!Cstubs} modules provide concrete implementations.  *)
+(** Foreign function binding interface.
+
+    The {!Foreign} and {!Cstubs} modules provide concrete implementations. *)
 module type FOREIGN =
 sig
   type 'a fn
@@ -487,6 +490,77 @@ sig
   val foreign_value : string -> 'a typ -> 'a ptr result
 end
 
+(** Foreign types binding interface.
+
+    The {!Cstubs} module builds concrete implementations. *)
+module type TYPE =
+sig
+  include Ctypes_types.TYPE
+
+  type 'a const
+  val constant : string -> 'a typ -> 'a const
+  (** [constant name typ] retrieves the value of the compile-time constant
+      [name] of type [typ].  It can be used to retrieve enum constants,
+      #defined values and other integer constant expressions.
+
+      The type [typ] must be either an integer type such as [bool], [char],
+      [int], [uint8], etc., or a view (or perhaps multiple views) where the
+      underlying type is an integer type.
+
+      When the value of the constant cannot be represented in the type there
+      will typically be a diagnostic from either the C compiler or the OCaml
+      compiler.  For example, gcc will say
+
+         warning: overflow in implicit constant conversion *)
+
+  val enum : string -> ?typedef:bool ->
+    ?unexpected:(int64 -> 'a) -> ('a * int64 const) list -> 'a typ
+  (** [enum name ?unexpected alist] builds a type representation for the
+      enum named [name].  The size and alignment are retrieved so that the
+      resulting type can be used everywhere an integer type can be used: as
+      an array element or struct member, as an argument or return value,
+      etc.
+
+      The value [alist] is an association list of OCaml values and values
+      retrieved by the [constant] function.  For example, to expose the enum
+
+        enum letters \{ A, B, C = 10, D \}; 
+
+      you might first retrieve the values of the enumeration constants:
+
+      {[
+        let a = constant "A" int64_t
+        and b = constant "B" int64_t
+        and c = constant "C" int64_t
+        and d = constant "D" int64_t
+      ]}
+
+      and then build the enumeration type
+
+      {[
+        let letters = enum "letters" [
+           `A, a;
+           `B, b;
+           `C, c;
+           `D, d;
+        ] ~unexpected:(fun i -> `E i)
+      ]}
+
+      The [unexpected] function specifies the value to return in the case
+      that some unexpected value is encountered -- for example, if a
+      function with the return type 'enum letters' actually returns the
+      value [-1].
+
+      The optional flag [typedef] specifies whether the first argument,
+      [name], indicates an tag or an alias.  If [typedef] is [false] (the
+      default) then [name] is treated as an enumeration tag:
+
+        [enum letters { ... }]
+
+      If [typedef] is [true] then [name] is instead treated as an alias:
+
+        [typedef enum { ... } letters] *)
+end
 
 (** {2:roots Registration of OCaml values as roots} *)
 module Root :
