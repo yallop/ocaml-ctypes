@@ -7,7 +7,7 @@
 
 open Ctypes
 
-module Struct_stubs(S : Ctypes_types.TYPE) =
+module Struct_stubs(S : Ctypes.TYPE) =
 struct
   open S
 

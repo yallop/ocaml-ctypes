@@ -9,7 +9,7 @@ open Ctypes
 
 type fruit = Orange | Apple | Banana | Pear
 
-module Struct_stubs(S : Cstubs.Types.TYPE) =
+module Struct_stubs(S : Ctypes.TYPE) =
 struct
   open S
 
