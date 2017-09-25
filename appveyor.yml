@@ -10,8 +10,8 @@ environment:
   CYG_ROOT: C:\cygwin64
   EXTRA_DEPS: ctypes-foreign
   matrix:
-    - OPAM_SWITCH: 4.03.0+mingw64c
-    - OPAM_SWITCH: 4.03.0+mingw32c
+    - OPAM_SWITCH: 4.05.0+mingw64c
+    - OPAM_SWITCH: 4.05.0+mingw32c
 
 install:
   - ps: iex ((new-object net.webclient).DownloadString("https://raw.githubusercontent.com/$env:FORK_USER/ocaml-ci-scripts/$env:FORK_BRANCH/appveyor-install.ps1"))
