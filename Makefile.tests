@@ -238,7 +238,7 @@ tests/test-higher_order/generated_bindings.ml: $(BUILDDIR)/test-higher_order-stu
 
 test-enums-struct-stubs.dir  = tests/test-enums/struct-stubs
 test-enums-struct-stubs.threads = yes
-test-enums-struct-stubs.subproject_deps = ctypes cstubs \
+test-enums-struct-stubs.subproject_deps = ctypes \
    ctypes-foreign-base ctypes-foreign-threaded tests-common
 test-enums-struct-stubs: PROJECT=test-enums-struct-stubs
 test-enums-struct-stubs: $$(LIB_TARGETS)
@@ -246,7 +246,7 @@ test-enums-struct-stubs: $$(LIB_TARGETS)
 test-enums-stubs.dir  = tests/test-enums/stubs
 test-enums-stubs.threads = yes
 test-enums-stubs.extra_mls = generated_struct_bindings.ml
-test-enums-stubs.subproject_deps = ctypes cstubs \
+test-enums-stubs.subproject_deps = ctypes \
    test-enums-struct-stubs \
    test-enums-struct-stubs-generator \
    ctypes-foreign-base ctypes-foreign-threaded tests-common
@@ -347,7 +347,7 @@ $(BUILDDIR)/tests/test-structs/generated_struct_stubs.c: $(BUILDDIR)/test-struct
 
 test-constants-stubs.dir  = tests/test-constants/stubs
 test-constants-stubs.threads = yes
-test-constants-stubs.subproject_deps = ctypes cstubs \
+test-constants-stubs.subproject_deps = ctypes \
    ctypes-foreign-base ctypes-foreign-threaded tests-common
 test-constants-stubs: PROJECT=test-constants-stubs
 test-constants-stubs: $$(LIB_TARGETS)
@@ -962,7 +962,7 @@ tests/test-passing-ocaml-values/generated_bindings.ml: $(BUILDDIR)/test-passing-
 
 test-lwt-jobs-stubs.dir  = tests/test-lwt-jobs/stubs
 test-lwt-jobs-stubs.threads = yes
-test-lwt-jobs-stubs.subproject_deps = ctypes cstubs \
+test-lwt-jobs-stubs.subproject_deps = ctypes \
    ctypes-foreign-base ctypes-foreign-threaded tests-common
 test-lwt-jobs-stubs: PROJECT=test-lwt-jobs-stubs
 test-lwt-jobs-stubs: $$(LIB_TARGETS)
@@ -1005,7 +1005,7 @@ $(BUILDDIR)/tests/test-lwt-jobs/generated_struct_stubs.c: $(BUILDDIR)/test-lwt-j
 
 test-lwt-preemptive-stubs.dir  = tests/test-lwt-preemptive/stubs
 test-lwt-preemptive-stubs.threads = yes
-test-lwt-preemptive-stubs.subproject_deps = ctypes cstubs \
+test-lwt-preemptive-stubs.subproject_deps = ctypes \
    ctypes-foreign-base ctypes-foreign-threaded tests-common
 test-lwt-preemptive-stubs: PROJECT=test-lwt-preemptive-stubs
 test-lwt-preemptive-stubs: $$(LIB_TARGETS)
@@ -1048,7 +1048,7 @@ $(BUILDDIR)/tests/test-lwt-preemptive/generated_struct_stubs.c: $(BUILDDIR)/test
 
 test-returning-errno-lwt-jobs-stubs.dir  = tests/test-returning-errno-lwt-jobs/stubs
 test-returning-errno-lwt-jobs-stubs.threads = yes
-test-returning-errno-lwt-jobs-stubs.subproject_deps = ctypes cstubs \
+test-returning-errno-lwt-jobs-stubs.subproject_deps = ctypes \
    ctypes-foreign-base ctypes-foreign-threaded tests-common
 test-returning-errno-lwt-jobs-stubs: PROJECT=test-returning-errno-lwt-jobs-stubs
 test-returning-errno-lwt-jobs-stubs: $$(LIB_TARGETS)
@@ -1090,7 +1090,7 @@ $(BUILDDIR)/tests/test-returning-errno-lwt-jobs/generated_struct_stubs.c: $(BUIL
 
 test-returning-errno-lwt-preemptive-stubs.dir  = tests/test-returning-errno-lwt-preemptive/stubs
 test-returning-errno-lwt-preemptive-stubs.threads = yes
-test-returning-errno-lwt-preemptive-stubs.subproject_deps = ctypes cstubs \
+test-returning-errno-lwt-preemptive-stubs.subproject_deps = ctypes \
    ctypes-foreign-base ctypes-foreign-threaded tests-common
 test-returning-errno-lwt-preemptive-stubs: PROJECT=test-returning-errno-lwt-preemptive-stubs
 test-returning-errno-lwt-preemptive-stubs: $$(LIB_TARGETS)
@@ -1132,7 +1132,7 @@ $(BUILDDIR)/tests/test-returning-errno-lwt-preemptive/generated_struct_stubs.c: 
 
 test-returning-errno-stubs.dir  = tests/test-returning-errno/stubs
 test-returning-errno-stubs.threads = yes
-test-returning-errno-stubs.subproject_deps = ctypes cstubs \
+test-returning-errno-stubs.subproject_deps = ctypes \
    ctypes-foreign-base ctypes-foreign-threaded tests-common
 test-returning-errno-stubs: PROJECT=test-returning-errno-stubs
 test-returning-errno-stubs: $$(LIB_TARGETS)

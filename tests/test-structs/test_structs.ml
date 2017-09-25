@@ -436,7 +436,7 @@ module Stub_tests = Build_stub_tests(Generated_bindings)
 
 
 module Build_struct_stub_tests
-    (S : Ctypes_types.TYPE
+    (S : Ctypes.TYPE
           with type 'a typ = 'a Ctypes.typ
            and type ('a, 's) field = ('a, 's) Ctypes.field) =
 struct

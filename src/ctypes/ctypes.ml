@@ -32,3 +32,13 @@ sig
   val foreign : string -> ('a -> 'b) fn -> ('a -> 'b) result
   val foreign_value : string -> 'a typ -> 'a ptr result
 end
+
+module type TYPE =
+sig
+  include Ctypes_types.TYPE
+
+  type 'a const
+  val constant : string -> 'a typ -> 'a const
+  val enum : string -> ?typedef:bool ->
+    ?unexpected:(int64 -> 'a) -> ('a * int64 const) list -> 'a typ
+end
