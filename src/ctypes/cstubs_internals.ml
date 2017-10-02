@@ -29,12 +29,13 @@ let cptr (CPointer p) = p
 let fptr (Static_funptr p) = p
 
 let mkView :
-  type a b. string -> a typ -> unexpected:(a -> b) -> (b * a) list -> b typ =
-  fun name typ ~unexpected alist ->
-    let rlist = List.map (fun (l, r) -> (r, l)) alist in 
+  type a b. string -> a typ -> typedef:bool -> unexpected:(a -> b) -> (b * a) list -> b typ =
+  fun name typ ~typedef ~unexpected alist ->
+    let typedef = if typedef then "" else "enum " in
+    let rlist = List.map (fun (l, r) -> (r, l)) alist in
     let write k = List.assoc k alist
     and read k = try List.assoc k rlist with Not_found -> unexpected k
-    and format_typ k fmt = Format.fprintf fmt "enum %s%t" name k in
+    and format_typ k fmt = Format.fprintf fmt "%s%s%t" typedef name k in
     view typ ~format_typ ~read ~write
 
 let map_assocv f = List.map (fun (k, v) -> (k, f v))
@@ -64,7 +65,7 @@ let int64_of_uint32 x = Int64.of_string (Unsigned.UInt32.to_string x)
 let uint64_of_int64 = Unsigned.UInt64.of_int64
 let int64_of_uint64 = Unsigned.UInt64.to_int64
 
-let build_enum_type name underlying ?unexpected alist =
+let build_enum_type name underlying ?(typedef=false) ?unexpected alist =
   let build_view t coerce uncoerce =
     let unexpected = match unexpected with
         Some u -> fun x -> u (uncoerce x)
@@ -72,7 +73,7 @@ let build_enum_type name underlying ?unexpected alist =
         Printf.ksprintf failwith "Unexpected enum value for %s: %Ld"
           name (uncoerce x)
     in
-    mkView name t ~unexpected (map_assocv coerce alist) in
+    mkView name t ~typedef ~unexpected (map_assocv coerce alist) in
   match underlying with
     Ctypes_static.Int8 -> build_view Ctypes.int8_t int8_of_int64 int64_of_int8
   | Ctypes_static.Int16 -> build_view Ctypes.int16_t int16_of_int64 int64_of_int16
