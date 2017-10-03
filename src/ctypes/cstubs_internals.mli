@@ -95,6 +95,7 @@ type 'a prim = 'a Ctypes_primitive_types.prim =
 | Complexld : ComplexL.t prim
 
 val build_enum_type :
-  string -> Ctypes_static.arithmetic -> ?unexpected:(int64 -> 'a) -> ('a * int64) list -> 'a typ
+  string -> Ctypes_static.arithmetic -> ?typedef:bool ->
+  ?unexpected:(int64 -> 'a) -> ('a * int64) list -> 'a typ
 
 val use_value : 'a -> unit

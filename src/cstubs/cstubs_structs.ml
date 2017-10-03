@@ -220,7 +220,7 @@ let write_enums fmt enums =
   let case (name, typedef) =
     printf1 fmt
       (Format.sprintf
-         "  | %S -> \n    Cstubs_internals.build_enum_type %S Ctypes_static.%%s ?unexpected alist\n"
+         "  | %S -> \n    Cstubs_internals.build_enum_type %S Ctypes_static.%%s ?typedef ?unexpected alist\n"
          name
          name)
       (fun fmt ->

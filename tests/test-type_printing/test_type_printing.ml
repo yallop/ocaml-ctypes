@@ -9,6 +9,9 @@ open OUnit2
 open Ctypes
 
 
+module Struct_stubs = Types.Stubs(Generated_struct_bindings)
+
+
 let strip_whitespace = Str.(global_replace (regexp "[\n ]+") "")
 
 let equal_ignoring_whitespace l r =
@@ -540,6 +543,31 @@ let test_view_printing _ =
 
 
 
+(*
+   Test the printing of enum types
+*)
+let test_enum_printing _ =
+  begin
+    assert_typ_printed_as ~name:"f" "enum fruit f"
+      Struct_stubs.fruit;
+
+    assert_typ_printed_as "enum fruit"
+      Struct_stubs.fruit;
+
+    assert_typ_printed_as ~name:"b" "bears_t b"
+      Struct_stubs.bears_t;
+
+    assert_typ_printed_as "bears_t"
+      Struct_stubs.bears_t;
+
+    assert_typ_printed_as ~name:"l" "letter_t l"
+      Struct_stubs.letter_t;
+
+    assert_typ_printed_as "letter_t"
+      Struct_stubs.letter_t;
+  end
+
+
 let suite = "Type printing tests" >:::
   ["printing atomic types"
     >:: test_atomic_printing;
@@ -570,6 +598,9 @@ let suite = "Type printing tests" >:::
 
    "printing views"
     >:: test_view_printing;
+
+   "printing enums"
+    >:: test_enum_printing;
   ]
 
 

@@ -237,6 +237,9 @@ struct fruit_cell {
   struct fruit_cell *next;
 };
 
+typedef enum letter letter_t;
+typedef enum bears bears_t;
+
 int32_t sum_int_array(int32_t *, size_t);
 
 void save_ocaml_value(void *);
