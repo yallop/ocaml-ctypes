@@ -660,9 +660,39 @@ test-marshal: $$(BEST_TARGET)
 test-type_printing.dir = tests/test-type_printing
 test-type_printing.threads = yes
 test-type_printing.deps = str bigarray oUnit bytes integers
-test-type_printing.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-threaded
+test-type_printing.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-threaded \
+  cstubs test-type_printing-stubs tests-common
+test-type_printing.link_flags = -L$(BUILDDIR)/clib -ltest_functions
 test-type_printing: PROJECT=test-type_printing
 test-type_printing: $$(BEST_TARGET)
+
+test-type_printing-stubs.dir  = tests/test-type_printing/stubs
+test-type_printing-stubs.threads = yes
+test-type_printing-stubs.subproject_deps = ctypes \
+   ctypes-foreign-base ctypes-foreign-threaded tests-common
+test-type_printing-stubs: PROJECT=test-type_printing-stubs
+test-type_printing-stubs: $$(LIB_TARGETS)
+
+test-type_printing-stub-generator.dir = tests/test-type_printing/stub-generator
+test-type_printing-stub-generator.threads = yes
+test-type_printing-stub-generator.subproject_deps = ctypes cstubs \
+     ctypes-foreign-base ctypes-foreign-threaded test-type_printing-stubs tests-common
+test-type_printing-stub-generator.deps = str bigarray bytes integers
+test-type_printing-stub-generator: PROJECT=test-type_printing-stub-generator
+test-type_printing-stub-generator: $$(BEST_TARGET)
+
+test-type_printing-generated= \
+  tests/test-type_printing/generated_struct_bindings.ml \
+  $(BUILDDIR)/tests/test-type_printing/generated_struct_stubs.c
+
+test-type_printing-generated: $(test-type_printing-generated)
+
+tests/test-type_printing/generated_struct_bindings.ml: $(BUILDDIR)/test-type_printing-ml-stub-generator.$(BEST)
+	$< > $@
+$(BUILDDIR)/test-type_printing-ml-stub-generator.$(BEST): $(BUILDDIR)/tests/test-type_printing/generated_struct_stubs.c
+	$(CC) -I `$(OCAMLFIND) ocamlc -where | sed 's|\r$$||'` $(CFLAGS) $(LDFLAGS) $(WINLDFLAGS) -o $@ $^
+$(BUILDDIR)/tests/test-type_printing/generated_struct_stubs.c: $(BUILDDIR)/test-type_printing-stub-generator.$(BEST)
+	$< --c-struct-file $@
 
 test-value_printing-stubs.dir  = tests/test-value_printing/stubs
 test-value_printing-stubs.threads = yes
@@ -1274,7 +1304,7 @@ TESTS += test-alignment
 TESTS += test-views-stubs test-views-stub-generator test-views-generated test-views
 TESTS += test-oo_style-stubs test-oo_style-stub-generator test-oo_style-generated test-oo_style
 TESTS += test-marshal
-TESTS += test-type_printing
+TESTS += test-type_printing-stubs test-type_printing-stub-generator test-type_printing-generated test-type_printing
 TESTS += test-value_printing-stubs test-value_printing-stub-generator test-value_printing-generated test-value_printing
 TESTS += test-complex-stubs test-complex-stub-generator test-complex-generated test-complex
 TESTS += test-bools-stubs test-bools-stub-generator test-bools-generated test-bools
