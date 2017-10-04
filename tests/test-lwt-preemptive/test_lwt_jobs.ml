@@ -51,7 +51,7 @@ let test_object_lifetime _ =
  *)
 let test_string_lifetime _ =
   let s = make Structures.stat in
-  let call = (Bindings.stat (Bytes.copy ".") (addr s)).Generated_bindings.lwt
+  let call = (Bindings.stat (Bytes.to_string (Bytes.of_string ".")) (addr s)).Generated_bindings.lwt
   in
   begin
     Gc.compact ();
