@@ -1,6 +1,17 @@
+## ctypes 0.13.0
+
+* Print typedefed enums correctly  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/547
+
+* Move the TYPE and FOREIGN signatures from cstubs to ctypes  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/544  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/537
+
+Thanks to Leo White (@lpw25) for contributing to this release.
+
 ## ctypes 0.12.1
 
-* Preserve intermediate values from views across foreign calls.
+* Preserve intermediate values from views across foreign calls.  
   https://github.com/ocamllabs/ocaml-ctypes/pull/531
 
 ## ctypes 0.12.0
