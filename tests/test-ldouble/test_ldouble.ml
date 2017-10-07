@@ -173,17 +173,25 @@ let test_complex _ =
   assert_polar ()
 
 let test_marshal _ = 
+  let same_repr x y =
+    let open Obj in
+    let x = magic x in
+    let y = magic y in
+    is_block x && is_block y && size x = size y && tag x = tag y
+  in
   let assert_ldouble x = 
-    let x = "foo", LDouble.of_float x, 1 in
+    let (_,xc,_) as x = "foo", LDouble.of_float x, 1 in
     let s = Marshal.to_string x [] in
-    let y : string * LDouble.t * int = Marshal.from_string s 0 in
-    assert_bool "marshal ldouble" (x=y)
+    let ((_,yc,_) : string * LDouble.t * int) as y = Marshal.from_string s 0 in
+    assert_bool "marshal ldouble" (x=y);
+    assert_bool "marshal ldouble repr" (same_repr xc yc)
   in
   let assert_complex x = 
-    let x = "f00", ComplexL.of_complex x, 1 in
+    let (_,xc,_) as x = "f00", ComplexL.of_complex x, 1 in
     let s = Marshal.to_string x [] in
-    let y : string * ComplexL.t * int = Marshal.from_string s 0 in
-    assert_bool "marshal ldouble complex" (x=y)
+    let ((_,yc,_) : string * ComplexL.t * int) as y = Marshal.from_string s 0 in
+    assert_bool "marshal ldouble complex" (x=y);
+    assert_bool "marshal ldouble complex repr" (same_repr xc yc)
   in
   assert_ldouble 23.11234;
   assert_ldouble (-23.9345);
@@ -217,6 +225,12 @@ let test_comparisons _ =
     assert_equal (-1) (compare nan (of_float 1.0));
     assert_equal (-1) (compare nan infinity);
     assert_equal (-1) (compare nan neg_infinity);
+  end;
+  begin (* ComplexL compare *)
+    let b re im = ComplexL.of_complex {Complex.re = re; im} in
+    assert_equal false (b 2.0 3.9 = b 2.0 3.7);
+    assert_equal false (b 3.9 2.0 = b 2.1 2.0);
+    assert_equal true (b 0.0 1.0 = b 0.0 1.0)
   end
 
 let test_int_conversions _ =

@@ -134,30 +134,25 @@ static intnat ldouble_hash(value v) {
   return ldouble_mix_hash(0, ldouble_custom_val(v));
 }
 
-static int ldouble_serialize_data(long double *q) {
+static void ldouble_serialize_data(long double *q) {
   unsigned char *p = (unsigned char *)q;
   if (LDOUBLE_VALUE_BYTES == 16) {
     caml_serialize_block_8(p, 2);
-    return 16;
   } else if (LDOUBLE_VALUE_BYTES == 10) {
     caml_serialize_block_8(p, 1);
     caml_serialize_block_2(p+8, 1);
-    return 10;
   } else {
     double d = (double) *q;
     if (sizeof(double) == 4) caml_serialize_float_4(d);
     else caml_serialize_float_8(d);
-    return sizeof(double);
   }
 }
 
 static void ldouble_serialize(value v, uintnat *wsize_32, uintnat *wsize_64) {
   long double p = norm(ldouble_custom_val(v));
-  int size;
   caml_serialize_int_1(LDBL_MANT_DIG);
-  size = ldouble_serialize_data(&p);
-  *wsize_32 = 1+size;
-  *wsize_64 = 1+size;
+  ldouble_serialize_data(&p);
+  *wsize_32 = *wsize_64 = sizeof(long double);
 }
 
 static int ldouble_deserialize_data(long double *q) {
@@ -179,11 +174,10 @@ static int ldouble_deserialize_data(long double *q) {
 }
 
 static uintnat ldouble_deserialize(void *d) {
-  int size;
   if (caml_deserialize_uint_1() != LDBL_MANT_DIG)
     caml_deserialize_error("invalid long double size");
-  size = ldouble_deserialize_data((long double *) d);
-  return 1+size;
+  ldouble_deserialize_data((long double *) d);
+  return (sizeof(long double));
 }
 
 static struct custom_operations caml_ldouble_ops = {
@@ -446,8 +440,8 @@ value ctypes_ldouble_size(value unit) {
 
 static int ldouble_complex_cmp_val(value v1, value v2)
 {
-  long double complex u1 = ldouble_custom_val(v1);
-  long double complex u2 = ldouble_custom_val(v2);
+  long double complex u1 = ldouble_complex_custom_val(v1);
+  long double complex u2 = ldouble_complex_custom_val(v2);
   int cmp_real = ldouble_cmp(creall(u1), creall(u2));
   return cmp_real == 0 ? ldouble_cmp(cimagl(u1), cimagl(u2)) : cmp_real;
 }
@@ -458,15 +452,14 @@ static intnat ldouble_complex_hash(value v) {
 }
 
 static void ldouble_complex_serialize(value v, uintnat *wsize_32, uintnat *wsize_64) {
-  long double re,im,*p = Data_custom_val(v);
-  int size;
+  long double re,im;
+  long double complex *p = Data_custom_val(v);
   caml_serialize_int_1(LDBL_MANT_DIG);
   re = creall(*p);
-  size = ldouble_serialize_data(&re);
+  ldouble_serialize_data(&re);
   im = cimagl(*p);
-  size += ldouble_serialize_data(&im);
-  *wsize_32 = 1+size;
-  *wsize_64 = 1+size;
+  ldouble_serialize_data(&im);
+  *wsize_32 = *wsize_64 = sizeof(long double complex);
 }
 
 static uintnat ldouble_complex_deserialize(void *d) {
@@ -477,7 +470,7 @@ static uintnat ldouble_complex_deserialize(void *d) {
   size = ldouble_deserialize_data(&re);
   size += ldouble_deserialize_data(&im);
   *(long double complex *)d = (re + im * I);
-  return 1+size;
+  return (sizeof(long double complex));
 }
 
 static struct custom_operations caml_ldouble_complex_ops = {
