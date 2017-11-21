@@ -1,3 +1,8 @@
+## ctypes 0.13.1
+
+* Add -no-keep-locs to the foreign-(un)?threaded build rules.  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/553
+
 ## ctypes 0.13.0
 
 * Print typedefed enums correctly  
