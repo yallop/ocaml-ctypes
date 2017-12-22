@@ -84,6 +84,7 @@ cstubs.subproject_deps = ctypes
 cstubs.deps = str bytes integers
 cstubs.install = yes
 cstubs.install_native_objects = yes
+cstubs.extra_hs = $(package_integers_path)/ocaml_integers.h
 
 cstubs: PROJECT=cstubs
 cstubs: $(cstubs.dir)/$(cstubs.extra_mls) $$(LIB_TARGETS)
