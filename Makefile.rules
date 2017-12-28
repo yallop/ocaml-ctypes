@@ -80,8 +80,7 @@ INSTALL_CMIS = $($(PROJECT).public:%=$(BUILDDIR)/$($(PROJECT).dir)/%.cmi) \
 INSTALL_CMTIS = $($(PROJECT).public:%=$(BUILDDIR)/$($(PROJECT).dir)/%.cmti)
 INSTALL_CMTS = $($(PROJECT).public:%=$(BUILDDIR)/$($(PROJECT).dir)/%.cmt)
 INSTALL_MLIS = $($(PROJECT).public:%=$($(PROJECT).dir)/%.mli)
-INSTALL_HEADERS = $(wildcard $($(PROJECT).dir)/*.h) \
-                  $(package_integers_path)/ocaml_integers.h
+INSTALL_HEADERS = $(wildcard $($(PROJECT).dir)/*.h) $($(PROJECT).extra_hs)
 THREAD_FLAG = $(if $(filter yes,$($(PROJECT).threads)),-thread)
 LINK_FLAGS = $(as_needed_flags) $($(PROJECT).link_flags)
 OCAML_LINK_FLAGS=$(LINK_FLAGS:%=-cclib %)
