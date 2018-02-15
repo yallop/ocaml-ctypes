@@ -1,8 +1,22 @@
 (jbuild_version 1)
 
+(rule
+ ((deps (config/backend.sexp))
+  (targets (dl_stubs.c))
+  (action (copy# "dl_stubs.c.${read:config/backend.sexp}" ${@}))))
+
+(rule
+ ((deps (config/backend.sexp))
+  (targets (dl.ml))
+  (action (copy# "dl.ml.${read:config/backend.sexp}" ${@}))))
+
+(rule
+ (with-stdout-to libffi_abi.ml (run ../configure/gen_libffi_abi.exe)))
+
 (library
  ((name ctypes_foreign_base)
   (public_name ctypes.foreign.base)
+  (wrapped false)
   (libraries (ctypes))
   (c_library_flags (:include c_library_flags.sexp))
   (c_flags (:include c_flags.sexp))

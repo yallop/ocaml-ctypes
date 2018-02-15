@@ -1,0 +1,7 @@
+(jbuild_version 1)
+
+(library
+ ((name ctypes_foreign_unthreaded)
+  (public_name ctypes.foreign.unthreaded)
+  (wrapped false)
+  (libraries (ctypes.foreign.base))))
