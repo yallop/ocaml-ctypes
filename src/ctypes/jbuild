@@ -1,0 +1,16 @@
+(jbuild_version 1)
+
+(library
+ ((name ctypes)
+  (public_name ctypes)
+  (wrapped false)
+  (libraries (bigarray bytes integers))
+  (c_names
+   (complex_stubs
+    ctypes_bigarrays
+    ctypes_roots
+    ldouble_stubs
+    managed_buffer_stubs
+    posix_types_stubs
+    raw_pointer_stubs
+    type_info_stubs))))

@@ -1,0 +1,14 @@
+(jbuild_version 1)
+
+(library
+ ((name ctypes_foreign_base)
+  (public_name ctypes.foreign.base)
+  (libraries (ctypes))
+  (c_library_flags (:include c_library_flags.sexp))
+  (c_flags (:include c_flags.sexp))
+  (c_names (dl_stubs ffi_call_stubs ffi_type_stubs))))
+
+(rule
+ ((targets (c_flags.sexp c_library_flags.sexp))
+  (deps (config/discover.exe))
+  (action (run ${<} -ocamlc ${OCAMLC}))))
