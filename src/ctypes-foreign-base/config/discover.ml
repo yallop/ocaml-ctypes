@@ -17,5 +17,11 @@ let () =
       let write_sexp file sexp =
         Out_channel.write_all file ~data:(Sexp.to_string sexp)
       in
+      let backend =
+        match C.ocaml_config_var_exn c "system" with
+        | "Win32" -> "win"
+        | _ -> "unix" in
       write_sexp "c_flags.sexp" (sexp_of_list sexp_of_string conf.cflags);
-      write_sexp "c_library_flags.sexp" (sexp_of_list sexp_of_string conf.libs))
+      write_sexp "c_library_flags.sexp" (sexp_of_list sexp_of_string conf.libs);
+      write_sexp "backend.sexp" (sexp_of_string backend)
+    )

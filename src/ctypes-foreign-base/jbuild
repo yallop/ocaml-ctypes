@@ -1,14 +1,14 @@
 (jbuild_version 1)
 
 (rule
- ((deps (config/backend.sexp))
+ ((deps (backend.sexp))
   (targets (dl_stubs.c))
-  (action (copy# "dl_stubs.c.${read:config/backend.sexp}" ${@}))))
+  (action (copy# "dl_stubs.c.${read:backend.sexp}" ${@}))))
 
 (rule
- ((deps (config/backend.sexp))
+ ((deps (backend.sexp))
   (targets (dl.ml))
-  (action (copy# "dl.ml.${read:config/backend.sexp}" ${@}))))
+  (action (copy# "dl.ml.${read:backend.sexp}" ${@}))))
 
 (rule
  (with-stdout-to libffi_abi.ml (run ../configure/gen_libffi_abi.exe)))
@@ -23,6 +23,6 @@
   (c_names (dl_stubs ffi_call_stubs ffi_type_stubs))))
 
 (rule
- ((targets (c_flags.sexp c_library_flags.sexp))
+ ((targets (c_flags.sexp c_library_flags.sexp backend.sexp))
   (deps (config/discover.exe))
   (action (run ${<} -ocamlc ${OCAMLC}))))
