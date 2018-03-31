@@ -5,7 +5,9 @@
  * See the file LICENSE for details.
  *)
 
-exception Uncoercible
+type uncoercible_info
+
+exception Uncoercible of uncoercible_info
 
 val coerce : 'a Ctypes_static.typ -> 'b Ctypes_static.typ -> 'a -> 'b
 
