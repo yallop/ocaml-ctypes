@@ -275,6 +275,10 @@ sig
   (** [unsafe_set a n v] behaves like [set a n v] except that the check that
       [n] between [0] and [(CArray.length a - 1)] is not performed. *)
 
+  val of_string : string -> char t
+  (** [of_string s] builds an array of the same length as [s], and writes
+      the elements of [s] to the corresponding elements of the array. *)
+
   val of_list : 'a typ -> 'a list -> 'a t
   (** [of_list t l] builds an array of type [t] of the same length as [l], and
       writes the elements of [l] to the corresponding elements of the array. *)
