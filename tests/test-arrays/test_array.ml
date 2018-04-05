@@ -92,7 +92,6 @@ let test_multidimensional_arrays _ =
     done
   done
 
-
 (*
   Test the CArray.iter function
  *)
@@ -209,6 +208,21 @@ let test_sub _ =
     assert_equal [1; 2; 3] (CArray.to_list a);
     assert_equal [10; 3] (CArray.to_list r);
   end
+
+
+(*
+  Test the CArray.of_string function
+*)
+let test_of_string _ =
+  let s = "abcdefghiABCDEFGHI" in
+  let a = CArray.of_string s in
+  let s' = coerce (ptr char) string (CArray.start a) in
+  assert_equal s s';
+
+  let s = "" in
+  let a = CArray.of_string s in
+  let s' = coerce (ptr char) string (CArray.start a) in
+  assert_equal s s'
 
 
 (*
@@ -374,6 +388,9 @@ let suite = "Array tests" >:::
 
    "CArray.sub"
     >:: test_sub;
+
+   "CArray.of_string"
+   >:: test_of_string;
 
    "array initialization"
     >:: test_array_initialiation;

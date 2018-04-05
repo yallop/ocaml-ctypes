@@ -192,6 +192,11 @@ sig
       To avoid problems with the garbage collector, values passed using
       {!string} are copied into immovable C-managed storage before being passed
       to C.
+
+      When the memory is not owned by the C code, -- i.e. when creating or
+      initializing a struct in OCaml before passing it to C -- then the
+      {!string} view isn't a good choice, because there's no way to manage the
+      lifetime of the C copy of the generated OCaml string.
   *)
 
   val string_opt : string option typ
