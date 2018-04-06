@@ -215,8 +215,10 @@ struct
   let element_type { astart } = reference_type astart
 
   let of_string string =
-    let arr = make char (String.length string) in
+    let len = String.length string in
+    let arr = make char (len + 1) in
     String.iteri (set arr) string;
+    set arr len '\x00';
     arr
 
   let of_list typ list =
