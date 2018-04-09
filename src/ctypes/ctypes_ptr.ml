@@ -7,36 +7,13 @@
 
 (* Boxed pointers to C memory locations . *)
 
-module Raw :
-sig
-  include Signed.S
-  val null : t
-end =
-struct
+module Raw = struct
   include Nativeint
-
-  module Infix =
-  struct
-    let (+) = add
-    let (-) = sub
-    let ( * ) = mul
-    let (/) = div
-    let (mod) = rem
-    let (land) = logand
-    let (lor) = logor
-    let (lxor) = logxor
-    let (lsl) = shift_left
-    let (lsr) = shift_right_logical
-  end
 
   let of_nativeint x = x
   let to_nativeint x = x
-  let of_int64 = Int64.to_nativeint
-  let to_int64  = Int64.of_nativeint
 
   let null = zero
-  let min = Pervasives.min
-  let max = Pervasives.max
 end
 
 type voidp = Raw.t
