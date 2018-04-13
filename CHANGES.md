@@ -1,3 +1,18 @@
+## ctypes 0.14.0
+
+* Add `CArray.of_string`  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/562  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/563
+
+* Attach ocaml_integers.h to the cstubs subpackage  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/557
+
+* fix custom operations of ComplexL  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/549
+
+Thanks to Andreas Hauptmann (@fdopen), Rudi Grinberg (@rgrinberg) and
+Marcello Seri (@mseri) for contributions to this release.
+
 ## ctypes 0.13.1
 
 * Add -no-keep-locs to the foreign-(un)?threaded build rules.  
