@@ -78,6 +78,8 @@ static long double norm(long double x) {
   }
 }
 
+extern int caml_compare_unordered;
+
 static int ldouble_cmp(long double u1, long double u2) {
   if (u1 < u2) return -1;
   if (u1 > u2) return 1;
