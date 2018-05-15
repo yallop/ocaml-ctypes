@@ -13,6 +13,8 @@ sig
   val constant : string -> 'a typ -> 'a const
 
   val enum : string -> ?typedef:bool -> ?unexpected:(int64 -> 'a) -> ('a * int64 const) list -> 'a typ
+
+  val interrogated_abstract : name:string -> 'a Ctypes.abstract typ
 end
 
 module type BINDINGS = functor (F : TYPE) -> sig end

@@ -303,7 +303,7 @@ sig
       itself as the second argument. *)
 
   val fold_left : ('a -> 'b -> 'a) -> 'a -> 'b t -> 'a
-  (** [CArray.fold_left (@) x a] computes 
+  (** [CArray.fold_left (@) x a] computes
          [(((x @ a.(0)) @ a.(1)) ...) @ a.(n-1)]
        where [n] is the length of the array [a]. *)
 
@@ -528,7 +528,7 @@ sig
       The value [alist] is an association list of OCaml values and values
       retrieved by the [constant] function.  For example, to expose the enum
 
-        enum letters \{ A, B, C = 10, D \}; 
+        enum letters \{ A, B, C = 10, D \};
 
       you might first retrieve the values of the enumeration constants:
 
@@ -564,6 +564,8 @@ sig
       If [typedef] is [true] then [name] is instead treated as an alias:
 
         [typedef enum { ... } letters] *)
+
+  val interrogated_abstract : name:string -> 'a abstract typ
 end
 
 (** {2:roots Registration of OCaml values as roots} *)
