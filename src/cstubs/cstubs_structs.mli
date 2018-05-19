@@ -5,17 +5,7 @@
  * See the file LICENSE for details.
  *)
 
-module type TYPE =
-sig
-  include Ctypes_types.TYPE
-
-  type 'a const
-  val constant : string -> 'a typ -> 'a const
-
-  val enum : string -> ?typedef:bool -> ?unexpected:(int64 -> 'a) -> ('a * int64 const) list -> 'a typ
-
-  val interrogated_abstract : name:string -> 'a Ctypes.abstract typ
-end
+module type TYPE = Ctypes.TYPE
 
 module type BINDINGS = functor (F : TYPE) -> sig end
 
