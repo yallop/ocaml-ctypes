@@ -10,16 +10,18 @@
 module Types :
 sig
   module type TYPE = Ctypes.TYPE
+    [@@deprecated "Cstubs.Types.TYPE is deprecated. Use Ctypes.TYPE instead"]
 
-  module type BINDINGS = functor (F : TYPE) -> sig end
+  module type BINDINGS = functor (F : Ctypes.TYPE) -> sig end
 
   val write_c : Format.formatter -> (module BINDINGS) -> unit
 end
 
 
 module type FOREIGN = Ctypes.FOREIGN
+  [@@deprecated "Cstubs.FOREIGN is deprecated. Use Ctypes.FOREIGN instead"]
 
-module type BINDINGS = functor (F : FOREIGN with type 'a result = unit) -> sig end
+module type BINDINGS = functor (F : Ctypes.FOREIGN with type 'a result = unit) -> sig end
 
 type errno_policy
 (** Values of the [errno_policy] type specify the errno support provided by
@@ -35,7 +37,7 @@ val return_errno : errno_policy
     Passing [return_errno] as the [errno] argument to {!Cstubs.write_c} and
     {!Cstubs.write_ml} changes the return type of bound functions from a
     single value to a pair of values.  For example, the binding
-    specification 
+    specification
 
        [let realpath = foreign "reaplath" (string @-> string @-> returning string)]
 

@@ -6,7 +6,8 @@
  *)
 
 module type TYPE = Ctypes.TYPE
+  [@@deprecated "Cstubs_structs.TYPE is deprecated. Use Ctypes.TYPE instead"]
 
-module type BINDINGS = functor (F : TYPE) -> sig end
+module type BINDINGS = functor (F : Ctypes.TYPE) -> sig end
 
 val write_c : Format.formatter -> (module BINDINGS) -> unit

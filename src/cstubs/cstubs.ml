@@ -9,7 +9,7 @@
 
 module type FOREIGN = Ctypes.FOREIGN
 
-module type FOREIGN' = FOREIGN with type 'a result = unit
+module type FOREIGN' = Ctypes.FOREIGN with type 'a result = unit
 
 module type BINDINGS = functor (F : FOREIGN') -> sig end
 

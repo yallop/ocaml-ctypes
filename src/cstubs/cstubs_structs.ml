@@ -9,7 +9,7 @@ open Ctypes
 
 module type TYPE = Ctypes.TYPE
 
-module type BINDINGS = functor (F : TYPE) -> sig end
+module type BINDINGS = functor (F : Ctypes.TYPE) -> sig end
 
 let cstring s =
   (* Format a string for output as a C string literal. *)
