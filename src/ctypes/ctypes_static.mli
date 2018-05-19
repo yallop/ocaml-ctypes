@@ -9,8 +9,8 @@
 
 type abstract_type = {
   aname : string;
-  asize : int;
-  aalignment : int;
+  asize : int option;
+  aalignment : int option;
 }
 
 type _ ocaml_type =
@@ -152,7 +152,7 @@ val ocaml_bytes : Bytes.t ocaml typ
 val ocaml_float_array : float array ocaml typ
 val ptr : 'a typ -> 'a ptr typ
 val ( @-> ) : 'a typ -> 'b fn -> ('a -> 'b) fn
-val abstract : name:string -> size:int -> alignment:int -> 'a abstract typ
+val abstract : name:string -> ?size:int -> ?alignment:int -> 'a abstract typ
 val view : ?format_typ:((Format.formatter -> unit) ->
                         Format.formatter -> unit) ->
            ?format: (Format.formatter -> 'b -> unit) ->

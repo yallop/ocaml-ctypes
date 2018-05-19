@@ -57,7 +57,8 @@ let rec write : type a b. a typ -> a -> b Fat.t -> unit
     | Struct { spec = Complete _ } as s -> write_aggregate (sizeof s)
     | Union { uspec = None } -> raise IncompleteType
     | Union { uspec = Some { size } } -> write_aggregate size
-    | Abstract { asize } -> write_aggregate asize
+    | Abstract { asize = None } -> raise IncompleteType
+    | Abstract { asize = Some size } -> write_aggregate size
     | Array _ as a ->
       let size = sizeof a in
       (fun { astart = CPointer src } dst ->
@@ -415,7 +416,7 @@ struct
 
   let set : 'a. unit ptr -> 'a -> unit =
     fun p v -> Stubs.set (raw_addr p) v
-  
+
   let release : 'a. unit ptr -> unit =
     fun p -> Stubs.release (raw_addr p)
 end

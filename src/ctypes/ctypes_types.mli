@@ -327,9 +327,17 @@ sig
 
   (** {3 Abstract types} *)
 
-  val abstract : name:string -> size:int -> alignment:int -> 'a Ctypes_static.abstract typ
-  (** Create an abstract type specification from the size and alignment
-      requirements for the type. *)
+  val abstract : name:string -> ?size:int -> ?alignment:int -> 'a Ctypes_static.abstract typ
+  (** Create an abstract type specification.
+
+      If [abstract] is used with [Cstubs_structs], [Cstubs_structs] generates
+      code for automatically discovering the size and alignment from C. [~size]
+      and [~alignment] can still be specified to override the discovered values.
+
+      When not using [Cstubs_structs], not specifying [~size] and [~alignment]
+      results in an incomplete type, which cannot be used in structs, unions, or
+      arrays, and cannot have [Ctypes.sizeof] and/or [Ctypes.alignment] applied
+      to it. *)
 
   (** {3 Injection of concrete types} *)
 

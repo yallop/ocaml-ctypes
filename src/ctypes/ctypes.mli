@@ -564,8 +564,6 @@ sig
       If [typedef] is [true] then [name] is instead treated as an alias:
 
         [typedef enum { ... } letters] *)
-
-  val interrogated_abstract : name:string -> 'a abstract typ
 end
 
 (** {2:roots Registration of OCaml values as roots} *)

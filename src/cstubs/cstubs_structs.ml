@@ -230,20 +230,28 @@ let write_enums fmt enums =
      "    failwith (\"unmatched enum: \"^ s)"]
 
 let write_abstract_types fmt abstract_types =
-  let case name =
+  let case (name, maybe_size, maybe_alignment) =
     let c_format_string =
       Format.sprintf
         "  | %S ->\n    abstract ~name ~size:%%lu ~alignment:%%lu\n"
         name
     in
-    let size fmt = sizeof fmt name in
-    let alignment fmt = alignmentof fmt name in
+    let size fmt =
+      match maybe_size with
+      | None -> sizeof fmt name
+      | Some n -> Format.fprintf fmt "(size_t)%i" n
+    in
+    let alignment fmt =
+      match maybe_alignment with
+      | None -> alignmentof fmt name
+      | Some n -> Format.fprintf fmt "(size_t)%i" n
+    in
     printf2 fmt c_format_string size alignment
   in
   cases fmt abstract_types
     [
       "";
-      "let interrogated_abstract ~name =";
+      "let abstract ~name ?size:_ ?alignment:_ =";
       "  match name with"
     ]
     ~case
@@ -311,8 +319,8 @@ let gen_c () =
           ~read:(fun _ -> assert false)
           ~write:(fun _ -> assert false)
 
-      let interrogated_abstract ~name =
-        abstract_types := name :: !abstract_types;
+      let abstract ~name ?size ?alignment =
+        abstract_types := (name, size, alignment) :: !abstract_types;
         (* Return a dummy value of type 'a abstract typ, to satisfy the
            signature of this function "abstract". *)
         Ctypes.abstract ~name:"dummy" ~size:1 ~alignment:1

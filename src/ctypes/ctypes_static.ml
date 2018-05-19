@@ -23,8 +23,8 @@ type 'a structspec =
 
 type abstract_type = {
   aname : string;
-  asize : int;
-  aalignment : int;
+  asize : int option;
+  aalignment : int option;
 }
 
 type _ ocaml_type =
@@ -128,7 +128,8 @@ let rec sizeof : type a. a typ -> int = function
                                    -> size
   | Array (t, i)                   -> i * sizeof t
   | Bigarray ba                    -> Ctypes_bigarray.sizeof ba
-  | Abstract { asize }             -> asize
+  | Abstract { asize = None }      -> raise IncompleteType
+  | Abstract { asize = Some size } -> size
   | Pointer _                      -> Ctypes_primitives.pointer_size
   | Funptr _                       -> Ctypes_primitives.pointer_size
   | OCaml _                        -> raise IncompleteType
@@ -144,7 +145,9 @@ let rec alignment : type a. a typ -> int = function
   | Union { uspec = Some { align } } -> align
   | Array (t, _)                     -> alignment t
   | Bigarray ba                      -> Ctypes_bigarray.alignment ba
-  | Abstract { aalignment }          -> aalignment
+  | Abstract { aalignment = None }   -> raise IncompleteType
+  | Abstract { aalignment = Some
+      align }                        -> align
   | Pointer _                        -> Ctypes_primitives.pointer_alignment
   | Funptr _                         -> Ctypes_primitives.pointer_alignment
   | OCaml _                          -> raise IncompleteType
@@ -227,7 +230,7 @@ let ( @->) f t =
     raise (Unsupported "Unsupported argument type")
   else
     Function (f, t)
-let abstract ~name ~size ~alignment =
+let abstract ~name ?size ?alignment =
   Abstract { aname = name; asize = size; aalignment = alignment }
 let view ?format_typ ?format ~read ~write ty =
   View { read; write; format_typ; format; ty }
@@ -242,7 +245,7 @@ let bigarray_ : type a b c d e l.
     dims: b;
     ba_repr: c;
     bigarray: d;
-    carray: e > bigarray_class -> 
+    carray: e > bigarray_class ->
    b -> (a, c) Bigarray.kind -> l Bigarray.layout -> d typ =
   fun spec dims kind l -> match spec with
   | Genarray -> Bigarray (Ctypes_bigarray.bigarray dims kind l)
