@@ -331,8 +331,10 @@ sig
   (** Create an abstract type specification.
 
       If [abstract] is used with [Cstubs_structs], [Cstubs_structs] generates
-      code for automatically discovering the size and alignment from C. [~size]
-      and [~alignment] can still be specified to override the discovered values.
+      code for automatically discovering the size and alignment from C. It is
+      recommended to pass [?size:None] and [?alignment:None] in this case. If
+      specific values are passed (e.g. [~size:4]), they are checked against the
+      discovered values. It is an error if the values don't match.
 
       When not using [Cstubs_structs], not specifying [~size] and [~alignment]
       results in an incomplete type, which cannot be used in structs, unions, or
