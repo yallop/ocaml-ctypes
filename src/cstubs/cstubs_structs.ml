@@ -233,25 +233,35 @@ let write_abstract_types fmt abstract_types =
   let case (name, maybe_size, maybe_alignment) =
     let c_format_string =
       Format.sprintf
-        "  | %S ->\n    abstract ~name ~size:%%lu ~alignment:%%lu\n"
+        "  | %S ->\n    _checked ~inferred_size:%%lu ~inferred_alignment:%%lu\n"
         name
     in
-    let size fmt =
-      match maybe_size with
-      | None -> sizeof fmt name
-      | Some n -> Format.fprintf fmt "(size_t)%i" n
-    in
-    let alignment fmt =
-      match maybe_alignment with
-      | None -> alignmentof fmt name
-      | Some n -> Format.fprintf fmt "(size_t)%i" n
-    in
+    let size fmt = sizeof fmt name in
+    let alignment fmt = alignmentof fmt name in
     printf2 fmt c_format_string size alignment
   in
   cases fmt abstract_types
     [
       "";
-      "let abstract ~name ?size:_ ?alignment:_ =";
+      "let abstract ~name ?size ?alignment =";
+      "  let _checked ~inferred_size ~inferred_alignment =";
+      "    begin match size with";
+      "    | Some size when size <> inferred_size ->";
+      "      Printf.ksprintf failwith";
+      "        \"Inferred size for %s is %i, but ~size:%i was passed to Ctypes.abstract\"";
+      "        name inferred_size size";
+      "    | _ -> ()";
+      "    end;";
+      "    begin match alignment with";
+      "    | Some alignment when alignment <> inferred_alignment ->";
+      "      Printf.ksprintf failwith";
+      "        \"Inferred alignment for %s is %i, but ~alignment:%i was passed to Ctypes.abstract\"";
+      "        name inferred_alignment alignment";
+      "    | _ -> ()";
+      "    end;";
+      "    abstract ~name ~size:inferred_size ~alignment:inferred_alignment";
+      "  in";
+      "";
       "  match name with"
     ]
     ~case
