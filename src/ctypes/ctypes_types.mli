@@ -212,6 +212,10 @@ sig
   val ocaml_bytes : Bytes.t Ctypes_static.ocaml typ
   (** Value representing the directly mapped storage of an OCaml byte array. *)
 
+  val ocaml_any_value : 'a typ
+  (** Value representing any OCaml value, to be accessed from C directly. This
+      corresponds to the C type [value] from [caml/mlvalues.h]. *)
+
   (** {3 Array types} *)
 
   (** {4 C array types} *)

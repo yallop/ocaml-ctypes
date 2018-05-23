@@ -10,4 +10,5 @@
 type path
 
 val path_of_string : string -> path
+val literal_path : string -> path
 val format_path : Format.formatter -> path -> unit

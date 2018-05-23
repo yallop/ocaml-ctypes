@@ -20,10 +20,13 @@ let rec is_valid_path = function
   | [l] -> is_ident l
   | u :: p -> is_uident u && is_valid_path p
 
-let path_of_string s = 
+let path_of_string s =
   let p = Str.(split (regexp_string ".") s) in
   if is_valid_path p then p
   else invalid_arg "Ctypes_ident.path_of_string"
 
 let format_path fmt p =
   Format.pp_print_string fmt (String.concat "." p)
+
+let literal_path s =
+  [s]

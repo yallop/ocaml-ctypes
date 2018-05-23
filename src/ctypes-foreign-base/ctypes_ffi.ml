@@ -64,6 +64,7 @@ struct
     | Pointer _                           -> ArgType (Ctypes_ffi_stubs.pointer_ffitype ())
     | Funptr _                            -> ArgType (Ctypes_ffi_stubs.pointer_ffitype ())
     | OCaml _                             -> ArgType (Ctypes_ffi_stubs.pointer_ffitype ())
+    | OCaml_value                         -> ArgType (Ctypes_ffi_stubs.pointer_ffitype ())
     | Union _                             -> report_unpassable "unions"
     | Struct ({ spec = Complete _ } as s) -> struct_arg_type s
     | View { ty }                         -> arg_type ty
@@ -111,7 +112,7 @@ struct
           let v = Ctypes_ffi_stubs.call name addr callspec
               (fun buf arr -> List.iter (fun w -> r := w buf arr :: !r) writers)
               read_return_value
-          in 
+          in
           Ctypes_memory_stubs.use_value r;
           v
       | WriteArg (write, ccallspec) ->
@@ -164,11 +165,11 @@ struct
     | OCaml Bytes      -> ocaml_arg 1
     | OCaml FloatArray -> ocaml_arg (Ctypes_primitives.sizeof Ctypes_primitive_types.Double)
     | View { write = w; ty } ->
-      (fun ~offset ~idx v dst mov -> 
+      (fun ~offset ~idx v dst mov ->
          let wv = w v in
          let wa = write_arg ty ~offset ~idx wv dst mov in
          Obj.repr (wv, wa))
-    | ty -> (fun ~offset ~idx v dst mov -> 
+    | ty -> (fun ~offset ~idx v dst mov ->
         Ctypes_memory.write ty v
           (Ctypes_ptr.Fat.(add_bytes (make ~reftyp:Void dst) offset));
         Obj.repr v)

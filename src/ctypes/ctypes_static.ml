@@ -32,7 +32,7 @@ type _ ocaml_type =
 | Bytes      : Bytes.t ocaml_type
 | FloatArray : float array ocaml_type
 
-type _ typ =
+type 'a typ =
     Void            :                       unit typ
   | Primitive       : 'a Ctypes_primitive_types.prim -> 'a typ
   | Pointer         : 'a typ             -> 'a ptr typ
@@ -45,6 +45,7 @@ type _ typ =
   | Bigarray        : (_, 'a, _) Ctypes_bigarray.t
                                          -> 'a typ
   | OCaml           : 'a ocaml_type      -> 'a ocaml typ
+  | OCaml_value     :                       'a typ
 and 'a carray = { astart : 'a ptr; alength : int }
 and ('a, 'kind) structured = { structured : ('a, 'kind) structured ptr }
 and 'a union = ('a, [`Union]) structured
@@ -132,6 +133,7 @@ let rec sizeof : type a. a typ -> int = function
   | Pointer _                      -> Ctypes_primitives.pointer_size
   | Funptr _                       -> Ctypes_primitives.pointer_size
   | OCaml _                        -> raise IncompleteType
+  | OCaml_value                    -> raise IncompleteType
   | View { ty }                    -> sizeof ty
 
 let rec alignment : type a. a typ -> int = function
@@ -148,6 +150,7 @@ let rec alignment : type a. a typ -> int = function
   | Pointer _                        -> Ctypes_primitives.pointer_alignment
   | Funptr _                         -> Ctypes_primitives.pointer_alignment
   | OCaml _                          -> raise IncompleteType
+  | OCaml_value                      -> raise IncompleteType
   | View { ty }                      -> alignment ty
 
 let rec passable : type a. a typ -> bool = function
@@ -163,6 +166,7 @@ let rec passable : type a. a typ -> bool = function
   | Funptr _                       -> true
   | Abstract _                     -> false
   | OCaml _                        -> true
+  | OCaml_value                    -> true
   | View { ty }                    -> passable ty
 
 (* Whether a value resides in OCaml-managed memory.
@@ -179,6 +183,7 @@ let rec ocaml_value : type a. a typ -> bool = function
   | Funptr _    -> false
   | Abstract _  -> false
   | OCaml _     -> true
+  | OCaml_value -> true
   | View { ty } -> ocaml_value ty
 
 let rec has_ocaml_argument : type a. a fn -> bool = function
@@ -221,6 +226,7 @@ let array i t = Array (t, i)
 let ocaml_string = OCaml String
 let ocaml_bytes = OCaml Bytes
 let ocaml_float_array = OCaml FloatArray
+let ocaml_any_value = OCaml_value
 let ptr t = Pointer t
 let ( @->) f t =
   if not (passable f) then
@@ -242,7 +248,7 @@ let bigarray_ : type a b c d e l.
     dims: b;
     ba_repr: c;
     bigarray: d;
-    carray: e > bigarray_class -> 
+    carray: e > bigarray_class ->
    b -> (a, c) Bigarray.kind -> l Bigarray.layout -> d typ =
   fun spec dims kind l -> match spec with
   | Genarray -> Bigarray (Ctypes_bigarray.bigarray dims kind l)
