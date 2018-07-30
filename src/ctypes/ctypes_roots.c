@@ -38,5 +38,5 @@ value ctypes_caml_roots_release(value p_)
 /* 'a -> unit */
 value ctypes_use(value v)
 {
-  return v;
+  return Val_unit;
 }
