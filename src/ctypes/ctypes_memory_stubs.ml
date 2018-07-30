@@ -48,4 +48,4 @@ external string_of_array : _ Fat.t -> len:int -> string
 
 (* Do nothing, concealing from the optimizer that nothing is being done. *)
 external use_value : 'a -> unit
-  = "ctypes_use"
+  = "ctypes_use" "noalloc"
