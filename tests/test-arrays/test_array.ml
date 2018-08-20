@@ -19,7 +19,7 @@ let test_multidimensional_arrays _ =
   let module Array = CArray in
   (* one dimension *)
   let one = Array.make int 10 in
-  
+
   for i = 0 to Array.length one - 1 do
     one.(i) <- i
   done;
@@ -114,7 +114,7 @@ let test_map _ =
   let a = CArray.of_list int [1; 2; 3] in
   let r = CArray.map float float_of_int a in
   assert_equal [1.0; 2.0; 3.0] (CArray.to_list r);
-    
+
   let a = CArray.of_list int [] in
   let r = CArray.map string (fun _ -> assert false) a in
   assert_equal (CArray.length r) 0
@@ -127,7 +127,7 @@ let test_mapi _ =
   let a = CArray.of_list int [1; 2; 3] in
   let r = CArray.mapi int (+) a in
   assert_equal [1; 3; 5] (CArray.to_list r);
-    
+
   let a = CArray.of_list int [] in
   let r = CArray.mapi string (fun _ _ -> assert false) a in
   assert_equal (CArray.length r) 0
@@ -140,7 +140,7 @@ let test_fold_left _ =
   let a = CArray.of_list int [1; 2; 3] in
   let r = CArray.fold_left (Printf.sprintf "%s%d") "." a in
   assert_equal ".123" r;
-    
+
   let a = CArray.of_list int [] in
   let r = CArray.fold_left (fun _ -> assert false) [] a in
   assert_equal r []
@@ -153,7 +153,7 @@ let test_fold_right _ =
   let a = CArray.of_list int [1; 2; 3] in
   let r = CArray.fold_right (Printf.sprintf "%d%s") a "." in
   assert_equal "123." r;
-    
+
   let a = CArray.of_list int [] in
   let r = CArray.fold_right (fun _ -> assert false) a [] in
   assert_equal r []
@@ -190,14 +190,14 @@ let test_sub _ =
   assert_raises (Invalid_argument "CArray.sub") begin fun () ->
     CArray.sub a ~pos:1 ~length:4
   end;
-  
+
   assert_raises (Invalid_argument "CArray.sub") begin fun () ->
     CArray.sub a ~pos:1 ~length:(-1)
   end;
 
-  let r = CArray.sub a ~pos:1 ~length:2 in 
+  let r = CArray.sub a ~pos:1 ~length:2 in
   assert_equal [2; 3] (CArray.to_list r);
-    
+
   let r = CArray.sub a ~pos:1 ~length:0 in
   assert_equal [] (CArray.to_list r);
 
@@ -224,6 +224,21 @@ let test_of_string _ =
   let s' = coerce (ptr char) string (CArray.start a) in
   assert_equal s s'
 
+(*
+  Test the CArray.to_string function
+*)
+let test_to_string _ =
+  let s = "abcdefghiABCDEFGHI" in
+  let a = CArray.of_string s in
+  let len = String.length s in
+  let s' = String.sub (CArray.to_string a) 0 (len - 1) in
+  assert_equal s s';
+
+  let s = "" in
+  let a = CArray.of_string s in
+  let len = String.length s in
+  let s' = String.sub (CArray.to_string a) 0 (len - 1) in
+  assert_equal s s'
 
 (*
   Test that creating an array initializes all elements appropriately.
@@ -343,7 +358,7 @@ struct
       v
     in
 
-    let sum = 
+    let sum =
       accepts_pointer_to_array_of_structs
         (from_voidp
            (array 5 s)
@@ -391,6 +406,9 @@ let suite = "Array tests" >:::
 
    "CArray.of_string"
    >:: test_of_string;
+
+   "CArray.to_string"
+   >:: test_to_string;
 
    "array initialization"
     >:: test_array_initialiation;

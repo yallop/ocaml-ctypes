@@ -223,6 +223,14 @@ struct
     set arr len '\x00';
     arr
 
+  let to_string a =
+    let len = length a in
+    let bytes = Bytes.create len in
+    for i = 0 to len - 1 do
+        Bytes.set bytes i (unsafe_get a i)
+    done;
+    Bytes.unsafe_to_string bytes
+
   let of_list typ list =
     let arr = make typ (List.length list) in
     List.iteri (set arr) list;
