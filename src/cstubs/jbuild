@@ -1,7 +1,5 @@
-(jbuild_version 1)
-
 (library
- ((name ctypes_stubs)
-  (public_name ctypes.stubs)
-  (wrapped false)
-  (libraries (ctypes))))
+ (name ctypes_stubs)
+ (public_name ctypes.stubs)
+ (wrapped false)
+ (libraries ctypes))

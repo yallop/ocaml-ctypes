@@ -1,8 +1,6 @@
-open Base
-open Stdio
+module C = Configurator.V1
 
 let () =
-  let module C = Configurator in
   C.main ~name:"ffi" (fun c ->
       let default : C.Pkg_config.package_conf = {
         libs = ["-lffi"];

@@ -1,19 +1,17 @@
-(jbuild_version 1)
-
 (rule
  (with-stdout-to ctypes_primitives.ml (run ../configure/gen_c_primitives.exe)))
 
 (library
- ((name ctypes)
-  (public_name ctypes)
-  (wrapped false)
-  (libraries (bigarray bytes integers))
-  (c_names
-   (complex_stubs
-    ctypes_bigarrays
-    ctypes_roots
-    ldouble_stubs
-    managed_buffer_stubs
-    posix_types_stubs
-    raw_pointer_stubs
-    type_info_stubs))))
+ (name ctypes)
+ (public_name ctypes)
+ (wrapped false)
+ (libraries bigarray bytes integers)
+ (c_names
+  complex_stubs
+  ctypes_bigarrays
+  ctypes_roots
+  ldouble_stubs
+  managed_buffer_stubs
+  posix_types_stubs
+  raw_pointer_stubs
+  type_info_stubs))

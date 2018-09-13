@@ -1,0 +1,14 @@
+(library
+ (name extract_from_c)
+ (modules extract_from_c)
+ (libraries str))
+
+(executable
+ (name gen_c_primitives)
+ (libraries extract_from_c)
+ (modules gen_c_primitives))
+
+(executable
+ (name gen_libffi_abi)
+ (libraries extract_from_c)
+ (modules gen_libffi_abi))
