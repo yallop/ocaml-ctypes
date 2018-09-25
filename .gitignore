@@ -1,4 +1,5 @@
 _build
+_opam
 libffi.config
 asneeded.config
 discover
