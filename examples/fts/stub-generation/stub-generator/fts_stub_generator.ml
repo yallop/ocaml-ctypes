@@ -9,6 +9,7 @@ let c_headers = "
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fts.h>
+#include <string.h>
 "
 
 let main () =
