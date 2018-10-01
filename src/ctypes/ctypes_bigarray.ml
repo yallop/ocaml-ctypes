@@ -105,14 +105,10 @@ let kind_type_names : type a. a kind -> _ = function
     (`Ident ["char"],
      `Ident ["Bigarray"; "int8_unsigned_elt"])
 
-(** OCaml-4.01-compatible comparison.  This can be replaced with
-    pattern matching once ctypes requires OCaml 4.02 *)
-type boxed_layout = Boxed_layout : _ Bigarray.layout -> boxed_layout
 let layout_path : type a. a Bigarray.layout -> string list =
-  fun layout ->
-    if Boxed_layout layout = Boxed_layout Bigarray.c_layout
-    then ["Bigarray"; "c_layout"]
-    else ["Bigarray"; "fortran_layout"]
+  function
+  | Bigarray.C_layout -> ["Bigarray"; "c_layout"]
+  | Bigarray.Fortran_layout -> ["Bigarray"; "fortran_layout"]
 
 let type_expression : type a b l. (a, b, l) t -> _ =
   fun (t, ck, l) ->
