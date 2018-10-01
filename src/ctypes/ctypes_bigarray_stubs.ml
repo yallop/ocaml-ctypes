@@ -20,15 +20,20 @@ type _ kind =
   | Kind_complex64 : Complex.t kind
   | Kind_char : char kind
 
-external kind : ('a, 'b) Bigarray.kind -> 'a kind
-  (* Bigarray.kind is simply an int whose values are consecutively numbered
-     starting from zero, so we can directly transform its values to a variant
-     with appropriately-ordered constructors.
-
-     In OCaml <= 4.01.0, Bigarray.char and Bigarray.int8_unsigned are
-     indistinguishable, so the 'kind' function will never return Kind_char.
-     OCaml 4.02.0 gives the types distinct representations. *)
-  = "%identity"
+let kind : type a b. (a, b) Bigarray.kind -> a kind = function
+  | Bigarray.Float32 -> Kind_float32
+  | Bigarray.Float64 -> Kind_float64
+  | Bigarray.Int8_signed -> Kind_int8_signed
+  | Bigarray.Int8_unsigned -> Kind_int8_unsigned
+  | Bigarray.Int16_signed -> Kind_int16_signed
+  | Bigarray.Int16_unsigned -> Kind_int16_unsigned
+  | Bigarray.Int32 -> Kind_int32
+  | Bigarray.Int64 -> Kind_int64
+  | Bigarray.Int -> Kind_int
+  | Bigarray.Nativeint -> Kind_nativeint
+  | Bigarray.Complex32 -> Kind_complex32
+  | Bigarray.Complex64 -> Kind_complex64
+  | Bigarray.Char -> Kind_char
 
 external address : 'b -> Ctypes_ptr.voidp
   = "ctypes_bigarray_address"
