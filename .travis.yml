@@ -12,7 +12,6 @@ os:
   - linux
   - osx
 env:
-  - OCAML_VERSION=4.01.0
   - OCAML_VERSION=4.02.3 COVERAGE=true
   - OCAML_VERSION=4.02.3 ARM=true
   - OCAML_VERSION=4.03.0
@@ -26,8 +25,6 @@ matrix:
       env: OCAML_VERSION=4.02.3 ARM=true
     - os: osx
       env: OCAML_VERSION=4.02.3 COVERAGE=true
-    - os: osx
-      env: OCAML_VERSION=4.01.0
     - os: osx
       env: OCAML_VERSION=4.04.0+flambda
     - os: osx
