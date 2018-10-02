@@ -370,10 +370,10 @@ struct
   let structure (type r) ~errno ~stub_name fmt fn args (result : r typ) =
     let open Ctypes in
     let s = structure_type stub_name in
-    let (_ : (_,_) field) = field s "job" lwt_unix_job in
+    let _ : (_,_) field = field s "job" lwt_unix_job in
     let () = match result with
-        Void -> let (_ : (_,_) field) = field s "result" int in ()
-      | result -> let (_ : (_,_) field) = field s "result" result in ()
+        Void -> let _ : (_,_) field = field s "result" int in ()
+      | result -> let _ : (_,_) field = field s "result" result in ()
     in
     let () = match errno with
         `Ignore_errno -> ()

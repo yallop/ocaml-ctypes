@@ -45,4 +45,4 @@ build-test: [
    ["sh" "-c" "ocveralls" "--send bisect*.out" "_build/bisect*.out" ">" "coveralls.json"] {bisect_ppx:installed}
 ]
 tags: ["org:ocamllabs" "org:mirage"]
-available: [ ocaml-version >= "4.01.0" ]
+available: [ ocaml-version >= "4.02.3" ]
