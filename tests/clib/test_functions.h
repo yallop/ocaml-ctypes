@@ -11,7 +11,6 @@
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stdlib.h>
-#include <complex.h>
 #include <stdint.h>
 
 #include <caml/mlvalues.h>
@@ -141,24 +140,24 @@ float retrieve_FLT_MIN(void);
 float retrieve_FLT_MAX(void);
 double retrieve_DBL_MIN(void);
 double retrieve_DBL_MAX(void);
-void add_complexd(double complex *, double complex *, double complex *);
-void mul_complexd(double complex *, double complex *, double complex *);
-void rotdist_complexd(double complex *, double *, double *);
-void add_complexld(long double complex *, long double complex *, long double complex *);
-void mul_complexld(long double complex *, long double complex *, long double complex *);
-void rotdist_complexld(long double complex *, long double *, long double *);
-void add_complexf(float complex *, float complex *, float complex *);
-void mul_complexf(float complex *, float complex *, float complex *);
-void rotdist_complexf(float complex *, float *, float *);
-double complex add_complexd_val(double complex, double complex);
-double complex mul_complexd_val(double complex, double complex);
-double rotdist_complexd_val(double complex, double);
-long double complex add_complexld_val(long double complex, long double complex);
-long double complex mul_complexld_val(long double complex, long double complex);
-long double rotdist_complexld_val(long double complex, long double);
-float complex add_complexf_val(float complex, float complex);
-float complex mul_complexf_val(float complex, float complex);
-float rotdist_complexf_val(float complex, float);
+void add_complexd(double _Complex *, double _Complex *, double _Complex *);
+void mul_complexd(double _Complex *, double _Complex *, double _Complex *);
+void rotdist_complexd(double _Complex *, double *, double *);
+void add_complexld(long double _Complex *, long double _Complex *, long double _Complex *);
+void mul_complexld(long double _Complex *, long double _Complex *, long double _Complex *);
+void rotdist_complexld(long double _Complex *, long double *, long double *);
+void add_complexf(float _Complex *, float _Complex *, float _Complex *);
+void mul_complexf(float _Complex *, float _Complex *, float _Complex *);
+void rotdist_complexf(float _Complex *, float *, float *);
+double _Complex add_complexd_val(double _Complex, double _Complex);
+double _Complex mul_complexd_val(double _Complex, double _Complex);
+double rotdist_complexd_val(double _Complex, double);
+long double _Complex add_complexld_val(long double _Complex, long double _Complex);
+long double _Complex mul_complexld_val(long double _Complex, long double _Complex);
+long double rotdist_complexld_val(long double _Complex, long double);
+float _Complex add_complexf_val(float _Complex, float _Complex);
+float _Complex mul_complexf_val(float _Complex, float _Complex);
+float rotdist_complexf_val(float _Complex, float);
 void store_callback(int (*callback)(int));
 int invoke_stored_callback(int);
 vintfun *return_callback(vintfun *);

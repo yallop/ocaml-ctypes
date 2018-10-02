@@ -54,7 +54,6 @@ let extract s =
 let headers = "\
 #include <stdint.h>
 #include <stdbool.h>
-#include <complex.h>
 #include <inttypes.h>
 #include <caml/mlvalues.h>
 "
