@@ -19,7 +19,7 @@ struct
      int ( *compar)(const FTSENT **, const FTSENT ** ));
   *)
   let _fts_open = foreign "fts_open"
-    (ptr string @-> int @-> compar_typ_opt @-> returning (ptr fts))
+    (ptr (ptr char) @-> int @-> compar_typ_opt @-> returning (ptr fts))
 
   (* FTSENT *fts_read(FTS *ftsp); *)
   let _fts_read = foreign "fts_read" (* ~check_errno:true *)
@@ -36,4 +36,10 @@ struct
   (* int fts_close(FTS *ftsp); *)
   let _fts_close = foreign "fts_close" (* ~check_errno:true *)
     (ptr fts @-> returning int)
+
+  let _strdup = foreign "strdup"
+    (string @-> returning (ptr char))
+
+  let _free = foreign "free"
+    (ptr char @-> returning void)
 end

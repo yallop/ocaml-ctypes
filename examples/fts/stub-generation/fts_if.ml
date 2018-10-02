@@ -33,10 +33,13 @@ let null_terminated_array_of_ptr_list typ list =
   let nitems = List.length list in
   let arr = CArray.make typ (1 + nitems) in
   List.iteri (CArray.set arr) list;
-  (coerce (ptr string) (ptr (ptr void)) (CArray.start arr +@ nitems)) <-@ null;
+  (coerce (ptr typ) (ptr (ptr void)) (CArray.start arr +@ nitems)) <-@ null;
   arr
 
 let fts_open ~path_argv ?compar ~options = 
-  let paths = null_terminated_array_of_ptr_list string path_argv in
+  let path_argv_cpointers = List.map _strdup path_argv in
+  let paths = null_terminated_array_of_ptr_list (ptr char) path_argv_cpointers in
   let options = crush_options fts_open_option_value options in
-  { ptr = _fts_open (CArray.start paths) options compar; compar }
+  let r = { ptr = _fts_open (CArray.start paths) options compar; compar } in
+  List.iter _free path_argv_cpointers;
+  r
