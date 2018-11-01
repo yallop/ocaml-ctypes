@@ -21,9 +21,9 @@
 #include <stdint.h>
 #include <float.h>
 #include <math.h>
-#include <complex.h>
 
 #include "ctypes_ldouble_stubs.h"
+#include "ctypes_complex_compatibility.h"
 
 /*********************** long double *************************/
 
@@ -436,30 +436,30 @@ value ctypes_ldouble_size(value unit) {
 
 /*********************** complex *************************/
 
-#define ldouble_complex_custom_val(V) (*(long double complex*)(Data_custom_val(V)))
+#define ldouble_complex_custom_val(V) (*(long double _Complex*)(Data_custom_val(V)))
 
 static int ldouble_complex_cmp_val(value v1, value v2)
 {
-  long double complex u1 = ldouble_complex_custom_val(v1);
-  long double complex u2 = ldouble_complex_custom_val(v2);
-  int cmp_real = ldouble_cmp(creall(u1), creall(u2));
-  return cmp_real == 0 ? ldouble_cmp(cimagl(u1), cimagl(u2)) : cmp_real;
+  long double _Complex u1 = ldouble_complex_custom_val(v1);
+  long double _Complex u2 = ldouble_complex_custom_val(v2);
+  int cmp_real = ldouble_cmp(ctypes_compat_creall(u1), ctypes_compat_creall(u2));
+  return cmp_real == 0 ? ldouble_cmp(ctypes_compat_cimagl(u1), ctypes_compat_cimagl(u2)) : cmp_real;
 }
 
 static intnat ldouble_complex_hash(value v) {
-  long double complex c = ldouble_complex_custom_val(v);
-  return ldouble_mix_hash(ldouble_mix_hash(0, creall(c)), cimagl(c));
+  long double _Complex c = ldouble_complex_custom_val(v);
+  return ldouble_mix_hash(ldouble_mix_hash(0, ctypes_compat_creall(c)), ctypes_compat_cimagl(c));
 }
 
 static void ldouble_complex_serialize(value v, uintnat *wsize_32, uintnat *wsize_64) {
   long double re,im;
-  long double complex *p = Data_custom_val(v);
+  long double _Complex *p = Data_custom_val(v);
   caml_serialize_int_1(LDBL_MANT_DIG);
-  re = creall(*p);
+  re = ctypes_compat_creall(*p);
   ldouble_serialize_data(&re);
-  im = cimagl(*p);
+  im = ctypes_compat_cimagl(*p);
   ldouble_serialize_data(&im);
-  *wsize_32 = *wsize_64 = sizeof(long double complex);
+  *wsize_32 = *wsize_64 = sizeof(long double _Complex);
 }
 
 static uintnat ldouble_complex_deserialize(void *d) {
@@ -469,8 +469,8 @@ static uintnat ldouble_complex_deserialize(void *d) {
     caml_deserialize_error("invalid long double size");
   size = ldouble_deserialize_data(&re);
   size += ldouble_deserialize_data(&im);
-  *(long double complex *)d = (re + im * I);
-  return (sizeof(long double complex));
+  *(long double _Complex *)d = (ctypes_compat_make_complexl(re, im));
+  return (sizeof(long double _Complex));
 }
 
 static struct custom_operations caml_ldouble_complex_ops = {
@@ -483,14 +483,14 @@ static struct custom_operations caml_ldouble_complex_ops = {
   custom_compare_ext_default
 };
 
-value ctypes_copy_ldouble_complex(long double complex u)
+value ctypes_copy_ldouble_complex(long double _Complex u)
 {
-  value res = caml_alloc_custom(&caml_ldouble_complex_ops, sizeof(long double complex), 0, 1);
+  value res = caml_alloc_custom(&caml_ldouble_complex_ops, sizeof(long double _Complex), 0, 1);
   ldouble_complex_custom_val(res) = u;
   return res;
 }
 
-long double complex ctypes_ldouble_complex_val(value v) {
+long double _Complex ctypes_ldouble_complex_val(value v) {
   return ldouble_complex_custom_val(v);
 }
 
@@ -499,19 +499,19 @@ CAMLprim value ctypes_ldouble_complex_make(value r, value i) {
   CAMLparam2(r, i);
   long double re = ldouble_custom_val(r);
   long double im = ldouble_custom_val(i);
-  CAMLreturn(ctypes_copy_ldouble_complex(re + (im * I)));
+  CAMLreturn(ctypes_copy_ldouble_complex(ctypes_compat_make_complexl(re, im)));
 }
 
 /* real : complex -> t */
 CAMLprim value ctypes_ldouble_complex_real(value v) {
   CAMLparam1(v);
-  CAMLreturn(ctypes_copy_ldouble(creall(ldouble_complex_custom_val(v))));
+  CAMLreturn(ctypes_copy_ldouble(ctypes_compat_creall(ldouble_complex_custom_val(v))));
 }
 
 /* imag : complex -> t */
 CAMLprim value ctypes_ldouble_complex_imag(value v) {
   CAMLparam1(v);
-  CAMLreturn(ctypes_copy_ldouble(cimagl(ldouble_complex_custom_val(v))));
+  CAMLreturn(ctypes_copy_ldouble(ctypes_compat_cimagl(ldouble_complex_custom_val(v))));
 }
 
 #define OP2(OPNAME, OP)                                                    \
@@ -534,47 +534,26 @@ CAMLprim value ctypes_ldouble_complex_neg(value a) {
 #define FN1(OP)                                                                   \
   CAMLprim value ctypes_ldouble_complex_ ## OP (value a) {                        \
     CAMLparam1(a);                                                                \
-    CAMLreturn(ctypes_copy_ldouble_complex( OP (ldouble_complex_custom_val(a)))); \
+    CAMLreturn(ctypes_copy_ldouble_complex( ctypes_compat_ ## OP (ldouble_complex_custom_val(a)))); \
   }
 
 #define FN2(OP)                                                            \
   CAMLprim value ctypes_ldouble_complex_ ## OP (value a, value b) {        \
     CAMLparam2(a, b);                                                      \
     CAMLreturn(ctypes_copy_ldouble_complex(                                \
-      OP (ldouble_complex_custom_val(a), ldouble_complex_custom_val(b)))); \
-  }
-
-#define FN1FAIL(OP)                                                        \
-  CAMLprim value ctypes_ldouble_complex_ ## OP (value a) {                 \
-    CAMLparam1(a);                                                         \
-    caml_failwith("ctypes: " #OP " does not exist on current platform");   \
-  }
-
-#define FN2FAIL(OP)                                                        \
-  CAMLprim value ctypes_ldouble_complex_ ## OP (value a, value b) {        \
-    CAMLparam2(a, b);                                                      \
-    caml_failwith("ctypes: " #OP " does not exist on current platform");   \
+      ctypes_compat_ ## OP (ldouble_complex_custom_val(a), ldouble_complex_custom_val(b)))); \
   }
 
 FN1(conjl)
 FN1(csqrtl)
 
-/* Android: As of API level 24, these functions do not exist.
-   Freebsd: still missing in FreeBSD 11.0-RELEASE-p2
- */
-#if defined(__ANDROID__) || defined(__FreeBSD__)
-FN1FAIL(cexpl)
-FN1FAIL(clogl)
-FN2FAIL(cpowl)
-#else
 FN1(cexpl)
 FN1(clogl)
 FN2(cpowl)
-#endif
 
 CAMLprim value ctypes_ldouble_complex_cargl(value a) {
   CAMLparam1(a);
-  CAMLreturn(ctypes_copy_ldouble( cargl(ldouble_complex_custom_val(a))));
+  CAMLreturn(ctypes_copy_ldouble( ctypes_compat_cargl(ldouble_complex_custom_val(a))));
 }
 
 value ldouble_init(value unit) {

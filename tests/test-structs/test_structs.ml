@@ -203,6 +203,7 @@ let test_structs_with_union_members _ =
 
       setf u uz { Complex.re = 5.55; im = -3.3 };
       assert_equal ~msg:"u.uz = 5.55 - 3.3i" ~cmp:complex64_eq
+        ~printer:(fun z -> Printf.sprintf "{re=%f; im=%f}" z.Complex.re z.Complex.im)
         { Complex.re = 5.55; im = -3.3 } (getf u uz);
     end
 

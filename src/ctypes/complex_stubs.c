@@ -5,11 +5,10 @@
  * See the file LICENSE for details.
  */
 
-#include <complex.h>
-
 #include <caml/memory.h>
 #include <caml/alloc.h>
 
+#include "ctypes_complex_compatibility.h"
 #include "ctypes_complex_stubs.h"
 
 static value allocate_complex_value(double r, double i)
@@ -20,26 +19,26 @@ static value allocate_complex_value(double r, double i)
   return v;
 }
 
-/* ctypes_copy_float_complex : float complex -> Complex.t */
-value ctypes_copy_float_complex(float complex c)
+/* ctypes_copy_float_complex : float _Complex -> Complex.t */
+value ctypes_copy_float_complex(float _Complex c)
 {
-  return allocate_complex_value(crealf(c), cimagf(c));
+  return allocate_complex_value(ctypes_compat_crealf(c), ctypes_compat_cimagf(c));
 }
 
-/* ctypes_copy_double_complex : double complex -> Complex.t */
-value ctypes_copy_double_complex(double complex c)
+/* ctypes_copy_double_complex : double _Complex -> Complex.t */
+value ctypes_copy_double_complex(double _Complex c)
 {
-  return allocate_complex_value(creal(c), cimag(c));
+  return allocate_complex_value(ctypes_compat_creal(c), ctypes_compat_cimag(c));
 }
 
-/* ctypes_float_complex_val : Complex.t -> float complex */
-float complex ctypes_float_complex_val(value v)
+/* ctypes_float_complex_val : Complex.t -> float _Complex */
+float _Complex ctypes_float_complex_val(value v)
 {
-  return Double_field(v, 0) + Double_field(v, 1) * I;
+  return ctypes_compat_make_complexf(Double_field(v, 0), Double_field(v, 1));
 }
 
-/* ctypes_double_complex_val : Complex.t -> double complex */
-double complex ctypes_double_complex_val(value v)
+/* ctypes_double_complex_val : Complex.t -> double _Complex */
+double _Complex ctypes_double_complex_val(value v)
 {
-  return Double_field(v, 0) + Double_field(v, 1) * I;
+  return ctypes_compat_make_complex(Double_field(v, 0), Double_field(v, 1));
 }
