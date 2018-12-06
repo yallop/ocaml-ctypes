@@ -61,4 +61,17 @@ let suite = "foreign+errno tests" >:::
 
 
 let _ =
+  if Sys.os_type = "Win32" then
+    (*
+      Ugly workaround because oUnit raises an error, if there are
+      any changes in the environment.
+
+      There are two ways to access the environments on windows:
+       - through the native Windows API.
+       - through the crt lib. The crt uses the environment for interprocess
+         communication, but hides it from the end user.
+      Since OCaml 4.07 the native Windows API is used by Unix.environment,
+      therefore the tricks of the crt lib are visible.
+    *)
+    Sys.chdir "."; (* udpate environment *)
   run_test_tt_main suite

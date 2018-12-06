@@ -210,11 +210,18 @@ struct
     let _FLT_MIN = retrieve_FLT_MIN () in
     let _FLT_MAX = retrieve_FLT_MAX () in
 
-    assert_equal (string_of float _FLT_MIN) (string_of_float _FLT_MIN);
+    let rex = Str.regexp "e\\([-+]\\)[0]+\\([1-9]+\\)" in
+    let exp_equal a b =
+      (* remove leading zeros from exponential form *)
+      let a = Str.global_replace rex "e\\1\\2" a in
+      let b = Str.global_replace rex "e\\1\\2" b in
+      assert_equal a b in
+
+    exp_equal (string_of float _FLT_MIN) (string_of_float _FLT_MIN);
     assert_equal (valid_float_lexem (string_of float 0.0)) (string_of_float 0.0);
     assert_equal (string_of float nan) (string_of_float nan);
     assert_equal (string_of float infinity) (string_of_float infinity);
-    assert_equal (string_of float _FLT_MAX) (string_of_float _FLT_MAX);
+    exp_equal (string_of float _FLT_MAX) (string_of_float _FLT_MAX);
 
     (* double *)
     let _DBL_MIN = retrieve_DBL_MIN () in
@@ -224,7 +231,7 @@ struct
     assert_equal (valid_float_lexem (string_of double 0.0)) (string_of_float 0.0);
     assert_equal (string_of double (-1.03)) (string_of_float (-1.03));
     assert_equal (string_of double (34.22)) (string_of_float (34.22));
-    assert_equal (string_of double (1.39e16)) (string_of_float (1.39e16));
+    exp_equal (string_of double (1.39e16)) (string_of_float (1.39e16));
     assert_equal (string_of double nan) (string_of_float nan);
     assert_equal (string_of double infinity) (string_of_float infinity);
     assert_equal (string_of double _DBL_MAX) (string_of_float _DBL_MAX);
