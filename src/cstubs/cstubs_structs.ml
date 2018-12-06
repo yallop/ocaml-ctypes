@@ -28,10 +28,6 @@ let cstring s =
   in "\""^ escaped ^"\""
 
 let cprologue = [
-  "#if !__USE_MINGW_ANSI_STDIO && (defined(__MINGW32__) || defined(__MINGW64__))";
-  "#define __USE_MINGW_ANSI_STDIO 1";
-  "#endif";
-  "";
   "#include <stdio.h>";
   "#include <stddef.h>";
   "#include \"ctypes_cstubs_internals.h\"";
@@ -54,11 +50,11 @@ let puts fmt s = Format.fprintf fmt "@[puts@[(%s);@]@]@\n"
   (cstring s)
 
 (* [printf1 fmt s v] writes the call [printf(s, v);] on [fmt]. *)
-let printf1 fmt s v = Format.fprintf fmt "@[printf@[(%s,@ %t);@]@]@\n"
+let printf1 fmt s v = Format.fprintf fmt "@[ctypes_printf@[(%s,@ %t);@]@]@\n"
   (cstring s) v
 
 (* [printf2 fmt s u v] writes the call [printf(s, u, v);] on [fmt]. *)
-let printf2 fmt s u v = Format.fprintf fmt "@[printf@[(%s,@ %t,@ %t);@]@]@\n"
+let printf2 fmt s u v = Format.fprintf fmt "@[ctypes_printf@[(%s,@ %t,@ %t);@]@]@\n"
   (cstring s) u v
 
 (* [offsetof fmt t f] writes the call [offsetof(t, f)] on [fmt]. *) 
