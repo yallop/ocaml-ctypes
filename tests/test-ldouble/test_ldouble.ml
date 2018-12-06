@@ -116,6 +116,31 @@ let test_conv _ =
   List.iter (fun a -> assert_bool "to/of_float" (a = LDouble.(to_float (of_float a)))) flts;
   assert_bool "to_int" (3 = LDouble.(to_int (of_float 3.45)));
   assert_bool "to_int" (-34 = LDouble.(to_int (of_float (-34.999))));
+  assert_bool "mant_dig" (LDouble.mant_dig >= 53);
+  if Sys.word_size = 32 then (
+    let max = float_of_int max_int in
+    let min = float_of_int min_int in
+    assert_bool "to_int" (max_int = LDouble.(to_int (of_float max)));
+    assert_bool "to_int" (min_int = LDouble.(to_int (of_float min)));
+    assert_bool "to_int_max" (max_int = LDouble.(to_int (of_int max_int)));
+    assert_bool "to_int_min" (min_int = LDouble.(to_int (of_int min_int)));
+  )
+  else (
+    let max =  9007199254740991. in (* 2^53 - 1. Largest integer that fits into the mantissa of a double *)
+    let min = -9007199254740991. in
+    assert_bool "to_int" (Int64.to_int (-9007199254740991L) = LDouble.(to_int (of_float min)));
+    assert_bool "to_int" (Int64.to_int 9007199254740991L = LDouble.(to_int (of_float max)));
+    let max,min =
+      if LDouble.mant_dig >= 62 then
+        max_int,(-max_int)
+      else
+        let rec iter ac i = if i = 0 then ac else iter (ac * 2) (pred i) in
+        let max = (iter 1 LDouble.mant_dig) - 1 in
+        max,(max * (-1))
+    in
+    assert_bool "to_int_max" (max = LDouble.(to_int (of_int max)));
+    assert_bool "to_int_min" (min = LDouble.(to_int (of_int min)));
+  );
   assert_bool "of_string" (3.5 = LDouble.(to_float (of_string "3.5")));
   assert_bool "to_string" ("3.500000" = LDouble.(to_string (of_float 3.5)))
 

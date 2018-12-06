@@ -178,3 +178,5 @@ val byte_sizes : int * int
     and the actual number of bytes used by the value.
     (unused bytes may contain undefined values) *)
 
+val mant_dig : int
+(** size of mantissa *)
