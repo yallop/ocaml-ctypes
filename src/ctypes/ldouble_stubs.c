@@ -21,6 +21,7 @@
 #include <stdint.h>
 #include <float.h>
 #include <math.h>
+#include <string.h>
 
 #include "ctypes_ldouble_stubs.h"
 #include "ctypes_complex_compatibility.h"
@@ -65,7 +66,11 @@
 #define LDOUBLE_VALUE_BYTES LDOUBLE_STORAGE_BYTES
 #endif
 
-#define ldouble_custom_val(V) (*(long double *)(Data_custom_val(V)))
+static inline long double ldouble_custom_val(value v) {
+  long double r;
+  memcpy(&r, Data_custom_val(v), sizeof(r));
+  return r;
+}
 
 // initialized in ldouble_init
 static long double nan_;
@@ -155,21 +160,18 @@ static void ldouble_serialize(value v, uintnat *wsize_32, uintnat *wsize_64) {
   *wsize_32 = *wsize_64 = sizeof(long double);
 }
 
-static int ldouble_deserialize_data(long double *q) {
+static void ldouble_deserialize_data(long double *q) {
   unsigned char *p = (unsigned char *)q;
   if (LDOUBLE_VALUE_BYTES == 16) {
     caml_deserialize_block_8(p, 2);
-    return 16;
   } else if (LDOUBLE_VALUE_BYTES == 10) {
     caml_deserialize_block_8(p, 1);
     caml_deserialize_block_2(p+8, 1);
-    return 10;
   } else {
     double d;
     if (sizeof(double) == 4) d = caml_deserialize_float_4();
     else d = caml_deserialize_float_8();
     *q = (long double) d;
-    return sizeof(double);
   }
 }
 
@@ -193,7 +195,7 @@ static struct custom_operations caml_ldouble_ops = {
 value ctypes_copy_ldouble(long double u)
 {
   value res = caml_alloc_custom(&caml_ldouble_ops, sizeof(long double), 0, 1);
-  ldouble_custom_val(res) = u;
+  memcpy(Data_custom_val(res), &u, sizeof(u));
   return res;
 }
 
@@ -436,7 +438,12 @@ value ctypes_ldouble_size(value unit) {
 
 /*********************** complex *************************/
 
-#define ldouble_complex_custom_val(V) (*(long double _Complex*)(Data_custom_val(V)))
+static inline long double _Complex ldouble_complex_custom_val(value v)
+{
+  long double _Complex r;
+  memcpy(&r, Data_custom_val(v), sizeof(r));
+  return r;
+}
 
 static int ldouble_complex_cmp_val(value v1, value v2)
 {
@@ -453,23 +460,36 @@ static intnat ldouble_complex_hash(value v) {
 
 static void ldouble_complex_serialize(value v, uintnat *wsize_32, uintnat *wsize_64) {
   long double re,im;
-  long double _Complex *p = Data_custom_val(v);
+  long double _Complex c;
+  void * p = Data_custom_val(v);
+#if defined(__GNUC__) && __GNUC__  == 6 && __GNUC_MINOR__ == 4
+  /* workaround gcc bug. gcc tries to inline the memcpy calls, but
+   * fails with an internal compiler error. I've observed this error
+   * only under Alpine Linux, other distros have already imported a
+   * patch from upstream.
+   */
+  void *(*volatile mymemcpy)(void*,const void*,size_t) = memcpy;
+  mymemcpy(&c, p, sizeof(c));
+#else
+  memcpy(&c, p, sizeof(c));
+#endif
   caml_serialize_int_1(LDBL_MANT_DIG);
-  re = ctypes_compat_creall(*p);
+  re = ctypes_compat_creall(c);
   ldouble_serialize_data(&re);
-  im = ctypes_compat_cimagl(*p);
+  im = ctypes_compat_cimagl(c);
   ldouble_serialize_data(&im);
   *wsize_32 = *wsize_64 = sizeof(long double _Complex);
 }
 
 static uintnat ldouble_complex_deserialize(void *d) {
   long double re, im;
-  int size;
+  long double _Complex c;
   if (caml_deserialize_uint_1() != LDBL_MANT_DIG)
     caml_deserialize_error("invalid long double size");
-  size = ldouble_deserialize_data(&re);
-  size += ldouble_deserialize_data(&im);
-  *(long double _Complex *)d = (ctypes_compat_make_complexl(re, im));
+  ldouble_deserialize_data(&re);
+  ldouble_deserialize_data(&im);
+  c = ctypes_compat_make_complexl(re, im);
+  memcpy(d, &c, sizeof(c));
   return (sizeof(long double _Complex));
 }
 
@@ -486,7 +506,7 @@ static struct custom_operations caml_ldouble_complex_ops = {
 value ctypes_copy_ldouble_complex(long double _Complex u)
 {
   value res = caml_alloc_custom(&caml_ldouble_complex_ops, sizeof(long double _Complex), 0, 1);
-  ldouble_complex_custom_val(res) = u;
+  memcpy(Data_custom_val(res), &u, sizeof(u));
   return res;
 }
 
