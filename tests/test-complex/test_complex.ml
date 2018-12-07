@@ -129,6 +129,10 @@ struct
       assert_equal ~cmp:complex32_eq (Complex.add l r) (add_complexf_val l r);
       assert_equal ~cmp:complex32_eq (Complex.mul l r) (mul_complexf_val l r);
 
+      let zinf = { re = 0.; im = infinity } in
+      assert_equal 0. (add_complexd_val zinf zinf).re;
+      assert_equal 0. (add_complexf_val zinf zinf).re;
+
       (* test long double complex *)
       let re x = LDouble.(to_float (ComplexL.re x)) in
       let im x = LDouble.(to_float (ComplexL.im x)) in
@@ -138,6 +142,8 @@ struct
       let l', r' = to_complexld l, to_complexld r in
       assert_equal ~cmp:complex64_eq (Complex.add l r) (of_complexld @@ add_complexld_val l' r');
       assert_equal ~cmp:complex64_eq (Complex.mul l r) (of_complexld @@ mul_complexld_val l' r');
+
+      assert_equal 0. (re (to_complexld zinf));
 
       (* rot-dist test *)
       let rot x a = 
