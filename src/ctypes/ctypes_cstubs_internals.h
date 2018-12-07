@@ -34,4 +34,10 @@ static inline value ctypes_pair_with_errno(value p)
   CAMLreturn (v);
 }
 
+#if defined(__MINGW32__) || defined(__MINGW64__)
+#define ctypes_printf __mingw_printf
+#else
+#define ctypes_printf printf
+#endif
+
 #endif /* CTYPES_CSTUBS_INTERNALS_H */
