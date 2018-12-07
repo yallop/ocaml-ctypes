@@ -213,7 +213,9 @@ CAMLprim value ctypes_ldouble_of_int(value a) {
 }
 CAMLprim value ctypes_ldouble_to_int(value a) {
   CAMLparam1(a);
-  CAMLreturn(Val_long(ldouble_custom_val(a)));
+  long double b = ldouble_custom_val(a);
+  intnat c = b;
+  CAMLreturn(Val_long(c));
 }
 
 #define OP2(OPNAME, OP)                                                               \
@@ -563,3 +565,7 @@ value ldouble_init(value unit) {
   return Val_unit;
 }
 
+CAMLprim value ctypes_ldouble_mant_dig(value unit) {
+  intnat r = LDBL_MANT_DIG;
+  return Val_long(r);
+}
