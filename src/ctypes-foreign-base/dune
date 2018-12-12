@@ -1,0 +1,21 @@
+(rule
+ (action (copy# "dl_stubs.c.%{read:backend.sexp}" dl_stubs.c)))
+
+(rule
+ (action (copy# "dl.ml.%{read:backend.sexp}" dl.ml)))
+
+(rule
+ (with-stdout-to libffi_abi.ml (run ../configure/gen_libffi_abi.exe)))
+
+(library
+ (name ctypes_foreign_base)
+ (public_name ctypes.foreign.base)
+ (wrapped false)
+ (libraries ctypes)
+ (c_library_flags (:include c_library_flags.sexp))
+ (c_flags (:include c_flags.sexp))
+ (c_names dl_stubs ffi_call_stubs ffi_type_stubs))
+
+(rule
+ (targets c_flags.sexp c_library_flags.sexp backend.sexp)
+ (action (run ./config/discover.exe)))

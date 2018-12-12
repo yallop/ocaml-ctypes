@@ -1,0 +1,6 @@
+(library
+ (name ctypes_foreign_threaded)
+ (public_name ctypes.foreign.threaded)
+ (wrapped false)
+ (libraries ctypes.foreign.base threads)
+ (c_names foreign_threaded_stubs))
