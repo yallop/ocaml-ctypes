@@ -1,8 +1,10 @@
 (rule
- (action (copy# "dl_stubs.c.%{read:backend.sexp}" dl_stubs.c)))
+ (targets dl_stub.c)
+ (action (copy# "dl_stubs.c.%{read:backend.sexp}" %{targets})))
 
 (rule
- (action (copy# "dl.ml.%{read:backend.sexp}" dl.ml)))
+ (targets dl.ml)
+ (action (copy# "dl.ml.%{read:backend.sexp}" %{targets})))
 
 (rule
  (with-stdout-to libffi_abi.ml (run ../configure/gen_libffi_abi.exe)))

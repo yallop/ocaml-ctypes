@@ -6,6 +6,7 @@
  (public_name ctypes)
  (wrapped false)
  (libraries bigarray bytes integers)
+ (modules_without_implementation ctypes_types)
  (c_names
   complex_stubs
   ctypes_bigarrays
