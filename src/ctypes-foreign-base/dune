@@ -1,5 +1,5 @@
 (rule
- (targets dl_stub.c)
+ (targets dl_stubs.c)
  (action (copy# "dl_stubs.c.%{read:backend.sexp}" %{targets})))
 
 (rule
