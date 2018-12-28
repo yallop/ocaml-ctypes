@@ -5,6 +5,8 @@
  * See the file LICENSE for details.
  *)
 
+[@@@warning "-9-27"]
+
 open Ctypes_static
 
 (* See type_printing.mli for the documentation of [format context]. *)

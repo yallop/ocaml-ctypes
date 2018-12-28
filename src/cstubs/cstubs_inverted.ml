@@ -7,6 +7,8 @@
 
 (* Cstubs_inverted public interface. *)
 
+[@@@warning "-9-27"]
+
 module type INTERNAL =
 sig
   val enum : (string * int64) list -> 'a Ctypes.typ -> unit

@@ -7,6 +7,8 @@
 
 (* ML stub generation *)
 
+[@@@warning "-9-27"]
+
 open Ctypes_static
 open Ctypes_path
 open Cstubs_errors

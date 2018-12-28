@@ -7,6 +7,8 @@
 
 (* Coercions *)
 
+[@@@warning "-27"]
+
 open Ctypes_static
 
 type uncoercible_info =

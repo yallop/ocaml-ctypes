@@ -15,6 +15,8 @@ let header ="\
 
 (* Support for various ABIs *)
 
+[@@@warning \"-37\"]
+
 type abi = Code of int | Unsupported of string
 
 let abi_code = function

@@ -5,6 +5,8 @@
  * See the file LICENSE for details.
  *)
 
+[@@@warning "-9-27"]
+
 open Ctypes_static
 open Ctypes_memory
 

@@ -7,6 +7,8 @@
 
 (* Cstubs public interface. *)
 
+[@@@warning "-27-32"]
+
 module type FOREIGN = Ctypes.FOREIGN
 
 module type FOREIGN' = FOREIGN with type 'a result = unit

@@ -1,3 +1,5 @@
+[@@@warning "-9"]
+
 let header ="\
 (*
  * Copyright (c) 2016 whitequark

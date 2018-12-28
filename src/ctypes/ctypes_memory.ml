@@ -5,6 +5,8 @@
  * See the file LICENSE for details.
  *)
 
+[@@@warning "-9-27"]
+
 open Ctypes_static
 
 module Stubs = Ctypes_memory_stubs
@@ -202,7 +204,7 @@ struct
   let copy {astart = CPointer src; alength} =
     begin
       let reftyp = Fat.reftype src in
-      let CPointer dst as r = allocate_n reftyp alength in
+      let CPointer dst as r = allocate_n reftyp ~count:alength in
       let () = Stubs.memcpy ~dst ~src ~size:(alength * sizeof reftyp) in
       from_ptr r alength
     end

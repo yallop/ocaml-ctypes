@@ -9,6 +9,8 @@
 
 open Ctypes_ptr
 
+[@@@warning "-3"] (* TODO check when @@noalloc was introduced to ocaml *)
+
 (* A reference, managed by the garbage collector, to a region of memory in the
    C heap. *)
 type managed_buffer

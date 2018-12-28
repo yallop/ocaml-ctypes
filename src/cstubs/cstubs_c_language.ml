@@ -7,6 +7,8 @@
 
 (* C code representation. *)
 
+[@@@warning "-9"]
+
 open Ctypes_static
 
 let fresh_var =
