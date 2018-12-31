@@ -5,7 +5,7 @@
 
 (executable
  (name gen_c_primitives)
- (libraries extract_from_c)
+ (libraries dune.configurator)
  (modules gen_c_primitives))
 
 (executable
