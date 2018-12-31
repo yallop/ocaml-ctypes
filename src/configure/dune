@@ -2,8 +2,3 @@
  (name gen_c_primitives)
  (libraries dune.configurator)
  (modules gen_c_primitives))
-
-(executable
- (name gen_libffi_abi)
- (libraries dune.configurator)
- (modules gen_libffi_abi))

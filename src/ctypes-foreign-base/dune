@@ -6,7 +6,7 @@
 
 (rule
  (with-stdout-to libffi_abi.ml
-   (run ../configure/gen_libffi_abi.exe -cflags %{read-lines:c_flags})))
+   (run ./config/gen_libffi_abi.exe -cflags %{read-lines:c_flags})))
 
 (library
  (name ctypes_foreign_base)
