@@ -2,4 +2,4 @@
  (name ctypes_stubs)
  (public_name ctypes.stubs)
  (wrapped false)
- (libraries ctypes))
+ (libraries ctypes str))
