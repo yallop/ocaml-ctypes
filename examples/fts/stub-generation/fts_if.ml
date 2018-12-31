@@ -8,7 +8,6 @@
 open Ctypes
 open Fts_types
 open FTS
-open FTSENT
 
 module N = Fts_bindings.Bindings(Fts_generated)
 open N
