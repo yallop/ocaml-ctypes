@@ -75,7 +75,7 @@ let find_defined_symbols c c_flags =
     else acc) [] symbols
 
 let get_symbol c c_flags symbol =
-  match CD.(import c ~includes ~c_flags [symbol,Type.Uint]) with
+  match CD.(import c ~includes ~c_flags [symbol,Type.Int]) with
   |[_,CD.Value.Int i] -> i
   |_ -> failwith (Printf.sprintf "unexpected error parsing ffi.h: is %s not an integer?" symbol)
 
