@@ -107,7 +107,6 @@ let includes = []
 let () =
   C.main ~name:"ctypes" (fun c ->
     let import_int l =
-      fprintf stderr "import int : %s\n%!" l;
       match C.C_define.(import c ~prelude ~includes [l,Type.Uint]) with
       |[_,C.C_define.Value.Int i] -> i
       |_ -> failwith ("unable to find integer definition for " ^ l) in
