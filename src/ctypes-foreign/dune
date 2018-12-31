@@ -1,0 +1,3 @@
+(library
+ (name ctypes_foreign)
+ (public_name ctypes-foreign))

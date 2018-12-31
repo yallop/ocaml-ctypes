@@ -10,7 +10,7 @@
 
 (library
  (name ctypes_foreign_base)
- (public_name ctypes.foreign.base)
+ (public_name ctypes-foreign.base)
  (wrapped false)
  (libraries ctypes)
  (c_library_flags (:include c_library_flags.sexp))
