@@ -8,8 +8,8 @@
 let c_headers = "#include <time.h>"
 
 let main () =
-  let ml_out = open_out "examples/date/stub-generation/date_generated.ml"
-  and c_out = open_out "examples/date/stub-generation/date_stubs.c" in
+  let ml_out = open_out "date_generated.ml"
+  and c_out = open_out "date_stubs.c" in
   let ml_fmt = Format.formatter_of_out_channel ml_out
   and c_fmt = Format.formatter_of_out_channel c_out in
   Format.fprintf c_fmt "%s@\n" c_headers;
