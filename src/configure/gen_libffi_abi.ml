@@ -5,7 +5,9 @@
  * See the file LICENSE for details.
  *)
 
-let header ="\
+module C = Configurator.V1
+
+let header = "\
 (*
  * Copyright (c) 2014 Jeremy Yallop.
  *
@@ -23,6 +25,14 @@ let abi_code = function
    Code c -> c
  | Unsupported sym -> raise (Ctypes.Unsupported sym)
 
+"
+
+let ffi_is_defined = Printf.sprintf "\
+#include <ffi.h>
+int main(int argc, char **argv) {
+   int s = %s;
+   return 0;
+}
 "
 
 let symbols = [
@@ -55,17 +65,34 @@ let symbols = [
   ("default_abi"      , "FFI_DEFAULT_ABI");
 ]
 
-let extra_headers = "#include <ffi.h>"
+let includes = ["ffi.h"]
+module CD = C.C_define
 
-let write_line name symbol =
-  try
-    Printf.printf "let %s = Code %d\n" name (Extract_from_c.integer ~extra_headers symbol)
-  with Not_found ->
+let find_defined_symbols c c_flags =
+  List.fold_left (fun acc (_,sym) ->
+    if C.c_test c ~c_flags (ffi_is_defined sym) then
+      sym :: acc
+    else acc) [] symbols
+
+let get_symbol c c_flags symbol =
+  match CD.(import c ~includes ~c_flags [symbol,Type.Uint]) with
+  |[_,CD.Value.Int i] -> i
+  |_ -> failwith (Printf.sprintf "unexpected error parsing ffi.h: is %s not an integer?" symbol)
+
+let write_line c ~c_flags ~defined_symbols ~name ~symbol =
+  if List.mem symbol defined_symbols then
+    get_symbol c c_flags symbol |>
+    Printf.printf "let %s = Code %d\n" name
+  else
     Printf.printf "let %s = Unsupported \"%s\"\n" name symbol
 
 let () =
-  begin
+  let c_flags = ref "" in
+  let args = ["-cflags", Arg.Set_string c_flags, "CFLAGS for libffi"] in
+  C.main ~args ~name:"ctypes-ffi" (fun c ->
+    let c_flags = [!c_flags] in
+    let defined_symbols = find_defined_symbols c c_flags in
     print_string header;
-    List.iter (fun (name, symbol) -> write_line name symbol) symbols
-  end
+    List.iter (fun (name, symbol) -> write_line c ~c_flags ~defined_symbols ~name ~symbol) symbols
+  )
 
