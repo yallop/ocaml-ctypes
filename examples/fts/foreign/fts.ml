@@ -5,6 +5,8 @@
  * See the file LICENSE for details.
  *)
 
+[@@@warning "-9-32"]
+
 open Ctypes
 
 type fts_info =
