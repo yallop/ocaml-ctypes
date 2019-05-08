@@ -211,7 +211,7 @@ struct
       let f = build_function ?name ~abi ~check_errno ~release_runtime_lock fn in
       fun (Static_funptr p) -> f p
 
-  let pointer_of_function ~abi ~acquire_runtime_lock ~thread_registration fn =
+  let pointer_of_function_internal ~abi ~acquire_runtime_lock ~thread_registration fn =
     let cs' = Ctypes_ffi_stubs.allocate_callspec
       ~check_errno:false
       ~runtime_lock:acquire_runtime_lock
@@ -221,13 +221,70 @@ struct
     fun f ->
       let boxed = cs (Ctypes_weak_ref.make f) in
       let id = Closure_properties.record (Obj.repr f) (Obj.repr boxed) in
-      let funptr = Ctypes_ffi_stubs.make_function_pointer cs' id in
+      Ctypes_ffi_stubs.make_function_pointer cs' id
+
+  let pointer_of_function ~abi ~acquire_runtime_lock ~thread_registration fn =
+    let make_funptr = pointer_of_function_internal ~abi ~acquire_runtime_lock ~thread_registration fn in
+    fun f ->
+      let funptr = make_funptr f in
       (* TODO: use a more intelligent strategy for keeping function pointers
          associated with top-level functions alive (e.g. cache function
          pointer creation by (function, type), or possibly even just by
          function, since the C arity and types must be the same in each case.)
-         See the note by [kept_alive_indefinitely].  *)
+         See the note by [kept_alive_indefinitely].
+
+         [dynamic_funptr_of_fun] allows for explicit life cycle management. *)
       let () = keep_alive funptr ~while_live:f in
       funptr_of_rawptr fn
         (Ctypes_ffi_stubs.raw_address_of_function_pointer funptr)
+
+  type 'a funptr =
+    { mutable gc_root : unit Ctypes.ptr
+    ; fn : 'a Ctypes.static_funptr
+    }
+
+  let free_funptr t =
+    if Ctypes.is_null t.gc_root then
+       failwith "This funptr was previously freed"
+    else (
+      Ctypes.Root.release t.gc_root;
+      t.gc_root <- Ctypes.null;
+    )
+
+  let report_leaked_funptr : (string -> unit) ref = ref (fun msg ->
+    Printf.eprintf "%s\n%!" msg)
+
+  let retain_funptr_root_to_avoid_segfaults_when_not_freed_correctly = ref []
+
+  let create_funptr gc_root fn =
+    let t = { gc_root = Ctypes.Root.create gc_root; fn } in
+    Gc.finalise (fun t ->
+      if Ctypes.is_null t.gc_root then
+        ()
+      else (
+        retain_funptr_root_to_avoid_segfaults_when_not_freed_correctly :=
+          t.gc_root :: !retain_funptr_root_to_avoid_segfaults_when_not_freed_correctly;
+        t.gc_root <- Ctypes.null;
+        !report_leaked_funptr
+          "WARN: a ctypes function pointer was not explicitly released.\n\
+           Releasing a function pointer or the associated OCaml closure while \n\
+           the function pointer is still in use from C will cause segmentation faults.\n\
+           Please call [Foreign.free_funptr] explicitly when the funptr is no longer needed.\n\
+           To avoid a segmentation fault we are preventing this funptr from\n\
+           being garbage collected. Please use [Foreign.free_funptr].\n%!")) t;
+    t
+
+  let funptr_of_fun ~abi ~acquire_runtime_lock ~thread_registration fn =
+    let make_funptr = pointer_of_function_internal ~abi ~acquire_runtime_lock ~thread_registration fn in
+    (fun f -> 
+       let funptr = make_funptr f in
+       create_funptr (f,funptr) (funptr_of_rawptr fn (Ctypes_ffi_stubs.raw_address_of_function_pointer funptr)))
+
+  let funptr_of_static_funptr fp =
+    create_funptr () fp
+
+  let funptr_to_static_funptr t =
+    if Ctypes.is_null t.gc_root then
+      failwith "This funptr was previously freed"
+    else t.fn
 end

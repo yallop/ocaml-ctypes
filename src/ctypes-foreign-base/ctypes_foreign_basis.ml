@@ -47,4 +47,37 @@ struct
                    (dlsym ?handle:from ~symbol)))
     with
     | exn -> if stub then fun _ -> raise exn else raise exn
+
+  module type Funptr = sig
+    type fn
+    type t
+    val t : t Ctypes.typ
+    val t_opt : t option Ctypes.typ
+    val free : t -> unit
+    val of_fun : fn -> t
+    val with_fun : fn -> (t -> 'c) -> 'c
+  end
+
+  let dynamic_funptr (type a b) ?(abi=Libffi_abi.default_abi) ?(runtime_lock=false) ?(thread_registration=false) fn : (module Funptr with type fn = a -> b) =
+    (module struct
+    type fn = a -> b
+    type t = fn Ffi.funptr
+
+    let t =
+      let write = Ffi.funptr_to_static_funptr in
+      let read = Ffi.funptr_of_static_funptr in
+      Ctypes_static.(view ~read ~write (static_funptr fn))
+
+    let t_opt = Ctypes_std_views.nullable_funptr_view t fn
+    let free = Ffi.free_funptr
+    let of_fun = Ffi.funptr_of_fun ~abi ~acquire_runtime_lock:runtime_lock ~thread_registration fn
+
+    let with_fun f do_it =
+      let f = of_fun f in
+      match do_it f with
+      | res -> free f; res
+      | exception exn -> free f; raise exn
+  end)
+
+  let report_leaked_funptr = Ffi.report_leaked_funptr
 end

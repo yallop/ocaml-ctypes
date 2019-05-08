@@ -37,4 +37,17 @@ sig
 
       The C function pointer returned is callable as long as the OCaml function
       value is live. *)
+
+  type 'a funptr
+
+  val free_funptr : _ funptr -> unit
+
+  val funptr_of_fun : abi:abi -> acquire_runtime_lock:bool -> thread_registration:bool
+    -> ('a -> 'b) fn -> ('a -> 'b) -> ('a -> 'b) funptr
+
+  val funptr_of_static_funptr : ('a -> 'b) static_funptr -> ('a -> 'b) funptr
+
+  val funptr_to_static_funptr : ('a -> 'b) funptr -> ('a -> 'b) static_funptr
+
+  val report_leaked_funptr : (string -> unit) ref 
 end
