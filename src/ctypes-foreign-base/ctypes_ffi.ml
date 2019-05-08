@@ -223,7 +223,7 @@ struct
       let id = Closure_properties.record (Obj.repr f) (Obj.repr boxed) in
       Ctypes_ffi_stubs.make_function_pointer cs' id
 
-  let pointer_of_function_unsafe ~abi ~acquire_runtime_lock ~thread_registration fn =
+  let pointer_of_function ~abi ~acquire_runtime_lock ~thread_registration fn =
     let make_funptr = pointer_of_function_internal ~abi ~acquire_runtime_lock ~thread_registration fn in
     fun f ->
       let funptr = make_funptr f in
