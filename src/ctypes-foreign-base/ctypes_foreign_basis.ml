@@ -14,18 +14,21 @@ struct
 
   exception CallToExpiredClosure = Ctypes_ffi_stubs.CallToExpiredClosure
 
-  let funptr ?(abi=Libffi_abi.default_abi) ?name ?(check_errno=false)
+  let funptr_unsafe ?(abi=Libffi_abi.default_abi) ?name ?(check_errno=false)
       ?(runtime_lock=false) ?(thread_registration=false) fn =
     let open Ffi in
     let read = function_of_pointer
       ~abi ~check_errno ~release_runtime_lock:runtime_lock ?name fn
-    and write = pointer_of_function fn
+    and write = pointer_of_function_unsafe fn
       ~abi ~acquire_runtime_lock:runtime_lock ~thread_registration in
     Ctypes_static.(view ~read ~write (static_funptr fn))
 
-  let funptr_opt ?abi ?name ?check_errno ?runtime_lock ?thread_registration fn =
+  let funptr_unsafe_opt ?abi ?name ?check_errno ?runtime_lock ?thread_registration fn =
     Ctypes_std_views.nullable_funptr_view
-      (funptr ?abi ?name ?check_errno ?runtime_lock ?thread_registration fn) fn
+      (funptr_unsafe ?abi ?name ?check_errno ?runtime_lock ?thread_registration fn) fn
+
+  let funptr = funptr_unsafe
+  let funptr_opt = funptr_unsafe_opt
 
   let funptr_of_raw_ptr p = 
     Ctypes.funptr_of_raw_address (Ctypes_ptr.Raw.to_nativeint p)
@@ -40,11 +43,39 @@ struct
   let foreign ?(abi=Libffi_abi.default_abi) ?from ?(stub=false)
       ?(check_errno=false) ?(release_runtime_lock=false) symbol typ =
     try
-      let coerce = Ctypes_coerce.coerce (static_funptr (void @-> returning void))
-        (funptr ~abi ~name:symbol ~check_errno ~runtime_lock:release_runtime_lock typ) in
-      coerce (funptr_of_raw_ptr
-                (Ctypes_ptr.Raw.of_nativeint
-                   (dlsym ?handle:from ~symbol)))
+      Ffi.function_of_pointer ~name:symbol ~abi ~check_errno ~release_runtime_lock typ
+        (Ctypes.coerce
+           (static_funptr (void @-> returning void))
+           (static_funptr typ)
+           (funptr_of_raw_ptr
+              (Ctypes_ptr.Raw.of_nativeint
+                 (dlsym ?handle:from ~symbol))))
     with
     | exn -> if stub then fun _ -> raise exn else raise exn
+
+  type 'a dynamic_funptr = 'a Ffi.funptr
+
+  let dynamic_funptr fn =
+    let write = Ffi.funptr_to_static_funptr in
+    let read = Ffi.funptr_of_static_funptr in
+    Ctypes_static.(view ~read ~write (static_funptr fn))
+
+  let dynamic_funptr_opt fn = Ctypes_std_views.nullable_funptr_view (dynamic_funptr fn) fn
+
+
+  let free_dynamic_funptr = Ffi.free_funptr
+
+  let dynamic_funptr_of_fun ?debug_info ?(abi=Libffi_abi.default_abi) ?(runtime_lock=false) ?(thread_registration=false) fn f =
+    Ffi.funptr_of_fun ?debug_info ~abi ~acquire_runtime_lock:runtime_lock ~thread_registration fn f
+
+  let with_dynamic_funptr_of_fun ?debug_info ?abi ?runtime_lock ?thread_registration fn f do_it =
+    let f = dynamic_funptr_of_fun ?debug_info ?abi ?runtime_lock ?thread_registration fn f in
+    match do_it f with
+    | res -> free_dynamic_funptr f; res
+    | exception exn -> free_dynamic_funptr f; raise exn
+
+  let call_static_funptr ?name ?(abi=Libffi_abi.default_abi) ?(check_errno=false) ?(release_runtime_lock=false) fn fp =
+    Ffi.function_of_pointer
+      ?name ~abi ~check_errno ~release_runtime_lock fn fp
+
 end

@@ -56,6 +56,16 @@ val funptr :
   ('a -> 'b) Ctypes.typ
 (** Construct a function pointer type from a function type.
 
+    ----
+    This function hides hard to reason about details of the life-time of the ocaml closure
+    and C function pointer. Getting this wrong will cause hard to debug segmentation faults.
+
+    For passing ocaml functions into C (for use in callbacks) consider using [Foreign.dynamic_funptr].
+
+    If passing function pointers from C [Ctypes.static_funptr] and [Foreign.call_static_funptr]
+    can be used.
+    ----
+
     The ctypes library, like C itself, distinguishes functions and function
     pointers.  Functions are not first class: it is not possible to use them
     as arguments or return values of calls, or store them in addressable
@@ -93,3 +103,65 @@ val funptr_opt :
 exception CallToExpiredClosure
 (** A closure passed to C was collected by the OCaml garbage collector before
     it was called. *)
+
+type 'a dynamic_funptr
+(** [dynamic_funptr] allows safer passing of ocaml functions for use as C callbacks.
+
+    Unfortunately it is not possible to track if a fuction pointer is still used in C,
+    so you must use the appropriate life cycle functions below for this.
+
+    See [dynamic_funptr], [dynamic_funptr_of_fun], [free_dynamic_funptr]
+    and [with_dynamic_funptr_of_fun].
+*)
+
+val dynamic_funptr : ('a -> 'b) Ctypes.fn -> ('a -> 'b) dynamic_funptr Ctypes.typ
+(** [dynamic_funptr fn] - define a Ctype for more safely passing ocaml functions to C.
+
+    [dynamic_funptr (FOO @-> returning BAR)] is roughly equivalent to [BAR( * )(FOO)] in C.
+*)
+
+val dynamic_funptr_opt : ('a -> 'b) Ctypes.fn -> ('a -> 'b) dynamic_funptr option Ctypes.typ
+(** Like [dynamic_funptr] but optional. *)
+
+val free_dynamic_funptr : _ dynamic_funptr -> unit
+(** [free_dynamic_funptr fptr] - Indicate that the [fptr] is no longer needed.
+
+    Once [free_dynamic_funptr] has been called any C calls to this [dynamic_funptr] are
+    unsafe and may result in a segmentation fault. Only call [free_dynamic_funptr] once
+    the callback is no longer used from C.
+*)
+
+val dynamic_funptr_of_fun : ?debug_info:string -> ?abi:Libffi_abi.abi -> ?runtime_lock:bool -> ?thread_registration:bool
+  -> ('a -> 'b) Ctypes.fn -> ('a -> 'b) -> ('a -> 'b) dynamic_funptr
+(** [dynamic_funptr_of_fun fn] - Turn an ocaml closure into a function pointer
+    that can be passed to C.
+
+    You MUST call [free_dynamic_funptr] to the function pointer is no longer needed.
+    Failure to do so will result in a memory leak.
+    Failure to call [free_dynamic_funptr] and not holding a reference this this pointer
+    is an error. To avoid unexpected crashes we log this and ensure that potentially still
+    needed ocaml values are retained.
+
+    For many use cases it may be simpler to use [with_dynamic_funptr_of_fun] instead as
+    this will do the free for you. *)
+
+val with_dynamic_funptr_of_fun : ?debug_info:string -> ?abi:Libffi_abi.abi -> ?runtime_lock:bool -> ?thread_registration:bool
+  -> ('a -> 'b) Ctypes.fn -> ('a -> 'b) -> (('a -> 'b) dynamic_funptr -> 'c) -> 'c
+(** [with_dynamic_funptr_of_fun fn (fun fptr -> DO_STUFF)] - Turn an ocaml closure into a
+    function pointer and do simple life cycle management.
+
+    This will automatically call [free_dynamic_funptr fptr] after [DO_STUFF] completes.
+
+    It is not safe to use if the C function ptr [fptr] may still be used after this
+    has been released.
+*)
+
+val call_static_funptr :
+  ?name:string ->
+  ?abi:Libffi_abi.abi ->
+  ?check_errno:bool ->
+  ?release_runtime_lock:bool ->
+  ('a -> 'b) Ctypes.fn ->
+  ('a -> 'b) Ctypes.static_funptr -> 'a -> 'b
+(** [call_static_funptr fn fptr] - Helper to allow calling function pointers passed to
+    ocaml from C. *)
