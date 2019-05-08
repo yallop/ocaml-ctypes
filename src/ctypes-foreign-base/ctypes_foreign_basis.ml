@@ -40,13 +40,11 @@ struct
   let foreign ?(abi=Libffi_abi.default_abi) ?from ?(stub=false)
       ?(check_errno=false) ?(release_runtime_lock=false) symbol typ =
     try
-      Ffi.function_of_pointer ~name:symbol ~abi ~check_errno ~release_runtime_lock typ
-        (Ctypes.coerce
-           (static_funptr (void @-> returning void))
-           (static_funptr typ)
-           (funptr_of_raw_ptr
-              (Ctypes_ptr.Raw.of_nativeint
-                 (dlsym ?handle:from ~symbol))))
+      let coerce = Ctypes_coerce.coerce (static_funptr (void @-> returning void))
+        (funptr ~abi ~name:symbol ~check_errno ~runtime_lock:release_runtime_lock typ) in
+      coerce (funptr_of_raw_ptr
+                (Ctypes_ptr.Raw.of_nativeint
+                   (dlsym ?handle:from ~symbol)))
     with
     | exn -> if stub then fun _ -> raise exn else raise exn
 
