@@ -225,17 +225,16 @@ struct
 
   let pointer_of_function_unsafe ~abi ~acquire_runtime_lock ~thread_registration fn =
     let make_funptr = pointer_of_function_internal ~abi ~acquire_runtime_lock ~thread_registration fn in
-    (* TODO: use a more intelligent strategy for keeping function pointers
-       associated with top-level functions alive (e.g. cache function
-       pointer creation by (function, type), or possibly even just by
-       function, since the C arity and types must be the same in each case.)
-       See the note by [kept_alive_indefinitely].
-
-       [pointer_of_function] should be considered deprecated, use [Funptr.of_fun] below
-       instead and explicitly call free when appropriate.
-    *)
     fun f ->
       let funptr = make_funptr f in
+      (* TODO: use a more intelligent strategy for keeping function pointers
+         associated with top-level functions alive (e.g. cache function
+         pointer creation by (function, type), or possibly even just by
+         function, since the C arity and types must be the same in each case.)
+         See the note by [kept_alive_indefinitely].
+
+         [dynamic_funptr_of_fun] below allows for explicit life cycle management
+         and is probably safer to use. *)
       let () = keep_alive funptr ~while_live:f in
       funptr_of_rawptr fn
         (Ctypes_ffi_stubs.raw_address_of_function_pointer funptr)
