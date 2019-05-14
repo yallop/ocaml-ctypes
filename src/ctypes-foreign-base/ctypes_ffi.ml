@@ -282,9 +282,11 @@ struct
       )) t;
     t
 
-  let funptr_of_fun ?debug_info ~abi ~acquire_runtime_lock ~thread_registration fn f =
-    let funptr = pointer_of_function_internal ~abi ~acquire_runtime_lock ~thread_registration fn f in
-    create_funptr ?debug_info (f,funptr) (funptr_of_rawptr fn (Ctypes_ffi_stubs.raw_address_of_function_pointer funptr))
+  let funptr_of_fun ~abi ~acquire_runtime_lock ~thread_registration fn =
+    let make_funptr = pointer_of_function_internal ~abi ~acquire_runtime_lock ~thread_registration fn in
+    (fun ?debug_info f ->
+       let funptr = make_funptr f in
+       create_funptr ?debug_info (f,funptr) (funptr_of_rawptr fn (Ctypes_ffi_stubs.raw_address_of_function_pointer funptr)))
 
   let funptr_of_static_funptr fp =
       create_funptr () fp
