@@ -48,7 +48,7 @@ struct
     with
     | exn -> if stub then fun _ -> raise exn else raise exn
 
-  module type Dynamic_funptr = sig
+  module type Funptr = sig
     type fn
     type t
     val t : t Ctypes.typ
@@ -62,15 +62,14 @@ struct
     type fn_first_arg
     type fn_rest
     val fn : (fn_first_arg -> fn_rest) Ctypes.fn
-    val debug_info : string option
     val abi : Libffi_abi.abi
     val acquire_runtime_lock : bool
     val thread_registration : bool
   end
 
   module Make_funptr(Fn : Funptr_spec) :
-    Dynamic_funptr with type fn=(Fn.fn_first_arg -> Fn.fn_rest) = struct
-    include Fn
+    Funptr with type fn=(Fn.fn_first_arg -> Fn.fn_rest) = struct
+    open Fn
     type fn = fn_first_arg -> fn_rest
     type t = fn Ffi.funptr
 
@@ -81,13 +80,7 @@ struct
 
     let t_opt = Ctypes_std_views.nullable_funptr_view t Fn.fn
     let free = Ffi.free_funptr
-    let of_fun_ = Ffi.funptr_of_fun ~abi ~acquire_runtime_lock ~thread_registration fn
-    let of_fun ?debug_info f =
-      let debug_info = match debug_info with
-        | None -> Fn.debug_info
-        | Some _ -> debug_info
-      in
-      of_fun_ ?debug_info f
+    let of_fun = Ffi.funptr_of_fun ~abi ~acquire_runtime_lock ~thread_registration fn
 
     let with_fun ?debug_info f do_it =
       let f = of_fun ?debug_info f in
@@ -96,12 +89,11 @@ struct
       | exception exn -> free f; raise exn
   end
 
-  let dynamic_funptr (type a b) ?debug_info ?(abi=Libffi_abi.default_abi) ?(runtime_lock=false) ?(thread_registration=false) fn : (module Funptr_spec with type fn_first_arg = a and type fn_rest = b) =
+  let funptr_spec (type a b) ?(abi=Libffi_abi.default_abi) ?(runtime_lock=false) ?(thread_registration=false) fn : (module Funptr_spec with type fn_first_arg = a and type fn_rest = b) =
     (module struct
          type fn_first_arg = a
          type fn_rest = b
          let fn = fn
-         let debug_info = debug_info
          let abi = abi
          let acquire_runtime_lock = runtime_lock
          let thread_registration = thread_registration

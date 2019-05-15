@@ -60,7 +60,7 @@ val funptr :
     This function hides hard to reason about details of the life-time of the ocaml closure
     and C function pointer. Getting this wrong will cause hard to debug segmentation faults.
 
-    For passing ocaml functions into C (for use in callbacks) consider using [Foreign.dynamic_funptr].
+    For passing ocaml functions into C (for use in callbacks) consider using [Foreign.Make_funptr].
 
     If passing function pointers from C [Ctypes.static_funptr] and [Foreign.call_static_funptr]
     can be used.
@@ -103,13 +103,12 @@ val funptr_opt :
 exception CallToExpiredClosure
 (** A closure passed to C was collected by the OCaml garbage collector before
     it was called. *)
-module type Dynamic_funptr = sig
+module type Funptr = sig
   type fn
   (** [fn] is the signature of the underlying ocaml function. *)
 
   type t
-  (** [Dynamic_funptr.t] Handle to an ocaml function that can be passed to C for
-      use in callbacks.
+  (** Handle to an ocaml function that can be passed to C for use in callbacks.
 
     Unfortunately it is not possible to track if a fuction pointer is still used in C,
     so you must use the appropriate life cycle functions below for this.
@@ -117,7 +116,7 @@ module type Dynamic_funptr = sig
     See [t], [of_fun], [with_fun] and [free] *)
 
   val t : t Ctypes.typ
-  (** ctype for that can be used in type signatures of external functions *)
+  (** ctype that can be used in type signatures of external functions *)
 
   val t_opt : t option Ctypes.typ
   (** Like [t] but optional. *)
@@ -159,24 +158,17 @@ module type Funptr_spec = sig
   type fn_first_arg
   type fn_rest
   val fn : (fn_first_arg -> fn_rest) Ctypes.fn
-  val debug_info : string option
   val abi : Libffi_abi.abi
   val acquire_runtime_lock : bool
   val thread_registration : bool
 end
 
-module Make_funptr(Fn:Funptr_spec) : Dynamic_funptr with type fn=Fn.fn_first_arg -> Fn.fn_rest
+module Make_funptr(Fn:Funptr_spec) : Funptr with type fn=Fn.fn_first_arg -> Fn.fn_rest
+(** [Make_funptr(val (funptr_spec fn))] - define a Ctype for more safely passing ocaml
+    functions to C.
 
-val dynamic_funptr
-  : ?debug_info:string
-  -> ?abi:Libffi_abi.abi
-  -> ?runtime_lock:bool
-  -> ?thread_registration:bool
-  -> ('a -> 'b) Ctypes.fn
-  -> (module Funptr_spec with type fn_first_arg = 'a and type fn_rest = 'b)
-(** [dynamic_funptr fn] - define a Ctype for more safely passing ocaml functions to C.
-
-    [dynamic_funptr (FOO @-> returning BAR)] is roughly equivalent to [BAR( * )(FOO)] in C.
+    [Make_funptr(val (funptr_spec (FOO @-> returning BAR)))] is roughly equivalent to
+    [BAR( * )(FOO)] in C.
 
     Example:
     {[
@@ -190,7 +182,14 @@ val dynamic_funptr
           (fun progress ->
              keygen 2048 65537 progress null)
     ]}
-    *)
+*)
+
+val funptr_spec
+  :  ?abi:Libffi_abi.abi
+  -> ?runtime_lock:bool
+  -> ?thread_registration:bool
+  -> ('a -> 'b) Ctypes.fn
+  -> (module Funptr_spec with type fn_first_arg = 'a and type fn_rest = 'b)
 
 val call_static_funptr :
   ?name:string ->
