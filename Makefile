@@ -67,7 +67,7 @@ ctypes.public = lDouble complexL ctypes posixTypes ctypes_types
 ctypes.dir = src/ctypes
 ctypes.extra_mls = ctypes_primitives.ml
 ctypes.deps = bigarray bytes integers
-ctypes.linkdeps = integers
+ctypes.linkdeps = integers_stubs
 ctypes.install = yes
 ctypes.install_native_objects = yes
 ifeq ($(XEN),enable)

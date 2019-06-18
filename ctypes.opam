@@ -23,7 +23,7 @@ remove: [
 ]
 depends: [
    "base-bytes"
-   "integers" { < "0.3.0" }
+   "integers" { >= "0.3.0" }
    "ocamlfind" {build}
    "conf-pkg-config" {build}
    "lwt" {test & < "4.0.0"}
