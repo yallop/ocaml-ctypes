@@ -1050,7 +1050,7 @@ test-lwt-preemptive-stub-generator: $$(BEST_TARGET)
 
 test-lwt-preemptive.dir = tests/test-lwt-preemptive
 test-lwt-preemptive.threads = yes
-test-lwt-preemptive.deps = str bigarray oUnit bytes integers lwt.preemptive
+test-lwt-preemptive.deps = str bigarray oUnit bytes integers lwt.unix
 test-lwt-preemptive.subproject_deps = ctypes ctypes-foreign-base \
    ctypes-foreign-threaded cstubs tests-common test-lwt-preemptive-stubs
 test-lwt-preemptive.link_flags = -L$(BUILDDIR)/clib -ltest_functions
@@ -1135,7 +1135,7 @@ test-returning-errno-lwt-preemptive-stub-generator: $$(BEST_TARGET)
 
 test-returning-errno-lwt-preemptive.dir = tests/test-returning-errno-lwt-preemptive
 test-returning-errno-lwt-preemptive.threads = yes
-test-returning-errno-lwt-preemptive.deps = str bigarray oUnit bytes integers lwt.preemptive
+test-returning-errno-lwt-preemptive.deps = str bigarray oUnit bytes integers lwt.unix
 test-returning-errno-lwt-preemptive.subproject_deps = ctypes ctypes-foreign-base \
    ctypes-foreign-threaded cstubs tests-common test-returning-errno-lwt-preemptive-stubs
 test-returning-errno-lwt-preemptive.link_flags = -L$(BUILDDIR)/clib -ltest_functions
