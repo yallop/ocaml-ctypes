@@ -60,10 +60,11 @@ val funptr :
     This function hides hard to reason about details of the life-time of the ocaml closure
     and C function pointer. Getting this wrong will cause hard to debug segmentation faults.
 
-    For passing ocaml functions into C (for use in callbacks) consider using [Foreign.Make_funptr].
+    For passing ocaml functions into C (for use in callbacks) consider using
+    [Foreign.Make_funptr(val (funptr_spec ...))].
 
-    If passing function pointers from C [Ctypes.static_funptr] and [Foreign.call_static_funptr]
-    can be used.
+    If passing function pointers from C consider using [Ctypes.static_funptr] and
+    [Foreign.call_static_funptr].
     ----
 
     The ctypes library, like C itself, distinguishes functions and function
@@ -103,6 +104,7 @@ val funptr_opt :
 exception CallToExpiredClosure
 (** A closure passed to C was collected by the OCaml garbage collector before
     it was called. *)
+
 module type Funptr = sig
   type fn
   (** [fn] is the signature of the underlying ocaml function. *)
@@ -173,7 +175,7 @@ module Make_funptr(Fn:Funptr_spec) : Funptr with type fn=Fn.fn_first_arg -> Fn.f
     Example:
     {[
       module Progress_callback = Foreign.Make_funptr(val (
-        Foreign.dynamic_funptr (int @-> int @-> ptr void @-> returning void))
+        Foreign.funptr_spec (int @-> int @-> ptr void @-> returning void))
       let keygen =
         foreign "RSA_generate_key" (int @-> int @-> Progress_callback.t @-> ptr void @-> returning rsa_key)
       let secret_key =
