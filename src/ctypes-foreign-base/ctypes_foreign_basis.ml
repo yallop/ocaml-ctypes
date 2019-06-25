@@ -89,7 +89,7 @@ struct
       | exception exn -> free f; raise exn
   end
 
-  let funptr_spec (type a b) ?(abi=Libffi_abi.default_abi) ?(runtime_lock=false) ?(thread_registration=false) fn : (module Funptr_spec with type fn_first_arg = a and type fn_rest = b) =
+  let funptr_spec (type a) (type b) ?(abi=Libffi_abi.default_abi) ?(runtime_lock=false) ?(thread_registration=false) fn : (module Funptr_spec with type fn_first_arg = a and type fn_rest = b) =
     (module struct
          type fn_first_arg = a
          type fn_rest = b
