@@ -1,9 +1,9 @@
-opam-version: "1.2"
+opam-version: "2.0"
 version: "dev"
 maintainer: "yallop@gmail.com"
 author: "yallop@gmail.com"
 homepage: "https://github.com/ocamllabs/ocaml-ctypes"
-dev-repo: "http://github.com/ocamllabs/ocaml-ctypes.git"
+dev-repo: "git+http://github.com/ocamllabs/ocaml-ctypes.git"
 bug-reports: "http://github.com/ocamllabs/ocaml-ctypes/issues"
 depexts: [
   [ ["debian"] [ "libffi-dev"] ]   
@@ -20,3 +20,4 @@ tags: ["org:ocamllabs" "org:mirage"]
 post-messages: [
   "This package requires libffi on your system" {failure}
 ]
+synopsis: "Virtual package for enabling the ctypes.foreign subpackage"
