@@ -1,3 +1,26 @@
+## ctypes 0.15.0
+
+* Avoid unaligned stores/loads  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/584
+
+* Fix LDouble.to_int bug resulting from upstream Val_long change  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/583
+
+*  use CMPLX[FL]? macros instead of I  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/585
+
+* Various Windows fixes  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/586
+
+* Drop OCaml 4.01 support  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/577
+
+* Eliminate uses of <complex.h> on Android  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/579
+
+Thanks to Anton Bachin (@aantron), Andreas Hauptmann (@fdopen) and
+@ygrek for contributions to this release.
+
 ## ctypes 0.14.0
 
 * Add `CArray.of_string`  
