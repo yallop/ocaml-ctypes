@@ -244,10 +244,13 @@ let rec ml_typ_of_return_typ : type a. a typ -> ml_type =
     "Unexpected array type in the return type: %s" (Ctypes.string_of_typ a)
   | Bigarray _ as a -> internal_error
     "Unexpected bigarray type in the return type: %s" (Ctypes.string_of_typ a)
+  | OCamlUnsafe String
   | OCaml String -> Ctypes_static.unsupported
     "cstubs does not support OCaml strings as return values"
+  | OCamlUnsafe Bytes
   | OCaml Bytes -> Ctypes_static.unsupported
     "cstubs does not support OCaml bytes values as return values"
+  | OCamlUnsafe FloatArray
   | OCaml FloatArray -> Ctypes_static.unsupported
     "cstubs does not support OCaml float arrays as return values"
 
@@ -264,12 +267,15 @@ let rec ml_typ_of_arg_typ : type a. a typ -> ml_type = function
     "Unexpected array in an argument type: %s" (Ctypes.string_of_typ a)
   | Bigarray _ as a -> internal_error
     "Unexpected bigarray in an argument type: %s" (Ctypes.string_of_typ a)
+  | OCamlUnsafe String
   | OCaml String ->
     `Appl (path_of_string "CI.ocaml",
            [`Ident (path_of_string "string")])
+  | OCamlUnsafe Bytes
   | OCaml Bytes ->
     `Appl (path_of_string "CI.ocaml",
            [`Ident (path_of_string "Bytes.t")])
+  | OCamlUnsafe FloatArray
   | OCaml FloatArray ->
     `Appl (path_of_string "CI.ocaml",
            [`Appl (path_of_string "array",
@@ -421,7 +427,7 @@ let rec pattern_and_exp_of_typ : type a. concurrency:concurrency_policy -> errno
                    path_of_string "read", `Var x], `Etc)] in
       (pat, Some (map_result ~concurrency ~errno (`Appl x) e), binds)
     end
-  | OCaml ty ->
+  | OCamlUnsafe ty ->
     begin match pol, ty with
     | In, String -> (static_con "OCaml" [static_con "String" []], None, binds)
     | In, Bytes -> (static_con "OCaml" [static_con "Bytes" []], None, binds)
@@ -431,7 +437,19 @@ let rec pattern_and_exp_of_typ : type a. concurrency:concurrency_policy -> errno
     | Out, Bytes -> Ctypes_static.unsupported
       "cstubs does not support OCaml bytes values as return values"
     | Out, FloatArray -> Ctypes_static.unsupported
-      "cstubs does not support OCaml float arrays as return values"
+        "cstubs does not support OCaml float arrays as return values"
+    end
+  | OCaml ty -> 
+    begin match pol, ty with
+    | In, String -> (static_con "OCaml" [static_con "String" []], None, binds)
+    | In, Bytes -> (static_con "OCaml" [static_con "Bytes" []], None, binds)
+    | In, FloatArray -> (static_con "OCaml" [static_con "FloatArray" []], None, binds)
+    | Out, String -> Ctypes_static.unsupported
+      "cstubs does not support OCaml strings as return values"
+    | Out, Bytes -> Ctypes_static.unsupported
+      "cstubs does not support OCaml bytes values as return values"
+    | Out, FloatArray -> Ctypes_static.unsupported
+        "cstubs does not support OCaml float arrays as return values"
     end
   | Abstract _ as ty -> internal_error
     "Unexpected abstract type encountered during ML code generation: %s"
@@ -464,12 +482,15 @@ let rec pattern_of_typ : type a. a typ -> ml_pat = function
      static_con "Array" [`Underscore; `Underscore]
   | Bigarray _ ->
      static_con "Bigarray" [`Underscore]
+  | OCamlUnsafe String
   | OCaml String ->
     Ctypes_static.unsupported
       "cstubs does not support OCaml strings as global values"
+  | OCamlUnsafe Bytes
   | OCaml Bytes ->
     Ctypes_static.unsupported
       "cstubs does not support OCaml bytes values as global values"
+  | OCamlUnsafe FloatArray
   | OCaml FloatArray ->
     Ctypes_static.unsupported
       "cstubs does not support OCaml float arrays as global values"

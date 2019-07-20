@@ -73,8 +73,11 @@ let rec format_typ' : type a. a typ ->
       let name = Ctypes_primitives.name elem in
       fprintf fmt "%s%t%t" name (k `array)
         (fun fmt -> (Array.iter (Format.fprintf fmt "[%d]") dims))
+    | OCamlUnsafe String
     | OCaml String -> format_typ' (ptr char) k context fmt
+    | OCamlUnsafe Bytes
     | OCaml Bytes -> format_typ' (ptr char) k context fmt
+    | OCamlUnsafe FloatArray
     | OCaml FloatArray -> format_typ' (ptr double) k context fmt
 
 and format_fields : type a. a boxed_field list -> Format.formatter -> unit =

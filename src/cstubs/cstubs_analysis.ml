@@ -109,6 +109,7 @@ let rec allocation : type a. a typ -> a allocation = function
  | Array _ -> `Alloc Alloc_array
  | Bigarray ba -> `Alloc (Alloc_bigarray ba)
  | OCaml _ -> `Alloc Alloc_pointer
+ | OCamlUnsafe _ -> `Alloc Alloc_pointer
 
 let rec may_allocate : type a. a fn -> bool = function
   | Returns t ->

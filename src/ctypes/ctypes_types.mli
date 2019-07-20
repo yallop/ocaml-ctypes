@@ -209,8 +209,18 @@ sig
   val ocaml_string : string Ctypes_static.ocaml typ
   (** Value representing the directly mapped storage of an OCaml string. *)
 
+  val ocaml_unsafe_string : string Ctypes_static.ocaml typ
+  (** [ocaml_unsafe_string str] is the same as [ocaml_string str] except that 
+      the compiler will not check if it passed in a C function with [Cstubs.unlocked]
+      concurrency. [str] should be registered as a global root via the [Root] module. *)
+
   val ocaml_bytes : Bytes.t Ctypes_static.ocaml typ
   (** Value representing the directly mapped storage of an OCaml byte array. *)
+
+  val ocaml_unsafe_bytes : bytes Ctypes_static.ocaml typ
+  (** [ocaml_unsafe_bytes buf] is the same as [ocaml_bytes buf] except that
+      the compiler will not check if it passed in a C function with [Cstubs.unlocked]
+      concurrency. [buf] should be registered as a global root via the [Root] module. *)
 
   (** {3 Array types} *)
 

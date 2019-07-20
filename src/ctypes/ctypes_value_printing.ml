@@ -21,6 +21,7 @@ let rec format : type a. a typ -> Format.formatter -> a -> unit
   | Bigarray ba -> Format.fprintf fmt "<bigarray %a>"
     (fun fmt -> Ctypes_type_printing.format_typ fmt) typ
   | Abstract _ -> format_structured fmt v
+  | OCamlUnsafe _ -> format_ocaml fmt v
   | OCaml _ -> format_ocaml fmt v
   | View {write; ty; format=f} ->
     begin match f with

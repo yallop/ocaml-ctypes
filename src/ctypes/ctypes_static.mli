@@ -38,6 +38,7 @@ type _ typ =
   | Array           : 'a typ * int       -> 'a carray typ
   | Bigarray        : (_, 'a, _) Ctypes_bigarray.t
                                          -> 'a typ
+  | OCamlUnsafe     : 'a ocaml_type      -> 'a ocaml typ
   | OCaml           : 'a ocaml_type      -> 'a ocaml typ
 and 'a carray = { astart : 'a ptr; alength : int }
 and ('a, 'kind) structured = { structured : ('a, 'kind) structured ptr }
@@ -148,8 +149,11 @@ val ulong : Unsigned.ulong typ
 val ullong : Unsigned.ullong typ
 val array : int -> 'a typ -> 'a carray typ
 val ocaml_string : string ocaml typ
+val ocaml_unsafe_string : string ocaml typ
 val ocaml_bytes : Bytes.t ocaml typ
+val ocaml_unsafe_bytes : bytes ocaml typ
 val ocaml_float_array : float array ocaml typ
+val ocaml_unsafe_float_array : float array ocaml typ
 val ptr : 'a typ -> 'a ptr typ
 val ( @-> ) : 'a typ -> 'b fn -> ('a -> 'b) fn
 val abstract : name:string -> size:int -> alignment:int -> 'a abstract typ

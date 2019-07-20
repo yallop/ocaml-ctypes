@@ -142,8 +142,11 @@ struct
     | View { ty } -> prj ty ~orig x
     | Array _ -> report_unpassable "arrays"
     | Bigarray _ -> report_unpassable "bigarrays"
+    | OCamlUnsafe String
     | OCaml String -> Some (string_to_ptr x)
+    | OCamlUnsafe Bytes
     | OCaml Bytes -> Some (string_to_ptr x)
+    | OCamlUnsafe FloatArray
     | OCaml FloatArray -> Some (float_array_to_ptr x)
 
   let prj ty x = prj ty ~orig:ty x
@@ -160,6 +163,7 @@ struct
     | View { ty } -> inj ty x
     | Array _ -> report_unpassable "arrays"
     | Bigarray _ -> report_unpassable "bigarrays"
+    | OCamlUnsafe _
     | OCaml _ -> report_unpassable "ocaml references as return values"
 
   type _ fn =

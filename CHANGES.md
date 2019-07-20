@@ -18,6 +18,8 @@
 * Eliminate uses of <complex.h> on Android  
   https://github.com/ocamllabs/ocaml-ctypes/pull/579
 
+* Allow unsafe ocaml values in callbacks
+
 Thanks to Anton Bachin (@aantron), Andreas Hauptmann (@fdopen) and
 @ygrek for contributions to this release.
 

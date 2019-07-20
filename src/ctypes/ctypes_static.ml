@@ -44,6 +44,7 @@ type _ typ =
   | Array           : 'a typ * int       -> 'a carray typ
   | Bigarray        : (_, 'a, _) Ctypes_bigarray.t
                                          -> 'a typ
+  | OCamlUnsafe     : 'a ocaml_type      -> 'a ocaml typ
   | OCaml           : 'a ocaml_type      -> 'a ocaml typ
 and 'a carray = { astart : 'a ptr; alength : int }
 and ('a, 'kind) structured = { structured : ('a, 'kind) structured ptr }
@@ -131,6 +132,7 @@ let rec sizeof : type a. a typ -> int = function
   | Abstract { asize }             -> asize
   | Pointer _                      -> Ctypes_primitives.pointer_size
   | Funptr _                       -> Ctypes_primitives.pointer_size
+  | OCamlUnsafe _
   | OCaml _                        -> raise IncompleteType
   | View { ty }                    -> sizeof ty
 
@@ -147,6 +149,7 @@ let rec alignment : type a. a typ -> int = function
   | Abstract { aalignment }          -> aalignment
   | Pointer _                        -> Ctypes_primitives.pointer_alignment
   | Funptr _                         -> Ctypes_primitives.pointer_alignment
+  | OCamlUnsafe _
   | OCaml _                          -> raise IncompleteType
   | View { ty }                      -> alignment ty
 
@@ -162,6 +165,7 @@ let rec passable : type a. a typ -> bool = function
   | Pointer _                      -> true
   | Funptr _                       -> true
   | Abstract _                     -> false
+  | OCamlUnsafe _
   | OCaml _                        -> true
   | View { ty }                    -> passable ty
 
@@ -169,16 +173,17 @@ let rec passable : type a. a typ -> bool = function
    Values that reside in OCaml memory cannot be accessed
    when the runtime lock is not held. *)
 let rec ocaml_value : type a. a typ -> bool = function
-    Void        -> false
-  | Primitive _ -> false
-  | Struct _    -> false
-  | Union _     -> false
-  | Array _     -> false
-  | Bigarray _  -> false
-  | Pointer _   -> false
-  | Funptr _    -> false
-  | Abstract _  -> false
-  | OCaml _     -> true
+    Void          -> false
+  | Primitive _   -> false
+  | Struct _      -> false
+  | Union _       -> false
+  | Array _       -> false
+  | Bigarray _    -> false
+  | Pointer _     -> false
+  | Funptr _      -> false
+  | Abstract _    -> false
+  | OCamlUnsafe _ -> false
+  | OCaml _       -> true
   | View { ty } -> ocaml_value ty
 
 let rec has_ocaml_argument : type a. a fn -> bool = function
@@ -218,8 +223,11 @@ let uint = Primitive Ctypes_primitive_types.Uint
 let ulong = Primitive Ctypes_primitive_types.Ulong
 let ullong = Primitive Ctypes_primitive_types.Ullong
 let array i t = Array (t, i)
+let ocaml_unsafe_string = OCamlUnsafe String
 let ocaml_string = OCaml String
+let ocaml_unsafe_bytes = OCamlUnsafe Bytes
 let ocaml_bytes = OCaml Bytes
+let ocaml_unsafe_float_array = OCamlUnsafe FloatArray
 let ocaml_float_array = OCaml FloatArray
 let ptr t = Pointer t
 let ( @->) f t =

@@ -63,6 +63,7 @@ struct
                                              else ArgType ffitype
     | Pointer _                           -> ArgType (Ctypes_ffi_stubs.pointer_ffitype ())
     | Funptr _                            -> ArgType (Ctypes_ffi_stubs.pointer_ffitype ())
+    | OCamlUnsafe _
     | OCaml _                             -> ArgType (Ctypes_ffi_stubs.pointer_ffitype ())
     | Union _                             -> report_unpassable "unions"
     | Struct ({ spec = Complete _ } as s) -> struct_arg_type s
@@ -160,9 +161,14 @@ struct
         mov.(idx) <- (Obj.repr obj, disp * elt_size);
         Obj.repr obj
     in function
-    | OCaml String     -> ocaml_arg 1
-    | OCaml Bytes      -> ocaml_arg 1
-    | OCaml FloatArray -> ocaml_arg (Ctypes_primitives.sizeof Ctypes_primitive_types.Double)
+    | OCamlUnsafe String -> ocaml_arg 1
+    | OCaml String       -> ocaml_arg 1
+    | OCamlUnsafe Bytes  -> ocaml_arg 1
+    | OCaml Bytes        -> ocaml_arg 1
+    | OCamlUnsafe FloatArray ->
+       ocaml_arg (Ctypes_primitives.sizeof Ctypes_primitive_types.Double)
+    | OCaml FloatArray ->
+       ocaml_arg (Ctypes_primitives.sizeof Ctypes_primitive_types.Double)
     | View { write = w; ty } ->
       (fun ~offset ~idx v dst mov -> 
          let wv = w v in
