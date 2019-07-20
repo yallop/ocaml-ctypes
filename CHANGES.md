@@ -19,6 +19,7 @@
   https://github.com/ocamllabs/ocaml-ctypes/pull/579
 
 * Allow unsafe ocaml values in callbacks
+  https://github.com/ocamllabs/ocaml-ctypes/pull/607
 
 Thanks to Anton Bachin (@aantron), Andreas Hauptmann (@fdopen) and
 @ygrek for contributions to this release.
