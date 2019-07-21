@@ -132,7 +132,7 @@ let rec sizeof : type a. a typ -> int = function
   | Abstract { asize }             -> asize
   | Pointer _                      -> Ctypes_primitives.pointer_size
   | Funptr _                       -> Ctypes_primitives.pointer_size
-  | OCamlUnsafe _
+  | OCamlUnsafe _                  -> raise IncompleteType
   | OCaml _                        -> raise IncompleteType
   | View { ty }                    -> sizeof ty
 
@@ -165,7 +165,7 @@ let rec passable : type a. a typ -> bool = function
   | Pointer _                      -> true
   | Funptr _                       -> true
   | Abstract _                     -> false
-  | OCamlUnsafe _
+  | OCamlUnsafe _                  -> true
   | OCaml _                        -> true
   | View { ty }                    -> passable ty
 
