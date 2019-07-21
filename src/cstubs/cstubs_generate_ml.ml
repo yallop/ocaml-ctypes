@@ -245,12 +245,18 @@ let rec ml_typ_of_return_typ : type a. a typ -> ml_type =
   | Bigarray _ as a -> internal_error
     "Unexpected bigarray type in the return type: %s" (Ctypes.string_of_typ a)
   | OCamlUnsafe String
+                 -> Ctypes_static.unsupported
+    "cstubs does not support OCaml strings as return values"
   | OCaml String -> Ctypes_static.unsupported
     "cstubs does not support OCaml strings as return values"
   | OCamlUnsafe Bytes
+                -> Ctypes_static.unsupported
+    "cstubs does not support OCaml bytes values as return values"
   | OCaml Bytes -> Ctypes_static.unsupported
     "cstubs does not support OCaml bytes values as return values"
   | OCamlUnsafe FloatArray
+                     -> Ctypes_static.unsupported
+    "cstubs does not support OCaml float arrays as return values"
   | OCaml FloatArray -> Ctypes_static.unsupported
     "cstubs does not support OCaml float arrays as return values"
 
@@ -267,15 +273,22 @@ let rec ml_typ_of_arg_typ : type a. a typ -> ml_type = function
     "Unexpected array in an argument type: %s" (Ctypes.string_of_typ a)
   | Bigarray _ as a -> internal_error
     "Unexpected bigarray in an argument type: %s" (Ctypes.string_of_typ a)
-  | OCamlUnsafe String
+  | OCamlUnsafe String ->
+    `Appl (path_of_string "CI.ocaml",
+           [`Ident (path_of_string "string")])
   | OCaml String ->
     `Appl (path_of_string "CI.ocaml",
            [`Ident (path_of_string "string")])
-  | OCamlUnsafe Bytes
+  | OCamlUnsafe Bytes ->
+    `Appl (path_of_string "CI.ocaml",
+           [`Ident (path_of_string "Bytes.t")])
   | OCaml Bytes ->
     `Appl (path_of_string "CI.ocaml",
            [`Ident (path_of_string "Bytes.t")])
-  | OCamlUnsafe FloatArray
+  | OCamlUnsafe FloatArray ->
+    `Appl (path_of_string "CI.ocaml",
+           [`Appl (path_of_string "array",
+                   [`Ident (path_of_string "float")])])
   | OCaml FloatArray ->
     `Appl (path_of_string "CI.ocaml",
            [`Appl (path_of_string "array",
@@ -482,15 +495,21 @@ let rec pattern_of_typ : type a. a typ -> ml_pat = function
      static_con "Array" [`Underscore; `Underscore]
   | Bigarray _ ->
      static_con "Bigarray" [`Underscore]
-  | OCamlUnsafe String
+  | OCamlUnsafe String ->
+    Ctypes_static.unsupported
+      "cstubs does not support OCaml strings as global values"
   | OCaml String ->
     Ctypes_static.unsupported
       "cstubs does not support OCaml strings as global values"
-  | OCamlUnsafe Bytes
+  | OCamlUnsafe Bytes ->
+    Ctypes_static.unsupported
+      "cstubs does not support OCaml bytes values as global values"
   | OCaml Bytes ->
     Ctypes_static.unsupported
       "cstubs does not support OCaml bytes values as global values"
-  | OCamlUnsafe FloatArray
+  | OCamlUnsafe FloatArray ->
+    Ctypes_static.unsupported
+      "cstubs does not support OCaml float arrays as global values"
   | OCaml FloatArray ->
     Ctypes_static.unsupported
       "cstubs does not support OCaml float arrays as global values"

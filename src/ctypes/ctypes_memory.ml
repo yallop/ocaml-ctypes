@@ -35,6 +35,7 @@ let rec build : type a b. a typ -> b typ Fat.t -> a
       let buildty = build ty in
       (fun buf -> read (buildty buf))
     | OCamlUnsafe _
+              -> (fun buf -> assert false)
     | OCaml _ -> (fun buf -> assert false)
     (* The following cases should never happen; non-struct aggregate
        types are excluded during type construction. *)
