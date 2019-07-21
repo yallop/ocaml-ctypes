@@ -149,7 +149,7 @@ let rec alignment : type a. a typ -> int = function
   | Abstract { aalignment }          -> aalignment
   | Pointer _                        -> Ctypes_primitives.pointer_alignment
   | Funptr _                         -> Ctypes_primitives.pointer_alignment
-  | OCamlUnsafe _
+  | OCamlUnsafe _                    -> raise IncompleteType
   | OCaml _                          -> raise IncompleteType
   | View { ty }                      -> alignment ty
 
