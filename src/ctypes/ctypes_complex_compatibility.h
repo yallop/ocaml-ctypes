@@ -123,6 +123,8 @@ static inline float _Complex ctypes_compat_make_complexf(float re, float im)
    Freebsd: still missing in FreeBSD 11.0-RELEASE-p2
  */
 
+#include <caml/fail.h>
+
 static inline long double _Complex ctypes_compat_cexpl(long double _Complex z)
 { caml_failwith("ctypes: cexpl does not exist on current platform"); }
 
