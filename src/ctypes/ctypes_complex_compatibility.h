@@ -8,6 +8,8 @@
 #ifndef CTYPES_COMPLEX_COMPATIBILITY_H
 #define CTYPES_COMPLEX_COMPATIBILITY_H
 
+#include <caml/fail.h>
+
 /* "Each complex type has the same representation and alignment
     requirements as an array type containing exactly two elements of
     the corresponding real type; the first element is equal to the real
@@ -35,8 +37,6 @@ union ctypes_complex_float_union {
 
 #include <math.h>
 
-#include <caml/fail.h>
-
 static inline long double ctypes_compat_creall(long double _Complex z)
 { union ctypes_complex_long_double_union u; u.z = z; return u.parts[0]; }
 
@@ -45,9 +45,6 @@ static inline long double ctypes_compat_cimagl(long double _Complex z)
 
 static inline long double _Complex ctypes_compat_conjl(long double _Complex z)
 { union ctypes_complex_long_double_union u; u.z = z; u.parts[1] = -u.parts[1]; return u.z; }
-
-static inline long double _Complex ctypes_compat_csqrtl(long double _Complex z)
-{ caml_failwith("ctypes: csqrtl does not exist on current platform"); }
 
 static inline long double ctypes_compat_cargl(long double _Complex z)
 { return atan2(ctypes_compat_cimagl(z), ctypes_compat_creall(z)); }
@@ -70,6 +67,21 @@ static inline float ctypes_compat_cimagf(float _Complex z)
 static inline float _Complex ctypes_compat_conjf(float _Complex z)
 { union ctypes_complex_float_union u; u.z = z; u.parts[1] = -u.parts[1]; return u.z; }
 
+/* Android: As of API level 24, these functions do not exist. */
+
+static inline long double _Complex ctypes_compat_csqrtl(long double _Complex z)
+{ caml_failwith("ctypes: csqrtl does not exist on current platform"); }
+
+static inline long double _Complex ctypes_compat_cexpl(long double _Complex z)
+{ caml_failwith("ctypes: cexpl does not exist on current platform"); }
+
+static inline long double _Complex ctypes_compat_clogl(long double _Complex z)
+{ caml_failwith("ctypes: clogl does not exist on current platform"); }
+
+static inline long double _Complex ctypes_compat_cpowl(long double _Complex x, long double _Complex z)
+{ caml_failwith("ctypes: cpowl does not exist on current platform"); }
+
+
 #else
 
 #include <complex.h>
@@ -80,12 +92,19 @@ static inline long double ctypes_compat_cimagl(long double _Complex z)
 { return cimagl(z); }
 static inline long double _Complex ctypes_compat_conjl(long double _Complex z)
 { return conjl(z); }
+
+#if defined(__FreeBSD__)
+static inline long double _Complex ctypes_compat_cexpl(long double _Complex z)
+{ caml_failwith("ctypes: cexpl does not exist on current platform"); }
+#else
 static inline long double _Complex ctypes_compat_cexpl(long double _Complex z)
 { return cexpl(z); }
+#endif
 static inline long double _Complex ctypes_compat_clogl(long double _Complex z)
 { return clogl(z); }
 static inline long double _Complex ctypes_compat_cpowl(long double _Complex x, long double _Complex z)
 { return cpowl(x, z); }
+
 static inline long double _Complex ctypes_compat_csqrtl(long double _Complex z)
 { return csqrtl(z); }
 static inline long double ctypes_compat_cargl(long double _Complex z)
@@ -117,22 +136,6 @@ static inline float _Complex ctypes_compat_make_complexf(float re, float im)
 #endif
 
 #endif
-
-#if defined(__ANDROID__) || defined(__FreeBSD__)
-/* Android: As of API level 24, these functions do not exist.
-   Freebsd: still missing in FreeBSD 11.0-RELEASE-p2
- */
-
-static inline long double _Complex ctypes_compat_cexpl(long double _Complex z)
-{ caml_failwith("ctypes: cexpl does not exist on current platform"); }
-
-static inline long double _Complex ctypes_compat_clogl(long double _Complex z)
-{ caml_failwith("ctypes: clogl does not exist on current platform"); }
-
-static inline long double _Complex ctypes_compat_cpowl(long double _Complex x, long double _Complex z)
-{ caml_failwith("ctypes: cpowl does not exist on current platform"); }
-#endif
-
 
 #ifdef CTYPES_USE_STRUCT_BUILDER
 static inline double _Complex ctypes_compat_make_complex(double re, double im)
