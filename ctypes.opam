@@ -19,9 +19,6 @@ build: [
 install: [
   [make "install" "XEN=%{mirage-xen:enable}%"]
 ]
-remove: [
-  ["ocamlfind" "remove" "ctypes"]
-]
 depends: [
    "ocaml" {>= "4.02.3"}
    "base-bytes"
