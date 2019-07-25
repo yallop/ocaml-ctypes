@@ -1,4 +1,4 @@
-version = "0.15.0"
+version = "0.15.1"
 description = "Combinators for binding to C libraries without writing any C."
 requires = "bigarray bytes integers"
 archive(byte) = "ctypes.cma"
@@ -9,7 +9,7 @@ archive(native, plugin) = "ctypes.cmxs"
 exists_if = "ctypes.cma"
 
 package "top" (
-  version = "0.15.0"
+  version = "0.15.1"
   description = "Toplevel printers for C types"
   requires = "ctypes"
   archive(byte) = "ctypes-top.cma"
@@ -20,7 +20,7 @@ package "top" (
 )
 
 package "stubs" (
-  version = "0.15.0"
+  version = "0.15.1"
   description = "Stub generation from C types"
   requires = "ctypes str"
   archive(byte) = "cstubs.cma"
@@ -32,13 +32,13 @@ package "stubs" (
 )
 
 package "foreign" (
- version = "0.15.0"
+ version = "0.15.1"
  description = "Dynamic linking of C functions"
  requires(-mt) = "ctypes.foreign.unthreaded"
  requires(mt) = "ctypes.foreign.threaded"
 
  package "base" (
-  version = "0.15.0"
+  version = "0.15.1"
   description = "Dynamic linking of C functions (base package)"
   requires = "ctypes"
   archive(byte) = "ctypes-foreign-base.cma"
@@ -49,7 +49,7 @@ package "foreign" (
  )
 
  package "threaded" (
-  version = "0.15.0"
+  version = "0.15.1"
   description = "Dynamic linking of C functions (for use in threaded programs)"
   requires = "threads ctypes ctypes.foreign.base"
   archive(byte) = "ctypes-foreign-threaded.cma"
@@ -60,7 +60,7 @@ package "foreign" (
  )
 
  package "unthreaded" (
-  version = "0.15.0"
+  version = "0.15.1"
   description = "Dynamic linking of C functions (for use in unthreaded programs)"
   requires = "ctypes ctypes.foreign.base"
   archive(byte) = "ctypes-foreign-unthreaded.cma"

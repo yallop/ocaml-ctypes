@@ -1,3 +1,8 @@
+## ctypes 0.15.1
+
+* Fix <complex.h>-related compilation issues on FreeBSD  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/608
+
 ## ctypes 0.15.0
 
 * Avoid unaligned stores/loads  
