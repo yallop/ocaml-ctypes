@@ -5,7 +5,7 @@
  * See the file LICENSE for details.
  *)
 
-val unwind_protect : cleanup:('a -> 'c) -> ('a -> 'b) -> 'a -> 'b
+val unwind_protect : cleanup:('a -> unit) -> ('a -> 'b) -> 'a -> 'b
 val with_open_output_file : filename:string -> (out_channel -> 'a) -> 'a
 
 val file_contents : filename:string -> string
