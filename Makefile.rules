@@ -20,9 +20,9 @@ endif
 endif
 
 ifeq ($(DEBUG),false)
-  OCAMLFLAGS=-principal -short-paths -ccopt "-I$(package_integers_path)"
+  OCAMLFLAGS=-principal -short-paths -strict-sequence -ccopt "-I$(package_integers_path)"
 else
-  OCAMLFLAGS=-principal -short-paths -g -ccopt "-I$(package_integers_path)"
+  OCAMLFLAGS=-principal -short-paths -strict-sequence -g -ccopt "-I$(package_integers_path)"
 endif
 ifneq ($(COVERAGE),false)
   OCAMLFIND_BISECT_FLAGS=-package bisect_ppx

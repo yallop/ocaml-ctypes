@@ -26,14 +26,14 @@ struct
     let bufsz = 128 in
     let write snprintf apply =
       let buf = allocate_n char bufsz in
-      apply (snprintf buf bufsz);
+      ignore (apply (snprintf buf bufsz));
       coerce (ptr char) string buf
     in
     begin
       assert_equal "an int: 100."
         (write snprintf_int
            (fun k -> k "an int: %d." 100));
-      
+
       assert_equal "a char A and a uint 33."
         (write snprintf_char_unsigned
            (fun k -> k "a char %c and a uint %u." 'A' (UInt.of_int 33)));
