@@ -59,8 +59,9 @@ module Make (Mutex : MUTEX) = struct
     in cleanup
 
   let try_finalise f x =
-    try Gc.finalise f x; true
-    with Invalid_argument _ -> false
+    match Gc.finalise f x with
+    | () -> true
+    | exception Invalid_argument _ -> false
 
   let record closure boxed_closure : int =
     let key = fresh () in
@@ -84,14 +85,12 @@ module Make (Mutex : MUTEX) = struct
   let retrieve id =
     begin
       Mutex.lock tables_lock;
-      let f =
-        try Hashtbl.find function_by_id id
-        with Not_found ->
-          Mutex.unlock tables_lock;
-          raise Not_found
-      in begin
-        Mutex.unlock tables_lock;
-        f
-      end
+      match Hashtbl.find function_by_id id with
+      | exception Not_found ->
+         Mutex.unlock tables_lock;
+         raise Not_found
+      | f ->
+         Mutex.unlock tables_lock;
+         f
     end
 end

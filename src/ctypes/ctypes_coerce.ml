@@ -85,30 +85,24 @@ let rec coercion : type a b. a typ -> b typ -> (a, b) coercion =
     | Coercion coerce -> Coercion (fun v -> bv.read (coerce v))
     end
   | Pointer a, Pointer b ->
-    begin
-      try
-        begin match coercion a b with
-        | Id -> Id
-        | Coercion _ ->
-          Coercion (fun (CPointer p) -> CPointer (Ctypes_ptr.Fat.coerce p b))
-        end
-      with Uncoercible _ ->
-        Coercion (fun (CPointer p) -> CPointer (Ctypes_ptr.Fat.coerce p b))
+    begin match coercion a b with
+    | Id -> Id
+    | Coercion _ ->
+       Coercion (fun (CPointer p) -> CPointer (Ctypes_ptr.Fat.coerce p b))
+    | exception Uncoercible _ ->
+       Coercion (fun (CPointer p) -> CPointer (Ctypes_ptr.Fat.coerce p b))
     end
   | Pointer a, Funptr b ->
     Coercion (fun (CPointer p) -> Static_funptr (Ctypes_ptr.Fat.coerce p b))
   | Funptr a, Pointer b ->
     Coercion (fun (Static_funptr p) -> CPointer (Ctypes_ptr.Fat.coerce p b))
   | Funptr a, Funptr b ->
-    begin
-      try
-        begin match fn_coercion a b with
-        | Id -> Id
-        | Coercion _ ->
-          Coercion (fun (Static_funptr p) -> Static_funptr (Ctypes_ptr.Fat.coerce p b))
-        end
-      with Uncoercible _ ->
-        Coercion (fun (Static_funptr p) -> Static_funptr (Ctypes_ptr.Fat.coerce p b))
+    begin match fn_coercion a b with
+    | Id -> Id
+    | Coercion _ ->
+       Coercion (fun (Static_funptr p) -> Static_funptr (Ctypes_ptr.Fat.coerce p b))
+    | exception Uncoercible _ ->
+       Coercion (fun (Static_funptr p) -> Static_funptr (Ctypes_ptr.Fat.coerce p b))
     end
   | l, r -> uncoercible l r
 
