@@ -112,10 +112,10 @@ module type Funptr = sig
   type t
   (** Handle to an ocaml function that can be passed to C for use in callbacks.
 
-    Unfortunately it is not possible to track if a fuction pointer is still used in C,
-    so you must use the appropriate life cycle functions below for this.
+      Unfortunately it is not possible to track if a fuction pointer is still used in C,
+      so you must use the appropriate life cycle functions below for this.
 
-    See [t], [of_fun], [with_fun] and [free] *)
+      See [t], [of_fun], [with_fun] and [free] *)
 
   val t : t Ctypes.typ
   (** ctype that can be used in type signatures of external functions *)
@@ -126,7 +126,7 @@ module type Funptr = sig
   val free : t -> unit
   (** [free fptr] - Indicate that the [fptr] is no longer needed.
 
-      Once [free] has been called any C calls to this [Dynamic_funptr.t] are 
+      Once [free] has been called any C calls to this [Dynamic_funptr.t] are
       unsafe and may result in a segmentation fault. Only call [free] once the
       callback is no longer used from C.
   *)
@@ -155,43 +155,30 @@ module type Funptr = sig
   *)
 end
 
-
-module type Funptr_spec = sig
-  type fn_first_arg
-  type fn_rest
-  val fn : (fn_first_arg -> fn_rest) Ctypes.fn
-  val abi : Libffi_abi.abi
-  val acquire_runtime_lock : bool
-  val thread_registration : bool
-end
-
-module Make_funptr(Fn:Funptr_spec) : Funptr with type fn=Fn.fn_first_arg -> Fn.fn_rest
-(** [Make_funptr(val (funptr_spec fn))] - define a Ctype for more safely passing ocaml
+(** [(val (dynamic_funptr fn))] - define a Ctype for more safely passing ocaml
     functions to C.
 
-    [Make_funptr(val (funptr_spec (FOO @-> returning BAR)))] is roughly equivalent to
+    [(val (funptr_spec (FOO @-> returning BAR)))] is roughly equivalent to
     [BAR( * )(FOO)] in C.
 
     Example:
     {[
-      module Progress_callback = Foreign.Make_funptr(val (
-        Foreign.funptr_spec (int @-> int @-> ptr void @-> returning void))
+      module Progress_callback = (val (dynamic_funptr (int @-> int @-> ptr void @-> returning void)))
       let keygen =
         foreign "RSA_generate_key" (int @-> int @-> Progress_callback.t @-> ptr void @-> returning rsa_key)
       let secret_key =
         Progress_callback.with_fun
-          (fun a b _ -> printf "progress: a:%d, b:%d\n" a b) 
+          (fun a b _ -> printf "progress: a:%d, b:%d\n" a b)
           (fun progress ->
              keygen 2048 65537 progress null)
     ]}
 *)
-
-val funptr_spec
+val dynamic_funptr
   :  ?abi:Libffi_abi.abi
   -> ?runtime_lock:bool
   -> ?thread_registration:bool
   -> ('a -> 'b) Ctypes.fn
-  -> (module Funptr_spec with type fn_first_arg = 'a and type fn_rest = 'b)
+  -> (module Funptr with type fn = 'a->'b)
 
 val call_static_funptr :
   ?name:string ->
