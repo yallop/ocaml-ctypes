@@ -23,6 +23,8 @@ env:
   - OCAML_VERSION=4.08.0
   - OCAML_VERSION=4.09.0
 matrix:
+  allow_failures:
+    - env: OCAML_VERSION=4.04.0+32bit ANDROID=true
   exclude:
     - os: osx
       env: OCAML_VERSION=4.02.3 ARM=true
@@ -47,3 +49,4 @@ before_install:
       sudo apt-get update && sudo apt-get install --yes qemu-user-static;
       docker pull yallop/ocaml-ctypes-qemu-arm-base;
     fi
+
