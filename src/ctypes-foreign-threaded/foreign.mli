@@ -113,7 +113,7 @@ module type Funptr = sig
       Alternatively {!with_fun} encapsulates both allocation and deallocation. *)
 
   val t : t Ctypes.typ
-  (** ctype that can be used in type signatures of external functions *)
+  (** A type representation for a function pointer type with explicit lifetime management. *)
 
   val t_opt : t option Ctypes.typ
   (** This behaves like {!t}, except that null pointers appear in OCaml as [None]. *)
