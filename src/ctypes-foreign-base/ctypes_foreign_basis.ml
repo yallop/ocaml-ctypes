@@ -54,8 +54,8 @@ struct
     val t : t Ctypes.typ
     val t_opt : t option Ctypes.typ
     val free : t -> unit
-    val of_fun : ?debug_info:string -> fn -> t
-    val with_fun : ?debug_info:string -> fn -> (t -> 'c) -> 'c
+    val of_fun : fn -> t
+    val with_fun : fn -> (t -> 'c) -> 'c
   end
 
   let dynamic_funptr (type a b) ?(abi=Libffi_abi.default_abi) ?(runtime_lock=false) ?(thread_registration=false) fn : (module Funptr with type fn = a -> b) =
@@ -72,15 +72,12 @@ struct
     let free = Ffi.free_funptr
     let of_fun = Ffi.funptr_of_fun ~abi ~acquire_runtime_lock:runtime_lock ~thread_registration fn
 
-    let with_fun ?debug_info f do_it =
-      let f = of_fun ?debug_info f in
+    let with_fun f do_it =
+      let f = of_fun f in
       match do_it f with
       | res -> free f; res
       | exception exn -> free f; raise exn
   end)
 
-  let call_static_funptr ?name ?(abi=Libffi_abi.default_abi) ?(check_errno=false) ?(release_runtime_lock=false) fn fp =
-    Ffi.function_of_pointer
-      ?name ~abi ~check_errno ~release_runtime_lock fn fp
-
+  let report_leaked_funptr = Ffi.report_leaked_funptr
 end
