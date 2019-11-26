@@ -109,37 +109,35 @@ module type Funptr = sig
   type t
   (** Handle to an OCaml function that can be passed to C for use in callbacks.
 
-      Unfortunately it is not possible to track if a fuction pointer is still used in C,
-      so you must use the appropriate life cycle functions below for this.
-
-      See [t], [of_fun], [with_fun] and [free] *)
+      Each value of type {!t} allocated by {!of_fun} must be deallocated by calling {!free}.
+      Alternatively {!with_fun} encapsulates both allocation and deallocation. *)
 
   val t : t Ctypes.typ
   (** ctype that can be used in type signatures of external functions *)
 
   val t_opt : t option Ctypes.typ
-  (** Like [t] but optional. *)
+  (** This behaves like {!t}, except that null pointers appear in OCaml as [None]. *)
 
   val free : t -> unit
-  (** [free fptr] - Indicate that the [fptr] is no longer needed.
+  (** Indicate that the [fptr] is no longer needed.
 
       Once [free] has been called any C calls to this [Dynamic_funptr.t] are
-      unsafe and may result in a segmentation fault. Only call [free] once the
-      callback is no longer used from C.
-  *)
+      unsafe. Only call [free] once the callback is no longer used from C. *)
 
   val of_fun : fn -> t
-  (** [of_fun fn] - Turn an OCaml closure into a function pointer
-      that can be passed to C.
+  (** Turn an OCaml closure into a function pointer that can be passed to C.
 
-      You MUST call [free] to the function pointer is no longer needed.
+      You MUST call {!free} when the function pointer is no longer needed.
       Failure to do so will result in a memory leak.
-      Failure to call [free] and not holding a reference this this pointer
-      is an error. To avoid unexpected crashes we log this and ensure that
-      potentially still needed OCaml values are retained.
 
-      For many use cases it may be simpler to use [with_fun] instead as this will
-      do the free for you. *)
+      Failure to call {!free} and not holding a reference this this pointer
+      is an error.
+
+      Alternatively {!with_fun} encapsulates both allocation and deallocation.
+
+      Implementation detail: To avoid hard to debug crashes the implementation
+      will leak the OCaml closure in this event that {!free} was not used and
+      report a warning, see {!on_leaked_funptr}. *)
 
   val with_fun : fn -> (t -> 'c) -> 'c
   (** [with_fun fn (fun fptr -> DO_STUFF)] - Turn an OCaml closure into a
@@ -158,8 +156,7 @@ val dynamic_funptr
   -> ?thread_registration:bool
   -> ('a -> 'b) Ctypes.fn
   -> (module Funptr with type fn = 'a->'b)
-(** [(val (dynamic_funptr fn))] - define a type representation for more safely passing OCaml
-    functions to C.
+(** Define a type representation for more safely passing OCaml functions to C.
 
     [(val (dynamic_funptr (FOO @-> returning BAR)))] is roughly equivalent to
     [BAR( * )(FOO)] in C.
@@ -176,3 +173,11 @@ val dynamic_funptr
              keygen 2048 65537 progress null)
     ]}
 *)
+
+val report_leaked_funptr : (string -> unit) ref
+(** Hook for setting custom handling for leaked non-{!free}d {!dynamic_funptr}s.
+
+    By default the library will retain function pointers that have not been freed and
+    print an warning to stderr.
+
+    You can use this hook to change how these error messages are reported. *)

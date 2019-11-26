@@ -133,8 +133,7 @@ module type Funptr = sig
       Failure to call {!free} and not holding a reference this this pointer
       is an error.
 
-      For many use cases it may be simpler to use {!with_fun} instead as this will
-      do the free for you.
+      Alternatively {!with_fun} encapsulates both allocation and deallocation.
 
       Implementation detail: To avoid hard to debug crashes the implementation
       will leak the OCaml closure in this event that {!free} was not used and
