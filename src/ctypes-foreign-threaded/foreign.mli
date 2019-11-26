@@ -137,7 +137,7 @@ module type Funptr = sig
       do the free for you.
 
       Implementation detail: To avoid hard to debug crashes the implementation
-      will leak the ocaml closure in this event that {!free} was not used and
+      will leak the OCaml closure in this event that {!free} was not used and
       report a warning, see {!on_leaked_funptr}. *)
 
   val with_fun : fn -> (t -> 'c) -> 'c
