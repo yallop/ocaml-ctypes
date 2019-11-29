@@ -990,6 +990,41 @@ tests/test-passing-ocaml-values/generated_stubs.c: $(BUILDDIR)/test-passing-ocam
 tests/test-passing-ocaml-values/generated_bindings.ml: $(BUILDDIR)/test-passing-ocaml-values-stub-generator.$(BEST)
 	$< --ml-file $@
 
+test-funptrs-stubs.dir = tests/test-funptrs/stubs
+test-funptrs-stubs.threads = yes
+test-funptrs-stubs.subproject_deps = ctypes \
+   ctypes-foreign-base ctypes-foreign-threaded tests-common
+test-funptrs-stubs: PROJECT=test-funptrs-stubs
+test-funptrs-stubs: $$(LIB_TARGETS)
+
+test-funptrs-stub-generator.dir = tests/test-funptrs/stub-generator
+test-funptrs-stub-generator.threads = yes
+test-funptrs-stub-generator.subproject_deps = ctypes cstubs \
+     ctypes-foreign-base ctypes-foreign-threaded test-funptrs-stubs tests-common
+test-funptrs-stub-generator.deps = str bigarray bytes integers
+test-funptrs-stub-generator: PROJECT=test-funptrs-stub-generator
+test-funptrs-stub-generator: $$(BEST_TARGET)
+
+test-funptrs.dir = tests/test-funptrs
+test-funptrs.threads = yes
+test-funptrs.deps = str bigarray oUnit bytes integers
+test-funptrs.subproject_deps = ctypes ctypes-foreign-base \
+   ctypes-foreign-threaded cstubs tests-common test-funptrs-stubs
+test-funptrs.link_flags = -L$(BUILDDIR)/clib -ltest_functions
+test-funptrs: PROJECT=test-funptrs
+test-funptrs: $$(BEST_TARGET)
+
+test-funptrs-generated= \
+  tests/test-funptrs/generated_bindings.ml \
+  tests/test-funptrs/generated_stubs.c
+
+test-funptrs-generated: $(test-funptrs-generated)
+
+tests/test-funptrs/generated_stubs.c: $(BUILDDIR)/test-funptrs-stub-generator.$(BEST)
+	$< --c-file $@
+tests/test-funptrs/generated_bindings.ml: $(BUILDDIR)/test-funptrs-stub-generator.$(BEST)
+	$< --ml-file $@
+
 test-lwt-jobs-stubs.dir  = tests/test-lwt-jobs/stubs
 test-lwt-jobs-stubs.threads = yes
 test-lwt-jobs-stubs.subproject_deps = ctypes \
@@ -1315,6 +1350,7 @@ TESTS += test-bigarrays-stubs test-bigarrays-stub-generator test-bigarrays-gener
 TESTS += test-coercions-stubs test-coercions-stub-generator test-coercions-generated test-coercions
 TESTS += test-roots
 TESTS += test-passing-ocaml-values-stubs test-passing-ocaml-values-stub-generator test-passing-ocaml-values-generated test-passing-ocaml-values
+TESTS += test-funptrs-stubs test-funptrs-stub-generator test-funptrs-generated test-funptrs
 TESTS += test-lwt-jobs-stubs test-lwt-jobs-stub-generator test-lwt-jobs-generated test-lwt-jobs
 TESTS += test-lwt-preemptive-stubs test-lwt-preemptive-stub-generator test-lwt-preemptive-generated test-lwt-preemptive
 TESTS += test-returning-errno-lwt-jobs-stubs test-returning-errno-lwt-jobs-stub-generator test-returning-errno-lwt-jobs-generated test-returning-errno-lwt-jobs

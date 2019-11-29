@@ -272,4 +272,14 @@ void check_ones(const int *, size_t);
 intnat max_caml_int(void);
 
 int foreign_thread_registration_test(void (*)(uint64_t),unsigned,unsigned);
+
+int call_dynamic_funptr(int (*)(int),int);
+
+void save_dynamic_funptr(int (*)(int));
+int call_saved_dynamic_funptr(int);
+
+struct simple_closure { int (*f)(int); int n; };
+int call_dynamic_funptr_struct(struct simple_closure);
+int call_dynamic_funptr_struct_ptr(struct simple_closure*);
+
 #endif /* TEST_FUNCTIONS_H */

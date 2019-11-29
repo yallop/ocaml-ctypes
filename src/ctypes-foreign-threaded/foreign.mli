@@ -121,7 +121,7 @@ module type Funptr = sig
   val free : t -> unit
   (** Indicate that the [fptr] is no longer needed.
 
-      Once [free] has been called any C calls to this [Dynamic_funptr.t] are
+      Once [free] has been called any C calls to this [Funptr.t] are
       unsafe. Only call [free] once the callback is no longer used from C. *)
 
   val of_fun : fn -> t
