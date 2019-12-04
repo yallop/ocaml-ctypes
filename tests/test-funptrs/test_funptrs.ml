@@ -72,7 +72,8 @@ struct
     detect_funptr_leaks (fun () ->
       let assert_closure = 
         let f, assert_closure = make_f () in
-        assert_equal 3 (Callback.with_fun f (fun f -> M.call_dynamic_funptr f 2));
+        assert_equal 3 (Callback.with_fun f
+                          (fun f -> M.call_dynamic_funptr f 2));
         assert_closure
       in
       assert_closure `Released)
@@ -85,7 +86,8 @@ struct
 
   let test_opt_some _ =
     detect_funptr_leaks (fun () ->
-      assert_equal 3 (Callback.with_fun ((+) 1) (fun f -> M.call_dynamic_funptr_opt (Some f) 2)))
+      assert_equal 3 (Callback.with_fun ((+) 1)
+                        (fun f -> M.call_dynamic_funptr_opt (Some f) 2)))
   ;;
 
   let test_save_and_free _ =
