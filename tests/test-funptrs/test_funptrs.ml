@@ -35,7 +35,7 @@ struct
   let make_f () : (int -> int) * ([`Live|`Released] -> unit) =
     let closure_status = ref `Live in
     let f = (+) 1 in
-    Gc.finalise_last (fun () -> closure_status := `Released) f;
+    Gc.finalise (fun _ -> closure_status := `Released) f;
     f, (fun status -> 
       Gc.full_major ();
       Gc.full_major ();
