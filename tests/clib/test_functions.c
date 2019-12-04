@@ -894,8 +894,8 @@ int foreign_thread_registration_test(void (*test_f)(uint64_t),
   return ret_code;
 }
 
-int call_dynamic_funptr(int (*f)(int),int n) {
-  if(f == NULL) return 0;
+int call_dynamic_funptr(int (*f)(int), int n) {
+  if (f == NULL) return 0;
   else return f(n);
 }
 
@@ -909,5 +909,5 @@ int call_saved_dynamic_funptr(int n) {
   return call_dynamic_funptr(saved_dynamic_funptr, n);
 }
 
-int call_dynamic_funptr_struct(struct simple_closure x) { return (x.f(x.n)); }
-int call_dynamic_funptr_struct_ptr(struct simple_closure *x) { return (x->f(x->n)); }
+int call_dynamic_funptr_struct(struct simple_closure x) { return x.f(x.n); }
+int call_dynamic_funptr_struct_ptr(struct simple_closure *x) { return x->f(x->n); }

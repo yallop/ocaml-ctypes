@@ -58,7 +58,9 @@ struct
     val with_fun : fn -> (t -> 'c) -> 'c
   end
 
-  let dynamic_funptr (type a b) ?(abi=Libffi_abi.default_abi) ?(runtime_lock=false) ?(thread_registration=false) fn : (module Funptr with type fn = a -> b) =
+  let dynamic_funptr (type a) (type b) ?(abi=Libffi_abi.default_abi)
+        ?(runtime_lock=false) ?(thread_registration=false) fn
+      : (module Funptr with type fn = a -> b) =
     (module struct
     type fn = a -> b
     type t = fn Ffi.funptr
@@ -70,7 +72,8 @@ struct
 
     let t_opt = Ctypes_std_views.nullable_funptr_view t fn
     let free = Ffi.free_funptr
-    let of_fun = Ffi.funptr_of_fun ~abi ~acquire_runtime_lock:runtime_lock ~thread_registration fn
+    let of_fun = Ffi.funptr_of_fun ~abi ~acquire_runtime_lock:runtime_lock
+      ~thread_registration fn
 
     let with_fun f do_it =
       let f = of_fun f in
