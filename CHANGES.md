@@ -1,3 +1,20 @@
+## ctypes 0.16.0
+
+* Add `Foreign.dynamic_funptr`, a variant of `Foreign.funptr` with
+  explicit life cycle management.
+  https://github.com/ocamllabs/ocaml-ctypes/pull/595
+
+* fix ctypes-foreign depexts to work with opam 2
+  https://github.com/ocamllabs/ocaml-ctypes/pull/617
+    
+* Build with -strict-sequence
+  https://github.com/ocamllabs/ocaml-ctypes/pull/613
+
+Thanks to Andreas Hauptmann (@fdopen), Andrew Ray (@andrewray), Anil
+Madhavapeddy (@avsm), Armaël Guéneau (@Armael) and Matthias Horn
+(@tiash) for contributions to this release.
+
+
 ## ctypes 0.15.1
 
 * Fix <complex.h>-related compilation issues on FreeBSD  
