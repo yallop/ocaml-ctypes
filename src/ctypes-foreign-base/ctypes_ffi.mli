@@ -42,8 +42,9 @@ sig
 
   val free_funptr : _ funptr -> unit
 
-  val funptr_of_fun : abi:abi -> acquire_runtime_lock:bool -> thread_registration:bool
-    -> ('a -> 'b) fn -> ('a -> 'b) -> ('a -> 'b) funptr
+  val funptr_of_fun : abi:abi -> acquire_runtime_lock:bool ->
+    thread_registration:bool ->
+    ('a -> 'b) fn -> ('a -> 'b) -> ('a -> 'b) funptr
 
   val funptr_of_static_funptr : ('a -> 'b) static_funptr -> ('a -> 'b) funptr
 

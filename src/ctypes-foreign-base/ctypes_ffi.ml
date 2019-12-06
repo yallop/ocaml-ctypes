@@ -269,9 +269,9 @@ struct
           "WARN: a ctypes function pointer was not explicitly released.\n\
            Releasing a function pointer or the associated OCaml closure while \n\
            the function pointer is still in use from C will cause segmentation faults.\n\
-           Please call [Foreign.free_funptr] explicitly when the funptr is no longer needed.\n\
+           Please call [Foreign.Funptr.free] explicitly when the funptr is no longer needed.\n\
            To avoid a segmentation fault we are preventing this funptr from\n\
-           being garbage collected. Please use [Foreign.free_funptr].\n%!")) t;
+           being garbage collected. Please use [Foreign.Funptr.free].\n%!")) t;
     t
 
   let funptr_of_fun ~abi ~acquire_runtime_lock ~thread_registration fn =
