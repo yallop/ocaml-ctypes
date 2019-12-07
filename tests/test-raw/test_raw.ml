@@ -14,6 +14,9 @@ open Ctypes_std_view_stubs
 *)
 
 
+let make_unmanaged ~reftyp p = Ctypes_ptr.Fat.make ~managed:None ~reftyp p
+
+
 (* Call the C function
 
         double fabs(double)
@@ -31,15 +34,15 @@ let test_fabs _ =
       double_ffitype in
     
     let dlfabs = Ctypes_ptr.Raw.of_nativeint (Dl.dlsym "fabs") in
-    let dlfabs_fat = Ctypes_ptr.Fat.make dlfabs
+    let dlfabs_fat = make_unmanaged dlfabs
         ~reftyp:Ctypes.(double @-> returning double) in
 
     let fabs x =
       call "fabs" dlfabs_fat callspec
         (fun p _values ->
           write Ctypes_primitive_types.Double x
-            Ctypes_ptr.(Fat.make ~reftyp:Ctypes_static.Void (Raw.(add p (of_int arg_1_offset)))))
-        (fun p -> read Ctypes_primitive_types.Double (Ctypes_ptr.Fat.make ~reftyp:Ctypes_static.Void p))
+            Ctypes_ptr.(make_unmanaged ~reftyp:Ctypes_static.Void (Raw.(add p (of_int arg_1_offset)))))
+        (fun p -> read Ctypes_primitive_types.Double (make_unmanaged ~reftyp:Ctypes_static.Void p))
     in
 
     assert_equal 2.0 (fabs (-2.0)) ~printer:string_of_float;
@@ -66,17 +69,17 @@ let test_pow _ =
       double_ffitype in
     
     let dlpow = Ctypes_ptr.Raw.of_nativeint (Dl.dlsym "pow") in
-    let dlpow_fat = Ctypes_ptr.Fat.make dlpow
+    let dlpow_fat = make_unmanaged dlpow
         ~reftyp:Ctypes.(double @-> double @-> returning double) in
 
     let pow x y =
       call "pow" dlpow_fat callspec
         (fun buffer _values ->
           write Ctypes_primitive_types.Double x
-            Ctypes_ptr.(Fat.make ~reftyp:Ctypes_static.Void (Raw.(add buffer (of_int arg_1_offset))));
+            Ctypes_ptr.(make_unmanaged ~reftyp:Ctypes_static.Void (Raw.(add buffer (of_int arg_1_offset))));
           write Ctypes_primitive_types.Double y
-            Ctypes_ptr.(Fat.make ~reftyp:Ctypes_static.Void (Raw.(add buffer (of_int arg_2_offset)))))
-        (fun p -> read Ctypes_primitive_types.Double (Ctypes_ptr.Fat.make ~reftyp:Ctypes_static.Void p))
+            Ctypes_ptr.(make_unmanaged ~reftyp:Ctypes_static.Void (Raw.(add buffer (of_int arg_2_offset)))))
+        (fun p -> read Ctypes_primitive_types.Double (make_unmanaged ~reftyp:Ctypes_static.Void p))
     in
 
     assert_equal 8.0 (pow 2.0 3.0);
