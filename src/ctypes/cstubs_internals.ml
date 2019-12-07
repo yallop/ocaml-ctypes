@@ -25,7 +25,6 @@ include Ctypes_primitive_types
 let make_ptr reftyp raw_ptr = CPointer (Ctypes_ptr.Fat.make ~reftyp raw_ptr)
 let make_fun_ptr reftyp raw_ptr = Static_funptr (Ctypes_ptr.Fat.make ~reftyp raw_ptr)
 
-let cptr (CPointer p) = p
 let fptr (Static_funptr p) = p
 
 let mkView :

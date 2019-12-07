@@ -349,8 +349,10 @@ let map_result ~concurrency ~errno f e =
   | _, _, `Appl x ->
     map_result (`Ident (path_of_string x)) e 
 
+type pattern_exp_return = ml_pat * ml_exp option * (ml_pat * ml_exp) list
+
 let rec pattern_and_exp_of_typ : type a. concurrency:concurrency_policy -> errno:errno_policy ->
-  a typ -> ml_exp -> polarity -> (ml_pat * ml_exp) list -> ml_pat * ml_exp option * (ml_pat * ml_exp) list =
+  a typ -> ml_exp -> polarity -> (ml_pat * ml_exp) list -> pattern_exp_return =
   fun ~concurrency ~errno typ e pol binds -> match typ with
   | Void ->
     (static_con "Void" [], None, binds)
@@ -361,7 +363,8 @@ let rec pattern_and_exp_of_typ : type a. concurrency:concurrency_policy -> errno
     begin match pol with
     | In ->
       let pat = static_con "Pointer" [`Underscore] in
-      (pat, Some (`Appl (`Ident (path_of_string "CI.cptr"), e)), binds)
+      let x = fresh_var () in
+      (pat, Some (`Ident (path_of_string x)), binds @ [static_con "CPointer" [`Var x], e])
     | Out ->
       let x = fresh_var () in
       let pat = static_con "Pointer" [`Var x] in
@@ -381,8 +384,10 @@ let rec pattern_and_exp_of_typ : type a. concurrency:concurrency_policy -> errno
     begin match pol with
     | In ->
       let pat = static_con "Struct" [`Underscore] in
-      (pat, Some (`Appl (`Ident (path_of_string "CI.cptr"),
-                         `Appl (`Ident (path_of_string "Ctypes.addr"), e))), binds)
+      let x = fresh_var () in
+      (pat, Some (`Ident (path_of_string x)),
+       binds @ [static_con "CPointer" [`Var x],
+                `Appl (`Ident (path_of_string "Ctypes.addr"), e)])
     | Out ->
       let x = fresh_var () in
       let pat = `As (static_con "Struct" [`Underscore], x) in
@@ -392,8 +397,10 @@ let rec pattern_and_exp_of_typ : type a. concurrency:concurrency_policy -> errno
     begin match pol with
     | In ->
       let pat = static_con "Union" [`Underscore] in
-      (pat, Some (`Appl (`Ident (path_of_string "CI.cptr"),
-                         `Appl (`Ident (path_of_string "Ctypes.addr"), e))), binds)
+      let x = fresh_var () in
+      (pat, Some (`Ident (path_of_string x)),
+       binds @ [static_con "CPointer" [`Var x],
+                `Appl (`Ident (path_of_string "Ctypes.addr"), e)])
     | Out ->
       let x = fresh_var () in
       let pat = `As (static_con "Union" [`Underscore], x) in

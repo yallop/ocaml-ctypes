@@ -23,7 +23,6 @@ val make_structured :
 val make_ptr : 'a typ -> voidp -> 'a ptr
 val make_fun_ptr : 'a fn -> voidp -> 'a Ctypes_static.static_funptr
 
-val cptr : 'a ptr -> 'a typ Ctypes_ptr.Fat.t
 val fptr : 'a Ctypes_static.static_funptr -> 'a fn Ctypes_ptr.Fat.t
 
 type 'a ocaml_type = 'a Ctypes_static.ocaml_type =
