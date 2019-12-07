@@ -38,7 +38,7 @@ type ml_exp = [ `Ident of path
               | `Appl of ml_exp * ml_exp
               | `Tuple of ml_exp list
               | `Seq of ml_exp * ml_exp
-              | `Let of lident * ml_exp * ml_exp
+              | `Let of ml_pat * ml_exp * ml_exp
               | `Unit
               | `Fun of lident list * ml_exp ]
 
@@ -156,10 +156,10 @@ struct
       fprintf fmt "(@[%a)@]" tuple_elements es
     | _, `Seq (e1, e2) ->
       fprintf fmt "(@[%a;@ %a)@]" (ml_exp NoApplParens) e1 (ml_exp NoApplParens) e2
-    | ApplParens, `Let (x, e1, e2) ->
-      fprintf fmt "(@[let@ %s@ = %a@ in@ %a)@]" x (ml_exp NoApplParens) e1 (ml_exp NoApplParens) e2
-    | NoApplParens, `Let (x, e1, e2) ->
-      fprintf fmt "@[let@ %s@ = %a@ in@ %a@]" x (ml_exp NoApplParens) e1 (ml_exp NoApplParens) e2
+    | ApplParens, `Let (p, e1, e2) ->
+      fprintf fmt "(@[let@ %a@ = %a@ in@ %a)@]" (ml_pat NoApplParens) p (ml_exp NoApplParens) e1 (ml_exp NoApplParens) e2
+    | NoApplParens, `Let (p, e1, e2) ->
+      fprintf fmt "@[let@ %a@ = %a@ in@ %a@]" (ml_pat NoApplParens) p (ml_exp NoApplParens) e1 (ml_exp NoApplParens) e2
   and tuple_elements fmt : ml_exp list -> unit =
     fun xs ->
       let last = List.length xs - 1 in
@@ -168,8 +168,7 @@ struct
           if i <> last then fprintf fmt "%a,@ " (ml_exp NoApplParens)
           else fprintf fmt "%a" (ml_exp NoApplParens))
         xs
-
-  let rec ml_pat appl_parens fmt pat =
+  and ml_pat appl_parens fmt pat =
     match appl_parens, pat with
     | _, `Var x -> fprintf fmt "%s" x
     | _, `Record (fs, `Etc) -> fprintf fmt "{@[%a_}@]" pat_fields fs
@@ -351,7 +350,7 @@ let map_result ~concurrency ~errno f e =
     map_result (`Ident (path_of_string x)) e 
 
 let rec pattern_and_exp_of_typ : type a. concurrency:concurrency_policy -> errno:errno_policy ->
-  a typ -> ml_exp -> polarity -> (lident * ml_exp) list -> ml_pat * ml_exp option * (lident * ml_exp) list =
+  a typ -> ml_exp -> polarity -> (ml_pat * ml_exp) list -> ml_pat * ml_exp option * (ml_pat * ml_exp) list =
   fun ~concurrency ~errno typ e pol binds -> match typ with
   | Void ->
     (static_con "Void" [], None, binds)
@@ -411,7 +410,7 @@ let rec pattern_and_exp_of_typ : type a. concurrency:concurrency_policy -> errno
       let pat = static_con "View"
         [`Record ([path_of_string "CI.ty", p;
                    path_of_string "write", `Var x], `Etc)] in
-      (pat, Some (`Ident (Ctypes_path.path_of_string y)), (y, e) :: binds)
+      (pat, Some (`Ident (Ctypes_path.path_of_string y)), (`Var y, e) :: binds)
     | Out ->
       let (p, None, binds), e | (p, Some e, binds), _ =
         pattern_and_exp_of_typ ~concurrency ~errno ty e pol binds, e in
@@ -483,7 +482,7 @@ type wrapper_state = {
   exp: ml_exp;
   args: lident list;
   trivial: bool;
-  binds: (lident * ml_exp) list;
+  binds: (ml_pat * ml_exp) list;
 }
 
 let lwt_unix_run_job = Ctypes_path.path_of_string "Lwt_unix.run_job"
@@ -497,13 +496,13 @@ let run_exp ~concurrency exp = match concurrency with
                                  `Fun (["_"], exp)),
                           `Unit)
 
-let let_bind : (lident * ml_exp) list -> ml_exp -> ml_exp =
+let let_bind : (ml_pat * ml_exp) list -> ml_exp -> ml_exp =
   fun binds e ->
     ListLabels.fold_left ~init:e binds
       ~f:(fun e' (x, e) -> `Let (x, e, e'))
 
 let rec wrapper_body : type a. concurrency:concurrency_policy -> errno:errno_policy ->
-  a fn -> ml_exp -> polarity -> (lident * ml_exp) list -> wrapper_state =
+  a fn -> ml_exp -> polarity -> (ml_pat * ml_exp) list -> wrapper_state =
   fun ~concurrency ~errno fn exp pol binds -> match fn with
   | Returns t ->
     let exp = run_exp ~concurrency exp in
@@ -548,6 +547,16 @@ let return_result : args:lident list -> ml_exp =
                          ~f:(fun x -> `Ident (Ctypes_path.path_of_string x)))),
              `Appl (`Ident lwt_return, `Ident (Ctypes_path.path_of_string x))))
 
+(** Returns the variables bound in a pattern, in no particular order *)
+let rec pat_bound_vars : ml_pat -> lident list = function
+  | `Var x -> [x]
+  | `Record (args, _) -> pats_bound_vars (List.map snd args)
+  | `As (p, x) -> x :: pat_bound_vars p
+  | `Underscore -> []
+  | `Con (_, ps) -> pats_bound_vars ps
+and pats_bound_vars : ml_pat list -> lident list =
+  fun ps -> List.fold_left (fun xs p -> pat_bound_vars p @ xs) [] ps
+
 let wrapper : type a. concurrency:concurrency_policy -> errno:errno_policy ->
   path -> a fn -> string -> polarity -> ml_pat * ml_exp =
   fun ~concurrency ~errno id fn f pol ->
@@ -564,13 +573,17 @@ let wrapper : type a. concurrency:concurrency_policy -> errno:errno_policy ->
                     (`Appl (`Ident box_lwt,
                             `Appl (`Appl (`Ident lwt_bind,
                                           run_exp ~concurrency exp),
-                                   return_result ~args:(args @ (List.map fst binds)))))))
+                                   return_result ~args:(args
+                                                        @ pats_bound_vars
+                                                            (List.map fst binds)))))))
     | { exp; args; pat; binds }, #lwt ->
       (pat, `Fun (args,
                   let_bind binds
                     (`Appl (`Ident box_lwt,
                             `Appl (`Appl (`Ident lwt_bind, exp),
-                                   return_result ~args:(args @ (List.map fst binds)))))))
+                                   return_result ~args:(args @
+                                                          pats_bound_vars
+                                                            (List.map fst binds)))))))
 
 let case ~concurrency ~errno ~stub_name ~external_name fmt fn =
   let p, e = wrapper ~concurrency ~errno
