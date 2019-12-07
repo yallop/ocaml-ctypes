@@ -51,11 +51,12 @@ and 'a union = ('a, [`Union]) structured
 and 'a structure = ('a, [`Struct]) structured
 and 'a abstract = ('a, [`Abstract]) structured
 and (_, _) pointer =
-  CPointer : 'a typ Ctypes_ptr.Fat.t -> ('a, [`C]) pointer
+  CPointer : (_ option,'a typ) Ctypes_ptr.Fat.t -> ('a, [`C]) pointer
 | OCamlRef : int * 'a * 'a ocaml_type -> ('a, [`OCaml]) pointer
 and 'a ptr = ('a, [`C]) pointer
 and 'a ocaml = ('a, [`OCaml]) pointer
-and 'a static_funptr = Static_funptr of 'a fn Ctypes_ptr.Fat.t
+and 'a static_funptr =
+  Static_funptr : (_ option, 'a fn) Ctypes_ptr.Fat.t -> 'a static_funptr
 and ('a, 'b) view = {
   read : 'b -> 'a;
   write : 'a -> 'b;

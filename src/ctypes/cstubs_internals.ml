@@ -10,20 +10,21 @@
 
 type voidp = Ctypes_ptr.voidp
 type managed_buffer = Ctypes_memory_stubs.managed_buffer
-type 'a fatptr = 'a Ctypes.typ Ctypes_ptr.Fat.t
-type 'a fatfunptr = 'a Ctypes.fn Ctypes_ptr.Fat.t
+type ('m, 'a) fatptr = ('m, 'a Ctypes.typ) Ctypes_ptr.Fat.t
+type ('m, 'a) fatfunptr = ('m, 'a Ctypes.fn) Ctypes_ptr.Fat.t
 
 let make_structured reftyp buf =
   let open Ctypes_static in
-  let managed = Obj.repr buf in
   let raw_ptr = Ctypes_memory_stubs.block_address buf in
-  { structured = CPointer (Ctypes_ptr.Fat.make ~managed ~reftyp raw_ptr) }
+  { structured = CPointer (Ctypes_ptr.Fat.make ~managed:(Some buf) ~reftyp raw_ptr) }
 
 include Ctypes_static
 include Ctypes_primitive_types
 
-let make_ptr reftyp raw_ptr = CPointer (Ctypes_ptr.Fat.make ~reftyp raw_ptr)
-let make_fun_ptr reftyp raw_ptr = Static_funptr (Ctypes_ptr.Fat.make ~reftyp raw_ptr)
+let make_ptr reftyp raw_ptr = CPointer (Ctypes_ptr.Fat.make
+                                          ~managed:None ~reftyp raw_ptr)
+let make_fun_ptr reftyp raw_ptr = Static_funptr (Ctypes_ptr.Fat.make
+                                                   ~managed:None ~reftyp raw_ptr)
 
 let mkView :
   type a b. string -> a typ -> typedef:bool -> unexpected:(a -> b) -> (b * a) list -> b typ =

@@ -22,7 +22,7 @@ module Fat :
 sig
   (** A fat pointer, which holds a reference to the reference type, the C memory
       location, and an OCaml object. *)
-  type _ t
+  type (_,_) t
 
   (** [make ?managed ~reftyp raw] builds a fat pointer from the reference
       type [reftyp], the C memory location [raw], and (optionally) an OCaml
@@ -30,42 +30,44 @@ sig
       lifetime of the C object; a typical use it to attach a finaliser to
       [managed] which releases the memory associated with the C object whose
       address is stored in [raw_ptr]. *)
-  val make : ?managed:_ -> reftyp:'typ -> voidp -> 'typ t
+  val make : managed:'m -> reftyp:'typ -> voidp -> ('m,'typ) t
 
-  val is_null : _ t -> bool
+  val is_null : (_,_) t -> bool
 
-  val reftype : 'typ t -> 'typ
+  val reftype : (_,'typ) t -> 'typ
 
-  val managed : _ t -> Obj.t option
+  val managed : ('m,_) t -> 'm
 
-  val coerce : _ t -> 'typ -> 'typ t
+  val set_managed : ('m,_) t -> 'm -> unit
+
+  val coerce : ('m,_) t -> 'typ -> ('m,'typ) t
 
   (** Return the raw pointer address.  The function is unsafe in the sense
       that it dissociates the address from the value which manages the memory,
       which may trigger associated finalisers, invalidating the address. *)
-  val unsafe_raw_addr : _ t -> voidp
+  val unsafe_raw_addr : (_,_) t -> voidp
 
-  val add_bytes : 'typ t -> int -> 'typ t
+  val add_bytes : ('m,'typ) t -> int -> ('m,'typ) t
 
-  val compare : 'typ t -> 'typ t -> int
+  val compare : (_,'typ) t -> (_,'typ) t -> int
 
-  val diff_bytes : 'typ t -> 'typ t -> int
+  val diff_bytes : (_,'typ) t -> (_,'typ) t -> int
 end =
 struct
-  type 'typ t =
+  type ('m, 'typ) t =
     { reftyp  : 'typ;
       raw     : voidp;
-      managed : Obj.t option; }
+      mutable managed : 'm; }
 
-  let make ?managed ~reftyp raw = match managed with
-    | None   -> { reftyp; raw; managed = None }
-    | Some v -> { reftyp; raw; managed = Some (Obj.repr v) }
+  let make ~managed ~reftyp raw = { reftyp; raw; managed }
 
   let is_null { raw } = Raw.(compare zero) raw = 0
 
   let reftype { reftyp } = reftyp
 
   let managed { managed } = managed
+
+  let set_managed p m = p.managed <- m
 
   let coerce p reftyp = { p with reftyp }
 

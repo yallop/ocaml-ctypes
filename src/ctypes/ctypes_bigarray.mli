@@ -59,7 +59,7 @@ val unsafe_address : 'a -> Ctypes_ptr.voidp
     reference to the OCaml object then the array might be freed, invalidating
     the address. *)
 
-val view : (_, 'a, _) t -> _ Ctypes_ptr.Fat.t -> 'a
+val view : (_, 'a, _) t -> (_ option, _) Ctypes_ptr.Fat.t -> 'a
 (** [view b ptr] creates a bigarray view onto existing memory.
 
     If [ptr] references an OCaml object then [view] will ensure that
