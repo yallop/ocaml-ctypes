@@ -374,7 +374,8 @@ let rec pattern_and_exp_of_typ : type a. concurrency:concurrency_policy -> errno
     begin match pol with
     | In ->
       let pat = static_con "Funptr" [`Underscore] in
-      (pat, Some (`Appl (`Ident (path_of_string "CI.fptr"), e)), binds)
+      let x = fresh_var () in
+      (pat, Some (`Ident (path_of_string x)), binds @ [static_con "Static_funptr" [`Var x], e])
     | Out ->
       let x = fresh_var () in
       let pat = static_con "Funptr" [`Var x] in
