@@ -122,7 +122,7 @@ let prim_of_kind k = prim_of_kind (kind k)
 
 let unsafe_address b = Ctypes_bigarray_stubs.address b
 
-let view : type a b l. (a, b, l) t -> _ Ctypes_ptr.Fat.t -> b =
+let view : type a b l m. (a, b, l) t -> (m option, _) Ctypes_ptr.Fat.t -> b =
   let open Ctypes_bigarray_stubs in
   fun (dims, kind, layout) ptr -> let ba : b = match dims with
   | DimsGen ds -> view kind ~dims:ds ptr layout

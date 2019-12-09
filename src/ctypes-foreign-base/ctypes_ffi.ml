@@ -96,12 +96,12 @@ struct
           write arg_n buffer v_n)
      read_return_value
   *)
-  let rec invoke : type a b.
+  let rec invoke : type a b m.
     string option ->
     a ccallspec ->
     (Ctypes_ptr.voidp -> (Obj.t * int) array -> Obj.t) list ->
     Ctypes_ffi_stubs.callspec ->
-    b fn Ctypes_ptr.Fat.t ->
+    (m, b fn) Ctypes_ptr.Fat.t ->
     a
     = fun name -> function
       | Call (check_errno, read_return_value) ->
@@ -137,7 +137,8 @@ struct
         let write_rv = Ctypes_memory.write ty in
         fun f ->
           let w = write_rv (Ctypes_weak_ref.get f) in
-          Ctypes_ffi_stubs.Done ((fun p -> w (Ctypes_ptr.Fat.make ~reftyp:Void p)),
+          Ctypes_ffi_stubs.Done ((fun p -> w (Ctypes_ptr.Fat.make
+                                                ~managed:None ~reftyp:Void p)),
                           callspec)
       | Function (p, f) ->
         let _ = add_argument callspec p in
@@ -145,7 +146,8 @@ struct
         let read = Ctypes_memory.build p in
         fun f -> Ctypes_ffi_stubs.Fn (fun buf ->
           let f' =
-            try Ctypes_weak_ref.get f (read (Ctypes_ptr.Fat.make ~reftyp:Void buf))
+            try Ctypes_weak_ref.get f (read (Ctypes_ptr.Fat.make
+                                               ~managed:None ~reftyp:Void buf))
             with Ctypes_weak_ref.EmptyWeakReference ->
               raise Ctypes_ffi_stubs.CallToExpiredClosure
           in
@@ -170,7 +172,7 @@ struct
          Obj.repr (wv, wa))
     | ty -> (fun ~offset ~idx v dst mov -> 
         Ctypes_memory.write ty v
-          (Ctypes_ptr.Fat.(add_bytes (make ~reftyp:Void dst) offset));
+          (Ctypes_ptr.Fat.(add_bytes (make ~managed:None ~reftyp:Void dst) offset));
         Obj.repr v)
 
   (*
@@ -187,7 +189,7 @@ struct
       | Returns t ->
         let () = prep_callspec callspec abi t in
         let b = Ctypes_memory.build t in
-        Call (check_errno, (fun p -> b (Ctypes_ptr.Fat.make ~reftyp:Void p)))
+        Call (check_errno, (fun p -> b (Ctypes_ptr.Fat.make ~managed:None ~reftyp:Void p)))
       | Function (p, f) ->
         let offset = add_argument callspec p in
         let rest = build_ccallspec ~abi ~check_errno ~idx:(idx+1) f callspec in
@@ -202,14 +204,13 @@ struct
     invoke name e [] c
 
   let funptr_of_rawptr fn raw_ptr =
-    Static_funptr (Ctypes_ptr.Fat.make ~reftyp:fn raw_ptr)
+    Static_funptr (Ctypes_ptr.Fat.make ~managed:None ~reftyp:fn raw_ptr)
 
   let function_of_pointer ?name ~abi ~check_errno ~release_runtime_lock fn =
     if release_runtime_lock && has_ocaml_argument fn
     then raise (Unsupported "Unsupported argument type when releasing runtime lock")
-    else
-      let f = build_function ?name ~abi ~check_errno ~release_runtime_lock fn in
-      fun (Static_funptr p) -> f p
+    else fun (Static_funptr p) ->
+         build_function ?name ~abi ~check_errno ~release_runtime_lock fn p
 
   let pointer_of_function_internal ~abi ~acquire_runtime_lock ~thread_registration fn =
     let cs' = Ctypes_ffi_stubs.allocate_callspec

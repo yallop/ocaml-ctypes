@@ -14,17 +14,14 @@ open Unsigned
 
 type voidp = Ctypes_ptr.voidp
 type managed_buffer = Ctypes_memory_stubs.managed_buffer
-type 'a fatptr = 'a typ Ctypes_ptr.Fat.t
-type 'a fatfunptr = 'a fn Ctypes_ptr.Fat.t
+type ('m, 'a) fatptr = ('m, 'a typ) Ctypes_ptr.Fat.t
+type ('m, 'a) fatfunptr = ('m, 'a fn) Ctypes_ptr.Fat.t
 
 val make_structured :
   ('a, 's) structured typ -> managed_buffer -> ('a, 's) structured
 
 val make_ptr : 'a typ -> voidp -> 'a ptr
 val make_fun_ptr : 'a fn -> voidp -> 'a Ctypes_static.static_funptr
-
-val cptr : 'a ptr -> 'a typ Ctypes_ptr.Fat.t
-val fptr : 'a Ctypes_static.static_funptr -> 'a fn Ctypes_ptr.Fat.t
 
 type 'a ocaml_type = 'a Ctypes_static.ocaml_type =
   String     : string ocaml_type
@@ -44,12 +41,12 @@ type 'a typ = 'a Ctypes_static.typ =
   | Bigarray        : (_, 'a, _) Ctypes_bigarray.t -> 'a typ
   | OCaml           : 'a ocaml_type             -> 'a ocaml typ
 and ('a, 'b) pointer = ('a, 'b) Ctypes_static.pointer =
-  CPointer : 'a typ Ctypes_ptr.Fat.t -> ('a, [`C]) pointer
+  CPointer : (_ option,'a typ) Ctypes_ptr.Fat.t -> ('a, [`C]) pointer
 | OCamlRef : int * 'a * 'a ocaml_type -> ('a, [`OCaml]) pointer
 and 'a ptr = ('a, [`C]) pointer
 and 'a ocaml = ('a, [`OCaml]) pointer
 and 'a static_funptr = 'a Ctypes_static.static_funptr =
-  Static_funptr of 'a fn Ctypes_ptr.Fat.t
+  Static_funptr : (_ option, 'a fn) Ctypes_ptr.Fat.t -> 'a static_funptr
 and ('a, 'b) view = ('a, 'b) Ctypes_static.view = {
   read : 'b -> 'a;
   write : 'a -> 'b;

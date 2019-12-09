@@ -9,9 +9,10 @@ let string_of_char_ptr (Ctypes_static.CPointer p) =
   Ctypes_std_view_stubs.string_of_cstring p
 
 let char_ptr_of_string s =
-  let managed = Ctypes_std_view_stubs.cstring_of_string s in
-  Ctypes_static.CPointer (Ctypes_ptr.Fat.make ~managed ~reftyp:Ctypes_static.char
-                     (Ctypes_memory_stubs.block_address managed))
+  let p = Ctypes_std_view_stubs.cstring_of_string s in
+  Ctypes_static.CPointer (Ctypes_ptr.Fat.make
+                            ~managed:(Some p) ~reftyp:Ctypes_static.char
+                     (Ctypes_memory_stubs.block_address p))
 
 let string = Ctypes_static.(view (ptr char))
   ~read:string_of_char_ptr ~write:char_ptr_of_string
@@ -39,7 +40,7 @@ let read_nullable_funptr t reftyp =
 let write_nullable_funptr t reftyp =
   let coerce = Ctypes_coerce.coerce t Ctypes_static.(static_funptr reftyp) in
   function None -> Ctypes_static.Static_funptr
-                     (Ctypes_ptr.Fat.make ~reftyp Ctypes_ptr.Raw.null)
+                     (Ctypes_ptr.Fat.make ~managed:None ~reftyp Ctypes_ptr.Raw.null)
          | Some f -> coerce f
 
 let nullable_funptr_view ?format_typ ?format t reftyp =

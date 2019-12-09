@@ -56,7 +56,7 @@ external prep_callspec : callspec -> int -> _ ffitype -> unit
 (* Call the function specified by `callspec' at the given address.
    The callback functions write the arguments to the buffer and read
    the return value. *)
-external call : string -> _ Ctypes_static.fn Fat.t -> callspec ->
+external call : string -> (_, _ Ctypes_static.fn) Fat.t -> callspec ->
   (voidp -> (Obj.t * int) array -> unit) -> (voidp -> 'a) -> 'a
   = "ctypes_call"
 

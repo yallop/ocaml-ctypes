@@ -13,8 +13,10 @@ module Fat = Ctypes_ptr.Fat
 
 let castp reftype (CPointer p) = CPointer (Fat.coerce p reftype)
 
+let make_unmanaged ~reftyp p = Fat.make ~managed:None ~reftyp p
+
 (* Describes how to read a value, e.g. from a return buffer *)
-let rec build : type a b. a typ -> b typ Fat.t -> a
+let rec build : type a b. a typ -> (_, b typ) Fat.t -> a
  = function
     | Void ->
       fun _ -> ()
@@ -23,14 +25,14 @@ let rec build : type a b. a typ -> b typ Fat.t -> a
       raise IncompleteType
     | Struct { spec = Complete { size } } as reftyp ->
       (fun buf ->
-        let managed = Stubs.allocate 1 size in
-        let dst = Fat.make ~managed ~reftyp (Stubs.block_address managed) in
+        let p = Stubs.allocate 1 size in
+        let dst = Fat.make ~managed:(Some p) ~reftyp (Stubs.block_address p) in
         let () = Stubs.memcpy ~size ~dst ~src:buf in
         { structured = CPointer dst})
     | Pointer reftyp ->
-      (fun buf -> CPointer (Fat.make ~reftyp (Stubs.Pointer.read buf)))
+      (fun buf -> CPointer (make_unmanaged ~reftyp (Stubs.Pointer.read buf)))
     | Funptr fn ->
-      (fun buf -> Static_funptr (Fat.make ~reftyp:fn (Stubs.Pointer.read buf)))
+      (fun buf -> Static_funptr (make_unmanaged ~reftyp:fn (Stubs.Pointer.read buf)))
     | View { read; ty } ->
       let buildty = build ty in
       (fun buf -> read (buildty buf))
@@ -42,7 +44,7 @@ let rec build : type a b. a typ -> b typ Fat.t -> a
     | Bigarray _ -> assert false
     | Abstract _ -> assert false
 
-let rec write : type a b. a typ -> a -> b Fat.t -> unit
+let rec write : type a b. a typ -> a -> (_, b) Fat.t -> unit
   = let write_aggregate size { structured = CPointer src } dst =
       Stubs.memcpy ~size ~dst ~src
     in
@@ -74,7 +76,7 @@ let rec write : type a b. a typ -> a -> b Fat.t -> unit
       (fun v -> writety (w v))
     | OCaml _ -> raise IncompleteType
 
-let null : unit ptr = CPointer (Fat.make ~reftyp:Void Raw.null)
+let null : unit ptr = CPointer (Fat.make ~managed:None ~reftyp:Void Raw.null)
 
 let rec (!@) : type a. a ptr -> a
   = fun (CPointer cptr as ptr) ->
@@ -126,7 +128,7 @@ let allocate_n
   : type a. ?finalise:(a ptr -> unit) -> a typ -> count:int -> a ptr
   = fun ?finalise reftyp ~count ->
     let package p =
-      CPointer (Fat.make ~managed:p ~reftyp (Stubs.block_address p))
+      CPointer (Fat.make ~managed:(Some p) ~reftyp (Stubs.block_address p))
     in
     let finalise = match finalise with
       | Some f -> Gc.finalise (fun p -> f (package p))
@@ -149,10 +151,10 @@ let ptr_compare (CPointer l) (CPointer r) = Fat.(compare l r)
 let reference_type (CPointer p) = Fat.reftype p
 
 let ptr_of_raw_address addr =
-  CPointer (Fat.make ~reftyp:Void (Raw.of_nativeint addr))
+  CPointer (make_unmanaged ~reftyp:Void (Raw.of_nativeint addr))
 
 let funptr_of_raw_address addr =
-  Static_funptr (Fat.make ~reftyp:(void @-> returning void) (Raw.of_nativeint addr))
+  Static_funptr (make_unmanaged ~reftyp:(void @-> returning void) (Raw.of_nativeint addr))
 
 let raw_address_of_ptr (CPointer p) =
   (* This is unsafe by definition: if the object to which [p] refers
@@ -288,7 +290,7 @@ open Bigarray
 let _bigarray_start kind ba =
   let raw_address = Ctypes_bigarray.unsafe_address ba in
   let reftyp = Primitive (Ctypes_bigarray.prim_of_kind kind) in
-  CPointer (Fat.make ~managed:ba ~reftyp raw_address)
+  CPointer (Fat.make ~managed:(Some ba) ~reftyp raw_address)
 
 let bigarray_kind : type a b c d f l.
   < element: a;
@@ -408,7 +410,7 @@ struct
     fun (CPointer p) -> Fat.unsafe_raw_addr p
 
   let create : 'a. 'a -> unit ptr =
-    fun v -> CPointer (Fat.make ~reftyp:void (Stubs.root v))
+    fun v -> CPointer (make_unmanaged ~reftyp:void (Stubs.root v))
 
   let get : 'a. unit ptr -> 'a =
     fun p -> Stubs.get (raw_addr p)
