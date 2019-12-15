@@ -74,6 +74,7 @@ external typeof_pid_t : unit -> Ctypes_static.arithmetic = "ctypes_typeof_pid_t"
 external typeof_ssize_t : unit -> Ctypes_static.arithmetic = "ctypes_typeof_ssize_t"
 external typeof_time_t : unit -> Ctypes_static.arithmetic = "ctypes_typeof_time_t"
 external typeof_useconds_t : unit -> Ctypes_static.arithmetic = "ctypes_typeof_useconds_t"
+external typeof_suseconds_t : unit -> Ctypes_static.arithmetic = "ctypes_typeof_suseconds_t"
 
 module Clock = (val mkArithmetic_abstract (typeof_clock_t ()) : Abstract)
 module Dev = (val mkArithmetic "dev_t" (typeof_dev_t ()))
@@ -89,7 +90,8 @@ struct
 end
 module Ssize = (val mkSigned "ssize_t" (typeof_ssize_t ()))
 module Time = (val mkArithmetic "time_t" (typeof_time_t ()))
-module Useconds = (val mkArithmetic_abstract (typeof_useconds_t ()) : Abstract)
+module Useconds = (val mkArithmetic "useconds_t" (typeof_useconds_t ()))
+module Suseconds = (val mkSigned "suseconds_t" (typeof_suseconds_t ()))
 
 type clock_t = Clock.t
 type dev_t = Dev.t
@@ -102,6 +104,7 @@ type size_t = Size.t
 type ssize_t = Ssize.t
 type time_t = Time.t
 type useconds_t = Useconds.t
+type suseconds_t = Suseconds.t
 
 let clock_t = Clock.t
 let dev_t = Dev.t
@@ -114,6 +117,7 @@ let size_t = Size.t
 let ssize_t = Ssize.t
 let time_t = Time.t
 let useconds_t = Useconds.t
+let suseconds_t = Suseconds.t
 
 (* Non-arithmetic types *)
 
