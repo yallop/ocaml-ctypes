@@ -21,7 +21,6 @@ module Pid : Signed.S
 module Ssize : Signed.S
 module Time : Unsigned.S
 module Useconds : Unsigned.S
-module Suseconds : Signed.S
 
 type clock_t
 type dev_t = Dev.t
@@ -34,7 +33,6 @@ type size_t = Unsigned.size_t
 type ssize_t = Ssize.t
 type time_t = Time.t
 type useconds_t = Useconds.t
-type suseconds_t = Suseconds.t
 
 (** {3 Values representing POSIX arithmetic types} *)
 
@@ -49,7 +47,6 @@ val size_t      : size_t typ
 val ssize_t     : ssize_t typ
 val time_t      : time_t typ
 val useconds_t  : useconds_t typ
-val suseconds_t : suseconds_t typ
 
 (* non-arithmetic types from <sys/types.h> *)
 (** {2 POSIX non-arithmetic types} *)

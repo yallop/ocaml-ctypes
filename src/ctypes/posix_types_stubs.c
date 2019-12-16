@@ -77,7 +77,6 @@ EXPOSE_TYPEINFO_S(pid_t)
 EXPOSE_TYPEINFO(ssize_t)
 EXPOSE_TYPEINFO(time_t)
 EXPOSE_TYPEINFO(useconds_t)
-EXPOSE_TYPEINFO(suseconds_t)
 #if !defined _WIN32 || defined __CYGWIN__
   EXPOSE_TYPEINFO(nlink_t)
 #else
