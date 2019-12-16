@@ -37,6 +37,7 @@ let rec build : type a b. a typ -> (_, b typ) Fat.t -> a
       let buildty = build ty in
       (fun buf -> read (buildty buf))
     | OCaml _ -> (fun buf -> assert false)
+    | OCaml_value -> (fun buf -> assert false)
     (* The following cases should never happen; non-struct aggregate
        types are excluded during type construction. *)
     | Union _ -> assert false
@@ -75,6 +76,7 @@ let rec write : type a b. a typ -> a -> (_, b) Fat.t -> unit
       let writety = write ty in
       (fun v -> writety (w v))
     | OCaml _ -> raise IncompleteType
+    | OCaml_value -> raise IncompleteType
 
 let null : unit ptr = CPointer (Fat.make ~managed:None ~reftyp:Void Raw.null)
 
@@ -417,7 +419,7 @@ struct
 
   let set : 'a. unit ptr -> 'a -> unit =
     fun p v -> Stubs.set (raw_addr p) v
-  
+
   let release : 'a. unit ptr -> unit =
     fun p -> Stubs.release (raw_addr p)
 end

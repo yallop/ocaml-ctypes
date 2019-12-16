@@ -145,6 +145,7 @@ struct
     | OCaml String -> Some (string_to_ptr x)
     | OCaml Bytes -> Some (string_to_ptr x)
     | OCaml FloatArray -> Some (float_array_to_ptr x)
+    | OCaml_value -> Some (x :> ccomp)
 
   let prj ty x = prj ty ~orig:ty x
 
@@ -161,6 +162,7 @@ struct
     | Array _ -> report_unpassable "arrays"
     | Bigarray _ -> report_unpassable "bigarrays"
     | OCaml _ -> report_unpassable "ocaml references as return values"
+    | OCaml_value -> (x:> ceff)
 
   type _ fn =
   | Returns  : 'a typ   -> 'a fn
@@ -193,17 +195,17 @@ struct
                `Ignore_errno, `Sequential -> `Let ((local x t, e), (inj t (local x t) :> ccomp))
              | `Ignore_errno, `Unlocked ->
                 release_runtime_system >>
-                `Let ((local x t, e), 
+                `Let ((local x t, e),
                       acquire_runtime_system >>
                      (((inj t (local x t) :> ccomp), value) >>= fun x ->
 		      `CAMLreturnT (Ty value, x) :> ccomp))
-             | `Return_errno, `Sequential -> 
+             | `Return_errno, `Sequential ->
                (`LetAssign (errno,
                            `Int Signed.SInt.zero,
                            `Let ((local x t, e),
                                  ((inj t (local x t) :> ccomp), value) >>= fun v ->
                                  (pair_with_errno v :> ccomp))) : ccomp)
-             | `Return_errno, `Unlocked -> 
+             | `Return_errno, `Unlocked ->
                (`LetAssign (errno,
                            `Int Signed.SInt.zero,
                            release_runtime_system >>
@@ -345,7 +347,7 @@ module Lwt =
 struct
   let fprintf, sprintf = Format.fprintf, Printf.sprintf
 
-  let unsupported t = 
+  let unsupported t =
     let fail msg = raise (Unsupported msg) in
     Printf.ksprintf fail
       "cstubs.lwt does not support the type %s"
@@ -364,7 +366,7 @@ struct
   let lwt_unix_job =
     abstract ~name:"struct lwt_unix_job" ~size:1 ~alignment:1
 
-  let structure_type stub_name = 
+  let structure_type stub_name =
     structure (sprintf "job_%s" stub_name)
 
   let structure (type r) ~errno ~stub_name fmt fn args (result : r typ) =
@@ -383,7 +385,7 @@ struct
         ~f:(fun (BoxedType t, name) -> ignore (field s name t : (_,_) field)) in
     let () = seal s in
     fprintf fmt "@[%a@];@\n" (fun t -> format_typ t) s
-    
+
   let worker (type r) ~errno ~cname ~stub_name fmt f (result : r typ) args =
     let fn' = { fname = cname;
                allocates = false;
@@ -500,7 +502,7 @@ struct
           Function (Void, f) -> aux f args
         | Function (t, f) -> aux f ((BoxedType t, var "arg") :: args)
         | Returns t -> List.rev args, BoxedType t
-     in aux fn []  
+     in aux fn []
 
   let fn ~errno ~cname ~stub_name fmt fn =
     let args, BoxedType r = fn_args_and_result fn in

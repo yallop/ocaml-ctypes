@@ -13,7 +13,7 @@ type abstract_type = {
   aalignment : int;
 }
 
-type _ ocaml_type =
+type 'a ocaml_type =
   String     : string ocaml_type
 | Bytes      : Bytes.t ocaml_type
 | FloatArray : float array ocaml_type
@@ -39,6 +39,7 @@ type _ typ =
   | Bigarray        : (_, 'a, _) Ctypes_bigarray.t
                                          -> 'a typ
   | OCaml           : 'a ocaml_type      -> 'a ocaml typ
+  | OCaml_value     :                       'a typ
 and 'a carray = { astart : 'a ptr; alength : int }
 and ('a, 'kind) structured = { structured : ('a, 'kind) structured ptr }
 and 'a union = ('a, [`Union]) structured
@@ -150,6 +151,7 @@ val ullong : Unsigned.ullong typ
 val array : int -> 'a typ -> 'a carray typ
 val ocaml_string : string ocaml typ
 val ocaml_bytes : Bytes.t ocaml typ
+val ocaml_any_value : 'a typ
 val ocaml_float_array : float array ocaml typ
 val ptr : 'a typ -> 'a ptr typ
 val ( @-> ) : 'a typ -> 'b fn -> ('a -> 'b) fn

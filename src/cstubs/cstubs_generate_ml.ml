@@ -30,7 +30,7 @@ type ml_pat = [ `Var of string
               | `Underscore
               | `Con of path * ml_pat list ]
 
-type ml_exp = [ `Ident of path 
+type ml_exp = [ `Ident of path
               | `Project of ml_exp * path
               | `MakePtr of ml_exp * ml_exp
               | `MakeFunPtr of ml_exp * ml_exp
@@ -52,7 +52,7 @@ type extern = {
   attributes: attributes;
 }
 
-module Emit_ML : sig 
+module Emit_ML : sig
   type appl_parens = ApplParens | NoApplParens
   val ml_exp : appl_parens -> Format.formatter -> ml_exp -> unit
   val ml_pat : appl_parens -> Format.formatter -> ml_pat -> unit
@@ -62,13 +62,13 @@ end =
 struct
   let fprintf = Format.fprintf
 
-  (* We (only) need to parenthesize function types in certain contexts 
+  (* We (only) need to parenthesize function types in certain contexts
         * on the lhs of a function type: - -> t
         * as the argument to a single-argument type constructor: - t
   *)
   type arrow_parens = ArrowParens | NoArrowParens
 
-  (* We (only) need to parenthesize application expressions in certain contexts 
+  (* We (only) need to parenthesize application expressions in certain contexts
         * in a projection expression: -.l
         * in a dereference expression: !@ -
         * as an argument in an application: e -
@@ -108,7 +108,7 @@ struct
     | Some primname -> fprintf fmt "%S@ " primname
 
   let attrs fmt { float; noalloc } =
-    begin 
+    begin
     (* TODO: float support not yet implemented *)
     (* if float then pp_print_string fmt "\"float\""; *)
 
@@ -249,6 +249,7 @@ let rec ml_typ_of_return_typ : type a. a typ -> ml_type =
     "cstubs does not support OCaml bytes values as return values"
   | OCaml FloatArray -> Ctypes_static.unsupported
     "cstubs does not support OCaml float arrays as return values"
+  | OCaml_value -> `Ident (literal_path "'a")
 
 let rec ml_typ_of_arg_typ : type a. a typ -> ml_type = function
   | Void -> `Ident (path_of_string "unit")
@@ -273,6 +274,8 @@ let rec ml_typ_of_arg_typ : type a. a typ -> ml_type = function
     `Appl (path_of_string "CI.ocaml",
            [`Appl (path_of_string "array",
                    [`Ident (path_of_string "float")])])
+  | OCaml_value ->
+    `Ident (literal_path "'a")
 
 type polarity = In | Out
 
@@ -347,7 +350,7 @@ let map_result ~concurrency ~errno f e =
   | _, _, `MakeStructured x ->
     map_result (`Appl (`Ident make_structured, `Ident (path_of_string x))) e
   | _, _, `Appl x ->
-    map_result (`Ident (path_of_string x)) e 
+    map_result (`Ident (path_of_string x)) e
 
 type pattern_exp_return = ml_pat * ml_exp option * (ml_pat * ml_exp) list
 
@@ -440,6 +443,7 @@ let rec pattern_and_exp_of_typ : type a. concurrency:concurrency_policy -> errno
     | Out, FloatArray -> Ctypes_static.unsupported
       "cstubs does not support OCaml float arrays as return values"
     end
+  | OCaml_value -> (static_con "OCaml_value" [], None, binds)
   | Abstract _ as ty -> internal_error
     "Unexpected abstract type encountered during ML code generation: %s"
     (Ctypes.string_of_typ ty)
@@ -480,6 +484,9 @@ let rec pattern_of_typ : type a. a typ -> ml_pat = function
   | OCaml FloatArray ->
     Ctypes_static.unsupported
       "cstubs does not support OCaml float arrays as global values"
+  | OCaml_value ->
+    Ctypes_static.unsupported
+      "cstubs does not support generic OCaml values as global values"
   | Abstract _ as ty ->
     internal_error
       "Unexpected abstract type encountered during ML code generation: %s"
@@ -621,5 +628,5 @@ let inverse_case ~register_name ~constructor name fmt fn : unit =
       (path_of_string "f") fn "f" Out in
   Format.fprintf fmt "|@[ @[%a, %S@] -> %s %s (%a)@]@\n"
     Emit_ML.(ml_pat NoApplParens) p name register_name constructor
-    Emit_ML.(ml_exp ApplParens) 
+    Emit_ML.(ml_exp ApplParens)
     e
