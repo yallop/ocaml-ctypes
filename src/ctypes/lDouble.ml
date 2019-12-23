@@ -77,5 +77,5 @@ let one = of_int 1
 external size_ : unit -> (int * int) = "ctypes_ldouble_size"
 let byte_sizes = size_ ()
 
-external mant_dig_ : unit -> int = "ctypes_ldouble_mant_dig" "noalloc"
+external mant_dig_ : unit -> int = "ctypes_ldouble_mant_dig" [@@noalloc]
 let mant_dig = mant_dig_ ()
