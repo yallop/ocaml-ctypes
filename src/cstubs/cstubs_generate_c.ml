@@ -77,6 +77,11 @@ struct
                           (value @-> returning (ptr void)),
                    [x])
 
+  let bytes_to_ptr : cexp -> ccomp =
+    fun x -> `App (reader "CTYPES_PTR_OF_OCAML_BYTES"
+                          (value @-> returning (ptr void)),
+                   [x])
+
   let float_array_to_ptr : cexp -> ccomp =
     fun x -> `App (reader "CTYPES_PTR_OF_FLOAT_ARRAY"
                           (value @-> returning (ptr void)),
@@ -143,7 +148,7 @@ struct
     | Array _ -> report_unpassable "arrays"
     | Bigarray _ -> report_unpassable "bigarrays"
     | OCaml String -> Some (string_to_ptr x)
-    | OCaml Bytes -> Some (string_to_ptr x)
+    | OCaml Bytes -> Some (bytes_to_ptr x)
     | OCaml FloatArray -> Some (float_array_to_ptr x)
 
   let prj ty x = prj ty ~orig:ty x

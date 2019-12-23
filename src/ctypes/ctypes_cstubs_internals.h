@@ -18,6 +18,14 @@
 #include <caml/threads.h>
 #define CTYPES_PTR_OF_OCAML_STRING(s) \
   (String_val(Field(s, 1)) + Long_val(Field(s, 0)))
+
+#ifdef Bytes_val
+#define CTYPES_PTR_OF_OCAML_BYTES(s) \
+  (Bytes_val(Field(s, 1)) + Long_val(Field(s, 0)))
+#else
+#define CTYPES_PTR_OF_OCAML_BYTES(s) CTYPES_PTR_OF_OCAML_STRING(s)
+#endif
+
 #define Ctypes_val_char(c) \
   (Val_int((c + 256) % 256))
 #define CTYPES_PAIR_WITH_ERRNO(v)
