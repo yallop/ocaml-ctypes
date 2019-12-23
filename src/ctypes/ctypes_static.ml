@@ -29,7 +29,7 @@ type abstract_type = {
 
 type _ ocaml_type =
   String     : string ocaml_type
-| Bytes      : Bytes.t ocaml_type
+| Bytes      : bytes ocaml_type
 | FloatArray : float array ocaml_type
 
 type _ typ =

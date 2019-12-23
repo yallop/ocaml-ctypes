@@ -21,7 +21,6 @@ install: [
 ]
 depends: [
    "ocaml" {>= "4.02.3"}
-   "base-bytes"
    "integers" { >= "0.3.0" }
    "ocamlfind" {build}
    "conf-pkg-config" {build}

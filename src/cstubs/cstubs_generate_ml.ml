@@ -268,7 +268,7 @@ let rec ml_typ_of_arg_typ : type a. a typ -> ml_type = function
            [`Ident (path_of_string "string")])
   | OCaml Bytes ->
     `Appl (path_of_string "CI.ocaml",
-           [`Ident (path_of_string "Bytes.t")])
+           [`Ident (path_of_string "bytes")])
   | OCaml FloatArray ->
     `Appl (path_of_string "CI.ocaml",
            [`Appl (path_of_string "array",

@@ -235,7 +235,7 @@ val ocaml_string_start : string -> string ocaml
 (** [ocaml_string_start s] allows to pass a pointer to the contents of an OCaml
     string directly to a C function. *)
 
-val ocaml_bytes_start : Bytes.t -> Bytes.t ocaml
+val ocaml_bytes_start : bytes -> bytes ocaml
 (** [ocaml_bytes_start s] allows to pass a pointer to the contents of an OCaml
     byte array directly to a C function. *)
 

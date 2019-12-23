@@ -209,7 +209,7 @@ sig
   val ocaml_string : string Ctypes_static.ocaml typ
   (** Value representing the directly mapped storage of an OCaml string. *)
 
-  val ocaml_bytes : Bytes.t Ctypes_static.ocaml typ
+  val ocaml_bytes : bytes Ctypes_static.ocaml typ
   (** Value representing the directly mapped storage of an OCaml byte array. *)
 
   (** {3 Array types} *)

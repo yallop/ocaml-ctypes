@@ -25,7 +25,7 @@ val make_fun_ptr : 'a fn -> voidp -> 'a Ctypes_static.static_funptr
 
 type 'a ocaml_type = 'a Ctypes_static.ocaml_type =
   String     : string ocaml_type
-| Bytes      : Bytes.t ocaml_type
+| Bytes      : bytes ocaml_type
 | FloatArray : float array ocaml_type
 
 type 'a typ = 'a Ctypes_static.typ =
