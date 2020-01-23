@@ -8,6 +8,7 @@
 open OUnit2
 open Ctypes
 
+let toplevel_plus x y = x + y
 
 module Common_tests(S : Cstubs.FOREIGN with type 'a result = 'a
                                         and type 'a return = 'a) =
@@ -37,7 +38,7 @@ struct
     begin
       assert_equal !@plus None;
 
-      plus <-@ Some (+);
+      plus <-@ Some toplevel_plus;
 
       assert_equal (sum 1 10) 55;
 
