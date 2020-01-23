@@ -15,7 +15,7 @@ let test_missing _ =
   let miss = foreign missing ~stub:true (int @-> int @-> (returning int)) in
   begin try ignore (miss 2 3); assert_failure "should raise" with exn -> () end;
   try
-    let _ = foreign missing ~stub:false (int @-> int @-> (returning int)) in
+    let _miss = foreign missing ~stub:false (int @-> int @-> (returning int)) in
     assert_failure "should raise"
   with exn -> ()
 
