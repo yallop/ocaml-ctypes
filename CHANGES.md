@@ -1,13 +1,25 @@
+## ctypes 0.17.0
+
+* ocaml_bytes now corresponds to 'unsigned char *', not 'char *'  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/626
+
+* Distinguish bytes and string in generated stub code  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/622
+
+* Reflect "managed" status in the types of fat pointers  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/619  
+  (This is an internal-only change.)
+
 ## ctypes 0.16.0
 
 * Add `Foreign.dynamic_funptr`, a variant of `Foreign.funptr` with
-  explicit life cycle management.
+  explicit life cycle management.  
   https://github.com/ocamllabs/ocaml-ctypes/pull/595
 
-* fix ctypes-foreign depexts to work with opam 2
+* fix ctypes-foreign depexts to work with opam 2  
   https://github.com/ocamllabs/ocaml-ctypes/pull/617
     
-* Build with -strict-sequence
+* Build with -strict-sequence  
   https://github.com/ocamllabs/ocaml-ctypes/pull/613
 
 Thanks to Andreas Hauptmann (@fdopen), Andrew Ray (@andrewray), Anil
