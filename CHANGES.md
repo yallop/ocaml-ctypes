@@ -1,7 +1,7 @@
 ## ctypes 0.17.0
 
 * ocaml_bytes now corresponds to 'unsigned char *', not 'char *'  
-  https://github.com/ocamllabs/ocaml-ctypes/pull/626
+  https://github.com/ocamllabs/ocaml-ctypes/pull/625
 
 * Distinguish bytes and string in generated stub code  
   https://github.com/ocamllabs/ocaml-ctypes/pull/622
