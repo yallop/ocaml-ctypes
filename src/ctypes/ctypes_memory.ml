@@ -26,7 +26,7 @@ let rec build : type a b. a typ -> (_, b typ) Fat.t -> a
     | Struct { spec = Complete { size } } as reftyp ->
       (fun buf ->
         let p = Stubs.allocate 1 size in
-        let dst = Fat.make ~managed:(Some p) ~reftyp (Stubs.block_address p) in
+        let dst = Fat.make ~managed:(Some (Obj.repr p)) ~reftyp (Stubs.block_address p) in
         let () = Stubs.memcpy ~size ~dst ~src:buf in
         { structured = CPointer dst})
     | Pointer reftyp ->
@@ -128,7 +128,7 @@ let allocate_n
   : type a. ?finalise:(a ptr -> unit) -> a typ -> count:int -> a ptr
   = fun ?finalise reftyp ~count ->
     let package p =
-      CPointer (Fat.make ~managed:(Some p) ~reftyp (Stubs.block_address p))
+      CPointer (Fat.make ~managed:(Some (Obj.repr p)) ~reftyp (Stubs.block_address p))
     in
     let finalise = match finalise with
       | Some f -> Gc.finalise (fun p -> f (package p))
@@ -290,7 +290,7 @@ open Bigarray
 let _bigarray_start kind ba =
   let raw_address = Ctypes_bigarray.unsafe_address ba in
   let reftyp = Primitive (Ctypes_bigarray.prim_of_kind kind) in
-  CPointer (Fat.make ~managed:(Some ba) ~reftyp raw_address)
+  CPointer (Fat.make ~managed:(Some (Obj.repr ba)) ~reftyp raw_address)
 
 let bigarray_kind : type a b c d f l.
   < element: a;

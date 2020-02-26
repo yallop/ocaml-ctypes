@@ -16,7 +16,7 @@ type ('m, 'a) fatfunptr = ('m, 'a Ctypes.fn) Ctypes_ptr.Fat.t
 let make_structured reftyp buf =
   let open Ctypes_static in
   let raw_ptr = Ctypes_memory_stubs.block_address buf in
-  { structured = CPointer (Ctypes_ptr.Fat.make ~managed:(Some buf) ~reftyp raw_ptr) }
+  { structured = CPointer (Ctypes_ptr.Fat.make ~managed:(Some (Obj.repr buf)) ~reftyp raw_ptr) }
 
 include Ctypes_static
 include Ctypes_primitive_types

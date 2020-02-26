@@ -11,7 +11,7 @@ let string_of_char_ptr (Ctypes_static.CPointer p) =
 let char_ptr_of_string s =
   let p = Ctypes_std_view_stubs.cstring_of_string s in
   Ctypes_static.CPointer (Ctypes_ptr.Fat.make
-                            ~managed:(Some p) ~reftyp:Ctypes_static.char
+                            ~managed:(Some (Obj.repr p)) ~reftyp:Ctypes_static.char
                      (Ctypes_memory_stubs.block_address p))
 
 let string = Ctypes_static.(view (ptr char))

@@ -41,12 +41,12 @@ type 'a typ = 'a Ctypes_static.typ =
   | Bigarray        : (_, 'a, _) Ctypes_bigarray.t -> 'a typ
   | OCaml           : 'a ocaml_type             -> 'a ocaml typ
 and ('a, 'b) pointer = ('a, 'b) Ctypes_static.pointer =
-  CPointer : (_ option,'a typ) Ctypes_ptr.Fat.t -> ('a, [`C]) pointer
+  CPointer : (Obj.t option,'a typ) Ctypes_ptr.Fat.t -> ('a, [`C]) pointer
 | OCamlRef : int * 'a * 'a ocaml_type -> ('a, [`OCaml]) pointer
 and 'a ptr = ('a, [`C]) pointer
 and 'a ocaml = ('a, [`OCaml]) pointer
 and 'a static_funptr = 'a Ctypes_static.static_funptr =
-  Static_funptr : (_ option, 'a fn) Ctypes_ptr.Fat.t -> 'a static_funptr
+  Static_funptr : (Obj.t option, 'a fn) Ctypes_ptr.Fat.t -> 'a static_funptr
 and ('a, 'b) view = ('a, 'b) Ctypes_static.view = {
   read : 'b -> 'a;
   write : 'a -> 'b;
