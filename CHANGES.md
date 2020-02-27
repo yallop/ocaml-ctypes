@@ -1,3 +1,10 @@
+## ctypes 0.17.1
+
+* Hide the managed component in pointer values  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/629  
+  (This is an internal-only change that addresses a problem introduced
+  in 0.17.0)
+
 ## ctypes 0.17.0
 
 * ocaml_bytes now corresponds to 'unsigned char *', not 'char *'  
