@@ -164,8 +164,7 @@ void concat_strings(const char **sv, int sc, char *buffer)
 
 struct tagged add_tagged_numbers(struct tagged l, struct tagged r)
 {
-  union number n;
-  struct tagged result = { 'd', n };
+  struct tagged result = { 'd' };
   switch (l.tag) {
   case 'i':
     switch (r.tag) {
