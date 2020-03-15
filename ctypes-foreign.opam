@@ -14,6 +14,9 @@ depexts: [
   ["libffi-dev"] {os-distribution = "alpine"}
   ["libffi-devel"] {os-family = "suse"}
 ]
+depends: [
+  "conf-pkg-config" {build}
+]
 tags: ["org:ocamllabs" "org:mirage"]
 post-messages: [
   "This package requires libffi on your system" {failure}
