@@ -81,7 +81,7 @@ val funptr :
     the associated OCaml closure, so that the C function may be used only
     while the closure is still live.
 
-    The {!dynamic_funptr} function is an alternative to {funptr} with explicit
+    The {!dynamic_funptr} function is an alternative to {!funptr} with explicit
     lifetime management.
  *)
 
