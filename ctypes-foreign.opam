@@ -10,6 +10,7 @@ depexts: [
   ["libffi"] {os = "macos" & os-distribution = "macports"}
   ["libffi-devel"] {os-distribution = "centos"}
   ["libffi-devel"] {os-distribution = "ol"}
+  ["libffi"] {os = "win32" & os-distribution = "cygwinports"}
   ["libffi-devel"] {os-distribution = "fedora"}
   ["libffi-dev"] {os-distribution = "alpine"}
   ["libffi-devel"] {os-family = "suse"}
