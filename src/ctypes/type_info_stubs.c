@@ -179,7 +179,7 @@ value ctypes_string_of_prim(value prim_, value v)
     assert(0);
   }
   s = caml_alloc_string(len);
-  memcpy(String_val(s), buf, len);
+  memcpy((char *)String_val(s), buf, len);
   CAMLreturn (s);
 }
 
