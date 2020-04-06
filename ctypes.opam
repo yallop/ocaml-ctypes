@@ -43,4 +43,4 @@ build-test: [
 ]
 tags: ["org:ocamllabs" "org:mirage"]
 synopsis: "Combinators for binding to C libraries without writing any C"
-flags: light-uninstall
+
