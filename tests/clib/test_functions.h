@@ -165,7 +165,7 @@ struct one_int { int i; };
 struct one_int return_struct_by_value(void);
 void matrix_mul(int, int, int, double *, double *, double *);
 double *matrix_transpose(int, int, double *);
-int (*plus_callback)(int);
+extern int (*plus_callback)(int);
 int sum_range_with_plus_callback(int, int);
 typedef int callback_t(void);
 void register_callback(callback_t *);
@@ -281,5 +281,23 @@ int call_saved_dynamic_funptr(int);
 struct simple_closure { int (*f)(int); int n; };
 int call_dynamic_funptr_struct(struct simple_closure);
 int call_dynamic_funptr_struct_ptr(struct simple_closure*);
+
+#if defined(_MSC_VER) && defined(_WIN32)
+#define CTYPES_PACKED(name)                               \
+  __pragma(pack(push, 1)) struct name __pragma(pack(pop))
+#elif defined(__GNUC__)
+#define CTYPES_PACKED(name) struct __attribute__((packed)) name
+#else
+#define CTYPES_PACKED(name) struct name
+#endif
+
+CTYPES_PACKED(packed_struct) {
+  int8_t i8;
+  int64_t i64;
+  long double _Complex ldc;
+  int32_t i32;
+};
+
+bool check_packed_struct(struct packed_struct *, int8_t, int64_t, long double _Complex*, int32_t);
 
 #endif /* TEST_FUNCTIONS_H */

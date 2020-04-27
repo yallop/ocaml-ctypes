@@ -49,4 +49,11 @@ struct
   let v1 = field s6 "v1" int
   let v2 = field s6 "v2" float
   let () = seal s6
+
+  let spacked : [`packed] structure typ = structure "packed_struct"
+  let i8 = field spacked "i8" int8_t
+  let i64 = field spacked "i64" int64_t
+  let ldc = field spacked "ldc" complexld
+  let i32 = field spacked "i32" int32_t
+  let () = seal spacked
 end

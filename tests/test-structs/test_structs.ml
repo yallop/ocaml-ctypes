@@ -588,6 +588,29 @@ struct
       end
   end
 
+  let test_packed_structs _ =
+    let open M in
+    let check_packed_struct =
+      Foreign.foreign "check_packed_struct"
+        (ptr spacked @-> int8_t @-> int64_t @-> ptr complexld @-> int32_t @-> returning bool)
+    in
+    let vi8 = 127 in
+    let vi64 = 0x1234567890abcdefL in
+    let vldc = Complex.{ re = 0x123456789abcde. ; im = -0xfedcba9876543. } in
+    let vldc = ComplexL.of_complex vldc in
+    let vi32 = 0x12345678l in
+    let s = make spacked in
+    s @. i8 <-@ vi8;
+    s @. i64 <-@ vi64;
+    s @. ldc <-@ vldc;
+    s @. i32 <-@ vi32;
+    let pvldc = allocate complexld vldc in
+    assert_equal true (check_packed_struct (addr s) vi8 vi64 pvldc vi32);
+    assert_equal vi8 (getf s i8);
+    assert_equal vi64 (getf s i64);
+    assert_equal vldc (getf s ldc);
+    assert_equal vi32 (getf s i32)
+
 end
 
 module Struct_stubs_tests = Build_struct_stub_tests(Generated_struct_bindings)
@@ -663,6 +686,9 @@ let suite = "Struct tests" >:::
 
    "test adding fields to tagless structs"
    >:: Struct_stubs_tests.test_tagless_structs;
+
+   "test packed structs"
+   >:: Struct_stubs_tests.test_packed_structs;
   ]
 
 
