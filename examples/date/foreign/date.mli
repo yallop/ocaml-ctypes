@@ -6,7 +6,7 @@
  *)
 
 open Ctypes
-open PosixTypes
+open Posix_types
 
 type tm
 val tm_sec : (int, tm structure) field

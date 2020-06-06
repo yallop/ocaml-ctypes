@@ -43,28 +43,6 @@ let format_array fmt v =
   Ctypes.(format CArray.(array (length v) (reference_type (start v))) fmt v)
 let format_ocaml fmt (Ctypes_static.OCamlRef (_, _, ty) as v) =
   Ctypes.format (Ctypes_static.OCaml ty) fmt v
-let format_clock_t fmt v =
-  Ctypes.format PosixTypes.clock_t fmt v
-let format_dev_t fmt v =
-  Ctypes.format PosixTypes.dev_t fmt v
-let format_ino_t fmt v =
-  Ctypes.format PosixTypes.ino_t fmt v
-let format_mode_t fmt v =
-  Ctypes.format PosixTypes.mode_t fmt v
-let format_nlink_t fmt v =
-  Ctypes.format PosixTypes.nlink_t fmt v
-let format_off_t fmt v =
-  Ctypes.format PosixTypes.off_t fmt v
-let format_pid_t fmt v =
-  Ctypes.format PosixTypes.pid_t fmt v
-let format_size_t fmt v =
-  Ctypes.format PosixTypes.size_t fmt v
-let format_ssize_t fmt v =
-  Ctypes.format PosixTypes.ssize_t fmt v
-let format_time_t fmt v =
-  Ctypes.format PosixTypes.time_t fmt v
-let format_useconds_t fmt v =
-  Ctypes.format PosixTypes.useconds_t fmt v
 let format_ldouble fmt v = 
   Format.fprintf fmt "<ldouble %s>" (LDouble.to_string v)
 let format_complexld fmt v = 

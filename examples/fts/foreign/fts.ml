@@ -73,7 +73,7 @@ let castp typ p = from_voidp typ (to_voidp p)
 
 module FTSENT =
 struct
-  open PosixTypes
+  open Posix_types
   open Unsigned
 
   type ftsent
@@ -146,7 +146,7 @@ end
 
 module FTS =
 struct
-  open PosixTypes
+  open Posix_types
   open FTSENT
 
   type fts

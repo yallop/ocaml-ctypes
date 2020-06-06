@@ -73,7 +73,7 @@ let id x = x
 
 module FTSENT =
 struct
-  open PosixTypes
+  open Posix_types
   open Unsigned
 
   type ftsent
@@ -148,7 +148,7 @@ end
 
 module FTS =
 struct
-  open PosixTypes
+  open Posix_types
   open FTSENT
 
   type compar_typ = t ptr -> t ptr -> int

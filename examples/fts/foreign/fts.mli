@@ -143,7 +143,7 @@ sig
 
   val array : t -> FTSENT.t list
 
-  val dev : t -> PosixTypes.dev_t
+  val dev : t -> Posix_types.dev_t
 
   val path : t -> string
 

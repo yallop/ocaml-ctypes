@@ -63,7 +63,7 @@ clean: clean-examples clean-tests
 
 # ctypes subproject
 ctypes.cmi_only = ctypes_static ctypes_primitive_types ctypes_structs cstubs_internals
-ctypes.public = lDouble complexL ctypes posixTypes ctypes_types
+ctypes.public = lDouble complexL ctypes ctypes_types
 ctypes.dir = src/ctypes
 ctypes.extra_mls = ctypes_primitives.ml
 ctypes.deps = bigarray integers

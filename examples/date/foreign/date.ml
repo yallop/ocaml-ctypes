@@ -6,7 +6,7 @@
  *)
 
 open Ctypes
-open PosixTypes
+open Posix_types
 open Foreign
 
 type tm

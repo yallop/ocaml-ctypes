@@ -6,7 +6,7 @@
  *)
 
 open Ctypes
-open PosixTypes
+open Posix_types
 open Date_stubs
 module D = Bindings(Date_generated)
 open D
