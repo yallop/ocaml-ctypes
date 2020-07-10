@@ -63,6 +63,37 @@ let int64_of_uint32 x = Int64.of_string (Unsigned.UInt32.to_string x)
 let uint64_of_int64 = Unsigned.UInt64.of_int64
 let int64_of_uint64 = Unsigned.UInt64.to_int64
 
+module type signed = sig include Signed.S val t : t typ end
+let build_signed_type name underlying : (module signed) =
+  let wrong kind =
+    Printf.ksprintf failwith "Signed type detected as %s type: %s" kind name
+  in
+  match underlying with
+    Ctypes_static.Uint8 -> wrong "unsigned"
+  | Ctypes_static.Uint16 -> wrong "unsigned"
+  | Ctypes_static.Uint32 -> wrong "unsigned"
+  | Ctypes_static.Uint64 -> wrong "unsigned"
+  | Ctypes_static.Int8 -> (module struct include Signed.Int let t = Ctypes.int8_t end)
+  | Ctypes_static.Int16 -> (module struct include Signed.Int let t = Ctypes.int16_t end)
+  | Ctypes_static.Int32 -> (module struct include Signed.Int32 let t = Ctypes.int32_t end)
+  | Ctypes_static.Int64 -> (module struct include Signed.Int64 let t = Ctypes.int64_t end)
+  | Ctypes_static.Float | Ctypes_static.Double -> wrong "floating"
+
+
+module type unsigned = sig include Unsigned.S val t : t typ end
+let build_unsigned_type name underlying : (module unsigned) =
+  match underlying with
+    Ctypes_static.Int8 -> (module struct include Signed.Int let t = Ctypes.int8_t end)
+  | Ctypes_static.Int16 -> (module struct include Signed.Int let t = Ctypes.int16_t end)
+  | Ctypes_static.Int32 -> (module struct include Signed.Int32 let t = Ctypes.int32_t end)
+  | Ctypes_static.Int64 -> (module struct include Signed.Int64 let t = Ctypes.int64_t end)
+  | Ctypes_static.Uint8 -> (module struct include Unsigned.UInt8 let t = Ctypes.uint8_t end)
+  | Ctypes_static.Uint16 -> (module struct include Unsigned.UInt16 let t = Ctypes.uint16_t end)
+  | Ctypes_static.Uint32 -> (module struct include Unsigned.UInt32 let t = Ctypes.uint32_t end)
+  | Ctypes_static.Uint64 -> (module struct include Unsigned.UInt64 let t = Ctypes.uint64_t end)
+  | Ctypes_static.Float | Ctypes_static.Double ->
+    Printf.ksprintf failwith "Unsigned type detected as floating type: %s" name
+
 let build_enum_type name underlying ?(typedef=false) ?unexpected alist =
   let build_view t coerce uncoerce =
     let unexpected = match unexpected with

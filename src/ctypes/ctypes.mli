@@ -517,6 +517,12 @@ sig
 
          warning: overflow in implicit constant conversion *)
 
+  module type signed = sig include Signed.S val t : t typ end
+  val signed  : string -> (module signed)
+
+  module type unsigned = sig include Unsigned.S val t : t typ end
+  val unsigned : string -> (module unsigned)
+
   val enum : string -> ?typedef:bool ->
     ?unexpected:(int64 -> 'a) -> ('a * int64 const) list -> 'a typ
   (** [enum name ?unexpected alist] builds a type representation for the
