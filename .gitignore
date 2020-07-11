@@ -10,8 +10,8 @@ gen_libffi_abi.log
 src/ctypes/ctypes_primitives.ml
 src/ctypes_config.h
 src/ctypes_config.ml
-src/ctypes-foreign-base/dl_stubs.c
-src/ctypes-foreign-base/dl.ml
+src/ctypes-foreign/dl_stubs.c
+src/ctypes-foreign/dl.ml
 src/discover/commands.cm*
 src/discover/discover.cm*
 src/configure/extract_from_c.cm*
