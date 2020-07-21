@@ -5,7 +5,7 @@
  * See the file LICENSE for details.
  *)
 
-open PosixTypes
+open Posix_types
 open Ctypes
 
 type t = sigset_t ptr

@@ -26,16 +26,5 @@ val format_struct : formatter -> ('a, 'b) Ctypes.structured -> unit
 val format_union : formatter -> ('a, 'b) Ctypes.structured -> unit
 val format_array : formatter -> 'a Ctypes.CArray.t -> unit
 val format_ocaml : formatter -> 'a Ctypes.ocaml -> unit
-val format_clock_t : formatter -> PosixTypes.clock_t -> unit
-val format_dev_t : formatter -> PosixTypes.dev_t -> unit
-val format_ino_t : formatter -> PosixTypes.ino_t -> unit
-val format_mode_t : formatter -> PosixTypes.mode_t -> unit
-val format_nlink_t : formatter -> PosixTypes.nlink_t -> unit
-val format_off_t : formatter -> PosixTypes.off_t -> unit
-val format_pid_t : formatter -> PosixTypes.pid_t -> unit
-val format_size_t : formatter -> PosixTypes.size_t -> unit
-val format_ssize_t : formatter -> PosixTypes.ssize_t -> unit
-val format_time_t : formatter -> PosixTypes.time_t -> unit
-val format_useconds_t : formatter -> PosixTypes.useconds_t -> unit
 val format_ldouble : formatter -> LDouble.t -> unit
 val format_complexld : formatter -> ComplexL.t -> unit
