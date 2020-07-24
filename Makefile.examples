@@ -3,25 +3,27 @@
 # subproject: fts with stub generation
 fts-stubs.install = no
 fts-stubs.dir = examples/fts/stub-generation/bindings
+fts-stubs.threads = yes
 fts-stubs.deps = integers
-fts-stubs.subproject_deps = ctypes \
-  ctypes-foreign-base ctypes-foreign-unthreaded
+fts-stubs.subproject_deps = ctypes ctypes-foreign
 fts-stubs: PROJECT=fts-stubs
 fts-stubs: $$(LIB_TARGETS)
 
 fts-stub-generator.install = no
 fts-stub-generator.dir = examples/fts/stub-generation/stub-generator
+fts-stub-generator.threads = yes
 fts-stub-generator.deps = integers
 fts-stub-generator.subproject_deps = ctypes cstubs \
-  ctypes-foreign-base ctypes-foreign-unthreaded fts-stubs
+  ctypes-foreign fts-stubs
 fts-stub-generator.deps = str unix bigarray integers
 fts-stub-generator: PROJECT=fts-stub-generator
 fts-stub-generator: $$(NATIVE_TARGET)
 
 fts-cmd.install = no
 fts-cmd.dir = examples/fts/stub-generation
+fts-cmd.threads = yes
 fts-cmd.subproject_deps = ctypes \
-  ctypes-foreign-base ctypes-foreign-unthreaded fts-stubs
+  ctypes-foreign fts-stubs
 fts-cmd.deps = str unix bigarray integers
 fts-cmd.extra_mls = fts_generated.ml
 fts-cmd.extra_cs = fts_stubs.c
@@ -36,8 +38,9 @@ examples/fts/stub-generation/fts_generated.ml: fts-stub-generator
 # subproject: fts using dynamic linking (foreign)
 fts.install = no
 fts.dir = examples/fts/foreign
+fts.threads = yes
 fts.deps = unix bigarray str integers
-fts.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
+fts.subproject_deps = ctypes ctypes-foreign
 fts: PROJECT=fts
 fts: $$(NATIVE_TARGET)
 
@@ -71,7 +74,8 @@ examples/date/stub-generation/date_generated.ml:
 # subproject: date using dynamic linking (foreign)
 date.install = no
 date.dir = examples/date/foreign
-date.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
+date.threads = yes
+date.subproject_deps = ctypes ctypes-foreign
 date.deps = unix bigarray str integers
 date: PROJECT=date
 date: $$(NATIVE_TARGET)
@@ -86,9 +90,10 @@ ncurses-stubs: $$(NATIVE_TARGET) $$(LIB_TARGETS)
 
 ncurses-stub-generator.install = no
 ncurses-stub-generator.dir = examples/ncurses/stub-generation/stub-generator
+ncurses-stub-generator.threads = yes
 ncurses-stub-generator.deps = integers
 ncurses-stub-generator.subproject_deps = ctypes cstubs \
-  ctypes-foreign-base ctypes-foreign-unthreaded ncurses-stubs
+  ctypes-foreign ncurses-stubs
 ncurses-stub-generator.deps = str unix bigarray integers
 ncurses-stub-generator: PROJECT=ncurses-stub-generator
 ncurses-stub-generator: $$(NATIVE_TARGET)
@@ -110,7 +115,8 @@ examples/ncurses/stub-generation/ncurses_generated.ml: ncurses-stubs
 # subproject: ncurses using dynamic linking (foreign)
 ncurses.install = no
 ncurses.dir = examples/ncurses/foreign
-ncurses.subproject_deps = ctypes ctypes-foreign-base ctypes-foreign-unthreaded
+ncurses.threads = yes
+ncurses.subproject_deps = ctypes ctypes-foreign
 ncurses.deps = unix bigarray str integers
 ncurses.link_flags = -lncurses
 ncurses: PROJECT=ncurses
