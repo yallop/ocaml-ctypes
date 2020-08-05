@@ -1367,7 +1367,7 @@ endif
 
 testlib: $(BUILDDIR)/clib/libtest_functions$(EXTDLL)
 $(BUILDDIR)/clib/libtest_functions$(EXTDLL): $(BUILDDIR)/clib/test_functions.o
-	$(CC) -shared $(LDFLAGS) $(WINLDFLAGS) -o $@ $^
+	$(CC) -shared $(LDFLAGS) $(WINLDFLAGS) -o $@ $^ -lm
 ifneq (,$(filter mingw%,$(OSYSTEM)))
 	cp $@ libtest_functions.dll.a $(BUILDDIR)
 endif
