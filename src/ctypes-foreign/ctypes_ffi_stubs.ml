@@ -22,6 +22,9 @@ external pointer_ffitype : unit -> voidp ffitype
 external void_ffitype : unit -> unit ffitype
  = "ctypes_void_ffitype"
 
+external value_ffitype : unit -> 'a ffitype
+ = "ctypes_value_ffitype"
+
 
 (* Allocate a new C typed buffer specification *)
 external allocate_struct_ffitype : int -> struct_ffitype

@@ -200,6 +200,23 @@ value ctypes_write_pointer(value p_, value dst_)
   CAMLreturn(Val_unit);
 }
 
+/* read_value : fat_pointer -> value */
+value ctypes_read_value(value src_)
+{
+  CAMLparam1(src_);
+  void *src = CTYPES_ADDR_OF_FATPTR(src_);
+  CAMLreturn(*(value *)src);
+}
+
+/* write_value : _ -> dst:fat_pointer -> unit */
+value ctypes_write_value(value v_, value dst_)
+{
+  CAMLparam2(v_, dst_);
+  void *dst = CTYPES_ADDR_OF_FATPTR(dst_);
+  *(value *)dst = v_;
+  CAMLreturn(Val_unit);
+}
+
 /* string_of_pointer : fat_pointer -> string */
 value ctypes_string_of_pointer(value p_)
 {

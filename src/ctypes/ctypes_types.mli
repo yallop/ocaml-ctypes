@@ -42,6 +42,16 @@ sig
       {!IncompleteType}.
   *)
 
+  (** {3 Value types}
+
+      The scalar types consist of the {!arithmetic_types} and the {!pointer_types}.
+  *)
+  module Value () : sig
+    type t
+
+    val typ : t typ
+  end
+
   (** {3 Scalar types}
 
       The scalar types consist of the {!arithmetic_types} and the {!pointer_types}.

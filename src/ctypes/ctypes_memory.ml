@@ -37,6 +37,7 @@ let rec build : type a b. a typ -> (_, b typ) Fat.t -> a
       let buildty = build ty in
       (fun buf -> read (buildty buf))
     | OCaml _ -> (fun buf -> assert false)
+    | Value -> (fun buf -> Stubs.Value.read buf)
     (* The following cases should never happen; non-struct aggregate
        types are excluded during type construction. *)
     | Union _ -> assert false
@@ -75,6 +76,7 @@ let rec write : type a b. a typ -> a -> (_, b) Fat.t -> unit
       let writety = write ty in
       (fun v -> writety (w v))
     | OCaml _ -> raise IncompleteType
+    | Value -> (fun v dst -> Stubs.Value.write v dst)
 
 let null : unit ptr = CPointer (Fat.make ~managed:None ~reftyp:Void Raw.null)
 
@@ -93,6 +95,7 @@ let rec (!@) : type a. a ptr -> a
       | Bigarray b -> Ctypes_bigarray.view b cptr
       | Abstract _ -> { structured = ptr }
       | OCaml _ -> raise IncompleteType
+      | Value -> raise IncompleteType
       (* If it's a value type then we cons a new value. *)
       | _ -> build (Fat.reftype cptr) cptr
 

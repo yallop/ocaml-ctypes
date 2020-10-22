@@ -150,6 +150,7 @@ struct
     | OCaml String -> Some (string_to_ptr x)
     | OCaml Bytes -> Some (bytes_to_ptr x)
     | OCaml FloatArray -> Some (float_array_to_ptr x)
+    | Value -> Some (x :> ccomp)
 
   let prj ty x = prj ty ~orig:ty x
 
@@ -166,6 +167,7 @@ struct
     | Array _ -> report_unpassable "arrays"
     | Bigarray _ -> report_unpassable "bigarrays"
     | OCaml _ -> report_unpassable "ocaml references as return values"
+    | Value -> (x :> ceff)
 
   type _ fn =
   | Returns  : 'a typ   -> 'a fn

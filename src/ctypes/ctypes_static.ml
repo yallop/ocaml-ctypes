@@ -32,7 +32,7 @@ type _ ocaml_type =
 | Bytes      : bytes ocaml_type
 | FloatArray : float array ocaml_type
 
-type _ typ =
+type 'a typ =
     Void            :                       unit typ
   | Primitive       : 'a Ctypes_primitive_types.prim -> 'a typ
   | Pointer         : 'a typ             -> 'a ptr typ
@@ -45,6 +45,7 @@ type _ typ =
   | Bigarray        : (_, 'a, _) Ctypes_bigarray.t
                                          -> 'a typ
   | OCaml           : 'a ocaml_type      -> 'a ocaml typ
+  | Value           :                       'a typ
 and 'a carray = { astart : 'a ptr; alength : int }
 and ('a, 'kind) structured = { structured : ('a, 'kind) structured ptr } [@@unboxed]
 and 'a union = ('a, [`Union]) structured
@@ -134,6 +135,7 @@ let rec sizeof : type a. a typ -> int = function
   | Funptr _                       -> Ctypes_primitives.pointer_size
   | OCaml _                        -> raise IncompleteType
   | View { ty }                    -> sizeof ty
+  | Value                          -> raise IncompleteType
 
 let rec alignment : type a. a typ -> int = function
     Void                             -> raise IncompleteType
@@ -150,6 +152,7 @@ let rec alignment : type a. a typ -> int = function
   | Funptr _                         -> Ctypes_primitives.pointer_alignment
   | OCaml _                          -> raise IncompleteType
   | View { ty }                      -> alignment ty
+  | Value                            -> raise IncompleteType
 
 let rec passable : type a. a typ -> bool = function
     Void                           -> true
@@ -165,6 +168,7 @@ let rec passable : type a. a typ -> bool = function
   | Abstract _                     -> false
   | OCaml _                        -> true
   | View { ty }                    -> passable ty
+  | Value                          -> true
 
 (* Whether a value resides in OCaml-managed memory.
    Values that reside in OCaml memory cannot be accessed
@@ -181,6 +185,7 @@ let rec ocaml_value : type a. a typ -> bool = function
   | Abstract _  -> false
   | OCaml _     -> true
   | View { ty } -> ocaml_value ty
+  | Value       -> true
 
 let rec has_ocaml_argument : type a. a fn -> bool = function
     Returns _ -> false
@@ -236,6 +241,11 @@ let id v = v
 let typedef old name =
   view ~format_typ:(fun k fmt -> Format.fprintf fmt "%s%t" name k)
     ~read:id ~write:id old
+module Value () = struct
+  type t
+
+  let typ = Value
+end
 
 let bigarray_ : type a b c d e l.
   < element: a;
