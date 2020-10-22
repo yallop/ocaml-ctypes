@@ -282,4 +282,11 @@ struct simple_closure { int (*f)(int); int n; };
 int call_dynamic_funptr_struct(struct simple_closure);
 int call_dynamic_funptr_struct_ptr(struct simple_closure*);
 
+value int_to_nativeint(int i);
+int nativeint_to_int(value i);
+
+value create_custom_array(int i);
+void set_custom_array(value array, int i, int x);
+int get_custom_array(value array, int i);
+
 #endif /* TEST_FUNCTIONS_H */

@@ -910,3 +910,41 @@ int call_saved_dynamic_funptr(int n) {
 
 int call_dynamic_funptr_struct(struct simple_closure x) { return x.f(x.n); }
 int call_dynamic_funptr_struct_ptr(struct simple_closure *x) { return x->f(x->n); }
+
+value caml_copy_nativeint(intnat);
+
+value int_to_nativeint(int i) { return caml_copy_nativeint((intnat) i); }
+
+#include <caml/mlvalues.h>
+
+int nativeint_to_int(value i) {
+  return ((int) (Nativeint_val(i)));
+}
+
+#include <caml/custom.h>
+
+struct custom_operations test_ops = {
+  "my_custom_array",
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL
+};
+
+value create_custom_array(int i)
+{
+  value res = caml_alloc_custom(&test_ops, i * sizeof(int), 0, 1);
+  return res;
+}
+
+void set_custom_array(value array, int i, int x)
+{
+  ((int *) Data_custom_val(array))[i] = x;
+}
+
+int get_custom_array(value array, int i)
+{
+  return ((int *) Data_custom_val(array))[i];
+}
