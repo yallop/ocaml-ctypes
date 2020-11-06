@@ -1,6 +1,6 @@
 version = "0.17.1"
 description = "Combinators for binding to C libraries without writing any C."
-requires = "bigarray bytes integers"
+requires = "bigarray-compat bytes integers"
 archive(byte) = "ctypes.cma"
 archive(byte, plugin) = "ctypes.cma"
 archive(byte, toploop) = "ctypes.cma ctypes-top.cma"
