@@ -27,6 +27,7 @@ depends: [
    "ctypes-foreign" {with-test}
    "ounit" {with-test}
    "conf-ncurses" {with-test}
+   "bigarray-compat"
 ]
 depopts: [
    "ctypes-foreign"
