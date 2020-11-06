@@ -289,7 +289,7 @@ let getf s field = !@(s @. field)
 
 let addr { structured } = structured
 
-open Bigarray
+open Bigarray_compat
 
 let _bigarray_start kind ba =
   let raw_address = Ctypes_bigarray.unsafe_address ba in
