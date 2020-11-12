@@ -1,3 +1,38 @@
+## ctypes 0.18.0
+
+* Remove the `Unix` dependency by using `bigarray-compat`  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/660
+
+* Remove the threaded/unthreaded split in ctypes-foreign  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/654
+
+* Eliminate some `const` warnings in generated code  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/646  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/638
+
+* Speed-up `CArray.make` with initial value  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/644
+
+* Fix complex allocation size  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/642
+
+* Report names of missing symbols also under windows  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/641
+
+* Remove a level of boxing from struct and union values  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/640
+
+* Fix a markup issue in the `funptr` docstring  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/633
+
+* Move conf-pkg-config dependency to ctypes-foreign  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/631
+
+Thanks to Andreas Hauptmann (@fdopen), Anil Madhavapeddy (@avsm),
+Anton Bachin (@aantron), Calascibetta Romain (@dinosaure), Sora
+Morimoto (@smorimoto) and and Stéphane Glondu (@glondu) for
+contributions to this release.
+
 ## ctypes 0.17.1
 
 * Hide the managed component in pointer values  
