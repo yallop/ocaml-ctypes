@@ -42,7 +42,7 @@ The documentation and source distribution contain more complex examples, involvi
 
 ## Links
 
-* [Chapter 19: Foreign Function Interface][rwo-19] of [Real World OCaml][rwo] describes ctypes
+* [Chapter 19: Foreign Function Interface][rwo-ffi] of [Real World OCaml][rwo] describes ctypes
 * [Modular Foreign Function Bindings][mirage-blogpost] introduces ctypes in the context of the [Mirage][mirage] library operating system
 * [Tutorial][tutorial]
 * [API documentation][apidoc]
@@ -52,7 +52,7 @@ The documentation and source distribution contain more complex examples, involvi
 * [A modular foreign function interface][scp-extended] is a research paper (extending an [earlier paper][flops-paper]) that presents the design of ctypes
 * [FAQ][faq]
 
-[rwo-19]: https://realworldocaml.org/v1/en/html/foreign-function-interface.html
+[rwo-ffi]: https://dev.realworldocaml.org/foreign-function-interface.html
 [rwo]: http://realworldocaml.org/
 [mirage-blogpost]: http://openmirage.org/blog/modular-foreign-function-bindings
 [tutorial]: https://github.com/ocamllabs/ocaml-ctypes/wiki/ctypes-tutorial
