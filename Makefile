@@ -54,7 +54,7 @@ endif
 all: libffi.config $(PROJECTS)
 
 ctypes-base: $(BASE_PROJECTS)
-ctypes-foreign: ctypes-base $(FOREIGN_PROJECTS)
+ctypes-foreign: ctypes-base test-libffi
 ctypes-stubs: ctypes-base $(STUB_PROJECTS)
 
 clean: clean-examples clean-tests
