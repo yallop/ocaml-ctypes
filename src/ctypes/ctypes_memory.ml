@@ -186,7 +186,7 @@ struct
   let length { alength } = alength
   let from_ptr astart alength = { astart; alength }
 
-  let fill ({ alength; astart = (CPointer p as astart) } as arr) v =
+  let fill { alength; astart = CPointer p } v =
     let size = sizeof (Fat.reftype p) in
     let w = write (Fat.reftype p) v in
     for i = 0 to alength - 1 do
