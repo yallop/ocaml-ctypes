@@ -2,7 +2,7 @@
 
 VPATH += tests
 
-CFLAGS += -I $(CURDIR)/src/ctypes -I $(CURDIR)/tests
+CFLAGS += -I "$(CURDIR)/src/ctypes" -I "$(CURDIR)/tests"
 
 CC=$(shell ocamlc -config | sed -n '/native_c_compiler/{ s/[^:]*://; p;}')
 
