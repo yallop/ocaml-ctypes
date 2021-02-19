@@ -4,7 +4,7 @@
   https://github.com/ocamllabs/ocaml-ctypes/pull/660
 
 * Remove the threaded/unthreaded split in ctypes-foreign  
-  https://github.com/ocamllabs/ocaml-ctypes/pull/654
+  https://github.com/ocamllabs/ocaml-ctypes/pull/651
 
 * Eliminate some `const` warnings in generated code  
   https://github.com/ocamllabs/ocaml-ctypes/pull/646  
