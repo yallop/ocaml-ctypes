@@ -10,7 +10,6 @@ license: "MIT"
 build: [
   [make
     "XEN=%{mirage-xen:enable}%"
-    "COVERAGE=true" {bisect_ppx:installed}
     "libffi.config"
     "ctypes-base"
     "ctypes-stubs"]
