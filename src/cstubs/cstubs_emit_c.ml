@@ -93,8 +93,7 @@ let camlop fmt : camlop -> unit = function
   | `CAMLlocalN (e, c) -> Format.fprintf fmt "CAMLlocalN(@[%a@],@ @[%a@])"
     cexp e cexp c
   | `CAMLdrop ->
-    Format.fprintf fmt "caml_local_roots = caml__frame;"
-    (* Format.fprintf fmt "CAMLdrop()" *) (* 4.03+ only *)
+    Format.fprintf fmt "CAMLdrop()"
 
 let rec ceff fmt : ceff -> unit = function
   | #cexp as e -> cexp fmt e
