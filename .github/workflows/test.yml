@@ -14,8 +14,6 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            ocaml-version: 4.02.3
-          - os: ubuntu-latest
             ocaml-version: 4.03.0
           - os: ubuntu-latest
             ocaml-version: 4.04.0
