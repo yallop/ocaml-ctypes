@@ -52,6 +52,111 @@ struct
     List.iter Thread.join allocators;
     List.iter Thread.join mutators
 
+  let test_object_lifetime4 _ =
+    Printf.fprintf stderr "test object lifetime 4\n"; flush stderr;
+    let iters = 20000 in
+    let l = [(); (); (); (); (); (); (); (); (); ()] in
+    let alloc =       (fun () ->
+        let tid = Thread.(id (self ())) in
+        Printf.fprintf stderr "allocator %d\n" tid; flush stderr;
+	for i = 0 to iters do
+	  for i = 0 to 200; do ignore (Array.make 10 ()) done;
+	  ignore (Array.make 1000 ());
+	  if i mod 1000 = 0 then (Gc.compact ());
+	done) in
+    let allocators =
+      List.map (Thread.create alloc) l
+    in
+    let size = 100 in
+    let mutate () =
+      let tid = Thread.(id (self ())) in
+      Printf.fprintf stderr "mutator %d\n" tid; flush stderr;
+      for i = 0 to iters do
+        (if i mod 1000 = 0 then
+           Printf.fprintf stderr "[%d]: %d\n" tid i; flush stderr);
+	check_ones
+	  (CArray.start (CArray.make int ~initial:1 size))
+	  (Unsigned.Size_t.of_int size);
+	for i = 0 to 200; do
+	  ignore (Array.make 10 ())
+	done;
+      done
+    in
+    let mutators =
+      List.map (Thread.create mutate) [(); ()]
+    in
+    List.iter Thread.join allocators;
+    List.iter Thread.join mutators
+
+  let test_object_lifetime3 _ =
+    Printf.fprintf stderr "test object lifetime 3\n"; flush stderr;
+    let iters = 20000 in
+    let l = [(); (); (); (); (); (); (); (); (); ()] in
+    let alloc =       (fun () ->
+        let tid = Thread.(id (self ())) in
+        Printf.fprintf stderr "allocator %d\n" tid; flush stderr;
+	for i = 0 to iters do
+	  for i = 0 to 200; do ignore (Array.make 10 ()) done;
+	  ignore (Array.make 1000 ());
+	  if i mod 1000 = 0 then (Gc.compact ());
+	done) in
+    let allocators =
+      List.map (Thread.create alloc) l
+    in
+    let size = 100 in
+    let mutate () =
+      let tid = Thread.(id (self ())) in
+      Printf.fprintf stderr "mutator %d\n" tid; flush stderr;
+      for i = 0 to iters do
+        (if i mod 1000 = 0 then
+           Printf.fprintf stderr "[%d]: %d\n" tid i; flush stderr);
+	check_ones
+	  (CArray.start (CArray.make int ~initial:1 size))
+	  (Unsigned.Size_t.of_int size);
+	for i = 0 to 200; do
+	  ignore (Array.make 10 ())
+	done;
+      done
+    in
+    let mutators =
+      List.map (Thread.create mutate) [()]
+    in
+    List.iter Thread.join allocators;
+    List.iter Thread.join mutators
+
+  let test_object_lifetime2 _ =
+    Printf.fprintf stderr "test object lifetime 2\n"; flush stderr;
+    let iters = 20000 in
+    let l = [(); (); (); (); (); (); (); (); (); ()] in
+    let alloc =       (fun () ->
+        let tid = Thread.(id (self ())) in
+        Printf.fprintf stderr "allocator %d\n" tid; flush stderr;
+	for i = 0 to iters do
+	  for i = 0 to 200; do ignore (Array.make 10 ()) done;
+	  ignore (Array.make 1000 ());
+	  if i mod 1000 = 0 then (Gc.compact ());
+	done) in
+    let allocators =
+      List.map (Thread.create alloc) l
+    in
+    let size = 100 in
+    let mutate () =
+      let tid = Thread.(id (self ())) in
+      Printf.fprintf stderr "mutator %d\n" tid; flush stderr;
+      for i = 0 to iters do
+        (if i mod 1000 = 0 then
+           Printf.fprintf stderr "[%d]: %d\n" tid i; flush stderr);
+	for i = 0 to 200; do
+	  ignore (Array.make 10 ())
+	done;
+      done
+    in
+    let mutators =
+      List.map (Thread.create mutate) l
+    in
+    List.iter Thread.join allocators;
+    List.iter Thread.join mutators
+
   let just_run_allocators _ =
     Printf.fprintf stderr "just run allocators\n"; flush stderr;
     let iters = 20000 in
@@ -80,6 +185,24 @@ let suite = "Lifetime tests" >:::
 
    "just run the allocators (stubs)"
     >:: Stub_tests.just_run_allocators;
+
+   "2-objects persist throughout C calls (foreign)"
+    >:: Foreign_tests.test_object_lifetime2;
+
+   "2-objects persist throughout C calls (stubs)"
+    >:: Stub_tests.test_object_lifetime2;
+
+   "3-objects persist throughout C calls (foreign)"
+    >:: Foreign_tests.test_object_lifetime3;
+
+   "3-objects persist throughout C calls (stubs)"
+    >:: Stub_tests.test_object_lifetime3;
+
+   "4-objects persist throughout C calls (foreign)"
+    >:: Foreign_tests.test_object_lifetime4;
+
+   "4-objects persist throughout C calls (stubs)"
+    >:: Stub_tests.test_object_lifetime4;
 
    "objects persist throughout C calls (foreign)"
     >:: Foreign_tests.test_object_lifetime;
