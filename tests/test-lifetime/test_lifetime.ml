@@ -30,7 +30,11 @@ struct
     in
     let size = 100 in
     let mutate () =
+      let tid = Thread.(id (self ())) in
+      Printf.fprintf stderr "mutator %d\n" tid; flush stderr;
       for i = 0 to iters do
+        (if i mod 1000 = 0 then
+           Printf.fprintf stderr "[%d]: %d\n" tid i; flush stderr);
 	check_ones
 	  (CArray.start (CArray.make int ~initial:1 size))
 	  (Unsigned.Size_t.of_int size);
