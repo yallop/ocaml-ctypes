@@ -1,3 +1,10 @@
+## ctypes 0.19.0
+
+* Drop compatibility with 4.02, and improve compatibility with Multicore OCaml  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/673
+
+Thanks to Kate Deplaix (@kit-ty-kate) for contributing to this release.
+
 ## ctypes 0.18.0
 
 * Remove the `Unix` dependency by using `bigarray-compat`  
