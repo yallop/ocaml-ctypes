@@ -172,15 +172,42 @@ struct
     let allocators =
       List.map (Thread.create alloc) l
     in
-    List.iter Thread.join allocators;
+    List.iter Thread.join allocators
       
 end
 
 module Foreign_tests = Common_tests(Tests_common.Foreign_binder)
 module Stub_tests = Common_tests(Generated_bindings)
 
+let just_run_allocators_toplevel _ =
+  Printf.fprintf stderr "just run allocators\n"; flush stderr;
+  let iters = 20000 in
+  let l = [(); (); (); (); (); (); (); (); (); ()] in
+  let alloc =       (fun () ->
+      let tid = Thread.(id (self ())) in
+      Printf.fprintf stderr "allocator %d\n" tid; flush stderr;
+	for i = 0 to iters do
+	  for i = 0 to 200; do ignore (Array.make 10 ()) done;
+	  ignore (Array.make 1000 ());
+	  if i mod 1000 = 0 then (Gc.compact ());
+	done) in
+  let allocators =
+    List.map (Thread.create alloc) l
+  in
+  List.iter Thread.join allocators
+
+
 let suite = "Lifetime tests" >:::
-  ["just run the allocators (foreign)"
+  ["just run the allocators (top level)"
+    >:: just_run_allocators_toplevel;
+
+   "just run the allocators (top level, again)"
+    >:: just_run_allocators_toplevel;
+
+   "just run the allocators (top level, a third time)"
+    >:: just_run_allocators_toplevel;
+
+   "just run the allocators (foreign)"
     >:: Foreign_tests.just_run_allocators;
 
    "just run the allocators (stubs)"
