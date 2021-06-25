@@ -12,13 +12,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - macos-latest
-          - ubuntu-latest
-          - windows-latest
-        ocaml-version:
-          - 4.09.0
-          - 4.10.0
+        include:
+          - os: windows-latest
+            ocaml-version: 4.11.1
+          - os: windows-latest
+            ocaml-version: 4.12.0
 
     runs-on: ${{ matrix.os }}
 
@@ -37,7 +35,6 @@ jobs:
           opam pin add -n ctypes-foreign.dev .
           opam depext -ty ctypes ctypes-foreign
           opam install -t --deps-only .
-
       - name: Build
         run: opam exec -- make
 
