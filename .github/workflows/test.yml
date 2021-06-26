@@ -67,4 +67,4 @@ jobs:
         run: opam exec -- make test
 
       - name: Test inverted stubs
-        run: opam pin add -n ctypes-inverted-stubs-example https://github.com/yallop/ocaml-ctypes-inverted-stubs-example.git 
+        run: opam pin add ctypes-inverted-stubs-example https://github.com/yallop/ocaml-ctypes-inverted-stubs-example.git 
