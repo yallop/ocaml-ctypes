@@ -1,3 +1,8 @@
+## ctypes 0.19.1
+
+* Fix use of CAMLdrop in generated code  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/680
+
 ## ctypes 0.19.0
 
 * Drop compatibility with 4.02, and improve compatibility with Multicore OCaml  
