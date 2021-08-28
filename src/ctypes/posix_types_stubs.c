@@ -13,7 +13,12 @@
 #include <assert.h>
 
 #include <sys/types.h>
+#ifdef _MSC_VER
+#include <basetsd.h>
+#include <WTypesbase.h>
+#else
 #include <unistd.h>
+#endif
 #include <signal.h>
 #if (!defined _WIN32 || defined __CYGWIN__) && !defined MINIOS
 #include <pthread.h>
@@ -71,12 +76,27 @@ typedef __pid_t pid_t;
 EXPOSE_TYPEINFO(clock_t)
 EXPOSE_TYPEINFO_S(dev_t)
 EXPOSE_TYPEINFO_S(ino_t)
-EXPOSE_TYPEINFO_S(mode_t)
 EXPOSE_TYPEINFO_S(off_t)
+EXPOSE_TYPEINFO(time_t)
+#ifdef _MSC_VER
+/* _chmod for Microsoft has second arg (the mode) as int. https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/chmod-wchmod?view=msvc-160 */
+EXPOSE_TYPEINFO_COMMON(mode_t, int)
+/* _getpid for Microsoft is int. https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/getpid?redirectedfrom=MSDN&view=msvc-160 */
+EXPOSE_TYPEINFO_COMMON(pid_t, int)
+EXPOSE_TYPEINFO_COMMON(ssize_t, SSIZE_T)
+/* usleep() is deprecated POSIX. QueryPerformanceCounter is MS equivalent https://docs.microsoft.com/en-us/windows/win32/api/profileapi/nf-profileapi-queryperformancecounter
+   but its interval type is a struct called LARGE_INTEGER with a single LONGLONG member.
+   Developers, if they continue to want to use it and work on Windows, will need to wrap their own usleep() around QueryPerformanceCounter. */
+EXPOSE_TYPEINFO_COMMON(useconds_t, LONGLONG)
+#else
+EXPOSE_TYPEINFO_S(mode_t)
 EXPOSE_TYPEINFO_S(pid_t)
 EXPOSE_TYPEINFO(ssize_t)
-EXPOSE_TYPEINFO(time_t)
 EXPOSE_TYPEINFO(useconds_t)
+#endif
+#ifdef _MSC_VER
+#else
+#endif
 #if !defined _WIN32 || defined __CYGWIN__
   EXPOSE_TYPEINFO(nlink_t)
 #else
@@ -85,5 +105,14 @@ EXPOSE_TYPEINFO(useconds_t)
 #endif
 
 
+#ifdef _MSC_VER
+/* There is no sigset on Windows, but signals are supported: https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/signal?view=msvc-160 
+   Assuming a developer wants to write their own polyfill for sigset on Windows, they would have to encode signal types ranging
+   from SIGINT (2) to SIGABRT (22). That is a 32 bit unsigned integer.
+ */
+EXPOSE_TYPESIZE_COMMON(sigset_t, uint32_t)
+EXPOSE_ALIGNMENT_COMMON(sigset_t, uint32_t)
+#else
 EXPOSE_TYPESIZE_S(sigset_t)
 EXPOSE_ALIGNMENT_S(sigset_t)
+#endif

@@ -2,7 +2,12 @@
 
 VPATH += tests
 
+ifeq ($(MSYSTEM),MSYS)
+CURDIR_WINDOWS = $(shell echo '$(CURDIR)' | cygpath -f - -aw)
+CFLAGS += -I "$(CURDIR_WINDOWS)\src\ctypes" -I "$(CURDIR_WINDOWS)\tests"
+else
 CFLAGS += -I "$(CURDIR)/src/ctypes" -I "$(CURDIR)/tests"
+endif
 
 CC=$(shell ocamlc -config | sed -n '/native_c_compiler/{ s/[^:]*://; p;}')
 
@@ -1312,7 +1317,7 @@ tests/test-closure-type-promotion/generated_bindings.ml: $(BUILDDIR)/test-closur
 test-ldouble.dir = tests/test-ldouble
 test-ldouble.threads = yes
 test-ldouble.deps = str bigarray-compat oUnit integers
-test-ldouble.subproject_deps = ctypes 
+test-ldouble.subproject_deps = ctypes
 test-ldouble: PROJECT=test-ldouble
 test-ldouble: $$(BEST_TARGET)
 
@@ -1367,15 +1372,23 @@ LDFLAGS+=-static-libgcc
 endif
 
 testlib: $(BUILDDIR)/clib/libtest_functions$(EXTDLL)
-$(BUILDDIR)/clib/libtest_functions$(EXTDLL): $(BUILDDIR)/clib/test_functions.o
+$(BUILDDIR)/clib/libtest_functions$(EXTDLL): $(BUILDDIR)/clib/test_functions$(OBJ_SUFFIX)
+ifeq ($(CCOMP_TYPE),msvc)
+	$(CC) /LD $(LDFLAGS) $(WINLDFLAGS) /Fe"$@" $^ -lm
+else
 	$(CC) -shared $(LDFLAGS) $(WINLDFLAGS) -o $@ $^ -lm
+endif
 ifneq (,$(filter mingw%,$(OSYSTEM)))
 	cp $@ libtest_functions.dll.a $(BUILDDIR)
 endif
 
-$(BUILDDIR)/clib/test_functions.o: tests/clib/test_functions.c
+$(BUILDDIR)/clib/test_functions$(OBJ_SUFFIX): tests/clib/test_functions.c
 	@mkdir -p $(@D)
+ifeq ($(CCOMP_TYPE),msvc)
+	$(CC) -c $(CFLAGS) -I `$(OCAMLFIND) ocamlc -where | sed 's|\r$$||'` /Fo"$@" $^
+else
 	$(CC) -c $(CFLAGS) -I `$(OCAMLFIND) ocamlc -where | sed 's|\r$$||'` -o $@ $^
+endif
 tests/clib/test_functions.c: tests/clib/test_functions.h
 
 .PHONY: test testlib $(TESTS) tests-common clean-tests

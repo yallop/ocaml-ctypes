@@ -43,11 +43,18 @@ export CFLAGS DEBUG
 
 EXTDLL:=$(shell $(OCAMLFIND) ocamlc -config | awk '/^ext_dll:/{print $$2}')
 OSYSTEM:=$(shell $(OCAMLFIND) ocamlc -config | awk '/^system:/{print $$2}')
+CCOMP_TYPE:=$(shell $(OCAMLFIND) ocamlc -config | awk '/^ccomp_type:/{print $$2}')
 
 ifneq (,$(filter mingw%,$(OSYSTEM)))
 OS_ALT_SUFFIX=.win
 else
 OS_ALT_SUFFIX=.unix
+endif
+
+ifeq ($(CCOMP_TYPE),msvc)
+OBJ_SUFFIX=.obj
+else
+OBJ_SUFFIX=.o
 endif
 
 # public targets

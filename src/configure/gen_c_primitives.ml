@@ -53,9 +53,9 @@ let c_primitives = [
   c_primitive "Float"     "float"               (Known_format ".12g");
   c_primitive "Double"    "double"              (Known_format ".12g");
   c_primitive "LDouble"   "long double"         (Known_format ".12Lg");
-  c_primitive "Complex32" "float _Complex"      (No_format);
-  c_primitive "Complex64" "double _Complex"     (No_format);
-  c_primitive "Complexld" "long double _Complex"(No_format);
+  c_primitive "Complex32" "floatcomplex_t"      (No_format);
+  c_primitive "Complex64" "doublecomplex_t"     (No_format);
+  c_primitive "Complexld" "longdoublecomplex_t" (No_format);
   c_primitive "Nativeint" "intnat"              (Defined_format "REAL_ARCH_INTNAT_PRINTF_FORMAT \"d\"");
   { constructor = "Camlint";
     typ         = "intnat";

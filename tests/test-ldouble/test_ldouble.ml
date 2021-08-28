@@ -8,7 +8,7 @@
 open OUnit2
 open Ctypes
 
-let flts = 
+let flts =
   [
     1.1234;
     -94.1239823897423;
@@ -20,10 +20,10 @@ let flts =
 let op1 f a = LDouble.(to_float (f (of_float a)))
 let op2 f a b = LDouble.(to_float (f (of_float a) (of_float b)))
 
-let chk_float x y = 
+let chk_float x y =
   match classify_float x, classify_float y with
-  | FP_normal, FP_normal 
-  | FP_subnormal, FP_subnormal 
+  | FP_normal, FP_normal
+  | FP_subnormal, FP_subnormal
   | FP_zero, FP_normal
   | FP_zero, FP_subnormal
   | FP_normal, FP_zero
@@ -31,19 +31,19 @@ let chk_float x y =
   | x, y when x=y -> true (* infinite, zero, nan *)
   | _ -> false
 
-let chk1 fop lop a = 
+let chk1 fop lop a =
   let x = fop a in
   let y = op1 lop a in
   chk_float x y
-  
-let chk2 fop lop a b = 
+
+let chk2 fop lop a b =
   let x = fop a b in
   let y = op2 lop a b in
   chk_float x y
 
-let test_op2 _ = 
-  let assert_chk2 n f l = 
-    List.iter (fun a -> List.iter (fun b -> assert_bool n @@ chk2 f l a b) flts) flts 
+let test_op2 _ =
+  let assert_chk2 n f l =
+    List.iter (fun a -> List.iter (fun b -> assert_bool n @@ chk2 f l a b) flts) flts
   in
   assert_chk2 "add" (+.) LDouble.add;
   assert_chk2 "sub" (-.) LDouble.sub;
@@ -55,8 +55,8 @@ let test_op2 _ =
   (*assert_chk2 "rem" ??? LDouble.rem;*)
   assert_chk2 "copysign" copysign LDouble.copysign
 
-let test_op1 _ = 
-  let assert_chk1 n f l = 
+let test_op1 _ =
+  let assert_chk1 n f l =
     List.iter (fun a -> assert_bool n @@ chk1 f l a) flts
   in
   assert_chk1 "neg" (fun x -> -. x) LDouble.neg;
@@ -81,20 +81,20 @@ let test_op1 _ =
   assert_chk1 "ceil" ceil LDouble.ceil;
   assert_chk1 "floor" floor LDouble.floor
 
-let test_opw _ = 
-  let chk_frexp a = 
+let test_opw _ =
+  let chk_frexp a =
     let x, i = frexp a in
     let y, j = LDouble.(frexp (of_float a)) in
     let y = LDouble.to_float y in
     assert_bool "frexp" (chk_float x y && i=j)
   in
-  let chk_modf a = 
+  let chk_modf a =
     let w,x = modf a in
     let y,z = LDouble.(modf (of_float a)) in
     let y,z = LDouble.(to_float y, to_float z) in
     assert_bool "modf" (chk_float w y && chk_float x z)
   in
-  let chk_ldexp a b = 
+  let chk_ldexp a b =
     let x = ldexp a b in
     let y = LDouble.(to_float (ldexp (of_float a) b)) in
     assert_bool "ldexp" (chk_float x y)
@@ -104,7 +104,7 @@ let test_opw _ =
   (if not Sys.win32 then List.iter chk_modf flts);
   List.iter (fun a -> List.iter (fun b -> chk_ldexp a b) [2;5;8]) flts
 
-let test_classify _ = 
+let test_classify _ =
   assert_bool "min" LDouble.(classify min_float = FP_normal);
   assert_bool "max" LDouble.(classify max_float = FP_normal);
   assert_bool "epsilon" LDouble.(classify max_float = FP_normal);
@@ -112,7 +112,7 @@ let test_classify _ =
   assert_bool "inf" LDouble.(classify infinity = FP_infinite);
   assert_bool "-inf" LDouble.(classify neg_infinity = FP_infinite)
 
-let test_conv _ = 
+let test_conv _ =
   List.iter (fun a -> assert_bool "to/of_float" (a = LDouble.(to_float (of_float a)))) flts;
   assert_bool "to_int" (3 = LDouble.(to_int (of_float 3.45)));
   assert_bool "to_int" (-34 = LDouble.(to_int (of_float (-34.999))));
@@ -144,9 +144,9 @@ let test_conv _ =
   assert_bool "of_string" (3.5 = LDouble.(to_float (of_string "3.5")));
   assert_bool "to_string" ("3.500000" = LDouble.(to_string (of_float 3.5)))
 
-let test_complex _ = 
+let test_complex _ =
   let module C = Complex in
-  let cplx = 
+  let cplx =
     [
       { C.re = 2.9;    im = 4.26 };
       { C.re = 0.32;   im = -7.6 };
@@ -155,29 +155,39 @@ let test_complex _ =
     ]
   in
   let chk_complex ?(prec=1e-12) x y = C.norm (C.sub x y) < prec in
-  let assert_chk2 ?prec name opc opl = 
-    List.iter (fun a -> List.iter (fun b -> 
+  let assert_chk2 ?prec name opc opl =
+    List.iter (fun a -> List.iter (fun b ->
       let open ComplexL in
       assert_bool name (chk_complex ?prec (opc a b) (to_complex (opl (of_complex a) (of_complex b))))
     ) cplx) cplx
   in
-  let assert_chk1 ?prec name opc opl = 
-    List.iter (fun a -> 
+  let assert_chk1 ?prec name opc opl =
+    List.iter (fun a ->
       let open ComplexL in
       assert_bool name (chk_complex ?prec (opc a) (to_complex (opl (of_complex a))))
     ) cplx
   in
-  let assert_chkf ?prec name opc opl = 
-    List.iter (fun a -> 
+  let assert_chkf ?prec name opc opl =
+    List.iter (fun a ->
       let open ComplexL in
       assert_bool name (chk_float (opc a) (LDouble.to_float (opl (of_complex a))))
     ) cplx
   in
-  let assert_polar () = 
+  let assert_polar () =
     let open ComplexL in
-    assert_bool "polar" 
-      (chk_complex (C.polar 3.4 1.2) 
+    assert_bool "polar"
+      (chk_complex (C.polar 3.4 1.2)
          (to_complex (polar (LDouble.of_float 3.4) (LDouble.of_float 1.2))))
+  in
+  let assert_division () =
+    (* test polyfill for missing Microsoft complex division function *)
+    let b = C.polar 3.4 1.2 in
+    let b_inv = C.pow b { C.re = -1.0; im = 0.0 } in
+    List.iter (fun a ->
+      let open ComplexL in
+      assert_bool "division"
+        (chk_complex ~prec:1e-3 (C.div a b) (C.mul a b_inv))
+    ) cplx
   in
 
   assert_chk2 "add" C.add ComplexL.add;
@@ -195,23 +205,24 @@ let test_complex _ =
   assert_chkf "norm2" C.norm2 ComplexL.norm2;
   assert_chkf "norm" C.norm ComplexL.norm;
   assert_chkf "arg" C.arg ComplexL.arg;
-  assert_polar ()
+  assert_polar ();
+  assert_division ()
 
-let test_marshal _ = 
+let test_marshal _ =
   let same_repr x y =
     let open Obj in
     let x = magic x in
     let y = magic y in
     is_block x && is_block y && size x = size y && tag x = tag y
   in
-  let assert_ldouble x = 
+  let assert_ldouble x =
     let (_,xc,_) as x = "foo", LDouble.of_float x, 1 in
     let s = Marshal.to_string x [] in
     let ((_,yc,_) : string * LDouble.t * int) as y = Marshal.from_string s 0 in
     assert_bool "marshal ldouble" (x=y);
     assert_bool "marshal ldouble repr" (same_repr xc yc)
   in
-  let assert_complex x = 
+  let assert_complex x =
     let (_,xc,_) as x = "f00", ComplexL.of_complex x, 1 in
     let s = Marshal.to_string x [] in
     let ((_,yc,_) : string * ComplexL.t * int) as y = Marshal.from_string s 0 in
@@ -223,7 +234,7 @@ let test_marshal _ =
   assert_complex { Complex.re = 11.23; im = -46.7764 };
   assert_complex { Complex.re = 0.00037; im = 881.222314 }
 
-let test_comparisons _ = 
+let test_comparisons _ =
   let open LDouble in
   begin (* < *)
     assert_equal false (neg_infinity < nan);
@@ -268,7 +279,7 @@ let test_int_conversions _ =
 			    (LDouble.of_int min_int))
       ~printer:string_of_int;
   end
-    
+
 
 let suite = "LDouble tests" >:::
   [

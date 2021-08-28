@@ -8,6 +8,7 @@
 #ifndef CTYPES_COMPLEX_COMPATIBILITY_H
 #define CTYPES_COMPLEX_COMPATIBILITY_H
 
+#include "ctypes_complex_types.h"
 #include <caml/fail.h>
 
 /* "Each complex type has the same representation and alignment
@@ -18,17 +19,17 @@
                                                        - C99 6.2.5 (13)
 */
 union ctypes_complex_long_double_union {
-  long double _Complex z;
+  longdoublecomplex_t z;
   long double parts[2];
 };
 
 union ctypes_complex_double_union {
-  double _Complex z;
+  doublecomplex_t z;
   double parts[2];
 };
 
 union ctypes_complex_float_union {
-  float _Complex z;
+  floatcomplex_t z;
   float parts[2];
 };
 
@@ -37,48 +38,48 @@ union ctypes_complex_float_union {
 
 #include <math.h>
 
-static inline long double ctypes_compat_creall(long double _Complex z)
+static inline long double ctypes_compat_creall(longdoublecomplex_t z)
 { union ctypes_complex_long_double_union u; u.z = z; return u.parts[0]; }
 
-static inline long double ctypes_compat_cimagl(long double _Complex z)
+static inline long double ctypes_compat_cimagl(longdoublecomplex_t z)
 { union ctypes_complex_long_double_union u; u.z = z; return u.parts[1]; }
 
-static inline long double _Complex ctypes_compat_conjl(long double _Complex z)
+static inline longdoublecomplex_t ctypes_compat_conjl(longdoublecomplex_t z)
 { union ctypes_complex_long_double_union u; u.z = z; u.parts[1] = -u.parts[1]; return u.z; }
 
-static inline long double ctypes_compat_cargl(long double _Complex z)
+static inline long double ctypes_compat_cargl(longdoublecomplex_t z)
 { return atan2(ctypes_compat_cimagl(z), ctypes_compat_creall(z)); }
 
-static inline double ctypes_compat_creal(double _Complex z)
+static inline double ctypes_compat_creal(doublecomplex_t z)
 { union ctypes_complex_double_union u; u.z = z; return u.parts[0]; }
 
-static inline double ctypes_compat_cimag(double _Complex z)
+static inline double ctypes_compat_cimag(doublecomplex_t z)
 { union ctypes_complex_double_union u; u.z = z; return u.parts[1]; }
 
-static inline double _Complex ctypes_compat_conj(double _Complex z)
+static inline doublecomplex_t ctypes_compat_conj(doublecomplex_t z)
 { union ctypes_complex_double_union u; u.z = z; u.parts[1] = -u.parts[1]; return u.z; }
 
-static inline float ctypes_compat_crealf(float _Complex z)
+static inline float ctypes_compat_crealf(floatcomplex_t z)
 { union ctypes_complex_float_union u; u.z = z; return u.parts[0]; }
 
-static inline float ctypes_compat_cimagf(float _Complex z)
+static inline float ctypes_compat_cimagf(floatcomplex_t z)
 { union ctypes_complex_float_union u; u.z = z; return u.parts[1]; }
 
-static inline float _Complex ctypes_compat_conjf(float _Complex z)
+static inline floatcomplex_t ctypes_compat_conjf(floatcomplex_t z)
 { union ctypes_complex_float_union u; u.z = z; u.parts[1] = -u.parts[1]; return u.z; }
 
 /* Android: As of API level 24, these functions do not exist. */
 
-static inline long double _Complex ctypes_compat_csqrtl(long double _Complex z)
+static inline longdoublecomplex_t ctypes_compat_csqrtl(longdoublecomplex_t z)
 { caml_failwith("ctypes: csqrtl does not exist on current platform"); }
 
-static inline long double _Complex ctypes_compat_cexpl(long double _Complex z)
+static inline longdoublecomplex_t ctypes_compat_cexpl(longdoublecomplex_t z)
 { caml_failwith("ctypes: cexpl does not exist on current platform"); }
 
-static inline long double _Complex ctypes_compat_clogl(long double _Complex z)
+static inline longdoublecomplex_t ctypes_compat_clogl(longdoublecomplex_t z)
 { caml_failwith("ctypes: clogl does not exist on current platform"); }
 
-static inline long double _Complex ctypes_compat_cpowl(long double _Complex x, long double _Complex z)
+static inline longdoublecomplex_t ctypes_compat_cpowl(longdoublecomplex_t x, longdoublecomplex_t z)
 { caml_failwith("ctypes: cpowl does not exist on current platform"); }
 
 
@@ -86,65 +87,92 @@ static inline long double _Complex ctypes_compat_cpowl(long double _Complex x, l
 
 #include <complex.h>
 
-static inline long double ctypes_compat_creall(long double _Complex z)
+static inline long double ctypes_compat_creall(longdoublecomplex_t z)
 { return creall(z); }
-static inline long double ctypes_compat_cimagl(long double _Complex z)
+static inline long double ctypes_compat_cimagl(longdoublecomplex_t z)
 { return cimagl(z); }
-static inline long double _Complex ctypes_compat_conjl(long double _Complex z)
+static inline longdoublecomplex_t ctypes_compat_conjl(longdoublecomplex_t z)
 { return conjl(z); }
 
 #if defined(__FreeBSD__)
-static inline long double _Complex ctypes_compat_cexpl(long double _Complex z)
+static inline longdoublecomplex_t ctypes_compat_cexpl(longdoublecomplex_t z)
 { caml_failwith("ctypes: cexpl does not exist on current platform"); }
 #else
-static inline long double _Complex ctypes_compat_cexpl(long double _Complex z)
+static inline longdoublecomplex_t ctypes_compat_cexpl(longdoublecomplex_t z)
 { return cexpl(z); }
 #endif
-static inline long double _Complex ctypes_compat_clogl(long double _Complex z)
+static inline longdoublecomplex_t ctypes_compat_clogl(longdoublecomplex_t z)
 { return clogl(z); }
-static inline long double _Complex ctypes_compat_cpowl(long double _Complex x, long double _Complex z)
+static inline longdoublecomplex_t ctypes_compat_cpowl(longdoublecomplex_t x, longdoublecomplex_t z)
 { return cpowl(x, z); }
 
-static inline long double _Complex ctypes_compat_csqrtl(long double _Complex z)
+static inline longdoublecomplex_t ctypes_compat_csqrtl(longdoublecomplex_t z)
 { return csqrtl(z); }
-static inline long double ctypes_compat_cargl(long double _Complex z)
+static inline long double ctypes_compat_cargl(longdoublecomplex_t z)
 { return cargl(z); }
 
-static inline double ctypes_compat_creal(double _Complex z)
+static inline double ctypes_compat_creal(doublecomplex_t z)
 { return creal(z); }
-static inline double ctypes_compat_cimag(double _Complex z)
+static inline double ctypes_compat_cimag(doublecomplex_t z)
 { return cimag(z); }
-static inline double _Complex ctypes_compat_conj(double _Complex z)
+static inline doublecomplex_t ctypes_compat_conj(doublecomplex_t z)
 { return conj(z); }
 
-static inline float ctypes_compat_crealf(float _Complex z)
+static inline float ctypes_compat_crealf(floatcomplex_t z)
 { return crealf(z); }
-static inline float ctypes_compat_cimagf(float _Complex z)
+static inline float ctypes_compat_cimagf(floatcomplex_t z)
 { return cimagf(z); }
-static inline float _Complex ctypes_compat_conjf(float _Complex z)
+static inline floatcomplex_t ctypes_compat_conjf(floatcomplex_t z)
 { return conjf(z); }
 
 #if !defined(CMPLXF) || !defined(CMPLX) || !defined(CMPLXL)
 #define CTYPES_USE_STRUCT_BUILDER 1
 #else
-static inline double _Complex ctypes_compat_make_complex(double re, double im)
+static inline doublecomplex_t ctypes_compat_make_complex(double re, double im)
 { return (CMPLX(re,im)); }
-static inline long double _Complex ctypes_compat_make_complexl(long double re, long double im)
+static inline longdoublecomplex_t ctypes_compat_make_complexl(long double re, long double im)
 { return (CMPLXL(re,im)); }
-static inline float _Complex ctypes_compat_make_complexf(float re, float im)
+static inline floatcomplex_t ctypes_compat_make_complexf(float re, float im)
 { return (CMPLXF(re,im)); }
 #endif
 
 #endif
 
 #ifdef CTYPES_USE_STRUCT_BUILDER
-static inline double _Complex ctypes_compat_make_complex(double re, double im)
+static inline doublecomplex_t ctypes_compat_make_complex(double re, double im)
 { union ctypes_complex_double_union u; u.parts[0] = re; u.parts[1] = im; return u.z; }
-static inline float _Complex ctypes_compat_make_complexf(float re, float im)
+static inline floatcomplex_t ctypes_compat_make_complexf(float re, float im)
 { union ctypes_complex_float_union u; u.parts[0] = re; u.parts[1] = im; return u.z; }
-static inline long double _Complex ctypes_compat_make_complexl(long double re, long double im)
+static inline longdoublecomplex_t ctypes_compat_make_complexl(long double re, long double im)
 { union ctypes_complex_long_double_union u; u.parts[0] = re; u.parts[1] = im; return u.z; }
 #undef CTYPES_USE_STRUCT_BUILDER
 #endif
+
+// Primitive arithmetic
+#ifdef _MSC_VER
+#define CCC_PRIM_OP(OPNAME, TYP, UNION, OP)                                           \
+  static inline TYP ctypes_compat_ ## OPNAME(TYP a, TYP b) {                          \
+    union ctypes_complex_ ## UNION u;                                                 \
+    union ctypes_complex_ ## UNION ua; union ctypes_complex_ ## UNION ub;             \
+    ua.z = a; ub.z = b;                                                               \
+    u.parts[0] = ua.parts[0] OP ub.parts[0]; u.parts[1] = ua.parts[1] OP ub.parts[1]; \
+    return u.z; }
+#else
+#define CCC_PRIM_OP(OPNAME, TYP, UNION, OP)                                   \
+  static inline TYP ctypes_compat_ ## OPNAME(TYP a, TYP b) { return a OP b; }
+#endif
+CCC_PRIM_OP(cadd, doublecomplex_t, double_union, +)
+CCC_PRIM_OP(csub, doublecomplex_t, double_union, -)
+CCC_PRIM_OP(cmul, doublecomplex_t, double_union, *)
+CCC_PRIM_OP(cdiv, doublecomplex_t, double_union, /)
+CCC_PRIM_OP(caddf, floatcomplex_t, float_union, +)
+CCC_PRIM_OP(csubf, floatcomplex_t, float_union, -)
+CCC_PRIM_OP(cmulf, floatcomplex_t, float_union, *)
+CCC_PRIM_OP(cdivf, floatcomplex_t, float_union, /)
+CCC_PRIM_OP(caddl, longdoublecomplex_t, long_double_union, +)
+CCC_PRIM_OP(csubl, longdoublecomplex_t, long_double_union, -)
+CCC_PRIM_OP(cmull, longdoublecomplex_t, long_double_union, *)
+CCC_PRIM_OP(cdivl, longdoublecomplex_t, long_double_union, /)
+#undef CCC_PRIM_OP
 
 #endif /* CTYPES_COMPLEX_COMPATIBILITY_H */

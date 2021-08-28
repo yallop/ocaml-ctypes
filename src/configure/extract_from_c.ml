@@ -16,7 +16,8 @@ let read_output program =
   let channel = open_out input_filename in
   output_string channel program;
   close_out channel;
-  let output_filename = (Filename.chop_suffix input_filename ".c") ^ ".o" in
+  let obj_ext = if Sys.win32 then ".obj" else ".o" in
+  let output_filename = (Filename.chop_suffix input_filename ".c") ^ obj_ext in
   let cwd = Sys.getcwd () in
   let cmd =
     Printf.sprintf "%s ocamlc -verbose %s %s -c 1>&2"
@@ -56,10 +57,23 @@ let headers = "\
 #define __USE_MINGW_ANSI_STDIO 1
 #include <stdio.h> /* see: https://sourceforge.net/p/mingw-w64/bugs/627/ */
 #endif
+#ifdef _MSC_VER
+#include <complex.h> /* see https://docs.microsoft.com/en-us/cpp/c-runtime-library/complex-math-support?view=msvc-160 */
+#endif
 #include <stdint.h>
 #include <stdbool.h>
 #include <inttypes.h>
 #include <caml/mlvalues.h>
+
+#ifdef _MSC_VER
+typedef _Lcomplex            longdoublecomplex_t;
+typedef _Dcomplex            doublecomplex_t;
+typedef _Fcomplex            floatcomplex_t;
+#else
+typedef long double _Complex longdoublecomplex_t;
+typedef double _Complex      doublecomplex_t;
+typedef float _Complex       floatcomplex_t;
+#endif
 "
 
 let integer ?(extra_headers="") expression =

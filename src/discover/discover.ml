@@ -118,6 +118,21 @@ let test_code opt lib stub_code caml_code =
       unwind_protect (fun () ->
           output_string stubfd stub_code;
           output_string camlfd caml_code;
+          (*
+            Microsoft cl.exe compiler will give:
+              c1: fatal error C1083: Cannot open source file: 'C:/Users/you/AppData/Local/Temp/ctypes_libffi5c9ac8.c': Permission denied
+            if we give it a file to compile that is still opened for writing.
+              
+            Windows and perhaps other OS-es don't by default let you
+            read from a file while it is being written (if it was opened
+            for writing). Simplest and most future proof technique is to
+            close the file as soon as it is written, and for safety close
+            it a second time during cleanup. `close_out` doc says that
+            "close_out and flush [...] do nothing when applied to an already
+            closed channel". 
+            *)
+          close_out camlfd;
+          close_out stubfd;
           Commands.command_succeeds
             "%s -custom %s %s %s %s 1>&2"
             !ocamlc

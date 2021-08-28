@@ -75,6 +75,9 @@ static inline long double ldouble_custom_val(value v) {
 // initialized in ldouble_init
 static long double nan_;
 
+// Microsoft defines its own long double norm(_Lcomplex) in <complex.h>;
+// we can't redefine it.
+#ifndef _MSC_VER
 static long double norm(long double x) {
   switch (fpclassify(x)){
   case FP_ZERO      : return 0.0L; // if -0 force to +0.
@@ -82,6 +85,7 @@ static long double norm(long double x) {
   default           : return x;
   }
 }
+#endif
 
 static int ldouble_cmp(long double u1, long double u2) {
   if (u1 < u2) return -1;
@@ -107,7 +111,11 @@ static uint32_t ldouble_mix_hash(uint32_t hash, long double d) {
     long double d;
     uint32_t a[(LDOUBLE_STORAGE_BYTES+3)/4];
   } u;
+#ifdef _MSC_VER
+  u.d = norml(_LCOMPLEX_(d, 0.0L));
+#else
   u.d = norm(d);
+#endif
 
   if (LDOUBLE_VALUE_BYTES == 16) {
     // ieee quad or __ibm128
@@ -154,7 +162,11 @@ static void ldouble_serialize_data(long double *q) {
 }
 
 static void ldouble_serialize(value v, uintnat *wsize_32, uintnat *wsize_64) {
+#ifdef _MSC_VER
+  long double p = norml(_LCOMPLEX_(ldouble_custom_val(v), 0.0L));
+#else
   long double p = norm(ldouble_custom_val(v));
+#endif
   caml_serialize_int_1(LDBL_MANT_DIG);
   ldouble_serialize_data(&p);
   *wsize_32 = *wsize_64 = sizeof(long double);
@@ -440,29 +452,29 @@ value ctypes_ldouble_size(value unit) {
 
 /*********************** complex *************************/
 
-static inline long double _Complex ldouble_complex_custom_val(value v)
+static inline longdoublecomplex_t ldouble_complex_custom_val(value v)
 {
-  long double _Complex r;
+  longdoublecomplex_t r;
   memcpy(&r, Data_custom_val(v), sizeof(r));
   return r;
 }
 
 static int ldouble_complex_cmp_val(value v1, value v2)
 {
-  long double _Complex u1 = ldouble_complex_custom_val(v1);
-  long double _Complex u2 = ldouble_complex_custom_val(v2);
+  longdoublecomplex_t u1 = ldouble_complex_custom_val(v1);
+  longdoublecomplex_t u2 = ldouble_complex_custom_val(v2);
   int cmp_real = ldouble_cmp(ctypes_compat_creall(u1), ctypes_compat_creall(u2));
   return cmp_real == 0 ? ldouble_cmp(ctypes_compat_cimagl(u1), ctypes_compat_cimagl(u2)) : cmp_real;
 }
 
 static intnat ldouble_complex_hash(value v) {
-  long double _Complex c = ldouble_complex_custom_val(v);
+  longdoublecomplex_t c = ldouble_complex_custom_val(v);
   return ldouble_mix_hash(ldouble_mix_hash(0, ctypes_compat_creall(c)), ctypes_compat_cimagl(c));
 }
 
 static void ldouble_complex_serialize(value v, uintnat *wsize_32, uintnat *wsize_64) {
   long double re,im;
-  long double _Complex c;
+  longdoublecomplex_t c;
   void * p = Data_custom_val(v);
 #if defined(__GNUC__) && __GNUC__  == 6 && __GNUC_MINOR__ == 4
   /* workaround gcc bug. gcc tries to inline the memcpy calls, but
@@ -480,19 +492,19 @@ static void ldouble_complex_serialize(value v, uintnat *wsize_32, uintnat *wsize
   ldouble_serialize_data(&re);
   im = ctypes_compat_cimagl(c);
   ldouble_serialize_data(&im);
-  *wsize_32 = *wsize_64 = sizeof(long double _Complex);
+  *wsize_32 = *wsize_64 = sizeof(longdoublecomplex_t);
 }
 
 static uintnat ldouble_complex_deserialize(void *d) {
   long double re, im;
-  long double _Complex c;
+  longdoublecomplex_t c;
   if (caml_deserialize_uint_1() != LDBL_MANT_DIG)
     caml_deserialize_error("invalid long double size");
   ldouble_deserialize_data(&re);
   ldouble_deserialize_data(&im);
   c = ctypes_compat_make_complexl(re, im);
   memcpy(d, &c, sizeof(c));
-  return (sizeof(long double _Complex));
+  return (sizeof(longdoublecomplex_t));
 }
 
 static struct custom_operations caml_ldouble_complex_ops = {
@@ -505,14 +517,14 @@ static struct custom_operations caml_ldouble_complex_ops = {
   custom_compare_ext_default
 };
 
-value ctypes_copy_ldouble_complex(long double _Complex u)
+value ctypes_copy_ldouble_complex(longdoublecomplex_t u)
 {
-  value res = caml_alloc_custom(&caml_ldouble_complex_ops, sizeof(long double _Complex), 0, 1);
+  value res = caml_alloc_custom(&caml_ldouble_complex_ops, sizeof(longdoublecomplex_t), 0, 1);
   memcpy(Data_custom_val(res), &u, sizeof(u));
   return res;
 }
 
-long double _Complex ctypes_ldouble_complex_val(value v) {
+longdoublecomplex_t ctypes_ldouble_complex_val(value v) {
   return ldouble_complex_custom_val(v);
 }
 
@@ -536,6 +548,43 @@ CAMLprim value ctypes_ldouble_complex_imag(value v) {
   CAMLreturn(ctypes_copy_ldouble(ctypes_compat_cimagl(ldouble_complex_custom_val(v))));
 }
 
+#ifdef _MSC_VER
+
+#define OP2COMPONENT(OPNAME, OP)                                                        \
+  CAMLprim value ctypes_ldouble_complex_ ## OPNAME(value a, value b) {                  \
+    CAMLparam2(a, b);                                                                   \
+    CAMLreturn(ctypes_copy_ldouble_complex(_LCbuild(                                    \
+        creall(ldouble_complex_custom_val(a)) OP creall(ldouble_complex_custom_val(b)), \
+        cimagl(ldouble_complex_custom_val(a)) OP cimagl(ldouble_complex_custom_val(b))  \
+    )));                                                                                \
+  }
+
+#define OP2FUNC(OPNAME, FUNC)                                                  \
+  CAMLprim value ctypes_ldouble_complex_ ## OPNAME(value a, value b) {         \
+    CAMLparam2(a, b);                                                          \
+    CAMLreturn(ctypes_copy_ldouble_complex(                                    \
+        FUNC(ldouble_complex_custom_val(a), ldouble_complex_custom_val(b)) )); \
+  }
+
+OP2COMPONENT(add, +)
+OP2COMPONENT(sub, -)
+OP2FUNC(mul, _LCmulcc)
+
+// Microsoft has no complex division function in C although they do have one in C++.
+// We could use logarithms, subtraction and exponentation in a few lines of code, but
+// best to be conservative.
+CAMLprim value ctypes_ldouble_complex_div(value a, value b) {
+  caml_failwith("ctypes: ctypes_ldouble_complex_div does not exist on current platform");
+}
+
+CAMLprim value ctypes_ldouble_complex_neg(value a) {
+  CAMLparam1(a);
+  longdoublecomplex_t ac = ldouble_complex_custom_val(a);
+  CAMLreturn(ctypes_copy_ldouble_complex(_LCbuild(- creall(ac), - cimagl(ac))));
+}
+
+#else
+
 #define OP2(OPNAME, OP)                                                    \
   CAMLprim value ctypes_ldouble_complex_ ## OPNAME(value a, value b) {     \
     CAMLparam2(a, b);                                                      \
@@ -552,6 +601,8 @@ CAMLprim value ctypes_ldouble_complex_neg(value a) {
   CAMLparam1(a);
   CAMLreturn(ctypes_copy_ldouble_complex( - ldouble_complex_custom_val(a) ));
 }
+
+#endif
 
 #define FN1(OP)                                                                   \
   CAMLprim value ctypes_ldouble_complex_ ## OP (value a) {                        \
