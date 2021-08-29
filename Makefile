@@ -48,7 +48,11 @@ CCOMP_TYPE:=$(shell $(OCAMLFIND) ocamlc -config | awk '/^ccomp_type:/{print $$2}
 ifneq (,$(filter mingw%,$(OSYSTEM)))
 OS_ALT_SUFFIX=.win
 else
+ifeq ($(CCOMP_TYPE),msvc)
+OS_ALT_SUFFIX=.win
+else
 OS_ALT_SUFFIX=.unix
+endif
 endif
 
 ifeq ($(CCOMP_TYPE),msvc)

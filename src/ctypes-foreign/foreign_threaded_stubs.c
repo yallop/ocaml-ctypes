@@ -51,8 +51,13 @@ ctypes_tls_callback(void* a, DWORD reason, PVOID b)
   }
 }
 
+#ifdef _MSC_VER
+#pragma const_seg(".CRT$XLB") EXTERN_C const PIMAGE_TLS_CALLBACK \
+  __crt_ctypes_tls_callback__ = ctypes_tls_callback;
+#else
 PIMAGE_TLS_CALLBACK __crt_ctypes_tls_callback__ __attribute__ \
  ((section(".CRT$XLB"))) = ctypes_tls_callback;
+#endif
 
 static int ctypes_thread_actually_register(void)
 {
