@@ -76,16 +76,14 @@ static inline long double ldouble_custom_val(value v) {
 static long double nan_;
 
 // Microsoft defines its own long double norm(_Lcomplex) in <complex.h>;
-// we can't redefine it.
-#ifndef _MSC_VER
-static long double norm(long double x) {
+// we can't redefine it. We'll call it ldouble_norm.
+static long double ldouble_norm(long double x) {
   switch (fpclassify(x)){
   case FP_ZERO      : return 0.0L; // if -0 force to +0.
   case FP_NAN       : return nan_;  // cannonical nan
   default           : return x;
   }
 }
-#endif
 
 static int ldouble_cmp(long double u1, long double u2) {
   if (u1 < u2) return -1;
@@ -111,11 +109,7 @@ static uint32_t ldouble_mix_hash(uint32_t hash, long double d) {
     long double d;
     uint32_t a[(LDOUBLE_STORAGE_BYTES+3)/4];
   } u;
-#ifdef _MSC_VER
-  u.d = norml(_LCOMPLEX_(d, 0.0L));
-#else
-  u.d = norm(d);
-#endif
+  u.d = ldouble_norm(d);
 
   if (LDOUBLE_VALUE_BYTES == 16) {
     // ieee quad or __ibm128
@@ -162,11 +156,7 @@ static void ldouble_serialize_data(long double *q) {
 }
 
 static void ldouble_serialize(value v, uintnat *wsize_32, uintnat *wsize_64) {
-#ifdef _MSC_VER
-  long double p = norml(_LCOMPLEX_(ldouble_custom_val(v), 0.0L));
-#else
-  long double p = norm(ldouble_custom_val(v));
-#endif
+  long double p = ldouble_norm(ldouble_custom_val(v));
   caml_serialize_int_1(LDBL_MANT_DIG);
   ldouble_serialize_data(&p);
   *wsize_32 = *wsize_64 = sizeof(long double);

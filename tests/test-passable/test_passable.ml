@@ -95,15 +95,15 @@ let test_complex_value_passability _ =
   ignore (complexld @-> returning void);
 
   assert_raises ~msg:"Foreign rejects complex32 type as argument"
-    (Unsupported "libffi does not support passing float _Complex")
+    (Unsupported "libffi does not support passing floatcomplex_t")
     (fun () -> Foreign.funptr (complex32 @-> returning void));
 
   assert_raises ~msg:"Foreign rejects complex64 type as argument"
-    (Unsupported "libffi does not support passing double _Complex")
+    (Unsupported "libffi does not support passing doublecomplex_t")
     (fun () -> Foreign.funptr (complex64 @-> returning void));
   
   assert_raises ~msg:"Foreign rejects complexld type as argument"
-    (Unsupported "libffi does not support passing long double _Complex")
+    (Unsupported "libffi does not support passing longdoublecomplex_t")
     (fun () -> Foreign.funptr (complexld @-> returning void));
   
   (* complex32 can be used as a return type *)
@@ -116,15 +116,15 @@ let test_complex_value_passability _ =
   ignore (void @-> returning complexld);
 
   assert_raises ~msg:"Foreign rejects complex32 type as return type"
-    (Unsupported "libffi does not support passing float _Complex")
+    (Unsupported "libffi does not support passing floatcomplex_t")
     (fun () -> Foreign.funptr (void @-> returning complex32));
 
   assert_raises ~msg:"Foreign rejects complex64 type as return type"
-    (Unsupported "libffi does not support passing double _Complex")
+    (Unsupported "libffi does not support passing doublecomplex_t")
     (fun () -> Foreign.funptr (void @-> returning complex64));
 
   assert_raises ~msg:"Foreign rejects complexld type as return type"
-    (Unsupported "libffi does not support passing long double _Complex")
+    (Unsupported "libffi does not support passing longdoublecomplex_t")
     (fun () -> Foreign.funptr (void @-> returning complexld))
 
 
