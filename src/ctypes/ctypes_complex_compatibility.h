@@ -150,29 +150,38 @@ static inline longdoublecomplex_t ctypes_compat_make_complexl(long double re, lo
 
 // Primitive arithmetic
 #ifdef _MSC_VER
-#define CCC_PRIM_OP(OPNAME, TYP, UNION, OP)                                           \
+# define CCC_PRIM_COMPONENT_OP(OPNAME, TYP, UNION, OP)                                 \
   static inline TYP ctypes_compat_ ## OPNAME(TYP a, TYP b) {                          \
     union ctypes_complex_ ## UNION u;                                                 \
     union ctypes_complex_ ## UNION ua; union ctypes_complex_ ## UNION ub;             \
     ua.z = a; ub.z = b;                                                               \
     u.parts[0] = ua.parts[0] OP ub.parts[0]; u.parts[1] = ua.parts[1] OP ub.parts[1]; \
     return u.z; }
+# define CCC_PRIM_MUL_OP(OPNAME, TYP, MSVCOP)                                          \
+  static inline TYP ctypes_compat_ ## OPNAME(TYP a, TYP b) { return MSVCOP(a, b); }
+# define CCC_PRIM_DIV_OP(OPNAME, TYP)                                                  \
+  static inline TYP ctypes_compat_ ## OPNAME(TYP a, TYP b)                             \
+  { caml_failwith("ctypes: OPNAME does not exist on current platform"); }
 #else
-#define CCC_PRIM_OP(OPNAME, TYP, UNION, OP)                                   \
+# define CCC_PRIM_COMPONENT_OP(OPNAME, TYP, UNION, OP)                                 \
   static inline TYP ctypes_compat_ ## OPNAME(TYP a, TYP b) { return a OP b; }
+# define CCC_PRIM_MUL_OP(OPNAME, TYP, MSVCOP)                                          \
+  static inline TYP ctypes_compat_ ## OPNAME(TYP a, TYP b) { return a * b; }
+# define CCC_PRIM_DIV_OP(OPNAME, TYP)                                                  \
+  static inline TYP ctypes_compat_ ## OPNAME(TYP a, TYP b) { return a / b; }
 #endif
-CCC_PRIM_OP(cadd, doublecomplex_t, double_union, +)
-CCC_PRIM_OP(csub, doublecomplex_t, double_union, -)
-CCC_PRIM_OP(cmul, doublecomplex_t, double_union, *)
-CCC_PRIM_OP(cdiv, doublecomplex_t, double_union, /)
-CCC_PRIM_OP(caddf, floatcomplex_t, float_union, +)
-CCC_PRIM_OP(csubf, floatcomplex_t, float_union, -)
-CCC_PRIM_OP(cmulf, floatcomplex_t, float_union, *)
-CCC_PRIM_OP(cdivf, floatcomplex_t, float_union, /)
-CCC_PRIM_OP(caddl, longdoublecomplex_t, long_double_union, +)
-CCC_PRIM_OP(csubl, longdoublecomplex_t, long_double_union, -)
-CCC_PRIM_OP(cmull, longdoublecomplex_t, long_double_union, *)
-CCC_PRIM_OP(cdivl, longdoublecomplex_t, long_double_union, /)
+CCC_PRIM_COMPONENT_OP(cadd, doublecomplex_t, double_union, +)
+CCC_PRIM_COMPONENT_OP(csub, doublecomplex_t, double_union, -)
+CCC_PRIM_MUL_OP(cmul, doublecomplex_t, _Cmulcc)
+CCC_PRIM_DIV_OP(cdiv, doublecomplex_t)
+CCC_PRIM_COMPONENT_OP(caddf, floatcomplex_t, float_union, +)
+CCC_PRIM_COMPONENT_OP(csubf, floatcomplex_t, float_union, -)
+CCC_PRIM_MUL_OP(cmulf, floatcomplex_t, _FCmulcc)
+CCC_PRIM_DIV_OP(cdivf, floatcomplex_t)
+CCC_PRIM_COMPONENT_OP(caddl, longdoublecomplex_t, long_double_union, +)
+CCC_PRIM_COMPONENT_OP(csubl, longdoublecomplex_t, long_double_union, -)
+CCC_PRIM_MUL_OP(cmull, longdoublecomplex_t, _LCmulcc)
+CCC_PRIM_DIV_OP(cdivl, longdoublecomplex_t)
 #undef CCC_PRIM_OP
 
 #endif /* CTYPES_COMPLEX_COMPATIBILITY_H */

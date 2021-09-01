@@ -180,7 +180,6 @@ let test_complex _ =
          (to_complex (polar (LDouble.of_float 3.4) (LDouble.of_float 1.2))))
   in
   let assert_division () =
-    (* test polyfill for missing Microsoft complex division function *)
     let b = C.polar 3.4 1.2 in
     let b_inv = C.pow b { C.re = -1.0; im = 0.0 } in
     List.iter (fun a ->
@@ -193,7 +192,9 @@ let test_complex _ =
   assert_chk2 "add" C.add ComplexL.add;
   assert_chk2 "sub" C.sub ComplexL.sub;
   assert_chk2 "mul" C.mul ComplexL.mul;
-  assert_chk2 "div" C.div ComplexL.div;
+  if not Sys.win32 then
+    (* complex division not supported by MSVC C runtime *)
+    assert_chk2 "div" C.div ComplexL.div;
   (* fairly large errors accrue here, so reduce precision *)
   assert_chk2 "pow" ~prec:1e-3 C.pow ComplexL.pow;
   assert_chk1 "neg" C.neg ComplexL.neg;
@@ -206,7 +207,9 @@ let test_complex _ =
   assert_chkf "norm" C.norm ComplexL.norm;
   assert_chkf "arg" C.arg ComplexL.arg;
   assert_polar ();
-  assert_division ()
+  if not Sys.win32 then
+    (* complex division not supported by MSVC C runtime *)
+    assert_division ()
 
 let test_marshal _ =
   let same_repr x y =
@@ -270,16 +273,24 @@ let test_comparisons _ =
   end
 
 let test_int_conversions _ =
+  (* Microsoft compiler uses `long double` as the 8-byte "binary64" format (https://en.wikipedia.org/wiki/Double-precision_floating-point_format).
+     The OCaml `max_int` on a 64-bit platform (max_int = 2^62 - 1) will be inaccurately represented in binary64.
+     Each integer in the ranges 2^52 to 2^53 has its own unique binary64 representation, so we use 2^53 (and -2^53) instead on 64-bit
+     OCaml platforms with MSVC compiler.
+  *)
+  let min_integer, max_integer =
+    if Sys.win32 && not Sys.cygwin && Sys.int_size > 32 then -(1 lsl 53), 1 lsl 53
+    else min_int, max_int
+  in
   begin
-    assert_equal max_int (LDouble.to_int
-			    (LDouble.of_int max_int))
+    assert_equal max_integer (LDouble.to_int
+                                (LDouble.of_int max_integer))
       ~printer:string_of_int;
 
-    assert_equal min_int (LDouble.to_int
-			    (LDouble.of_int min_int))
+    assert_equal min_integer (LDouble.to_int
+                                (LDouble.of_int min_integer))
       ~printer:string_of_int;
   end
-
 
 let suite = "LDouble tests" >:::
   [

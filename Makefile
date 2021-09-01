@@ -39,6 +39,7 @@ GENERATED=src/ctypes/ctypes_primitives.ml	\
 	  src/discover/discover.cmo
 
 OCAML_FFI_INCOPTS=$(libffi_opt)
+NCURSES_INCOPTS=
 export CFLAGS DEBUG
 
 EXTDLL:=$(shell $(OCAMLFIND) ocamlc -config | awk '/^ext_dll:/{print $$2}')

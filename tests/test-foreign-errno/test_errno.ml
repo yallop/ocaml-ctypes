@@ -19,7 +19,18 @@ let test_errno_exception_raised _ =
   let close = Foreign.foreign (us "close") ~check_errno:true
     (int @-> returning int) in
   assert_raises (Unix.Unix_error(Unix.EBADF, us "close", ""))
-    (fun () -> close (-300))
+    (fun () ->
+      (*
+      `check_errno` is unreliable on Windows. Some of that unreliability
+      is due to custom parameter validation;
+      https://docs.microsoft.com/en-us/cpp/c-runtime-library/parameter-validation?view=msvc-160
+      *)
+      if Sys.win32 then
+        let ret = close (-300) in
+        if ret <> 0 then raise (Unix.Unix_error(Unix.EBADF, us "close", ""))
+        else 0
+      else
+        close (-300))
     
 
 (*
@@ -35,7 +46,18 @@ let test_int_return_errno_exception_raised _ =
   let chdir = Foreign.foreign (us "chdir") ~check_errno:true
     (string @-> returning int) in
   assert_raises (Unix.Unix_error(Unix.ENOENT, us "chdir", ""))
-    (fun () -> chdir unlikely_to_exist)
+    (fun () ->
+      (*
+      `check_errno` is unreliable on Windows. Some of that unreliability
+      is due to custom parameter validation;
+      https://docs.microsoft.com/en-us/cpp/c-runtime-library/parameter-validation?view=msvc-160
+      *)
+      if Sys.win32 then
+        let ret = chdir unlikely_to_exist in
+        if ret <> 0 then raise (Unix.Unix_error(Unix.ENOENT, us "chdir", ""))
+        else 0
+      else
+        chdir unlikely_to_exist)
     
 
 (*

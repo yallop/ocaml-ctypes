@@ -26,6 +26,7 @@ let polar n a = make LDouble.(mul (cos a) n) LDouble.(mul (sin a) n)
 
 let zero = make LDouble.zero LDouble.zero
 let one = make LDouble.one LDouble.zero
+let negone = make LDouble.(neg one) LDouble.zero
 let i = make LDouble.zero LDouble.one
 
 external neg : t -> t = "ctypes_ldouble_complex_neg"
@@ -34,10 +35,15 @@ external add : t -> t -> t = "ctypes_ldouble_complex_add"
 external sub : t -> t -> t = "ctypes_ldouble_complex_sub"
 external mul : t -> t -> t = "ctypes_ldouble_complex_mul"
 external div : t -> t -> t = "ctypes_ldouble_complex_div"
-let inv x = div one x
 external sqrt : t -> t = "ctypes_ldouble_complex_csqrtl"
 external arg : t -> LDouble.t = "ctypes_ldouble_complex_cargl"
 external exp : t -> t = "ctypes_ldouble_complex_cexpl"
 external log : t -> t = "ctypes_ldouble_complex_clogl"
 external pow : t -> t -> t = "ctypes_ldouble_complex_cpowl"
 
+let inv x =
+  if Sys.win32 then
+    (* complex division not supported by MSVC C runtime *)
+    pow x negone
+  else
+    div one x

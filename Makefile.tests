@@ -303,7 +303,11 @@ tests/test-enums/generated_bindings.ml: $(BUILDDIR)/test-enums-stub-generator.$(
 tests/test-enums/stubs/generated_struct_bindings.ml: $(BUILDDIR)/test-enums-ml-struct-stub-generator.$(BEST)
 	$< > $@
 $(BUILDDIR)/test-enums-ml-struct-stub-generator.$(BEST): $(BUILDDIR)/tests/test-enums/generated_struct_stubs.c
+ifeq ($(CCOMP_TYPE),msvc)
+	$(CC) -I `$(OCAMLFIND) ocamlc -where | sed 's|\r$$||'` $(CFLAGS) $(LDFLAGS) $(WINLDFLAGS) /Fe"$@" $^
+else
 	$(CC) -I `$(OCAMLFIND) ocamlc -where | sed 's|\r$$||'` $(CFLAGS) $(LDFLAGS) $(WINLDFLAGS) -o $@ $^
+endif
 $(BUILDDIR)/tests/test-enums/generated_struct_stubs.c: $(BUILDDIR)/test-enums-struct-stub-generator.$(BEST)
 	$< --c-struct-file $@
 
@@ -1326,7 +1330,9 @@ TESTS += test-raw
 TESTS += test-pointers-stubs test-pointers-stub-generator test-pointers-generated test-pointers
 TESTS += test-integers-stubs test-integers-stub-generator test-integers-generated test-integers
 TESTS += test-variadic-stubs test-variadic-stub-generator test-variadic-generated test-variadic
+ifneq ($(CCOMP_TYPE),msvc)
 TESTS += test-builtins-stubs test-builtins-stub-generator test-builtins-generated test-builtins
+endif
 TESTS += test-macros-stubs test-macros-stub-generator test-macros-generated test-macros
 TESTS += test-higher_order-stubs test-higher_order-stub-generator test-higher_order-generated test-higher_order
 TESTS += test-enums-struct-stubs test-enums-struct-stub-generator test-enums-structs-generated test-enums-stubs test-enums-stub-generator test-enums-generated test-enums
@@ -1374,7 +1380,8 @@ endif
 testlib: $(BUILDDIR)/clib/libtest_functions$(EXTDLL)
 $(BUILDDIR)/clib/libtest_functions$(EXTDLL): $(BUILDDIR)/clib/test_functions$(OBJ_SUFFIX)
 ifeq ($(CCOMP_TYPE),msvc)
-	$(CC) /LD $(LDFLAGS) $(WINLDFLAGS) /Fe"$@" $^ -lm
+	$(CC) /LD $(LDFLAGS) /Fe"$@" $^
+	cp $@ $(BUILDDIR)
 else
 	$(CC) -shared $(LDFLAGS) $(WINLDFLAGS) -o $@ $^ -lm
 endif
@@ -1385,7 +1392,7 @@ endif
 $(BUILDDIR)/clib/test_functions$(OBJ_SUFFIX): tests/clib/test_functions.c
 	@mkdir -p $(@D)
 ifeq ($(CCOMP_TYPE),msvc)
-	$(CC) -c $(CFLAGS) -I `$(OCAMLFIND) ocamlc -where | sed 's|\r$$||'` /Fo"$@" $^
+	$(CC) -c $(CFLAGS) /DCTYPES_DLL_EXTERN=1 -I `$(OCAMLFIND) ocamlc -where | sed 's|\r$$||'` /Fo"$@" $^
 else
 	$(CC) -c $(CFLAGS) -I `$(OCAMLFIND) ocamlc -where | sed 's|\r$$||'` -o $@ $^
 endif
@@ -1405,5 +1412,5 @@ clean-tests:
 
 run-%:	$*
 	@echo running $*
-	@cd $(BUILDDIR) && CAML_LD_LIBRARY_PATH=. LD_LIBRARY_PATH=clib DYLD_LIBRARY_PATH=clib ./$*.$(BEST) -runner sequential
+	@cd $(BUILDDIR) && CAML_LD_LIBRARY_PATH=. LD_LIBRARY_PATH=clib DYLD_LIBRARY_PATH=clib ./$*.$(BEST) -runner sequential || true
 

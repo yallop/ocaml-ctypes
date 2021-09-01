@@ -8,24 +8,24 @@ ifneq (,$(filter mingw%,$(OSYSTEM)))
 lib_process=-lpsapi
 OCAMLMKLIB_EXTRA_FLAGS=-ldopt "-link -static-libgcc" # see GPR#1535
 ifeq ($(DEBUG),false)
-  CFLAGS=-std=c99 -Wall -O3 $(OCAML_FFI_INCOPTS) "-I$(package_integers_path)"
+  CFLAGS=-std=c99 -Wall -O3 $(OCAML_FFI_INCOPTS) $(NCURSES_INCOPTS) "-I$(package_integers_path)"
 else
-  CFLAGS=-std=c99 -Wall -g $(OCAML_FFI_INCOPTS) "-I$(package_integers_path)"
+  CFLAGS=-std=c99 -Wall -g $(OCAML_FFI_INCOPTS) $(NCURSES_INCOPTS) "-I$(package_integers_path)"
 endif
 else ifeq ($(CCOMP_TYPE),msvc)
 # MSVC
 lib_process=-lpsapi
 ifeq ($(DEBUG),false)
-  CFLAGS=-Wall -O2 $(OCAML_FFI_INCOPTS) "-I$(package_integers_path)"
+  CFLAGS=-Wall -O2 $(OCAML_FFI_INCOPTS) $(NCURSES_INCOPTS) "-I$(package_integers_path)"
 else
-  CFLAGS=-Wall /Z7 $(OCAML_FFI_INCOPTS) "-I$(package_integers_path)"
+  CFLAGS=-Wall /Z7 $(OCAML_FFI_INCOPTS) $(NCURSES_INCOPTS) "-I$(package_integers_path)"
 endif
 else
 # Neither MinGW nor MSCV
 ifeq ($(DEBUG),false)
-  CFLAGS=-fPIC -Wall -O3 $(OCAML_FFI_INCOPTS) "-I$(package_integers_path)"
+  CFLAGS=-fPIC -Wall -O3 $(OCAML_FFI_INCOPTS) $(NCURSES_INCOPTS) "-I$(package_integers_path)"
 else
-  CFLAGS=-fPIC -Wall -g $(OCAML_FFI_INCOPTS) "-I$(package_integers_path)"
+  CFLAGS=-fPIC -Wall -g $(OCAML_FFI_INCOPTS) $(NCURSES_INCOPTS) "-I$(package_integers_path)"
 endif
 endif
 
