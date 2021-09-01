@@ -1,0 +1,6 @@
+REC
+S .
+S ./stub-generator
+S ./stubs
+B ../../_build/tests/test-ldouble/stub-generator
+B ../../_build/tests/test-ldouble/stubs

@@ -1,0 +1,10 @@
+REC
+S .
+S ./struct-stub-generator
+S ./struct-stubs
+S ./stub-generator
+S ./stubs
+B ../../_build/tests/test-enums/struct-stub-generator
+B ../../_build/tests/test-enums/struct-stubs
+B ../../_build/tests/test-enums/stub-generator
+B ../../_build/tests/test-enums/stubs
