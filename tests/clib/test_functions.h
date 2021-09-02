@@ -26,13 +26,13 @@
 #endif
 
 #ifdef _MSC_VER
-typedef _Lcomplex            longdoublecomplex_t;
-typedef _Dcomplex            doublecomplex_t;
-typedef _Fcomplex            floatcomplex_t;
+typedef _Lcomplex            ctypes_complex_long_double;
+typedef _Dcomplex            ctypes_complex_double;
+typedef _Fcomplex            ctypes_complex_float;
 #else
-typedef long double _Complex longdoublecomplex_t;
-typedef double _Complex      doublecomplex_t;
-typedef float _Complex       floatcomplex_t;
+typedef long double _Complex ctypes_complex_long_double;
+typedef double _Complex      ctypes_complex_double;
+typedef float _Complex       ctypes_complex_float;
 #endif
 
 typedef int intfun(int, int);
@@ -160,24 +160,24 @@ DLL_EXTERN float retrieve_FLT_MIN(void);
 DLL_EXTERN float retrieve_FLT_MAX(void);
 DLL_EXTERN double retrieve_DBL_MIN(void);
 DLL_EXTERN double retrieve_DBL_MAX(void);
-DLL_EXTERN void add_complexd(doublecomplex_t *, doublecomplex_t *, doublecomplex_t *);
-DLL_EXTERN void mul_complexd(doublecomplex_t *, doublecomplex_t *, doublecomplex_t *);
-DLL_EXTERN void rotdist_complexd(doublecomplex_t *, double *, double *);
-DLL_EXTERN void add_complexld(longdoublecomplex_t *, longdoublecomplex_t *, longdoublecomplex_t *);
-DLL_EXTERN void mul_complexld(longdoublecomplex_t *, longdoublecomplex_t *, longdoublecomplex_t *);
-DLL_EXTERN void rotdist_complexld(longdoublecomplex_t *, long double *, long double *);
-DLL_EXTERN void add_complexf(floatcomplex_t *, floatcomplex_t *, floatcomplex_t *);
-DLL_EXTERN void mul_complexf(floatcomplex_t *, floatcomplex_t *, floatcomplex_t *);
-DLL_EXTERN void rotdist_complexf(floatcomplex_t *, float *, float *);
-DLL_EXTERN doublecomplex_t add_complexd_val(doublecomplex_t, doublecomplex_t);
-DLL_EXTERN doublecomplex_t mul_complexd_val(doublecomplex_t, doublecomplex_t);
-DLL_EXTERN double rotdist_complexd_val(doublecomplex_t, double);
-DLL_EXTERN longdoublecomplex_t add_complexld_val(longdoublecomplex_t, longdoublecomplex_t);
-DLL_EXTERN longdoublecomplex_t mul_complexld_val(longdoublecomplex_t, longdoublecomplex_t);
-DLL_EXTERN long double rotdist_complexld_val(longdoublecomplex_t, long double);
-DLL_EXTERN floatcomplex_t add_complexf_val(floatcomplex_t, floatcomplex_t);
-DLL_EXTERN floatcomplex_t mul_complexf_val(floatcomplex_t, floatcomplex_t);
-DLL_EXTERN float rotdist_complexf_val(floatcomplex_t, float);
+DLL_EXTERN void add_complexd(ctypes_complex_double *, ctypes_complex_double *, ctypes_complex_double *);
+DLL_EXTERN void mul_complexd(ctypes_complex_double *, ctypes_complex_double *, ctypes_complex_double *);
+DLL_EXTERN void rotdist_complexd(ctypes_complex_double *, double *, double *);
+DLL_EXTERN void add_complexld(ctypes_complex_long_double *, ctypes_complex_long_double *, ctypes_complex_long_double *);
+DLL_EXTERN void mul_complexld(ctypes_complex_long_double *, ctypes_complex_long_double *, ctypes_complex_long_double *);
+DLL_EXTERN void rotdist_complexld(ctypes_complex_long_double *, long double *, long double *);
+DLL_EXTERN void add_complexf(ctypes_complex_float *, ctypes_complex_float *, ctypes_complex_float *);
+DLL_EXTERN void mul_complexf(ctypes_complex_float *, ctypes_complex_float *, ctypes_complex_float *);
+DLL_EXTERN void rotdist_complexf(ctypes_complex_float *, float *, float *);
+DLL_EXTERN ctypes_complex_double add_complexd_val(ctypes_complex_double, ctypes_complex_double);
+DLL_EXTERN ctypes_complex_double mul_complexd_val(ctypes_complex_double, ctypes_complex_double);
+DLL_EXTERN double rotdist_complexd_val(ctypes_complex_double, double);
+DLL_EXTERN ctypes_complex_long_double add_complexld_val(ctypes_complex_long_double, ctypes_complex_long_double);
+DLL_EXTERN ctypes_complex_long_double mul_complexld_val(ctypes_complex_long_double, ctypes_complex_long_double);
+DLL_EXTERN long double rotdist_complexld_val(ctypes_complex_long_double, long double);
+DLL_EXTERN ctypes_complex_float add_complexf_val(ctypes_complex_float, ctypes_complex_float);
+DLL_EXTERN ctypes_complex_float mul_complexf_val(ctypes_complex_float, ctypes_complex_float);
+DLL_EXTERN float rotdist_complexf_val(ctypes_complex_float, float);
 DLL_EXTERN void store_callback(int (*callback)(int));
 DLL_EXTERN int invoke_stored_callback(int);
 DLL_EXTERN vintfun *return_callback(vintfun *);

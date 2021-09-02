@@ -6,13 +6,13 @@
 #endif
 
 #ifdef _MSC_VER
-typedef _Lcomplex            longdoublecomplex_t;
-typedef _Dcomplex            doublecomplex_t;
-typedef _Fcomplex            floatcomplex_t;
+typedef _Lcomplex            ctypes_complex_long_double;
+typedef _Dcomplex            ctypes_complex_double;
+typedef _Fcomplex            ctypes_complex_float;
 #else
-typedef long double _Complex longdoublecomplex_t;
-typedef double _Complex      doublecomplex_t;
-typedef float _Complex       floatcomplex_t;
+typedef long double _Complex ctypes_complex_long_double;
+typedef double _Complex      ctypes_complex_double;
+typedef float _Complex       ctypes_complex_float;
 #endif
 
 #endif /* CTYPES_COMPLEX_TYPES_H */

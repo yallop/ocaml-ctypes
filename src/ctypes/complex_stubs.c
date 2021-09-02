@@ -20,25 +20,25 @@ static value allocate_complex_value(double r, double i)
 }
 
 /* ctypes_copy_float_complex : float _Complex -> Complex.t */
-value ctypes_copy_float_complex(floatcomplex_t c)
+value ctypes_copy_float_complex(ctypes_complex_float c)
 {
   return allocate_complex_value(ctypes_compat_crealf(c), ctypes_compat_cimagf(c));
 }
 
 /* ctypes_copy_double_complex : double _Complex -> Complex.t */
-value ctypes_copy_double_complex(doublecomplex_t c)
+value ctypes_copy_double_complex(ctypes_complex_double c)
 {
   return allocate_complex_value(ctypes_compat_creal(c), ctypes_compat_cimag(c));
 }
 
 /* ctypes_float_complex_val : Complex.t -> float _Complex */
-floatcomplex_t ctypes_float_complex_val(value v)
+ctypes_complex_float ctypes_float_complex_val(value v)
 {
   return ctypes_compat_make_complexf(Double_field(v, 0), Double_field(v, 1));
 }
 
 /* ctypes_double_complex_val : Complex.t -> double _Complex */
-doublecomplex_t ctypes_double_complex_val(value v)
+ctypes_complex_double ctypes_double_complex_val(value v)
 {
   return ctypes_compat_make_complex(Double_field(v, 0), Double_field(v, 1));
 }

@@ -479,10 +479,10 @@ let test_bigarray_float_printing _ =
     assert_typ_printed_as "double[20][30][40]"
       (bigarray genarray [|20; 30; 40|] Bigarray_compat.float64);
 
-    assert_typ_printed_as "floatcomplex_t[16][17][18]"
+    assert_typ_printed_as "ctypes_complex_float[16][17][18]"
       (bigarray array3 (16, 17, 18) Bigarray_compat.complex32);
 
-    assert_typ_printed_as "doublecomplex_t[19][20][21]"
+    assert_typ_printed_as "ctypes_complex_double[19][20][21]"
       (bigarray array3 (19, 20, 21) Bigarray_compat.complex64);
   end
 

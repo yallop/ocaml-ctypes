@@ -16,8 +16,8 @@ extern long double ctypes_ldouble_val(value);
 extern value ctypes_ldouble_of_float(value a);
 extern value ctypes_ldouble_to_float(value a);
 
-extern value ctypes_copy_ldouble_complex(longdoublecomplex_t u);
-extern longdoublecomplex_t ctypes_ldouble_complex_val(value);
+extern value ctypes_copy_ldouble_complex(ctypes_complex_long_double u);
+extern ctypes_complex_long_double ctypes_ldouble_complex_val(value);
 extern value ctypes_ldouble_complex_make(value r, value i);
 extern value ctypes_ldouble_complex_real(value v);
 extern value ctypes_ldouble_complex_imag(value v);

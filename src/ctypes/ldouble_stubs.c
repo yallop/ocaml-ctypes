@@ -442,29 +442,29 @@ value ctypes_ldouble_size(value unit) {
 
 /*********************** complex *************************/
 
-static inline longdoublecomplex_t ldouble_complex_custom_val(value v)
+static inline ctypes_complex_long_double ldouble_complex_custom_val(value v)
 {
-  longdoublecomplex_t r;
+  ctypes_complex_long_double r;
   memcpy(&r, Data_custom_val(v), sizeof(r));
   return r;
 }
 
 static int ldouble_complex_cmp_val(value v1, value v2)
 {
-  longdoublecomplex_t u1 = ldouble_complex_custom_val(v1);
-  longdoublecomplex_t u2 = ldouble_complex_custom_val(v2);
+  ctypes_complex_long_double u1 = ldouble_complex_custom_val(v1);
+  ctypes_complex_long_double u2 = ldouble_complex_custom_val(v2);
   int cmp_real = ldouble_cmp(ctypes_compat_creall(u1), ctypes_compat_creall(u2));
   return cmp_real == 0 ? ldouble_cmp(ctypes_compat_cimagl(u1), ctypes_compat_cimagl(u2)) : cmp_real;
 }
 
 static intnat ldouble_complex_hash(value v) {
-  longdoublecomplex_t c = ldouble_complex_custom_val(v);
+  ctypes_complex_long_double c = ldouble_complex_custom_val(v);
   return ldouble_mix_hash(ldouble_mix_hash(0, ctypes_compat_creall(c)), ctypes_compat_cimagl(c));
 }
 
 static void ldouble_complex_serialize(value v, uintnat *wsize_32, uintnat *wsize_64) {
   long double re,im;
-  longdoublecomplex_t c;
+  ctypes_complex_long_double c;
   void * p = Data_custom_val(v);
 #if defined(__GNUC__) && __GNUC__  == 6 && __GNUC_MINOR__ == 4
   /* workaround gcc bug. gcc tries to inline the memcpy calls, but
@@ -482,19 +482,19 @@ static void ldouble_complex_serialize(value v, uintnat *wsize_32, uintnat *wsize
   ldouble_serialize_data(&re);
   im = ctypes_compat_cimagl(c);
   ldouble_serialize_data(&im);
-  *wsize_32 = *wsize_64 = sizeof(longdoublecomplex_t);
+  *wsize_32 = *wsize_64 = sizeof(ctypes_complex_long_double);
 }
 
 static uintnat ldouble_complex_deserialize(void *d) {
   long double re, im;
-  longdoublecomplex_t c;
+  ctypes_complex_long_double c;
   if (caml_deserialize_uint_1() != LDBL_MANT_DIG)
     caml_deserialize_error("invalid long double size");
   ldouble_deserialize_data(&re);
   ldouble_deserialize_data(&im);
   c = ctypes_compat_make_complexl(re, im);
   memcpy(d, &c, sizeof(c));
-  return (sizeof(longdoublecomplex_t));
+  return (sizeof(ctypes_complex_long_double));
 }
 
 static struct custom_operations caml_ldouble_complex_ops = {
@@ -507,14 +507,14 @@ static struct custom_operations caml_ldouble_complex_ops = {
   custom_compare_ext_default
 };
 
-value ctypes_copy_ldouble_complex(longdoublecomplex_t u)
+value ctypes_copy_ldouble_complex(ctypes_complex_long_double u)
 {
-  value res = caml_alloc_custom(&caml_ldouble_complex_ops, sizeof(longdoublecomplex_t), 0, 1);
+  value res = caml_alloc_custom(&caml_ldouble_complex_ops, sizeof(ctypes_complex_long_double), 0, 1);
   memcpy(Data_custom_val(res), &u, sizeof(u));
   return res;
 }
 
-longdoublecomplex_t ctypes_ldouble_complex_val(value v) {
+ctypes_complex_long_double ctypes_ldouble_complex_val(value v) {
   return ldouble_complex_custom_val(v);
 }
 
@@ -569,7 +569,7 @@ CAMLprim value ctypes_ldouble_complex_div(value a, value b) {
 
 CAMLprim value ctypes_ldouble_complex_neg(value a) {
   CAMLparam1(a);
-  longdoublecomplex_t ac = ldouble_complex_custom_val(a);
+  ctypes_complex_long_double ac = ldouble_complex_custom_val(a);
   CAMLreturn(ctypes_copy_ldouble_complex(_LCbuild(- creall(ac), - cimagl(ac))));
 }
 
