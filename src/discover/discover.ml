@@ -88,6 +88,7 @@ let ccomp_type = ref "cc"
 let ffi_dir = ref ""
 let is_homebrew = ref false
 let is_macports = ref false
+let is_msys = ref false
 let homebrew_prefix = ref "/usr/local"
 let macports_prefix = ref "/opt/local"
 
@@ -177,12 +178,27 @@ let brew_libffi_version flags =
   | { Commands.stdout } ->
     String.trim stdout
 
+let msys_env_args () =
+  let pcp = Sys.getenv_opt "PKG_CONFIG_PATH" in
+  if Option.is_none pcp then
+    ""
+  else
+    match Commands.command "cygpath --path '%s'" (Option.get pcp) with
+      { Commands.status; stderr } when status <> 0 ->
+      ksprintf failwith "cygpath failed: %s" stderr
+    | { Commands.stdout } ->
+      sprintf "PKG_CONFIG_PATH='%s'" (String.trim stdout)
+
 let pkg_config flags =
   let output =
     if !is_homebrew then
       Commands.command
         "env PKG_CONFIG_PATH=%s/Cellar/libffi/%s/lib/pkgconfig %s/bin/pkg-config %s"
         !homebrew_prefix (brew_libffi_version ()) !homebrew_prefix flags
+    else if !is_msys then
+      Commands.command
+        "env %s pkg-config %s"
+        (msys_env_args ()) flags
     else
       Commands.command "pkg-config %s" flags
   in
@@ -279,6 +295,16 @@ let () =
     test_feature "MacPorts"
       (fun () ->
          Commands.command_succeeds "port info libffi");
+
+  (* Test for MSYS. *)
+  is_msys :=
+    test_feature "MSYS"
+      (fun () ->
+        (* Look for `uname -s` = MSYS_NT-10.0-22000 and similar *)
+        let uname_s = (Commands.command "uname -s").Commands.stdout in
+        String.sub uname_s 0
+          (min (String.length "MSYS_NT") (String.length uname_s))
+          = "MSYS_NT");
 
   let have_pkg_config = have_pkg_config !is_homebrew !is_macports homebrew_prefix macports_prefix in
 
