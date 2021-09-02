@@ -172,7 +172,7 @@ static inline ctypes_complex_long_double ctypes_compat_make_complexl(long double
   static inline TYP ctypes_compat_ ## OPNAME(TYP a, TYP b) { return a * b; }
 # define CCC_PRIM_DIV_OP(OPNAME, TYP)                                                  \
   static inline TYP ctypes_compat_ ## OPNAME(TYP a, TYP b) { return a / b; }
-# define CCC_PRIM_INV_OP(OPNAME, TYP, CONSTRUCTOR)                                     \
+# define CCC_PRIM_INV_OP(OPNAME, TYP, CONSTRUCTOR, MSVCPOW)                                     \
   static inline TYP ctypes_compat_ ## OPNAME(TYP a) { return CONSTRUCTOR(1, 0) / a; }
 #endif
 CCC_PRIM_COMPONENT_OP(cadd, ctypes_complex_double, double_union, +)

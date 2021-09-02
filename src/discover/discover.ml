@@ -179,11 +179,11 @@ let brew_libffi_version flags =
     String.trim stdout
 
 let msys_env_args () =
-  let pcp = Sys.getenv_opt "PKG_CONFIG_PATH" in
-  if Option.is_none pcp then
+  let pcp = try Sys.getenv "PKG_CONFIG_PATH" with Not_found -> "" in
+  if pcp = "" then
     ""
   else
-    match Commands.command "cygpath --path '%s'" (Option.get pcp) with
+    match Commands.command "cygpath --path '%s'" pcp with
       { Commands.status; stderr } when status <> 0 ->
       ksprintf failwith "cygpath failed: %s" stderr
     | { Commands.stdout } ->

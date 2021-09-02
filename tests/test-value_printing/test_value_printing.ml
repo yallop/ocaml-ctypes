@@ -224,7 +224,7 @@ struct
     let find_nan s =
       try ignore (Str.search_forward rex s 0 : int); true
       with Not_found -> false in
-    if Sys.getenv_opt "CCOMP_TYPE" = Some "msvc" then
+    if try Sys.getenv "CCOMP_TYPE" = "msvc" with Not_found -> false then
       assert_equal true (find_nan (string_of float nan))
     else
       assert_equal (string_of float nan) (string_of_float nan);
@@ -240,7 +240,7 @@ struct
     assert_equal (string_of double (-1.03)) (string_of_float (-1.03));
     assert_equal (string_of double (34.22)) (string_of_float (34.22));
     exp_equal (string_of double (1.39e16)) (string_of_float (1.39e16));
-    if Sys.getenv_opt "CCOMP_TYPE" = Some "msvc" then
+    if try Sys.getenv "CCOMP_TYPE" = "msvc" with Not_found -> false then
       assert_equal true (find_nan (string_of double nan))
     else
       assert_equal (string_of double nan) (string_of_float nan);
