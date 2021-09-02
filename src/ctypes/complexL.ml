@@ -40,10 +40,4 @@ external arg : t -> LDouble.t = "ctypes_ldouble_complex_cargl"
 external exp : t -> t = "ctypes_ldouble_complex_cexpl"
 external log : t -> t = "ctypes_ldouble_complex_clogl"
 external pow : t -> t -> t = "ctypes_ldouble_complex_cpowl"
-
-let inv x =
-  if Sys.win32 then
-    (* complex division not supported by MSVC C runtime *)
-    pow x negone
-  else
-    div one x
+external inv : t -> t = "ctypes_ldouble_complex_cinvl"

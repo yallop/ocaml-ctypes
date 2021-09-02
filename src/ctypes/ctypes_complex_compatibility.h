@@ -162,6 +162,9 @@ static inline longdoublecomplex_t ctypes_compat_make_complexl(long double re, lo
 # define CCC_PRIM_DIV_OP(OPNAME, TYP)                                                  \
   static inline TYP ctypes_compat_ ## OPNAME(TYP a, TYP b)                             \
   { caml_failwith("ctypes: OPNAME does not exist on current platform"); }
+# define CCC_PRIM_INV_OP(OPNAME, TYP, CONSTRUCTOR, MSVCPOW)                            \
+  static inline TYP ctypes_compat_ ## OPNAME(TYP a)                                    \
+  { return MSVCPOW(a, CONSTRUCTOR(-1, 0)); }
 #else
 # define CCC_PRIM_COMPONENT_OP(OPNAME, TYP, UNION, OP)                                 \
   static inline TYP ctypes_compat_ ## OPNAME(TYP a, TYP b) { return a OP b; }
@@ -169,19 +172,24 @@ static inline longdoublecomplex_t ctypes_compat_make_complexl(long double re, lo
   static inline TYP ctypes_compat_ ## OPNAME(TYP a, TYP b) { return a * b; }
 # define CCC_PRIM_DIV_OP(OPNAME, TYP)                                                  \
   static inline TYP ctypes_compat_ ## OPNAME(TYP a, TYP b) { return a / b; }
+# define CCC_PRIM_INV_OP(OPNAME, TYP, CONSTRUCTOR)                                     \
+  static inline TYP ctypes_compat_ ## OPNAME(TYP a) { return CONSTRUCTOR(1, 0) / a; }
 #endif
 CCC_PRIM_COMPONENT_OP(cadd, doublecomplex_t, double_union, +)
 CCC_PRIM_COMPONENT_OP(csub, doublecomplex_t, double_union, -)
 CCC_PRIM_MUL_OP(cmul, doublecomplex_t, _Cmulcc)
 CCC_PRIM_DIV_OP(cdiv, doublecomplex_t)
+CCC_PRIM_INV_OP(cinv, doublecomplex_t, ctypes_compat_make_complex, cpow)
 CCC_PRIM_COMPONENT_OP(caddf, floatcomplex_t, float_union, +)
 CCC_PRIM_COMPONENT_OP(csubf, floatcomplex_t, float_union, -)
 CCC_PRIM_MUL_OP(cmulf, floatcomplex_t, _FCmulcc)
 CCC_PRIM_DIV_OP(cdivf, floatcomplex_t)
+CCC_PRIM_INV_OP(cinvf, floatcomplex_t, ctypes_compat_make_complexf, cpowf)
 CCC_PRIM_COMPONENT_OP(caddl, longdoublecomplex_t, long_double_union, +)
 CCC_PRIM_COMPONENT_OP(csubl, longdoublecomplex_t, long_double_union, -)
 CCC_PRIM_MUL_OP(cmull, longdoublecomplex_t, _LCmulcc)
 CCC_PRIM_DIV_OP(cdivl, longdoublecomplex_t)
+CCC_PRIM_INV_OP(cinvl, longdoublecomplex_t, ctypes_compat_make_complexl, cpowl)
 #undef CCC_PRIM_OP
 
 #endif /* CTYPES_COMPLEX_COMPATIBILITY_H */

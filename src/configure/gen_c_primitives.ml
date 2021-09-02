@@ -78,22 +78,23 @@ let generate name typ f =
     printf "\n") c_primitives
 
 let () =
+  let opts = Extract_from_c.get_extract_opts Sys.argv in
   begin
     print_string header;
     generate "sizeof" "int" (fun { size } ->
-      printf "%d" (Extract_from_c.integer size));
+      printf "%d" (Extract_from_c.integer opts size));
     generate "alignment" "int" (fun { alignment } ->
-      printf "%d" (Extract_from_c.integer alignment));
+      printf "%d" (Extract_from_c.integer opts alignment));
     generate "name" "string" (fun { typ } ->
-      printf "%S" (Extract_from_c.string ("STRINGIFY("^typ^")")));
+      printf "%S" (Extract_from_c.string opts ("STRINGIFY("^typ^")")));
     generate "format_string" "string option" (fun { format } ->
       match format with
       | Known_format str ->
         printf "Some %S" ("%"^str)
       | Defined_format str ->
-        printf "Some %S" ("%"^Extract_from_c.string str)
+        printf "Some %S" ("%"^Extract_from_c.string opts str)
       | No_format ->
         printf "None");
-    printf "let pointer_size = %d\n" (Extract_from_c.integer "sizeof(void*)");
-    printf "let pointer_alignment = %d\n" (Extract_from_c.integer "alignof(void*)");
+    printf "let pointer_size = %d\n" (Extract_from_c.integer opts "sizeof(void*)");
+    printf "let pointer_alignment = %d\n" (Extract_from_c.integer opts "alignof(void*)");
   end

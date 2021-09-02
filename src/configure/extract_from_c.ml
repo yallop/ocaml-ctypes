@@ -5,19 +5,34 @@
  * See the file LICENSE for details.
  *)
 
+type extract_opts = {
+  ext_obj : string;
+}
+
+let get_extract_opts argv =
+  let usage = "arguments: [--ext_obj .o|.obj|...]" in
+  let ext_obj = ref ".o" in
+  let spec = Arg.([("--ext_obj",
+                    Set_string ext_obj, "C object file extension")]) in
+  let no_positional_args _ =
+    prerr_endline "No positional arguments" in
+  begin
+    Arg.parse spec no_positional_args usage;
+    { ext_obj = !ext_obj }
+  end
+
 let getenv ~default name =
   try Sys.getenv name
   with Not_found -> default
 
 let nsplit sep str = Str.(split (regexp_string sep)) str
 
-let read_output program =
+let read_output opts program =
   let input_filename = Filename.temp_file "ctypes_libffi_config" ".c" in
   let channel = open_out input_filename in
   output_string channel program;
   close_out channel;
-  let obj_ext = if Sys.win32 then ".obj" else ".o" in
-  let output_filename = (Filename.chop_suffix input_filename ".c") ^ obj_ext in
+  let output_filename = (Filename.chop_suffix input_filename ".c") ^ opts.ext_obj in
   let cwd = Sys.getcwd () in
   let cmd =
     Printf.sprintf "%s ocamlc -verbose %s %s -c 1>&2"
@@ -76,7 +91,7 @@ typedef float _Complex       floatcomplex_t;
 #endif
 "
 
-let integer ?(extra_headers="") expression =
+let integer ?(extra_headers="") opts expression =
   let code = Printf.sprintf "%s
 %s
 
@@ -98,9 +113,9 @@ const char s[] = {
   '-', 'E', 'N', 'D'
 };
 " headers extra_headers expression in
-  int_of_string (extract (read_output code))
+  int_of_string (extract (read_output opts code))
 
-let string ?(extra_headers="") expression =
+let string ?(extra_headers="") opts expression =
   let code = Printf.sprintf "%s
 %s
 
@@ -115,4 +130,4 @@ let string ?(extra_headers="") expression =
 
 const char *s = \"BEGIN-\" %s \"-END\";
 " headers extra_headers expression in
-  extract (read_output code)
+  extract (read_output opts code)

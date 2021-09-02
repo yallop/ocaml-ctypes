@@ -1378,7 +1378,7 @@ LDFLAGS+=-static-libgcc
 endif
 
 testlib: $(BUILDDIR)/clib/libtest_functions$(EXTDLL)
-$(BUILDDIR)/clib/libtest_functions$(EXTDLL): $(BUILDDIR)/clib/test_functions$(OBJ_SUFFIX)
+$(BUILDDIR)/clib/libtest_functions$(EXTDLL): $(BUILDDIR)/clib/test_functions$(EXTOBJ)
 ifeq ($(CCOMP_TYPE),msvc)
 	$(CC) /LD $(LDFLAGS) /Fe"$@" $^
 	cp $@ $(BUILDDIR)
@@ -1389,7 +1389,7 @@ ifneq (,$(filter mingw%,$(OSYSTEM)))
 	cp $@ libtest_functions.dll.a $(BUILDDIR)
 endif
 
-$(BUILDDIR)/clib/test_functions$(OBJ_SUFFIX): tests/clib/test_functions.c
+$(BUILDDIR)/clib/test_functions$(EXTOBJ): tests/clib/test_functions.c
 	@mkdir -p $(@D)
 ifeq ($(CCOMP_TYPE),msvc)
 	$(CC) -c $(CFLAGS) /DCTYPES_DLL_EXTERN=1 -I `$(OCAMLFIND) ocamlc -where | sed 's|\r$$||'` /Fo"$@" $^
@@ -1412,5 +1412,5 @@ clean-tests:
 
 run-%:	$*
 	@echo running $*
-	@cd $(BUILDDIR) && CAML_LD_LIBRARY_PATH=. LD_LIBRARY_PATH=clib DYLD_LIBRARY_PATH=clib ./$*.$(BEST) -runner sequential || true
+	@cd $(BUILDDIR) && CAML_LD_LIBRARY_PATH=. LD_LIBRARY_PATH=clib DYLD_LIBRARY_PATH=clib CCOMP_TYPE=$(CCOMP_TYPE) ./$*.$(BEST) -runner sequential || true
 

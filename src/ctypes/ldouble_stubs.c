@@ -613,6 +613,7 @@ FN1(csqrtl)
 FN1(cexpl)
 FN1(clogl)
 FN2(cpowl)
+FN1(cinvl)
 
 CAMLprim value ctypes_ldouble_complex_cargl(value a) {
   CAMLparam1(a);

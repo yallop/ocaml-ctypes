@@ -44,8 +44,8 @@ ML_SOURCE = $(shell $(OCAMLDEP) -sort $(sort $(wildcard $($(PROJECT).dir)/*.ml) 
 
 NATIVE_OBJECTS = $(ML_SOURCE:$($(PROJECT).dir)/%.ml=$(BUILDDIR)/$($(PROJECT).dir)/%.cmx)
 BYTE_OBJECTS = $(ML_SOURCE:$($(PROJECT).dir)/%.ml=$(BUILDDIR)/$($(PROJECT).dir)/%.cmo)
-C_OBJECTS = $(C_SOURCE:$($(PROJECT).dir)/%.c=$(BUILDDIR)/$($(PROJECT).dir)/%$(OBJ_SUFFIX))
-XEN_OBJECTS = $(C_SOURCE:$($(PROJECT).dir)/%.c=$(BUILDDIR)/xen/$($(PROJECT).dir)/%$(OBJ_SUFFIX))
+C_OBJECTS = $(C_SOURCE:$($(PROJECT).dir)/%.c=$(BUILDDIR)/$($(PROJECT).dir)/%$(EXTOBJ))
+XEN_OBJECTS = $(C_SOURCE:$($(PROJECT).dir)/%.c=$(BUILDDIR)/xen/$($(PROJECT).dir)/%$(EXTOBJ))
 
 STUB_LIB = $(if $(C_OBJECTS),$(BUILDDIR)/dll$(PROJECT)_stubs$(EXTDLL))
 
@@ -123,7 +123,7 @@ $(BUILDDIR)/%.cmx : %.ml
 	@mkdir -p $(@D)
 	$(OCAMLFIND) opt -bin-annot -c -o $@ $(OCAMLFIND_PACKAGE_FLAGS) $(OCAMLFLAGS) $(THREAD_FLAG) $(OCAMLFIND_PACKAGE_FLAGS) $(CMX_OPTS) $(OCAMLINCLUDES) $(filter %.ml,$<)
 
-$(BUILDDIR)/%$(OBJ_SUFFIX) : %.c
+$(BUILDDIR)/%$(EXTOBJ) : %.c
 	@mkdir -p $(@D)
 ifeq ($(MSYSTEM),MSYS)
 	cd $(@D) && $(OCAMLFIND) ocamlc -c $(OCAMLFIND_PACKAGE_FLAGS) $(CFLAGS:%=-ccopt %) -o $(@F) $(OCAMLFLAGS) `cygpath -w "$(realpath $<)"`

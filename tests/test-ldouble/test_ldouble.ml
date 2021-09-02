@@ -192,7 +192,7 @@ let test_complex _ =
   assert_chk2 "add" C.add ComplexL.add;
   assert_chk2 "sub" C.sub ComplexL.sub;
   assert_chk2 "mul" C.mul ComplexL.mul;
-  if not Sys.win32 then
+  if Sys.getenv_opt "CCOMP_TYPE" <> Some "msvc" then
     (* complex division not supported by MSVC C runtime *)
     assert_chk2 "div" C.div ComplexL.div;
   (* fairly large errors accrue here, so reduce precision *)
@@ -207,7 +207,7 @@ let test_complex _ =
   assert_chkf "norm" C.norm ComplexL.norm;
   assert_chkf "arg" C.arg ComplexL.arg;
   assert_polar ();
-  if not Sys.win32 then
+  if Sys.getenv_opt "CCOMP_TYPE" <> Some "msvc" then
     (* complex division not supported by MSVC C runtime *)
     assert_division ()
 
@@ -279,7 +279,7 @@ let test_int_conversions _ =
      OCaml platforms with MSVC compiler.
   *)
   let min_integer, max_integer =
-    if Sys.win32 && not Sys.cygwin && Sys.int_size > 32 then -(1 lsl 53), 1 lsl 53
+    if Sys.getenv_opt "CCOMP_TYPE" = Some "msvc" && Sys.int_size > 32 then -(1 lsl 53), 1 lsl 53
     else min_int, max_int
   in
   begin
