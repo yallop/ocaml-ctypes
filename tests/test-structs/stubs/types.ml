@@ -49,4 +49,12 @@ struct
   let v1 = field s6 "v1" int
   let v2 = field s6 "v2" float
   let () = seal s6
+
+  (* adding fields through views (typedefs) *)
+  let struct_s7 : [`s7] structure typ = structure ""
+  let s7 = typedef struct_s7 "s7"
+  let s7_v1 = field s7 "v1" int
+  let s7_v2 = field s7 "v2" float
+  let s7_v3 = field s7 "v3" int
+  let () = seal s7
 end

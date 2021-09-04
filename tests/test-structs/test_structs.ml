@@ -470,6 +470,11 @@ struct
   let alignmentof_s6 = retrieve_size "alignmentof_s6"
   let offsetof_v1 = retrieve_size "offsetof_v1"
   let offsetof_v2 = retrieve_size "offsetof_v2"
+  let sizeof_s7 = retrieve_size "sizeof_s7"
+  let alignmentof_s7 = retrieve_size "alignmentof_s7"
+  let offsetof_s7_v1 = retrieve_size "offsetof_s7_v1"
+  let offsetof_s7_v2 = retrieve_size "offsetof_s7_v2"
+  let offsetof_s7_v3 = retrieve_size "offsetof_s7_v3"
 
   (*
     Test that struct layout retrieved from C correctly accounts for missing
@@ -542,6 +547,7 @@ struct
   (* Test that we can retrieve information for structs without tags that are
      identified through typedefs, e.g.
          typedef struct { int x; float y; } t;
+     Test also we get info for correct anonymous struct.
    *)
   let test_tagless_structs _ =
     begin
@@ -556,6 +562,21 @@ struct
 
       assert_equal offsetof_v2
         (offsetof M.v2);
+
+      assert_equal sizeof_s7
+        (sizeof M.s7);
+
+      assert_equal alignmentof_s7
+        (alignment M.s7);
+
+      assert_equal offsetof_s7_v1
+        (offsetof M.s7_v1);
+
+      assert_equal offsetof_s7_v2
+        (offsetof M.s7_v2);
+
+      assert_equal offsetof_s7_v3
+        (offsetof M.s7_v3);
     end
 
 
