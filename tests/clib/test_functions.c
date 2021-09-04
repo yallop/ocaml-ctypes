@@ -664,6 +664,8 @@ size_t sizeof_u1(void) { return sizeof(union u1); }
 size_t alignmentof_u1(void) { return offsetof (struct { char c; union u1 x; }, x); }
 size_t sizeof_u2(void) { return sizeof(u2); }
 size_t alignmentof_u2(void) { return offsetof (struct { char c; u2 x; }, x); }
+size_t sizeof_u3(void) { return sizeof(u3); }
+size_t alignmentof_u3(void) { return offsetof (struct { char c; u3 x; }, x); }
 
 bool bool_and(bool l, bool r)
 {

@@ -217,12 +217,16 @@ size_t offsetof_s7_v3(void);
 
 union u1 { char x1; float x2; double x3; char x4[13]; };
 typedef union { int t1; float t2; } u2;
+typedef union { int t1; float t2; double t3; } u3;
 
 size_t sizeof_u1(void);
 size_t alignmentof_u1(void);
 
 size_t sizeof_u2(void);
 size_t alignmentof_u2(void);
+
+size_t sizeof_u3(void);
+size_t alignmentof_u3(void);
 
 bool bool_and(bool, bool);
 int call_s5(struct s1 *, struct s5 *);
