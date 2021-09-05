@@ -414,6 +414,11 @@ void mul_complexd(ctypes_complex_double *l, ctypes_complex_double *r, ctypes_com
   *out = ctypes_compat_cmul(*l, *r);
 }
 
+void inv_complexd(ctypes_complex_double *a, ctypes_complex_double *out)
+{
+  *out = ctypes_compat_cinv(*a);
+}
+
 void rotdist_complexd(ctypes_complex_double *c, double *r, double *out) {
   ctypes_complex_double x = ctypes_compat_cmul(*c, (ctypes_compat_make_complex(cos(*r), sin(*r))));
   *out = fabs(ctypes_compat_creal(x)) + fabs(ctypes_compat_cimag(x));
@@ -429,6 +434,11 @@ void mul_complexld(ctypes_complex_long_double *l, ctypes_complex_long_double *r,
   *out = ctypes_compat_cmull(*l,  *r);
 }
 
+void inv_complexld(ctypes_complex_long_double *a, ctypes_complex_long_double *out)
+{
+  *out = ctypes_compat_cinvl(*a);
+}
+
 void rotdist_complexld(ctypes_complex_long_double *c, long double *r, long double *out) {
   ctypes_complex_long_double x = ctypes_compat_cmull(*c, (ctypes_compat_make_complexl(cosl(*r), sinl(*r))));
   *out = fabsl(ctypes_compat_creall(x)) + fabsl(ctypes_compat_cimagl(x));
@@ -437,6 +447,11 @@ void rotdist_complexld(ctypes_complex_long_double *c, long double *r, long doubl
 void add_complexf(ctypes_complex_float *l, ctypes_complex_float *r, ctypes_complex_float *out)
 {
   *out = ctypes_compat_caddf(*l, *r);
+}
+
+void inv_complexf(ctypes_complex_float *a, ctypes_complex_float *out)
+{
+  *out = ctypes_compat_cinvf(*a);
 }
 
 void mul_complexf(ctypes_complex_float *l, ctypes_complex_float *r, ctypes_complex_float *out)
@@ -459,6 +474,11 @@ ctypes_complex_long_double mul_complexld_val(ctypes_complex_long_double l, ctype
   return ctypes_compat_cmull(l, r);
 }
 
+ctypes_complex_long_double inv_complexld_val(ctypes_complex_long_double a)
+{
+  return ctypes_compat_cinvl(a);
+}
+
 long double rotdist_complexld_val(ctypes_complex_long_double c, long double r) {
   ctypes_complex_long_double x = ctypes_compat_cmull(c, (ctypes_compat_make_complexl(cosl(r), sinl(r))));
   return fabsl(ctypes_compat_creall(x)) + fabsl(ctypes_compat_cimagl(x));
@@ -474,6 +494,11 @@ ctypes_complex_double mul_complexd_val(ctypes_complex_double l, ctypes_complex_d
   return ctypes_compat_cmul(l, r);
 }
 
+ctypes_complex_double inv_complexd_val(ctypes_complex_double a)
+{
+  return ctypes_compat_cinv(a);
+}
+
 double rotdist_complexd_val(ctypes_complex_double c, double r) {
   ctypes_complex_double x = ctypes_compat_cmul(c, (ctypes_compat_make_complex(cos(r), sin(r))));
   return fabs(ctypes_compat_creal(x)) + fabs(ctypes_compat_cimag(x));
@@ -487,6 +512,11 @@ ctypes_complex_float add_complexf_val(ctypes_complex_float l, ctypes_complex_flo
 ctypes_complex_float mul_complexf_val(ctypes_complex_float l, ctypes_complex_float r)
 {
   return ctypes_compat_cmulf(l, r);
+}
+
+ctypes_complex_float inv_complexf_val(ctypes_complex_float a)
+{
+  return ctypes_compat_cinvf(a);
 }
 
 float rotdist_complexf_val(ctypes_complex_float c, float r) {

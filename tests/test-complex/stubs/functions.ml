@@ -17,15 +17,21 @@ struct
     F.(foreign name
          (ptr typ1 @-> ptr typ2 @-> ptr typ2 @-> returning void))
   let bind typ name = bind' typ typ name
+  let bind1 typ1 name =
+    F.(foreign name
+         (ptr typ1 @-> ptr typ1 @-> returning void))
 
   let add_complexd = bind complex64 "add_complexd"
   let mul_complexd = bind complex64 "mul_complexd"
+  let inv_complexd = bind1 complex64 "inv_complexd"
   let rotdist_complexd = bind' complex64 double "rotdist_complexd"
   let add_complexld = bind complexld "add_complexld"
   let mul_complexld = bind complexld "mul_complexld"
+  let inv_complexld = bind1 complexld "inv_complexld"
   let rotdist_complexld = bind' complexld ldouble "rotdist_complexld"
   let add_complexf = bind complex32 "add_complexf"
   let mul_complexf = bind complex32 "mul_complexf"
+  let inv_complexf = bind1 complex32 "inv_complexf"
   let rotdist_complexf = bind' complex32 float "rotdist_complexf"
 end
 
@@ -36,15 +42,21 @@ struct
   let bind' typ1 typ2 name =
     F.(foreign name (typ1 @-> typ2 @-> returning typ2))
   let bind typ name = bind' typ typ name
+  let bind1' typ1 name =
+    F.(foreign name (typ1 @-> returning typ1))
+  let bind1 typ name = bind1' typ name
 
   let add_complexd_val = bind complex64 "add_complexd_val"
   let mul_complexd_val = bind complex64 "mul_complexd_val"
+  let inv_complexd_val = bind1 complex64 "inv_complexd_val"
   let rotdist_complexd_val = bind' complex64 double "rotdist_complexd_val"
   let add_complexld_val = bind complexld "add_complexld_val"
   let mul_complexld_val = bind complexld "mul_complexld_val"
+  let inv_complexld_val = bind1 complexld "inv_complexld_val"
   let rotdist_complexld_val = bind' complexld ldouble "rotdist_complexld_val"
   let add_complexf_val = bind complex32 "add_complexf_val"
   let mul_complexf_val = bind complex32 "mul_complexf_val"
+  let inv_complexf_val = bind1 complex32 "inv_complexf_val"
   let rotdist_complexf_val = bind' complex32 float "rotdist_complexf_val"
 end
 
