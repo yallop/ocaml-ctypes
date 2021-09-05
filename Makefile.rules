@@ -83,9 +83,9 @@ endif
 ifneq ($(wildcard $(shell $(OCAMLFIND) ocamlc -where)/dynlink.cmxa),)
 LIB_TARGETS += $(BUILDDIR)/$(PROJECT).cmxs
 endif
-LIB_TARGET_EXTRAS = $(if $(STUB_LIB),$(BUILDDIR)/lib$(PROJECT)_stubs.a) \
-                    $(if $(XEN_LIB),$(BUILDDIR)/lib$(PROJECT)_stubs_xen.a) \
-                    $(BUILDDIR)/$(PROJECT).a
+LIB_TARGET_EXTRAS = $(if $(STUB_LIB),$(BUILDDIR)/lib$(PROJECT)_stubs$(EXTLIB)) \
+                    $(if $(XEN_LIB),$(BUILDDIR)/lib$(PROJECT)_stubs_xen$(EXTLIB)) \
+                    $(BUILDDIR)/$(PROJECT)$(EXTLIB)
 INSTALL_CMIS = $($(PROJECT).public:%=$(BUILDDIR)/$($(PROJECT).dir)/%.cmi) \
                $($(PROJECT).cmi_only:%=$(BUILDDIR)/$($(PROJECT).dir)/%.cmi)
 INSTALL_CMTIS = $($(PROJECT).public:%=$(BUILDDIR)/$($(PROJECT).dir)/%.cmti)

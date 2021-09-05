@@ -46,6 +46,7 @@ EXTDLL:=$(shell $(OCAMLFIND) ocamlc -config | awk '/^ext_dll:/{print $$2}')
 OSYSTEM:=$(shell $(OCAMLFIND) ocamlc -config | awk '/^system:/{print $$2}')
 CCOMP_TYPE:=$(shell $(OCAMLFIND) ocamlc -config | awk '/^ccomp_type:/{print $$2}')
 EXTOBJ:=$(shell $(OCAMLFIND) ocamlc -config | awk '/^ext_obj:/{print $$2}')
+EXTLIB:=$(shell $(OCAMLFIND) ocamlc -config | awk '/^ext_lib:/{print $$2}')
 
 ifneq (,$(filter mingw%,$(OSYSTEM)))
 OS_ALT_SUFFIX=.win
