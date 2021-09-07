@@ -54,12 +54,12 @@ The documentation and source distribution contain more complex examples, involvi
 
 [rwo-ffi]: https://dev.realworldocaml.org/foreign-function-interface.html
 [rwo]: http://realworldocaml.org/
-[mirage-blogpost]: http://openmirage.org/blog/modular-foreign-function-bindings
+[mirage-blogpost]: https://mirage.io/blog/modular-foreign-function-bindings
 [tutorial]: https://github.com/ocamllabs/ocaml-ctypes/wiki/ctypes-tutorial
 [apidoc]: https://docs.ocaml.pro/html/LIBRARY.ctypes@ctypes.0.17.1/index.html
 [mailing-list]: http://lists.ocaml.org/listinfo/ctypes
 [faq]: https://github.com/ocamllabs/ocaml-ctypes/wiki/FAQ
-[mirage]: http://openmirage.org
+[mirage]: https://mirage.io/
 [sjb-cstubs-post]: http://simonjbeaumont.com/posts/ocaml-ctypes/
 [cstubs]: https://github.com/ocamllabs/ocaml-ctypes/blob/master/src/cstubs/cstubs.mli
 [orbitz-cstubs_structs]: https://github.com/ocamllabs/ocaml-ctypes/blob/master/examples/cstubs_structs/README.md
