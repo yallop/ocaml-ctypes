@@ -51,13 +51,34 @@ ctypes_tls_callback(void* a, DWORD reason, PVOID b)
   }
 }
 
-#ifdef _MSC_VER
-#pragma const_seg(".CRT$XLB") EXTERN_C const PIMAGE_TLS_CALLBACK \
-  __crt_ctypes_tls_callback__ = ctypes_tls_callback;
-#else
+#ifndef _MSC_VER
 PIMAGE_TLS_CALLBACK __crt_ctypes_tls_callback__ __attribute__ \
  ((section(".CRT$XLB"))) = ctypes_tls_callback;
-#endif
+
+#else
+
+#ifdef _WIN64
+
+#pragma comment(linker, "/INCLUDE:_tls_used")
+#pragma comment(linker, "/INCLUDE:crt_ctypes_tls_callback")
+#pragma data_seg(push, old_seg)
+#pragma const_seg(".CRT$XLB")
+extern const PIMAGE_TLS_CALLBACK crt_ctypes_tls_callback;
+const PIMAGE_TLS_CALLBACK crt_ctypes_tls_callback = ctypes_tls_callback;
+#pragma data_seg(pop, old_seg)
+
+#else
+
+#pragma comment(linker, "/INCLUDE:__tls_used")
+#pragma comment(linker, "/INCLUDE:_crt_ctypes_tls_callback")
+#pragma data_seg(push, old_seg)
+#pragma data_seg(".CRT$XLB")
+PIMAGE_TLS_CALLBACK crt_ctypes_tls_callback = ctypes_tls_callback;
+#pragma data_seg(pop, old_seg)
+
+#endif /* _WIN64 */
+
+#endif /* _MSC_VER */
 
 static int ctypes_thread_actually_register(void)
 {
@@ -104,7 +125,7 @@ static int ctypes_thread_actually_register(void)
        will always succeed.  Consequently, there is no need to protect
        the TLS-creation code with pthread_once.  (And at worst, if the
        assumption is violated then caml_c_thread_unregister will be
-       called multiple times, which is harmless.) */ 
+       called multiple times, which is harmless.) */
     pthread_key_create(&cleanup_key, ctypes_thread_unregister);
     pthread_setspecific(cleanup_key, &cleanup_key);
   }
