@@ -144,7 +144,7 @@ src/ctypes-foreign/libffi_abi.ml: src/configure/extract_from_c.ml src/configure/
 
 libffi.config: src/discover/commands.mli src/discover/commands.ml src/discover/discover.ml
 	$(HOSTOCAMLFIND) ocamlc -o discover -package str -strict-sequence -linkpkg $^ -I src/discover
-	./discover -ocamlc "$(OCAMLFIND) ocamlc" > $@ || (rm $@ && false)
+	./discover -ext-obj $(EXTOBJ) -ocamlc "$(OCAMLFIND) ocamlc" > $@ || (rm $@ && false)
 
 asneeded.config:
 	./src/discover/determine_as_needed_flags.sh >> $@
