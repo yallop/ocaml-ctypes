@@ -29,3 +29,8 @@ fts_generated.ml
 fts_stubs.c
 libffi_abi.ml
 .vscode/
+.vs/
+camlprog.exe
+*.pdb
+*.sln
+generated_struct_stubs.obj
