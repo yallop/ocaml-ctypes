@@ -61,11 +61,11 @@ PIMAGE_TLS_CALLBACK __crt_ctypes_tls_callback__ __attribute__ \
 
 #pragma comment(linker, "/INCLUDE:_tls_used")
 #pragma comment(linker, "/INCLUDE:crt_ctypes_tls_callback")
-#pragma data_seg(push, old_seg)
+#pragma const_seg(push, old_seg)
 #pragma const_seg(".CRT$XLB")
 extern const PIMAGE_TLS_CALLBACK crt_ctypes_tls_callback;
 const PIMAGE_TLS_CALLBACK crt_ctypes_tls_callback = ctypes_tls_callback;
-#pragma data_seg(pop, old_seg)
+#pragma const_seg(pop, old_seg)
 
 #else
 
