@@ -18,7 +18,7 @@ lib_process=-lpsapi
 ifeq ($(DEBUG),false)
   CFLAGS=-Wall -O2 $(OCAML_FFI_INCOPTS) $(NCURSES_INCOPTS) "-I$(package_integers_path)"
 else
-  CFLAGS=-Wall /Z7 $(OCAML_FFI_INCOPTS) $(NCURSES_INCOPTS) "-I$(package_integers_path)"
+  CFLAGS=-Wall /Zi $(OCAML_FFI_INCOPTS) $(NCURSES_INCOPTS) "-I$(package_integers_path)"
 endif
 else
 # Neither MinGW nor MSCV
@@ -38,6 +38,13 @@ ifneq ($(COVERAGE),false)
   OCAMLFIND_BISECT_FLAGS=-package bisect_ppx
 endif
 
+ifeq ($(CCOMP_TYPE),msvc)
+ifneq ($(DEBUG),false)
+GENERATE_PDB=yes
+NATIVE_OCAML_LINK_FLAGS=-cclib -link -cclib "/DEBUG"
+endif
+endif
+
 C_SOURCE  = $(sort $(wildcard $($(PROJECT).dir)/*.c) $(patsubst %,$($(PROJECT).dir)/%,$($(PROJECT).extra_cs)))
 ML_SOURCE = $(shell $(OCAMLDEP) -sort $(sort $(wildcard $($(PROJECT).dir)/*.ml) \
                     $(patsubst %,$($(PROJECT).dir)/%,$($(PROJECT).extra_mls))))
@@ -48,9 +55,11 @@ C_OBJECTS = $(C_SOURCE:$($(PROJECT).dir)/%.c=$(BUILDDIR)/$($(PROJECT).dir)/%$(EX
 XEN_OBJECTS = $(C_SOURCE:$($(PROJECT).dir)/%.c=$(BUILDDIR)/xen/$($(PROJECT).dir)/%$(EXTOBJ))
 
 STUB_LIB = $(if $(C_OBJECTS),$(BUILDDIR)/dll$(PROJECT)_stubs$(EXTDLL))
+STUB_PDB = $(if $(filter yes,$(GENERATE_PDB)),$(if $(C_OBJECTS),$(BUILDDIR)/dll$(PROJECT)_stubs.pdb))
 
 OPAM_PREFIX=$(shell opam config var prefix)
 XEN_LIB = $(if $($(PROJECT).xen),$(BUILDDIR)/dll$(PROJECT)_stubs_xen$(EXTDLL))
+XEN_PDB = $(if $(filter yes,$(GENERATE_PDB)),$(if $($(PROJECT).xen),$(BUILDDIR)/dll$(PROJECT)_stubs_xen.pdb))
 XEN_CFLAGS=$(if $(XEN_LIB), \
         $(CFLAGS) -DMINIOS $(shell env PKG_CONFIG_PATH="$(OPAM_PREFIX)/lib/pkgconfig" \
                                        pkg-config --cflags mirage-xen) -fno-builtin)
@@ -75,8 +84,8 @@ NATIVE_LIB=$(BUILDDIR)/$(PROJECT).cmxa
 NATIVE_TARGET=$(BUILDDIR)/$(PROJECT).native
 BEST_TARGET=$(BUILDDIR)/$(PROJECT).$(BEST)
 LIB_TARGETS = $(BUILDDIR)/$(PROJECT).cma \
-              $(STUB_LIB) \
-              $(XEN_LIB)
+              $(STUB_LIB) $(STUB_PDB) \
+              $(XEN_LIB) $(XEN_PDB)
 ifeq ($(BEST),native)
 LIB_TARGETS += $(BUILDDIR)/$(PROJECT).cmxa
 endif
@@ -86,6 +95,11 @@ endif
 LIB_TARGET_EXTRAS = $(if $(STUB_LIB),$(BUILDDIR)/lib$(PROJECT)_stubs$(EXTLIB)) \
                     $(if $(XEN_LIB),$(BUILDDIR)/lib$(PROJECT)_stubs_xen$(EXTLIB)) \
                     $(BUILDDIR)/$(PROJECT)$(EXTLIB)
+ifeq ($(GENERATE_PDB),yes)
+LIB_TARGET_EXTRAS += $(if $(STUB_LIB),$(BUILDDIR)/dll$(PROJECT)_stubs.pdb) \
+                     $(if $(XEN_LIB),$(BUILDDIR)/dll$(PROJECT)_stubs_xen.pdb) \
+                     $(BUILDDIR)/$(PROJECT).pdb
+endif
 INSTALL_CMIS = $($(PROJECT).public:%=$(BUILDDIR)/$($(PROJECT).dir)/%.cmi) \
                $($(PROJECT).cmi_only:%=$(BUILDDIR)/$($(PROJECT).dir)/%.cmi)
 INSTALL_CMTIS = $($(PROJECT).public:%=$(BUILDDIR)/$($(PROJECT).dir)/%.cmti)
@@ -103,11 +117,19 @@ OCAMLFIND_PACKAGE_FLAGS=$(patsubst %,-package %,$($(PROJECT).deps)) \
 $(BUILDDIR)/%.cmxa: $$(NATIVE_OBJECTS)
 	$(OCAMLFIND) opt -a -linkall $(OCAMLFLAGS) $(THREAD_FLAG) $(OCAMLFIND_PACKAGE_FLAGS) $(CMXA_OPTS) -o $@ $(NATIVE_OBJECTS) $(OCAML_LINK_FLAGS)
 
-$(BUILDDIR)/dll%_stubs$(EXTDLL): $$(C_OBJECTS)
+$(BUILDDIR)/dll%_stubs$(EXTDLL) $(if $(filter yes,$(GENERATE_PDB)),$(BUILDDIR)/dll%_stubs.pdb): $$(C_OBJECTS)
+ifeq ($(GENERATE_PDB),yes)
+	$(OCAMLMKLIB) -o $(BUILDDIR)/$*_stubs $^ $(OCAMLMKLIB_FLAGS) $(OCAMLMKLIB_EXTRA_FLAGS) -ldopt "-link /DEBUG -link /Fd$(BUILDDIR)/dll$*_stubs.pdb"
+else
 	$(OCAMLMKLIB) -o $(BUILDDIR)/$*_stubs $^ $(OCAMLMKLIB_FLAGS) $(OCAMLMKLIB_EXTRA_FLAGS)
+endif
 
-$(BUILDDIR)/dll%_stubs_xen$(EXTDLL): $$(XEN_OBJECTS)
+$(BUILDDIR)/dll%_stubs_xen$(EXTDLL) $(if $(filter yes,$(GENERATE_PDB)),$(BUILDDIR)/dll%_stubs_xen.pdb): $$(XEN_OBJECTS)
+ifeq ($(GENERATE_PDB),yes)
+	$(OCAMLMKLIB) -o $(BUILDDIR)/$*_stubs_xen $^ $(OCAMLMKLIB_FLAGS) $(OCAMLMKLIB_EXTRA_FLAGS) -ldopt "-link /DEBUG -link /Fd$(BUILDDIR)/dll$*_stubs_xen.pdb"
+else
 	$(OCAMLMKLIB) -o $(BUILDDIR)/$*_stubs_xen $^ $(OCAMLMKLIB_FLAGS) $(OCAMLMKLIB_EXTRA_FLAGS)
+endif
 
 $(BUILDDIR)/%.cmxs : $$(NATIVE_OBJECTS)
 	$(OCAMLFIND) opt -shared -linkall $(OCAMLFLAGS) $(THREAD_FLAG) $(OCAMLFIND_PACKAGE_FLAGS) -o $@ $(NATIVE_OBJECTS) $(C_OBJECTS) $(OCAML_LINK_FLAGS)
@@ -148,7 +170,7 @@ else
 endif
 
 $(BUILDDIR)/%.native : $$(NATIVE_OBJECTS) $$(C_OBJECTS)
-	$(OCAMLFIND) opt -I $(BUILDDIR) -linkpkg $(OCAMLFLAGS) $(THREAD_FLAG) $(OCAMLFIND_PACKAGE_FLAGS) $(LOCAL_CMXAS) -o $@ $(NATIVE_OBJECTS) $(C_OBJECTS) $(OCAML_LINK_FLAGS) 
+	$(OCAMLFIND) opt -I $(BUILDDIR) -linkpkg $(OCAMLFLAGS) $(THREAD_FLAG) $(OCAMLFIND_PACKAGE_FLAGS) $(LOCAL_CMXAS) -o $@ $(NATIVE_OBJECTS) $(C_OBJECTS) $(OCAML_LINK_FLAGS) $(NATIVE_OCAML_LINK_FLAGS)
 
 $(BUILDDIR)/%.byte : $$(BYTE_OBJECTS) $$(C_OBJECTS)
 	$(OCAMLFIND) ocamlc -custom -I $(BUILDDIR) -linkpkg $(OCAMLFLAGS) $(THREAD_FLAG) $(OCAMLFIND_PACKAGE_FLAGS) $(LOCAL_CMAS) -o $@ $(BYTE_OBJECTS) $(C_OBJECTS) $(OCAML_LINK_FLAGS)

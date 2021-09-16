@@ -9,6 +9,12 @@ else
 CFLAGS += -I "$(CURDIR)/src/ctypes" -I "$(CURDIR)/tests"
 endif
 
+ifneq ($(DEBUG),false)
+ifeq ($(CCOMP_TYPE),msvc)
+CFLAGS += /Zi
+endif
+endif
+
 CC=$(shell ocamlc -config | sed -n '/native_c_compiler/{ s/[^:]*://; p;}')
 
 # tests-common subproject
@@ -1375,12 +1381,18 @@ TESTS += test-ldouble
 ifneq (,$(filter mingw%,$(OSYSTEM)))
 WINLDFLAGS=-Wl,--out-implib,libtest_functions.dll.a
 LDFLAGS+=-static-libgcc
+else
+ifeq ($(CCOMP_TYPE),msvc)
+ifneq ($(DEBUG),false)
+WINLDFLAGS=/Zi
+endif
+endif
 endif
 
 testlib: $(BUILDDIR)/clib/libtest_functions$(EXTDLL)
 $(BUILDDIR)/clib/libtest_functions$(EXTDLL): $(BUILDDIR)/clib/test_functions$(EXTOBJ)
 ifeq ($(CCOMP_TYPE),msvc)
-	$(CC) /LD $(LDFLAGS) /Fe"$@" $^
+	$(CC) /LD $(LDFLAGS) $(WINLDFLAGS) /Fe"$@" $^
 	cp $@ $(BUILDDIR)
 else
 	$(CC) -shared $(LDFLAGS) $(WINLDFLAGS) -o $@ $^ -lm
