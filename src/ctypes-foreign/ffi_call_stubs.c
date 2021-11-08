@@ -602,7 +602,7 @@ value ctypes_make_function_pointer(value callspec_, value fnid)
     ctypes_check_ffi_status(status);
 
     codeptr =
-      caml_alloc_custom(&closure_custom_ops, sizeof(struct closure *), 1, 1);
+      caml_alloc_custom(&closure_custom_ops, sizeof(struct closure *), 0, 1);
     *(struct closure **)Data_custom_val(codeptr) = closure;
 
     CAMLreturn (codeptr);
