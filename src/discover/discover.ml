@@ -257,7 +257,9 @@ let () =
   is_homebrew :=
     test_feature "brew"
       (fun () ->
-         (Commands.command "brew ls --versions").Commands.stdout <> "");
+         let out = Commands.command "brew ls --versions" in
+         out.status == 0 && out.stdout <> ""
+         );
 
   (* Test for MacOS X MacPorts. *)
   is_macports :=
