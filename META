@@ -1,4 +1,4 @@
-version = "0.19.1"
+version = "0.20.0"
 description = "Combinators for binding to C libraries without writing any C."
 requires = "bigarray-compat bytes integers"
 archive(byte) = "ctypes.cma"
@@ -9,7 +9,7 @@ archive(native, plugin) = "ctypes.cmxs"
 exists_if = "ctypes.cma"
 
 package "top" (
-  version = "0.19.1"
+  version = "0.20.0"
   description = "Toplevel printers for C types"
   requires = "ctypes"
   archive(byte) = "ctypes-top.cma"
@@ -20,7 +20,7 @@ package "top" (
 )
 
 package "stubs" (
-  version = "0.19.1"
+  version = "0.20.0"
   description = "Stub generation from C types"
   requires = "ctypes str"
   archive(byte) = "cstubs.cma"
@@ -32,7 +32,7 @@ package "stubs" (
 )
 
 package "foreign" (
- version = "0.19.1"
+ version = "0.20.0"
  description = "Dynamic linking of C functions"
  requires = "threads ctypes"
  archive(byte) = "ctypes-foreign.cma"

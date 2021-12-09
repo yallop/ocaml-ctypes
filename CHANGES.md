@@ -1,3 +1,17 @@
+## ctypes 0.20.0
+
+* Remove naked pointers from the Dl library   
+  https://github.com/ocamllabs/ocaml-ctypes/pull/681
+
+* Avoid running a full GC cycle on every FFI closure allocation  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/694
+
+* Check output of `brew ls --versions` when detecting homebrew  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/697
+
+Thanks to Martin Kletzander (@nertpinx) and Arseniy Alekseyev
+(@aalekseyev) for contributions to this release.
+
 ## ctypes 0.19.1
 
 * Fix use of CAMLdrop in generated code  
