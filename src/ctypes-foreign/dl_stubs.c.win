@@ -178,7 +178,7 @@ ctypes_win32_dlsym(value handle,value sym)
   CAMLreturn(ret);
 }
 
-#define Val_none Val_long(0)
+#define Val_none Val_int(0)
 #define Some_val(v) Field(v, 0)
 
 /*
