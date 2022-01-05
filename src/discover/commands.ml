@@ -59,8 +59,8 @@ let shell_command_results command =
            (unixify stderr_filename)
        in
        let status = Sys.command full_command in
-       let stdout = file_contents stdout_filename in
-       let stderr = file_contents stderr_filename in
+       let stdout = file_contents ~filename:stdout_filename in
+       let stderr = file_contents ~filename:stderr_filename in
        { status; stdout; stderr }
     ) ()
     ~cleanup:begin fun () ->
