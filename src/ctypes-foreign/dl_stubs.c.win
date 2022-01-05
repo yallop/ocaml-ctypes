@@ -210,7 +210,7 @@ ctypes_win32_dlopen(value filename, value flags)
     intnat iflags = Long_val(flags);
     HMODULE p;
     UINT e_mode;
-    DWORD ec;
+    DWORD ec = ERROR_SUCCESS;
 
     filename=utf8_to_wstring(Some_val(filename));
     if ( filename == Val_unit ){
