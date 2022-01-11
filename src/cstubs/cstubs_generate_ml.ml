@@ -249,6 +249,9 @@ let rec ml_typ_of_return_typ : type a. a typ -> ml_type =
     "cstubs does not support OCaml bytes values as return values"
   | OCaml FloatArray -> Ctypes_static.unsupported
     "cstubs does not support OCaml float arrays as return values"
+  | Value ->
+    `Ident (path_of_string "Obj.t")
+
 
 let rec ml_typ_of_arg_typ : type a. a typ -> ml_type = function
   | Void -> `Ident (path_of_string "unit")
@@ -273,6 +276,8 @@ let rec ml_typ_of_arg_typ : type a. a typ -> ml_type = function
     `Appl (path_of_string "CI.ocaml",
            [`Appl (path_of_string "array",
                    [`Ident (path_of_string "float")])])
+  | Value ->
+    `Ident (path_of_string "Obj.t")
 
 type polarity = In | Out
 
@@ -440,6 +445,11 @@ let rec pattern_and_exp_of_typ : type a. concurrency:concurrency_policy -> errno
     | Out, FloatArray -> Ctypes_static.unsupported
       "cstubs does not support OCaml float arrays as return values"
     end
+  | Value ->
+   begin  match pol with
+     | In -> (static_con "Value" [], None, binds)
+     | Out -> (static_con "Value" [], None, binds)
+   end
   | Abstract _ as ty -> internal_error
     "Unexpected abstract type encountered during ML code generation: %s"
     (Ctypes.string_of_typ ty)
@@ -480,6 +490,9 @@ let rec pattern_of_typ : type a. a typ -> ml_pat = function
   | OCaml FloatArray ->
     Ctypes_static.unsupported
       "cstubs does not support OCaml float arrays as global values"
+  | Value ->
+    Ctypes_static.unsupported
+      "cstubs does not support OCaml value as global values"
   | Abstract _ as ty ->
     internal_error
       "Unexpected abstract type encountered during ML code generation: %s"

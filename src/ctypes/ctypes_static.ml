@@ -45,6 +45,7 @@ type _ typ =
   | Bigarray        : (_, 'a, _) Ctypes_bigarray.t
                                          -> 'a typ
   | OCaml           : 'a ocaml_type      -> 'a ocaml typ
+  | Value           :                        Obj.t typ
 and 'a carray = { astart : 'a ptr; alength : int }
 and ('a, 'kind) structured = { structured : ('a, 'kind) structured ptr } [@@unboxed]
 and 'a union = ('a, [`Union]) structured
@@ -133,6 +134,7 @@ let rec sizeof : type a. a typ -> int = function
   | Pointer _                      -> Ctypes_primitives.pointer_size
   | Funptr _                       -> Ctypes_primitives.pointer_size
   | OCaml _                        -> raise IncompleteType
+  | Value                          -> raise IncompleteType
   | View { ty }                    -> sizeof ty
 
 let rec alignment : type a. a typ -> int = function
@@ -149,6 +151,7 @@ let rec alignment : type a. a typ -> int = function
   | Pointer _                        -> Ctypes_primitives.pointer_alignment
   | Funptr _                         -> Ctypes_primitives.pointer_alignment
   | OCaml _                          -> raise IncompleteType
+  | Value                            -> raise IncompleteType
   | View { ty }                      -> alignment ty
 
 let rec passable : type a. a typ -> bool = function
@@ -164,6 +167,7 @@ let rec passable : type a. a typ -> bool = function
   | Funptr _                       -> true
   | Abstract _                     -> false
   | OCaml _                        -> true
+  | Value                          -> true
   | View { ty }                    -> passable ty
 
 (* Whether a value resides in OCaml-managed memory.
@@ -180,10 +184,11 @@ let rec ocaml_value : type a. a typ -> bool = function
   | Funptr _    -> false
   | Abstract _  -> false
   | OCaml _     -> true
+  | Value       -> true
   | View { ty } -> ocaml_value ty
 
 let rec has_ocaml_argument : type a. a fn -> bool = function
-    Returns _ -> false
+    Returns t -> ocaml_value t
   | Function (t, _) when ocaml_value t -> true
   | Function (_, t) -> has_ocaml_argument t
 
@@ -222,6 +227,7 @@ let array i t = Array (t, i)
 let ocaml_string = OCaml String
 let ocaml_bytes = OCaml Bytes
 let ocaml_float_array = OCaml FloatArray
+let ocaml_value = Value
 let ptr t = Pointer t
 let ( @->) f t =
   if not (passable f) then

@@ -143,6 +143,7 @@ static struct callspec {
     int check_errno:1;
     int runtime_lock:1;
     int thread_registration:1;
+    int return_ocaml_value:1;
   } context;
 
   /* The libffi call interface structure.  It would be nice for this member to
@@ -220,12 +221,13 @@ static void populate_arg_array(struct callspec *callspec,
 /* Allocate a new C call specification */
 /* allocate_callspec : check_errno:bool -> runtime_lock:bool -> callspec */
 value ctypes_allocate_callspec(value check_errno, value runtime_lock,
-                               value thread_registration)
+                               value thread_registration, value return_ocaml_value)
 {
   struct call_context context = {
     Int_val(check_errno),
     Int_val(runtime_lock),
     Int_val(thread_registration),
+    Int_val(return_ocaml_value),
   };
 
   value block = caml_alloc_custom(&callspec_custom_ops,
@@ -379,11 +381,15 @@ value ctypes_call(value fnname, value function, value callspec_,
     if(arg_tuple == Val_unit) continue;
 
     value arg_ptr    = Field(arg_tuple, 0);
-    value arg_offset = Field(arg_tuple, 1);
+    intnat arg_offset = Long_val(Field(arg_tuple, 1));
 
-    /* Only strings have defined semantics for now. */
-    assert(Is_block(arg_ptr) && Tag_val(arg_ptr) == String_tag);
-    val_refs[arg_idx] = String_val(arg_ptr) + Long_val(arg_offset);
+    if(arg_offset == -1){
+      val_refs[arg_idx] = (void*) arg_ptr;
+    } else {
+       /* Only strings have defined semantics for now. */
+       assert(Is_block(arg_ptr) && Tag_val(arg_ptr) == String_tag);
+       val_refs[arg_idx] = String_val(arg_ptr) + arg_offset;
+    }
 
     ((const void**)(callbuffer + arg_array_offset))[arg_idx] = &val_refs[arg_idx];
   }
@@ -422,7 +428,11 @@ value ctypes_call(value fnname, value function, value callspec_,
     unix_error(saved_errno, buffer, Nothing);
   }
 
-  callback_rv_buf = CTYPES_FROM_PTR(return_read_slot);
+  if(context.return_ocaml_value){
+    callback_rv_buf = *((value*)return_read_slot);
+  }else{
+    callback_rv_buf = CTYPES_FROM_PTR(return_read_slot);
+  }
   CAMLreturn(caml_callback(rvreader, callback_rv_buf));
 }
 

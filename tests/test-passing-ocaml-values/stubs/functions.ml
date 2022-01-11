@@ -29,4 +29,8 @@ struct
 
   let strdup = foreign name_strdup
     (ocaml_string @-> returning string)
+
+  let get_first_field = foreign "get_first_field"
+    (ocaml_value @-> returning ocaml_value)
+
 end

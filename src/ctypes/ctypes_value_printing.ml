@@ -21,6 +21,7 @@ let rec format : type a. a typ -> Format.formatter -> a -> unit
   | Bigarray ba -> Format.fprintf fmt "<bigarray %a>"
     (fun fmt -> Ctypes_type_printing.format_typ fmt) typ
   | Abstract _ -> format_structured fmt v
+  | Value -> Format.fprintf fmt "Obj.t"
   | OCaml _ -> format_ocaml fmt v
   | View {write; ty; format=f} ->
     begin match f with
@@ -70,6 +71,7 @@ and format_ocaml : type a. Format.formatter -> a ocaml -> unit =
   | String -> Format.fprintf fmt "%S%a" obj offset off
   | Bytes -> Format.fprintf fmt "%S%a" (Bytes.to_string obj) offset off
   | FloatArray -> Format.fprintf fmt "%a%a" float_array obj offset off
+
 and format_fields : type a b. string -> (a, b) structured boxed_field list ->
                               Format.formatter -> (a, b) structured -> unit
   = fun sep fields fmt s ->
