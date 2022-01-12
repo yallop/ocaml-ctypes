@@ -114,7 +114,7 @@ type boxed_typ = BoxedType : 'a typ -> boxed_typ
 val sizeof : 'a typ -> int
 val alignment : 'a typ -> int
 val passable : 'a typ -> bool
-val ocaml_value : 'a typ -> bool
+val is_ocaml_value : 'a typ -> bool
 val has_ocaml_argument : 'a fn -> bool
 
 val void : unit typ
@@ -152,7 +152,8 @@ val array : int -> 'a typ -> 'a carray typ
 val ocaml_string : string ocaml typ
 val ocaml_bytes : bytes ocaml typ
 val ocaml_float_array : float array ocaml typ
-val ocaml_value : Obj.t typ
+val ocaml_obj_t : Obj.t typ
+val ocaml_value : ?format: (Format.formatter -> 'a -> unit) -> string -> 'a typ
 val ptr : 'a typ -> 'a ptr typ
 val ( @-> ) : 'a typ -> 'b fn -> ('a -> 'b) fn
 val abstract : name:string -> size:int -> alignment:int -> 'a abstract typ

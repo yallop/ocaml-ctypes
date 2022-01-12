@@ -30,7 +30,21 @@ struct
   let strdup = foreign name_strdup
     (ocaml_string @-> returning string)
 
-  let get_first_field = foreign "get_first_field"
-    (ocaml_value @-> returning ocaml_value)
+  let int_ref_ref_typ : int ref ref typ =
+     ocaml_value  "int ref ref"
+          ~format:(fun fmt (x:int ref ref) ->
+                       Format.fprintf fmt "ref (ref %i)" !(!x))
+
+  let int_ref_typ : int ref typ =
+     ocaml_value  "int ref"
+          ~format:(fun fmt (x:int ref) ->
+                       Format.fprintf fmt "(ref %i)" !x)
+
+  let get_first_field_int_ref_ref = foreign "get_first_field"
+    (int_ref_ref_typ @-> returning int_ref_typ)
+
+  let get_first_field_obj_t = foreign "get_first_field"
+      (ocaml_obj_t @-> returning ocaml_obj_t)
+
 
 end

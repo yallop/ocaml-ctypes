@@ -173,7 +173,7 @@ let rec passable : type a. a typ -> bool = function
 (* Whether a value resides in OCaml-managed memory.
    Values that reside in OCaml memory cannot be accessed
    when the runtime lock is not held. *)
-let rec ocaml_value : type a. a typ -> bool = function
+let rec is_ocaml_value : type a. a typ -> bool = function
     Void        -> false
   | Primitive _ -> false
   | Struct _    -> false
@@ -185,11 +185,11 @@ let rec ocaml_value : type a. a typ -> bool = function
   | Abstract _  -> false
   | OCaml _     -> true
   | Value       -> true
-  | View { ty } -> ocaml_value ty
+  | View { ty } -> is_ocaml_value ty
 
 let rec has_ocaml_argument : type a. a fn -> bool = function
-    Returns t -> ocaml_value t
-  | Function (t, _) when ocaml_value t -> true
+    Returns t -> is_ocaml_value t
+  | Function (t, _) when is_ocaml_value t -> true
   | Function (_, t) -> has_ocaml_argument t
 
 let void = Void
@@ -227,7 +227,7 @@ let array i t = Array (t, i)
 let ocaml_string = OCaml String
 let ocaml_bytes = OCaml Bytes
 let ocaml_float_array = OCaml FloatArray
-let ocaml_value = Value
+let ocaml_obj_t = Value
 let ptr t = Pointer t
 let ( @->) f t =
   if not (passable f) then
@@ -242,6 +242,14 @@ let id v = v
 let typedef old name =
   view ~format_typ:(fun k fmt -> Format.fprintf fmt "%s%t" name k)
     ~read:id ~write:id old
+let ocaml_value ?format name =
+  let format = match format with
+    | None -> (fun fmt _ -> Format.fprintf fmt "(* %s *)" name)
+    | Some format -> format
+  in
+  view ~format ~read:Obj.obj ~write:Obj.repr
+    ~format_typ:(fun k fmt -> Format.fprintf fmt "/*%s*/ value%t" name k)
+    Value
 
 let bigarray_ : type a b c d e l.
   < element: a;
