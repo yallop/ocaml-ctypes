@@ -178,7 +178,7 @@ ctypes_win32_dlsym(value handle,value sym)
   CAMLreturn(ret);
 }
 
-#define Val_none Val_long(0)
+#define Val_none Val_int(0)
 #define Some_val(v) Field(v, 0)
 
 /*
@@ -210,7 +210,7 @@ ctypes_win32_dlopen(value filename, value flags)
     intnat iflags = Long_val(flags);
     HMODULE p;
     UINT e_mode;
-    DWORD ec;
+    DWORD ec = ERROR_SUCCESS;
 
     filename=utf8_to_wstring(Some_val(filename));
     if ( filename == Val_unit ){
