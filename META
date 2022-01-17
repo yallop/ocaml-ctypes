@@ -2,10 +2,10 @@ version = "0.20.0"
 description = "Combinators for binding to C libraries without writing any C."
 requires = "bigarray-compat bytes integers"
 archive(byte) = "ctypes.cma"
-archive(byte, plugin) = "ctypes.cma"
+plugin(byte) = "ctypes.cma"
 archive(byte, toploop) = "ctypes.cma ctypes-top.cma"
 archive(native) = "ctypes.cmxa"
-archive(native, plugin) = "ctypes.cmxs"
+plugin(native) = "ctypes.cmxs"
 exists_if = "ctypes.cma"
 
 package "top" (
@@ -13,9 +13,9 @@ package "top" (
   description = "Toplevel printers for C types"
   requires = "ctypes"
   archive(byte) = "ctypes-top.cma"
-  archive(byte, plugin) = "ctypes-top.cma"
+  plugin(byte) = "ctypes-top.cma"
   archive(native) = "ctypes-top.cmxa"
-  archive(native, plugin) = "ctypes-top.cmxs"
+  plugin(native) = "ctypes-top.cmxs"
   exists_if = "ctypes-top.cma"
 )
 
@@ -24,9 +24,9 @@ package "stubs" (
   description = "Stub generation from C types"
   requires = "ctypes str"
   archive(byte) = "cstubs.cma"
-  archive(byte, plugin) = "cstubs.cma"
+  plugin(byte) = "cstubs.cma"
   archive(native) = "cstubs.cmxa"
-  archive(native, plugin) = "cstubs.cmxs"
+  plugin(native) = "cstubs.cmxs"
   xen_linkopts = "-lctypes_stubs_xen"
   exists_if = "cstubs.cma"
 )
@@ -36,8 +36,8 @@ package "foreign" (
  description = "Dynamic linking of C functions"
  requires = "threads ctypes"
  archive(byte) = "ctypes-foreign.cma"
- archive(byte, plugin) = "ctypes-foreign.cma"
+ plugin(byte) = "ctypes-foreign.cma"
  archive(native) = "ctypes-foreign.cmxa"
- archive(native, plugin) = "ctypes-foreign.cmxs"
+ plugin(native) = "ctypes-foreign.cmxs"
  exists_if = "ctypes-foreign.cma"
 )
