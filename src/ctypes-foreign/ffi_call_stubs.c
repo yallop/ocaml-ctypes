@@ -153,7 +153,7 @@ static struct callspec {
   ffi_cif *cif;
 
 } callspec_prototype = {
-  0, 0, 0, 0, BUILDING, NULL, -1, 0, { 0, 0 }, NULL
+  0, 0, 0, 0, BUILDING, NULL, -1, 0, { 0, 0, 0 }, NULL
 };
 
 
@@ -222,15 +222,17 @@ static void populate_arg_array(struct callspec *callspec,
 value ctypes_allocate_callspec(value check_errno, value runtime_lock,
                                value thread_registration)
 {
+  value block;
+  struct callspec *spec;
   struct call_context context = {
     Int_val(check_errno),
     Int_val(runtime_lock),
     Int_val(thread_registration),
   };
 
-  value block = caml_alloc_custom(&callspec_custom_ops,
-                                  sizeof(struct callspec), 0, 1);
-  struct callspec *spec = Data_custom_val(block);
+  block = caml_alloc_custom(&callspec_custom_ops,
+                            sizeof(struct callspec), 0, 1);
+  spec = Data_custom_val(block);
   memcpy(spec, &callspec_prototype, sizeof(struct callspec));
   spec->context = context;
   return block;
@@ -247,13 +249,14 @@ value ctypes_add_argument(value callspec_, value argument_)
   CAMLparam2(callspec_, argument_);
   struct callspec *callspec = Data_custom_val(callspec_);
   ffi_type *argtype = CTYPES_TO_PTR(argument_);
+  int offset;
 
   assert (callspec->state == BUILDING);
 
   /* If there's a possibility that this spec represents an argument list or
      a struct we might pass by value then we have to take care to maintain
      the args, capacity and nelements members. */
-  int offset = aligned_offset(callspec->bytes, argtype->alignment);
+  offset = aligned_offset(callspec->bytes, argtype->alignment);
   callspec->bytes = offset + argtype->size;
 
   if (callspec->nelements + 2 >= callspec->capacity) {
@@ -305,6 +308,7 @@ value ctypes_prep_callspec(value callspec_, value abi_, value rtype)
   struct callspec *callspec = Data_custom_val(callspec_);
   ffi_type *rffitype = CTYPES_TO_PTR(rtype);
   ffi_abi abi = Int_val(abi_);
+  ffi_status status;
 
   /* Allocate the cif structure */
   callspec->cif = caml_stat_alloc(sizeof *callspec->cif);
@@ -326,11 +330,11 @@ value ctypes_prep_callspec(value callspec_, value abi_, value rtype)
                                               ffi_type_pointer.alignment);
   callspec->bytes += ffi_type_pointer.size;
 
-  ffi_status status = ffi_prep_cif(callspec->cif,
-                                   abi,
-                                   callspec->nelements,
-                                   rffitype,
-                                   callspec->args);
+  status = ffi_prep_cif(callspec->cif,
+                        abi,
+                        callspec->nelements,
+                        rffitype,
+                        callspec->args);
 
   ctypes_check_ffi_status(status);
 
@@ -398,7 +402,11 @@ value ctypes_call(value fnname, value function, value callspec_,
 
   if (check_errno)
   {
+#ifdef _MSC_VER
+    _set_errno(0);
+#else
     errno=0;
+#endif
   }
 
   ffi_call(cif,
@@ -407,7 +415,11 @@ value ctypes_call(value fnname, value function, value callspec_,
            (void **)(callbuffer + arg_array_offset));
   if (check_errno)
   {
+#ifdef _MSC_VER
+    _get_errno(&check_errno);
+#else
     saved_errno=errno;
+#endif
   }
 
   if (context.runtime_lock)
@@ -588,11 +600,12 @@ value ctypes_make_function_pointer(value callspec_, value fnid)
   if (closure == NULL) {
     caml_raise_out_of_memory();
   } else {
+    ffi_status status;
     closure->fnkey = Long_val(fnid);
     closure->context = callspec->context;
     closure->fnptr = code_address;
 
-    ffi_status status =  ffi_prep_closure_loc
+    status = ffi_prep_closure_loc
       ((ffi_closure *)closure,
        callspec->cif,
        callback_handler,

@@ -88,6 +88,7 @@ let ccomp_type = ref "cc"
 let ffi_dir = ref ""
 let is_homebrew = ref false
 let is_macports = ref false
+let is_msys = ref false
 let homebrew_prefix = ref "/usr/local"
 let macports_prefix = ref "/opt/local"
 
@@ -118,6 +119,21 @@ let test_code opt lib stub_code caml_code =
       unwind_protect (fun () ->
           output_string stubfd stub_code;
           output_string camlfd caml_code;
+          (*
+            Microsoft cl.exe compiler will give:
+              c1: fatal error C1083: Cannot open source file: 'C:/Users/you/AppData/Local/Temp/ctypes_libffi5c9ac8.c': Permission denied
+            if we give it a file to compile that is still opened for writing.
+              
+            Windows and perhaps other OS-es don't by default let you
+            read from a file while it is being written (if it was opened
+            for writing). Simplest and most future proof technique is to
+            close the file as soon as it is written, and for safety close
+            it a second time during cleanup. `close_out` doc says that
+            "close_out and flush [...] do nothing when applied to an already
+            closed channel". 
+            *)
+          close_out camlfd;
+          close_out stubfd;
           Commands.command_succeeds
             "%s -custom %s %s %s %s 1>&2"
             !ocamlc
@@ -162,12 +178,27 @@ let brew_libffi_version flags =
   | { Commands.stdout } ->
     String.trim stdout
 
+let msys_env_args () =
+  let pcp = try Sys.getenv "PKG_CONFIG_PATH" with Not_found -> "" in
+  if pcp = "" then
+    ""
+  else
+    match Commands.command "cygpath --path '%s'" pcp with
+      { Commands.status; stderr } when status <> 0 ->
+      ksprintf failwith "cygpath failed: %s" stderr
+    | { Commands.stdout } ->
+      sprintf "PKG_CONFIG_PATH='%s'" (String.trim stdout)
+
 let pkg_config flags =
   let output =
     if !is_homebrew then
       Commands.command
         "env PKG_CONFIG_PATH=%s/Cellar/libffi/%s/lib/pkgconfig %s/bin/pkg-config %s"
         !homebrew_prefix (brew_libffi_version ()) !homebrew_prefix flags
+    else if !is_msys then
+      Commands.command
+        "env %s pkg-config %s"
+        (msys_env_args ()) flags
     else
       Commands.command "pkg-config %s" flags
   in
@@ -266,6 +297,16 @@ let () =
     test_feature "MacPorts"
       (fun () ->
          Commands.command_succeeds "port info libffi");
+
+  (* Test for MSYS. *)
+  is_msys :=
+    test_feature "MSYS"
+      (fun () ->
+        (* Look for `uname -s` = MSYS_NT-10.0-22000 and similar *)
+        let uname_s = (Commands.command "uname -s").Commands.stdout in
+        String.sub uname_s 0
+          (min (String.length "MSYS_NT") (String.length uname_s))
+          = "MSYS_NT");
 
   let have_pkg_config = have_pkg_config !is_homebrew !is_macports homebrew_prefix macports_prefix in
 

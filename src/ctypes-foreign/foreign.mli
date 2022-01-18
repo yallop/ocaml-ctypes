@@ -29,7 +29,8 @@ val foreign :
     The value [?check_errno], which defaults to [false], indicates whether
     {!Unix.Unix_error} should be raised if the C function modifies [errno].
     Please note that a function that succeeds is allowed to change errno. So
-    use this option with caution.
+    use this option with caution. [?check_errno] is not supported by the native
+    windows port (msvc).
 
     The value [?release_runtime_lock], which defaults to [false], indicates
     whether the OCaml runtime lock should be released during the call to the C

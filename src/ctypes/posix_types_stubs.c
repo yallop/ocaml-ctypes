@@ -6,6 +6,7 @@
  */
 
 #include "ctypes_primitives.h"
+#include "ctypes_posix_compatibility.h"
 
 #define _XOPEN_SOURCE 500
 #include <caml/mlvalues.h>
@@ -13,7 +14,9 @@
 #include <assert.h>
 
 #include <sys/types.h>
+#ifndef _MSC_VER
 #include <unistd.h>
+#endif
 #include <signal.h>
 #if (!defined _WIN32 || defined __CYGWIN__) && !defined MINIOS
 #include <pthread.h>
@@ -71,11 +74,16 @@ typedef __pid_t pid_t;
 EXPOSE_TYPEINFO(clock_t)
 EXPOSE_TYPEINFO_S(dev_t)
 EXPOSE_TYPEINFO_S(ino_t)
-EXPOSE_TYPEINFO_S(mode_t)
 EXPOSE_TYPEINFO_S(off_t)
-EXPOSE_TYPEINFO_S(pid_t)
-EXPOSE_TYPEINFO(ssize_t)
 EXPOSE_TYPEINFO(time_t)
+#ifdef _MSC_VER
+EXPOSE_TYPEINFO(mode_t)
+EXPOSE_TYPEINFO(pid_t)
+#else
+EXPOSE_TYPEINFO_S(mode_t)
+EXPOSE_TYPEINFO_S(pid_t)
+#endif
+EXPOSE_TYPEINFO(ssize_t)
 EXPOSE_TYPEINFO(useconds_t)
 #if !defined _WIN32 || defined __CYGWIN__
   EXPOSE_TYPEINFO(nlink_t)
@@ -85,5 +93,14 @@ EXPOSE_TYPEINFO(useconds_t)
 #endif
 
 
+#ifdef _MSC_VER
+/* There is no sigset on Windows, but signals are supported: https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/signal?view=msvc-160 
+   Assuming a developer wants to write their own polyfill for sigset on Windows, they would have to encode signal types ranging
+   from SIGINT (2) to SIGABRT (22). That is a 32 bit unsigned integer.
+ */
+EXPOSE_TYPESIZE_COMMON(sigset_t, uint32_t)
+EXPOSE_ALIGNMENT_COMMON(sigset_t, uint32_t)
+#else
 EXPOSE_TYPESIZE_S(sigset_t)
 EXPOSE_ALIGNMENT_S(sigset_t)
+#endif

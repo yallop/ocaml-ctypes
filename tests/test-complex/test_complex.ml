@@ -31,15 +31,23 @@ struct
       !@rv
     in
     let wrap typ f l r = wrap' typ typ f l r in
+    let wrap1 typ1 f a =
+      let rv = allocate_n ~count:1 typ1 in
+      f (allocate typ1 a) rv;
+      !@rv
+    in
 
     let addz64 = wrap complex64 add_complexd
     and mulz64 = wrap complex64 mul_complexd
+    and invz64 = wrap1 complex64 inv_complexd
     and rotz64 = wrap' complex64 double rotdist_complexd
     and addz32 = wrap complex32 add_complexf
     and mulz32 = wrap complex32 mul_complexf
+    and invz32 = wrap1 complex32 inv_complexf
     and rotz32 = wrap' complex32 float rotdist_complexf
     and addzld = wrap complexld add_complexld
     and mulzld = wrap complexld mul_complexld
+    and invzld = wrap1 complexld inv_complexld
     and rotzld = wrap' complexld ldouble rotdist_complexld
     in
 
@@ -58,9 +66,11 @@ struct
 
       assert_equal ~cmp:complex64_eq (Complex.add l r) (addz64 l r);
       assert_equal ~cmp:complex64_eq (Complex.mul l r) (mulz64 l r);
+      assert_equal ~cmp:complex64_eq (Complex.inv l)   (invz64 l);
 
       assert_equal ~cmp:complex32_eq (Complex.add l r) (addz32 l r);
       assert_equal ~cmp:complex32_eq (Complex.mul l r) (mulz32 l r);
+      assert_equal ~cmp:complex32_eq (Complex.inv l)   (invz32 l);
 
       (* test long double complex *)
       let re x = LDouble.(to_float (ComplexL.re x)) in
@@ -71,6 +81,7 @@ struct
       let l', r' = to_complexld l, to_complexld r in
       assert_equal ~cmp:complex64_eq (Complex.add l r) (of_complexld @@ addzld l' r');
       assert_equal ~cmp:complex64_eq (Complex.mul l r) (of_complexld @@ mulzld l' r');
+      assert_equal ~cmp:complex64_eq (Complex.inv l)   (of_complexld @@ invzld l');
 
       (* The rotdist test is designed to check passing and returning long doubles.
          The function rotates a complex number by the given angle in radians,
@@ -125,9 +136,11 @@ struct
 
       assert_equal ~cmp:complex64_eq (Complex.add l r) (add_complexd_val l r);
       assert_equal ~cmp:complex64_eq (Complex.mul l r) (mul_complexd_val l r);
+      assert_equal ~cmp:complex64_eq (Complex.inv l) (inv_complexd_val l);
 
       assert_equal ~cmp:complex32_eq (Complex.add l r) (add_complexf_val l r);
       assert_equal ~cmp:complex32_eq (Complex.mul l r) (mul_complexf_val l r);
+      assert_equal ~cmp:complex32_eq (Complex.inv l) (inv_complexf_val l);
 
       let zinf = { re = 0.; im = infinity } in
       let res = add_complexd_val zinf zinf in
@@ -147,6 +160,7 @@ struct
       let l', r' = to_complexld l, to_complexld r in
       assert_equal ~cmp:complex64_eq (Complex.add l r) (of_complexld @@ add_complexld_val l' r');
       assert_equal ~cmp:complex64_eq (Complex.mul l r) (of_complexld @@ mul_complexld_val l' r');
+      assert_equal ~cmp:complex64_eq (Complex.inv l) (of_complexld @@ inv_complexld_val l');
 
       assert_equal 0. (re (to_complexld zinf));
 

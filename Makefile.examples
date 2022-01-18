@@ -118,6 +118,8 @@ ncurses.dir = examples/ncurses/foreign
 ncurses.threads = yes
 ncurses.subproject_deps = ctypes ctypes-foreign
 ncurses.deps = unix bigarray-compat str integers
+ncurses.cmo_opts = $(NCURSES_INCOPTS:%=-ccopt %)
+ncurses.cmx_opts = $(NCURSES_INCOPTS:%=-ccopt %)
 ncurses.link_flags = -lncurses
 ncurses: PROJECT=ncurses
 ncurses: $$(NATIVE_TARGET)

@@ -7,6 +7,7 @@ S src/ctypes
 S src/ctypes-top
 S src/configure
 S src/ctypes-foreign
+S tests/tests-common
 B _build
 B _build/src
 B _build/src/cstubs
@@ -15,5 +16,10 @@ B _build/src/ctypes
 B _build/src/ctypes-top
 B _build/src/configure
 B _build/src/ctypes-foreign
+B _build/tests/tests-common
+PKG bigarray-compat
 PKG bytes
 PKG integers
+PKG lwt.unix
+PKG oUnit
+PKG str

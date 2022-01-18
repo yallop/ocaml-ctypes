@@ -2,7 +2,18 @@
 
 VPATH += tests
 
+ifeq ($(MSYSTEM),MSYS)
+CURDIR_WINDOWS = $(shell echo '$(CURDIR)' | cygpath -f - -aw)
+CFLAGS += -I "$(CURDIR_WINDOWS)\src\ctypes" -I "$(CURDIR_WINDOWS)\tests"
+else
 CFLAGS += -I "$(CURDIR)/src/ctypes" -I "$(CURDIR)/tests"
+endif
+
+ifneq ($(DEBUG),false)
+ifeq ($(CCOMP_TYPE),msvc)
+CFLAGS += /Zi
+endif
+endif
 
 CC=$(shell ocamlc -config | sed -n '/native_c_compiler/{ s/[^:]*://; p;}')
 
@@ -298,7 +309,11 @@ tests/test-enums/generated_bindings.ml: $(BUILDDIR)/test-enums-stub-generator.$(
 tests/test-enums/stubs/generated_struct_bindings.ml: $(BUILDDIR)/test-enums-ml-struct-stub-generator.$(BEST)
 	$< > $@
 $(BUILDDIR)/test-enums-ml-struct-stub-generator.$(BEST): $(BUILDDIR)/tests/test-enums/generated_struct_stubs.c
+ifeq ($(CCOMP_TYPE),msvc)
+	$(CC) -I `$(OCAMLFIND) ocamlc -where | sed 's|\r$$||'` $(CFLAGS) $(LDFLAGS) $(WINLDFLAGS) /Fe"$@" $^
+else
 	$(CC) -I `$(OCAMLFIND) ocamlc -where | sed 's|\r$$||'` $(CFLAGS) $(LDFLAGS) $(WINLDFLAGS) -o $@ $^
+endif
 $(BUILDDIR)/tests/test-enums/generated_struct_stubs.c: $(BUILDDIR)/test-enums-struct-stub-generator.$(BEST)
 	$< --c-struct-file $@
 
@@ -1312,7 +1327,7 @@ tests/test-closure-type-promotion/generated_bindings.ml: $(BUILDDIR)/test-closur
 test-ldouble.dir = tests/test-ldouble
 test-ldouble.threads = yes
 test-ldouble.deps = str bigarray-compat oUnit integers
-test-ldouble.subproject_deps = ctypes 
+test-ldouble.subproject_deps = ctypes
 test-ldouble: PROJECT=test-ldouble
 test-ldouble: $$(BEST_TARGET)
 
@@ -1321,7 +1336,9 @@ TESTS += test-raw
 TESTS += test-pointers-stubs test-pointers-stub-generator test-pointers-generated test-pointers
 TESTS += test-integers-stubs test-integers-stub-generator test-integers-generated test-integers
 TESTS += test-variadic-stubs test-variadic-stub-generator test-variadic-generated test-variadic
+ifneq ($(CCOMP_TYPE),msvc)
 TESTS += test-builtins-stubs test-builtins-stub-generator test-builtins-generated test-builtins
+endif
 TESTS += test-macros-stubs test-macros-stub-generator test-macros-generated test-macros
 TESTS += test-higher_order-stubs test-higher_order-stub-generator test-higher_order-generated test-higher_order
 TESTS += test-enums-struct-stubs test-enums-struct-stub-generator test-enums-structs-generated test-enums-stubs test-enums-stub-generator test-enums-generated test-enums
@@ -1364,18 +1381,33 @@ TESTS += test-ldouble
 ifneq (,$(filter mingw%,$(OSYSTEM)))
 WINLDFLAGS=-Wl,--out-implib,libtest_functions.dll.a
 LDFLAGS+=-static-libgcc
+else
+ifeq ($(CCOMP_TYPE),msvc)
+ifneq ($(DEBUG),false)
+WINLDFLAGS=/Zi
+endif
+endif
 endif
 
 testlib: $(BUILDDIR)/clib/libtest_functions$(EXTDLL)
-$(BUILDDIR)/clib/libtest_functions$(EXTDLL): $(BUILDDIR)/clib/test_functions.o
+$(BUILDDIR)/clib/libtest_functions$(EXTDLL): $(BUILDDIR)/clib/test_functions$(EXTOBJ)
+ifeq ($(CCOMP_TYPE),msvc)
+	$(CC) /LD $(LDFLAGS) $(WINLDFLAGS) /Fe"$@" $^
+	cp $@ $(BUILDDIR)
+else
 	$(CC) -shared $(LDFLAGS) $(WINLDFLAGS) -o $@ $^ -lm
+endif
 ifneq (,$(filter mingw%,$(OSYSTEM)))
 	cp $@ libtest_functions.dll.a $(BUILDDIR)
 endif
 
-$(BUILDDIR)/clib/test_functions.o: tests/clib/test_functions.c
+$(BUILDDIR)/clib/test_functions$(EXTOBJ): tests/clib/test_functions.c
 	@mkdir -p $(@D)
+ifeq ($(CCOMP_TYPE),msvc)
+	$(CC) -c $(CFLAGS) /DCTYPES_DLL_EXTERN=1 -I `$(OCAMLFIND) ocamlc -where | sed 's|\r$$||'` /Fo"$@" $^
+else
 	$(CC) -c $(CFLAGS) -I `$(OCAMLFIND) ocamlc -where | sed 's|\r$$||'` -o $@ $^
+endif
 tests/clib/test_functions.c: tests/clib/test_functions.h
 
 .PHONY: test testlib $(TESTS) tests-common clean-tests
@@ -1392,5 +1424,5 @@ clean-tests:
 
 run-%:	$*
 	@echo running $*
-	@cd $(BUILDDIR) && CAML_LD_LIBRARY_PATH=. LD_LIBRARY_PATH=clib DYLD_LIBRARY_PATH=clib ./$*.$(BEST) -runner sequential
+	@cd $(BUILDDIR) && CAML_LD_LIBRARY_PATH=. LD_LIBRARY_PATH=clib DYLD_LIBRARY_PATH=clib CCOMP_TYPE=$(CCOMP_TYPE) ./$*.$(BEST) -runner sequential || true
 

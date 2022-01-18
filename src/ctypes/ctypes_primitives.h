@@ -135,14 +135,30 @@ enum ctypes_arithmetic_type {
   Ctypes_arith_Double
 };
 
+#if defined(_WIN32) && defined(_MSC_VER)
+__pragma( warning (push) )
+__pragma( warning (disable:4189 ) )
+/* casting float constants to enum leads to a surprising result,
+   but only `enum t foo = (enum t)0.5` is strange,
+   not `double bar = 0.5;  enum t foo = (enum t)bar`. */
+static const double CTYPES_CLASSIFY_FLOAT_ZERO_DOT_FIVE_ = 0.5;
+static const int CTYPES_CLASSIFY_MINUS_ONE_ = -1;
+__pragma( warning (pop))
+#else
+# define CTYPES_CLASSIFY_FLOAT_ZERO_DOT_FIVE_ (0.5)
+# define CTYPES_CLASSIFY_MINUS_ONE_ (-1)
+#endif
+
 #define CTYPES_FLOATING_FLAG_BIT 15
 #define CTYPES_UNSIGNED_FLAG_BIT 14
 #define CTYPES_FLOATING ((size_t)1u << CTYPES_FLOATING_FLAG_BIT)
 #define CTYPES_UNSIGNED ((size_t)1u << CTYPES_UNSIGNED_FLAG_BIT)
 #define CTYPES_CHECK_FLOATING(TYPENAME) \
-  ((unsigned)(((TYPENAME) 0.5) != 0) << CTYPES_FLOATING_FLAG_BIT)
+  ((unsigned)(((TYPENAME) CTYPES_CLASSIFY_FLOAT_ZERO_DOT_FIVE_) != 0) \
+   << CTYPES_FLOATING_FLAG_BIT)
 #define CTYPES_CHECK_UNSIGNED(TYPENAME) \
-  ((unsigned)(((TYPENAME) -1) > 0) << CTYPES_UNSIGNED_FLAG_BIT)
+  ((unsigned)(((TYPENAME) CTYPES_CLASSIFY_MINUS_ONE_) > 0) \
+   << CTYPES_UNSIGNED_FLAG_BIT)
 #define CTYPES_CLASSIFY(TYPENAME) (CTYPES_CHECK_FLOATING(TYPENAME) \
                                  | CTYPES_CHECK_UNSIGNED(TYPENAME))
 #define CTYPES_ARITHMETIC_TYPEINFO(TYPENAME) (CTYPES_CLASSIFY(TYPENAME) \

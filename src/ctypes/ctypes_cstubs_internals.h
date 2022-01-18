@@ -15,6 +15,7 @@
 #include "ctypes_ldouble_stubs.h"
 #include "ctypes_raw_pointer.h"
 #include "ctypes_managed_buffer_stubs.h"
+#include "ctypes_posix_compatibility.h"
 #include <caml/threads.h>
 /* The cast here removes the 'const' qualifier in recent
    versions of OCaml because ctypes doesn't yet support const.

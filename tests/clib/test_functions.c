@@ -404,93 +404,123 @@ float retrieve_FLT_MAX(void) { return FLT_MAX; }
 double retrieve_DBL_MIN(void) { return DBL_MIN; }
 double retrieve_DBL_MAX(void) { return DBL_MAX; }
 
-void add_complexd(double _Complex *l, double _Complex *r, double _Complex *out)
+void add_complexd(ctypes_complex_double *l, ctypes_complex_double *r, ctypes_complex_double *out)
 {
-  *out = *l + *r;
+  *out = ctypes_compat_cadd(*l,  *r);
 }
 
-void mul_complexd(double _Complex *l, double _Complex *r, double _Complex *out)
+void mul_complexd(ctypes_complex_double *l, ctypes_complex_double *r, ctypes_complex_double *out)
 {
-  *out = *l * *r;
+  *out = ctypes_compat_cmul(*l, *r);
 }
 
-void rotdist_complexd(double _Complex *c, double *r, double *out) {
-  double _Complex x = *c * (ctypes_compat_make_complex(cos(*r), sin(*r)));
+void inv_complexd(ctypes_complex_double *a, ctypes_complex_double *out)
+{
+  *out = ctypes_compat_cinv(*a);
+}
+
+void rotdist_complexd(ctypes_complex_double *c, double *r, double *out) {
+  ctypes_complex_double x = ctypes_compat_cmul(*c, (ctypes_compat_make_complex(cos(*r), sin(*r))));
   *out = fabs(ctypes_compat_creal(x)) + fabs(ctypes_compat_cimag(x));
 }
 
-void add_complexld(long double _Complex *l, long double _Complex *r, long double _Complex *out)
+void add_complexld(ctypes_complex_long_double *l, ctypes_complex_long_double *r, ctypes_complex_long_double *out)
 {
-  *out = *l + *r;
+  *out = ctypes_compat_caddl(*l,  *r);
 }
 
-void mul_complexld(long double _Complex *l, long double _Complex *r, long double _Complex *out)
+void mul_complexld(ctypes_complex_long_double *l, ctypes_complex_long_double *r, ctypes_complex_long_double *out)
 {
-  *out = *l * *r;
+  *out = ctypes_compat_cmull(*l,  *r);
 }
 
-void rotdist_complexld(long double _Complex *c, long double *r, long double *out) {
-  long double _Complex x = *c * (ctypes_compat_make_complexl(cosl(*r), sinl(*r)));
+void inv_complexld(ctypes_complex_long_double *a, ctypes_complex_long_double *out)
+{
+  *out = ctypes_compat_cinvl(*a);
+}
+
+void rotdist_complexld(ctypes_complex_long_double *c, long double *r, long double *out) {
+  ctypes_complex_long_double x = ctypes_compat_cmull(*c, (ctypes_compat_make_complexl(cosl(*r), sinl(*r))));
   *out = fabsl(ctypes_compat_creall(x)) + fabsl(ctypes_compat_cimagl(x));
 }
 
-void add_complexf(float _Complex *l, float _Complex *r, float _Complex *out)
+void add_complexf(ctypes_complex_float *l, ctypes_complex_float *r, ctypes_complex_float *out)
 {
-  *out = *l + *r;
+  *out = ctypes_compat_caddf(*l, *r);
 }
 
-void mul_complexf(float _Complex *l, float _Complex *r, float _Complex *out)
+void inv_complexf(ctypes_complex_float *a, ctypes_complex_float *out)
 {
-  *out = *l * *r;
+  *out = ctypes_compat_cinvf(*a);
 }
 
-void rotdist_complexf(float _Complex *c, float *r, float *out) {
-  float _Complex x = *c * (ctypes_compat_make_complexf(cosf(*r), sinf(*r)));
+void mul_complexf(ctypes_complex_float *l, ctypes_complex_float *r, ctypes_complex_float *out)
+{
+  *out = ctypes_compat_cmulf(*l, *r);
+}
+
+void rotdist_complexf(ctypes_complex_float *c, float *r, float *out) {
+  ctypes_complex_float x = ctypes_compat_cmulf(*c, (ctypes_compat_make_complexf(cosf(*r), sinf(*r))));
   *out = fabsf(ctypes_compat_crealf(x)) + fabsf(ctypes_compat_cimagf(x));
 }
 
-long double _Complex add_complexld_val(long double _Complex l, long double _Complex r)
+ctypes_complex_long_double add_complexld_val(ctypes_complex_long_double l, ctypes_complex_long_double r)
 {
-  return l + r;
+  return ctypes_compat_caddl(l, r);
 }
 
-long double _Complex mul_complexld_val(long double _Complex l, long double _Complex r)
+ctypes_complex_long_double mul_complexld_val(ctypes_complex_long_double l, ctypes_complex_long_double r)
 {
-  return l * r;
+  return ctypes_compat_cmull(l, r);
 }
 
-long double rotdist_complexld_val(long double _Complex c, long double r) {
-  long double _Complex x = c * (ctypes_compat_make_complexl(cosl(r), sinl(r)));
+ctypes_complex_long_double inv_complexld_val(ctypes_complex_long_double a)
+{
+  return ctypes_compat_cinvl(a);
+}
+
+long double rotdist_complexld_val(ctypes_complex_long_double c, long double r) {
+  ctypes_complex_long_double x = ctypes_compat_cmull(c, (ctypes_compat_make_complexl(cosl(r), sinl(r))));
   return fabsl(ctypes_compat_creall(x)) + fabsl(ctypes_compat_cimagl(x));
 }
 
-double _Complex add_complexd_val(double _Complex l, double _Complex r)
+ctypes_complex_double add_complexd_val(ctypes_complex_double l, ctypes_complex_double r)
 {
-  return l + r;
+  return ctypes_compat_cadd(l, r);
 }
 
-double _Complex mul_complexd_val(double _Complex l, double _Complex r)
+ctypes_complex_double mul_complexd_val(ctypes_complex_double l, ctypes_complex_double r)
 {
-  return l * r;
+  return ctypes_compat_cmul(l, r);
 }
 
-double rotdist_complexd_val(double _Complex c, double r) {
-  double _Complex x = c * (ctypes_compat_make_complex(cos(r), sin(r)));
+ctypes_complex_double inv_complexd_val(ctypes_complex_double a)
+{
+  return ctypes_compat_cinv(a);
+}
+
+double rotdist_complexd_val(ctypes_complex_double c, double r) {
+  ctypes_complex_double x = ctypes_compat_cmul(c, (ctypes_compat_make_complex(cos(r), sin(r))));
   return fabs(ctypes_compat_creal(x)) + fabs(ctypes_compat_cimag(x));
 }
 
-float _Complex add_complexf_val(float _Complex l, float _Complex r)
+ctypes_complex_float add_complexf_val(ctypes_complex_float l, ctypes_complex_float r)
 {
-  return l + r;
+  return ctypes_compat_caddf(l, r);
 }
 
-float _Complex mul_complexf_val(float _Complex l, float _Complex r)
+ctypes_complex_float mul_complexf_val(ctypes_complex_float l, ctypes_complex_float r)
 {
-  return l * r;
+  return ctypes_compat_cmulf(l, r);
 }
 
-float rotdist_complexf_val(float _Complex c, float r) {
-  float _Complex x = c * (ctypes_compat_make_complexf(cosf(r), sinf(r)));
+ctypes_complex_float inv_complexf_val(ctypes_complex_float a)
+{
+  return ctypes_compat_cinvf(a);
+}
+
+float rotdist_complexf_val(ctypes_complex_float c, float r) {
+  ctypes_complex_float x = ctypes_compat_cmulf(c, (ctypes_compat_make_complexf(cosf(r), sinf(r))));
   return fabsf(ctypes_compat_crealf(x)) + fabsf(ctypes_compat_cimagf(x));
 }
 
@@ -792,6 +822,9 @@ uint64_t thread_id(void)
 #ifndef _WIN32
 typedef pthread_t thread_t;
 typedef void *(*start_routine)(void *);
+#elif defined(_MSC_VER)
+typedef HANDLE thread_t;
+typedef PTHREAD_START_ROUTINE start_routine;
 #else
 typedef HANDLE thread_t;
 typedef DWORD WINAPI (*start_routine)(void *);

@@ -53,9 +53,9 @@ let c_primitives = [
   c_primitive "Float"     "float"               (Known_format ".12g");
   c_primitive "Double"    "double"              (Known_format ".12g");
   c_primitive "LDouble"   "long double"         (Known_format ".12Lg");
-  c_primitive "Complex32" "float _Complex"      (No_format);
-  c_primitive "Complex64" "double _Complex"     (No_format);
-  c_primitive "Complexld" "long double _Complex"(No_format);
+  c_primitive "Complex32" "ctypes_complex_float"       (No_format);
+  c_primitive "Complex64" "ctypes_complex_double"      (No_format);
+  c_primitive "Complexld" "ctypes_complex_long_double" (No_format);
   c_primitive "Nativeint" "intnat"              (Defined_format "REAL_ARCH_INTNAT_PRINTF_FORMAT \"d\"");
   { constructor = "Camlint";
     typ         = "intnat";
@@ -78,22 +78,23 @@ let generate name typ f =
     printf "\n") c_primitives
 
 let () =
+  let opts = Extract_from_c.get_extract_opts Sys.argv in
   begin
     print_string header;
     generate "sizeof" "int" (fun { size } ->
-      printf "%d" (Extract_from_c.integer size));
+      printf "%d" (Extract_from_c.integer opts size));
     generate "alignment" "int" (fun { alignment } ->
-      printf "%d" (Extract_from_c.integer alignment));
+      printf "%d" (Extract_from_c.integer opts alignment));
     generate "name" "string" (fun { typ } ->
-      printf "%S" (Extract_from_c.string ("STRINGIFY("^typ^")")));
+      printf "%S" (Extract_from_c.string opts ("STRINGIFY("^typ^")")));
     generate "format_string" "string option" (fun { format } ->
       match format with
       | Known_format str ->
         printf "Some %S" ("%"^str)
       | Defined_format str ->
-        printf "Some %S" ("%"^Extract_from_c.string str)
+        printf "Some %S" ("%"^Extract_from_c.string opts str)
       | No_format ->
         printf "None");
-    printf "let pointer_size = %d\n" (Extract_from_c.integer "sizeof(void*)");
-    printf "let pointer_alignment = %d\n" (Extract_from_c.integer "alignof(void*)");
+    printf "let pointer_size = %d\n" (Extract_from_c.integer opts "sizeof(void*)");
+    printf "let pointer_alignment = %d\n" (Extract_from_c.integer opts "alignof(void*)");
   end

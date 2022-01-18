@@ -10,7 +10,9 @@
 let cheader = "#include <math.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
+#ifndef _MSC_VER
+# include <unistd.h>
+#endif
 "
 
 let () = Tests_common.run ~cheader Sys.argv (module Functions.Stubs)

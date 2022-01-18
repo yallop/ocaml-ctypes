@@ -55,15 +55,16 @@ let symbols = [
 
 let extra_headers = "#include <ffi.h>"
 
-let write_line name symbol =
+let write_line opts name symbol =
   try
-    Printf.printf "let %s = Code %d\n" name (Extract_from_c.integer ~extra_headers symbol)
+    Printf.printf "let %s = Code %d\n" name (Extract_from_c.integer ~extra_headers opts symbol)
   with Not_found ->
     Printf.printf "let %s = Unsupported \"%s\"\n" name symbol
 
 let () =
+  let opts = Extract_from_c.get_extract_opts Sys.argv in
   begin
     print_string header;
-    List.iter (fun (name, symbol) -> write_line name symbol) symbols
+    List.iter (fun (name, symbol) -> write_line opts name symbol) symbols
   end
 

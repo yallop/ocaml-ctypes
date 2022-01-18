@@ -68,9 +68,9 @@ value ctypes_read(value prim_, value buffer_)
    case Ctypes_Float: b = caml_copy_double(*(float *)buf); break;
    case Ctypes_Double: b = caml_copy_double(*(double *)buf); break;
    case Ctypes_LDouble: b = ctypes_copy_ldouble(*(long double *)buf); break;
-   case Ctypes_Complex32: b = ctypes_copy_float_complex(*(float _Complex *)buf); break;
-   case Ctypes_Complex64: b = ctypes_copy_double_complex(*(double _Complex *)buf); break;
-   case Ctypes_Complexld: b = ctypes_copy_ldouble_complex(*(long double _Complex *)buf); break;
+   case Ctypes_Complex32: b = ctypes_copy_float_complex(*(ctypes_complex_float *)buf); break;
+   case Ctypes_Complex64: b = ctypes_copy_double_complex(*(ctypes_complex_double *)buf); break;
+   case Ctypes_Complexld: b = ctypes_copy_ldouble_complex(*(ctypes_complex_long_double *)buf); break;
    default:
     assert(0);
   }
@@ -112,9 +112,9 @@ value ctypes_write(value prim_, value v, value buffer_) /* noalloc */
    case Ctypes_Float: *(float *)buf = Double_val(v); break;
    case Ctypes_Double: *(double *)buf = Double_val(v); break;
    case Ctypes_LDouble: *(long double *)buf = ctypes_ldouble_val(v); break;
-   case Ctypes_Complex32: *(float _Complex *)buf = ctypes_float_complex_val(v); break;
-   case Ctypes_Complex64: *(double _Complex *)buf = ctypes_double_complex_val(v); break;
-   case Ctypes_Complexld: *(long double _Complex *)buf = ctypes_ldouble_complex_val(v); break;
+   case Ctypes_Complex32: *(ctypes_complex_float *)buf = ctypes_float_complex_val(v); break;
+   case Ctypes_Complex64: *(ctypes_complex_double *)buf = ctypes_double_complex_val(v); break;
+   case Ctypes_Complexld: *(ctypes_complex_long_double *)buf = ctypes_ldouble_complex_val(v); break;
    default:
     assert(0);
   }
@@ -161,17 +161,17 @@ value ctypes_string_of_prim(value prim_, value v)
   case Ctypes_Double: len = snprintf(buf, sizeof buf, "%.12g", Double_val(v)); break;
   case Ctypes_LDouble: len = snprintf(buf, sizeof buf, "%.12Lg", ctypes_ldouble_val(v)); break;
   case Ctypes_Complex32: {
-    float _Complex c = ctypes_float_complex_val(v);
+    ctypes_complex_float c = ctypes_float_complex_val(v);
     len = snprintf(buf, sizeof buf, "%.12g+%.12gi", ctypes_compat_crealf(c), ctypes_compat_cimagf(c));
     break;
   }
   case Ctypes_Complex64: {
-    double _Complex c = ctypes_double_complex_val(v);
+    ctypes_complex_double c = ctypes_double_complex_val(v);
     len = snprintf(buf, sizeof buf, "%.12g+%.12gi", ctypes_compat_creal(c), ctypes_compat_cimag(c));
     break;
   }
   case Ctypes_Complexld: {
-    long double _Complex c = ctypes_ldouble_complex_val(v);
+    ctypes_complex_long_double c = ctypes_ldouble_complex_val(v);
     len = snprintf(buf, sizeof buf, "%.12Lg+%.12Lgi", ctypes_compat_creall(c), ctypes_compat_cimagl(c));
     break;
   }

@@ -39,15 +39,23 @@ GENERATED=src/ctypes/ctypes_primitives.ml	\
 	  src/discover/discover.cmo
 
 OCAML_FFI_INCOPTS=$(libffi_opt)
+NCURSES_INCOPTS=
 export CFLAGS DEBUG
 
 EXTDLL:=$(shell $(OCAMLFIND) ocamlc -config | awk '/^ext_dll:/{print $$2}')
 OSYSTEM:=$(shell $(OCAMLFIND) ocamlc -config | awk '/^system:/{print $$2}')
+CCOMP_TYPE:=$(shell $(OCAMLFIND) ocamlc -config | awk '/^ccomp_type:/{print $$2}')
+EXTOBJ:=$(shell $(OCAMLFIND) ocamlc -config | awk '/^ext_obj:/{print $$2}')
+EXTLIB:=$(shell $(OCAMLFIND) ocamlc -config | awk '/^ext_lib:/{print $$2}')
 
 ifneq (,$(filter mingw%,$(OSYSTEM)))
 OS_ALT_SUFFIX=.win
 else
+ifeq ($(CCOMP_TYPE),msvc)
+OS_ALT_SUFFIX=.win
+else
 OS_ALT_SUFFIX=.unix
+endif
 endif
 
 # public targets
@@ -128,15 +136,15 @@ src/ctypes-foreign/dl_stubs.c: src/ctypes-foreign/dl_stubs.c$(OS_ALT_SUFFIX)
 
 src/ctypes/ctypes_primitives.ml: src/configure/extract_from_c.ml src/configure/gen_c_primitives.ml
 	$(HOSTOCAMLFIND) ocamlc -o gen_c_primitives -package str -strict-sequence -linkpkg $^ -I src/configure
-	./gen_c_primitives > $@ 2> gen_c_primitives.log || (rm $@ && cat gen_c_primitives.log || false)
+	./gen_c_primitives --ext_obj $(EXTOBJ) > $@ 2> gen_c_primitives.log || (rm $@ && cat gen_c_primitives.log || false)
 
 src/ctypes-foreign/libffi_abi.ml: src/configure/extract_from_c.ml src/configure/gen_libffi_abi.ml
 	$(HOSTOCAMLFIND) ocamlc -o gen_libffi_abi -package str -strict-sequence -linkpkg $^ -I src/configure
-	./gen_libffi_abi > $@ 2> gen_c_primitives.log || (rm $@ && cat gen_c_primitives.log || false)
+	./gen_libffi_abi --ext_obj $(EXTOBJ) > $@ 2> gen_c_primitives.log || (rm $@ && cat gen_c_primitives.log || false)
 
 libffi.config: src/discover/commands.mli src/discover/commands.ml src/discover/discover.ml
 	$(HOSTOCAMLFIND) ocamlc -o discover -package str -strict-sequence -linkpkg $^ -I src/discover
-	./discover -ocamlc "$(OCAMLFIND) ocamlc" > $@ || (rm $@ && false)
+	./discover -ext-obj $(EXTOBJ) -ocamlc "$(OCAMLFIND) ocamlc" > $@ || (rm $@ && false)
 
 asneeded.config:
 	./src/discover/determine_as_needed_flags.sh >> $@
