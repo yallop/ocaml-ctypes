@@ -5,6 +5,8 @@
  * See the file LICENSE for details.
  *)
 
+[@@@ocaml.warning "-16"]
+
 type library
 
 type flag = 
