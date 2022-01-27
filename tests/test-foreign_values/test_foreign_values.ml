@@ -76,7 +76,7 @@ struct
   let test_environ _ =
     let parse_entry s =
       match Str.(bounded_split (regexp "=") s 2), "" with
-        [k; v], _ | [k], v -> (String.uppercase k, v)
+        [k; v], _ | [k], v -> (String.uppercase_ascii k, v)
       | _ -> Printf.ksprintf failwith "Parsing %S failed" s
     in
     let rec copy_environ acc env =

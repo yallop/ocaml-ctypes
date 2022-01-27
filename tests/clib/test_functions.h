@@ -158,7 +158,7 @@ long double rotdist_complexld_val(long double _Complex, long double);
 float _Complex add_complexf_val(float _Complex, float _Complex);
 float _Complex mul_complexf_val(float _Complex, float _Complex);
 float rotdist_complexf_val(float _Complex, float);
-void store_callback(int (*callback)(int));
+void store_callback(int (*)(int));
 int invoke_stored_callback(int);
 vintfun *return_callback(vintfun *);
 struct one_int { int i; };
