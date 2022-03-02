@@ -42,6 +42,7 @@ The documentation and source distribution contain more complex examples, involvi
 
 ## Links
 
+* [Building C libraries in OCaml with the dune ctypes stanza][dune-ctypes] describes how to use ctypes with [dune][dune]
 * [Chapter 19: Foreign Function Interface][rwo-ffi] of [Real World OCaml][rwo] describes ctypes
 * [Modular Foreign Function Bindings][mirage-blogpost] introduces ctypes in the context of the [Mirage][mirage] library operating system
 * [Tutorial][tutorial]
@@ -66,3 +67,5 @@ The documentation and source distribution contain more complex examples, involvi
 [cstubs_structs]: http://ocamllabs.github.io/ocaml-ctypes/Cstubs_structs.html
 [flops-paper]: http://www.cl.cam.ac.uk/~jdy22/papers/declarative-foreign-function-binding-through-generic-programming.pdf
 [scp-extended]: http://www.cl.cam.ac.uk/~jdy22/papers/a-modular-foreign-function-interface.pdf
+[dune-ctypes]: https://michael.bacarella.com/2022/02/19/dune-ctypes/
+[dune]: https://dune.build/
