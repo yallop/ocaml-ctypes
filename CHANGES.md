@@ -1,3 +1,10 @@
+## ctypes 0.20.1
+
+* Fix warning 9 [missing-record-field-pattern] in generated OCaml code  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/700
+
+Thanks to Antonin Décimo (@MisterDA) for contributing to this release.
+
 ## ctypes 0.20.0
 
 * Remove naked pointers from the Dl library   
