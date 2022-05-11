@@ -6,6 +6,7 @@
  *)
 
 open OUnit2
+module Float_ = struct let float = float end (*has to be above the module Ctypes*)
 open Ctypes
 
 
@@ -47,7 +48,7 @@ let test_multidimensional_arrays _ =
 
   (* three dimensions *)
   let three = Array.make (array 2 (array 5 float)) 10 in
-  let float = Pervasives.float in
+  let float = Float_.float in
 
   for i = 0 to 9 do
     for j = 0 to 1 do
