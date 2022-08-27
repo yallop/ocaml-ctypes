@@ -147,7 +147,7 @@ $(BUILDDIR)/%.cmx : %.ml
 
 $(BUILDDIR)/%$(EXTOBJ) : %.c
 	@mkdir -p $(@D)
-ifeq ($(MSYSTEM),MSYS)
+ifneq ($(MSYSTEM),)
 	cd $(@D) && $(OCAMLFIND) ocamlc -c $(OCAMLFIND_PACKAGE_FLAGS) $(CFLAGS:%=-ccopt %) -o $(@F) $(OCAMLFLAGS) `cygpath -w "$(realpath $<)"`
 else
 	cd $(@D) && $(OCAMLFIND) ocamlc -c $(OCAMLFIND_PACKAGE_FLAGS) $(CFLAGS:%=-ccopt %) -o $(@F) $(OCAMLFLAGS) $(realpath $<)
@@ -155,7 +155,7 @@ endif
 
 $(BUILDDIR)/xen/%.o : %.c
 	@mkdir -p $(@D)
-ifeq ($(MSYSTEM),MSYS)
+ifneq ($(MSYSTEM),)
 	cd $(@D) && $(OCAMLFIND) ocamlc -c $(OCAMLFIND_PACKAGE_FLAGS) $(XEN_CFLAGS:%=-ccopt %) -o $(@F) $(OCAMLFLAGS) `cygpath -w "$(realpath $<)"`
 else
 	cd $(@D) && $(OCAMLFIND) ocamlc -c $(OCAMLFIND_PACKAGE_FLAGS) $(XEN_CFLAGS:%=-ccopt %) -o $(@F) $(OCAMLFLAGS) $(realpath $<)
