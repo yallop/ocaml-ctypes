@@ -128,11 +128,11 @@ src/ctypes-foreign/dl_stubs.c: src/ctypes-foreign/dl_stubs.c$(OS_ALT_SUFFIX)
 
 src/ctypes/ctypes_primitives.ml: src/configure/extract_from_c.ml src/configure/gen_c_primitives.ml
 	$(HOSTOCAMLFIND) ocamlc -o gen_c_primitives -package str -strict-sequence -linkpkg $^ -I src/configure
-	./gen_c_primitives > $@ 2> gen_c_primitives.log || (rm $@ && cat gen_c_primitives.log || false)
+	./gen_c_primitives > $@ 2> gen_c_primitives.log || (rm $@ && cat gen_c_primitives.log && false)
 
 src/ctypes-foreign/libffi_abi.ml: src/configure/extract_from_c.ml src/configure/gen_libffi_abi.ml
 	$(HOSTOCAMLFIND) ocamlc -o gen_libffi_abi -package str -strict-sequence -linkpkg $^ -I src/configure
-	./gen_libffi_abi > $@ 2> gen_c_primitives.log || (rm $@ && cat gen_c_primitives.log || false)
+	./gen_libffi_abi > $@ 2> gen_c_primitives.log || (rm $@ && cat gen_c_primitives.log && false)
 
 libffi.config: src/discover/commands.mli src/discover/commands.ml src/discover/discover.ml
 	$(HOSTOCAMLFIND) ocamlc -o discover -package str -strict-sequence -linkpkg $^ -I src/discover
