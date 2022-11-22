@@ -276,8 +276,9 @@ sig
       [n] between [0] and [(CArray.length a - 1)] is not performed. *)
 
   val of_string : string -> char t
-  (** [of_string s] builds an array of the same length as [s], and writes
-      the elements of [s] to the corresponding elements of the array. *)
+  (** [of_string s] builds an array of the same length as [s] plus one, and writes
+      the elements of [s] to the corresponding elements of the array with the
+      null character '\0' as a last element. *)
 
   val of_list : 'a typ -> 'a list -> 'a t
   (** [of_list t l] builds an array of type [t] of the same length as [l], and
