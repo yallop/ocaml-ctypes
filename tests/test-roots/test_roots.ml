@@ -23,7 +23,7 @@ let test_root_lifetime _ =
     let v = [| 1; 2; 3 |] in
     Gc.finalise (fun _ -> alive := false) v;
   in
-  Gc.compact ();
+  Gc.full_major ();
   assert_equal false !alive
     ~msg:"values not registered as roots are collected";
 
@@ -34,7 +34,7 @@ let test_root_lifetime _ =
     Gc.finalise (fun _ -> alive := false) v;
     Root.create v
   in
-  Gc.compact ();
+  Gc.full_major ();
   assert_equal true !alive
     ~msg:"registered roots are not collected";
 
@@ -46,7 +46,7 @@ let test_root_lifetime _ =
     Root.create v
   in
   Root.release r;
-  Gc.compact ();
+  Gc.full_major ();
   assert_equal false !alive
     ~msg:"released roots are collected";
 
@@ -58,7 +58,7 @@ let test_root_lifetime _ =
     let r = Root.create () in
     Root.set r v;
   in
-  Gc.compact ();
+  Gc.full_major ();
   assert_equal true !alive
     ~msg:"values assigned to roots are not collected";
 
@@ -70,7 +70,7 @@ let test_root_lifetime _ =
     Root.create v
   in
   Root.set r ();
-  Gc.compact ();
+  Gc.full_major ();
   assert_equal false !alive
     ~msg:"overwritten roots are collected";
 
@@ -92,7 +92,7 @@ let test_passing_roots _ =
 
   begin
     save r;
-    Gc.compact ();
+    Gc.full_major ();
     let fs : (int -> int) array = Root.get (retrieve ()) in
     assert_equal 11 (fs.(0) 10);
     assert_equal 20 (fs.(1) 10)
