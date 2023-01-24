@@ -161,6 +161,8 @@ install-%:
                    $(INSTALL_HEADERS) \
                    $(if $(filter yes,$($(PROJECT).install_native_objects)),$(NATIVE_OBJECTS)))
 
+$(PROJECTS:%=install-%): META-install
+
 install: META-install $(PROJECTS:%=install-%)
 
 uninstall:
