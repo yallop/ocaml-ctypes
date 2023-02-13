@@ -70,7 +70,8 @@ LIB_TARGETS = $(BUILDDIR)/$(PROJECT).cma \
 ifeq ($(BEST),native)
 LIB_TARGETS += $(BUILDDIR)/$(PROJECT).cmxa
 endif
-ifneq ($(wildcard $(shell $(OCAMLFIND) ocamlc -where)/dynlink.cmxa),)
+OCAMLC_WHERE:=$(shell $(OCAMLFIND) ocamlc -where)
+ifneq ($(wildcard $(OCAMLC_WHERE)/dynlink.cmxa $(OCAMLC_WHERE)/dynlink/dynlink.cmxa),)
 LIB_TARGETS += $(BUILDDIR)/$(PROJECT).cmxs
 endif
 LIB_TARGET_EXTRAS = $(if $(STUB_LIB),$(BUILDDIR)/lib$(PROJECT)_stubs.a) \
