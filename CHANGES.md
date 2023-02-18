@@ -1,3 +1,18 @@
+## ctypes 0.20.2
+
+* Restore compilation of cmxs for 5.0  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/727
+
+* Update build rules to make .o files a dependency of cmxs  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/723
+
+* update CArray.of_string comment to accurately reflect the length  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/716
+
+Thanks to @houseofsuns, @ygrek, Alpha Diallo (@moyodiallo), François
+Bobot (@bobot) and Alfredo Tupone (@atupone) for contributions to this
+release.
+
 ## ctypes 0.20.1
 
 * Fix warning 9 [missing-record-field-pattern] in generated OCaml code  
