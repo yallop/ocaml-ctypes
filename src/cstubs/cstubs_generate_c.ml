@@ -483,7 +483,7 @@ struct
   let byte_stub ~errno ~stub_name fmt fn args =
     begin
       let nargs = List.length args in
-      fprintf fmt "@[value@ %s_byte%d@;@[(value *argv, int argc)@]@]@;@[<2>{@\n"
+      fprintf fmt "@[value@ %s_byte%d@;@[(value *argv, int argc)@]@]@;@[<2>{@\n(void)(argc);\n"
         stub_name nargs;
       fprintf fmt "@[<2>return@ @[%s(@[" stub_name;
       ListLabels.iteri args
