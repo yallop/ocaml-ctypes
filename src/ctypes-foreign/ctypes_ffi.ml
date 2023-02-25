@@ -27,7 +27,7 @@ struct
   let () = Ctypes_ffi_stubs.set_closure_callback Closure_properties.retrieve
 
   type _ ccallspec =
-      Call : bool * (Ctypes_ptr.voidp -> 'a) -> 'a ccallspec
+      Call : bool * (Obj.t -> 'a) -> 'a ccallspec
     | WriteArg : ('a -> Ctypes_ptr.voidp -> (Obj.t * int) array -> Obj.t) * 'b ccallspec ->
                  ('a -> 'b) ccallspec
 
@@ -64,6 +64,9 @@ struct
     | Pointer _                           -> ArgType (Ctypes_ffi_stubs.pointer_ffitype ())
     | Funptr _                            -> ArgType (Ctypes_ffi_stubs.pointer_ffitype ())
     | OCaml _                             -> ArgType (Ctypes_ffi_stubs.pointer_ffitype ())
+    | Value                               ->
+      let ffitype = Ctypes_ffi_stubs.primitive_ffitype Ctypes_primitive_types.Nativeint in
+      ArgType (ffitype)
     | Union _                             -> report_unpassable "unions"
     | Struct ({ spec = Complete _ } as s) -> struct_arg_type s
     | View { ty }                         -> arg_type ty
@@ -165,6 +168,10 @@ struct
     | OCaml String     -> ocaml_arg 1
     | OCaml Bytes      -> ocaml_arg 1
     | OCaml FloatArray -> ocaml_arg (Ctypes_primitives.sizeof Ctypes_primitive_types.Double)
+    | Value            ->
+      (fun ~offset ~idx obj dst mov ->
+         mov.(idx) <- (obj, -1); (* -1 special value *)
+         obj)
     | View { write = w; ty } ->
       (fun ~offset ~idx v dst mov -> 
          let wv = w v in
@@ -174,6 +181,15 @@ struct
         Ctypes_memory.write ty v
           (Ctypes_ptr.Fat.(add_bytes (make ~managed:None ~reftyp:Void dst) offset));
         Obj.repr v)
+
+  let rec is_ocaml_value : type a. a Ctypes_static.typ -> bool  = function
+       | Value -> true
+       | View { ty } -> is_ocaml_value ty
+       | _ -> false
+
+  let rec return_ocaml_value : type a. a Ctypes_static.fn -> bool = function
+    | Returns (ty) -> is_ocaml_value ty
+    | Function(_,fn) -> return_ocaml_value fn
 
   (*
     callspec = allocate_callspec ()
@@ -187,9 +203,23 @@ struct
     Ctypes_ffi_stubs.callspec -> a ccallspec
     = fun ~abi ~check_errno ?(idx=0) fn callspec -> match fn with
       | Returns t ->
-        let () = prep_callspec callspec abi t in
-        let b = Ctypes_memory.build t in
-        Call (check_errno, (fun p -> b (Ctypes_ptr.Fat.make ~managed:None ~reftyp:Void p)))
+        (* ugly *)
+        if is_ocaml_value t then
+          let () = prep_callspec callspec abi Value in
+          let rec aux : type a. a typ -> Obj.t -> a = function
+            | Value -> (fun p -> p)
+            | View { read; ty } ->
+               let buildty = aux ty in
+               (fun p -> read (buildty p))
+            | _ -> assert false
+          in
+          Call (check_errno, aux t)
+        else
+          let () = prep_callspec callspec abi t in
+          let b = Ctypes_memory.build t in
+          Call (check_errno, (fun p ->
+              let p = (Obj.obj p : Ctypes_ptr.voidp) in
+              b (Ctypes_ptr.Fat.make ~managed:None ~reftyp:Void p)))
       | Function (p, f) ->
         let offset = add_argument callspec p in
         let rest = build_ccallspec ~abi ~check_errno ~idx:(idx+1) f callspec in
@@ -199,6 +229,7 @@ struct
     let c = Ctypes_ffi_stubs.allocate_callspec ~check_errno
       ~runtime_lock:release_runtime_lock
       ~thread_registration:false
+      ~return_ocaml_value:(return_ocaml_value fn)
     in
     let e = build_ccallspec ~abi ~check_errno fn c in
     invoke name e [] c
@@ -217,6 +248,7 @@ struct
       ~check_errno:false
       ~runtime_lock:acquire_runtime_lock
       ~thread_registration
+      ~return_ocaml_value:(return_ocaml_value fn)
     in
     let cs = box_function abi fn cs' in
     fun f ->

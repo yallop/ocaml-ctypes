@@ -212,6 +212,13 @@ sig
   val ocaml_bytes : bytes Ctypes_static.ocaml typ
   (** Value representing the directly mapped storage of an OCaml byte array. *)
 
+  val ocaml_value :
+     ?format: (Format.formatter -> 'a -> unit) -> string -> 'a typ
+  (** Value representing directly the OCaml value. [ocaml_value ?format name]
+     the [name] and [format] are only used for debugging *)
+
+  val ocaml_obj_t : Obj.t typ
+
   (** {3 Array types} *)
 
   (** {4 C array types} *)

@@ -71,6 +71,19 @@ struct
         (strdup (ocaml_string_start "klmnopqrstuvwxyz"))
         (strdup (s +@ 10))
     end
+
+  let test_obj_value1 _ =
+    let r = ref (ref 1) in
+    let r' = get_first_field_int_ref_ref r in
+    assert_equal true (!r == r')
+
+  let get_first_field : type a. a ref ref -> a ref =
+      fun r ->  Obj.obj (get_first_field_obj_t (Obj.repr r))
+
+  let test_obj_value2 _ =
+    let r = ref (ref 1) in
+    let r' = get_first_field r in
+    assert_equal true (!r == r')
 end
 
 
@@ -139,6 +152,18 @@ let suite = "Tests passing OCaml values" >:::
    "pointer arithmetic on OCaml values (stubs)"
     >:: Stub_tests.test_pointer_arithmetic;
 
+   "passing an OCaml values with view (foreign)"
+    >:: Foreign_tests.test_obj_value1;
+
+   "passing an OCaml values with view (stubs)"
+    >:: Stub_tests.test_obj_value1;
+
+   "passing an OCaml values (foreign)"
+    >:: Foreign_tests.test_obj_value2;
+
+   "passing an OCaml values (stubs)"
+    >:: Stub_tests.test_obj_value2;
+   
    "ocaml_string values aren't addressable"
     >:: test_ocaml_types_rejected_as_pointer_reference_types;
 

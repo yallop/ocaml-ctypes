@@ -52,6 +52,7 @@ type _ alloc =
 | Alloc_complex : Complex.t alloc
 | Alloc_complexld : ComplexL.t alloc
 | Alloc_pointer : (_, _) pointer alloc
+| Alloc_value : Obj.t alloc
 | Alloc_funptr : _ static_funptr alloc
 | Alloc_structured : (_, _) structured alloc
 | Alloc_array : _ carray alloc
@@ -109,6 +110,7 @@ let rec allocation : type a. a typ -> a allocation = function
  | Array _ -> `Alloc Alloc_array
  | Bigarray ba -> `Alloc (Alloc_bigarray ba)
  | OCaml _ -> `Alloc Alloc_pointer
+ | Value -> `Alloc Alloc_value
 
 let rec may_allocate : type a. a fn -> bool = function
   | Returns t ->

@@ -30,6 +30,7 @@ let test_fabs _ =
       ~check_errno:false
       ~runtime_lock:false
       ~thread_registration:false
+      ~return_ocaml_value:false
     in
     let arg_1_offset = add_argument callspec double_ffitype in
     let () = prep_callspec callspec Libffi_abi.(abi_code default_abi)
@@ -44,7 +45,7 @@ let test_fabs _ =
         (fun p _values ->
           write Ctypes_primitive_types.Double x
             Ctypes_ptr.(make_unmanaged ~reftyp:Ctypes_static.Void (Raw.(add p (of_int arg_1_offset)))))
-        (fun p -> read Ctypes_primitive_types.Double (make_unmanaged ~reftyp:Ctypes_static.Void p))
+        (fun p -> read Ctypes_primitive_types.Double (make_unmanaged ~reftyp:Ctypes_static.Void (Obj.obj p:Ctypes_ptr.voidp)))
     in
 
     assert_equal 2.0 (fabs (-2.0)) ~printer:string_of_float;
@@ -64,6 +65,7 @@ let test_pow _ =
       ~check_errno:false
       ~runtime_lock:false
       ~thread_registration:false
+      ~return_ocaml_value:false
     in
     let arg_1_offset = add_argument callspec double_ffitype in
     let arg_2_offset = add_argument callspec double_ffitype in
@@ -81,7 +83,7 @@ let test_pow _ =
             Ctypes_ptr.(make_unmanaged ~reftyp:Ctypes_static.Void (Raw.(add buffer (of_int arg_1_offset))));
           write Ctypes_primitive_types.Double y
             Ctypes_ptr.(make_unmanaged ~reftyp:Ctypes_static.Void (Raw.(add buffer (of_int arg_2_offset)))))
-        (fun p -> read Ctypes_primitive_types.Double (make_unmanaged ~reftyp:Ctypes_static.Void p))
+        (fun p -> read Ctypes_primitive_types.Double (make_unmanaged ~reftyp:Ctypes_static.Void (Obj.obj p:Ctypes_ptr.voidp)))
     in
 
     assert_equal 8.0 (pow 2.0 3.0);

@@ -910,3 +910,7 @@ int call_saved_dynamic_funptr(int n) {
 
 int call_dynamic_funptr_struct(struct simple_closure x) { return x.f(x.n); }
 int call_dynamic_funptr_struct_ptr(struct simple_closure *x) { return x->f(x->n); }
+
+intnat get_first_field(intnat a){
+  return *((intnat*)a);
+}

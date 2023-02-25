@@ -282,4 +282,6 @@ struct simple_closure { int (*f)(int); int n; };
 int call_dynamic_funptr_struct(struct simple_closure);
 int call_dynamic_funptr_struct_ptr(struct simple_closure*);
 
+intnat get_first_field(intnat);
+
 #endif /* TEST_FUNCTIONS_H */

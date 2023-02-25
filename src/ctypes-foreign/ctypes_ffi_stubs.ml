@@ -42,7 +42,7 @@ type callspec
 
 (* Allocate a new C call specification *)
 external allocate_callspec : check_errno:bool -> runtime_lock:bool ->
-  thread_registration:bool -> callspec
+  thread_registration:bool -> return_ocaml_value:bool -> callspec
   = "ctypes_allocate_callspec"
 
 (* Add an argument to the C buffer specification *)
@@ -57,7 +57,7 @@ external prep_callspec : callspec -> int -> _ ffitype -> unit
    The callback functions write the arguments to the buffer and read
    the return value. *)
 external call : string -> (_, _ Ctypes_static.fn) Fat.t -> callspec ->
-  (voidp -> (Obj.t * int) array -> unit) -> (voidp -> 'a) -> 'a
+  (voidp -> (Obj.t * int) array -> unit) -> (Obj.t -> 'a) -> 'a
   = "ctypes_call"
 
 

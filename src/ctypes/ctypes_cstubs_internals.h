@@ -30,6 +30,9 @@
 #define CTYPES_PTR_OF_OCAML_BYTES(s) CTYPES_PTR_OF_OCAML_STRING(s)
 #endif
 
+#define CTYPES_INTNAT_OF_VALUE(s) (s)
+#define CTYPES_VALUE_OF_INTNAT(s) (s)
+
 #define Ctypes_val_char(c) \
   (Val_int((c + 256) % 256))
 #define CTYPES_PAIR_WITH_ERRNO(v)

@@ -87,6 +87,16 @@ struct
                           (value @-> returning (ptr void)),
                    [x])
 
+  let value_to_intnat : cexp -> ccomp =
+    fun x -> `App (reader "CTYPES_INTNAT_OF_VALUE"
+                          (value @-> returning nativeint),
+                   [x])
+
+  let intnat_to_value : cexp -> ceff =
+    fun x -> `App (conser "CTYPES_VALUE_OF_INTNAT"
+                          (nativeint @-> returning value),
+                   [x])
+
   let from_ptr : cexp -> ceff =
     fun x -> `App (conser "CTYPES_FROM_PTR"
                           (ptr void @-> returning value),
@@ -150,6 +160,7 @@ struct
     | OCaml String -> Some (string_to_ptr x)
     | OCaml Bytes -> Some (bytes_to_ptr x)
     | OCaml FloatArray -> Some (float_array_to_ptr x)
+    | Value -> Some (value_to_intnat x)
 
   let prj ty x = prj ty ~orig:ty x
 
@@ -165,6 +176,7 @@ struct
     | View { ty } -> inj ty x
     | Array _ -> report_unpassable "arrays"
     | Bigarray _ -> report_unpassable "bigarrays"
+    | Value -> (intnat_to_value (x:>cexp))
     | OCaml _ -> report_unpassable "ocaml references as return values"
 
   type _ fn =
