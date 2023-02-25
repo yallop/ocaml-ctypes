@@ -26,7 +26,7 @@ type 'a structspec =
     Incomplete of incomplete_size
   | Complete of structured_spec
 
-type _ typ =
+type 'a typ =
     Void            :                       unit typ
   | Primitive       : 'a Ctypes_primitive_types.prim -> 'a typ
   | Pointer         : 'a typ             -> 'a ptr typ
@@ -39,6 +39,7 @@ type _ typ =
   | Bigarray        : (_, 'a, _) Ctypes_bigarray.t
                                          -> 'a typ
   | OCaml           : 'a ocaml_type      -> 'a ocaml typ
+  | Value           :                       'a typ
 and 'a carray = { astart : 'a ptr; alength : int }
 and ('a, 'kind) structured = { structured : ('a, 'kind) structured ptr } [@@unboxed]
 and 'a union = ('a, [`Union]) structured
@@ -180,6 +181,12 @@ val union : string -> 'a union typ
 val offsetof : ('a, 'b) field -> int
 val field_type : ('a, 'b) field -> 'a typ
 val field_name : ('a, 'b) field -> string
+
+module Value () : sig
+  type t
+
+  val typ : t typ
+end
 
 exception IncompleteType
 exception ModifyingSealedType of string

@@ -800,6 +800,41 @@ tests/test-bools/generated_stubs.c: $(BUILDDIR)/test-bools-stub-generator.$(BEST
 tests/test-bools/generated_bindings.ml: $(BUILDDIR)/test-bools-stub-generator.$(BEST)
 	$< --ml-file $@
 
+test-values-stubs.dir  = tests/test-values/stubs
+test-values-stubs.threads = yes
+test-values-stubs.subproject_deps = ctypes \
+   ctypes-foreign tests-common
+test-values-stubs: PROJECT=test-values-stubs
+test-values-stubs: $$(LIB_TARGETS)
+
+test-values-stub-generator.dir = tests/test-values/stub-generator
+test-values-stub-generator.threads = yes
+test-values-stub-generator.subproject_deps = ctypes cstubs \
+     ctypes-foreign test-values-stubs tests-common
+test-values-stub-generator.deps = str bigarray integers
+test-values-stub-generator: PROJECT=test-values-stub-generator
+test-values-stub-generator: $$(BEST_TARGET)
+
+test-values.dir = tests/test-values
+test-values.threads = yes
+test-values.deps = str bigarray oUnit integers
+test-values.subproject_deps = ctypes ctypes-foreign \
+  cstubs tests-common test-values-stubs
+test-values.link_flags = -L$(BUILDDIR)/clib -ltest_functions
+test-values: PROJECT=test-values
+test-values: $$(BEST_TARGET)
+
+test-values-generated= \
+  tests/test-values/generated_bindings.ml \
+  tests/test-values/generated_stubs.c
+
+test-values-generated: $(test-values-generated)
+
+tests/test-values/generated_stubs.c: $(BUILDDIR)/test-values-stub-generator.$(BEST)
+	$< --c-file $@
+tests/test-values/generated_bindings.ml: $(BUILDDIR)/test-values-stub-generator.$(BEST)
+	$< --ml-file $@
+
 test-callback_lifetime-stubs.dir  = tests/test-callback_lifetime/stubs
 test-callback_lifetime-stubs.threads = yes
 test-callback_lifetime-stubs.subproject_deps = ctypes \
@@ -1360,6 +1395,7 @@ TESTS += test-returning-errno-stubs test-returning-errno-stub-generator test-ret
 TESTS += test-closure-type-promotion-stubs test-closure-type-promotion-stub-generator test-closure-type-promotion-generated test-closure-type-promotion
 TESTS += test-threads-stubs test-threads-stub-generator test-threads-generated test-threads
 TESTS += test-ldouble
+TESTS += test-values-stubs test-values-stub-generator test-values-generated test-values
 
 ifneq (,$(filter mingw%,$(OSYSTEM)))
 WINLDFLAGS=-Wl,--out-implib,libtest_functions.dll.a

@@ -76,6 +76,7 @@ let rec format_typ' : type a. a typ ->
     | OCaml String -> format_typ' (ptr char) k context fmt
     | OCaml Bytes -> format_typ' (ptr uchar) k context fmt
     | OCaml FloatArray -> format_typ' (ptr double) k context fmt
+    | Value -> fprintf fmt "value%t" (k `nonarray)
 
 and format_fields : type a. a boxed_field list -> Format.formatter -> unit =
   fun fields fmt ->

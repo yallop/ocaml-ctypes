@@ -38,6 +38,15 @@ struct
   = "ctypes_write_pointer"
 end
 
+module Value =
+struct
+  external read : _ Fat.t -> _
+    = "ctypes_read_value"
+
+  external write : _ -> _ Fat.t -> unit
+    = "ctypes_write_value"
+end
+
 (* Copy [size] bytes from [src] to [dst]. *)
 external memcpy : dst:_ Fat.t -> src:_ Fat.t -> size:int -> unit
   = "ctypes_memcpy"

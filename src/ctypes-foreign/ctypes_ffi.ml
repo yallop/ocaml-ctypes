@@ -74,6 +74,7 @@ struct
     (* The following case should never happen; incomplete types are excluded
        during type construction. *)
     | Struct { spec = Incomplete _ }      -> report_unpassable "incomplete types"
+    | Value                               -> ArgType (Ctypes_ffi_stubs.value_ffitype ())
   and struct_arg_type : type s. s structure_type -> arg_type =
      fun ({fields} as s) ->
        let bufspec = Ctypes_ffi_stubs.allocate_struct_ffitype (List.length fields) in

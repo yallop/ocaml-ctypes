@@ -113,6 +113,23 @@ value ctypes_void_ffitype(value _)
   return CTYPES_FROM_PTR(&ffi_type_void);
 }
 
+/* value_ffitype : unit -> value ffitype */
+value ctypes_value_ffitype(value _)
+{
+#if SIZEOF_PTR == SIZEOF_LONG
+/* Standard models: ILP32 or I32LP64 */
+  return CTYPES_FROM_PTR(&ffi_type_slong);
+#elif SIZEOF_PTR == SIZEOF_INT
+/* Hypothetical IP32L64 model */
+  return CTYPES_FROM_PTR(&ffi_type_sint);
+#elif SIZEOF_PTR == 8
+/* Win64 model: IL32P64 */
+  return CTYPES_FROM_PTR(&ffi_type_sint64);
+#else
+#error "No integer type available to represent pointers"
+#endif
+}
+
 #define Struct_ffitype_val(v) (*(ffi_type **)Data_custom_val(v))
 
 /* allocate_struct_ffitype : int -> managed_buffer */

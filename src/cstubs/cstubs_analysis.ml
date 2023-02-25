@@ -21,7 +21,7 @@ let rec float : type a. a fn -> bool = function
 
 (* A value of type 'a noalloc says that reading a value of type 'a
    will not cause an OCaml allocation in C code. *)
-type _ noalloc =
+type 'a noalloc =
   Noalloc_unit : unit noalloc
 | Noalloc_int : int noalloc
 | Noalloc_uint8_t : Unsigned.uint8 noalloc
@@ -29,6 +29,7 @@ type _ noalloc =
 | Noalloc_char : char noalloc
 | Noalloc_bool : bool noalloc
 | Noalloc_view : ('a, 'b) view * 'b noalloc -> 'a noalloc
+| Noalloc_value : 'a noalloc
 
 (* A value of type 'a alloc says that reading a value of type 'a
    may cause an OCaml allocation in C code. *)
@@ -109,6 +110,7 @@ let rec allocation : type a. a typ -> a allocation = function
  | Array _ -> `Alloc Alloc_array
  | Bigarray ba -> `Alloc (Alloc_bigarray ba)
  | OCaml _ -> `Alloc Alloc_pointer
+ | Value -> `Noalloc Noalloc_value
 
 let rec may_allocate : type a. a fn -> bool = function
   | Returns t ->
