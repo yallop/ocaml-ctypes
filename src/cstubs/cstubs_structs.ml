@@ -14,6 +14,12 @@ sig
   type 'a const
   val constant : string -> 'a typ -> 'a const
 
+  module type signed = sig include Signed.S val t : t typ end
+  val signed  : string -> (module signed)
+
+  module type unsigned = sig include Unsigned.S val t : t typ end
+  val unsigned : string -> (module unsigned)
+
   val enum : string -> ?typedef:bool -> ?unexpected:(int64 -> 'a) -> ('a * int64 const) list -> 'a typ
 end
 
@@ -233,22 +239,59 @@ let write_enums fmt enums =
     ["  | s ->";
      "    failwith (\"unmatched enum: \"^ s)"]
 
+let write_signeds fmt signeds =
+  let case name =
+    printf1 fmt
+      (Format.sprintf
+         "  | %S -> \n    Cstubs_internals.build_signed_type %S Ctypes_static.%%s\n" name name)
+      (fun fmt ->
+         Format.fprintf fmt
+           "ctypes_arithmetic_type_name(CTYPES_CLASSIFY_ARITHMETIC_TYPE(%s))" name)
+  in
+  cases fmt signeds
+    ["";
+     "module type signed = sig include Signed.S val t : t typ end";
+     "let signed (type a) name = match name with"]
+    ~case
+    ["  | s -> failwith (\"unmatched signed type: \"^ s)"]
 
-let write_ml fmt fields structures consts enums =
+let write_unsigneds fmt unsigneds =
+  let case name =
+    printf1 fmt
+      (Format.sprintf
+         "  | %S -> \n    Cstubs_internals.build_unsigned_type %S Ctypes_static.%%s\n" name name)
+      (fun fmt ->
+         Format.fprintf fmt
+           "ctypes_arithmetic_type_name(CTYPES_CLASSIFY_ARITHMETIC_TYPE(%s))" name)
+  in
+  cases fmt unsigneds
+    ["";
+     "module type unsigned = sig include Unsigned.S val t : t typ end";
+     "let unsigned (type a) name = match name with"]
+    ~case
+    ["  | s -> failwith (\"unmatched unsigned type: \"^ s)"]
+
+
+let write_ml fmt fields structures consts enums signeds unsigneds =
   List.iter (puts fmt) mlprologue;
   write_field fmt fields;
   write_seal fmt structures;
   write_consts fmt consts;
-  write_enums fmt enums
+  write_enums fmt enums;
+  write_signeds fmt signeds;
+  write_unsigneds fmt unsigneds
+
 
 let gen_c () =
   let fields = ref []
   and structures = ref []
   and consts = ref []
   and enums = ref []
+  and signeds = ref []
+  and unsigneds = ref []
   in
   let finally fmt = write_c fmt (fun fmt ->
-                    write_ml fmt !fields !structures !consts !enums) in
+                    write_ml fmt !fields !structures !consts !enums !signeds !unsigneds) in
   let m =
     (module struct
       include Ctypes
@@ -281,6 +324,17 @@ let gen_c () =
 
       type _ const = unit
       let constant name ty  = consts := (name, Ctypes_static.BoxedType ty) :: !consts
+
+      module type signed = sig include Signed.S val t : t typ end
+      let signed name : (module signed) =
+        let () = signeds := name :: !signeds in
+        (module struct include Signed.Int32 let t = int32_t end) (* arbitrary *)
+
+      module type unsigned = sig include Unsigned.S val t : t typ end
+      let unsigned name : (module unsigned) =
+        let () = unsigneds := name :: !unsigneds in
+        (module struct include Unsigned.UInt32 let t = uint32_t end) (* arbitrary *)
+
       let enum name ?(typedef=false) ?unexpected alist =
         let () = enums := (name, typedef) :: !enums in
         let format_typ k fmt = Format.fprintf fmt "%s%s%t"

@@ -246,6 +246,7 @@ test-enums-struct-stubs: $$(LIB_TARGETS)
 test-enums-stubs.dir  = tests/test-enums/stubs
 test-enums-stubs.threads = yes
 test-enums-stubs.extra_mls = generated_struct_bindings.ml
+test-enums-stubs.deps = integers
 test-enums-stubs.subproject_deps = ctypes \
    test-enums-struct-stubs \
    test-enums-struct-stubs-generator \

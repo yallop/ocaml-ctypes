@@ -91,6 +91,14 @@ type 'a prim = 'a Ctypes_primitive_types.prim =
 | Complex64 : Complex.t prim
 | Complexld : ComplexL.t prim
 
+module type signed = sig include Signed.S val t : t typ end
+val build_signed_type :
+  string -> Ctypes_static.arithmetic -> (module signed)
+
+module type unsigned = sig include Unsigned.S val t : t typ end
+val build_unsigned_type :
+  string -> Ctypes_static.arithmetic -> (module unsigned)
+
 val build_enum_type :
   string -> Ctypes_static.arithmetic -> ?typedef:bool ->
   ?unexpected:(int64 -> 'a) -> ('a * int64) list -> 'a typ
