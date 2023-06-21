@@ -5,6 +5,8 @@
  * See the file LICENSE for details.
  *)
 
+[@@@warning "-33"]
+
 open OUnit2
 open Ctypes
 

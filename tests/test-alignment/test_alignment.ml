@@ -8,6 +8,7 @@
 open OUnit2
 open Ctypes
 
+[@@@warning "-32-34"]
 
 (*
   Test some relationships between the alignment requirements of primitive types.

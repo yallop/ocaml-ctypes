@@ -8,7 +8,6 @@
 (* Foreign function bindings for the OO-style tests. *)
 
 open Ctypes
-open Foreign
 
 module Stubs (F: Ctypes.FOREIGN) =
 struct

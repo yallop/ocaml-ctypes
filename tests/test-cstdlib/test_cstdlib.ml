@@ -95,7 +95,7 @@ struct
     assert_bool "memcmp(&10, &20) < 0"
       (memcmp (to_voidp p1) (to_voidp p2) (Size_t.of_int (sizeof int)) < 0);
 
-    let p = allocate_n uchar 12 in
+    let p = allocate_n uchar ~count:12 in
     let i = 44 in
     let u = UChar.of_int i in begin
       ignore (memset (to_voidp p) i (Size_t.of_int 12));
@@ -115,7 +115,6 @@ struct
     let sortby (type a) (typ : a typ) (f : a -> a -> int) (l : a list) =
       let open CArray in
       let open Size_t in
-      let open Infix in
       let arr = of_list typ l in
       let len = of_int (length arr) in
       let size = of_int (sizeof typ) in

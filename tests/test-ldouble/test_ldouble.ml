@@ -6,7 +6,6 @@
  *)
 
 open OUnit2
-open Ctypes
 
 let flts = 
   [
@@ -167,7 +166,7 @@ let test_complex _ =
       assert_bool name (chk_complex ?prec (opc a) (to_complex (opl (of_complex a))))
     ) cplx
   in
-  let assert_chkf ?prec name opc opl = 
+  let assert_chkf name opc opl = 
     List.iter (fun a -> 
       let open ComplexL in
       assert_bool name (chk_float (opc a) (LDouble.to_float (opl (of_complex a))))
@@ -260,12 +259,14 @@ let test_comparisons _ =
 
 let test_int_conversions _ =
   begin
-    assert_equal max_int (LDouble.to_int
-			    (LDouble.of_int max_int))
+    let max_ok = 1 lsr 53 in
+    let min_ok = -max_ok in
+    assert_equal max_ok (LDouble.to_int
+			    (LDouble.of_int max_ok))
       ~printer:string_of_int;
 
-    assert_equal min_int (LDouble.to_int
-			    (LDouble.of_int min_int))
+    assert_equal min_ok (LDouble.to_int
+			    (LDouble.of_int min_ok))
       ~printer:string_of_int;
   end
     

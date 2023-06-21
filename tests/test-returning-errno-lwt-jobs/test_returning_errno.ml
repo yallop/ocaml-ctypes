@@ -8,6 +8,7 @@
 open OUnit2
 open Ctypes
 
+[@@@warning "-27"]
 
 module Bindings = Functions.Stubs(Generated_bindings)
 module Constants = Types.Struct_stubs(Generated_struct_bindings)

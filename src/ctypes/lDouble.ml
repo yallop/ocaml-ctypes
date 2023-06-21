@@ -5,6 +5,8 @@
  * See the file LICENSE for details.
  *)
 
+[@@@warning "-3"]
+
 external init : unit -> unit = "ldouble_init"
 let () = init ()
 

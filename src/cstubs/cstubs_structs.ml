@@ -5,6 +5,8 @@
  * See the file LICENSE for details.
  *)
 
+[@@@warning "-9-27"]
+
 open Ctypes
 
 module type TYPE =
@@ -40,6 +42,7 @@ let cepilogue = [
   "}";
   ]
 let mlprologue = [
+  "[@@@warning \"-9-27\"]";
   "include Ctypes";
   "let lift x = x";
   "open Ctypes_static";
@@ -133,7 +136,7 @@ let primitive_format_string : type a. a Ctypes_primitive_types.prim -> string =
     let open Ctypes_primitive_types in
     let sprintf = Printf.sprintf in
     let fail () =
-      Printf.kprintf failwith "Cannot retrieve constants of type %s"
+      Printf.ksprintf failwith "Cannot retrieve constants of type %s"
         (Ctypes_primitives.name p)
     in
     match p, Ctypes_primitives.format_string p with

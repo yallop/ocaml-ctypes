@@ -1,3 +1,7 @@
+[@@@warning "-9"]
+
+module C = Configurator.V1
+
 let header ="\
 (*
  * Copyright (c) 2016 whitequark
@@ -64,7 +68,7 @@ let c_primitives = [
     alignment   = "alignof(intnat)" };
 ]
 
-let printf = Printf.printf
+open Printf
 
 let generate name typ f =
   printf "let %s : type a. a prim -> %s = function\n" name typ;
@@ -77,23 +81,54 @@ let generate name typ f =
     end;
     printf "\n") c_primitives
 
+let prelude = "\
+#if defined(__MINGW32__) || defined(__MINGW64__)
+#define __USE_MINGW_ANSI_STDIO 1
+#include <stdio.h> /* see: https://sourceforge.net/p/mingw-w64/bugs/627/ */
+#endif
+
+#include <stdint.h>
+#include <stdbool.h>
+#include <inttypes.h>
+#include <caml/mlvalues.h>
+
+#define alignof(T) (offsetof(struct { char c; T t; }, t))
+#define STRINGIFY1(x) #x
+#define STRINGIFY(x) STRINGIFY1(x)
+
+#if __USE_MINGW_ANSI_STDIO && defined(__MINGW64__)
+#define REAL_ARCH_INTNAT_PRINTF_FORMAT \"ll\"
+#else
+#define REAL_ARCH_INTNAT_PRINTF_FORMAT ARCH_INTNAT_PRINTF_FORMAT
+#endif
+"
+let includes = []
+
 let () =
-  begin
+  C.main ~name:"ctypes" (fun c ->
+    let import_int l =
+      match C.C_define.(import c ~prelude ~includes [l,Type.Int]) with
+      |[_,C.C_define.Value.Int i] -> i
+      |_ -> failwith ("unable to find integer definition for " ^ l) in
+    let import_string l  =
+      match C.C_define.(import c ~prelude ~includes [l,Type.String]) with
+      |[_,C.C_define.Value.String s] -> s
+      |_ -> failwith ("unable to find string definition for " ^ l) in
     print_string header;
     generate "sizeof" "int" (fun { size } ->
-      printf "%d" (Extract_from_c.integer size));
+      printf "%d" (import_int size));
     generate "alignment" "int" (fun { alignment } ->
-      printf "%d" (Extract_from_c.integer alignment));
+      printf "%d" (import_int alignment));
     generate "name" "string" (fun { typ } ->
-      printf "%S" (Extract_from_c.string ("STRINGIFY("^typ^")")));
+      printf "%S" (import_string ("STRINGIFY("^typ^")")));
     generate "format_string" "string option" (fun { format } ->
       match format with
       | Known_format str ->
         printf "Some %S" ("%"^str)
       | Defined_format str ->
-        printf "Some %S" ("%"^Extract_from_c.string str)
+        printf "Some %S" ("%"^(import_string str))
       | No_format ->
         printf "None");
-    printf "let pointer_size = %d\n" (Extract_from_c.integer "sizeof(void*)");
-    printf "let pointer_alignment = %d\n" (Extract_from_c.integer "alignof(void*)");
-  end
+    printf "let pointer_size = %d\n" (import_int "sizeof(void*)");
+    printf "let pointer_alignment = %d\n" (import_int "alignof(void*)");
+  )

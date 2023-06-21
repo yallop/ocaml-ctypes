@@ -1,0 +1,12 @@
+(test
+ (name test_cstdlib)
+ (package ctypes-foreign)
+ (libraries
+  ounit2
+  ctypes
+  ctypes.stubs
+  ctypes-foreign
+  test_cstdlib_stubs
+  test_cstdlib_bindings
+  tests_common
+  stdlib-shims))

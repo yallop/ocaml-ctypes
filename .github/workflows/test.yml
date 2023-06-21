@@ -63,10 +63,7 @@ jobs:
           opam install -t --deps-only .
 
       - name: Build
-        run: opam exec -- make
+        run: opam exec -- dune build
 
       - name: Test
-        run: opam exec -- make test
-
-      - name: Test inverted stubs
-        run: opam pin add ctypes-inverted-stubs-example https://github.com/yallop/ocaml-ctypes-inverted-stubs-example.git 
+        run: opam exec -- dune runtest

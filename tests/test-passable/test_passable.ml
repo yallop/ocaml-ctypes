@@ -47,9 +47,9 @@ let test_unions_are_not_passable _ =
 
     let u : u union typ = union "u"
     let (-:) ty label = field u label ty
-    let c = int    -: "c"
-    let f = double -: "f"
-    let p = ptr u  -: "p"
+    let _c = int    -: "c"
+    let _f = double -: "f"
+    let _p = ptr u  -: "p"
     let () = seal u
 
     let _ = begin

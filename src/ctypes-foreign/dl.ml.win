@@ -3,7 +3,7 @@
  * See the file LICENSE for details.
  *)
 
-[@@@ocaml.warning "-16"]
+[@@@ocaml.warning "-16-37"]
 
 type library
 
@@ -84,7 +84,7 @@ let dlopen ?filename ~flags =
           else
             x
         in
-        let ls = String.lowercase s in
+        let ls = String.lowercase_ascii s in
         let s' =
           if Filename.check_suffix ls ".so" ||
             Filename.check_suffix ls ".dylib"

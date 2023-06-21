@@ -9,9 +9,6 @@ open OUnit2
 open Ctypes
 open Foreign
 
-
-let testlib = Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW])
-
 module Common_tests(S : Cstubs.FOREIGN with type 'a result = 'a
                                         and type 'a return = 'a) =
 struct
@@ -100,7 +97,7 @@ let test_ocaml_types_rejected_as_return_types _ =
   Test that pointers to OCaml values cannot be dereferenced.
 *)
 let test_pointers_to_ocaml_types_cannot_be_dereferenced _ =
-  let p = allocate_n char 10 in
+  let p = allocate_n char ~count:10 in
   let po = coerce (ptr char) (ptr ocaml_string) p in
 
   begin

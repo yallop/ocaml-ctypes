@@ -7,9 +7,7 @@
 
 (* Functions for test stub generation. *)
 
-open Ctypes
-
-let filenames argv =
+let filenames _argv =
   let usage = "arguments: [--ml-file $filename] [--c-file $filename]" in
   let ml_filename = ref ""
   and c_filename = ref ""
@@ -55,7 +53,7 @@ let with_open_formatter filename f =
     close_channel ();
     raise e
 
-let header = "#include \"clib/test_functions.h\""
+let header = "#include \"test_functions.h\""
 
 let run ?concurrency ?errno ?(cheader="") argv ?structs specs =
   let ml_filename, c_filename, c_struct_filename = filenames argv

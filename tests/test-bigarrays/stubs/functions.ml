@@ -8,7 +8,6 @@
 (* Foreign function bindings for the bigarrays tests. *)
 
 open Ctypes
-open Tests_common
 
 module Stubs (F: Ctypes.FOREIGN) =
 struct

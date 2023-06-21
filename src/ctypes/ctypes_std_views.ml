@@ -74,7 +74,7 @@ let signed_typedef name ~size : (module Signed_type) =
            let t = Ctypes_static.(typedef int32_t name) end)
   | 8 -> (module struct include Signed.Int64
            let t = Ctypes_static.(typedef int64_t name) end)
-  | n -> Printf.kprintf failwith "size %d not supported for %s\n" n name
+  | n -> Printf.ksprintf failwith "size %d not supported for %s\n" n name
 
 let unsigned_typedef name ~size : (module Unsigned_type) =
   match size with
@@ -86,7 +86,7 @@ let unsigned_typedef name ~size : (module Unsigned_type) =
            let t = Ctypes_static.(typedef uint32_t name) end)
   | 8 -> (module struct include Unsigned.UInt64
            let t = Ctypes_static.(typedef uint64_t name) end)
-  | n -> Printf.kprintf failwith "size %d not supported for %s\n" n name
+  | n -> Printf.ksprintf failwith "size %d not supported for %s\n" n name
 
 module Intptr = (val signed_typedef "intptr_t"
                     ~size:(Ctypes_std_view_stubs.intptr_t_size ()))

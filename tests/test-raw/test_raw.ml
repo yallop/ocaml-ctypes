@@ -9,7 +9,8 @@
 
 open OUnit2
 open Ctypes_memory_stubs
-open Ctypes_std_view_stubs
+
+[@@@warning "-6-33"]
 
 (* Tests for the low-level module on which the public high-level
    interface is based.  

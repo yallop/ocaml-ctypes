@@ -13,8 +13,8 @@ let c_headers = "
 "
 
 let main () =
-  let ml_out = open_out "examples/fts/stub-generation/fts_generated.ml"
-  and c_out = open_out "examples/fts/stub-generation/fts_stubs.c" in
+  let ml_out = open_out "fts_generated.ml"
+  and c_out = open_out "fts_stubs.c" in
   let ml_fmt = Format.formatter_of_out_channel ml_out
   and c_fmt = Format.formatter_of_out_channel c_out in
   Format.fprintf c_fmt "%s@\n" c_headers;

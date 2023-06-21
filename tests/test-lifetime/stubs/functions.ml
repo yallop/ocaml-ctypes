@@ -8,7 +8,6 @@
 (* Foreign function bindings for the lifetime tests. *)
 
 open Ctypes
-open Foreign
 
 module Stubs (F: Ctypes.FOREIGN) =
 struct

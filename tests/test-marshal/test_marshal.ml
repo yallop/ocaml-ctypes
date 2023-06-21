@@ -6,7 +6,6 @@
  *)
 
 open OUnit2
-open Ctypes
 open Unsigned
 
 
