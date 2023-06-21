@@ -7,7 +7,8 @@
 
 open OUnit2
 open Ctypes
-open Foreign
+
+let _ = Dl.(dlopen ~filename:"../clib/clib.so" ~flags:[RTLD_NOW])
 
 (* Explicitly raise on leaked funptrs. *)
 

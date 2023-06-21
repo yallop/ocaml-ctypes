@@ -7,6 +7,8 @@
 
 (* Boxed pointers to C memory locations . *)
 
+[@@@warning "-9"]
+
 module Raw = struct
   include Nativeint
 

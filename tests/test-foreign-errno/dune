@@ -1,0 +1,4 @@
+(test
+ (name test_errno)
+ (package ctypes-foreign)
+ (libraries ounit2 ctypes ctypes-foreign))

@@ -6,7 +6,6 @@
  *)
 
 open OUnit2
-open Ctypes
 
 module Bindings = Functions.Stubs(Generated_bindings)
 

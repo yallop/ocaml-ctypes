@@ -8,8 +8,8 @@
 let c_headers = "#include <ncurses.h>"
 
 let main () =
-  let ml_out = open_out "examples/ncurses/stub-generation/ncurses_generated.ml" in
-  let c_out = open_out "examples/ncurses/stub-generation/ncurses_stubs.c" in
+  let ml_out = open_out "ncurses_generated.ml" in
+  let c_out = open_out "ncurses_stubs.c" in
   let c_fmt = Format.formatter_of_out_channel c_out in
   let ml_fmt = Format.formatter_of_out_channel ml_out in
   Format.fprintf c_fmt "%s@\n" c_headers;

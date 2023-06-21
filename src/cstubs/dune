@@ -1,0 +1,9 @@
+(library
+ (name ctypes_stubs)
+ (public_name ctypes.stubs)
+ (instrumentation
+  (backend bisect_ppx))
+ (wrapped false)
+ (libraries
+  (re_export ctypes)
+  str))

@@ -1,0 +1,10 @@
+(test
+ (name test_variadic)
+ (package ctypes-foreign)
+ (libraries
+  ounit2
+  ctypes
+  integers
+  test_variadic_stubs
+  test_variadic_bindings
+  tests_common))

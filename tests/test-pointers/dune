@@ -1,0 +1,15 @@
+(test
+ (name test_pointers)
+ (package ctypes-foreign)
+ (deps ../clib/clib%{ext_dll})
+ (link_flags
+  (:include ../flags/link-flags.sexp))
+ (libraries
+  ounit2
+  ctypes
+  ctypes.stubs
+  ctypes-foreign
+  test_pointers_stubs
+  test_pointers_bindings
+  tests_common
+  stdlib-shims))

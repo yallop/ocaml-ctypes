@@ -8,6 +8,9 @@
 open OUnit2
 open Ctypes
 
+let _ = Dl.(dlopen ~filename:"../clib/clib.so" ~flags:[RTLD_NOW])
+
+[@@@warning "-6-27-37"]
 
 module Common_tests(S : Cstubs.FOREIGN with type 'a result = 'a
                                         and type 'a return = 'a) =
@@ -75,7 +78,7 @@ struct
 
       class chorse ~colour =
       object
-        inherit animalc (new_chorse (colour_num colour))
+        inherit animalc (new_chorse(colour_num colour))
       end
 
       let () =

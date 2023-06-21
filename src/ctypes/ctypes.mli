@@ -477,10 +477,9 @@ val coerce_fn : 'a fn -> 'b fn -> 'a -> 'b
     coercions. *)
 
 
-(** {2 binding interfaces}.
-*)
+(** {2 binding interfaces}
 
-(** Foreign function binding interface.
+    Foreign function binding interface.
 
     The {!Foreign} and {!Cstubs} modules provide concrete implementations. *)
 module type FOREIGN =

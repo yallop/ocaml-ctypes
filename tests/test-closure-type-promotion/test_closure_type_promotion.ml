@@ -3,9 +3,9 @@
  * See the file LICENSE for details.
  *)
 
-open Ctypes
 open OUnit2
-open Foreign
+
+let _testlib = Dl.(dlopen ~filename:"../clib/clib.so" ~flags:[RTLD_NOW])
 
 (*
  *  Using the closure API of libffi is error prone due to differences

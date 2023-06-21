@@ -50,6 +50,7 @@ let _report_dl_error noload =
 
 let crush_flags f : 'a list -> int = List.fold_left (fun i o -> i lor (f o)) 0
 
+[@@@warning "-16"]
 let dlopen ?filename ~flags =
   match _dlopen ?filename ~flags:(crush_flags resolve_flag flags) with
     | Some library -> library

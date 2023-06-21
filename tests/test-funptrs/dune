@@ -1,0 +1,12 @@
+(test
+ (name test_funptrs)
+ (link_flags
+  (:include ../flags/link-flags.sexp))
+ (libraries
+  ounit2
+  ctypes
+  ctypes-foreign
+  test_funptrs_stubs
+  ctypes.stubs
+  tests_common
+  test_funptrs_bindings))

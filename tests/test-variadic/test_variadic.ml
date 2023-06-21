@@ -11,7 +11,7 @@
 
 open OUnit2
 open Ctypes
-
+[@@@warning "-6"]
 
 module Common_tests(S : Cstubs.FOREIGN with type 'a result = 'a
                                         and type 'a return = 'a) =
@@ -28,7 +28,7 @@ struct
     let bufsz = 128 in
     let write snprintf apply =
       let buf = allocate_n char bufsz in
-      ignore (apply (snprintf buf bufsz));
+      let _ : int = apply (snprintf buf bufsz) in
       coerce (ptr char) string buf
     in
     begin

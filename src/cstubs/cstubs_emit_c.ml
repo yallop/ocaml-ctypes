@@ -7,6 +7,8 @@
 
 (* C pretty printing. *)
 
+[@@@warning "-9-27"]
+
 open Ctypes_static
 open Cstubs_c_language
 open Format

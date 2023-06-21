@@ -7,6 +7,8 @@
 
 (* C stub generation *)
 
+[@@@warning "-9-27"]
+
 open Ctypes_static
 open Cstubs_c_language
 open Unchecked_function_types

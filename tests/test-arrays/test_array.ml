@@ -9,9 +9,7 @@ open OUnit2
 module Float_ = struct let float = float end (*has to be above the module Ctypes*)
 open Ctypes
 
-
-let testlib = Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW])
-
+let _ = Dl.(dlopen ~filename:"../clib/clib.so" ~flags:[RTLD_NOW])
 
 (*
   Creating multidimensional arrays, and reading and writing elements.

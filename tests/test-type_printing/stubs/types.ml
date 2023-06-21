@@ -5,8 +5,6 @@
  * See the file LICENSE for details.
  *)
 
-open Ctypes
-
 module Stubs(S : Ctypes.TYPE) =
 struct
   open S

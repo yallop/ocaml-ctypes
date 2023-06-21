@@ -1,0 +1,14 @@
+(test
+ (name test_oo_style)
+ (package ctypes-foreign)
+ (deps ../clib/clib%{ext_dll})
+ (link_flags
+  (:include ../flags/link-flags.sexp))
+ (libraries
+  ounit2
+  ctypes
+  ctypes.stubs
+  ctypes-foreign
+  test_oo_style_stubs
+  test_oo_style_bindings
+  tests_common))

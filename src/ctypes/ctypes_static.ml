@@ -7,6 +7,8 @@
 
 (* C type construction *)
 
+[@@@warning "-9"]
+
 exception IncompleteType
 exception ModifyingSealedType of string
 exception Unsupported of string

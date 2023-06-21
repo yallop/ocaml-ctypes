@@ -5,11 +5,12 @@
  * See the file LICENSE for details.
  *)
 
+[@@@warning "-32-33-34"]
 open OUnit2
 open Ctypes
 
 
-let testlib = Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW])
+let testlib = Dl.(dlopen ~filename:"../clib/clib.so" ~flags:[RTLD_NOW])
 
 
 module Build_foreign_tests(S : Cstubs.FOREIGN with type 'a result = 'a

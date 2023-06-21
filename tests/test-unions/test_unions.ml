@@ -10,7 +10,7 @@ open Ctypes
 open Unsigned
 
 
-let testlib = Dl.(dlopen ~filename:"clib/libtest_functions.so" ~flags:[RTLD_NOW])
+let testlib = Dl.(dlopen ~filename:"../clib/clib.so" ~flags:[RTLD_NOW])
 
 
 (* 
@@ -246,8 +246,8 @@ let test_adding_fields_through_views _ =
   let module M = struct
     let union_u = union "union_u"
     let u = typedef union_u "u"
-    let x = field u "x" int
-    let y = field u "y" float
+    let _x = field u "x" int
+    let _y = field u "y" float
     let () = seal u
   end in ()
 
@@ -300,8 +300,8 @@ let suite = "Union tests" >:::
    "test adding fields to tagless unions"
    >:: Struct_stubs_tests.test_tagless_unions;
 
-   (* "test layout of unions with missing fields" *)
-   (* >:: Struct_stubs_tests.test_missing_fields; *)
+   "test layout of unions with missing fields"
+   >:: Struct_stubs_tests.test_missing_fields;
   ]
 
 
