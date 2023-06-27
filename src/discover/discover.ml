@@ -42,6 +42,7 @@ let search_paths =
     "/opt";
     "/opt/local";
     "/sw";
+    "/clang64";
     "/mingw";
   ]
 
