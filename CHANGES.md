@@ -1,3 +1,11 @@
+## ctypes 0.21.0
+
+* Switch to dune  
+  https://github.com/yallop/ocaml-ctypes/pull/588
+
+Thanks to Anil Madhavapeddy (@avsm) and Etienne Millon (@emillon) for
+contributing to this release.
+
 ## ctypes 0.20.2
 
 * Restore compilation of cmxs for 5.0  
