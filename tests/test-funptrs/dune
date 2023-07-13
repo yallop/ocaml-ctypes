@@ -1,5 +1,6 @@
 (test
  (name test_funptrs)
+ (package ctypes-foreign)
  (link_flags
   (:include ../flags/link-flags.sexp))
  (libraries
