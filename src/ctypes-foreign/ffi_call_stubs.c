@@ -416,7 +416,7 @@ value ctypes_call(value fnname, value function, value callspec_,
   if (check_errno)
   {
 #ifdef _MSC_VER
-    _get_errno(&check_errno);
+    _get_errno(&saved_errno);
 #else
     saved_errno=errno;
 #endif
