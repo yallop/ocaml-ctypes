@@ -1,3 +1,7 @@
+## ctypes 0.21.1
+
+* Add missing version information to dune-project
+
 ## ctypes 0.21.0
 
 * Switch to dune  
