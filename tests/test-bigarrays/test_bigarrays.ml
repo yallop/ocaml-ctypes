@@ -6,7 +6,6 @@
  *)
 
 module Std_array = Array
-type 'a std_array = 'a array
 
 let _ = Dl.(dlopen ~filename:"../clib/clib.so" ~flags:[RTLD_NOW])
 
