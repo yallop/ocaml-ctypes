@@ -1,13 +1,6 @@
-(* -*- tuareg -*- *)
-
-(* This can be ported to build_if once available, ocaml/dune#7899 *)
-
-let unix = List.mem ("os_type", "Unix") Jbuild_plugin.V1.ocamlc_config
-
-let () = Jbuild_plugin.V1.send @@ if not unix then "" else {|
 (test
  (name fts_cmd)
- (enabled_if
+ (build_if
   (= %{os_type} Unix))
  (libraries fts_stubs fts_generated)
  (package ctypes)
@@ -15,4 +8,3 @@ let () = Jbuild_plugin.V1.send @@ if not unix then "" else {|
  (link_flags
   :standard
   (:include config/c_library_flags.sexp)))
-|}
