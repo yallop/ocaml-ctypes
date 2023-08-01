@@ -193,10 +193,19 @@ sig
       {!string} are copied into immovable C-managed storage before being passed
       to C.
 
-      When the memory is not owned by the C code, -- i.e. when creating or
-      initializing a struct in OCaml before passing it to C -- then the
-      {!string} view isn't a good choice, because there's no way to manage the
-      lifetime of the C copy of the generated OCaml string.
+      The string type representation is suitable for use in function argument
+      types such as the following:
+
+          [string @-> returning int]
+
+      where the lifetime of the C-managed storage does not need to extend beyond
+      the duration of the function call.  However, it is not suitable for
+      use in struct or union fields
+
+          [field s "x" string]
+
+      because it does not provide a way to manage the lifetime of the
+      C-managed storage.
   *)
 
   val string_opt : string option typ
