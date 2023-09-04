@@ -115,10 +115,12 @@ let () =
       |[_,C.C_define.Value.String s] -> s
       |_ -> failwith ("unable to find string definition for " ^ l) in
     print_string header;
-    generate "sizeof" "int" (fun { size } ->
-      printf "%d" (import_int size));
-    generate "alignment" "int" (fun { alignment } ->
-      printf "%d" (import_int alignment));
+    generate "sizeof" "int" (function
+      | { constructor = "Size_t" } -> printf "Sys.word_size / 8"
+      | { size } -> printf "%i" (import_int size));
+    generate "alignment" "int" (function
+      | { constructor = "Size_t" } -> printf "Sys.word_size / 8"
+      | { alignment } -> printf "%i" (import_int alignment));
     generate "name" "string" (fun { typ } ->
       printf "%S" (import_string ("STRINGIFY("^typ^")")));
     generate "format_string" "string option" (fun { format } ->
@@ -129,6 +131,6 @@ let () =
         printf "Some %S" ("%"^(import_string str))
       | No_format ->
         printf "None");
-    printf "let pointer_size = %d\n" (import_int "sizeof(void*)");
-    printf "let pointer_alignment = %d\n" (import_int "alignof(void*)");
+    printf "let pointer_size = Sys.word_size / 8\n";
+    printf "let pointer_alignment = Sys.word_size / 8\n"
   )
