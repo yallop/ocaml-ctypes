@@ -120,8 +120,7 @@ let (+@) : type a b. (a, b) pointer -> int -> (a, b) pointer
 let (-@) p x = p +@ (-x)
 
 let (<-@) : type a. a ptr -> a -> unit
-  = fun (CPointer p) ->
-    fun v -> write (Fat.reftype p) v p
+  = fun (CPointer p) v -> write (Fat.reftype p) v p
 
 let from_voidp = castp
 let to_voidp p = castp Void p
