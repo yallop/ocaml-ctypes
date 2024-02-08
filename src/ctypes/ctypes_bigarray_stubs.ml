@@ -34,6 +34,7 @@ let kind : type a b. (a, b) Bigarray_compat.kind -> a kind = function
   | Bigarray_compat.Complex32 -> Kind_complex32
   | Bigarray_compat.Complex64 -> Kind_complex64
   | Bigarray_compat.Char -> Kind_char
+  | _ -> failwith "Unsupported bigarray kind" [@@ocaml.warning "-11"]
 
 external address : 'b -> Ctypes_ptr.voidp
   = "ctypes_bigarray_address"
