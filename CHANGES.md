@@ -1,3 +1,11 @@
+## ctypes 0.22.0
+
+* Support for OCaml 5.2.0  
+  https://github.com/ocamllabs/ocaml-ctypes/pull/764
+
+Thanks to Nick Roberts (@ncik-roberts) and Danny Willems
+(@dannywillems) for contributions to this release.
+
 ## ctypes 0.21.1
 
 * Add missing version information to dune-project
