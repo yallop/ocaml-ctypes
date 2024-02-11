@@ -65,11 +65,13 @@ and ('a, 's) field = {
 }
 and 'a structure_type = {
   tag: string;
+  stamp : int;
   mutable spec: 'a structspec;
   mutable fields : 'a structure boxed_field list;
 }
 and 'a union_type = {
   utag: string;
+  stamp : int;
   mutable uspec: structured_spec option;
   mutable ufields : 'a union boxed_field list;
 }

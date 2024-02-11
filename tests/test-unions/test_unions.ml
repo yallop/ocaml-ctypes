@@ -167,6 +167,9 @@ struct
   let sizeof_u2 = retrieve_size "sizeof_u2"
   let alignmentof_u2 = retrieve_size "alignmentof_u2"
 
+  let sizeof_u3 = retrieve_size "sizeof_u3"
+  let alignmentof_u3 = retrieve_size "alignmentof_u3"
+
   (*
     Test that union layout retrieved from C correctly accounts for missing
     fields.
@@ -192,6 +195,12 @@ struct
 
       assert_equal alignmentof_u2
         (alignment M.u2);
+
+      assert_equal sizeof_u3
+        (sizeof M.u3);
+
+      assert_equal alignmentof_u3
+        (alignment M.u3);
     end
 end
 
