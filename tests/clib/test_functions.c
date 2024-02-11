@@ -910,3 +910,8 @@ int call_saved_dynamic_funptr(int n) {
 
 int call_dynamic_funptr_struct(struct simple_closure x) { return x.f(x.n); }
 int call_dynamic_funptr_struct_ptr(struct simple_closure *x) { return x->f(x->n); }
+
+bool check_packed_struct(struct packed_struct *s, int8_t i8, int64_t i64,
+                         long double _Complex *ldc, int32_t i32) {
+  return ( s->i8 == i8 && s->i64 == i64 && s->ldc == *ldc && s->i32 == i32 );
+}
