@@ -37,20 +37,20 @@ val return_errno : errno_policy
     single value to a pair of values.  For example, the binding
     specification 
 
-       [let realpath = foreign "reaplath" (string @-> string @-> returning string)]
+       [let realpath = foreign "realpath" (string @-> string @-> returning string)]
 
     generates a value of the following type by default:
 
-       [val realpath : string -> string -> stirng]
+       [val realpath : string -> string -> string]
 
     but when using [return_errno] the generated type is as follows:
 
-       [val realpath : string -> string -> stirng * int]
+       [val realpath : string -> string -> string * int]
 
     and when using both [return_errno] and [lwt_jobs] the generated type is as
     follows:
 
-       [val realpath : string -> string -> (stirng * int) Lwt.t]
+       [val realpath : string -> string -> (string * int) Lwt.t]
 *)
 
 type concurrency_policy
