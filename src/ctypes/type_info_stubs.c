@@ -44,33 +44,158 @@ value ctypes_read(value prim_, value buffer_)
    case Ctypes_Char: b = Val_int(*(unsigned char*)buf); break;
    case Ctypes_Schar: b = Val_int(*(signed char *)buf); break;
    case Ctypes_Uchar: b = Integers_val_uint8(*(unsigned char *)buf); break;
-   case Ctypes_Bool: b = Val_bool(*(bool *)buf); break;
-   case Ctypes_Short: b = Val_int(*(short *)buf); break;
-   case Ctypes_Int: b = Val_int(*(int *)buf); break;
-   case Ctypes_Long: b = ctypes_copy_long(*(long *)buf); break;
-   case Ctypes_Llong: b = ctypes_copy_llong(*(long long *)buf); break;
-   case Ctypes_Ushort: b = ctypes_copy_ushort(*(unsigned short *)buf); break;
-   case Ctypes_Sint: b = ctypes_copy_sint(*(int *)buf); break;
-   case Ctypes_Uint: b = ctypes_copy_uint(*(unsigned int *)buf); break;
-   case Ctypes_Ulong: b = ctypes_copy_ulong(*(unsigned long *)buf); break;
-   case Ctypes_Ullong: b = ctypes_copy_ullong(*(unsigned long long *)buf); break;
-   case Ctypes_Size_t: b = ctypes_copy_size_t(*(size_t *)buf); break;
+   case Ctypes_Bool: {
+     bool s;
+     memcpy(&s,buf,sizeof(s));
+     b = Val_bool(s);
+     break;
+   }
+   case Ctypes_Short: {
+     short s;
+     memcpy(&s, buf, sizeof(s));
+     b = Val_int(s);
+     break;
+   }
+   case Ctypes_Int: {
+     int s;
+     memcpy(&s, buf, sizeof(s));
+     b = Val_int(s);
+     break;
+   }
+   case Ctypes_Long: {
+     long s;
+     memcpy(&s, buf, sizeof(s));
+     b = ctypes_copy_long(s);
+     break;
+   }
+   case Ctypes_Llong: {
+     long long s;
+     memcpy(&s, buf, sizeof(s));
+     b = ctypes_copy_llong(s);
+     break;
+   }
+   case Ctypes_Ushort: {
+     unsigned short s;
+     memcpy(&s, buf, sizeof(s));
+     b = ctypes_copy_ushort(s);
+     break;
+   }
+   case Ctypes_Sint: {
+     int s;
+     memcpy(&s, buf, sizeof(s));
+     b = ctypes_copy_sint(s);
+     break;
+   }
+   case Ctypes_Uint: {
+     unsigned int s;
+     memcpy(&s, buf, sizeof(s));
+     b = ctypes_copy_uint(s);
+     break;
+   }
+   case Ctypes_Ulong: {
+     unsigned long s;
+     memcpy(&s, buf, sizeof(s));
+     b = ctypes_copy_ulong(s);
+     break;
+   }
+   case Ctypes_Ullong: {
+     unsigned long long s;
+     memcpy(&s, buf, sizeof(s));
+     b = ctypes_copy_ullong(s);
+     break;
+   }
+   case Ctypes_Size_t: {
+     size_t s;
+     memcpy(&s, buf, sizeof(s));
+     b = ctypes_copy_size_t(s);
+     break;
+   }
    case Ctypes_Int8_t: b = Val_int(*(int8_t *)buf); break;
-   case Ctypes_Int16_t: b = Val_int(*(int16_t *)buf); break;
-   case Ctypes_Int32_t: b = caml_copy_int32(*(int32_t *)buf); break;
-   case Ctypes_Int64_t: b = caml_copy_int64(*(int64_t *)buf); break;
+   case Ctypes_Int16_t: {
+     int16_t s;
+     memcpy(&s, buf, sizeof(s));
+     b = Val_int(s);
+     break;
+   }
+   case Ctypes_Int32_t: {
+     int32_t s;
+     memcpy(&s, buf, sizeof(s));
+     b = caml_copy_int32(s);
+     break;
+   }
+   case Ctypes_Int64_t: {
+     int64_t s;
+     memcpy(&s, buf, sizeof(s));
+     b = caml_copy_int64(s);
+     break;
+   }
    case Ctypes_Uint8_t: b = Integers_val_uint8(*(uint8_t *)buf); break;
-   case Ctypes_Uint16_t: b = Integers_val_uint16(*(uint16_t *)buf); break;
-   case Ctypes_Uint32_t: b = integers_copy_uint32(*(uint32_t *)buf); break;
-   case Ctypes_Uint64_t: b = integers_copy_uint64(*(uint64_t *)buf); break;
-   case Ctypes_Camlint: b = Val_long(*(intnat *)buf); break;
-   case Ctypes_Nativeint: b = caml_copy_nativeint(*(intnat *)buf); break;
-   case Ctypes_Float: b = caml_copy_double(*(float *)buf); break;
-   case Ctypes_Double: b = caml_copy_double(*(double *)buf); break;
-   case Ctypes_LDouble: b = ctypes_copy_ldouble(*(long double *)buf); break;
-   case Ctypes_Complex32: b = ctypes_copy_float_complex(*(float _Complex *)buf); break;
-   case Ctypes_Complex64: b = ctypes_copy_double_complex(*(double _Complex *)buf); break;
-   case Ctypes_Complexld: b = ctypes_copy_ldouble_complex(*(long double _Complex *)buf); break;
+   case Ctypes_Uint16_t: {
+     uint16_t s;
+     memcpy(&s, buf, sizeof(s));
+     b = Integers_val_uint16(s);
+     break;
+   }
+   case Ctypes_Uint32_t: {
+     uint32_t s;
+     memcpy(&s, buf, sizeof(s));
+     b = integers_copy_uint32(s);
+     break;
+   }
+   case Ctypes_Uint64_t: {
+     uint64_t s;
+     memcpy(&s, buf, sizeof(s));
+     b = integers_copy_uint64(s);
+     break;
+   }
+   case Ctypes_Camlint: {
+     intnat s;
+     memcpy(&s, buf, sizeof(s));
+     b = Val_long(s);
+     break;
+   }
+   case Ctypes_Nativeint: {
+     intnat s;
+     memcpy(&s, buf, sizeof(s));
+     b = caml_copy_nativeint(s);
+     break;
+   }
+   case Ctypes_Float: {
+     float s;
+     memcpy(&s, buf, sizeof(s));
+     b = caml_copy_double(s);
+     break;
+   }
+   case Ctypes_Double: {
+     double s;
+     memcpy(&s, buf, sizeof(s));
+     b = caml_copy_double(s);
+     break;
+   }
+   case Ctypes_LDouble: {
+     long double s;
+     memcpy(&s, buf, sizeof(s));
+     b = ctypes_copy_ldouble(s);
+     break;
+   }
+   case Ctypes_Complex32: {
+     float _Complex s;
+     memcpy(&s, buf, sizeof(s));
+     b = ctypes_copy_float_complex(s);
+     break;
+   }
+   case Ctypes_Complex64: {
+     double _Complex s;
+     memcpy(&s, buf, sizeof(s));
+     b = ctypes_copy_double_complex(s);
+     break;
+   }
+   case Ctypes_Complexld: {
+     long double _Complex s;
+     memcpy(&s, buf, sizeof(s));
+     b = ctypes_copy_ldouble_complex(s);
+     break;
+   }
    default:
     assert(0);
   }
@@ -88,33 +213,133 @@ value ctypes_write(value prim_, value v, value buffer_) /* noalloc */
    case Ctypes_Char: *(unsigned char *)buf = Int_val(v); break;
    case Ctypes_Schar: *(signed char *)buf = Int_val(v); break;
    case Ctypes_Uchar: *(unsigned char *)buf = Uint8_val(v); break;
-   case Ctypes_Bool: *(bool *)buf = Bool_val(v); break;
-   case Ctypes_Short: *(short *)buf = Int_val(v); break;
-   case Ctypes_Int: *(int *)buf = Int_val(v); break;
-   case Ctypes_Long: *(long *)buf = ctypes_long_val(v); break;
-   case Ctypes_Llong: *(long long *)buf = ctypes_llong_val(v); break;
-   case Ctypes_Ushort: *(unsigned short *)buf = ctypes_ushort_val(v); break;
-   case Ctypes_Sint: *(int *)buf = ctypes_sint_val(v); break;
-   case Ctypes_Uint: *(unsigned int *)buf = ctypes_uint_val(v); break;
-   case Ctypes_Ulong: *(unsigned long *)buf = ctypes_ulong_val(v); break;
-   case Ctypes_Ullong: *(unsigned long long *)buf = ctypes_ullong_val(v); break;
-   case Ctypes_Size_t: *(size_t *)buf = ctypes_size_t_val(v); break;
+   case Ctypes_Bool: {
+     bool s = Bool_val(v);
+     memcpy(buf, &s, sizeof(s));
+     break;
+   }
+   case Ctypes_Short: {
+     short s = Int_val(v);
+     memcpy(buf, &s, sizeof(s));
+     break;
+   }
+   case Ctypes_Int: {
+     int s = Int_val(v);
+     memcpy(buf, &s, sizeof(s));
+     break;
+   }
+   case Ctypes_Long: {
+     long s = ctypes_long_val(v);
+     memcpy(buf, &s, sizeof(s));
+     break;
+   }
+   case Ctypes_Llong: {
+     long long s = ctypes_llong_val(v);
+     memcpy(buf, &s, sizeof(s));
+     break;
+   }
+   case Ctypes_Ushort: {
+     unsigned short s = ctypes_ushort_val(v);
+     memcpy(buf, &s, sizeof(s));
+     break;
+   }
+   case Ctypes_Sint: {
+     int s = ctypes_sint_val(v);
+     memcpy(buf, &s, sizeof(s));
+     break;
+   }
+   case Ctypes_Uint: {
+     unsigned int s = ctypes_uint_val(v);
+     memcpy(buf, &s, sizeof(s));
+     break;
+   }
+   case Ctypes_Ulong: {
+     unsigned long s = ctypes_ulong_val(v);
+     memcpy(buf, &s, sizeof(s));
+     break;
+   }
+   case Ctypes_Ullong: {
+     unsigned long long s = ctypes_ullong_val(v);
+     memcpy(buf, &s, sizeof(s));
+     break;
+   }
+   case Ctypes_Size_t: {
+     size_t s = ctypes_size_t_val(v);
+     memcpy(buf, &s, sizeof(s));
+     break;
+   }
    case Ctypes_Int8_t: *(int8_t *)buf = Int_val(v); break;
-   case Ctypes_Int16_t: *(int16_t *)buf = Int_val(v); break;
-   case Ctypes_Int32_t: *(int32_t *)buf = Int32_val(v); break;
-   case Ctypes_Int64_t: *(int64_t *)buf = Int64_val(v); break;
+   case Ctypes_Int16_t: {
+     int16_t s = Int_val(v);
+     memcpy(buf, &s, sizeof(s));
+     break;
+   }
+   case Ctypes_Int32_t: {
+     int32_t s = Int32_val(v);
+     memcpy(buf, &s, sizeof(s));
+     break;
+   }
+   case Ctypes_Int64_t: {
+     int64_t s = Int64_val(v);
+     memcpy(buf, &s, sizeof(s));
+     break;
+   }
    case Ctypes_Uint8_t: *(uint8_t *)buf = Uint8_val(v); break;
-   case Ctypes_Uint16_t: *(uint16_t *)buf = Uint16_val(v); break;
-   case Ctypes_Uint32_t: *(uint32_t *)buf = Uint32_val(v); break;
-   case Ctypes_Uint64_t: *(uint64_t *)buf = Uint64_val(v); break;
-   case Ctypes_Camlint: *(intnat *)buf = Long_val(v); break;
-   case Ctypes_Nativeint: *(intnat *)buf = Nativeint_val(v); break;
-   case Ctypes_Float: *(float *)buf = Double_val(v); break;
-   case Ctypes_Double: *(double *)buf = Double_val(v); break;
-   case Ctypes_LDouble: *(long double *)buf = ctypes_ldouble_val(v); break;
-   case Ctypes_Complex32: *(float _Complex *)buf = ctypes_float_complex_val(v); break;
-   case Ctypes_Complex64: *(double _Complex *)buf = ctypes_double_complex_val(v); break;
-   case Ctypes_Complexld: *(long double _Complex *)buf = ctypes_ldouble_complex_val(v); break;
+   case Ctypes_Uint16_t: {
+     uint16_t s = Uint16_val(v);
+     memcpy(buf, &s, sizeof(s));
+     break;
+   }
+   case Ctypes_Uint32_t: {
+     uint32_t s = Uint32_val(v);
+     memcpy(buf, &s, sizeof(s));
+     break;
+   }
+   case Ctypes_Uint64_t: {
+     uint64_t s = Uint64_val(v);
+     memcpy(buf, &s, sizeof(s));
+     break;
+   }
+   case Ctypes_Camlint: {
+     intnat s = Long_val(v);
+     memcpy(buf, &s, sizeof(s));
+     break;
+   }
+   case Ctypes_Nativeint: {
+     intnat s = Nativeint_val(v);
+     memcpy(buf, &s, sizeof(s));
+     break;
+   }
+   case Ctypes_Float: {
+     float s = Double_val(v);
+     memcpy(buf, &s, sizeof(s));
+     break;
+   }
+   case Ctypes_Double: {
+     double s = Double_val(v);
+     memcpy(buf, &s, sizeof(s));
+     break;
+   }
+   case Ctypes_LDouble: {
+     long double s = ctypes_ldouble_val(v);
+     memcpy(buf, &s, sizeof(s));
+     break;
+   }
+   case Ctypes_Complex32: {
+     float _Complex s = ctypes_float_complex_val(v);
+     memcpy(buf, &s, sizeof(s));
+     break;
+   }
+   case Ctypes_Complex64: {
+     double _Complex s = ctypes_double_complex_val(v);
+     memcpy(buf, &s, sizeof(s));
+     break;
+   }
+   case Ctypes_Complexld: {
+     long double _Complex s = ctypes_ldouble_complex_val(v);
+     memcpy(buf, &s, sizeof(s));
+     break;
+   }
    default:
     assert(0);
   }

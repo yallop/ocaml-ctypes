@@ -282,4 +282,22 @@ struct simple_closure { int (*f)(int); int n; };
 int call_dynamic_funptr_struct(struct simple_closure);
 int call_dynamic_funptr_struct_ptr(struct simple_closure*);
 
+#if defined(_MSC_VER) && defined(_WIN32)
+#define CTYPES_PACKED(name)                               \
+  __pragma(pack(push, 1)) struct name __pragma(pack(pop))
+#elif defined(__GNUC__)
+#define CTYPES_PACKED(name) struct __attribute__((packed)) name
+#else
+#define CTYPES_PACKED(name) struct name
+#endif
+
+CTYPES_PACKED(packed_struct) {
+  int8_t i8;
+  int64_t i64;
+  long double _Complex ldc;
+  int32_t i32;
+};
+
+bool check_packed_struct(struct packed_struct *, int8_t, int64_t, long double _Complex*, int32_t);
+
 #endif /* TEST_FUNCTIONS_H */
