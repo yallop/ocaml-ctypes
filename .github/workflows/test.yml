@@ -1,9 +1,11 @@
 name: Ctypes
 
 on:
-  - pull_request
-  - push
-  - workflow_dispatch
+  push:
+    branches:
+      - master
+  pull_request:
+  workflow_dispatch:
 
 jobs:
   tests:
@@ -41,6 +43,8 @@ jobs:
             ocaml-compiler: 5.0.0
           - os: ubuntu-latest
             ocaml-compiler: 5.1.0
+          - os: ubuntu-latest
+            ocaml-compiler: 5.2.0
           - os: windows-latest
             ocaml-compiler: 4.13.1
           - os: macos-latest
@@ -50,7 +54,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Use OCaml ${{ matrix.ocaml-compiler }}
         uses: ocaml/setup-ocaml@v2
