@@ -32,30 +32,6 @@ struct
       assert_equal 10 (invoke_stored_callback 5)
     end
 
-
-  (*
-    Check that if a closure passed to C is collected before it's called then
-    CallToExpiredClosure is raised.
-
-    The value of this test is questionable: calling an expired closure does not
-    have defined behaviour, since the structures needed to make the call may
-    have been garbage collected.
-  *)
-  let test_calling_collected_closure_raises_exception _ =
-    let closure x y = x * y in
-
-    begin
-      (* The closure should be collected in the next GC *)
-      store_callback (closure (int_of_string "2"));
-      (* The first GC collects the closure itself, which frees the associated object
-         to be collected on the next GC. *)
-      Gc.full_major ();
-      Gc.full_major (); 
-      assert_raises CallToExpiredClosure
-        (fun () -> invoke_stored_callback 5)
-    end
-
-
   (*
     Check that we have fairly fine-grained control over the lifetime of closures
     passed to C.
@@ -149,12 +125,6 @@ let suite = "Callback lifetime tests" >:::
    "storing references to OCaml functions (stubs)"
     >:: Stub_tests.test_storing_function_reference;
    
-   "calling expired closures (foreign)"
-    >:: Foreign_tests.test_calling_collected_closure_raises_exception;
-
-   "calling expired closures (stubs)"
-    >:: Stub_tests.test_calling_collected_closure_raises_exception;
-
    "controlling the lifetime of closures passed to C (foreign)"
     >:: Foreign_tests.test_controlling_closure_lifetime;
 
