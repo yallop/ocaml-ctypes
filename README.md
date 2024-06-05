@@ -2,7 +2,7 @@ ctypes is a library for binding to C libraries using pure OCaml.  The primary ai
 
 The core of ctypes is a set of combinators for describing the structure of C types -- numeric types, arrays, pointers, structs, unions and functions.  You can use these combinators to describe the types of the functions that you want to call, then bind directly to those functions -- all without writing or generating any C!
 
-![GitHub Actions status](https://github.com/ocamllabs/ocaml-ctypes/workflows/Ctypes/badge.svg)
+![GitHub Actions status](https://github.com/yallop/ocaml-ctypes/workflows/Ctypes/badge.svg)
 
 ## Usage
 
@@ -56,15 +56,15 @@ The documentation and source distribution contain more complex examples, involvi
 [rwo-ffi]: https://dev.realworldocaml.org/foreign-function-interface.html
 [rwo]: http://realworldocaml.org/
 [mirage-blogpost]: https://mirage.io/blog/modular-foreign-function-bindings
-[tutorial]: https://github.com/ocamllabs/ocaml-ctypes/wiki/ctypes-tutorial
+[tutorial]: https://github.com/yallop/ocaml-ctypes/wiki/ctypes-tutorial
 [apidoc]: https://docs.ocaml.pro/docs/LIBRARY.ctypes@ctypes.0.17.1/index.html
 [mailing-list]: http://lists.ocaml.org/listinfo/ctypes
-[faq]: https://github.com/ocamllabs/ocaml-ctypes/wiki/FAQ
+[faq]: https://github.com/yallop/ocaml-ctypes/wiki/FAQ
 [mirage]: https://mirage.io/
 [sjb-cstubs-post]: http://simonjbeaumont.com/posts/ocaml-ctypes/
-[cstubs]: https://github.com/ocamllabs/ocaml-ctypes/blob/master/src/cstubs/cstubs.mli
-[orbitz-cstubs_structs]: https://github.com/ocamllabs/ocaml-ctypes/blob/master/examples/cstubs_structs/README.md
-[cstubs_structs]: http://ocamllabs.github.io/ocaml-ctypes/Cstubs_structs.html
+[cstubs]: https://github.com/yallop/ocaml-ctypes/blob/master/src/cstubs/cstubs.mli
+[orbitz-cstubs_structs]: https://github.com/yallop/ocaml-ctypes/blob/master/examples/cstubs_structs/README.md
+[cstubs_structs]: http://yallop.github.io/ocaml-ctypes/Cstubs_structs.html
 [flops-paper]: http://www.cl.cam.ac.uk/~jdy22/papers/declarative-foreign-function-binding-through-generic-programming.pdf
 [scp-extended]: http://www.cl.cam.ac.uk/~jdy22/papers/a-modular-foreign-function-interface.pdf
 [dune-ctypes]: https://michael.bacarella.com/2022/02/19/dune-ctypes/

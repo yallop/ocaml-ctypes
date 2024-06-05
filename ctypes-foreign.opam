@@ -9,9 +9,9 @@ maintainer: ["Jeremy Yallop <yallop@gmail.com>"]
 authors: ["Jeremy Yallop"]
 license: "MIT"
 tags: ["org:mirage" "org:ocamllabs"]
-homepage: "https://github.com/ocamllabs/ocaml-ctypes"
-doc: "https://ocamllabs.github.io/ocaml-ctypes/"
-bug-reports: "https://github.com/ocamllabs/ocaml-ctypes/issues"
+homepage: "https://github.com/yallop/ocaml-ctypes"
+doc: "https://yallop.github.io/ocaml-ctypes/"
+bug-reports: "https://github.com/yallop/ocaml-ctypes/issues"
 depends: [
   "dune" {>= "2.9"}
   "ocaml" {>= "4.03.0"}
@@ -43,4 +43,4 @@ build: [
   ]
   ["dune" "install" "-p" name "--create-install-files" name]
 ]
-dev-repo: "git+https://github.com/ocamllabs/ocaml-ctypes.git"
+dev-repo: "git+https://github.com/yallop/ocaml-ctypes.git"
