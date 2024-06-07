@@ -29,6 +29,7 @@ let rec format : type a. a typ -> Format.formatter -> a -> unit
       | None -> format ty fmt (write v)
       | Some f -> f fmt v
     end
+  | Qualified (_, ty) -> format ty fmt v
 and format_structured : type a b. Format.formatter -> (a, b) structured -> unit
   = fun fmt ({structured = CPointer p} as s) ->
     let open Format in

@@ -383,4 +383,6 @@ sig
   val static_funptr : 'a fn -> 'a Ctypes_static.static_funptr typ
   (** Construct a function pointer type from an existing function type
       (called the {i reference type}).  *)
+
+  val const : 'a typ -> 'a typ
 end

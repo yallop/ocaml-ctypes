@@ -34,6 +34,8 @@ type _ ocaml_type =
 | Bytes      : bytes ocaml_type
 | FloatArray : float array ocaml_type
 
+type qualifier = Const | Volatile
+
 type _ typ =
     Void            :                       unit typ
   | Primitive       : 'a Ctypes_primitive_types.prim -> 'a typ
@@ -43,6 +45,7 @@ type _ typ =
   | Union           : 'a union_type      -> 'a union typ
   | Abstract        : abstract_type      -> 'a abstract typ
   | View            : ('a, 'b) view      -> 'a typ
+  | Qualified       : qualifier * 'a typ -> 'a typ
   | Array           : 'a typ * int       -> 'a carray typ
   | Bigarray        : (_, 'a, _) Ctypes_bigarray.t
                                          -> 'a typ
@@ -136,6 +139,7 @@ let rec sizeof : type a. a typ -> int = function
   | Funptr _                       -> Ctypes_primitives.pointer_size
   | OCaml _                        -> raise IncompleteType
   | View { ty }                    -> sizeof ty
+  | Qualified (_, ty)              -> sizeof ty
 
 let rec alignment : type a. a typ -> int = function
     Void                             -> raise IncompleteType
@@ -152,6 +156,7 @@ let rec alignment : type a. a typ -> int = function
   | Funptr _                         -> Ctypes_primitives.pointer_alignment
   | OCaml _                          -> raise IncompleteType
   | View { ty }                      -> alignment ty
+  | Qualified (_, ty)                -> alignment ty
 
 let rec passable : type a. a typ -> bool = function
     Void                           -> true
@@ -167,22 +172,24 @@ let rec passable : type a. a typ -> bool = function
   | Abstract _                     -> false
   | OCaml _                        -> true
   | View { ty }                    -> passable ty
+  | Qualified (_, ty)              -> passable ty
 
 (* Whether a value resides in OCaml-managed memory.
    Values that reside in OCaml memory cannot be accessed
    when the runtime lock is not held. *)
 let rec ocaml_value : type a. a typ -> bool = function
-    Void        -> false
-  | Primitive _ -> false
-  | Struct _    -> false
-  | Union _     -> false
-  | Array _     -> false
-  | Bigarray _  -> false
-  | Pointer _   -> false
-  | Funptr _    -> false
-  | Abstract _  -> false
-  | OCaml _     -> true
-  | View { ty } -> ocaml_value ty
+    Void              -> false
+  | Primitive _       -> false
+  | Struct _          -> false
+  | Union _           -> false
+  | Array _           -> false
+  | Bigarray _        -> false
+  | Pointer _         -> false
+  | Funptr _          -> false
+  | Abstract _        -> false
+  | OCaml _           -> true
+  | View { ty }       -> ocaml_value ty
+  | Qualified (_, ty) -> ocaml_value ty
 
 let rec has_ocaml_argument : type a. a fn -> bool = function
     Returns _ -> false
@@ -273,6 +280,16 @@ let union utag = Union { utag; uspec = None; ufields = [] }
 let offsetof { foffset } = foffset
 let field_type { ftype } = ftype
 let field_name { fname } = fname
+
+let rec const : type a. a typ -> a typ = function
+  | Qualified (Const, _) as ty -> ty
+  | Qualified (Volatile, ty) -> Qualified (Volatile, const ty)
+  | ty -> Qualified (Const, ty)
+
+let rec volatile : type a. a typ -> a typ = function
+  | Qualified (Volatile, _) as ty -> ty
+  | Qualified (Const, ty) -> Qualified (Const, volatile ty)
+  | ty -> Qualified (Volatile, ty)
 
 (* This corresponds to the enum in ctypes_primitives.h *)
 type arithmetic =

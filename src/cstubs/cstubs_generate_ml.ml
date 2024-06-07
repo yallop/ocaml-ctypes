@@ -241,6 +241,7 @@ let rec ml_typ_of_return_typ : type a. a typ -> ml_type =
   | Pointer _   -> voidp
   | Funptr _    -> voidp
   | View { ty } -> ml_typ_of_return_typ ty
+  | Qualified (_, ty) -> ml_typ_of_return_typ ty
   | Array _    as a -> internal_error
     "Unexpected array type in the return type: %s" (Ctypes.string_of_typ a)
   | Bigarray _ as a -> internal_error
@@ -261,6 +262,7 @@ let rec ml_typ_of_arg_typ : type a. a typ -> ml_type = function
   | Union _     -> fatptr
   | Abstract _  -> fatptr
   | View { ty } -> ml_typ_of_arg_typ ty
+  | Qualified (_, ty) -> ml_typ_of_arg_typ ty
   | Array _    as a -> internal_error
     "Unexpected array in an argument type: %s" (Ctypes.string_of_typ a)
   | Bigarray _ as a -> internal_error
@@ -430,6 +432,23 @@ let rec pattern_and_exp_of_typ : type a. concurrency:concurrency_policy -> errno
                    path_of_string "read", `Var x], `Etc)] in
       (pat, Some (map_result ~concurrency ~errno (`Appl x) e), binds)
     end
+  | Qualified (_, ty) ->
+    begin match pol  with
+    | In ->
+      let x = fresh_var () in
+      let y = fresh_var () in
+      let e = `Appl (`Ident (path_of_string x), e) in
+      let (p, None, binds), e | (p, Some e, binds), _ =
+        pattern_and_exp_of_typ ~concurrency ~errno ty e pol binds, e in
+      let pat = static_con "Qualified" [`Underscore; `Var x] in
+      (pat, Some (`Ident (Ctypes_path.path_of_string y)), (`Var y, e) :: binds)
+    | Out ->
+      let (p, None, binds), e | (p, Some e, binds), _ =
+        pattern_and_exp_of_typ ~concurrency ~errno ty e pol binds, e in
+      let x = fresh_var () in
+      let pat = static_con "Qualified" [`Underscore; `Var x] in
+      (pat, Some (map_result ~concurrency ~errno (`Appl x) e), binds)
+    end
   | OCaml ty ->
     begin match pol, ty with
     | In, String -> (static_con "OCaml" [static_con "String" []], None, binds)
@@ -469,6 +488,8 @@ let rec pattern_of_typ : type a. a typ -> ml_pat = function
   | View { ty } ->
     static_con "View"
       [`Record ([path_of_string "CI.ty", pattern_of_typ ty], `Etc)]
+  | Qualified (_, ty) ->
+    static_con "Qualified" [`Underscore; pattern_of_typ ty]
   | Array (_, _) ->
      static_con "Array" [`Underscore; `Underscore]
   | Bigarray _ ->

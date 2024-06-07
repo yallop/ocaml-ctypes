@@ -106,6 +106,7 @@ let rec allocation : type a. a typ -> a allocation = function
    | `Alloc a -> `Alloc (Alloc_view (v, a))
    | `Noalloc na -> `Noalloc (Noalloc_view (v, na))
    end
+ | Qualified (_, ty) -> allocation ty
  | Array _ -> `Alloc Alloc_array
  | Bigarray ba -> `Alloc (Alloc_bigarray ba)
  | OCaml _ -> `Alloc Alloc_pointer

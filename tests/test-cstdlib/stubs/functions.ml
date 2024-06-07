@@ -49,12 +49,12 @@ struct
 
   let qsort = foreign "qsort"
     (ptr void @-> size_t @-> size_t @->
-     funptr Ctypes.(ptr void @-> ptr void @-> returning int) @->
+     funptr Ctypes.(ptr (const void) @-> ptr (const void) @-> returning int) @->
      returning void)
 
   let bsearch = foreign "bsearch"
-    (ptr void @-> ptr void @-> size_t @-> size_t @->
-     funptr Ctypes.(ptr void @-> ptr void @-> returning int) @->
+    (ptr (const void) @-> ptr (const void) @-> size_t @-> size_t @->
+     funptr Ctypes.(ptr (const void) @-> ptr (const void) @-> returning int) @->
      returning (ptr void))
 
   let strlen = foreign "strlen" (ptr char @-> returning size_t)

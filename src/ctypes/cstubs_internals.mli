@@ -37,6 +37,7 @@ type 'a typ = 'a Ctypes_static.typ =
   | Union           : 'a Ctypes_static.union_type      -> 'a Ctypes_static.union typ
   | Abstract        : Ctypes_static.abstract_type      -> 'a Ctypes_static.abstract typ
   | View            : ('a, 'b) view             -> 'a typ
+  | Qualified       : Ctypes_static.qualifier * 'a typ -> 'a typ
   | Array           : 'a typ * int              -> 'a Ctypes_static.carray typ
   | Bigarray        : (_, 'a, _) Ctypes_bigarray.t -> 'a typ
   | OCaml           : 'a ocaml_type             -> 'a ocaml typ

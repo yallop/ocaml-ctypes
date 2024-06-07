@@ -147,6 +147,7 @@ struct
             `Deref (`Cast (Ty (ptr orig), y)))
     | Abstract _ -> report_unpassable "values of abstract type"
     | View { ty } -> prj ty ~orig x
+    | Qualified (_, ty) -> prj ty ~orig x
     | Array _ -> report_unpassable "arrays"
     | Bigarray _ -> report_unpassable "bigarrays"
     | OCaml String -> Some (string_to_ptr x)
@@ -165,6 +166,7 @@ struct
     | Union u -> `App (copy_bytes, [`Addr (x :> cvar); `Int (Signed.SInt.of_int (sizeof ty))])
     | Abstract _ -> report_unpassable "values of abstract type"
     | View { ty } -> inj ty x
+    | Qualified (_, ty) -> inj ty x
     | Array _ -> report_unpassable "arrays"
     | Bigarray _ -> report_unpassable "bigarrays"
     | OCaml _ -> report_unpassable "ocaml references as return values"
@@ -364,6 +366,7 @@ struct
     | Pointer _ -> Generate_C.of_fatptr x
     | Funptr _ -> Generate_C.of_fatptr x
     | View { ty } -> prj ty ~orig x
+    | Qualified (_, ty) -> prj ty ~orig x
     | t -> unsupported t
 
   let prj ty x = prj ty ~orig:ty x

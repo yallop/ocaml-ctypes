@@ -9,8 +9,14 @@
 
 open Ctypes_static
 
-(* See type_printing.mli for the documentation of [format context]. *)
+(* See ctypes_type_printing.mli for the documentation of [format_context]. *)
 type format_context = [ `toplevel | `array | `nonarray ]
+
+let format_qualifier : Format.formatter -> qualifier -> unit =
+  fun fmt q ->
+  match q with
+  | Const -> Format.fprintf fmt "const"
+  | Volatile -> Format.fprintf fmt "volatile"
 
 let rec format_typ' : type a. a typ ->
   (format_context -> Format.formatter -> unit) ->
@@ -26,6 +32,10 @@ let rec format_typ' : type a. a typ ->
       format (k `nonarray) fmt
     | View { ty }, context ->
       format_typ' ty k context fmt
+    | Qualified (q, ty), ctxt ->
+       format_typ' ty 
+         (fun context fmt ->
+           fprintf fmt "@ %a%t" format_qualifier q (k context)) ctxt fmt
     | Abstract { aname }, _ ->
       fprintf fmt "%s%t" aname (k `nonarray)
     | Struct { tag = "" ; fields }, _ ->
