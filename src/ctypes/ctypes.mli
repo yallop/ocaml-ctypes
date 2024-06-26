@@ -293,6 +293,11 @@ sig
   (** [iter f a] is analogous to [Array.iter f a]: it applies [f] in turn to
       all the elements of [a]. *)
 
+  val iteri : (int -> 'a -> unit) -> 'a t -> unit
+  (** [iter f a] is analogous to [Array.iteri f a]: it applies [f] in turn to
+      all the elements of [a] but the function is applied to the index of the 
+      element as first argument, and the element itself as second argument *)
+
   val map : 'b typ -> ('a -> 'b) -> 'a t -> 'b t
   (** [map t f a] is analogous to [Array.map f a]: it creates a new array with
       element type [t] whose elements are obtained by applying [f] to the
