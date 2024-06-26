@@ -245,6 +245,11 @@ struct
       f (unsafe_get a i)
     done
 
+  let iteri f a =
+    for i = 0 to length a - 1 do
+      f i (unsafe_get a i)
+    done
+
   let map typ f a =
     let l = length a in
     let r = make typ l in

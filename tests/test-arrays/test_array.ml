@@ -107,6 +107,21 @@ let test_iter _ =
 
 
 (*
+  Test the CArray.iteri function
+ *)
+ let test_iteri _ =
+  let r = ref 0 in
+  let a = CArray.of_list int [1; 2; 3] in
+  let () = CArray.iteri (fun i v -> r := !r + i + v) a in
+  assert_equal !r 9;
+
+  let r = ref 0 in
+  let a = CArray.of_list int [] in
+  let () = CArray.iteri (fun _ -> assert false) a in
+  assert_equal !r 0
+
+
+(*
   Test the CArray.map function
  *)
 let test_map _ =
@@ -369,6 +384,9 @@ let suite = "Array tests" >:::
 
    "CArray.iter "
     >:: test_iter;
+
+    "CArray.iteri "
+    >:: test_iteri;
 
    "CArray.map "
     >:: test_map;
