@@ -124,7 +124,7 @@ struct
         f x y
       in
       let () = qsort (to_voidp (start arr)) len size cmp in
-      let _ = Ctypes_memory_stubs.use_value cmp in
+      let _ = Ctypes_memory.keep_alive cmp in
       to_list arr
       in
 
@@ -256,7 +256,7 @@ struct
     let () =
       assert_equal None (find_month_by_name empty)
 
-    let _ = Ctypes_memory_stubs.use_value
+    let _ = Ctypes_memory.keep_alive
       [jan; feb; mar; apr; may; jun;
        jul; aug; sep; oct; nov; dec]
     end in ()

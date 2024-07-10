@@ -198,6 +198,24 @@ val allocate_n : ?finalise:('a ptr -> unit) -> 'a typ -> count:int -> 'a ptr
     memory is allocated with libc's [calloc] and is guaranteed to be
     zero-filled.  *)
 
+val keep_alive : 'a -> unit
+(** Inserting [keep_alive x;] in a sequence of expressions ensures that
+    the garbage collector will not collect [x] until after that [keep_alive]
+    has returned.
+
+    For example:
+    {[
+      let strchr = Foreign.foreign "strchr" (ptr char @-> char @-> returning (ptr char)) in
+      let p = CArray.of_string "abc" in
+      let q =  strchr (CArray.start p) 'a' in
+      let () = Gc.compact () in
+      let () = Printf.printf "%c\n" !@q in
+      keep_alive p;
+    ]}
+    Without the [keep_alive p] at the bottom, [p] could be collected during the
+    [Gc.compact ()] call, which would make [q] an invalid pointer into the
+    now-collected [p], leading to undefined behavior. *)
+
 val ptr_compare : 'a ptr -> 'a ptr -> int
 (** If [p] and [q] are pointers to elements [i] and [j] of the same array then
     [ptr_compare p q] compares the indexes of the elements.  The result is

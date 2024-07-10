@@ -68,7 +68,7 @@ struct
           assert_equal c#humps 3;
         end
 
-      let _ = Ctypes_memory_stubs.use_value (idfn, humpsfn, sayfn)
+      let _ = Ctypes_memory.keep_alive (idfn, humpsfn, sayfn)
 
       (* Test that we can call a virtual method in a C-created subclass from
          OCaml *)

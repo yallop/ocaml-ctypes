@@ -543,15 +543,15 @@ let rec wrapper_body : type a. concurrency:concurrency_policy -> errno:errno_pol
 let lwt_bind = Ctypes_path.path_of_string "Lwt.bind"
 let lwt_return = Ctypes_path.path_of_string "Lwt.return"
 let box_lwt = Ctypes_path.path_of_string "box_lwt"
-let use_value = Ctypes_path.path_of_string "CI.use_value"
+let keep_alive = Ctypes_path.path_of_string "CI.keep_alive"
 
 let return_result : args:lident list -> ml_exp =
   fun ~args ->
     let x = fresh_var () in
-    (* fun v -> CI.use_value (x1,x2,....xn); Lwt.return v *)
+    (* fun v -> CI.keep_alive (x1,x2,....xn); Lwt.return v *)
     `Fun ([x],
           `Seq
-            (`Appl (`Ident use_value,
+            (`Appl (`Ident keep_alive,
                     `Tuple
                       (ListLabels.map args
                          ~f:(fun x -> `Ident (Ctypes_path.path_of_string x)))),
