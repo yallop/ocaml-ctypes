@@ -16,68 +16,60 @@ let rec format_typ' : type a. a typ ->
   (format_context -> Format.formatter -> unit) ->
   (format_context -> Format.formatter -> unit) =
   let fprintf = Format.fprintf in
-  fun t k context fmt -> match t with
-    | Void ->
+  fun t k ctxt fmt -> match t, ctxt with
+    | Void, _ ->
       fprintf fmt "void%t" (k `nonarray)
-    | Primitive p ->
+    | Primitive p, _ ->
       let name = Ctypes_primitives.name p in
       fprintf fmt "%s%t" name (k `nonarray)
-    | View { format_typ = Some format } ->
+    | View { format_typ = Some format }, _ ->
       format (k `nonarray) fmt
-    | View { ty } ->
+    | View { ty }, context ->
       format_typ' ty k context fmt
-    | Abstract { aname } ->
+    | Abstract { aname }, _ ->
       fprintf fmt "%s%t" aname (k `nonarray)
-    | Struct { tag = "" ; fields } ->
+    | Struct { tag = "" ; fields }, _ ->
       fprintf fmt "struct {@;<1 2>@[";
       format_fields fields fmt;
       fprintf fmt "@]@;}%t" (k `nonarray)
-    | Struct { tag ; spec; fields } ->
-      begin match spec, context with
-        | Complete _, `toplevel ->
-          begin
-            fprintf fmt "struct %s {@;<1 2>@[" tag;
-            format_fields fields fmt;
-            fprintf fmt "@]@;}%t" (k `nonarray)
-          end
-        | _ -> fprintf fmt "struct %s%t" tag (k `nonarray)
-      end
-    | Union { utag = ""; ufields } ->
+    | Struct { tag ; spec = Complete _; fields }, `toplevel ->
+       fprintf fmt "struct %s {@;<1 2>@[" tag;
+       format_fields fields fmt;
+       fprintf fmt "@]@;}%t" (k `nonarray)
+    | Struct { tag ; _ }, _ ->
+       fprintf fmt "struct %s%t" tag (k `nonarray)
+    | Union { utag = ""; ufields }, _ ->
       fprintf fmt "union {@;<1 2>@[";
       format_fields ufields fmt;
       fprintf fmt "@]@;}%t" (k `nonarray)
-    | Union { utag; uspec; ufields } ->
-      begin match uspec, context with
-        | Some _, `toplevel ->
-          begin
+    | Union { utag; uspec = Some _; ufields }, `toplevel ->
             fprintf fmt "union %s {@;<1 2>@[" utag;
             format_fields ufields fmt;
             fprintf fmt "@]@;}%t" (k `nonarray)
-          end
-        | _ -> fprintf fmt "union %s%t" utag (k `nonarray)
-      end
-    | Pointer ty ->
+    | Union { utag; _ }, context ->
+       fprintf fmt "union %s%t" utag (k `nonarray)
+    | Pointer ty, _ ->
       format_typ' ty
         (fun context fmt ->
           match context with
             | `array -> fprintf fmt "(*%t)" (k `nonarray)
             | _      -> fprintf fmt "*%t" (k `nonarray))
         `nonarray fmt
-    | Funptr fn ->
+    | Funptr fn, _ ->
       format_fn' fn
         (fun fmt -> Format.fprintf fmt "(*%t)" (k `nonarray)) fmt
-    | Array (ty, n) ->
+    | Array (ty, n), _ ->
       format_typ' ty (fun _ fmt -> fprintf fmt "%t[%d]" (k `array) n) `nonarray
         fmt
-    | Bigarray ba ->
+    | Bigarray ba, _ ->
       let elem = Ctypes_bigarray.element_type ba
       and dims = Ctypes_bigarray.dimensions ba in
       let name = Ctypes_primitives.name elem in
       fprintf fmt "%s%t%t" name (k `array)
         (fun fmt -> (Array.iter (Format.fprintf fmt "[%d]") dims))
-    | OCaml String -> format_typ' (ptr char) k context fmt
-    | OCaml Bytes -> format_typ' (ptr uchar) k context fmt
-    | OCaml FloatArray -> format_typ' (ptr double) k context fmt
+    | OCaml String, context -> format_typ' (ptr char) k context fmt
+    | OCaml Bytes, context -> format_typ' (ptr uchar) k context fmt
+    | OCaml FloatArray, context -> format_typ' (ptr double) k context fmt
 
 and format_fields : type a. a boxed_field list -> Format.formatter -> unit =
   fun fields fmt ->
