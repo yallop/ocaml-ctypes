@@ -1,3 +1,17 @@
+## ctypes 0.23.0
+
+* Support for 'const' and 'volatile'  
+  https://github.com/yallop/ocaml-ctypes/pull/780
+
+* Make `string` a view of `ptr (const char)`, not `ptr char`  
+  https://github.com/yallop/ocaml-ctypes/pull/782
+
+* Add `CArray.iteri`  
+  https://github.com/yallop/ocaml-ctypes/pull/775
+
+Thanks to Antoine Provot (@Ant1-Provot) and @prgbln for contributions
+to this release.
+
 ## ctypes 0.22.0
 
 * Support for OCaml 5.2.0  
