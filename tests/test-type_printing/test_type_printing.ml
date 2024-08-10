@@ -533,7 +533,7 @@ let test_view_printing _ =
   begin
     (* By default, views are printed as the underlying type *)
 
-    assert_typ_printed_as ~name:"a" "char *a"
+    assert_typ_printed_as ~name:"a" "char const* a"
       string;
 
     let v : unit typ = view ~read:(fun _ -> ()) ~write:(fun () () -> ())

@@ -74,7 +74,7 @@ struct triple {
 extern struct triple add_triples(struct triple, struct triple);
 struct animal;
 struct chorse;
-extern int check_name(struct animal *, char *);
+extern int check_name(struct animal *, const char *);
 extern char *chorse_colour(struct chorse *);
 extern char *chorse_say(struct animal *);
 extern char *chorse_identify(struct animal *);
@@ -264,7 +264,7 @@ float callback_returns_float(float (*f)(void));
 double callback_returns_double(double (*f)(void));
 bool callback_returns_bool(bool (*f)(void));
 
-extern char *string_array[2];
+extern const char *string_array[2];
 extern int32_t int_array[5];
 
 void check_ones(const int *, size_t);

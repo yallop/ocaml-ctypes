@@ -106,6 +106,8 @@ let rec coercion : type a b. a typ -> b typ -> (a, b) coercion =
     | exception Uncoercible _ ->
        Coercion (fun (Static_funptr p) -> Static_funptr (Ctypes_ptr.Fat.coerce p b))
     end
+  | Qualified (_,l), r
+  | l, Qualified (_, r) -> coercion l r
   | l, r -> uncoercible l r
 
 and fn_coercion : type a b. a fn -> b fn -> (a, b) coercion =
