@@ -107,6 +107,7 @@ struct
 
   type t = ftsent structure ptr
   let t = ptr ftsent
+  let const_t = ptr (const ftsent)
 
   let info : t -> fts_info
     = fun t -> fts_info_of_int (UShort.to_int (getf !@t fts_info))
@@ -155,10 +156,12 @@ struct
 
   type compar_typ = t ptr -> t ptr -> int
   let compar_typ : compar_typ typ =
-    Foreign.funptr (ptr FTSENT.t @-> ptr FTSENT.t @-> returning int)
+    Foreign.funptr
+      (ptr FTSENT.const_t @-> ptr FTSENT.const_t @-> returning int)
   type compar_typ_opt = compar_typ option
   let compar_typ_opt : compar_typ_opt typ =
-    Foreign.funptr_opt (ptr FTSENT.t @-> ptr FTSENT.t @-> returning int)
+    Foreign.funptr_opt
+      (ptr FTSENT.const_t @-> ptr FTSENT.const_t @-> returning int)
 
   type fts
   let struct_fts : fts structure typ = structure "FTS"

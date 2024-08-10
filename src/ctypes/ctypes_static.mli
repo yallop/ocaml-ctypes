@@ -26,6 +26,8 @@ type 'a structspec =
     Incomplete of incomplete_size
   | Complete of structured_spec
 
+type qualifier = Const | Volatile
+
 type _ typ =
     Void            :                       unit typ
   | Primitive       : 'a Ctypes_primitive_types.prim -> 'a typ
@@ -35,6 +37,7 @@ type _ typ =
   | Union           : 'a union_type      -> 'a union typ
   | Abstract        : abstract_type      -> 'a abstract typ
   | View            : ('a, 'b) view      -> 'a typ
+  | Qualified       : qualifier * 'a typ -> 'a typ
   | Array           : 'a typ * int       -> 'a carray typ
   | Bigarray        : (_, 'a, _) Ctypes_bigarray.t
                                          -> 'a typ
@@ -180,6 +183,8 @@ val union : string -> 'a union typ
 val offsetof : ('a, 'b) field -> int
 val field_type : ('a, 'b) field -> 'a typ
 val field_name : ('a, 'b) field -> string
+val const : 'a typ -> 'a typ
+val volatile : 'a typ -> 'a typ
 
 exception IncompleteType
 exception ModifyingSealedType of string

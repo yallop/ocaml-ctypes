@@ -118,6 +118,16 @@ include Ctypes_types.TYPE
  with type 'a typ = 'a Ctypes_static.typ
   and type ('a, 's) field := ('a, 's) field
 
+(** {3 Qualified types} *)
+
+val const : 'a typ -> 'a typ
+(** [const t] const-qualifies the type [t].  At present the only
+    effect is that the type is marked 'const' in generated code. *)
+
+val volatile : 'a typ -> 'a typ
+(** [volatile t] volatile-qualifies the type [t].  At present the only
+    effect is that the type is marked 'volatile' in generated code. *)
+
 (** {3 Operations on types} *)
 
 val sizeof : 'a typ -> int
