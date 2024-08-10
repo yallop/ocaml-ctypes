@@ -14,7 +14,7 @@ let char_ptr_of_string s =
                             ~managed:(Some (Obj.repr p)) ~reftyp:Ctypes_static.char
                      (Ctypes_memory_stubs.block_address p))
 
-let string = Ctypes_static.(view (ptr char))
+let string = Ctypes_static.(view (ptr (const char)))
   ~read:string_of_char_ptr ~write:char_ptr_of_string
 
 let read_nullable t reftyp =

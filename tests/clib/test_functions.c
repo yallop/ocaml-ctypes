@@ -236,7 +236,7 @@ struct animal_methods {
   char *(*identify)(struct animal *);
 };
 
-int check_name(struct animal *a, char *name)
+int check_name(struct animal *a, const char *name)
 {
   return strcmp(a->vtable->identify(a), name) == 0;
 }
@@ -755,7 +755,7 @@ GEN_RETURN_F(float)
 GEN_RETURN_F(double)
 GEN_RETURN_F(bool)
 
-char *string_array[2] = { "Hello", "world" };
+const char *string_array[2] = { "Hello", "world" };
 int32_t int_array[5] = { 0, 1, 2, 3, 4 };
 
 void check_ones(const int *p, size_t sz)

@@ -432,23 +432,7 @@ let rec pattern_and_exp_of_typ : type a. concurrency:concurrency_policy -> errno
                    path_of_string "read", `Var x], `Etc)] in
       (pat, Some (map_result ~concurrency ~errno (`Appl x) e), binds)
     end
-  | Qualified (_, ty) ->
-    begin match pol  with
-    | In ->
-      let x = fresh_var () in
-      let y = fresh_var () in
-      let e = `Appl (`Ident (path_of_string x), e) in
-      let (p, None, binds), e | (p, Some e, binds), _ =
-        pattern_and_exp_of_typ ~concurrency ~errno ty e pol binds, e in
-      let pat = static_con "Qualified" [`Underscore; `Var x] in
-      (pat, Some (`Ident (Ctypes_path.path_of_string y)), (`Var y, e) :: binds)
-    | Out ->
-      let (p, None, binds), e | (p, Some e, binds), _ =
-        pattern_and_exp_of_typ ~concurrency ~errno ty e pol binds, e in
-      let x = fresh_var () in
-      let pat = static_con "Qualified" [`Underscore; `Var x] in
-      (pat, Some (map_result ~concurrency ~errno (`Appl x) e), binds)
-    end
+  | Qualified (_, ty) -> pattern_and_exp_of_typ ~concurrency ~errno ty e pol binds
   | OCaml ty ->
     begin match pol, ty with
     | In, String -> (static_con "OCaml" [static_con "String" []], None, binds)
