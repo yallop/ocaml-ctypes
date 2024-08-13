@@ -81,6 +81,6 @@ struct
   let check_name = foreign "check_name"
     (ptr animal @-> string @-> returning int)
 
-    let new_chorse = foreign "new_chorse"
+  let new_chorse = foreign "new_chorse_as_animal"
       (int @-> returning (ptr animal))
 end

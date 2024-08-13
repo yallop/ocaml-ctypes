@@ -79,6 +79,8 @@ extern char *chorse_colour(struct chorse *);
 extern char *chorse_say(struct animal *);
 extern char *chorse_identify(struct animal *);
 extern struct chorse *new_chorse(int);
+extern struct animal *new_chorse_as_animal(int);
+
 extern int accept_pointers(float *,
                            double *,
                            short *,

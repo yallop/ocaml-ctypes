@@ -293,6 +293,11 @@ struct chorse *new_chorse(int colour)
   h->colour = (enum colour)colour;
   return h;
 }
+
+struct animal *new_chorse_as_animal(int colour)
+{
+  return (struct animal *)new_chorse(colour);
+}
 /* (End of OO-style example) */
 
 int accept_pointers(float *float_p,
