@@ -76,12 +76,14 @@ and ('a, 's) field = {
 }
 and 'a structure_type = {
   tag: string;
+  stamp : int;
   mutable spec: 'a structspec;
   (* fields are in reverse order iff the struct type is incomplete *)
   mutable fields : 'a structure boxed_field list;
 }
 and 'a union_type = {
   utag: string;
+  stamp : int;
   mutable uspec: structured_spec option;
   (* fields are in reverse order iff the union type is incomplete *)
   mutable ufields : 'a union boxed_field list;
@@ -272,10 +274,13 @@ let returning v =
     Returns v
 let static_funptr fn = Funptr fn
 
-let structure tag =
-  Struct { spec = Incomplete { isize = 0 }; tag; fields = [] }
+let stamp = ref 0
+let new_stamp () = incr stamp; !stamp
 
-let union utag = Union { utag; uspec = None; ufields = [] }
+let structure tag =
+  Struct { spec = Incomplete { isize = 0 }; tag; stamp = new_stamp (); fields = [] }
+
+let union utag = Union { utag; uspec = None; stamp = new_stamp (); ufields = [] }
 
 let offsetof { foffset } = foffset
 let field_type { ftype } = ftype
