@@ -97,7 +97,7 @@ struct
     let ret = Sys.opaque_identity (Better.make ~arg:(closure (int_of_string "3"))) in
     Gc.full_major ();
     assert_equal 15 (Better.get ret 5);
-    let _ = Ctypes_memory_stubs.use_value ret in
+    let _ = Ctypes_memory.keep_alive ret in
 
     (* However, even with the careful implementation things can go wrong if we
        keep a reference to ret beyond the lifetime of the pair. *)
@@ -111,7 +111,7 @@ struct
     let ret = Careful.get (Careful.make ~arg:(closure (int_of_string "3"))) in
     Gc.full_major ();
     assert_equal 15 (ret 5);
-    let _ = Ctypes_memory_stubs.use_value ret in
+    let _ = Ctypes_memory.keep_alive ret in
     ()
 end
 
