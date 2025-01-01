@@ -135,7 +135,7 @@ let () =
       |[_,C.C_define.Value.String s] -> s
       |_ -> failwith ("unable to find string definition for " ^ l) in
     print_string header;
-    let has_float16 = Int.equal (import_int "FLOAT16_AVAILABLE") 1 in
+    let has_float16 = (import_int "FLOAT16_AVAILABLE") = 1 in
     let c_primitives = c_primitives has_float16 in
     generate "sizeof" "int" (fun { size } ->
       match size with

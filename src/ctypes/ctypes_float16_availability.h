@@ -6,8 +6,8 @@
  */
 
 
-#ifndef CTYPES_FLOAT16_COMPATIBILITY_H
-#define CTYPES_FLOAT16_COMPATIBILITY_H
+#ifndef CTYPES_FLOAT16_AVAILABILITY_H
+#define CTYPES_FLOAT16_AVAILABILITY_H
 
 #define __STDC_WANT_IEC_60559_TYPES_EXT__
 #include <float.h>
@@ -33,4 +33,4 @@
 /* float16_available : unit -> bool */
 extern value ctypes_float16_available(value unit);
 
-#endif /* CTYPES_FLOAT16_COMPATIBILITY_H */
+#endif /* CTYPES_FLOAT16_AVAILABILITY_H */
