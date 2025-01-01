@@ -11,6 +11,7 @@ open Ctypes_static
 
 let is_float_primitive : type a. a typ -> bool =
   let open Ctypes_primitive_types in function
+  | Primitive Float16 -> true
   | Primitive Float -> true
   | Primitive Double -> true
   | _ -> false
@@ -86,6 +87,7 @@ let primitive_allocation : type a. a Ctypes_primitive_types.prim -> a allocation
  | Uint32_t -> `Alloc Alloc_uint32_t
  | Uint64_t -> `Alloc Alloc_uint64_t
  | Nativeint -> `Alloc Alloc_nativeint
+ | Float16 -> `Alloc Alloc_float
  | Float -> `Alloc Alloc_float
  | Double -> `Alloc Alloc_float
  | LDouble -> `Alloc Alloc_ldouble

@@ -22,16 +22,16 @@ type c_primitive = {
   constructor : string;
   typ         : string;
   format      : c_format;
-  size        : string;
-  alignment   : string;
+  size        : string option;
+  alignment   : string option;
 }
 
 let c_primitive constructor typ format =
   { constructor; typ; format;
-    size = "sizeof("^typ^")";
-    alignment = "alignof("^typ^")"; }
+    size = Some ("sizeof("^typ^")");
+    alignment = Some ("alignof("^typ^")"); }
 
-let c_primitives = [
+let c_primitives has_float16 = [
   c_primitive "Char"      "char"                (Known_format "d");
   c_primitive "Schar"     "signed char"         (Known_format "d");
   c_primitive "Uchar"     "unsigned char"       (Known_format "d");
@@ -53,8 +53,16 @@ let c_primitives = [
   c_primitive "Uint8_t"   "uint8_t"             (Defined_format "PRIu8");
   c_primitive "Uint16_t"  "uint16_t"            (Defined_format "PRIu16");
   c_primitive "Uint32_t"  "uint32_t"            (Defined_format "PRIu32");
-  c_primitive "Uint64_t"  "uint64_t"            (Defined_format "PRIu64");
-  c_primitive "Float"     "float"               (Known_format ".12g");
+  c_primitive "Uint64_t"  "uint64_t"            (Defined_format "PRIu64")] @
+ (if has_float16 then
+    c_primitive "Float16"  "_Float16"          (Known_format ".12g")
+  else
+    { constructor = "Float16";
+       typ         = "_Float16";
+       format      = Known_format ".12g";
+       size        = None;
+       alignment   = None }) ::
+ [c_primitive "Float"     "float"               (Known_format ".12g");
   c_primitive "Double"    "double"              (Known_format ".12g");
   c_primitive "LDouble"   "long double"         (Known_format ".12Lg");
   c_primitive "Complex32" "float _Complex"      (No_format);
@@ -64,13 +72,13 @@ let c_primitives = [
   { constructor = "Camlint";
     typ         = "intnat";
     format      = Defined_format "REAL_ARCH_INTNAT_PRINTF_FORMAT \"d\"";
-    size        = "sizeof(intnat)";
-    alignment   = "alignof(intnat)" };
+    size        = Some "sizeof(intnat)";
+    alignment   = Some "alignof(intnat)" };
 ]
 
 open Printf
 
-let generate name typ f =
+let generate name typ f c_primitives =
   printf "let %s : type a. a prim -> %s = function\n" name typ;
   List.iter (fun c_primitive ->
     printf " | %s -> " c_primitive.constructor;
@@ -90,11 +98,23 @@ let prelude = "\
 #include <stdint.h>
 #include <stdbool.h>
 #include <inttypes.h>
+#define __STDC_WANT_IEC_60559_TYPES_EXT__
+#include <float.h>
 #include <caml/mlvalues.h>
 
 #define alignof(T) (offsetof(struct { char c; T t; }, t))
 #define STRINGIFY1(x) #x
 #define STRINGIFY(x) STRINGIFY1(x)
+
+#ifdef FLT16_MAX
+#ifdef FLT16_MIN
+#define FLOAT16_AVAILABLE 1
+#else
+#define FLOAT16_AVAILABLE 0
+#endif
+#else
+#define FLOAT16_AVAILABLE 0
+#endif
 
 #if __USE_MINGW_ANSI_STDIO && defined(__MINGW64__)
 #define REAL_ARCH_INTNAT_PRINTF_FORMAT \"ll\"
@@ -115,12 +135,24 @@ let () =
       |[_,C.C_define.Value.String s] -> s
       |_ -> failwith ("unable to find string definition for " ^ l) in
     print_string header;
+    let has_float16 = (import_int "FLOAT16_AVAILABLE") = 1 in
+    let c_primitives = c_primitives has_float16 in
     generate "sizeof" "int" (fun { size } ->
-      printf "%d" (import_int size));
+      match size with
+      | Some size ->
+        printf "%d" (import_int size)
+      | None ->
+        printf "assert false"
+      ) c_primitives;
     generate "alignment" "int" (fun { alignment } ->
-      printf "%d" (import_int alignment));
+      match alignment with
+      | Some alignment ->
+        printf "%d" (import_int alignment)
+      | None ->
+        printf "assert false"
+      ) c_primitives;
     generate "name" "string" (fun { typ } ->
-      printf "%S" (import_string ("STRINGIFY("^typ^")")));
+      printf "%S" (import_string ("STRINGIFY("^typ^")"))) c_primitives;
     generate "format_string" "string option" (fun { format } ->
       match format with
       | Known_format str ->
@@ -128,7 +160,7 @@ let () =
       | Defined_format str ->
         printf "Some %S" ("%"^(import_string str))
       | No_format ->
-        printf "None");
+        printf "None") c_primitives;
     printf "let pointer_size = %d\n" (import_int "sizeof(void*)");
     printf "let pointer_alignment = %d\n" (import_int "alignof(void*)");
   )

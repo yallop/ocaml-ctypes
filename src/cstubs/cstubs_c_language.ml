@@ -45,7 +45,7 @@ type cexp = [ cconst
             | `Addr of cvar ]
 type clvalue = [ cvar
                | `Index of clvalue * cexp
-               | `Field of clvalue * fieldname 
+               | `Field of clvalue * fieldname
                | `PointerField of clvalue * fieldname ]
 type camlop = [ `CAMLparam0
               | `CAMLlocalN of cexp * cexp
@@ -181,6 +181,7 @@ let prim_prj : type a. a Ctypes_primitive_types.prim -> _ =
   | Uint64_t -> reader "Uint64_val" (value @-> returning uint64_t)
   | Camlint -> reader "Long_val" (value @-> returning int)
   | Nativeint -> reader "Nativeint_val" (value @-> returning nativeint)
+  | Float16 -> reader "Double_val" (value @-> returning double)
   | Float -> reader "Double_val" (value @-> returning double)
   | Double -> reader "Double_val" (value @-> returning double)
   | LDouble -> reader "ctypes_ldouble_val" (value @-> returning ldouble)
@@ -215,6 +216,7 @@ let prim_inj : type a. a Ctypes_primitive_types.prim -> _ =
   | Uint64_t -> conser "integers_copy_uint64" (uint64_t @-> returning value)
   | Camlint -> immediater "Val_long" (int @-> returning value)
   | Nativeint -> conser "caml_copy_nativeint" (nativeint @-> returning value)
+  | Float16 -> conser "caml_copy_double" (double @-> returning value)
   | Float -> conser "caml_copy_double" (double @-> returning value)
   | Double -> conser "caml_copy_double" (double @-> returning value)
   | LDouble -> conser "ctypes_copy_ldouble" (ldouble @-> returning value)

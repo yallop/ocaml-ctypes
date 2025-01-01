@@ -5,8 +5,10 @@
  * See the file LICENSE for details.
  *)
 
-type _ kind =
-    Kind_float32 : float kind
+(* Module [Bigarray_kind_conv] is generated at compile-time, see [configure/gen_bigarray_kind_conv].
+   We re-export the generated type here. *)
+type 'a kind = 'a Ctypes_bigarray_kind_conv.kind =
+  | Kind_float32 : float kind
   | Kind_float64 : float kind
   | Kind_int8_signed : int kind
   | Kind_int8_unsigned : int kind
@@ -19,22 +21,9 @@ type _ kind =
   | Kind_complex32 : Complex.t kind
   | Kind_complex64 : Complex.t kind
   | Kind_char : char kind
+  | Kind_float16 : float kind
 
-let kind : type a b. (a, b) Bigarray_compat.kind -> a kind = function
-  | Bigarray_compat.Float32 -> Kind_float32
-  | Bigarray_compat.Float64 -> Kind_float64
-  | Bigarray_compat.Int8_signed -> Kind_int8_signed
-  | Bigarray_compat.Int8_unsigned -> Kind_int8_unsigned
-  | Bigarray_compat.Int16_signed -> Kind_int16_signed
-  | Bigarray_compat.Int16_unsigned -> Kind_int16_unsigned
-  | Bigarray_compat.Int32 -> Kind_int32
-  | Bigarray_compat.Int64 -> Kind_int64
-  | Bigarray_compat.Int -> Kind_int
-  | Bigarray_compat.Nativeint -> Kind_nativeint
-  | Bigarray_compat.Complex32 -> Kind_complex32
-  | Bigarray_compat.Complex64 -> Kind_complex64
-  | Bigarray_compat.Char -> Kind_char
-  | _ -> failwith "Unsupported bigarray kind" [@@ocaml.warning "-11"]
+let kind = Ctypes_bigarray_kind_conv.kind
 
 external address : 'b -> Ctypes_ptr.voidp
   = "ctypes_bigarray_address"
