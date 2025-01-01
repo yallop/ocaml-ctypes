@@ -60,20 +60,37 @@ let post_52_kind () =
 
 module C = Configurator.V1
 
+(* Adapted from the OCaml stdlib. This is for compatibility with OCaml 4.03 where
+   [String.split_on_char] is not available. *)
+let split_on_char sep s =
+  let r = ref [] in
+  let j = ref (String.length s) in
+  for i = String.length s - 1 downto 0 do
+    if String.get s i = sep then begin
+      r := String.sub s (i + 1) (!j - i - 1) :: !r;
+      j := i
+    end
+  done;
+  String.sub s 0 !j :: !r
+
+let version v =
+  let v = split_on_char '.' v in
+  match v with
+  | major :: minor :: _ ->
+    Some (int_of_string major, int_of_string minor)
+  | _ -> None
+
 let () =
   C.main ~name:"bigarray" (fun c ->
       match C.ocaml_config_var c "version" with
       | None -> failwith "Could not determine OCaml version"
       | Some v -> begin
-          let v = String.split_on_char '.' v in
-          match v with
-          | major :: minor :: _ ->
-            let major = int_of_string major in
-            let minor = int_of_string minor in
+          match version v with
+          | Some (major, minor) ->
             if major < 5 || (major = 5 && minor < 2) then
               gen_pre_52_kind ()
             else
               post_52_kind ()
-          | _ -> failwith "Could not determine OCaml version"
+          | None -> failwith "Could not determine OCaml version"
         end
     )
