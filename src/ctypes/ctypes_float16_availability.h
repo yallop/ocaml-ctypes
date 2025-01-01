@@ -33,7 +33,4 @@
 /* float16_available : unit -> bool */
 extern value ctypes_float16_available(value unit);
 
-/* float16_bigarray_available : unit -> bool */
-extern value ctypes_float16_bigarray_available(value unit);
-
 #endif /* CTYPES_FLOAT16_COMPATIBILITY_H */

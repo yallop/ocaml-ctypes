@@ -17,6 +17,7 @@
 
 #include <caml/memory.h>
 #include <caml/alloc.h>
+#include <caml/fail.h>
 
 #include "ocaml_integers.h"
 #include "ctypes_type_info_stubs.h"
