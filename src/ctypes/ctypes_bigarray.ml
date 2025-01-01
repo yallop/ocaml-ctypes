@@ -9,7 +9,8 @@ open Ctypes_bigarray_stubs
 
 let prim_of_kind : type a. a kind -> a Ctypes_primitive_types.prim
   = let open Ctypes_primitive_types in function
-    Kind_float32 -> Float
+  | Kind_float16 -> Float16
+  | Kind_float32 -> Float
   | Kind_float64 -> Double
   | Kind_int8_signed -> Int8_t
   | Kind_int8_unsigned -> Int8_t
@@ -65,6 +66,9 @@ let type_name : type a b l. (b, a, l) dims -> string list = function
   | Dims3 _ -> ["Bigarray"; "Array3"; "t"]
 
 let kind_type_names : type a. a kind -> _ = function
+  | Kind_float16 ->
+    (`Ident ["float"],
+     `Ident ["Bigarray"; "float16_elt"])
   | Kind_float32 ->
     (`Ident ["float"],
      `Ident ["Bigarray"; "float32_elt"])

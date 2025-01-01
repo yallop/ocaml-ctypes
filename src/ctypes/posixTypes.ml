@@ -28,7 +28,7 @@ let mkAbstractSized : name:string -> size:int -> alignment:int -> (module Abstra
        let t = abstract ~name ~size ~alignment:a
      end : Abstract)
 
-let mkArithmetic_abstract = 
+let mkArithmetic_abstract =
   let open Ctypes in function
     Ctypes_static.Int8   -> mkAbstract int8_t
   | Ctypes_static.Int16  -> mkAbstract int16_t
@@ -38,6 +38,7 @@ let mkArithmetic_abstract =
   | Ctypes_static.Uint16 -> mkAbstract uint16_t
   | Ctypes_static.Uint32 -> mkAbstract uint32_t
   | Ctypes_static.Uint64 -> mkAbstract uint64_t
+  | Ctypes_static.Float16 -> mkAbstract (float16 ())
   | Ctypes_static.Float  -> mkAbstract float
   | Ctypes_static.Double -> mkAbstract double
 

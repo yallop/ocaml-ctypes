@@ -4,6 +4,11 @@
   (run ../configure/gen_c_primitives.exe)))
 
 (rule
+ (with-stdout-to
+  ctypes_bigarray_kind_conv.ml
+  (run ../configure/gen_bigarray_kind_conv.exe)))
+
+(rule
  (deps
   (:header %{lib:integers:ocaml_integers.h}))
  (target ocaml_integers.h)
@@ -28,6 +33,7 @@
   ctypes_ldouble_stubs
   ctypes_complex_stubs
   ctypes_type_info_stubs
+  ctypes_float16_availability
   ocaml_integers)
  (foreign_stubs
   (language c)
@@ -39,4 +45,5 @@
    managed_buffer_stubs
    posix_types_stubs
    raw_pointer_stubs
-   type_info_stubs)))
+   type_info_stubs
+   ctypes_float16_availability)))

@@ -33,6 +33,7 @@ type _ prim =
  | Uint64_t : uint64 prim
  | Camlint : int prim
  | Nativeint : nativeint prim
+ | Float16 : float prim
  | Float : float prim
  | Double : float prim
  | LDouble : LDouble.t prim
@@ -40,7 +41,7 @@ type _ prim =
  | Complex64 : Complex.t prim
  | Complexld : ComplexL.t prim
 
-type _ ml_prim = 
+type _ ml_prim =
   | ML_char :  char ml_prim
   | ML_complex :  Complex.t ml_prim
   | ML_complexld :  ComplexL.t ml_prim
@@ -90,6 +91,7 @@ let ml_prim : type a. a prim -> a ml_prim = function
   | Uint64_t -> ML_uint64
   | Camlint -> ML_int
   | Nativeint -> ML_nativeint
+  | Float16 -> ML_float
   | Float -> ML_float
   | Double -> ML_float
   | LDouble -> ML_ldouble

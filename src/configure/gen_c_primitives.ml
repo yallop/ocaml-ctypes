@@ -54,6 +54,7 @@ let c_primitives = [
   c_primitive "Uint16_t"  "uint16_t"            (Defined_format "PRIu16");
   c_primitive "Uint32_t"  "uint32_t"            (Defined_format "PRIu32");
   c_primitive "Uint64_t"  "uint64_t"            (Defined_format "PRIu64");
+  c_primitive "Float16"  "_Float16"             (Known_format ".12g");
   c_primitive "Float"     "float"               (Known_format ".12g");
   c_primitive "Double"    "double"              (Known_format ".12g");
   c_primitive "LDouble"   "long double"         (Known_format ".12Lg");

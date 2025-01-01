@@ -199,6 +199,12 @@ let rec has_ocaml_argument : type a. a fn -> bool = function
 let void = Void
 let char = Primitive Ctypes_primitive_types.Char
 let schar = Primitive Ctypes_primitive_types.Schar
+let float16 () =
+  if Ctypes_float16_availability.float16_available () then
+    Primitive Ctypes_primitive_types.Float16
+  else
+    raise (Unsupported "float16 not available on this platform")
+
 let float = Primitive Ctypes_primitive_types.Float
 let double = Primitive Ctypes_primitive_types.Double
 let ldouble = Primitive Ctypes_primitive_types.LDouble
@@ -252,7 +258,7 @@ let bigarray_ : type a b c d e l.
     dims: b;
     ba_repr: c;
     bigarray: d;
-    carray: e > bigarray_class -> 
+    carray: e > bigarray_class ->
    b -> (a, c) Bigarray_compat.kind -> l Bigarray_compat.layout -> d typ =
   fun spec dims kind l -> match spec with
   | Genarray -> Bigarray (Ctypes_bigarray.bigarray dims kind l)
@@ -301,5 +307,6 @@ type arithmetic =
   | Uint16
   | Uint32
   | Uint64
+  | Float16
   | Float
   | Double

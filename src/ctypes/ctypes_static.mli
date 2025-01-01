@@ -122,6 +122,7 @@ val has_ocaml_argument : 'a fn -> bool
 val void : unit typ
 val char : char typ
 val schar : int typ
+val float16 : unit -> float typ
 val float : float typ
 val double : float typ
 val ldouble : LDouble.t typ
@@ -202,5 +203,6 @@ type arithmetic =
   | Uint16
   | Uint32
   | Uint64
+  | Float16
   | Float
   | Double

@@ -14,6 +14,7 @@
 #include <stdint.h>
 
 #include "ocaml_integers.h"
+#include "ctypes_float16_availability.h"
 
 /* The order here must correspond to the constructor order in primitives.ml */
 enum ctypes_primitive {
@@ -41,6 +42,7 @@ enum ctypes_primitive {
   Ctypes_Uint64_t,
   Ctypes_Camlint,
   Ctypes_Nativeint,
+  Ctypes_Float16,
   Ctypes_Float,
   Ctypes_Double,
   Ctypes_LDouble,
@@ -131,6 +133,7 @@ enum ctypes_arithmetic_type {
   Ctypes_arith_Uint16,
   Ctypes_arith_Uint32,
   Ctypes_arith_Uint64,
+  Ctypes_arith_Float16,
   Ctypes_arith_Float,
   Ctypes_arith_Double
 };
@@ -155,6 +158,9 @@ enum ctypes_arithmetic_type ctypes_classify_arithmetic_type(size_t typeinfo)
 {
   switch (typeinfo)
   {
+#if FLOAT16_AVAILABLE
+  case CTYPES_FLOATING | sizeof(_Float16): return Ctypes_arith_Float16;
+#endif
   case CTYPES_FLOATING | sizeof(float):    return Ctypes_arith_Float;
   case CTYPES_FLOATING | sizeof(double):   return Ctypes_arith_Double;
   case CTYPES_UNSIGNED | sizeof(uint8_t):  return Ctypes_arith_Uint8;
@@ -174,16 +180,17 @@ const char *ctypes_arithmetic_type_name(enum ctypes_arithmetic_type t)
 {
   switch (t)
   {
-  case Ctypes_arith_Int8:   return "Int8";
-  case Ctypes_arith_Int16:  return "Int16";
-  case Ctypes_arith_Int32:  return "Int32";
-  case Ctypes_arith_Int64:  return "Int64";
-  case Ctypes_arith_Uint8:  return "Uint8";
-  case Ctypes_arith_Uint16: return "Uint16";
-  case Ctypes_arith_Uint32: return "Uint32";
-  case Ctypes_arith_Uint64: return "Uint64";
-  case Ctypes_arith_Float:  return "Float";
-  case Ctypes_arith_Double: return "Double";
+  case Ctypes_arith_Int8:    return "Int8";
+  case Ctypes_arith_Int16:   return "Int16";
+  case Ctypes_arith_Int32:   return "Int32";
+  case Ctypes_arith_Int64:   return "Int64";
+  case Ctypes_arith_Uint8:   return "Uint8";
+  case Ctypes_arith_Uint16:  return "Uint16";
+  case Ctypes_arith_Uint32:  return "Uint32";
+  case Ctypes_arith_Uint64:  return "Uint64";
+  case Ctypes_arith_Float16: return "Float16";
+  case Ctypes_arith_Float:   return "Float";
+  case Ctypes_arith_Double:  return "Double";
   default: assert(0);
   }
 }
