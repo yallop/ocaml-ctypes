@@ -85,6 +85,7 @@ type 'a prim = 'a Ctypes_primitive_types.prim =
 | Uint64_t : uint64 prim
 | Camlint : int prim
 | Nativeint : nativeint prim
+| Float16 : float prim
 | Float : float prim
 | Double : float prim
 | LDouble : LDouble.t prim

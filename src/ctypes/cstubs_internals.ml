@@ -81,7 +81,7 @@ let build_enum_type name underlying ?(typedef=false) ?unexpected alist =
   | Ctypes_static.Uint16 -> build_view Ctypes.uint16_t uint16_of_int64 int64_of_uint16
   | Ctypes_static.Uint32 -> build_view Ctypes.uint32_t uint32_of_int64 int64_of_uint32
   | Ctypes_static.Uint64 -> build_view Ctypes.uint64_t uint64_of_int64 int64_of_uint64
-  | Ctypes_static.Float | Ctypes_static.Double ->
+  | Ctypes_static.Float16 | Ctypes_static.Float | Ctypes_static.Double ->
     Printf.ksprintf failwith
       "Enum type detected as floating type: %s" name
 
