@@ -57,7 +57,7 @@ The documentation and source distribution contain more complex examples, involvi
 [rwo]: http://realworldocaml.org/
 [mirage-blogpost]: https://mirage.io/blog/modular-foreign-function-bindings
 [tutorial]: https://github.com/yallop/ocaml-ctypes/wiki/ctypes-tutorial
-[apidoc]: https://docs.ocaml.pro/docs/LIBRARY.ctypes@ctypes.0.17.1/index.html
+[apidoc]: https://ocaml.org/p/ctypes/latest/doc/index.html
 [mailing-list]: http://lists.ocaml.org/listinfo/ctypes
 [faq]: https://github.com/yallop/ocaml-ctypes/wiki/FAQ
 [mirage]: https://mirage.io/
