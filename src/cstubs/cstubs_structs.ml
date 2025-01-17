@@ -81,14 +81,14 @@ let cases fmt list prologue epilogue ~case =
 
 let write_field fmt specs =
   let case = function
-  | `Struct (tag, typedef), fname ->
+  | `Struct (tag, typedef, stamp), fname ->
     let foffset fmt = offsetof fmt (typedef, fname) in
-    puts fmt (Printf.sprintf "  | Struct ({ tag = %S; _} as s'), %S ->" tag fname);
+    puts fmt (Printf.sprintf "  | Struct ({ tag = %S; stamp = %d; _} as s'), %S ->" tag stamp fname);
     printf1 fmt             "    let f = {ftype; fname; foffset = %zu} in \n" foffset;
     puts fmt                "    (s'.fields <- BoxedField f :: s'.fields; f)";
-  | `Union (tag, typedef), fname ->
+  | `Union (tag, typedef, stamp), fname ->
     let foffset fmt = offsetof fmt (typedef, fname) in
-    puts fmt (Printf.sprintf "  | Union ({ utag = %S; _} as s'), %S ->" tag fname);
+    puts fmt (Printf.sprintf "  | Union ({ utag = %S; stamp = %d; _} as s'), %S ->" tag stamp fname);
     printf1 fmt             "    let f = {ftype; fname; foffset = %zu} in \n" foffset;
     puts fmt                "    (s'.ufields <- BoxedField f :: s'.ufields; f)";
   | _ -> raise (Unsupported "Adding a field to non-structured type")
@@ -105,15 +105,15 @@ let write_field fmt specs =
 
 let write_seal fmt specs =
   let case = function
-    | `Struct (tag, typedef) ->
+    | `Struct (tag, typedef, stamp) ->
         let ssize fmt = sizeof fmt typedef
         and salign fmt = alignmentof fmt typedef in
-        puts fmt (Printf.sprintf "  | Struct ({ tag = %S; spec = Incomplete _; _ } as s') ->" tag);
+        puts fmt (Printf.sprintf "  | Struct ({ tag = %S; spec = Incomplete _; stamp = %d; _ } as s') ->" tag stamp);
         printf2 fmt              "    s'.spec <- Complete { size = %zu; align = %zu }\n" ssize salign;
-    | `Union (tag, typedef) ->
+    | `Union (tag, typedef, stamp) ->
         let usize fmt = sizeof fmt typedef
         and ualign fmt = alignmentof fmt typedef in
-        puts fmt (Printf.sprintf "  | Union ({ utag = %S; uspec = None; _ } as s') ->" tag);
+        puts fmt (Printf.sprintf "  | Union ({ utag = %S; uspec = None; stamp = %d; _ } as s') ->" tag stamp);
         printf2 fmt              "    s'.uspec <- Some { size = %zu; align = %zu }\n" usize ualign;
     | `Other -> 
       raise (Unsupported "Sealing a non-structured type")
@@ -258,11 +258,11 @@ let gen_c () =
       open Ctypes_static
       let rec field' : type a s r. string -> s typ -> string -> a typ -> (a, r) field =
         fun structname s fname ftype -> match s with 
-        | Struct { tag } ->
-          fields := (`Struct (tag, structname), fname) :: !fields;
+        | Struct { tag; stamp } ->
+          fields := (`Struct (tag, structname, stamp), fname) :: !fields;
           { ftype; foffset = -1; fname}
-        | Union { utag } ->
-          fields := (`Union (utag, structname), fname) :: !fields;
+        | Union { utag; stamp } ->
+          fields := (`Union (utag, structname, stamp), fname) :: !fields;
           { ftype; foffset = -1; fname}
         | View { ty } -> 
           field' structname ty fname ftype
@@ -272,10 +272,10 @@ let gen_c () =
 
       let rec seal' : type s. string -> s typ -> unit =
         fun structname -> function
-        | Struct { tag } ->
-          structures := `Struct (tag, structname) :: !structures
-        | Union { utag } ->
-          structures := `Union (utag, structname) :: !structures
+        | Struct { tag; stamp } ->
+          structures := `Struct (tag, structname, stamp) :: !structures
+        | Union { utag; stamp } ->
+          structures := `Union (utag, structname, stamp) :: !structures
         | View { ty } ->
            seal' structname ty
         | _ -> raise (Unsupported "Sealing a field to non-structured type")
