@@ -17,14 +17,16 @@ let strip_whitespace = Str.(global_replace (regexp "[\r\n ]+") "")
 let equal_ignoring_whitespace l r =
   strip_whitespace l = strip_whitespace r
 
-let assert_printed_as ?name format expected typ =
- assert_equal
-   ~cmp:equal_ignoring_whitespace 
-   ~printer:(fun s -> s)
-   expected (format ?name typ)
+let assert_printed_as ?name format expecteds typ =
+ assert_equal true
+   (List.exists (equal_ignoring_whitespace (format ?name typ)) expecteds)
 
-let assert_typ_printed_as ?name e t = assert_printed_as ?name string_of_typ e t
-let assert_fn_printed_as ?name e f = assert_printed_as ?name string_of_fn e f
+let assert_typ_printed_as ?name e t =
+  assert_printed_as ?name string_of_typ [e] t
+let assert_typ_printed_as_one_of ?name es t =
+  assert_printed_as ?name string_of_typ es t
+let assert_fn_printed_as ?name e f =
+  assert_printed_as ?name string_of_fn [e] f
 
 
 (*
@@ -78,7 +80,7 @@ let test_atomic_printing _ =
     assert_typ_printed_as "unsigned char volatile"
       (volatile uchar);
 
-    assert_typ_printed_as "_Bool"
+    assert_typ_printed_as_one_of ["_Bool"; "bool"]
       bool;
 
     assert_typ_printed_as ~name:"g" "uint8_t g"
