@@ -33,7 +33,7 @@ struct
   let z3 = field s4 "z3" s3
   let z4 = field s4 "z4" (ptr s3)
   let () = seal s4
-
+  
   (* dependencies involving function pointers *)
 
   (* (incomplete types are available in the present) *)
@@ -49,4 +49,6 @@ struct
   let v1 = field s6 "v1" int
   let v2 = field s6 "v2" float
   let () = seal s6
+  
+  let funptr = static_funptr (struct_s6 @-> returning int)
 end
