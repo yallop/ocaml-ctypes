@@ -32,6 +32,7 @@ let cstring s =
 let cprologue = [
   "#include <stdio.h>";
   "#include <stddef.h>";
+  "#define CAML_COMPATIBILITY_H";
   "#include \"ctypes_cstubs_internals.h\"";
   "";
   "int main(void)";
