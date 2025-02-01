@@ -150,6 +150,12 @@ sig
 
   (** {5 Floating types} *)
 
+  (** Value representing the C half-precision [_Float16] type.
+
+      If the platform does not support half-precision floating point numbers,
+      raises {!Unsupported}. *)
+  val float16 : unit -> float typ
+
   val float : float typ
   (** Value representing the C single-precision [float] type. *)
 

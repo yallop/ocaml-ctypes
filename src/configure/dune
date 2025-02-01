@@ -2,3 +2,8 @@
  (name gen_c_primitives)
  (libraries dune-configurator)
  (modules gen_c_primitives))
+
+(executable
+ (name gen_bigarray_kind_conv)
+ (libraries dune-configurator str)
+ (modules gen_bigarray_kind_conv))

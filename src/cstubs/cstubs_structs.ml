@@ -60,10 +60,10 @@ let printf1 fmt s v = Format.fprintf fmt "@[ctypes_printf@[(%s,@ %t);@]@]@\n"
 let printf2 fmt s u v = Format.fprintf fmt "@[ctypes_printf@[(%s,@ %t,@ %t);@]@]@\n"
   (cstring s) u v
 
-(* [offsetof fmt t f] writes the call [offsetof(t, f)] on [fmt]. *) 
+(* [offsetof fmt t f] writes the call [offsetof(t, f)] on [fmt]. *)
 let offsetof fmt (t, f) = Format.fprintf fmt "@[offsetof@[(%s,@ %s)@]@]" t f
 
-(* [sizeof fmt t] writes the call [sizeof(t)] on [fmt]. *) 
+(* [sizeof fmt t] writes the call [sizeof(t)] on [fmt]. *)
 let sizeof fmt t = Format.fprintf fmt "@[sizeof@[(%s)@]@]" t
 
 let alignmentof fmt t =
@@ -115,7 +115,7 @@ let write_seal fmt specs =
         and ualign fmt = alignmentof fmt typedef in
         puts fmt (Printf.sprintf "  | Union ({ utag = %S; uspec = None; _ } as s') ->" tag);
         printf2 fmt              "    s'.uspec <- Some { size = %zu; align = %zu }\n" usize ualign;
-    | `Other -> 
+    | `Other ->
       raise (Unsupported "Sealing a non-structured type")
   in
   cases fmt specs
@@ -169,12 +169,13 @@ let primitive_format_string : type a. a Ctypes_primitive_types.prim -> string =
     | Complex32, _ -> fail ()
     | Complex64, _ -> fail ()
     | Complexld, _ -> fail ()
+    | Float16, _ -> fail ()
     | Float, _ -> fail ()
     | Double, _ -> fail ()
     | LDouble, _ -> fail ()
 
 let rec ml_pat_and_exp_of_typ : type a. a typ -> string * string =
-  fun ty -> 
+  fun ty ->
     match ty with
     | Ctypes_static.View { Ctypes_static.ty } ->
       let p, e = ml_pat_and_exp_of_typ ty in
@@ -183,7 +184,7 @@ let rec ml_pat_and_exp_of_typ : type a. a typ -> string * string =
       and e' = Printf.sprintf "(%s (%s))" x e in
       (p', e')
     | Ctypes_static.Primitive p ->
-      let pat = 
+      let pat =
         (Format.asprintf "Ctypes_static.Primitive %a"
            Ctypes_path.format_path
            (Cstubs_public_name.constructor_cident_of_prim p))
@@ -212,8 +213,8 @@ let write_consts fmt consts =
     ["type 'a const = 'a";
      "let constant (type t) name (t : t typ) : t = match t, name with"]
     ~case
-    ["  | _, s -> failwith (\"unmatched constant: \"^ s)"] 
-    
+    ["  | _, s -> failwith (\"unmatched constant: \"^ s)"]
+
 
 let write_enums fmt enums =
   let case (name, typedef) =
@@ -258,14 +259,14 @@ let gen_c () =
       let ( @-> ) f t = Ctypes_static.Function (f, t) (* bypass passability check *)
       open Ctypes_static
       let rec field' : type a s r. string -> s typ -> string -> a typ -> (a, r) field =
-        fun structname s fname ftype -> match s with 
+        fun structname s fname ftype -> match s with
         | Struct { tag } ->
           fields := (`Struct (tag, structname), fname) :: !fields;
           { ftype; foffset = -1; fname}
         | Union { utag } ->
           fields := (`Union (utag, structname), fname) :: !fields;
           { ftype; foffset = -1; fname}
-        | View { ty } -> 
+        | View { ty } ->
           field' structname ty fname ftype
         | _ -> raise (Unsupported "Adding a field to non-structured type")
 
