@@ -60,22 +60,11 @@ let gen_post_52_kind () =
 
 module C = Configurator.V1
 
-(* Adapted from the OCaml stdlib. This is for compatibility with OCaml 4.03 where
-   [String.split_on_char] is not available. *)
-let split_on_char sep s =
-  let r = ref [] in
-  let j = ref (String.length s) in
-  for i = String.length s - 1 downto 0 do
-    if String.get s i = sep then begin
-      r := String.sub s (i + 1) (!j - i - 1) :: !r;
-      j := i
-    end
-  done;
-  String.sub s 0 !j :: !r
+let split_on_char c s = Str.(split (regexp_string (String.make 1 c))) s
 
 let version v =
-  let v = split_on_char '.' v in
-  match v with
+  let v' = split_on_char '.' v in
+  match v' with
   | major :: minor :: _ ->
     Some (int_of_string major, int_of_string minor)
   | _ -> None

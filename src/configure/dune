@@ -5,5 +5,5 @@
 
 (executable
  (name gen_bigarray_kind_conv)
- (libraries dune-configurator)
+ (libraries dune-configurator str)
  (modules gen_bigarray_kind_conv))
