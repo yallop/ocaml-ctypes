@@ -96,4 +96,4 @@ val build_enum_type :
   string -> Ctypes_static.arithmetic -> ?typedef:bool ->
   ?unexpected:(int64 -> 'a) -> ('a * int64) list -> 'a typ
 
-val use_value : 'a -> unit
+val keep_alive : 'a -> unit
