@@ -16,7 +16,7 @@
  (name ctypes)
  (tags (org:mirage org:ocamllabs))
  (depends
-  (ocaml (>= 4.03.0))
+  (ocaml (>= 4.07.0))
   integers
   dune-configurator
   bigarray-compat
@@ -45,7 +45,7 @@ This will make the `ctypes-foreign` ocamlfind subpackage available."))
  (name ctypes-foreign)
  (tags (org:mirage org:ocamllabs))
  (depends
-  (ocaml (>= 4.03.0))
+  (ocaml (>= 4.07.0))
   (integers (and :with-test (>= 0.2.2)))
   (ctypes (= :version))
   dune-configurator
