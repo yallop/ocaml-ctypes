@@ -19,7 +19,6 @@
   (ocaml (>= 4.07.0))
   integers
   dune-configurator
-  bigarray-compat
   (ounit2 :with-test)
   (conf-fts (and :with-test (<> :os win32)))
   (conf-pkg-config :with-test))
