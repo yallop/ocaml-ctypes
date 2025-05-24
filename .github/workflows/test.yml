@@ -16,14 +16,6 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            ocaml-compiler: 4.03.0
-          - os: ubuntu-latest
-            ocaml-compiler: 4.04.0
-          - os: ubuntu-latest
-            ocaml-compiler: 4.05.0
-          - os: ubuntu-latest
-            ocaml-compiler: 4.06.0
-          - os: ubuntu-latest
             ocaml-compiler: 4.07.0
           - os: ubuntu-latest
             ocaml-compiler: 4.08.0
@@ -45,6 +37,8 @@ jobs:
             ocaml-compiler: 5.1.0
           - os: ubuntu-latest
             ocaml-compiler: 5.2.0
+          - os: ubuntu-latest
+            ocaml-compiler: 5.3.0
           - os: windows-latest
             ocaml-compiler: 4.13.1
           - os: macos-latest
