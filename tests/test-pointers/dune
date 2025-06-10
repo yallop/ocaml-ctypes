@@ -11,5 +11,4 @@
   ctypes-foreign
   test_pointers_stubs
   test_pointers_bindings
-  tests_common
-  stdlib-shims))
+  tests_common))

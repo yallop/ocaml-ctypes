@@ -27,10 +27,9 @@ doc: "https://yallop.github.io/ocaml-ctypes/"
 bug-reports: "https://github.com/yallop/ocaml-ctypes/issues"
 depends: [
   "dune" {>= "3.9"}
-  "ocaml" {>= "4.03.0"}
+  "ocaml" {>= "4.07.0"}
   "integers"
   "dune-configurator"
-  "bigarray-compat"
   "ounit2" {with-test}
   "conf-fts" {with-test & os != "win32"}
   "conf-pkg-config" {with-test}

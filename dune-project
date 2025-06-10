@@ -16,10 +16,9 @@
  (name ctypes)
  (tags (org:mirage org:ocamllabs))
  (depends
-  (ocaml (>= 4.03.0))
+  (ocaml (>= 4.07.0))
   integers
   dune-configurator
-  bigarray-compat
   (ounit2 :with-test)
   (conf-fts (and :with-test (<> :os win32)))
   (conf-pkg-config :with-test))
@@ -45,7 +44,7 @@ This will make the `ctypes-foreign` ocamlfind subpackage available."))
  (name ctypes-foreign)
  (tags (org:mirage org:ocamllabs))
  (depends
-  (ocaml (>= 4.03.0))
+  (ocaml (>= 4.07.0))
   (integers (and :with-test (>= 0.2.2)))
   (ctypes (= :version))
   dune-configurator
@@ -53,7 +52,6 @@ This will make the `ctypes-foreign` ocamlfind subpackage available."))
   (lwt (and :with-test (>= 2.4.7)))
   (ounit2 :with-test)
   (conf-ncurses :with-test)
-  (stdlib-shims :with-test)
   (conf-fts (and :with-test (<> :os win32)))
   (conf-libffi (>= 2.0.0)))
  (synopsis "Dynamic access to foreign C libraries using Ctypes")

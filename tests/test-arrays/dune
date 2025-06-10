@@ -11,5 +11,4 @@
   ctypes-foreign
   test_arrays_stubs
   test_arrays_bindings
-  tests_common
-  stdlib-shims))
+  tests_common))

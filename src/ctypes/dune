@@ -14,7 +14,7 @@
  (name ctypes)
  (public_name ctypes)
  (wrapped false)
- (libraries integers bigarray-compat)
+ (libraries integers bigarray)
  (modules_without_implementation ctypes_types)
  (instrumentation
   (backend bisect_ppx))
