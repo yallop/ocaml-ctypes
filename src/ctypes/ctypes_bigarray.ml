@@ -131,4 +131,7 @@ let view : type a b l m. (a, b, l) t -> (m option, _) Ctypes_ptr.Fat.t -> b =
   | Dims3 (d1, d2, d3) -> view3 kind ~dims:[| d1; d2; d3 |] ptr layout in
   match Ctypes_ptr.Fat.managed ptr with
   | None -> ba
-  | Some src -> Gc.finalise (fun _ -> Ctypes_memory_stubs.use_value src) ba; ba
+  | Some src -> 
+    (* To avoid a dependence on Ctypes_memory, we redefine keep_alive here. *)
+    let keep_alive x = ignore (Sys.opaque_identity x) in
+    Gc.finalise (fun _ -> keep_alive src) ba; ba
