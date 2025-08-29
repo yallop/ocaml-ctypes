@@ -39,6 +39,8 @@ jobs:
             ocaml-compiler: 5.2.0
           - os: ubuntu-latest
             ocaml-compiler: 5.3.0
+          - os: ubuntu-24.04-arm
+            ocaml-compiler: 5.3.0
           - os: windows-latest
             ocaml-compiler: 4.13.1
           - os: macos-latest
