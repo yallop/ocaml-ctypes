@@ -48,7 +48,7 @@ struct
   *)
   let kept_alive_indefinitely = ref []
   let keep_alive w ~while_live:v =
-    try Gc.finalise (fun _ -> Ctypes_memory_stubs.use_value w; ()) v
+    try Gc.finalise (fun _ -> Ctypes_memory.keep_alive w; ()) v
     with Invalid_argument _ ->
       kept_alive_indefinitely := Obj.repr w :: !kept_alive_indefinitely
 
@@ -115,7 +115,7 @@ struct
               (fun buf arr -> List.iter (fun w -> r := w buf arr :: !r) writers)
               read_return_value
           in 
-          Ctypes_memory_stubs.use_value r;
+          Ctypes_memory.keep_alive r;
           v
       | WriteArg (write, ccallspec) ->
         let next = invoke name ccallspec in
@@ -155,7 +155,7 @@ struct
               raise Ctypes_ffi_stubs.CallToExpiredClosure
           in
           let v = box (Ctypes_weak_ref.make f') in
-          let () = Gc.finalise (fun _ -> Ctypes_memory_stubs.use_value f') v in
+          let () = Gc.finalise (fun _ -> Ctypes_memory.keep_alive f') v in
           v)
 
   let rec write_arg : type a. a typ -> offset:int -> idx:int -> a ->

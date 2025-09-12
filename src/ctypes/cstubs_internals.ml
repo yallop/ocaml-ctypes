@@ -85,4 +85,4 @@ let build_enum_type name underlying ?(typedef=false) ?unexpected alist =
     Printf.ksprintf failwith
       "Enum type detected as floating type: %s" name
 
-let use_value v = Ctypes_memory_stubs.use_value v
+let keep_alive x = ignore (Sys.opaque_identity x)

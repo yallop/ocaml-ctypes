@@ -34,9 +34,3 @@ value ctypes_caml_roots_release(value p_)
   caml_stat_free(p);
   return Val_unit;
 }
-
-/* 'a -> unit */
-value ctypes_use(value v)
-{
-  return Val_unit;
-}

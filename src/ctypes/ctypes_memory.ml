@@ -149,6 +149,9 @@ let allocate : type a. ?finalise:(a ptr -> unit) -> a typ -> a -> a ptr
       p
     end
 
+let keep_alive : type a. a -> unit
+  = fun x -> ignore (Sys.opaque_identity x)
+
 let ptr_compare (CPointer l) (CPointer r) = Fat.(compare l r)
 
 let reference_type (CPointer p) = Fat.reftype p
