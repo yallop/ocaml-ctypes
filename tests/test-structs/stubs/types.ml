@@ -51,4 +51,5 @@ struct
   let () = seal s6
   
   let funptr = static_funptr (struct_s6 @-> returning int)
+  let funptr2 = static_funptr (int @-> returning struct_s6)
 end
