@@ -1,6 +1,6 @@
 (lang dune 3.9)
 (name ctypes)
-(version 0.23.0)
+(version 0.24.0)
 (formatting (enabled_for dune))
 (use_standard_c_and_cxx_flags true)
 

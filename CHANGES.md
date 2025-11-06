@@ -1,3 +1,15 @@
+## ctypes 0.24.0
+
+* Allow incomplete types in function pointers in type bindings  
+  https://github.com/yallop/ocaml-ctypes/pull/795  
+  https://github.com/yallop/ocaml-ctypes/pull/800  
+
+* Restrict support to OCaml 4.07 and above
+  https://github.com/yallop/ocaml-ctypes/pull/797  
+
+Thanks to Etienne Millon (@emillon), @j-w-c-b and Sacha Ayoun
+(@giltho) for contributions to this release.
+
 ## ctypes 0.23.0
 
 * Support for 'const' and 'volatile'  
