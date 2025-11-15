@@ -10,8 +10,118 @@ let header ="\
  * See the file LICENSE for details.
  *)
 
+(** Size and alignment of C primitives
+
+    This module defines the size and alignment of C primitives. By default, the
+    values are generated at compile time for the host architecture and compiler.
+
+    When the run-time architecture does not match the host architecture, a C
+    data model can be selected at compile-time or run-time using the environment
+    variable `CTYPES_DATA_MODEL`. Currently, only `CTYPES_DATA_MODEL=ILP32` is
+    supported, which can be used to execute programs in 32-bit WebAssembly.
+ *)
+
 open Ctypes_primitive_types
+
+module type CTYPES_PRIMITIVES = sig
+  val sizeof : 'a prim -> int
+  val alignment : 'a prim -> int
+  val pointer_size : int
+  val pointer_alignment : int
+end
+
 "
+
+let other_primitives = {|
+module Primitives_ILP32 = struct
+let char_size = 1
+let short_size = 2
+let int_size = 4
+let long_size = 4
+let llong_size = 8
+let size_t_size = 4
+let pointer_size = 4
+let pointer_alignment = 4
+let sizeof : type a. a prim -> int = function
+  | Char -> char_size
+  | Schar -> char_size
+  | Uchar -> char_size
+  | Bool -> 1
+  | Short -> short_size
+  | Int -> int_size
+  | Long -> long_size
+  | Llong -> llong_size
+  | Ushort -> short_size
+  | Sint -> int_size
+  | Uint -> int_size
+  | Ulong -> long_size
+  | Ullong -> llong_size
+  | Size_t -> size_t_size
+  | Int8_t -> 1
+  | Int16_t -> 2
+  | Int32_t -> 4
+  | Int64_t -> 8
+  | Uint8_t -> 1
+  | Uint16_t -> 2
+  | Uint32_t -> 4
+  | Uint64_t -> 8
+  | Float -> 4
+  | Double -> 8
+  | LDouble -> 16
+  | Complex32 -> 8
+  | Complex64 -> 16
+  | Complexld -> 32
+  | Nativeint -> 4
+  | Camlint -> 4
+let alignment : type a. a prim -> int = function
+  | Char -> 1
+  | Schar -> 1
+  | Uchar -> 1
+  | Bool -> 1
+  | Short -> 2
+  | Int -> 4
+  | Long -> 4
+  | Llong -> 8
+  | Ushort -> 2
+  | Sint -> 4
+  | Uint -> 4
+  | Ulong -> 4
+  | Ullong -> 8
+  | Size_t -> 4
+  | Int8_t -> 1
+  | Int16_t -> 2
+  | Int32_t -> 4
+  | Int64_t -> 8
+  | Uint8_t -> 1
+  | Uint16_t -> 2
+  | Uint32_t -> 4
+  | Uint64_t -> 8
+  | Float -> 4
+  | Double -> 8
+  | LDouble -> 16
+  | Complex32 -> 4
+  | Complex64 -> 8
+  | Complexld -> 16
+  | Nativeint -> 4
+  | Camlint -> 4
+end
+|}
+
+let select_primitives =
+  let default_primitives =
+    match Sys.getenv_opt "CTYPES_DATA_MODEL" with
+    | Some "ILP32" -> "Primitives_ILP32"
+    | Some s -> failwith ("unexpected value for CTYPE_DATA_MODEL: " ^ s)
+    | None -> "Primitives_host" in
+  Format.sprintf {|
+include
+  (val
+    (match Sys.getenv_opt "CTYPES_DATA_MODEL" with
+     | Some "ILP32" -> (module Primitives_ILP32 : CTYPES_PRIMITIVES)
+     | Some s -> failwith ("unexpected value for CTYPE_DATA_MODEL: " ^ s)
+     | None -> (module %s : CTYPES_PRIMITIVES)))
+ |}
+    default_primitives
 
 type c_format =
 | No_format
@@ -73,7 +183,7 @@ open Printf
 let generate name typ f =
   printf "let %s : type a. a prim -> %s = function\n" name typ;
   List.iter (fun c_primitive ->
-    printf " | %s -> " c_primitive.constructor;
+    printf "  | %s -> " c_primitive.constructor;
     begin try
       f c_primitive
     with Not_found ->
@@ -115,10 +225,16 @@ let () =
       |[_,C.C_define.Value.String s] -> s
       |_ -> failwith ("unable to find string definition for " ^ l) in
     print_string header;
+    print_endline "module Primitives_host = struct";
     generate "sizeof" "int" (fun { size } ->
       printf "%d" (import_int size));
     generate "alignment" "int" (fun { alignment } ->
       printf "%d" (import_int alignment));
+    printf "let pointer_size = %d\n" (import_int "sizeof(void*)");
+    printf "let pointer_alignment = %d\n" (import_int "alignof(void*)");
+    print_endline "end";
+    print_endline other_primitives;
+    print_endline select_primitives;
     generate "name" "string" (fun { typ } ->
       printf "%S" (import_string ("STRINGIFY("^typ^")")));
     generate "format_string" "string option" (fun { format } ->
@@ -129,6 +245,4 @@ let () =
         printf "Some %S" ("%"^(import_string str))
       | No_format ->
         printf "None");
-    printf "let pointer_size = %d\n" (import_int "sizeof(void*)");
-    printf "let pointer_alignment = %d\n" (import_int "alignof(void*)");
   )
