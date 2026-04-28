@@ -165,13 +165,13 @@ let primitive_format_string : type a. a Ctypes_primitive_types.prim -> string =
     | Uint64_t, Some fmt -> sprintf "Unsigned.UInt64.of_string \"%s\"" fmt
     | Camlint, Some fmt -> fmt
     | Nativeint, Some fmt -> fmt ^"n"
-    (* Integer constant expressions cannot have non-integer type *)
+    | Float, Some fmt -> fmt
+    | Double, Some fmt -> fmt
+    | LDouble, Some fmt -> sprintf "LDouble.of_string \"%s\"" fmt
+    (* Complex constant expressions are not supported yet *)
     | Complex32, _ -> fail ()
     | Complex64, _ -> fail ()
     | Complexld, _ -> fail ()
-    | Float, _ -> fail ()
-    | Double, _ -> fail ()
-    | LDouble, _ -> fail ()
 
 let rec ml_pat_and_exp_of_typ : type a. a typ -> string * string =
   fun ty -> 
