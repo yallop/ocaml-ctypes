@@ -530,7 +530,7 @@ sig
       will typically be a diagnostic from either the C compiler or the OCaml
       compiler.  For example, gcc will say
 
-         warning: overflow in implicit constant conversion *)
+        warning: overflow in implicit constant conversion *)
 
   val enum : string -> ?typedef:bool ->
     ?unexpected:(int64 -> 'a) -> ('a * int64 const) list -> 'a typ
