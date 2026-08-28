@@ -9,6 +9,7 @@
 #define TEST_FUNCTIONS_H
 
 #include <inttypes.h>
+#include <float.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdint.h>

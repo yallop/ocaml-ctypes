@@ -522,15 +522,15 @@ sig
       [name] of type [typ].  It can be used to retrieve enum constants,
       #defined values and other integer constant expressions.
 
-      The type [typ] must be either an integer type such as [bool], [char],
-      [int], [uint8], etc., or a view (or perhaps multiple views) where the
-      underlying type is an integer type.
+      The type [typ] must be either an integer-like type such as [bool],
+      [char], [int], [uint8], [double], etc., or a view (or perhaps multiple
+      views) where the underlying type is an integer-like type.
 
       When the value of the constant cannot be represented in the type there
       will typically be a diagnostic from either the C compiler or the OCaml
       compiler.  For example, gcc will say
 
-         warning: overflow in implicit constant conversion *)
+        warning: overflow in implicit constant conversion *)
 
   val enum : string -> ?typedef:bool ->
     ?unexpected:(int64 -> 'a) -> ('a * int64 const) list -> 'a typ

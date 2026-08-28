@@ -63,6 +63,10 @@ let test_retrieve_constants _ =
     assert_equal Constants._UINT32_MAX (constant "UINT32_MAX" Ctypes.uint32_t);
     assert_equal Constants._UINT64_MAX (constant "UINT64_MAX" Ctypes.uint64_t);
     assert_equal Constants._SIZE_MAX (constant "SIZE_MAX" Ctypes.size_t);
+    assert_equal Constants._FLT_MIN (constant "FLT_MIN" Ctypes.float);
+    assert_equal Constants._FLT_MAX (constant "FLT_MAX" Ctypes.float);
+    assert_equal Constants._DBL_MIN (constant "DBL_MIN" Ctypes.double);
+    assert_equal Constants._DBL_MAX (constant "DBL_MAX" Ctypes.double);
     assert_equal Constants._true true;
     assert_equal Constants._false false;
   end

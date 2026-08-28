@@ -39,6 +39,10 @@ struct
   let _UINT32_MAX = constant "UINT32_MAX" uint32_t
   let _UINT64_MAX = constant "UINT64_MAX" uint64_t
   let _SIZE_MAX = constant "SIZE_MAX" size_t
+  let _FLT_MIN = constant "FLT_MIN" float
+  let _FLT_MAX = constant "FLT_MAX" float
+  let _DBL_MIN = constant "DBL_MIN" double
+  let _DBL_MAX = constant "DBL_MAX" double
   let _true = constant "true" bool
   let _false = constant "false" bool
 
